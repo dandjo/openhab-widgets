@@ -424,7 +424,7 @@ slots:
                     action: command
                     actionCommand: =props.timerShort
                     actionItem: =props.setTimerItem
-                    active: =(items[props.setTimerItem].state <= props.timerShort)
+                    active: =(items[props.setTimerItem].state <= props.timerShort && items[props.setTimerItem].state > 0)
                     color-theme: gray
                     outline: true
                     round: true
@@ -461,4 +461,3 @@ slots:
                     small: true
                     text: =(props.timerLong + ' min')
                     title: =(props.timerLong + ' min')
-
