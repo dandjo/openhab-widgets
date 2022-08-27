@@ -1,0 +1,178 @@
+uid: netatmo-basic-card
+tags: []
+props:
+  parameters:
+    - context: item
+      description: The item for the measured indoor temperature
+      label: Indoor Temperature Item
+      name: indoorTempItem
+      required: true
+      type: TEXT
+    - context: item
+      description: The item for the measured indoor humidity
+      label: Indoor Humidity Item
+      name: indoorHumidityItem
+      required: true
+      type: TEXT
+    - context: item
+      description: The item for the measured outdoor temperature
+      label: Outdoor Temperature Item
+      name: outdoorTempItem
+      required: true
+      type: TEXT
+    - context: item
+      description: The item for the measured outdoor humidity
+      label: Outdoor Humidity Item
+      name: outdoorHumidityItem
+      required: true
+      type: TEXT
+    - context: item
+      description: The item for the CO2 sensor
+      label: CO2 Sensor
+      name: co2Item
+      required: true
+      type: TEXT
+    - context: item
+      description: The item for the noise sensor
+      label: Noise Sensor
+      name: noiseItem
+      required: true
+      type: TEXT
+    - context: item
+      description: The item for the barometric pressure
+      label: Barometric Pressure
+      name: barometricPressureItem
+      required: true
+      type: TEXT
+component: f7-card
+config:
+  noBorder: false
+  noShadow: false
+  outline: false
+  padding: true
+  style:
+    --f7-card-border-radius: 0px
+    --f7-card-box-shadow: 0px 5px 10px rgba(0,0,0,0.15)
+    --f7-card-content-padding-horizontal: 16px
+    --f7-card-content-padding-vertical: 0px
+    --f7-card-header-font-size: 14px
+    --f7-card-header-font-weight: 600
+    --f7-card-margin-horizontal: 10px
+slots:
+  content:
+    - component: f7-row
+      config:
+        class:
+          - padding-bottom
+        colorTheme: gray
+      slots:
+        default:
+          - component: f7-col
+            slots:
+              default:
+                - component: oh-label-card
+                  config:
+                    footer: Indoor
+                    action: analyzer
+                    actionAnalyzerItems: =[props.indoorTempItem]
+                    icon: oh:temperature
+                    iconUseState: true
+                    item: =props.indoorTempItem
+                    trendItem: =props.indoorTempItem
+                    vertical: true
+          - component: f7-col
+            slots:
+              default:
+                - component: oh-label-card
+                  config:
+                    footer: Indoor
+                    action: analyzer
+                    actionAnalyzerItems: =[props.indoorHumidityItem]
+                    icon: oh:humidity
+                    iconUseState: true
+                    item: =props.indoorHumidityItem
+                    trendItem: =props.indoorHumidityItem
+                    vertical: true
+    - component: f7-row
+      config:
+        class:
+          - padding-bottom
+        colorTheme: gray
+      slots:
+        default:
+          - component: f7-col
+            slots:
+              default:
+                - component: oh-label-card
+                  config:
+                    footer: Outdoor
+                    action: analyzer
+                    actionAnalyzerItems: =[props.outdoorTempItem]
+                    icon: oh:temperature
+                    iconUseState: true
+                    item: =props.outdoorTempItem
+                    trendItem: =props.outdoorTempItem
+                    vertical: true
+          - component: f7-col
+            slots:
+              default:
+                - component: oh-label-card
+                  config:
+                    footer: Outdoor
+                    action: analyzer
+                    actionAnalyzerItems: =[props.outdoorHumidityItem]
+                    icon: oh:humidity
+                    iconUseState: true
+                    item: =props.outdoorHumidityItem
+                    trendItem: =props.outdoorHumidityItem
+                    vertical: true
+    - component: f7-row
+      config:
+        class:
+          - padding-bottom
+        colorTheme: gray
+      slots:
+        default:
+          - component: f7-col
+            slots:
+              default:
+                - component: oh-label-card
+                  config:
+                    action: analyzer
+                    actionAnalyzerItems: =[props.co2Item]
+                    icon: oh:carbondioxide
+                    iconUseState: true
+                    item: =props.co2Item
+                    trendItem: =props.co2Item
+                    vertical: true
+          - component: f7-col
+            slots:
+              default:
+                - component: oh-label-card
+                  config:
+                    action: analyzer
+                    actionAnalyzerItems: =[props.noiseItem]
+                    icon: oh:soundvolume
+                    iconUseState: true
+                    item: =props.noiseItem
+                    trendItem: =props.noiseItem
+                    vertical: true
+    - component: f7-row
+      config:
+        class:
+          - padding-bottom
+        colorTheme: gray
+      slots:
+        default:
+          - component: f7-col
+            slots:
+              default:
+                - component: oh-label-card
+                  config:
+                    action: analyzer
+                    actionAnalyzerItems: =[props.barometricPressureItem]
+                    icon: oh:pressure
+                    iconUseState: true
+                    item: =props.barometricPressureItem
+                    trendItem: =props.barometricPressureItem
+

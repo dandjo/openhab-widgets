@@ -1,0 +1,464 @@
+uid: tado-ac-control
+tags: []
+props:
+  parameters:
+    - context: item
+      description: The item for the measured temperature
+      label: Temperature Item
+      name: tempItem
+      required: true
+      type: TEXT
+    - context: item
+      description: The item for the measured humidity
+      label: Humidity Item
+      name: humidityItem
+      required: true
+      type: TEXT
+    - context: item
+      description: The item for the HVAC modes
+      label: HVAC Mode Item
+      name: setHvacItem
+      required: true
+      type: TEXT
+    - context: item
+      description: The item for the target temperature
+      label: Target Temperature Item
+      name: setTargetTempItem
+      required: true
+      type: TEXT
+    - context: command
+      description: Low Preset
+      label: Cold
+      name: tempCold
+      required: true
+      type: INTEGER
+    - context: command
+      description: Normal Preset
+      label: Normal
+      name: tempNormal
+      required: true
+      type: INTEGER
+    - context: command
+      description: High Preset
+      label: Warm
+      name: tempWarm
+      required: true
+      type: INTEGER
+    - context: command
+      description: Temperature Minimum
+      label: Temp Min
+      name: tempMin
+      required: false
+      type: INTEGER
+    - context: command
+      description: Temperature Maximum
+      label: Temp Max
+      name: tempMax
+      required: false
+      type: INTEGER
+    - context: item
+      description: The item for the fan speed
+      label: Fan Speed Item
+      name: setFanSpeedItem
+      required: true
+      type: TEXT
+    - context: item
+      description: The item for the timer
+      label: Timer Item
+      name: setTimerItem
+      required: true
+      type: TEXT
+    - context: command
+      description: Minutes for a short timer
+      label: Short Timer (minutes)
+      name: timerShort
+      required: false
+      type: INTEGER
+    - context: command
+      description: Minutes for a typical timer
+      label: Normal Timer (minutes)
+      name: timerNormal
+      required: false
+      type: INTEGER
+    - context: command
+      description: Minutes for a long timer
+      label: Long Timer (minutes)
+      name: timerLong
+      required: false
+      type: INTEGER
+    - context: command
+      description: Timer minimum
+      label: Timer Min
+      name: timerMin
+      required: false
+      type: INTEGER
+    - context: command
+      description: Timer maximum
+      label: Timer Max
+      name: timerMax
+      required: false
+      type: INTEGER
+    - context: command
+      description: Timer step
+      label: Timer Step
+      name: timerStep
+      required: false
+      type: INTEGER
+component: f7-card
+config:
+  noBorder: false
+  noShadow: false
+  outline: false
+  padding: true
+  style:
+    --f7-card-border-radius: 0px
+    --f7-card-box-shadow: 0px 5px 10px rgba(0,0,0,0.15)
+    --f7-card-content-padding-horizontal: 16px
+    --f7-card-content-padding-vertical: 0px
+    --f7-card-header-font-size: 14px
+    --f7-card-header-font-weight: 600
+    --f7-card-margin-horizontal: 10px
+slots:
+  content:
+    - component: f7-row
+      config:
+        class:
+          - padding-bottom
+        colorTheme: gray
+      slots:
+        default:
+          - component: f7-col
+            slots:
+              default:
+                - component: oh-label-card
+                  config:
+                    action: analyzer
+                    actionAnalyzerItems: =[props.tempItem]
+                    icon: oh:temperature
+                    iconUseState: true
+                    item: =props.tempItem
+                    trendItem: =props.tempItem
+                    vertical: true
+          - component: f7-col
+            slots:
+              default:
+                - component: oh-label-card
+                  config:
+                    action: analyzer
+                    actionAnalyzerItems: =[props.humidityItem]
+                    icon: oh:humidity
+                    iconUseState: true
+                    item: =props.humidityItem
+                    trendItem: =props.humidityItem
+                    vertical: true
+    - component: f7-row
+      config:
+        class:
+          - padding-bottom
+        colorTheme: gray
+      slots:
+        default:
+          - component: f7-col
+            slots:
+              default:
+                - component: oh-button
+                  config:
+                    action: command
+                    actionCommand: OFF
+                    actionItem: =props.setHvacItem
+                    active: =(items[props.setHvacItem].state == 'OFF')
+                    color-theme: gray
+                    outline: true
+                    round: true
+                    small: true
+                    text: Off
+                    title: Off
+          - component: f7-col
+            slots:
+              default:
+                - component: oh-button
+                  config:
+                    action: command
+                    actionCommand: AUTO
+                    actionItem: =props.setHvacItem
+                    active: =(items[props.setHvacItem].state == 'AUTO')
+                    color-theme: gray
+                    outline: true
+                    round: true
+                    small: true
+                    text: Auto
+                    title: Auto
+          - component: f7-col
+            slots:
+              default:
+                - component: oh-button
+                  config:
+                    action: command
+                    actionCommand: FAN
+                    actionItem: =props.setHvacItem
+                    active: =(items[props.setHvacItem].state == 'FAN')
+                    color-theme: gray
+                    outline: true
+                    round: true
+                    small: true
+                    text: Fan
+                    title: Fan
+    - component: f7-row
+      config:
+        class:
+          - padding-bottom
+        colorTheme: gray
+      slots:
+        default:
+          - component: f7-col
+            slots:
+              default:
+                - component: oh-button
+                  config:
+                    action: command
+                    actionCommand: COOL
+                    actionItem: =props.setHvacItem
+                    active: =(items[props.setHvacItem].state == 'COOL')
+                    color-theme: gray
+                    outline: true
+                    round: true
+                    small: true
+                    text: Cool
+                    title: Cool
+          - component: f7-col
+            slots:
+              default:
+                - component: oh-button
+                  config:
+                    action: command
+                    actionCommand: HEAT
+                    actionItem: =props.setHvacItem
+                    active: =(items[props.setHvacItem].state == 'HEAT')
+                    color-theme: gray
+                    outline: true
+                    round: true
+                    small: true
+                    text: Heat
+                    title: Heat
+          - component: f7-col
+            slots:
+              default:
+                - component: oh-button
+                  config:
+                    action: command
+                    actionCommand: DRY
+                    actionItem: =props.setHvacItem
+                    active: =(items[props.setHvacItem].state == 'DRY')
+                    color-theme: gray
+                    outline: true
+                    round: true
+                    small: true
+                    text: Dry
+                    title: Dry
+    - component: oh-stepper-card
+      config:
+        autorepeat: true
+        color-theme: gray
+        fill: true
+        item: =props.setTargetTempItem
+        large: false
+        max: =props.tempMax
+        min: =props.tempMin
+        noBorder: true
+        noShadow: true
+        raised: true
+        round: true
+        small: false
+        step: 1
+    - component: f7-row
+      config:
+        class:
+          - padding-bottom
+      slots:
+        default:
+          - component: f7-col
+            slots:
+              default:
+                - component: oh-button
+                  config:
+                    action: command
+                    actionCommand: =props.tempCold
+                    actionItem: =props.setTargetTempItem
+                    active: =(items[props.setTargetTempItem].state.split(' ')[0] == props.tempCold)
+                    color-theme: blue
+                    iconF7: thermometer_snowflake
+                    iconSize: 14
+                    outline: true
+                    round: true
+                    small: true
+                    text: Cold
+                    title: Cold
+          - component: f7-col
+            slots:
+              default:
+                - component: oh-button
+                  config:
+                    action: command
+                    actionCommand: =props.tempNormal
+                    actionItem: =props.setTargetTempItem
+                    active: =(items[props.setTargetTempItem].state.split(' ')[0] == props.tempNormal)
+                    color-theme: green
+                    iconF7: thermometer
+                    iconSize: 14
+                    outline: true
+                    round: true
+                    small: true
+                    text: Ok
+                    title: Normal
+          - component: f7-col
+            slots:
+              default:
+                - component: oh-button
+                  config:
+                    action: command
+                    actionCommand: =props.tempWarm
+                    actionItem: =props.setTargetTempItem
+                    active: =(items[props.setTargetTempItem].state.split(' ')[0] == props.tempWarm)
+                    color-theme: red
+                    iconF7: thermometer_sun
+                    iconSize: 14
+                    outline: true
+                    round: true
+                    small: true
+                    text: Warm
+                    title: Warm
+    - component: f7-row
+      config:
+        class:
+          - padding-bottom
+        colorTheme: gray
+      slots:
+        default:
+          - component: f7-col
+            slots:
+              default:
+                - component: oh-button
+                  config:
+                    action: command
+                    actionCommand: AUTO
+                    actionItem: =props.setFanSpeedItem
+                    active: =(items[props.setFanSpeedItem].state == 'AUTO')
+                    color-theme: gray
+                    outline: true
+                    round: true
+                    small: true
+                    text: Auto
+                    title: Auto
+          - component: f7-col
+            slots:
+              default:
+                - component: oh-button
+                  config:
+                    action: command
+                    actionCommand: LOW
+                    actionItem: =props.setFanSpeedItem
+                    active: =(items[props.setFanSpeedItem].state == 'LOW')
+                    color-theme: gray
+                    outline: true
+                    round: true
+                    small: true
+                    text: Low
+                    title: Low
+          - component: f7-col
+            slots:
+              default:
+                - component: oh-button
+                  config:
+                    action: command
+                    actionCommand: MIDDLE
+                    actionItem: =props.setFanSpeedItem
+                    active: =(items[props.setFanSpeedItem].state == 'MIDDLE')
+                    color-theme: gray
+                    outline: true
+                    round: true
+                    small: true
+                    text: Mid
+                    title: Middle
+          - component: f7-col
+            slots:
+              default:
+                - component: oh-button
+                  config:
+                    action: command
+                    actionCommand: HIGH
+                    actionItem: =props.setFanSpeedItem
+                    active: =(items[props.setFanSpeedItem].state == 'HIGH')
+                    color-theme: gray
+                    outline: true
+                    round: true
+                    small: true
+                    text: High
+                    title: High
+    - component: oh-stepper-card
+      config:
+        autorepeat: true
+        color-theme: gray
+        fill: true
+        item: =props.setTimerItem
+        large: false
+        max: =props.timerMax
+        min: =props.timerMin
+        noBorder: true
+        noShadow: true
+        raised: true
+        round: true
+        small: false
+        step: =props.timerStep
+    - component: f7-row
+      config:
+        class:
+          - padding-bottom
+        colorTheme: gray
+      slots:
+        default:
+          - component: f7-col
+            slots:
+              default:
+                - component: oh-button
+                  config:
+                    action: command
+                    actionCommand: =props.timerShort
+                    actionItem: =props.setTimerItem
+                    active: =(items[props.setTimerItem].state <= props.timerShort)
+                    color-theme: gray
+                    outline: true
+                    round: true
+                    small: true
+                    text: =(props.timerShort + ' min')
+                    title: =(props.timerShort + ' min')
+          - component: f7-col
+            slots:
+              default:
+                - component: oh-button
+                  config:
+                    action: command
+                    actionCommand: =props.timerNormal
+                    actionItem: =props.setTimerItem
+                    active: =(items[props.setTimerItem].state <= props.timerNormal && items[props.setTimerItem].state > props.timerShort)
+                    color-theme: gray
+                    outline: true
+                    round: true
+                    small: true
+                    text: =(props.timerNormal + ' min')
+                    title: =(props.timerNormal + ' min')
+          - component: f7-col
+            slots:
+              default:
+                - component: oh-button
+                  config:
+                    action: command
+                    actionCommand: =props.timerLong
+                    actionItem: =props.setTimerItem
+                    active: =(items[props.setTimerItem].state > props.timerNormal)
+                    color-theme: gray
+                    outline: true
+                    round: true
+                    small: true
+                    text: =(props.timerLong + ' min')
+                    title: =(props.timerLong + ' min')
+
