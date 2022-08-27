@@ -3,18 +3,6 @@ tags: []
 props:
   parameters:
     - context: item
-      description: The item for the measured temperature
-      label: Temperature Item
-      name: tempItem
-      required: true
-      type: TEXT
-    - context: item
-      description: The item for the measured humidity
-      label: Humidity Item
-      name: humidityItem
-      required: true
-      type: TEXT
-    - context: item
       description: The item for the HVAC modes
       label: HVAC Mode Item
       name: setHvacItem
@@ -93,51 +81,15 @@ config:
   outline: false
   padding: true
   style:
-    --f7-card-border-radius: 0px
-    --f7-card-box-shadow: 0px 5px 10px rgba(0,0,0,0.15)
-    --f7-card-content-padding-horizontal: 16px
-    --f7-card-content-padding-vertical: 0px
-    --f7-card-header-font-size: 14px
-    --f7-card-header-font-weight: 600
-    --f7-card-margin-horizontal: 10px
+    --f7-card-content-padding-horizontal: 14px
+    --f7-card-content-padding-vertical: 4px
 slots:
   content:
     - component: f7-row
       config:
         class:
+          - padding-top
           - padding-bottom
-        colorTheme: gray
-      slots:
-        default:
-          - component: f7-col
-            slots:
-              default:
-                - component: oh-label-card
-                  config:
-                    action: analyzer
-                    actionAnalyzerItems: =[props.tempItem]
-                    icon: oh:temperature
-                    iconUseState: true
-                    item: =props.tempItem
-                    trendItem: =props.tempItem
-                    vertical: true
-          - component: f7-col
-            slots:
-              default:
-                - component: oh-label-card
-                  config:
-                    action: analyzer
-                    actionAnalyzerItems: =[props.humidityItem]
-                    icon: oh:humidity
-                    iconUseState: true
-                    item: =props.humidityItem
-                    trendItem: =props.humidityItem
-                    vertical: true
-    - component: f7-row
-      config:
-        class:
-          - padding-bottom
-        colorTheme: gray
       slots:
         default:
           - component: f7-col
@@ -186,10 +138,6 @@ slots:
                     text: Fan
                     title: Fan
     - component: f7-row
-      config:
-        class:
-          - padding-bottom
-        colorTheme: gray
       slots:
         default:
           - component: f7-col
@@ -310,10 +258,6 @@ slots:
                     text: Warm
                     title: Warm
     - component: f7-row
-      config:
-        class:
-          - padding-bottom
-        colorTheme: gray
       slots:
         default:
           - component: f7-col
@@ -380,6 +324,7 @@ slots:
       config:
         autorepeat: true
         autorepeatDynamic: true
+        max: 1440
         color-theme: gray
         fill: true
         item: =props.setTimerItem
@@ -394,7 +339,6 @@ slots:
       config:
         class:
           - padding-bottom
-        colorTheme: gray
       slots:
         default:
           - component: f7-col
@@ -407,6 +351,8 @@ slots:
                     actionItem: =props.setTimerItem
                     active: =(items[props.setTimerItem].state <= props.timerShort && items[props.setTimerItem].state > 0)
                     color-theme: gray
+                    iconF7: timer
+                    iconSize: 14
                     outline: true
                     round: true
                     small: true
@@ -422,6 +368,8 @@ slots:
                     actionItem: =props.setTimerItem
                     active: =(items[props.setTimerItem].state <= props.timerNormal && items[props.setTimerItem].state > props.timerShort)
                     color-theme: gray
+                    iconF7: timer
+                    iconSize: 14
                     outline: true
                     round: true
                     small: true
@@ -437,8 +385,10 @@ slots:
                     actionItem: =props.setTimerItem
                     active: =(items[props.setTimerItem].state > props.timerNormal)
                     color-theme: gray
+                    iconF7: timer
+                    iconSize: 14
                     outline: true
                     round: true
                     small: true
                     text: =(props.timerLong + ' min')
-                    title: =(props.timerLong + ' min')
+                    title: =('rops.timerLong + ' min')
