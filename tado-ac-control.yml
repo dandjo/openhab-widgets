@@ -87,18 +87,6 @@ props:
       required: false
       type: INTEGER
     - context: command
-      description: Timer minimum
-      label: Timer Min
-      name: timerMin
-      required: false
-      type: INTEGER
-    - context: command
-      description: Timer maximum
-      label: Timer Max
-      name: timerMax
-      required: false
-      type: INTEGER
-    - context: command
       description: Timer step
       label: Timer Step
       name: timerStep
@@ -397,12 +385,12 @@ slots:
     - component: oh-stepper-card
       config:
         autorepeat: true
+        autorepeatDynamic: true
         color-theme: gray
         fill: true
         item: =props.setTimerItem
+        min: 0
         large: false
-        max: =props.timerMax
-        min: =props.timerMin
         noBorder: true
         noShadow: true
         raised: true
