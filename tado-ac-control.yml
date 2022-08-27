@@ -86,12 +86,6 @@ props:
       name: timerLong
       required: false
       type: INTEGER
-    - context: command
-      description: Timer step
-      label: Timer Step
-      name: timerStep
-      required: false
-      type: INTEGER
 component: f7-card
 config:
   noBorder: false
@@ -389,14 +383,13 @@ slots:
         color-theme: gray
         fill: true
         item: =props.setTimerItem
-        min: 0
         large: false
         noBorder: true
         noShadow: true
         raised: true
         round: true
         small: false
-        step: =props.timerStep
+        step: 1
     - component: f7-row
       config:
         class:
