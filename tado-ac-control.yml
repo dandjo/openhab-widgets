@@ -324,17 +324,18 @@ slots:
       config:
         autorepeat: true
         autorepeatDynamic: true
-        max: 1440
         color-theme: gray
         fill: true
         item: =props.setTimerItem
         large: false
+        min: 0
+        max: 1440
         noBorder: true
         noShadow: true
         raised: true
         round: true
         small: false
-        step: 1
+        step: 5
     - component: f7-row
       config:
         class:
