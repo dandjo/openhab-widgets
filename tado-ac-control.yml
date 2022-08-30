@@ -328,14 +328,13 @@ slots:
         fill: true
         item: =props.setTimerItem
         large: false
-        min: 0
         max: 1440
         noBorder: true
         noShadow: true
         raised: true
         round: true
         small: false
-        step: 5
+        step: 1
     - component: f7-row
       config:
         class:
