@@ -1,0 +1,316 @@
+uid: energy-summary
+tags: []
+props:
+  parameters:
+    - context: item
+      description: The item for grid consumption
+      label: Grid Consumption
+      name: grid_consumption
+      required: false
+    - context: item
+      description: The item for grid surplus
+      label: Grid Surplus
+      name: grid_surplus
+      required: false
+      type: TEXT
+    - context: item
+      description: The item for pv production
+      label: PV Production
+      name: pv_production
+      required: false
+      type: TEXT
+    - context: item
+      description: The item for own pv consumption
+      label: PV Own Consumption
+      name: pv_own_consumption
+      required: false
+      type: TEXT
+    - context: item
+      description: The item for home consumption
+      label: Home Consumption
+      name: home_consumption
+      required: false
+      type: TEXT
+  parameterGroups: []
+component: f7-card
+config:
+  title: Energy Summary
+slots:
+  content:
+    - component: f7-block
+      config:
+        style:
+          margin: 0
+          padding: 0
+      slots:
+        default:
+          - component: f7-block
+            config:
+              style:
+                margin: 0
+                padding: 0
+                display: flex
+                justify-content: space-between
+                --f7-theme-color: var(--f7-text-color)
+                --f7-block-font-size: 12px
+            slots:
+              default:
+                - component: f7-col
+                  config:
+                    style:
+                      display: flex
+                      flex-direction: column
+                      justify-content: bottom
+                      align-items: center
+                  slots:
+                    default:
+                      - component: f7-block
+                        config:
+                          style:
+                            margin-top: 140px
+                            padding-top: 10px
+                            height: 100px
+                            width: 100px
+                            border: 2px solid teal
+                            border-radius: 50px
+                            display: flex
+                            align-items: center
+                            flex-direction: column
+                        slots:
+                          default:
+                            - component: oh-icon
+                              config:
+                                icon: if:mdi:transmission-tower
+                                height: 25px
+                                color: teal
+                            - component: oh-link
+                              config:
+                                text: =@props.grid_surplus
+                                iconF7: arrow_left
+                                iconSize: 12px
+                                iconColor: purple
+                                style:
+                                  font-size: 12px
+                                  white-space: nowrap
+                                action: analyzer
+                                actionAnalyzerItems:
+                                  - =props.grid_surplus
+                            - component: oh-link
+                              config:
+                                text: =@props.grid_consumption
+                                iconF7: arrow_right
+                                iconSize: 12px
+                                iconColor: grey
+                                style:
+                                  font-size: 12px
+                                  white-space: nowrap
+                                action: analyzer
+                                actionAnalyzerItems:
+                                  - =props.grid_consumption
+                      - component: Label
+                        config:
+                          text: Grid
+                - component: f7-col
+                  config:
+                    style:
+                      flex-grow: 1
+                      display: flex
+                      flex-direction: column
+                      align-items: center
+                  slots:
+                    default:
+                      - component: Label
+                        config:
+                          text: PV
+                      - component: f7-block
+                        config:
+                          style:
+                            padding-top: 20px
+                            height: 100px
+                            width: 100px
+                            border: 2px solid orange
+                            border-radius: 50px
+                            display: flex
+                            align-items: center
+                            flex-direction: column
+                        slots:
+                          default:
+                            - component: oh-icon
+                              config:
+                                icon: if:mdi:solar-power
+                                height: 25px
+                                color: orange
+                            - component: oh-link
+                              config:
+                                text: =@props.pv_production
+                                style:
+                                  font-size: 12px
+                                action: analyzer
+                                actionAnalyzerItems:
+                                  - =props.pv_production
+                      - component: f7-block
+                        config:
+                          style:
+                            margin: 0
+                            padding: 0
+                            width: 100%
+                            display: flex
+                            height: 125px
+                            justify-content: center
+                        slots:
+                          default:
+                            - component: f7-row
+                              config:
+                                tag: svg
+                                xmlns: http://www.w3.org/2000/svg
+                                viewBox: 0 0 100 100
+                                preserveAspectRatio: xMidYMid slice
+                                style:
+                                  height: auto
+                              slots:
+                                default:
+                                  - component: f7-row
+                                    config:
+                                      tag: path
+                                      id: path1
+                                      d: m 52,0 v 15 c 0,35 9.4,35 28.2,35 H 100
+                                      stroke: orange
+                                      stroke-width: 1
+                                      vector-effect: non-scaling-stroke
+                                      fill: none
+                                  - component: f7-row
+                                    config:
+                                      tag: circle
+                                      r: 1
+                                      vector-effect: non-scaling-stroke
+                                      fill: orange
+                                      style:
+                                        stroke-width: 4
+                                    slots:
+                                      default:
+                                        - component: f7-row
+                                          config:
+                                            tag: animateMotion
+                                            repeatCount: indefinite
+                                            calcMode: linear
+                                            dur: 5s
+                                          slots:
+                                            default:
+                                              - component: f7-row
+                                                config:
+                                                  tag: mpath
+                                                  xlink:href: "#path1"
+                                  - component: f7-row
+                                    config:
+                                      tag: path
+                                      id: path2
+                                      d: m 48,0 v 15 c 0,35 -9.4,35 -28.2,35 H 0
+                                      stroke: purple
+                                      stroke-width: 1
+                                      vector-effect: non-scaling-stroke
+                                      fill: none
+                                  - component: f7-row
+                                    config:
+                                      tag: circle
+                                      r: 1
+                                      vectorEffect: non-scaling-stroke
+                                      strokeWidth: 10
+                                      fill: purple
+                                    slots:
+                                      default:
+                                        - component: f7-row
+                                          config:
+                                            tag: animateMotion
+                                            repeatCount: indefinite
+                                            calcMode: linear
+                                            dur: 3s
+                                          slots:
+                                            default:
+                                              - component: f7-row
+                                                config:
+                                                  tag: mpath
+                                                  xlink:href: "#path2"
+                                  - component: f7-row
+                                    config:
+                                      tag: path
+                                      id: path3
+                                      d: M0,55 H100
+                                      stroke: teal
+                                      stroke-width: 1
+                                      vector-effect: non-scaling-stroke
+                                      fill: none
+                                  - component: f7-row
+                                    config:
+                                      tag: circle
+                                      r: 1
+                                      vectorEffect: non-scaling-stroke
+                                      strokeWidth: 10
+                                      fill: teal
+                                    slots:
+                                      default:
+                                        - component: f7-row
+                                          config:
+                                            tag: animateMotion
+                                            repeatCount: indefinite
+                                            calcMode: linear
+                                            dur: 3s
+                                          slots:
+                                            default:
+                                              - component: f7-row
+                                                config:
+                                                  tag: mpath
+                                                  xlink:href: "#path3"
+                - component: f7-col
+                  config:
+                    style:
+                      display: flex
+                      flex-direction: column
+                      align-items: center
+                  slots:
+                    default:
+                      - component: f7-block
+                        config:
+                          style:
+                            margin-top: 140px
+                            padding-top: 10px
+                            height: 100px
+                            width: 100px
+                            border: 2px solid gray
+                            border-radius: 50px
+                            display: flex
+                            align-items: center
+                            flex-direction: column
+                        slots:
+                          default:
+                            - component: oh-icon
+                              config:
+                                icon: if:mdi:home
+                                height: 25px
+                                color: grey
+                            - component: oh-link
+                              config:
+                                text: =@props.pv_own_consumption
+                                iconF7: arrow_right
+                                iconSize: 12px
+                                iconColor: yellow
+                                style:
+                                  font-size: 12px
+                                  white-space: nowrap
+                                action: analyzer
+                                actionAnalyzerItems:
+                                  - =props.pv_own_consumption
+                            - component: oh-link
+                              config:
+                                text: =@props.home_consumption
+                                iconF7: arrow_right
+                                iconSize: 12px
+                                iconColor: grey
+                                style:
+                                  font-size: 12px
+                                  white-space: nowrap
+                                action: analyzer
+                                actionAnalyzerItems:
+                                  - =props.home_consumption
+                      - component: Label
+                        config:
+                          text: Home
