@@ -7,6 +7,7 @@ props:
       label: Grid Consumption
       name: grid_consumption
       required: false
+      type: TEXT
     - context: item
       description: The item for grid surplus
       label: Grid Surplus
