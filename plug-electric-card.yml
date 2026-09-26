@@ -16,7 +16,7 @@ props:
     required: false
     default: Elektrisch
   parameterGroups: []
-timestamp: Sep 26, 2026, 4:41:07 AM
+timestamp: Sep 26, 2026, 5:08:08 AM
 component: oh-card
 config:
   title: =props.title
@@ -62,13 +62,18 @@ slots:
                 text-overflow: ellipsis
           - component: oh-link
             config:
-              action: analyzer
+              action: popup
               style:
                 position: absolute
                 inset: '0'
                 display: block
                 border-radius: 12px
-              actionAnalyzerItems: =[props.prefix + '_voltage']
+              actionModal: widget:item-popup
+              actionModalConfig:
+                item: =props.prefix + '_voltage'
+                title: Spannung
+                color: '#5c6bc0'
+                kind: number
       - component: div
         config:
           style:
@@ -98,13 +103,18 @@ slots:
                 text-overflow: ellipsis
           - component: oh-link
             config:
-              action: analyzer
+              action: popup
               style:
                 position: absolute
                 inset: '0'
                 display: block
                 border-radius: 12px
-              actionAnalyzerItems: =[props.prefix + '_current']
+              actionModal: widget:item-popup
+              actionModalConfig:
+                item: =props.prefix + '_current'
+                title: Strom
+                color: '#5c6bc0'
+                kind: number
       - component: div
         config:
           style:
@@ -134,13 +144,18 @@ slots:
                 text-overflow: ellipsis
           - component: oh-link
             config:
-              action: analyzer
+              action: popup
               style:
                 position: absolute
                 inset: '0'
                 display: block
                 border-radius: 12px
-              actionAnalyzerItems: =[props.prefix + '_power_factor']
+              actionModal: widget:item-popup
+              actionModalConfig:
+                item: =props.prefix + '_power_factor'
+                title: Leistungsfaktor
+                color: '#5c6bc0'
+                kind: number
       - component: div
         config:
           style:
@@ -170,13 +185,18 @@ slots:
                 text-overflow: ellipsis
           - component: oh-link
             config:
-              action: analyzer
+              action: popup
               style:
                 position: absolute
                 inset: '0'
                 display: block
                 border-radius: 12px
-              actionAnalyzerItems: =[props.prefix + '_apparent_power']
+              actionModal: widget:item-popup
+              actionModalConfig:
+                item: =props.prefix + '_apparent_power'
+                title: Scheinleistung
+                color: '#5c6bc0'
+                kind: number
       - component: div
         config:
           style:
@@ -206,10 +226,15 @@ slots:
                 text-overflow: ellipsis
           - component: oh-link
             config:
-              action: analyzer
+              action: popup
               style:
                 position: absolute
                 inset: '0'
                 display: block
                 border-radius: 12px
-              actionAnalyzerItems: =[props.prefix + '_reactive_power']
+              actionModal: widget:item-popup
+              actionModalConfig:
+                item: =props.prefix + '_reactive_power'
+                title: Blindleistung
+                color: '#5c6bc0'
+                kind: number
