@@ -16,7 +16,7 @@ props:
     required: false
     default: '#8d6e63'
   parameterGroups: []
-timestamp: Sep 26, 2026, 4:41:07 AM
+timestamp: Sep 26, 2026, 5:08:08 AM
 component: oh-card
 config:
   title: Energie pro Tag

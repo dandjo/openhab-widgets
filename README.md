@@ -1,7 +1,7 @@
 # openHAB Widgets
 
 MainUI widgets from my openHAB 5 installation: the cards of an energy and home dashboard, and a set of cards for every
-metered plug. The UI texts are German, numbers use a decimal comma. No widget names an item: every item comes in as a
+metered plug, and a popup for any item. The UI texts are German, numbers use a decimal comma. No widget names an item: every item comes in as a
 prop, so the widgets work with any item names.
 
 ![Overview](screenshots/overview-light.png)
@@ -76,6 +76,32 @@ Voltage, current, power factor, apparent and reactive power.
 |---|---|---|---|
 | `prefix` | Name prefix of the plug's items: `<prefix>_power`, _switch, _energy_today, _energy_total, _voltage, _current, _power_factor, _apparent_power, _reactive_power | TEXT |  |
 | `title` | Card title | TEXT | `Elektrisch` |
+
+## Item popup: `item-popup`
+
+The popup every tile of my device pages opens, in place of the analyzer: the item's value large and its course over
+the day with arrows for earlier days, as a line for measurements or as a band of states for switches, texts and
+numbers with state options (labelled from the `states` prop), or the value alone for dates. Open it from any link
+with `action: popup`, `actionModal: widget:item-popup` and its props in `actionModalConfig`:
+
+```yaml
+action: popup
+actionModal: widget:item-popup
+actionModalConfig:
+  item: coffee_machine_energy_today
+  title: Energie heute
+  kind: number
+```
+
+![Item popup](screenshots/item-popup.png)
+
+| Prop | Description | Type | Default |
+|---|---|---|---|
+| `item` | The item to show | Item |  |
+| `title` | Title of the popup, the tile's | TEXT |  |
+| `color` | Colour of the course as #rrggbb | TEXT | `#5c6bc0` |
+| `kind` | number: its course as a line; state: a band of its states; none: only the value | TEXT | `number` |
+| `states` | value=label pairs, comma-separated, for the band of states | TEXT |  |
 
 ## Dashboard cards
 

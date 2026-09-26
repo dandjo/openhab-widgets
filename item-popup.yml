@@ -1,0 +1,187 @@
+uid: item-popup
+tags:
+- popup
+props:
+  parameters:
+  - name: item
+    label: Item
+    description: The item to show
+    type: TEXT
+    required: true
+    context: item
+  - name: title
+    label: Title
+    description: Title of the popup, the tile's
+    type: TEXT
+    required: false
+  - name: color
+    label: Colour
+    description: 'Colour of the course as #rrggbb'
+    type: TEXT
+    required: false
+    default: '#5c6bc0'
+  - name: kind
+    label: Kind
+    description: 'number: its course as a line; state: a band of its states; none: only the value'
+    type: TEXT
+    required: false
+    default: number
+  - name: states
+    label: State labels
+    description: value=label pairs, comma-separated, for the band of states
+    type: TEXT
+    required: false
+  parameterGroups: []
+timestamp: Sep 26, 2026, 5:08:08 AM
+component: div
+config:
+  style:
+    padding: 8px 6px
+  stylesheet: '.menu-item-dropdown:not(.menu-item-dropdown-opened) .menu-dropdown { display: none; }'
+slots:
+  default:
+  - component: oh-card
+    config:
+      title: =props.title
+      style:
+        height: calc(100% - 2 * var(--f7-card-margin-vertical))
+    slots:
+      content:
+      - component: Label
+        config:
+          text: '=(([''NULL'', ''UNDEF''].includes(items[props.item].state) ? ''–'' : (items[props.item].displayState || items[props.item].state))
+            || ''–'')'
+          style:
+            font-size: 30px
+            font-weight: '700'
+            line-height: 36px
+            overflow-wrap: anywhere
+            padding: 4px 16px 18px
+  - component: oh-card
+    config:
+      title: Verlauf
+      style:
+        height: calc(100% - 2 * var(--f7-card-margin-vertical))
+      visible: =!props.kind || props.kind === 'number'
+    slots:
+      content:
+      - component: oh-chart
+        config:
+          chartType: ''
+          periodVisible: true
+          period: D
+          height: 260px
+        slots:
+          grid:
+          - component: oh-chart-grid
+            config:
+              top: '62'
+              bottom: '35'
+              left: '50'
+              right: '20'
+          xAxis:
+          - component: oh-time-axis
+            config:
+              gridIndex: 0
+          yAxis:
+          - component: oh-value-axis
+            config:
+              gridIndex: 0
+              name: ''
+              nameGap: 14
+              nameTextStyle:
+                align: right
+                padding:
+                - 0
+                - 8
+                - 0
+                - 0
+              splitLine:
+                lineStyle:
+                  type: dashed
+                  opacity: 0.4
+          series:
+          - component: oh-time-series
+            config:
+              name: =props.title
+              gridIndex: 0
+              xAxisIndex: 0
+              yAxisIndex: 0
+              type: line
+              item: =props.item
+              symbol: none
+              sampling: lttb
+              lineStyle:
+                width: 1.5
+                color: =props.color
+              itemStyle:
+                color: =props.color
+              areaStyle:
+                color:
+                  type: linear
+                  x: 0
+                  y: 0
+                  x2: 0
+                  y2: 1
+                  colorStops:
+                  - offset: 0
+                    color: ='rgba(' + Number.parseInt(props.color.slice(1, 3), 16) + ', ' + Number.parseInt(props.color.slice(3,
+                      5), 16) + ', ' + Number.parseInt(props.color.slice(5, 7), 16) + ', 0.45)'
+                  - offset: 1
+                    color: ='rgba(' + Number.parseInt(props.color.slice(1, 3), 16) + ', ' + Number.parseInt(props.color.slice(3,
+                      5), 16) + ', ' + Number.parseInt(props.color.slice(5, 7), 16) + ', 0.02)'
+          tooltip:
+          - component: oh-chart-tooltip
+            config:
+              show: true
+              confine: true
+              trigger: axis
+              smartFormatter: true
+  - component: oh-card
+    config:
+      title: Verlauf
+      style:
+        height: calc(100% - 2 * var(--f7-card-margin-vertical))
+      visible: =props.kind === 'state'
+    slots:
+      content:
+      - component: oh-chart
+        config:
+          chartType: ''
+          periodVisible: true
+          period: D
+          height: 150px
+        slots:
+          grid:
+          - component: oh-chart-grid
+            config:
+              top: '62'
+              bottom: '35'
+              left: '20'
+              right: '20'
+          xAxis:
+          - component: oh-time-axis
+            config:
+              gridIndex: 0
+          yAxis:
+          - component: oh-category-axis
+            config:
+              gridIndex: 0
+              categoryType: values
+              data: =[props.title]
+              show: false
+          series:
+          - component: oh-state-series
+            config:
+              name: =props.title
+              item: =props.item
+              xAxisIndex: 0
+              yAxisIndex: 0
+              yValue: 0
+              mapState: =(s) => ((props.states || 'ON=An,OFF=Aus').split(',').map((o) => o.trim().split('=')).find((o) =>
+                o[0] === s) || [s, s])[1]
+          tooltip:
+          - component: oh-chart-tooltip
+            config:
+              show: true
+              confine: true

@@ -45,7 +45,7 @@ props:
     required: false
     context: item
   parameterGroups: []
-timestamp: Sep 26, 2026, 4:41:07 AM
+timestamp: Sep 26, 2026, 5:08:08 AM
 component: oh-card
 config:
   title: =props.title
@@ -226,13 +226,18 @@ slots:
                 text-overflow: ellipsis
           - component: oh-link
             config:
-              action: analyzer
+              action: popup
               style:
                 position: absolute
                 inset: '0'
                 display: block
                 border-radius: 12px
-              actionAnalyzerItems: =[props.prefix + '_energy_today']
+              actionModal: widget:item-popup
+              actionModalConfig:
+                item: =props.prefix + '_energy_today'
+                title: Energie heute
+                color: '#5c6bc0'
+                kind: number
       - component: div
         config:
           style:
@@ -262,13 +267,18 @@ slots:
                 text-overflow: ellipsis
           - component: oh-link
             config:
-              action: analyzer
+              action: popup
               style:
                 position: absolute
                 inset: '0'
                 display: block
                 border-radius: 12px
-              actionAnalyzerItems: =[props.prefix + '_energy_total']
+              actionModal: widget:item-popup
+              actionModalConfig:
+                item: =props.prefix + '_energy_total'
+                title: Energie gesamt
+                color: '#5c6bc0'
+                kind: number
   - component: Label
     config:
       text: =props.note
