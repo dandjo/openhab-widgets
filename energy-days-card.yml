@@ -1,0 +1,155 @@
+uid: energy-days-card
+tags:
+- overview
+props:
+  parameters:
+  - name: dailySelfUse
+    label: Energie täglich Eigenverbrauch
+    description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  - name: dailyGridImport
+    label: Energie täglich Netzbezug
+    description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  - name: dailyPv
+    label: Energie täglich PV
+    description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  parameterGroups: []
+timestamp: Sep 26, 2026, 4:41:07 AM
+component: oh-card
+config:
+  title: Energie pro Tag
+  style:
+    height: calc(100% - 2 * var(--f7-card-margin-vertical))
+    display: flex
+    flex-direction: column
+  contentStyle:
+    flex: 1 1 auto
+    display: flex
+    flex-direction: column
+slots:
+  content:
+  - component: div
+    config:
+      style:
+        position: relative
+        flex: 1 1 auto
+        min-height: 340px
+    slots:
+      default:
+      - component: div
+        config:
+          style:
+            position: absolute
+            inset: '0'
+        slots:
+          default:
+          - component: oh-chart
+            config:
+              chartType: month
+              periodVisible: true
+              height: 100%
+            slots:
+              grid:
+              - component: oh-chart-grid
+                config:
+                  top: '40'
+                  bottom: '70'
+                  left: '45'
+                  right: '45'
+              xAxis:
+              - component: oh-category-axis
+                config:
+                  gridIndex: 0
+                  categoryType: month
+                  name: Tag
+                  nameGap: 12
+                  axisTick:
+                    show: false
+              yAxis:
+              - component: oh-value-axis
+                config:
+                  gridIndex: 0
+                  name: kWh
+                  nameGap: 14
+                  nameTextStyle:
+                    align: right
+                    padding:
+                    - 0
+                    - 8
+                    - 0
+                    - 0
+                  splitLine:
+                    lineStyle:
+                      type: dashed
+                      opacity: 0.4
+              series:
+              - component: oh-aggregate-series
+                config:
+                  name: Aus PV
+                  gridIndex: 0
+                  xAxisIndex: 0
+                  yAxisIndex: 0
+                  type: bar
+                  item: =props.dailySelfUse
+                  aggregationFunction: last
+                  dimension1: date
+                  itemStyle:
+                    color: '#81c784'
+                  stack: home
+              - component: oh-aggregate-series
+                config:
+                  name: Aus dem Netz
+                  gridIndex: 0
+                  xAxisIndex: 0
+                  yAxisIndex: 0
+                  type: bar
+                  item: =props.dailyGridImport
+                  aggregationFunction: last
+                  dimension1: date
+                  itemStyle:
+                    color: '#e57373'
+                    borderRadius:
+                    - 4
+                    - 4
+                    - 0
+                    - 0
+                  stack: home
+              - component: oh-aggregate-series
+                config:
+                  name: PV-Ertrag
+                  gridIndex: 0
+                  xAxisIndex: 0
+                  yAxisIndex: 0
+                  type: line
+                  item: =props.dailyPv
+                  aggregationFunction: last
+                  dimension1: date
+                  itemStyle:
+                    color: '#ffa000'
+                  symbol: circle
+                  symbolSize: 7
+                  lineStyle:
+                    width: 2.5
+                    color: '#ffa000'
+                  z: 3
+              tooltip:
+              - component: oh-chart-tooltip
+                config:
+                  show: true
+                  confine: true
+                  trigger: axis
+                  smartFormatter: true
+              legend:
+              - component: oh-chart-legend
+                config:
+                  show: true
+                  bottom: '0'
+                  type: scroll

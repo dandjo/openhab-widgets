@@ -1,0 +1,1891 @@
+uid: heatpump-card
+tags:
+- overview
+props:
+  parameters:
+  - name: heatpumpDhwTankTemp
+    label: ESPAltherma Warmwasserspeicher Temperatur
+    description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpInvFrequency
+    label: ESPAltherma Verdichterfrequenz
+    description: Number:Frequency item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpWaterPumpOperation
+    label: ESPAltherma Umwälzpumpe
+    description: Switch item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpFlowSensor
+    label: ESPAltherma Durchfluss
+    description: Number:VolumetricFlowRate item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpValve
+    label: ESPAltherma 3-Wege-Ventil
+    description: String item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpPower
+    label: ESPAltherma Elektrische Leistung
+    description: Number:Power item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpBuhStep1Mode
+    label: ESPAltherma Heizstab Stufe 1
+    description: Switch item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpBuhStep2Mode
+    label: ESPAltherma Heizstab Stufe 2
+    description: Switch item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpBshMode
+    label: ESPAltherma Zusatzheizung Speicher
+    description: Switch item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpExtAmbientTemp
+    label: ESPAltherma Außentemperatur
+    description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpDefrostOperaton
+    label: ESPAltherma Abtauen
+    description: Switch item
+    type: TEXT
+    required: true
+    context: item
+  - name: acTemperature
+    label: Faikout Perfera Temperatur
+    description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpIndoorAmbientTemp
+    label: ESPAltherma Raumtemperatur
+    description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpLeavingWaterTempAfterBuh
+    label: ESPAltherma Vorlauftemperatur nach Heizstab
+    description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpInletWaterTemp
+    label: ESPAltherma Rücklauftemperatur
+    description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpDhwSetpoint
+    label: ESPAltherma Warmwasser Sollwert
+    description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpHeatPower
+    label: ESPAltherma Heizleistung
+    description: Number:Power item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpCop
+    label: ESPAltherma COP
+    description: Number item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpEnergyToday
+    label: ESPAltherma Energie heute
+    description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpEnergySpaceToday
+    label: ESPAltherma Energie Heizung heute
+    description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpEnergyDhwToday
+    label: ESPAltherma Energie Warmwasser heute
+    description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpEnergyStandbyToday
+    label: ESPAltherma Energie Standby heute
+    description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpHeatingEnergyToday
+    label: ESPAltherma Heizenergie heute
+    description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpHeatingEnergySpaceToday
+    label: ESPAltherma Heizenergie Heizung heute
+    description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpHeatingEnergyDhwToday
+    label: ESPAltherma Heizenergie Warmwasser heute
+    description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpDcopSpace
+    label: ESPAltherma Tages-COP Heizung
+    description: Number item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpDcopDhw
+    label: ESPAltherma Tages-COP Warmwasser
+    description: Number item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpDcop
+    label: ESPAltherma Tages-COP
+    description: Number item
+    type: TEXT
+    required: true
+    context: item
+  parameterGroups: []
+timestamp: Sep 26, 2026, 4:41:07 AM
+component: oh-card
+config:
+  title: Wärmepumpe
+  style:
+    height: calc(100% - 2 * var(--f7-card-margin-vertical))
+slots:
+  content:
+  - component: div
+    config:
+      style:
+        display: flex
+        flex-wrap: wrap
+        justify-content: space-evenly
+        align-items: center
+        gap: 20px 16px
+        padding: '=screen.width < 600 ? ''8px 4px 12px'' : ''8px 0 16px'''
+    slots:
+      default:
+      - component: div
+        config:
+          style:
+            flex: 0 1 auto
+            min-width: '0'
+            max-width: 100%
+            width: '=screen.width < 600 ? ''100%'' : ''max(min(694px, calc(55.96vw - 256px)), calc((1024px - 100vw) * 1000))'''
+        slots:
+          default:
+          - component: div
+            config:
+              style:
+                position: relative
+            slots:
+              default:
+              - component: svg
+                config:
+                  viewBox: 88 72 526 498
+                  width: 100%
+                  style:
+                    display: block
+                    overflow: visible
+                slots:
+                  default:
+                  - component: defs
+                    config: {}
+                    slots:
+                      default:
+                      - component: linearGradient
+                        config:
+                          id: hpLoopV
+                          x1: '0'
+                          y1: '0'
+                          x2: '0'
+                          y2: '1'
+                        slots:
+                          default:
+                          - component: stop
+                            config:
+                              offset: 0%
+                              stop-color: '#e57373'
+                              stop-opacity: '1'
+                          - component: stop
+                            config:
+                              offset: 100%
+                              stop-color: '#64b5f6'
+                              stop-opacity: '1'
+                      - component: linearGradient
+                        config:
+                          id: hpTank
+                          x1: '0'
+                          y1: '0'
+                          x2: '0'
+                          y2: '1'
+                        slots:
+                          default:
+                          - component: stop
+                            config:
+                              offset: 0%
+                              stop-color: '=(Number(items[props.heatpumpDhwTankTemp].numericState) || 0) >= 50 ? ''#ef9a9a''
+                                : (Number(items[props.heatpumpDhwTankTemp].numericState) || 0) >= 40 ? ''#ffab91'' : (Number(items[props.heatpumpDhwTankTemp].numericState)
+                                || 0) >= 30 ? ''#ffe0b2'' : ''#bbdefb'''
+                              stop-opacity: '0.95'
+                          - component: stop
+                            config:
+                              offset: 100%
+                              stop-color: '#bbdefb'
+                              stop-opacity: '0.85'
+                  - component: path
+                    config:
+                      d: M112.0,510.0 Q100,510 100.0,498.0 L100.0,174.0 Q100,162 111.78,159.69 L343.22,114.31 Q355.0,112 366.78,114.31
+                        L598.22,159.69 Q610,162 610.0,174.0 L610.0,498.0 Q610,510 598.0,510.0 Z
+                      stroke: currentColor
+                      stroke-width: 2
+                      stroke-linecap: round
+                      fill: none
+                      opacity: '0.4'
+                      stroke-linejoin: round
+                  - component: line
+                    config:
+                      x1: 101
+                      y1: 270
+                      x2: 609
+                      y2: 270
+                      stroke: currentColor
+                      stroke-width: 1.4
+                      stroke-linecap: round
+                      fill: none
+                      opacity: '0.25'
+                  - component: line
+                    config:
+                      x1: 102
+                      y1: 386
+                      x2: 608
+                      y2: 386
+                      stroke: '#a5d6a7'
+                      stroke-width: 3
+                      stroke-linecap: round
+                      fill: none
+                  - component: path
+                    config:
+                      d: M588,137 V448 H570
+                      stroke: '#ba68c8'
+                      stroke-width: 3
+                      stroke-linecap: round
+                      fill: none
+                      opacity: '=(Number(items[props.heatpumpInvFrequency].numericState) || 0) > 0 ? ''0.55'' : ''0.18'''
+                      stroke-linejoin: round
+                  - component: circle
+                    config:
+                      r: 4.5
+                      fill: '#ba68c8'
+                      cx: 0
+                      cy: 0
+                      visible: =(Number(items[props.heatpumpInvFrequency].numericState) || 0) > 0
+                    slots:
+                      default:
+                      - component: animateMotion
+                        config:
+                          path: M588,137 V448 H570
+                          dur: 2s
+                          repeatCount: indefinite
+                          calcMode: linear
+                          keyPoints: 0;1
+                          keyTimes: 0;1
+                  - component: circle
+                    config:
+                      r: 4.5
+                      fill: '#ba68c8'
+                      cx: 0
+                      cy: 0
+                      visible: =(Number(items[props.heatpumpInvFrequency].numericState) || 0) > 0
+                    slots:
+                      default:
+                      - component: animateMotion
+                        config:
+                          path: M588,137 V448 H570
+                          dur: 2s
+                          repeatCount: indefinite
+                          calcMode: linear
+                          keyPoints: 0.3333;1;0;0.3333
+                          keyTimes: 0;0.6667;0.6667;1
+                  - component: circle
+                    config:
+                      r: 4.5
+                      fill: '#ba68c8'
+                      cx: 0
+                      cy: 0
+                      visible: =(Number(items[props.heatpumpInvFrequency].numericState) || 0) > 0
+                    slots:
+                      default:
+                      - component: animateMotion
+                        config:
+                          path: M588,137 V448 H570
+                          dur: 2s
+                          repeatCount: indefinite
+                          calcMode: linear
+                          keyPoints: 0.6667;1;0;0.6667
+                          keyTimes: 0;0.3333;0.3333;1
+                  - component: path
+                    config:
+                      d: M510,448 H464
+                      stroke: '#e57373'
+                      stroke-width: 3
+                      stroke-linecap: round
+                      fill: none
+                      opacity: '=(items[props.heatpumpWaterPumpOperation].state === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState)
+                        || 0) > 0) ? ''0.55'' : ''0.18'''
+                      stroke-linejoin: round
+                  - component: circle
+                    config:
+                      r: 4.5
+                      fill: '#e57373'
+                      cx: 0
+                      cy: 0
+                      visible: =(items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
+                        || 0) > 0)
+                    slots:
+                      default:
+                      - component: animateMotion
+                        config:
+                          path: M510,448 H464
+                          dur: 1.2s
+                          repeatCount: indefinite
+                          calcMode: linear
+                          keyPoints: 0;1
+                          keyTimes: 0;1
+                  - component: circle
+                    config:
+                      r: 4.5
+                      fill: '#e57373'
+                      cx: 0
+                      cy: 0
+                      visible: =(items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
+                        || 0) > 0)
+                    slots:
+                      default:
+                      - component: animateMotion
+                        config:
+                          path: M510,448 H464
+                          dur: 1.2s
+                          repeatCount: indefinite
+                          calcMode: linear
+                          keyPoints: 0.3333;1;0;0.3333
+                          keyTimes: 0;0.6667;0.6667;1
+                  - component: circle
+                    config:
+                      r: 4.5
+                      fill: '#e57373'
+                      cx: 0
+                      cy: 0
+                      visible: =(items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
+                        || 0) > 0)
+                    slots:
+                      default:
+                      - component: animateMotion
+                        config:
+                          path: M510,448 H464
+                          dur: 1.2s
+                          repeatCount: indefinite
+                          calcMode: linear
+                          keyPoints: 0.6667;1;0;0.6667
+                          keyTimes: 0;0.3333;0.3333;1
+                  - component: path
+                    config:
+                      d: M404,448 H358
+                      stroke: '#e57373'
+                      stroke-width: 3
+                      stroke-linecap: round
+                      fill: none
+                      opacity: '=((items[props.heatpumpWaterPumpOperation].state === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState)
+                        || 0) > 0) && (items[props.heatpumpValve].state === ''DHW'')) ? ''0.55'' : ''0.18'''
+                      stroke-linejoin: round
+                  - component: circle
+                    config:
+                      r: 4.5
+                      fill: '#e57373'
+                      cx: 0
+                      cy: 0
+                      visible: =((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
+                        || 0) > 0) && (items[props.heatpumpValve].state === 'DHW'))
+                    slots:
+                      default:
+                      - component: animateMotion
+                        config:
+                          path: M404,448 H358
+                          dur: 1.2s
+                          repeatCount: indefinite
+                          calcMode: linear
+                          keyPoints: 0;1
+                          keyTimes: 0;1
+                  - component: circle
+                    config:
+                      r: 4.5
+                      fill: '#e57373'
+                      cx: 0
+                      cy: 0
+                      visible: =((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
+                        || 0) > 0) && (items[props.heatpumpValve].state === 'DHW'))
+                    slots:
+                      default:
+                      - component: animateMotion
+                        config:
+                          path: M404,448 H358
+                          dur: 1.2s
+                          repeatCount: indefinite
+                          calcMode: linear
+                          keyPoints: 0.3333;1;0;0.3333
+                          keyTimes: 0;0.6667;0.6667;1
+                  - component: circle
+                    config:
+                      r: 4.5
+                      fill: '#e57373'
+                      cx: 0
+                      cy: 0
+                      visible: =((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
+                        || 0) > 0) && (items[props.heatpumpValve].state === 'DHW'))
+                    slots:
+                      default:
+                      - component: animateMotion
+                        config:
+                          path: M404,448 H358
+                          dur: 1.2s
+                          repeatCount: indefinite
+                          calcMode: linear
+                          keyPoints: 0.6667;1;0;0.6667
+                          keyTimes: 0;0.3333;0.3333;1
+                  - component: path
+                    config:
+                      d: M434,418 V216 H350
+                      stroke: '#e57373'
+                      stroke-width: 3
+                      stroke-linecap: round
+                      fill: none
+                      opacity: '=((items[props.heatpumpWaterPumpOperation].state === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState)
+                        || 0) > 0) && !(items[props.heatpumpValve].state === ''DHW'')) ? ''0.55'' : ''0.18'''
+                      stroke-linejoin: round
+                  - component: circle
+                    config:
+                      r: 4.5
+                      fill: '#e57373'
+                      cx: 0
+                      cy: 0
+                      visible: =((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
+                        || 0) > 0) && !(items[props.heatpumpValve].state === 'DHW'))
+                    slots:
+                      default:
+                      - component: animateMotion
+                        config:
+                          path: M434,418 V216 H350
+                          dur: 2.4s
+                          repeatCount: indefinite
+                          calcMode: linear
+                          keyPoints: 0;1
+                          keyTimes: 0;1
+                  - component: circle
+                    config:
+                      r: 4.5
+                      fill: '#e57373'
+                      cx: 0
+                      cy: 0
+                      visible: =((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
+                        || 0) > 0) && !(items[props.heatpumpValve].state === 'DHW'))
+                    slots:
+                      default:
+                      - component: animateMotion
+                        config:
+                          path: M434,418 V216 H350
+                          dur: 2.4s
+                          repeatCount: indefinite
+                          calcMode: linear
+                          keyPoints: 0.3333;1;0;0.3333
+                          keyTimes: 0;0.6667;0.6667;1
+                  - component: circle
+                    config:
+                      r: 4.5
+                      fill: '#e57373'
+                      cx: 0
+                      cy: 0
+                      visible: =((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
+                        || 0) > 0) && !(items[props.heatpumpValve].state === 'DHW'))
+                    slots:
+                      default:
+                      - component: animateMotion
+                        config:
+                          path: M434,418 V216 H350
+                          dur: 2.4s
+                          repeatCount: indefinite
+                          calcMode: linear
+                          keyPoints: 0.6667;1;0;0.6667
+                          keyTimes: 0;0.3333;0.3333;1
+                  - component: path
+                    config:
+                      d: M434,328 H350
+                      stroke: '#e57373'
+                      stroke-width: 3
+                      stroke-linecap: round
+                      fill: none
+                      opacity: '=((items[props.heatpumpWaterPumpOperation].state === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState)
+                        || 0) > 0) && !(items[props.heatpumpValve].state === ''DHW'')) ? ''0.55'' : ''0.18'''
+                      stroke-linejoin: round
+                  - component: circle
+                    config:
+                      r: 4.5
+                      fill: '#e57373'
+                      cx: 0
+                      cy: 0
+                      visible: =((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
+                        || 0) > 0) && !(items[props.heatpumpValve].state === 'DHW'))
+                    slots:
+                      default:
+                      - component: animateMotion
+                        config:
+                          path: M434,328 H350
+                          dur: 1.6s
+                          repeatCount: indefinite
+                          calcMode: linear
+                          keyPoints: 0;1
+                          keyTimes: 0;1
+                  - component: circle
+                    config:
+                      r: 4.5
+                      fill: '#e57373'
+                      cx: 0
+                      cy: 0
+                      visible: =((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
+                        || 0) > 0) && !(items[props.heatpumpValve].state === 'DHW'))
+                    slots:
+                      default:
+                      - component: animateMotion
+                        config:
+                          path: M434,328 H350
+                          dur: 1.6s
+                          repeatCount: indefinite
+                          calcMode: linear
+                          keyPoints: 0.3333;1;0;0.3333
+                          keyTimes: 0;0.6667;0.6667;1
+                  - component: circle
+                    config:
+                      r: 4.5
+                      fill: '#e57373'
+                      cx: 0
+                      cy: 0
+                      visible: =((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
+                        || 0) > 0) && !(items[props.heatpumpValve].state === 'DHW'))
+                    slots:
+                      default:
+                      - component: animateMotion
+                        config:
+                          path: M434,328 H350
+                          dur: 1.6s
+                          repeatCount: indefinite
+                          calcMode: linear
+                          keyPoints: 0.6667;1;0;0.6667
+                          keyTimes: 0;0.3333;0.3333;1
+                  - component: path
+                    config:
+                      d: M434,404 H222 V418
+                      stroke: '#e57373'
+                      stroke-width: 3
+                      stroke-linecap: round
+                      fill: none
+                      opacity: '=((items[props.heatpumpWaterPumpOperation].state === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState)
+                        || 0) > 0) && !(items[props.heatpumpValve].state === ''DHW'')) ? ''0.55'' : ''0.18'''
+                      stroke-linejoin: round
+                  - component: circle
+                    config:
+                      r: 4.5
+                      fill: '#e57373'
+                      cx: 0
+                      cy: 0
+                      visible: =((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
+                        || 0) > 0) && !(items[props.heatpumpValve].state === 'DHW'))
+                    slots:
+                      default:
+                      - component: animateMotion
+                        config:
+                          path: M434,404 H222 V418
+                          dur: 2s
+                          repeatCount: indefinite
+                          calcMode: linear
+                          keyPoints: 0;1
+                          keyTimes: 0;1
+                  - component: circle
+                    config:
+                      r: 4.5
+                      fill: '#e57373'
+                      cx: 0
+                      cy: 0
+                      visible: =((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
+                        || 0) > 0) && !(items[props.heatpumpValve].state === 'DHW'))
+                    slots:
+                      default:
+                      - component: animateMotion
+                        config:
+                          path: M434,404 H222 V418
+                          dur: 2s
+                          repeatCount: indefinite
+                          calcMode: linear
+                          keyPoints: 0.3333;1;0;0.3333
+                          keyTimes: 0;0.6667;0.6667;1
+                  - component: circle
+                    config:
+                      r: 4.5
+                      fill: '#e57373'
+                      cx: 0
+                      cy: 0
+                      visible: =((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
+                        || 0) > 0) && !(items[props.heatpumpValve].state === 'DHW'))
+                    slots:
+                      default:
+                      - component: animateMotion
+                        config:
+                          path: M434,404 H222 V418
+                          dur: 2s
+                          repeatCount: indefinite
+                          calcMode: linear
+                          keyPoints: 0.6667;1;0;0.6667
+                          keyTimes: 0;0.3333;0.3333;1
+                  - component: g
+                    config: {}
+                    slots:
+                      default:
+                      - component: circle
+                        config:
+                          cx: 575
+                          cy: 110
+                          r: 30
+                          style:
+                            fill: 'var(--f7-card-bg-color, #fff)'
+                      - component: circle
+                        config:
+                          cx: 575
+                          cy: 110
+                          r: 30
+                          fill: '#fb8c00'
+                          stroke: '#fb8c00'
+                          fill-opacity: '0.12'
+                          stroke-width: 3
+                  - component: rect
+                    config:
+                      x: 558
+                      y: 98
+                      width: 34
+                      height: 24
+                      rx: 3
+                      stroke: currentColor
+                      stroke-width: 1.6
+                      stroke-linecap: round
+                      fill: none
+                  - component: circle
+                    config:
+                      cx: 570
+                      cy: 110
+                      r: 9
+                      stroke: currentColor
+                      stroke-width: 1.2
+                      stroke-linecap: round
+                      fill: none
+                  - component: g
+                    config: {}
+                    slots:
+                      default:
+                      - component: path
+                        config:
+                          d: M570,110 q3.5,-3 0,-7.5 q-3.5,3 0,7.5
+                          fill: '#fb8c00'
+                          transform: rotate(0 570 110)
+                      - component: path
+                        config:
+                          d: M570,110 q3.5,-3 0,-7.5 q-3.5,3 0,7.5
+                          fill: '#fb8c00'
+                          transform: rotate(120 570 110)
+                      - component: path
+                        config:
+                          d: M570,110 q3.5,-3 0,-7.5 q-3.5,3 0,7.5
+                          fill: '#fb8c00'
+                          transform: rotate(240 570 110)
+                      - component: animateTransform
+                        config:
+                          attributeName: transform
+                          type: rotate
+                          from: 0 570 110
+                          to: 360 570 110
+                          dur: '=Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) < 800 ? ''1.4s'' : (Math.abs((Number(items[props.heatpumpPower].numericState)
+                            || 0)) < 2000 ? ''0.9s'' : (''0.5s''))'
+                          repeatCount: indefinite
+                          visible: =Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) > 100
+                  - component: circle
+                    config:
+                      cx: 570
+                      cy: 110
+                      r: 1.5
+                      fill: currentColor
+                  - component: line
+                    config:
+                      x1: 582
+                      y1: 103
+                      x2: 589
+                      y2: 103
+                      stroke: currentColor
+                      stroke-width: 1
+                      stroke-linecap: round
+                      fill: none
+                      opacity: '0.7'
+                  - component: line
+                    config:
+                      x1: 582
+                      y1: 106.5
+                      x2: 589
+                      y2: 106.5
+                      stroke: currentColor
+                      stroke-width: 1
+                      stroke-linecap: round
+                      fill: none
+                      opacity: '0.7'
+                  - component: line
+                    config:
+                      x1: 582
+                      y1: 110
+                      x2: 589
+                      y2: 110
+                      stroke: currentColor
+                      stroke-width: 1
+                      stroke-linecap: round
+                      fill: none
+                      opacity: '0.7'
+                  - component: line
+                    config:
+                      x1: 582
+                      y1: 113.5
+                      x2: 589
+                      y2: 113.5
+                      stroke: currentColor
+                      stroke-width: 1
+                      stroke-linecap: round
+                      fill: none
+                      opacity: '0.7'
+                  - component: line
+                    config:
+                      x1: 582
+                      y1: 117
+                      x2: 589
+                      y2: 117
+                      stroke: currentColor
+                      stroke-width: 1
+                      stroke-linecap: round
+                      fill: none
+                      opacity: '0.7'
+                  - component: line
+                    config:
+                      x1: 563
+                      y1: 122
+                      x2: 563
+                      y2: 125
+                      stroke: currentColor
+                      stroke-width: 1.6
+                      stroke-linecap: round
+                      fill: none
+                  - component: line
+                    config:
+                      x1: 587
+                      y1: 122
+                      x2: 587
+                      y2: 125
+                      stroke: currentColor
+                      stroke-width: 1.6
+                      stroke-linecap: round
+                      fill: none
+                  - component: g
+                    config: {}
+                    slots:
+                      default:
+                      - component: circle
+                        config:
+                          cx: 540
+                          cy: 448
+                          r: 30
+                          style:
+                            fill: 'var(--f7-card-bg-color, #fff)'
+                      - component: circle
+                        config:
+                          cx: 540
+                          cy: 448
+                          r: 30
+                          fill: '#64b5f6'
+                          stroke: '#64b5f6'
+                          fill-opacity: '0.12'
+                          stroke-width: 3
+                  - component: rect
+                    config:
+                      x: 529
+                      y: 431
+                      width: 22
+                      height: 34
+                      rx: 3
+                      stroke: currentColor
+                      stroke-width: 1.6
+                      stroke-linecap: round
+                      fill: none
+                  - component: rect
+                    config:
+                      x: 533
+                      y: 435
+                      width: 14
+                      height: 6
+                      rx: 1
+                      fill: '#37474f'
+                  - component: path
+                    config:
+                      d: M532,449 l2.7,-3 l2.7,6 l2.7,-6 l2.7,6 l2.7,-6 l2.7,6 l1.1,-3
+                      stroke: '=(items[props.heatpumpBuhStep1Mode].state === ''ON'' || items[props.heatpumpBuhStep2Mode].state
+                        === ''ON'') ? ''#ff8a65'' : ''#9e9e9e'''
+                      stroke-width: 1.6
+                      stroke-linecap: round
+                      fill: none
+                  - component: circle
+                    config:
+                      cx: 540
+                      cy: 458
+                      r: 3.5
+                      stroke: '=(items[props.heatpumpWaterPumpOperation].state === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState)
+                        || 0) > 0) ? ''#64b5f6'' : ''#9e9e9e'''
+                      stroke-width: 1.4
+                      stroke-linecap: round
+                      fill: none
+                  - component: g
+                    config: {}
+                    slots:
+                      default:
+                      - component: circle
+                        config:
+                          cx: 434
+                          cy: 448
+                          r: 30
+                          style:
+                            fill: 'var(--f7-card-bg-color, #fff)'
+                      - component: circle
+                        config:
+                          cx: 434
+                          cy: 448
+                          r: 30
+                          fill: '#ffb74d'
+                          stroke: '#ffb74d'
+                          fill-opacity: '0.12'
+                          stroke-width: 3
+                  - component: polygon
+                    config:
+                      points: 422,442 434,448 422,454
+                      stroke: currentColor
+                      stroke-width: 1.4
+                      stroke-linecap: round
+                      fill: '#ffe0b2'
+                  - component: polygon
+                    config:
+                      points: 446,442 434,448 446,454
+                      stroke: currentColor
+                      stroke-width: 1.4
+                      stroke-linecap: round
+                      fill: '#ffe0b2'
+                  - component: polygon
+                    config:
+                      points: 428,436 434,448 440,436
+                      stroke: currentColor
+                      stroke-width: 1.4
+                      stroke-linecap: round
+                      fill: '#ffe0b2'
+                  - component: line
+                    config:
+                      x1: 434
+                      y1: 448
+                      x2: 434
+                      y2: 459
+                      stroke: currentColor
+                      stroke-width: 1.6
+                      stroke-linecap: round
+                      fill: none
+                  - component: rect
+                    config:
+                      x: 429
+                      y: 459
+                      width: 10
+                      height: 5
+                      rx: 1
+                      stroke: currentColor
+                      stroke-width: 1.4
+                      stroke-linecap: round
+                      fill: none
+                  - component: g
+                    config: {}
+                    slots:
+                      default:
+                      - component: circle
+                        config:
+                          cx: 328
+                          cy: 448
+                          r: 30
+                          style:
+                            fill: 'var(--f7-card-bg-color, #fff)'
+                      - component: circle
+                        config:
+                          cx: 328
+                          cy: 448
+                          r: 30
+                          fill: '#e57373'
+                          stroke: '#e57373'
+                          fill-opacity: '0.12'
+                          stroke-width: 3
+                  - component: rect
+                    config:
+                      x: 320
+                      y: 431
+                      width: 18
+                      height: 34
+                      rx: 9
+                      stroke: currentColor
+                      stroke-width: 1.5
+                      stroke-linecap: round
+                      fill: url(#hpTank)
+                  - component: rect
+                    config:
+                      x: 314
+                      y: 442
+                      width: 5
+                      height: 12
+                      rx: 1.5
+                      stroke: currentColor
+                      stroke-width: 1.2
+                      stroke-linecap: round
+                      fill: '=items[props.heatpumpBshMode].state === ''ON'' ? ''#ff8a65'' : ''none'''
+                  - component: g
+                    config: {}
+                    slots:
+                      default:
+                      - component: circle
+                        config:
+                          cx: 222
+                          cy: 448
+                          r: 30
+                          style:
+                            fill: 'var(--f7-card-bg-color, #fff)'
+                      - component: circle
+                        config:
+                          cx: 222
+                          cy: 448
+                          r: 30
+                          fill: '#ffab91'
+                          stroke: '#ffab91'
+                          fill-opacity: '0.12'
+                          stroke-width: 3
+                  - component: rect
+                    config:
+                      x: 208
+                      y: 437
+                      width: 28
+                      height: 22
+                      rx: 4
+                      stroke: currentColor
+                      stroke-width: 1.6
+                      stroke-linecap: round
+                      fill: none
+                  - component: line
+                    config:
+                      x1: 213
+                      y1: 441
+                      x2: 213
+                      y2: 455
+                      stroke: currentColor
+                      stroke-width: 1.6
+                      stroke-linecap: round
+                      fill: none
+                  - component: line
+                    config:
+                      x1: 219
+                      y1: 441
+                      x2: 219
+                      y2: 455
+                      stroke: currentColor
+                      stroke-width: 1.6
+                      stroke-linecap: round
+                      fill: none
+                  - component: line
+                    config:
+                      x1: 225
+                      y1: 441
+                      x2: 225
+                      y2: 455
+                      stroke: currentColor
+                      stroke-width: 1.6
+                      stroke-linecap: round
+                      fill: none
+                  - component: line
+                    config:
+                      x1: 231
+                      y1: 441
+                      x2: 231
+                      y2: 455
+                      stroke: currentColor
+                      stroke-width: 1.6
+                      stroke-linecap: round
+                      fill: none
+                  - component: g
+                    config: {}
+                    slots:
+                      default:
+                      - component: circle
+                        config:
+                          cx: 320
+                          cy: 328
+                          r: 30
+                          style:
+                            fill: 'var(--f7-card-bg-color, #fff)'
+                      - component: circle
+                        config:
+                          cx: 320
+                          cy: 328
+                          r: 30
+                          fill: '#f48fb1'
+                          stroke: '#f48fb1'
+                          fill-opacity: '0.12'
+                          stroke-width: 3
+                  - component: path
+                    config:
+                      d: M305,318 H335 V325 H305 V332 H335 V339 H305
+                      stroke: url(#hpLoopV)
+                      stroke-width: 2
+                      stroke-linecap: round
+                      fill: none
+                      stroke-linejoin: round
+                  - component: g
+                    config: {}
+                    slots:
+                      default:
+                      - component: circle
+                        config:
+                          cx: 320
+                          cy: 216
+                          r: 30
+                          style:
+                            fill: 'var(--f7-card-bg-color, #fff)'
+                      - component: circle
+                        config:
+                          cx: 320
+                          cy: 216
+                          r: 30
+                          fill: '#f48fb1'
+                          stroke: '#f48fb1'
+                          fill-opacity: '0.12'
+                          stroke-width: 3
+                  - component: path
+                    config:
+                      d: M305,206 H335 V213 H305 V220 H335 V227 H305
+                      stroke: url(#hpLoopV)
+                      stroke-width: 2
+                      stroke-linecap: round
+                      fill: none
+                      stroke-linejoin: round
+                  - component: text
+                    config:
+                      x: 537
+                      y: 88
+                      content: '=''Außengerät · '' + ([''NULL'', ''UNDEF''].includes(items[props.heatpumpExtAmbientTemp].state)
+                        ? ''–'' : (items[props.heatpumpExtAmbientTemp].displayState || items[props.heatpumpExtAmbientTemp].state))'
+                      fill: currentColor
+                      font-size: 13
+                      font-weight: normal
+                      text-anchor: end
+                      opacity: '0.7'
+                  - component: text
+                    config:
+                      x: 537
+                      y: 108
+                      content: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpPower].state) ? ''–'' : (items[props.heatpumpPower].displayState
+                        || items[props.heatpumpPower].state)) + '' · '' + ([''NULL'', ''UNDEF''].includes(items[props.heatpumpInvFrequency].state)
+                        ? ''–'' : (items[props.heatpumpInvFrequency].displayState || items[props.heatpumpInvFrequency].state))'
+                      fill: currentColor
+                      font-size: 17
+                      font-weight: '700'
+                      text-anchor: end
+                      opacity: '1'
+                  - component: text
+                    config:
+                      x: 537
+                      y: 126
+                      content: Abtauen
+                      fill: '#4fc3f7'
+                      font-size: 13
+                      text-anchor: end
+                      visible: =items[props.heatpumpDefrostOperaton].state === 'ON'
+                  - component: text
+                    config:
+                      x: 280
+                      y: 210
+                      content: Obergeschoss
+                      fill: currentColor
+                      font-size: 16
+                      font-weight: '700'
+                      text-anchor: end
+                      opacity: '1'
+                  - component: text
+                    config:
+                      x: 280
+                      y: 229
+                      content: '=''Fußbodenheizung · '' + ([''NULL'', ''UNDEF''].includes(items[props.acTemperature].state)
+                        ? ''–'' : (items[props.acTemperature].displayState || items[props.acTemperature].state))'
+                      fill: currentColor
+                      font-size: 12
+                      font-weight: normal
+                      text-anchor: end
+                      opacity: '0.7'
+                  - component: text
+                    config:
+                      x: 280
+                      y: 322
+                      content: Erdgeschoss
+                      fill: currentColor
+                      font-size: 16
+                      font-weight: '700'
+                      text-anchor: end
+                      opacity: '1'
+                  - component: text
+                    config:
+                      x: 280
+                      y: 341
+                      content: '=''Fußbodenheizung · '' + ([''NULL'', ''UNDEF''].includes(items[props.heatpumpIndoorAmbientTemp].state)
+                        ? ''–'' : (items[props.heatpumpIndoorAmbientTemp].displayState || items[props.heatpumpIndoorAmbientTemp].state))'
+                      fill: currentColor
+                      font-size: 12
+                      font-weight: normal
+                      text-anchor: end
+                      opacity: '0.7'
+                  - component: polygon
+                    config:
+                      points: 449,321 458,306 467,321
+                      fill: '#e57373'
+                  - component: text
+                    config:
+                      x: 474
+                      y: 321
+                      content: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpLeavingWaterTempAfterBuh].state) ? ''–''
+                        : (items[props.heatpumpLeavingWaterTempAfterBuh].displayState || items[props.heatpumpLeavingWaterTempAfterBuh].state))'
+                      fill: '#e57373'
+                      font-size: 20
+                      font-weight: '700'
+                      text-anchor: start
+                      opacity: '1'
+                  - component: polygon
+                    config:
+                      points: 449,335 458,350 467,335
+                      fill: '#64b5f6'
+                  - component: text
+                    config:
+                      x: 474
+                      y: 351
+                      content: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpInletWaterTemp].state) ? ''–'' : (items[props.heatpumpInletWaterTemp].displayState
+                        || items[props.heatpumpInletWaterTemp].state))'
+                      fill: '#64b5f6'
+                      font-size: 20
+                      font-weight: '700'
+                      text-anchor: start
+                      opacity: '1'
+                  - component: text
+                    config:
+                      x: 434
+                      y: 495
+                      content: '=items[props.heatpumpValve].state === ''DHW'' ? ''Warmwasser'' : ''Heizung'''
+                      fill: '#ffa726'
+                      font-size: 14
+                      font-weight: '700'
+                      text-anchor: middle
+                      opacity: '1'
+                  - component: text
+                    config:
+                      x: 182
+                      y: 442
+                      content: Keller
+                      fill: currentColor
+                      font-size: 16
+                      font-weight: '700'
+                      text-anchor: end
+                      opacity: '1'
+                  - component: text
+                    config:
+                      x: 182
+                      y: 461
+                      content: Heizkörper
+                      fill: currentColor
+                      font-size: 12
+                      font-weight: normal
+                      text-anchor: end
+                      opacity: '0.7'
+                  - component: text
+                    config:
+                      x: 308
+                      y: 540
+                      content: '=''Warmwasserspeicher · '' + ([''NULL'', ''UNDEF''].includes(items[props.heatpumpDhwTankTemp].state)
+                        ? ''–'' : (items[props.heatpumpDhwTankTemp].displayState || items[props.heatpumpDhwTankTemp].state))'
+                      fill: currentColor
+                      font-size: 15
+                      font-weight: '700'
+                      text-anchor: middle
+                      opacity: '1'
+                  - component: text
+                    config:
+                      x: 308
+                      y: 560
+                      content: '=''Soll '' + ([''NULL'', ''UNDEF''].includes(items[props.heatpumpDhwSetpoint].state) ? ''–''
+                        : (items[props.heatpumpDhwSetpoint].displayState || items[props.heatpumpDhwSetpoint].state)) + ''
+                        · Zusatzheizung '' + (items[props.heatpumpBshMode].state === ''ON'' ? ''An'' : ''Aus'')'
+                      fill: currentColor
+                      font-size: 12
+                      font-weight: normal
+                      text-anchor: middle
+                      opacity: '0.7'
+                  - component: text
+                    config:
+                      x: 610
+                      y: 540
+                      content: '=''Altherma 3 · '' + ([''NULL'', ''UNDEF''].includes(items[props.heatpumpHeatPower].state)
+                        ? ''–'' : (items[props.heatpumpHeatPower].displayState || items[props.heatpumpHeatPower].state))'
+                      fill: currentColor
+                      font-size: 15
+                      font-weight: '700'
+                      text-anchor: end
+                      opacity: '1'
+                  - component: text
+                    config:
+                      x: 610
+                      y: 560
+                      content: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpFlowSensor].state) ? ''–'' : (items[props.heatpumpFlowSensor].displayState
+                        || items[props.heatpumpFlowSensor].state)) + '' · Heizstab '' + ((items[props.heatpumpBuhStep1Mode].state
+                        === ''ON'' || items[props.heatpumpBuhStep2Mode].state === ''ON'') ? ''An'' : ''Aus'')'
+                      fill: currentColor
+                      font-size: 12
+                      font-weight: normal
+                      text-anchor: end
+                      opacity: '0.7'
+              - component: oh-link
+                config:
+                  action: popup
+                  actionModal: page:hp_outdoor_unit
+                  style:
+                    position: absolute
+                    display: block
+                    border-radius: 50%
+                    left: 86.88%
+                    top: 1.61%
+                    width: 11.41%
+                    height: 12.05%
+              - component: oh-link
+                config:
+                  action: popup
+                  actionModal: page:hp_indoor_unit
+                  style:
+                    position: absolute
+                    display: block
+                    border-radius: 50%
+                    left: 80.23%
+                    top: 69.48%
+                    width: 11.41%
+                    height: 12.05%
+              - component: oh-link
+                config:
+                  action: popup
+                  actionModal: page:hp_valve
+                  style:
+                    position: absolute
+                    display: block
+                    border-radius: 50%
+                    left: 60.08%
+                    top: 69.48%
+                    width: 11.41%
+                    height: 12.05%
+              - component: oh-link
+                config:
+                  action: popup
+                  actionModal: page:hp_dhw_tank
+                  style:
+                    position: absolute
+                    display: block
+                    border-radius: 50%
+                    left: 39.92%
+                    top: 69.48%
+                    width: 11.41%
+                    height: 12.05%
+              - component: oh-link
+                config:
+                  action: popup
+                  actionModal: page:hp_space_heating
+                  style:
+                    position: absolute
+                    display: block
+                    border-radius: 50%
+                    left: 19.77%
+                    top: 69.48%
+                    width: 11.41%
+                    height: 12.05%
+              - component: oh-link
+                config:
+                  action: popup
+                  actionModal: page:hp_space_heating
+                  style:
+                    position: absolute
+                    display: block
+                    border-radius: 50%
+                    left: 38.40%
+                    top: 45.38%
+                    width: 11.41%
+                    height: 12.05%
+              - component: oh-link
+                config:
+                  action: popup
+                  actionModal: page:hp_space_heating
+                  style:
+                    position: absolute
+                    display: block
+                    border-radius: 50%
+                    left: 38.40%
+                    top: 22.89%
+                    width: 11.41%
+                    height: 12.05%
+      - component: div
+        config:
+          style:
+            flex: 1 1 300px
+            min-width: 260px
+            max-width: 460px
+        slots:
+          default:
+          - component: div
+            config:
+              style:
+                padding: 4px 4px 8px
+                font-size: 14px
+            slots:
+              default:
+              - component: div
+                config:
+                  style:
+                    display: grid
+                    grid-template-columns: repeat(3, 1fr)
+                    gap: 8px
+                    margin-bottom: 16px
+                slots:
+                  default:
+                  - component: div
+                    config:
+                      style:
+                        padding: 10px 12px
+                        border-radius: 12px
+                        background: rgba(127, 127, 127, 0.08)
+                    slots:
+                      default:
+                      - component: Label
+                        config:
+                          text: Elektrisch
+                          style:
+                            font-size: 12px
+                            opacity: '0.7'
+                      - component: Label
+                        config:
+                          text: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpPower].state) ? ''–'' : (items[props.heatpumpPower].displayState
+                            || items[props.heatpumpPower].state))'
+                          style:
+                            font-size: 22px
+                            font-weight: '700'
+                            color: '#ffa726'
+                            white-space: nowrap
+                  - component: div
+                    config:
+                      style:
+                        padding: 10px 12px
+                        border-radius: 12px
+                        background: rgba(127, 127, 127, 0.08)
+                    slots:
+                      default:
+                      - component: Label
+                        config:
+                          text: Wärme
+                          style:
+                            font-size: 12px
+                            opacity: '0.7'
+                      - component: Label
+                        config:
+                          text: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpHeatPower].state) ? ''–'' : (items[props.heatpumpHeatPower].displayState
+                            || items[props.heatpumpHeatPower].state))'
+                          style:
+                            font-size: 22px
+                            font-weight: '700'
+                            color: '#e57373'
+                            white-space: nowrap
+                  - component: div
+                    config:
+                      style:
+                        padding: 10px 12px
+                        border-radius: 12px
+                        background: rgba(127, 127, 127, 0.08)
+                    slots:
+                      default:
+                      - component: Label
+                        config:
+                          text: COP
+                          style:
+                            font-size: 12px
+                            opacity: '0.7'
+                      - component: Label
+                        config:
+                          text: '=(Number(items[props.heatpumpCop].numericState) || 0) > 0 ? ((Number(items[props.heatpumpCop].numericState)
+                            || 0)).toFixed(2).replace(''.'', '','') : ''–'''
+                          style:
+                            font-size: 22px
+                            font-weight: '700'
+                            color: '#66bb6a'
+                            white-space: nowrap
+              - component: Label
+                config:
+                  text: Heute
+                  style:
+                    font-weight: '700'
+                    margin-bottom: 8px
+              - component: div
+                config:
+                  stylesheet: '.k { transition: opacity 0.15s, transform 0.15s, background-color 0.15s; }
+
+                    .item { border-radius: 6px; padding: 3px 6px; margin: 0 -6px; }
+
+                    :host:has(.k:hover) .k { opacity: 0.3; }
+
+                    :host:has(.k-heizung:hover) .k-heizung { opacity: 1; }
+
+                    :host:has(.k-heizung:hover) .item.k-heizung { background-color: rgba(255, 183, 77, 0.4); font-weight:
+                    700; }
+
+                    :host:has(.k-heizung:hover) .seg.k-heizung { transform: scaleY(1.5); }
+
+                    :host:has(.k-warmwasser:hover) .k-warmwasser { opacity: 1; }
+
+                    :host:has(.k-warmwasser:hover) .item.k-warmwasser { background-color: rgba(229, 115, 115, 0.4); font-weight:
+                    700; }
+
+                    :host:has(.k-warmwasser:hover) .seg.k-warmwasser { transform: scaleY(1.5); }
+
+                    :host:has(.k-standby:hover) .k-standby { opacity: 1; }
+
+                    :host:has(.k-standby:hover) .item.k-standby { background-color: rgba(176, 190, 197, 0.4); font-weight:
+                    700; }
+
+                    :host:has(.k-standby:hover) .seg.k-standby { transform: scaleY(1.5); }'
+                  style: {}
+                slots:
+                  default:
+                  - component: div
+                    config:
+                      style:
+                        margin-bottom: 12px
+                    slots:
+                      default:
+                      - component: div
+                        config:
+                          style:
+                            display: flex
+                            justify-content: space-between
+                            margin-bottom: 4px
+                        slots:
+                          default:
+                          - component: Label
+                            config:
+                              text: Strom
+                              style:
+                                opacity: '0.7'
+                          - component: Label
+                            config:
+                              text: =((Number(items[props.heatpumpEnergyToday].numericState) || 0)).toFixed(1).replace('.',
+                                ',') + ' kWh'
+                              style:
+                                font-weight: '700'
+                      - component: div
+                        config:
+                          style:
+                            display: flex
+                            gap: 2px
+                            height: 14px
+                        slots:
+                          default:
+                          - component: div
+                            config:
+                              class: seg k k-heizung
+                              title: ='Heizung · ' + ((Number(items[props.heatpumpEnergySpaceToday].numericState) || 0)).toFixed(2).replace('.',
+                                ',') + ' kWh'
+                              visible: =(Number(items[props.heatpumpEnergySpaceToday].numericState) || 0) > 0.005
+                              style:
+                                width: '=((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ? 100 * (Number(items[props.heatpumpEnergySpaceToday].numericState)
+                                  || 0) / (Number(items[props.heatpumpEnergyToday].numericState) || 0) : 0).toFixed(1) + ''%'''
+                                background: '#ffb74d'
+                                height: 100%
+                                border-radius: 4px
+                            slots:
+                              default: []
+                          - component: div
+                            config:
+                              class: seg k k-warmwasser
+                              title: ='Warmwasser · ' + ((Number(items[props.heatpumpEnergyDhwToday].numericState) || 0)).toFixed(2).replace('.',
+                                ',') + ' kWh'
+                              visible: =(Number(items[props.heatpumpEnergyDhwToday].numericState) || 0) > 0.005
+                              style:
+                                width: '=((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ? 100 * (Number(items[props.heatpumpEnergyDhwToday].numericState)
+                                  || 0) / (Number(items[props.heatpumpEnergyToday].numericState) || 0) : 0).toFixed(1) + ''%'''
+                                background: '#e57373'
+                                height: 100%
+                                border-radius: 4px
+                            slots:
+                              default: []
+                          - component: div
+                            config:
+                              class: seg k k-standby
+                              title: ='Standby · ' + ((Number(items[props.heatpumpEnergyStandbyToday].numericState) || 0)).toFixed(2).replace('.',
+                                ',') + ' kWh'
+                              visible: =(Number(items[props.heatpumpEnergyStandbyToday].numericState) || 0) > 0.005
+                              style:
+                                width: '=((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ? 100 * (Number(items[props.heatpumpEnergyStandbyToday].numericState)
+                                  || 0) / (Number(items[props.heatpumpEnergyToday].numericState) || 0) : 0).toFixed(1) + ''%'''
+                                background: '#b0bec5'
+                                height: 100%
+                                border-radius: 4px
+                            slots:
+                              default: []
+                  - component: div
+                    config:
+                      style:
+                        margin-bottom: 12px
+                    slots:
+                      default:
+                      - component: div
+                        config:
+                          style:
+                            display: flex
+                            justify-content: space-between
+                            margin-bottom: 4px
+                        slots:
+                          default:
+                          - component: Label
+                            config:
+                              text: Wärme
+                              style:
+                                opacity: '0.7'
+                          - component: Label
+                            config:
+                              text: =((Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0)).toFixed(1).replace('.',
+                                ',') + ' kWh'
+                              style:
+                                font-weight: '700'
+                      - component: div
+                        config:
+                          style:
+                            display: flex
+                            gap: 2px
+                            height: 14px
+                        slots:
+                          default:
+                          - component: div
+                            config:
+                              class: seg k k-heizung
+                              title: ='Heizung · ' + ((Number(items[props.heatpumpHeatingEnergySpaceToday].numericState) ||
+                                0)).toFixed(2).replace('.', ',') + ' kWh'
+                              visible: =(Number(items[props.heatpumpHeatingEnergySpaceToday].numericState) || 0) > 0.005
+                              style:
+                                width: '=((Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0) > 0 ? 100 *
+                                  (Number(items[props.heatpumpHeatingEnergySpaceToday].numericState) || 0) / (Number(items[props.heatpumpHeatingEnergyToday].numericState)
+                                  || 0) : 0).toFixed(1) + ''%'''
+                                background: '#ffb74d'
+                                height: 100%
+                                border-radius: 4px
+                            slots:
+                              default: []
+                          - component: div
+                            config:
+                              class: seg k k-warmwasser
+                              title: ='Warmwasser · ' + ((Number(items[props.heatpumpHeatingEnergyDhwToday].numericState)
+                                || 0)).toFixed(2).replace('.', ',') + ' kWh'
+                              visible: =(Number(items[props.heatpumpHeatingEnergyDhwToday].numericState) || 0) > 0.005
+                              style:
+                                width: '=((Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0) > 0 ? 100 *
+                                  (Number(items[props.heatpumpHeatingEnergyDhwToday].numericState) || 0) / (Number(items[props.heatpumpHeatingEnergyToday].numericState)
+                                  || 0) : 0).toFixed(1) + ''%'''
+                                background: '#e57373'
+                                height: 100%
+                                border-radius: 4px
+                            slots:
+                              default: []
+                  - component: div
+                    config:
+                      style:
+                        display: flex
+                        gap: 14px
+                        margin: -4px 0 14px
+                    slots:
+                      default:
+                      - component: div
+                        config:
+                          class: item k k-heizung
+                          style:
+                            display: flex
+                            align-items: center
+                            gap: 5px
+                        slots:
+                          default:
+                          - component: div
+                            config:
+                              style:
+                                width: 10px
+                                height: 10px
+                                border-radius: 3px
+                                background: '#ffb74d'
+                            slots:
+                              default: []
+                          - component: Label
+                            config:
+                              text: Heizung
+                              style:
+                                font-size: 12px
+                                opacity: '0.75'
+                      - component: div
+                        config:
+                          class: item k k-warmwasser
+                          style:
+                            display: flex
+                            align-items: center
+                            gap: 5px
+                        slots:
+                          default:
+                          - component: div
+                            config:
+                              style:
+                                width: 10px
+                                height: 10px
+                                border-radius: 3px
+                                background: '#e57373'
+                            slots:
+                              default: []
+                          - component: Label
+                            config:
+                              text: Warmwasser
+                              style:
+                                font-size: 12px
+                                opacity: '0.75'
+                      - component: div
+                        config:
+                          class: item k k-standby
+                          style:
+                            display: flex
+                            align-items: center
+                            gap: 5px
+                        slots:
+                          default:
+                          - component: div
+                            config:
+                              style:
+                                width: 10px
+                                height: 10px
+                                border-radius: 3px
+                                background: '#b0bec5'
+                            slots:
+                              default: []
+                          - component: Label
+                            config:
+                              text: Standby
+                              style:
+                                font-size: 12px
+                                opacity: '0.75'
+              - component: div
+                config:
+                  style:
+                    display: flex
+                    justify-content: space-around
+                slots:
+                  default:
+                  - component: div
+                    config:
+                      style:
+                        display: flex
+                        flex-direction: column
+                        align-items: center
+                        gap: 4px
+                    slots:
+                      default:
+                      - component: svg
+                        config:
+                          viewBox: 0 0 76 76
+                          width: 76
+                          height: 76
+                        slots:
+                          default:
+                          - component: circle
+                            config:
+                              cx: 38
+                              cy: 38
+                              r: 28
+                              stroke: '#9e9e9e'
+                              stroke-width: 8
+                              stroke-linecap: round
+                              fill: none
+                              stroke-opacity: '0.25'
+                          - component: circle
+                            config:
+                              cx: 38
+                              cy: 38
+                              r: 28
+                              transform: rotate(-90 38 38)
+                              stroke: '#ffb74d'
+                              stroke-width: 8
+                              stroke-linecap: round
+                              fill: none
+                              stroke-dasharray: =(175.93 * Math.min(1, (Number(items[props.heatpumpDcopSpace].numericState)
+                                || 0) / 6)).toFixed(1) + ' 175.93'
+                          - component: text
+                            config:
+                              x: 38
+                              y: 44
+                              content: '=(Number(items[props.heatpumpDcopSpace].numericState) || 0) > 0 ? ((Number(items[props.heatpumpDcopSpace].numericState)
+                                || 0)).toFixed(1).replace(''.'', '','') : ''–'''
+                              fill: currentColor
+                              font-size: 18
+                              font-weight: 700
+                              text-anchor: middle
+                      - component: Label
+                        config:
+                          text: COP Heizung
+                          style:
+                            font-size: 14px
+                            opacity: '0.75'
+                  - component: div
+                    config:
+                      style:
+                        display: flex
+                        flex-direction: column
+                        align-items: center
+                        gap: 4px
+                    slots:
+                      default:
+                      - component: svg
+                        config:
+                          viewBox: 0 0 76 76
+                          width: 76
+                          height: 76
+                        slots:
+                          default:
+                          - component: circle
+                            config:
+                              cx: 38
+                              cy: 38
+                              r: 28
+                              stroke: '#9e9e9e'
+                              stroke-width: 8
+                              stroke-linecap: round
+                              fill: none
+                              stroke-opacity: '0.25'
+                          - component: circle
+                            config:
+                              cx: 38
+                              cy: 38
+                              r: 28
+                              transform: rotate(-90 38 38)
+                              stroke: '#e57373'
+                              stroke-width: 8
+                              stroke-linecap: round
+                              fill: none
+                              stroke-dasharray: =(175.93 * Math.min(1, (Number(items[props.heatpumpDcopDhw].numericState)
+                                || 0) / 6)).toFixed(1) + ' 175.93'
+                          - component: text
+                            config:
+                              x: 38
+                              y: 44
+                              content: '=(Number(items[props.heatpumpDcopDhw].numericState) || 0) > 0 ? ((Number(items[props.heatpumpDcopDhw].numericState)
+                                || 0)).toFixed(1).replace(''.'', '','') : ''–'''
+                              fill: currentColor
+                              font-size: 18
+                              font-weight: 700
+                              text-anchor: middle
+                      - component: Label
+                        config:
+                          text: COP Warmwasser
+                          style:
+                            font-size: 14px
+                            opacity: '0.75'
+                  - component: div
+                    config:
+                      style:
+                        display: flex
+                        flex-direction: column
+                        align-items: center
+                        gap: 4px
+                    slots:
+                      default:
+                      - component: svg
+                        config:
+                          viewBox: 0 0 76 76
+                          width: 76
+                          height: 76
+                        slots:
+                          default:
+                          - component: circle
+                            config:
+                              cx: 38
+                              cy: 38
+                              r: 28
+                              stroke: '#9e9e9e'
+                              stroke-width: 8
+                              stroke-linecap: round
+                              fill: none
+                              stroke-opacity: '0.25'
+                          - component: circle
+                            config:
+                              cx: 38
+                              cy: 38
+                              r: 28
+                              transform: rotate(-90 38 38)
+                              stroke: '#66bb6a'
+                              stroke-width: 8
+                              stroke-linecap: round
+                              fill: none
+                              stroke-dasharray: =(175.93 * Math.min(1, (Number(items[props.heatpumpDcop].numericState) ||
+                                0) / 6)).toFixed(1) + ' 175.93'
+                          - component: text
+                            config:
+                              x: 38
+                              y: 44
+                              content: '=(Number(items[props.heatpumpDcop].numericState) || 0) > 0 ? ((Number(items[props.heatpumpDcop].numericState)
+                                || 0)).toFixed(1).replace(''.'', '','') : ''–'''
+                              fill: currentColor
+                              font-size: 18
+                              font-weight: 700
+                              text-anchor: middle
+                      - component: Label
+                        config:
+                          text: COP gesamt
+                          style:
+                            font-size: 14px
+                            opacity: '0.75'

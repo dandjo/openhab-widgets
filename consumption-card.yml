@@ -1,0 +1,1163 @@
+uid: consumption-card
+tags:
+- overview
+props:
+  parameters:
+  - name: homeEnergyToday
+    label: Haus Energie heute
+    description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  - name: pvSelfUseToday
+    label: Photovoltaik Eigenverbrauch heute
+    description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  - name: gridImportToday
+    label: Stromzähler Bezug heute
+    description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpEnergyToday
+    label: ESPAltherma Energie heute
+    description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  - name: ecarEnergyToday
+    label: E-Auto Energie heute
+    description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  - name: acUnitEnergyToday
+    label: Klimaanlage Geräteenergie heute
+    description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  - name: office1EnergyToday
+    label: Büro 1 Energie heute
+    description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  - name: office2EnergyToday
+    label: Büro 2 Energie heute
+    description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  - name: networkEnergyToday
+    label: Netzwerk Energie heute
+    description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  - name: ventilationEnergyToday
+    label: Lüftung Energie heute
+    description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  - name: refrigeratorEnergyToday
+    label: Kühlschrank Energie heute
+    description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  - name: coffeeMachineEnergyToday
+    label: Kaffeemaschine Energie heute
+    description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  - name: livingRoomEntertainmentEnergyToday
+    label: Wohnzimmer Medien Energie heute
+    description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  - name: dishwasherEnergyToday
+    label: Geschirrspüler Energie heute
+    description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  - name: washingMachine1EnergyToday
+    label: Waschmaschine 1 Energie heute
+    description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  - name: washingMachine2EnergyToday
+    label: Waschmaschine 2 Energie heute
+    description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  - name: tumbleDryerEnergyToday
+    label: Wäschetrockner Energie heute
+    description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  - name: terraceLightEnergyToday
+    label: Terrassenlicht Energie heute
+    description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  - name: bicycleBatteriesEnergyToday
+    label: Fahrradakkus Energie heute
+    description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  - name: acMeterEnergyToday
+    label: Klimaanlage Energie heute
+    description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  parameterGroups: []
+timestamp: Sep 26, 2026, 4:41:07 AM
+component: oh-card
+config:
+  title: '=''Verbrauch heute · '' + ([''NULL'', ''UNDEF''].includes(items[props.homeEnergyToday].state) ? ''–'' : (items[props.homeEnergyToday].displayState
+    || items[props.homeEnergyToday].state))'
+  style:
+    height: calc(100% - 2 * var(--f7-card-margin-vertical))
+slots:
+  content:
+  - component: div
+    config:
+      style:
+        padding: 4px 16px 16px
+    slots:
+      default:
+      - component: div
+        config:
+          stylesheet: '.k { transition: opacity 0.15s, transform 0.15s, background-color 0.15s; }
+
+            .item { border-radius: 6px; padding: 3px 6px; margin: 0 -6px; }
+
+            :host:has(.k:hover) .k { opacity: 0.3; }
+
+            :host:has(.k-pv:hover) .k-pv { opacity: 1; }
+
+            :host:has(.k-pv:hover) .item.k-pv { background-color: rgba(165, 214, 167, 0.4); font-weight: 700; }
+
+            :host:has(.k-pv:hover) .seg.k-pv { transform: scaleY(1.5); }
+
+            :host:has(.k-grid:hover) .k-grid { opacity: 1; }
+
+            :host:has(.k-grid:hover) .item.k-grid { background-color: rgba(239, 154, 154, 0.4); font-weight: 700; }
+
+            :host:has(.k-grid:hover) .seg.k-grid { transform: scaleY(1.5); }'
+          style: {}
+        slots:
+          default:
+          - component: div
+            config:
+              style:
+                display: flex
+                justify-content: space-between
+                margin-bottom: 6px
+            slots:
+              default:
+              - component: div
+                config:
+                  class: item k k-pv
+                  style:
+                    text-align: left
+                slots:
+                  default:
+                  - component: Label
+                    config:
+                      text: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? Math.round(100 * (Number(items[props.pvSelfUseToday].numericState)
+                        || 0) / (Number(items[props.homeEnergyToday].numericState) || 0)) : 0) + '' %'''
+                      style:
+                        font-size: 26px
+                        font-weight: '700'
+                        color: '#43a047'
+                        line-height: 30px
+                  - component: Label
+                    config:
+                      text: ='aus PV · ' + ((Number(items[props.pvSelfUseToday].numericState) || 0)).toFixed(1).replace('.',
+                        ',') + ' kWh'
+                      style:
+                        font-size: 12px
+                        opacity: '0.7'
+              - component: div
+                config:
+                  class: item k k-grid
+                  style:
+                    text-align: right
+                slots:
+                  default:
+                  - component: Label
+                    config:
+                      text: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? Math.round(100 * (Number(items[props.gridImportToday].numericState)
+                        || 0) / (Number(items[props.homeEnergyToday].numericState) || 0)) : 0) + '' %'''
+                      style:
+                        font-size: 26px
+                        font-weight: '700'
+                        color: '#e53935'
+                        line-height: 30px
+                  - component: Label
+                    config:
+                      text: ='aus dem Netz · ' + ((Number(items[props.gridImportToday].numericState) || 0)).toFixed(1).replace('.',
+                        ',') + ' kWh'
+                      style:
+                        font-size: 12px
+                        opacity: '0.7'
+          - component: div
+            config:
+              style:
+                display: flex
+                gap: 2px
+                height: 10px
+            slots:
+              default:
+              - component: div
+                config:
+                  class: seg k k-pv
+                  title: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? Math.round(100 * (Number(items[props.pvSelfUseToday].numericState)
+                    || 0) / (Number(items[props.homeEnergyToday].numericState) || 0)) : 0) + '' % aus PV'''
+                  visible: =(Number(items[props.pvSelfUseToday].numericState) || 0) > 0.005
+                  style:
+                    width: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? 100 * (Number(items[props.pvSelfUseToday].numericState)
+                      || 0) / (Number(items[props.homeEnergyToday].numericState) || 0) : 0).toFixed(2) + ''%'''
+                    height: 100%
+                    background: '#a5d6a7'
+                    border-radius: 4px
+                slots:
+                  default: []
+              - component: div
+                config:
+                  class: seg k k-grid
+                  title: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? Math.round(100 * (Number(items[props.gridImportToday].numericState)
+                    || 0) / (Number(items[props.homeEnergyToday].numericState) || 0)) : 0) + '' % aus dem Netz'''
+                  visible: =(Number(items[props.gridImportToday].numericState) || 0) > 0.005
+                  style:
+                    width: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? 100 * (Number(items[props.gridImportToday].numericState)
+                      || 0) / (Number(items[props.homeEnergyToday].numericState) || 0) : 0).toFixed(2) + ''%'''
+                    height: 100%
+                    background: '#ef9a9a'
+                    border-radius: 4px
+                slots:
+                  default: []
+      - component: Label
+        config:
+          text: Verbraucher
+          style:
+            font-size: 13px
+            opacity: '0.7'
+            margin: 16px 0 6px
+      - component: div
+        config:
+          stylesheet: '.k { transition: opacity 0.15s, transform 0.15s, background-color 0.15s; }
+
+            .item { border-radius: 6px; padding: 3px 6px; margin: 0 -6px; }
+
+            :host:has(.k:hover) .k { opacity: 0.3; }
+
+            :host:has(.k-c0:hover) .k-c0 { opacity: 1; }
+
+            :host:has(.k-c0:hover) .item.k-c0 { background-color: rgba(255, 183, 77, 0.4); font-weight: 700; }
+
+            :host:has(.k-c0:hover) .seg.k-c0 { transform: scaleY(1.5); }
+
+            :host:has(.k-c1:hover) .k-c1 { opacity: 1; }
+
+            :host:has(.k-c1:hover) .item.k-c1 { background-color: rgba(38, 166, 154, 0.4); font-weight: 700; }
+
+            :host:has(.k-c1:hover) .seg.k-c1 { transform: scaleY(1.5); }
+
+            :host:has(.k-c2:hover) .k-c2 { opacity: 1; }
+
+            :host:has(.k-c2:hover) .item.k-c2 { background-color: rgba(79, 195, 247, 0.4); font-weight: 700; }
+
+            :host:has(.k-c2:hover) .seg.k-c2 { transform: scaleY(1.5); }
+
+            :host:has(.k-c3:hover) .k-c3 { opacity: 1; }
+
+            :host:has(.k-c3:hover) .item.k-c3 { background-color: rgba(206, 147, 216, 0.4); font-weight: 700; }
+
+            :host:has(.k-c3:hover) .seg.k-c3 { transform: scaleY(1.5); }
+
+            :host:has(.k-c4:hover) .k-c4 { opacity: 1; }
+
+            :host:has(.k-c4:hover) .item.k-c4 { background-color: rgba(159, 168, 218, 0.4); font-weight: 700; }
+
+            :host:has(.k-c4:hover) .seg.k-c4 { transform: scaleY(1.5); }
+
+            :host:has(.k-c5:hover) .k-c5 { opacity: 1; }
+
+            :host:has(.k-c5:hover) .item.k-c5 { background-color: rgba(128, 203, 196, 0.4); font-weight: 700; }
+
+            :host:has(.k-c5:hover) .seg.k-c5 { transform: scaleY(1.5); }
+
+            :host:has(.k-c6:hover) .k-c6 { opacity: 1; }
+
+            :host:has(.k-c6:hover) .item.k-c6 { background-color: rgba(176, 190, 197, 0.4); font-weight: 700; }
+
+            :host:has(.k-c6:hover) .seg.k-c6 { transform: scaleY(1.5); }
+
+            :host:has(.k-c7:hover) .k-c7 { opacity: 1; }
+
+            :host:has(.k-c7:hover) .item.k-c7 { background-color: rgba(188, 170, 164, 0.4); font-weight: 700; }
+
+            :host:has(.k-c7:hover) .seg.k-c7 { transform: scaleY(1.5); }
+
+            :host:has(.k-c8:hover) .k-c8 { opacity: 1; }
+
+            :host:has(.k-c8:hover) .item.k-c8 { background-color: rgba(244, 143, 177, 0.4); font-weight: 700; }
+
+            :host:has(.k-c8:hover) .seg.k-c8 { transform: scaleY(1.5); }
+
+            :host:has(.k-c9:hover) .k-c9 { opacity: 1; }
+
+            :host:has(.k-c9:hover) .item.k-c9 { background-color: rgba(174, 213, 129, 0.4); font-weight: 700; }
+
+            :host:has(.k-c9:hover) .seg.k-c9 { transform: scaleY(1.5); }
+
+            :host:has(.k-c10:hover) .k-c10 { opacity: 1; }
+
+            :host:has(.k-c10:hover) .item.k-c10 { background-color: rgba(255, 241, 118, 0.4); font-weight: 700; }
+
+            :host:has(.k-c10:hover) .seg.k-c10 { transform: scaleY(1.5); }
+
+            :host:has(.k-c11:hover) .k-c11 { opacity: 1; }
+
+            :host:has(.k-c11:hover) .item.k-c11 { background-color: rgba(224, 224, 224, 0.4); font-weight: 700; }
+
+            :host:has(.k-c11:hover) .seg.k-c11 { transform: scaleY(1.5); }'
+          style: {}
+        slots:
+          default:
+          - component: div
+            config:
+              style:
+                display: flex
+                gap: 2px
+                height: 18px
+            slots:
+              default:
+              - component: div
+                config:
+                  class: seg k k-c0
+                  title: '=''Wärmepumpe · '' + (((Number(items[props.heatpumpEnergyToday].numericState) || 0))).toFixed(2).replace(''.'',
+                    '','') + '' kWh · '' + ((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? Math.round(100
+                    * ((Number(items[props.heatpumpEnergyToday].numericState) || 0)) / (Number(items[props.homeEnergyToday].numericState)
+                    || 0)) : 0) + '' %'''
+                  visible: =((Number(items[props.heatpumpEnergyToday].numericState) || 0)) > 0.005
+                  style:
+                    width: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? 100 * ((Number(items[props.heatpumpEnergyToday].numericState)
+                      || 0)) / (Number(items[props.homeEnergyToday].numericState) || 0) : 0).toFixed(2) + ''%'''
+                    height: 100%
+                    background: '#ffb74d'
+                    border-radius: 4px
+                slots:
+                  default: []
+              - component: div
+                config:
+                  class: seg k k-c1
+                  title: '=''E-Auto · '' + ((Number(items[props.ecarEnergyToday].numericState) || 0)).toFixed(2).replace(''.'',
+                    '','') + '' kWh · '' + ((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? Math.round(100
+                    * (Number(items[props.ecarEnergyToday].numericState) || 0) / (Number(items[props.homeEnergyToday].numericState)
+                    || 0)) : 0) + '' %'''
+                  visible: =(Number(items[props.ecarEnergyToday].numericState) || 0) > 0.005
+                  style:
+                    width: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? 100 * (Number(items[props.ecarEnergyToday].numericState)
+                      || 0) / (Number(items[props.homeEnergyToday].numericState) || 0) : 0).toFixed(2) + ''%'''
+                    height: 100%
+                    background: '#26a69a'
+                    border-radius: 4px
+                slots:
+                  default: []
+              - component: div
+                config:
+                  class: seg k k-c2
+                  title: '=''Klimaanlage · '' + ((Number(items[props.acUnitEnergyToday].numericState) || 0)).toFixed(2).replace(''.'',
+                    '','') + '' kWh · '' + ((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? Math.round(100
+                    * (Number(items[props.acUnitEnergyToday].numericState) || 0) / (Number(items[props.homeEnergyToday].numericState)
+                    || 0)) : 0) + '' %'''
+                  visible: =(Number(items[props.acUnitEnergyToday].numericState) || 0) > 0.005
+                  style:
+                    width: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? 100 * (Number(items[props.acUnitEnergyToday].numericState)
+                      || 0) / (Number(items[props.homeEnergyToday].numericState) || 0) : 0).toFixed(2) + ''%'''
+                    height: 100%
+                    background: '#4fc3f7'
+                    border-radius: 4px
+                slots:
+                  default: []
+              - component: div
+                config:
+                  class: seg k k-c3
+                  title: '=''Büros · '' + (((Number(items[props.office1EnergyToday].numericState) || 0) + (Number(items[props.office2EnergyToday].numericState)
+                    || 0))).toFixed(2).replace(''.'', '','') + '' kWh · '' + ((Number(items[props.homeEnergyToday].numericState)
+                    || 0) > 0 ? Math.round(100 * ((Number(items[props.office1EnergyToday].numericState) || 0) + (Number(items[props.office2EnergyToday].numericState)
+                    || 0)) / (Number(items[props.homeEnergyToday].numericState) || 0)) : 0) + '' %'''
+                  visible: =((Number(items[props.office1EnergyToday].numericState) || 0) + (Number(items[props.office2EnergyToday].numericState)
+                    || 0)) > 0.005
+                  style:
+                    width: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? 100 * ((Number(items[props.office1EnergyToday].numericState)
+                      || 0) + (Number(items[props.office2EnergyToday].numericState) || 0)) / (Number(items[props.homeEnergyToday].numericState)
+                      || 0) : 0).toFixed(2) + ''%'''
+                    height: 100%
+                    background: '#ce93d8'
+                    border-radius: 4px
+                slots:
+                  default: []
+              - component: div
+                config:
+                  class: seg k k-c4
+                  title: '=''Netzwerk · '' + (((Number(items[props.networkEnergyToday].numericState) || 0))).toFixed(2).replace(''.'',
+                    '','') + '' kWh · '' + ((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? Math.round(100
+                    * ((Number(items[props.networkEnergyToday].numericState) || 0)) / (Number(items[props.homeEnergyToday].numericState)
+                    || 0)) : 0) + '' %'''
+                  visible: =((Number(items[props.networkEnergyToday].numericState) || 0)) > 0.005
+                  style:
+                    width: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? 100 * ((Number(items[props.networkEnergyToday].numericState)
+                      || 0)) / (Number(items[props.homeEnergyToday].numericState) || 0) : 0).toFixed(2) + ''%'''
+                    height: 100%
+                    background: '#9fa8da'
+                    border-radius: 4px
+                slots:
+                  default: []
+              - component: div
+                config:
+                  class: seg k k-c5
+                  title: '=''Lüftung · '' + (((Number(items[props.ventilationEnergyToday].numericState) || 0))).toFixed(2).replace(''.'',
+                    '','') + '' kWh · '' + ((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? Math.round(100
+                    * ((Number(items[props.ventilationEnergyToday].numericState) || 0)) / (Number(items[props.homeEnergyToday].numericState)
+                    || 0)) : 0) + '' %'''
+                  visible: =((Number(items[props.ventilationEnergyToday].numericState) || 0)) > 0.005
+                  style:
+                    width: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? 100 * ((Number(items[props.ventilationEnergyToday].numericState)
+                      || 0)) / (Number(items[props.homeEnergyToday].numericState) || 0) : 0).toFixed(2) + ''%'''
+                    height: 100%
+                    background: '#80cbc4'
+                    border-radius: 4px
+                slots:
+                  default: []
+              - component: div
+                config:
+                  class: seg k k-c6
+                  title: '=''Kühlschrank · '' + (((Number(items[props.refrigeratorEnergyToday].numericState) || 0))).toFixed(2).replace(''.'',
+                    '','') + '' kWh · '' + ((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? Math.round(100
+                    * ((Number(items[props.refrigeratorEnergyToday].numericState) || 0)) / (Number(items[props.homeEnergyToday].numericState)
+                    || 0)) : 0) + '' %'''
+                  visible: =((Number(items[props.refrigeratorEnergyToday].numericState) || 0)) > 0.005
+                  style:
+                    width: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? 100 * ((Number(items[props.refrigeratorEnergyToday].numericState)
+                      || 0)) / (Number(items[props.homeEnergyToday].numericState) || 0) : 0).toFixed(2) + ''%'''
+                    height: 100%
+                    background: '#b0bec5'
+                    border-radius: 4px
+                slots:
+                  default: []
+              - component: div
+                config:
+                  class: seg k k-c7
+                  title: '=''Kaffeemaschine · '' + (((Number(items[props.coffeeMachineEnergyToday].numericState) || 0))).toFixed(2).replace(''.'',
+                    '','') + '' kWh · '' + ((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? Math.round(100
+                    * ((Number(items[props.coffeeMachineEnergyToday].numericState) || 0)) / (Number(items[props.homeEnergyToday].numericState)
+                    || 0)) : 0) + '' %'''
+                  visible: =((Number(items[props.coffeeMachineEnergyToday].numericState) || 0)) > 0.005
+                  style:
+                    width: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? 100 * ((Number(items[props.coffeeMachineEnergyToday].numericState)
+                      || 0)) / (Number(items[props.homeEnergyToday].numericState) || 0) : 0).toFixed(2) + ''%'''
+                    height: 100%
+                    background: '#bcaaa4'
+                    border-radius: 4px
+                slots:
+                  default: []
+              - component: div
+                config:
+                  class: seg k k-c8
+                  title: '=''Wohnzimmer Medien · '' + (((Number(items[props.livingRoomEntertainmentEnergyToday].numericState)
+                    || 0))).toFixed(2).replace(''.'', '','') + '' kWh · '' + ((Number(items[props.homeEnergyToday].numericState)
+                    || 0) > 0 ? Math.round(100 * ((Number(items[props.livingRoomEntertainmentEnergyToday].numericState) ||
+                    0)) / (Number(items[props.homeEnergyToday].numericState) || 0)) : 0) + '' %'''
+                  visible: =((Number(items[props.livingRoomEntertainmentEnergyToday].numericState) || 0)) > 0.005
+                  style:
+                    width: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? 100 * ((Number(items[props.livingRoomEntertainmentEnergyToday].numericState)
+                      || 0)) / (Number(items[props.homeEnergyToday].numericState) || 0) : 0).toFixed(2) + ''%'''
+                    height: 100%
+                    background: '#f48fb1'
+                    border-radius: 4px
+                slots:
+                  default: []
+              - component: div
+                config:
+                  class: seg k k-c9
+                  title: '=''Wäsche & Geschirr · '' + (((Number(items[props.dishwasherEnergyToday].numericState) || 0) + (Number(items[props.washingMachine1EnergyToday].numericState)
+                    || 0) + (Number(items[props.washingMachine2EnergyToday].numericState) || 0) + (Number(items[props.tumbleDryerEnergyToday].numericState)
+                    || 0))).toFixed(2).replace(''.'', '','') + '' kWh · '' + ((Number(items[props.homeEnergyToday].numericState)
+                    || 0) > 0 ? Math.round(100 * ((Number(items[props.dishwasherEnergyToday].numericState) || 0) + (Number(items[props.washingMachine1EnergyToday].numericState)
+                    || 0) + (Number(items[props.washingMachine2EnergyToday].numericState) || 0) + (Number(items[props.tumbleDryerEnergyToday].numericState)
+                    || 0)) / (Number(items[props.homeEnergyToday].numericState) || 0)) : 0) + '' %'''
+                  visible: =((Number(items[props.dishwasherEnergyToday].numericState) || 0) + (Number(items[props.washingMachine1EnergyToday].numericState)
+                    || 0) + (Number(items[props.washingMachine2EnergyToday].numericState) || 0) + (Number(items[props.tumbleDryerEnergyToday].numericState)
+                    || 0)) > 0.005
+                  style:
+                    width: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? 100 * ((Number(items[props.dishwasherEnergyToday].numericState)
+                      || 0) + (Number(items[props.washingMachine1EnergyToday].numericState) || 0) + (Number(items[props.washingMachine2EnergyToday].numericState)
+                      || 0) + (Number(items[props.tumbleDryerEnergyToday].numericState) || 0)) / (Number(items[props.homeEnergyToday].numericState)
+                      || 0) : 0).toFixed(2) + ''%'''
+                    height: 100%
+                    background: '#aed581'
+                    border-radius: 4px
+                slots:
+                  default: []
+              - component: div
+                config:
+                  class: seg k k-c10
+                  title: '=''Terrasse & Fahrräder · '' + (((Number(items[props.terraceLightEnergyToday].numericState) || 0)
+                    + (Number(items[props.bicycleBatteriesEnergyToday].numericState) || 0))).toFixed(2).replace(''.'', '','')
+                    + '' kWh · '' + ((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? Math.round(100 * ((Number(items[props.terraceLightEnergyToday].numericState)
+                    || 0) + (Number(items[props.bicycleBatteriesEnergyToday].numericState) || 0)) / (Number(items[props.homeEnergyToday].numericState)
+                    || 0)) : 0) + '' %'''
+                  visible: =((Number(items[props.terraceLightEnergyToday].numericState) || 0) + (Number(items[props.bicycleBatteriesEnergyToday].numericState)
+                    || 0)) > 0.005
+                  style:
+                    width: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? 100 * ((Number(items[props.terraceLightEnergyToday].numericState)
+                      || 0) + (Number(items[props.bicycleBatteriesEnergyToday].numericState) || 0)) / (Number(items[props.homeEnergyToday].numericState)
+                      || 0) : 0).toFixed(2) + ''%'''
+                    height: 100%
+                    background: '#fff176'
+                    border-radius: 4px
+                slots:
+                  default: []
+              - component: div
+                config:
+                  class: seg k k-c11
+                  title: '=''Nicht gemessen · '' + (Math.max(0, (Number(items[props.homeEnergyToday].numericState) || 0) -
+                    ((Number(items[props.heatpumpEnergyToday].numericState) || 0) + (Number(items[props.acMeterEnergyToday].numericState)
+                    || 0) + (Number(items[props.office1EnergyToday].numericState) || 0) + (Number(items[props.office2EnergyToday].numericState)
+                    || 0) + (Number(items[props.networkEnergyToday].numericState) || 0) + (Number(items[props.ventilationEnergyToday].numericState)
+                    || 0) + (Number(items[props.refrigeratorEnergyToday].numericState) || 0) + (Number(items[props.coffeeMachineEnergyToday].numericState)
+                    || 0) + (Number(items[props.livingRoomEntertainmentEnergyToday].numericState) || 0) + (Number(items[props.dishwasherEnergyToday].numericState)
+                    || 0) + (Number(items[props.washingMachine1EnergyToday].numericState) || 0) + (Number(items[props.washingMachine2EnergyToday].numericState)
+                    || 0) + (Number(items[props.tumbleDryerEnergyToday].numericState) || 0) + (Number(items[props.terraceLightEnergyToday].numericState)
+                    || 0) + (Number(items[props.bicycleBatteriesEnergyToday].numericState) || 0)))).toFixed(2).replace(''.'',
+                    '','') + '' kWh · '' + ((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? Math.round(100
+                    * Math.max(0, (Number(items[props.homeEnergyToday].numericState) || 0) - ((Number(items[props.heatpumpEnergyToday].numericState)
+                    || 0) + (Number(items[props.acMeterEnergyToday].numericState) || 0) + (Number(items[props.office1EnergyToday].numericState)
+                    || 0) + (Number(items[props.office2EnergyToday].numericState) || 0) + (Number(items[props.networkEnergyToday].numericState)
+                    || 0) + (Number(items[props.ventilationEnergyToday].numericState) || 0) + (Number(items[props.refrigeratorEnergyToday].numericState)
+                    || 0) + (Number(items[props.coffeeMachineEnergyToday].numericState) || 0) + (Number(items[props.livingRoomEntertainmentEnergyToday].numericState)
+                    || 0) + (Number(items[props.dishwasherEnergyToday].numericState) || 0) + (Number(items[props.washingMachine1EnergyToday].numericState)
+                    || 0) + (Number(items[props.washingMachine2EnergyToday].numericState) || 0) + (Number(items[props.tumbleDryerEnergyToday].numericState)
+                    || 0) + (Number(items[props.terraceLightEnergyToday].numericState) || 0) + (Number(items[props.bicycleBatteriesEnergyToday].numericState)
+                    || 0))) / (Number(items[props.homeEnergyToday].numericState) || 0)) : 0) + '' %'''
+                  visible: =Math.max(0, (Number(items[props.homeEnergyToday].numericState) || 0) - ((Number(items[props.heatpumpEnergyToday].numericState)
+                    || 0) + (Number(items[props.acMeterEnergyToday].numericState) || 0) + (Number(items[props.office1EnergyToday].numericState)
+                    || 0) + (Number(items[props.office2EnergyToday].numericState) || 0) + (Number(items[props.networkEnergyToday].numericState)
+                    || 0) + (Number(items[props.ventilationEnergyToday].numericState) || 0) + (Number(items[props.refrigeratorEnergyToday].numericState)
+                    || 0) + (Number(items[props.coffeeMachineEnergyToday].numericState) || 0) + (Number(items[props.livingRoomEntertainmentEnergyToday].numericState)
+                    || 0) + (Number(items[props.dishwasherEnergyToday].numericState) || 0) + (Number(items[props.washingMachine1EnergyToday].numericState)
+                    || 0) + (Number(items[props.washingMachine2EnergyToday].numericState) || 0) + (Number(items[props.tumbleDryerEnergyToday].numericState)
+                    || 0) + (Number(items[props.terraceLightEnergyToday].numericState) || 0) + (Number(items[props.bicycleBatteriesEnergyToday].numericState)
+                    || 0))) > 0.005
+                  style:
+                    width: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? 100 * Math.max(0, (Number(items[props.homeEnergyToday].numericState)
+                      || 0) - ((Number(items[props.heatpumpEnergyToday].numericState) || 0) + (Number(items[props.acMeterEnergyToday].numericState)
+                      || 0) + (Number(items[props.office1EnergyToday].numericState) || 0) + (Number(items[props.office2EnergyToday].numericState)
+                      || 0) + (Number(items[props.networkEnergyToday].numericState) || 0) + (Number(items[props.ventilationEnergyToday].numericState)
+                      || 0) + (Number(items[props.refrigeratorEnergyToday].numericState) || 0) + (Number(items[props.coffeeMachineEnergyToday].numericState)
+                      || 0) + (Number(items[props.livingRoomEntertainmentEnergyToday].numericState) || 0) + (Number(items[props.dishwasherEnergyToday].numericState)
+                      || 0) + (Number(items[props.washingMachine1EnergyToday].numericState) || 0) + (Number(items[props.washingMachine2EnergyToday].numericState)
+                      || 0) + (Number(items[props.tumbleDryerEnergyToday].numericState) || 0) + (Number(items[props.terraceLightEnergyToday].numericState)
+                      || 0) + (Number(items[props.bicycleBatteriesEnergyToday].numericState) || 0))) / (Number(items[props.homeEnergyToday].numericState)
+                      || 0) : 0).toFixed(2) + ''%'''
+                    height: 100%
+                    background: '#e0e0e0'
+                    border-radius: 4px
+                slots:
+                  default: []
+          - component: div
+            config:
+              style:
+                columns: 2 230px
+                column-gap: 24px
+                margin-top: 12px
+            slots:
+              default:
+              - component: div
+                config:
+                  class: item k k-c0
+                  style:
+                    display: flex
+                    align-items: center
+                    gap: 8px
+                    font-size: 13px
+                    break-inside: avoid
+                    margin-bottom: 2px
+                slots:
+                  default:
+                  - component: div
+                    config:
+                      style:
+                        width: 10px
+                        height: 10px
+                        border-radius: 50%
+                        background: '#ffb74d'
+                        flex: 0 0 auto
+                    slots:
+                      default: []
+                  - component: Label
+                    config:
+                      text: Wärmepumpe
+                      style:
+                        flex: '1'
+                        min-width: '0'
+                        white-space: nowrap
+                        overflow: hidden
+                        text-overflow: ellipsis
+                  - component: Label
+                    config:
+                      text: =(((Number(items[props.heatpumpEnergyToday].numericState) || 0))).toFixed(2).replace('.', ',')
+                        + ' kWh'
+                      style:
+                        font-weight: '600'
+                        white-space: nowrap
+                  - component: Label
+                    config:
+                      text: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? Math.round(100 * ((Number(items[props.heatpumpEnergyToday].numericState)
+                        || 0)) / (Number(items[props.homeEnergyToday].numericState) || 0)) : 0) + '' %'''
+                      style:
+                        opacity: '0.6'
+                        min-width: 40px
+                        text-align: right
+              - component: div
+                config:
+                  class: item k k-c1
+                  style:
+                    display: flex
+                    align-items: center
+                    gap: 8px
+                    font-size: 13px
+                    break-inside: avoid
+                    margin-bottom: 2px
+                slots:
+                  default:
+                  - component: div
+                    config:
+                      style:
+                        width: 10px
+                        height: 10px
+                        border-radius: 50%
+                        background: '#26a69a'
+                        flex: 0 0 auto
+                    slots:
+                      default: []
+                  - component: Label
+                    config:
+                      text: E-Auto
+                      style:
+                        flex: '1'
+                        min-width: '0'
+                        white-space: nowrap
+                        overflow: hidden
+                        text-overflow: ellipsis
+                  - component: Label
+                    config:
+                      text: =((Number(items[props.ecarEnergyToday].numericState) || 0)).toFixed(2).replace('.', ',') + ' kWh'
+                      style:
+                        font-weight: '600'
+                        white-space: nowrap
+                  - component: Label
+                    config:
+                      text: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? Math.round(100 * (Number(items[props.ecarEnergyToday].numericState)
+                        || 0) / (Number(items[props.homeEnergyToday].numericState) || 0)) : 0) + '' %'''
+                      style:
+                        opacity: '0.6'
+                        min-width: 40px
+                        text-align: right
+              - component: div
+                config:
+                  class: item k k-c2
+                  style:
+                    display: flex
+                    align-items: center
+                    gap: 8px
+                    font-size: 13px
+                    break-inside: avoid
+                    margin-bottom: 2px
+                slots:
+                  default:
+                  - component: div
+                    config:
+                      style:
+                        width: 10px
+                        height: 10px
+                        border-radius: 50%
+                        background: '#4fc3f7'
+                        flex: 0 0 auto
+                    slots:
+                      default: []
+                  - component: Label
+                    config:
+                      text: Klimaanlage
+                      style:
+                        flex: '1'
+                        min-width: '0'
+                        white-space: nowrap
+                        overflow: hidden
+                        text-overflow: ellipsis
+                  - component: Label
+                    config:
+                      text: =((Number(items[props.acUnitEnergyToday].numericState) || 0)).toFixed(2).replace('.', ',') + '
+                        kWh'
+                      style:
+                        font-weight: '600'
+                        white-space: nowrap
+                  - component: Label
+                    config:
+                      text: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? Math.round(100 * (Number(items[props.acUnitEnergyToday].numericState)
+                        || 0) / (Number(items[props.homeEnergyToday].numericState) || 0)) : 0) + '' %'''
+                      style:
+                        opacity: '0.6'
+                        min-width: 40px
+                        text-align: right
+              - component: div
+                config:
+                  class: item k k-c3
+                  style:
+                    display: flex
+                    align-items: center
+                    gap: 8px
+                    font-size: 13px
+                    break-inside: avoid
+                    margin-bottom: 2px
+                slots:
+                  default:
+                  - component: div
+                    config:
+                      style:
+                        width: 10px
+                        height: 10px
+                        border-radius: 50%
+                        background: '#ce93d8'
+                        flex: 0 0 auto
+                    slots:
+                      default: []
+                  - component: Label
+                    config:
+                      text: Büros
+                      style:
+                        flex: '1'
+                        min-width: '0'
+                        white-space: nowrap
+                        overflow: hidden
+                        text-overflow: ellipsis
+                  - component: Label
+                    config:
+                      text: =(((Number(items[props.office1EnergyToday].numericState) || 0) + (Number(items[props.office2EnergyToday].numericState)
+                        || 0))).toFixed(2).replace('.', ',') + ' kWh'
+                      style:
+                        font-weight: '600'
+                        white-space: nowrap
+                  - component: Label
+                    config:
+                      text: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? Math.round(100 * ((Number(items[props.office1EnergyToday].numericState)
+                        || 0) + (Number(items[props.office2EnergyToday].numericState) || 0)) / (Number(items[props.homeEnergyToday].numericState)
+                        || 0)) : 0) + '' %'''
+                      style:
+                        opacity: '0.6'
+                        min-width: 40px
+                        text-align: right
+              - component: div
+                config:
+                  class: item k k-c4
+                  style:
+                    display: flex
+                    align-items: center
+                    gap: 8px
+                    font-size: 13px
+                    break-inside: avoid
+                    margin-bottom: 2px
+                slots:
+                  default:
+                  - component: div
+                    config:
+                      style:
+                        width: 10px
+                        height: 10px
+                        border-radius: 50%
+                        background: '#9fa8da'
+                        flex: 0 0 auto
+                    slots:
+                      default: []
+                  - component: Label
+                    config:
+                      text: Netzwerk
+                      style:
+                        flex: '1'
+                        min-width: '0'
+                        white-space: nowrap
+                        overflow: hidden
+                        text-overflow: ellipsis
+                  - component: Label
+                    config:
+                      text: =(((Number(items[props.networkEnergyToday].numericState) || 0))).toFixed(2).replace('.', ',')
+                        + ' kWh'
+                      style:
+                        font-weight: '600'
+                        white-space: nowrap
+                  - component: Label
+                    config:
+                      text: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? Math.round(100 * ((Number(items[props.networkEnergyToday].numericState)
+                        || 0)) / (Number(items[props.homeEnergyToday].numericState) || 0)) : 0) + '' %'''
+                      style:
+                        opacity: '0.6'
+                        min-width: 40px
+                        text-align: right
+              - component: div
+                config:
+                  class: item k k-c5
+                  style:
+                    display: flex
+                    align-items: center
+                    gap: 8px
+                    font-size: 13px
+                    break-inside: avoid
+                    margin-bottom: 2px
+                slots:
+                  default:
+                  - component: div
+                    config:
+                      style:
+                        width: 10px
+                        height: 10px
+                        border-radius: 50%
+                        background: '#80cbc4'
+                        flex: 0 0 auto
+                    slots:
+                      default: []
+                  - component: Label
+                    config:
+                      text: Lüftung
+                      style:
+                        flex: '1'
+                        min-width: '0'
+                        white-space: nowrap
+                        overflow: hidden
+                        text-overflow: ellipsis
+                  - component: Label
+                    config:
+                      text: =(((Number(items[props.ventilationEnergyToday].numericState) || 0))).toFixed(2).replace('.', ',')
+                        + ' kWh'
+                      style:
+                        font-weight: '600'
+                        white-space: nowrap
+                  - component: Label
+                    config:
+                      text: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? Math.round(100 * ((Number(items[props.ventilationEnergyToday].numericState)
+                        || 0)) / (Number(items[props.homeEnergyToday].numericState) || 0)) : 0) + '' %'''
+                      style:
+                        opacity: '0.6'
+                        min-width: 40px
+                        text-align: right
+              - component: div
+                config:
+                  class: item k k-c6
+                  style:
+                    display: flex
+                    align-items: center
+                    gap: 8px
+                    font-size: 13px
+                    break-inside: avoid
+                    margin-bottom: 2px
+                slots:
+                  default:
+                  - component: div
+                    config:
+                      style:
+                        width: 10px
+                        height: 10px
+                        border-radius: 50%
+                        background: '#b0bec5'
+                        flex: 0 0 auto
+                    slots:
+                      default: []
+                  - component: Label
+                    config:
+                      text: Kühlschrank
+                      style:
+                        flex: '1'
+                        min-width: '0'
+                        white-space: nowrap
+                        overflow: hidden
+                        text-overflow: ellipsis
+                  - component: Label
+                    config:
+                      text: =(((Number(items[props.refrigeratorEnergyToday].numericState) || 0))).toFixed(2).replace('.',
+                        ',') + ' kWh'
+                      style:
+                        font-weight: '600'
+                        white-space: nowrap
+                  - component: Label
+                    config:
+                      text: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? Math.round(100 * ((Number(items[props.refrigeratorEnergyToday].numericState)
+                        || 0)) / (Number(items[props.homeEnergyToday].numericState) || 0)) : 0) + '' %'''
+                      style:
+                        opacity: '0.6'
+                        min-width: 40px
+                        text-align: right
+              - component: div
+                config:
+                  class: item k k-c7
+                  style:
+                    display: flex
+                    align-items: center
+                    gap: 8px
+                    font-size: 13px
+                    break-inside: avoid
+                    margin-bottom: 2px
+                slots:
+                  default:
+                  - component: div
+                    config:
+                      style:
+                        width: 10px
+                        height: 10px
+                        border-radius: 50%
+                        background: '#bcaaa4'
+                        flex: 0 0 auto
+                    slots:
+                      default: []
+                  - component: Label
+                    config:
+                      text: Kaffeemaschine
+                      style:
+                        flex: '1'
+                        min-width: '0'
+                        white-space: nowrap
+                        overflow: hidden
+                        text-overflow: ellipsis
+                  - component: Label
+                    config:
+                      text: =(((Number(items[props.coffeeMachineEnergyToday].numericState) || 0))).toFixed(2).replace('.',
+                        ',') + ' kWh'
+                      style:
+                        font-weight: '600'
+                        white-space: nowrap
+                  - component: Label
+                    config:
+                      text: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? Math.round(100 * ((Number(items[props.coffeeMachineEnergyToday].numericState)
+                        || 0)) / (Number(items[props.homeEnergyToday].numericState) || 0)) : 0) + '' %'''
+                      style:
+                        opacity: '0.6'
+                        min-width: 40px
+                        text-align: right
+              - component: div
+                config:
+                  class: item k k-c8
+                  style:
+                    display: flex
+                    align-items: center
+                    gap: 8px
+                    font-size: 13px
+                    break-inside: avoid
+                    margin-bottom: 2px
+                slots:
+                  default:
+                  - component: div
+                    config:
+                      style:
+                        width: 10px
+                        height: 10px
+                        border-radius: 50%
+                        background: '#f48fb1'
+                        flex: 0 0 auto
+                    slots:
+                      default: []
+                  - component: Label
+                    config:
+                      text: Wohnzimmer Medien
+                      style:
+                        flex: '1'
+                        min-width: '0'
+                        white-space: nowrap
+                        overflow: hidden
+                        text-overflow: ellipsis
+                  - component: Label
+                    config:
+                      text: =(((Number(items[props.livingRoomEntertainmentEnergyToday].numericState) || 0))).toFixed(2).replace('.',
+                        ',') + ' kWh'
+                      style:
+                        font-weight: '600'
+                        white-space: nowrap
+                  - component: Label
+                    config:
+                      text: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? Math.round(100 * ((Number(items[props.livingRoomEntertainmentEnergyToday].numericState)
+                        || 0)) / (Number(items[props.homeEnergyToday].numericState) || 0)) : 0) + '' %'''
+                      style:
+                        opacity: '0.6'
+                        min-width: 40px
+                        text-align: right
+              - component: div
+                config:
+                  class: item k k-c9
+                  style:
+                    display: flex
+                    align-items: center
+                    gap: 8px
+                    font-size: 13px
+                    break-inside: avoid
+                    margin-bottom: 2px
+                slots:
+                  default:
+                  - component: div
+                    config:
+                      style:
+                        width: 10px
+                        height: 10px
+                        border-radius: 50%
+                        background: '#aed581'
+                        flex: 0 0 auto
+                    slots:
+                      default: []
+                  - component: Label
+                    config:
+                      text: Wäsche & Geschirr
+                      style:
+                        flex: '1'
+                        min-width: '0'
+                        white-space: nowrap
+                        overflow: hidden
+                        text-overflow: ellipsis
+                  - component: Label
+                    config:
+                      text: =(((Number(items[props.dishwasherEnergyToday].numericState) || 0) + (Number(items[props.washingMachine1EnergyToday].numericState)
+                        || 0) + (Number(items[props.washingMachine2EnergyToday].numericState) || 0) + (Number(items[props.tumbleDryerEnergyToday].numericState)
+                        || 0))).toFixed(2).replace('.', ',') + ' kWh'
+                      style:
+                        font-weight: '600'
+                        white-space: nowrap
+                  - component: Label
+                    config:
+                      text: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? Math.round(100 * ((Number(items[props.dishwasherEnergyToday].numericState)
+                        || 0) + (Number(items[props.washingMachine1EnergyToday].numericState) || 0) + (Number(items[props.washingMachine2EnergyToday].numericState)
+                        || 0) + (Number(items[props.tumbleDryerEnergyToday].numericState) || 0)) / (Number(items[props.homeEnergyToday].numericState)
+                        || 0)) : 0) + '' %'''
+                      style:
+                        opacity: '0.6'
+                        min-width: 40px
+                        text-align: right
+              - component: div
+                config:
+                  class: item k k-c10
+                  style:
+                    display: flex
+                    align-items: center
+                    gap: 8px
+                    font-size: 13px
+                    break-inside: avoid
+                    margin-bottom: 2px
+                slots:
+                  default:
+                  - component: div
+                    config:
+                      style:
+                        width: 10px
+                        height: 10px
+                        border-radius: 50%
+                        background: '#fff176'
+                        flex: 0 0 auto
+                    slots:
+                      default: []
+                  - component: Label
+                    config:
+                      text: Terrasse & Fahrräder
+                      style:
+                        flex: '1'
+                        min-width: '0'
+                        white-space: nowrap
+                        overflow: hidden
+                        text-overflow: ellipsis
+                  - component: Label
+                    config:
+                      text: =(((Number(items[props.terraceLightEnergyToday].numericState) || 0) + (Number(items[props.bicycleBatteriesEnergyToday].numericState)
+                        || 0))).toFixed(2).replace('.', ',') + ' kWh'
+                      style:
+                        font-weight: '600'
+                        white-space: nowrap
+                  - component: Label
+                    config:
+                      text: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? Math.round(100 * ((Number(items[props.terraceLightEnergyToday].numericState)
+                        || 0) + (Number(items[props.bicycleBatteriesEnergyToday].numericState) || 0)) / (Number(items[props.homeEnergyToday].numericState)
+                        || 0)) : 0) + '' %'''
+                      style:
+                        opacity: '0.6'
+                        min-width: 40px
+                        text-align: right
+              - component: div
+                config:
+                  class: item k k-c11
+                  style:
+                    display: flex
+                    align-items: center
+                    gap: 8px
+                    font-size: 13px
+                    break-inside: avoid
+                    margin-bottom: 2px
+                slots:
+                  default:
+                  - component: div
+                    config:
+                      style:
+                        width: 10px
+                        height: 10px
+                        border-radius: 50%
+                        background: '#e0e0e0'
+                        flex: 0 0 auto
+                    slots:
+                      default: []
+                  - component: Label
+                    config:
+                      text: Nicht gemessen
+                      style:
+                        flex: '1'
+                        min-width: '0'
+                        white-space: nowrap
+                        overflow: hidden
+                        text-overflow: ellipsis
+                  - component: Label
+                    config:
+                      text: =(Math.max(0, (Number(items[props.homeEnergyToday].numericState) || 0) - ((Number(items[props.heatpumpEnergyToday].numericState)
+                        || 0) + (Number(items[props.acMeterEnergyToday].numericState) || 0) + (Number(items[props.office1EnergyToday].numericState)
+                        || 0) + (Number(items[props.office2EnergyToday].numericState) || 0) + (Number(items[props.networkEnergyToday].numericState)
+                        || 0) + (Number(items[props.ventilationEnergyToday].numericState) || 0) + (Number(items[props.refrigeratorEnergyToday].numericState)
+                        || 0) + (Number(items[props.coffeeMachineEnergyToday].numericState) || 0) + (Number(items[props.livingRoomEntertainmentEnergyToday].numericState)
+                        || 0) + (Number(items[props.dishwasherEnergyToday].numericState) || 0) + (Number(items[props.washingMachine1EnergyToday].numericState)
+                        || 0) + (Number(items[props.washingMachine2EnergyToday].numericState) || 0) + (Number(items[props.tumbleDryerEnergyToday].numericState)
+                        || 0) + (Number(items[props.terraceLightEnergyToday].numericState) || 0) + (Number(items[props.bicycleBatteriesEnergyToday].numericState)
+                        || 0)))).toFixed(2).replace('.', ',') + ' kWh'
+                      style:
+                        font-weight: '600'
+                        white-space: nowrap
+                  - component: Label
+                    config:
+                      text: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? Math.round(100 * Math.max(0,
+                        (Number(items[props.homeEnergyToday].numericState) || 0) - ((Number(items[props.heatpumpEnergyToday].numericState)
+                        || 0) + (Number(items[props.acMeterEnergyToday].numericState) || 0) + (Number(items[props.office1EnergyToday].numericState)
+                        || 0) + (Number(items[props.office2EnergyToday].numericState) || 0) + (Number(items[props.networkEnergyToday].numericState)
+                        || 0) + (Number(items[props.ventilationEnergyToday].numericState) || 0) + (Number(items[props.refrigeratorEnergyToday].numericState)
+                        || 0) + (Number(items[props.coffeeMachineEnergyToday].numericState) || 0) + (Number(items[props.livingRoomEntertainmentEnergyToday].numericState)
+                        || 0) + (Number(items[props.dishwasherEnergyToday].numericState) || 0) + (Number(items[props.washingMachine1EnergyToday].numericState)
+                        || 0) + (Number(items[props.washingMachine2EnergyToday].numericState) || 0) + (Number(items[props.tumbleDryerEnergyToday].numericState)
+                        || 0) + (Number(items[props.terraceLightEnergyToday].numericState) || 0) + (Number(items[props.bicycleBatteriesEnergyToday].numericState)
+                        || 0))) / (Number(items[props.homeEnergyToday].numericState) || 0)) : 0) + '' %'''
+                      style:
+                        opacity: '0.6'
+                        min-width: 40px
+                        text-align: right

@@ -1,0 +1,75 @@
+uid: pv-days-card
+tags:
+- overview
+props:
+  parameters:
+  - name: dailyPv
+    label: Energie täglich PV
+    description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  parameterGroups: []
+timestamp: Sep 26, 2026, 4:41:07 AM
+component: oh-card
+config:
+  title: PV-Ertrag pro Tag
+  style:
+    height: calc(100% - 2 * var(--f7-card-margin-vertical))
+slots:
+  content:
+  - component: oh-chart
+    config:
+      chartType: year
+      periodVisible: true
+      height: 250px
+    slots:
+      calendar:
+      - component: oh-calendar-axis
+        config:
+          orient: horizontal
+          cellSize:
+          - auto
+          - auto
+          top: '75'
+          bottom: '10'
+          left: '40'
+          right: '20'
+          dayLabel:
+            firstDay: 1
+          yearLabel:
+            show: false
+          monthLabel:
+            fontSize: '=screen.width < 600 ? 8 : 12'
+      series:
+      - component: oh-calendar-series
+        config:
+          name: PV-Ertrag
+          type: heatmap
+          calendarIndex: 0
+          item: =props.dailyPv
+          aggregationFunction: last
+      visualMap:
+      - component: oh-chart-visualmap
+        config:
+          show: =!(screen.width < 600)
+          min: 0
+          max: 60
+          type: continuous
+          calculable: true
+          orient: horizontal
+          left: center
+          top: '8'
+          itemWidth: 12
+          itemHeight: 200
+          inRange:
+            color:
+            - '#eeeeee'
+            - '#ffe082'
+            - '#ffb300'
+            - '#e65100'
+      tooltip:
+      - component: oh-chart-tooltip
+        config:
+          show: true
+          confine: true

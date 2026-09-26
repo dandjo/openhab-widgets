@@ -1,0 +1,215 @@
+uid: plug-electric-card
+tags:
+- plug
+props:
+  parameters:
+  - name: prefix
+    label: Item prefix
+    description: 'Name prefix of the plug''s items: <prefix>_power, _switch, _energy_today, _energy_total, _voltage, _current,
+      _power_factor, _apparent_power, _reactive_power'
+    type: TEXT
+    required: true
+  - name: title
+    label: Title
+    description: Card title
+    type: TEXT
+    required: false
+    default: Elektrisch
+  parameterGroups: []
+timestamp: Sep 26, 2026, 4:41:07 AM
+component: oh-card
+config:
+  title: =props.title
+  style:
+    height: calc(100% - 2 * var(--f7-card-margin-vertical))
+slots:
+  content:
+  - component: div
+    config:
+      style:
+        display: grid
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr))
+        gap: 10px
+        padding: 4px 16px 16px
+    slots:
+      default:
+      - component: div
+        config:
+          style:
+            padding: 10px 12px
+            border-radius: 12px
+            min-width: '0'
+            background: rgba(127, 127, 127, 0.08)
+            position: relative
+        slots:
+          default:
+          - component: Label
+            config:
+              text: Spannung
+              style:
+                font-size: 12px
+                opacity: '0.65'
+          - component: Label
+            config:
+              text: '=(([''NULL'', ''UNDEF''].includes(items[props.prefix + ''_voltage''].state) ? ''–'' : (items[props.prefix
+                + ''_voltage''].displayState || items[props.prefix + ''_voltage''].state)) || ''–'')'
+              style:
+                font-size: 20px
+                font-weight: '700'
+                line-height: 26px
+                white-space: nowrap
+                overflow: hidden
+                text-overflow: ellipsis
+          - component: oh-link
+            config:
+              action: analyzer
+              style:
+                position: absolute
+                inset: '0'
+                display: block
+                border-radius: 12px
+              actionAnalyzerItems: =[props.prefix + '_voltage']
+      - component: div
+        config:
+          style:
+            padding: 10px 12px
+            border-radius: 12px
+            min-width: '0'
+            background: rgba(127, 127, 127, 0.08)
+            position: relative
+        slots:
+          default:
+          - component: Label
+            config:
+              text: Strom
+              style:
+                font-size: 12px
+                opacity: '0.65'
+          - component: Label
+            config:
+              text: '=(([''NULL'', ''UNDEF''].includes(items[props.prefix + ''_current''].state) ? ''–'' : (items[props.prefix
+                + ''_current''].displayState || items[props.prefix + ''_current''].state)) || ''–'')'
+              style:
+                font-size: 20px
+                font-weight: '700'
+                line-height: 26px
+                white-space: nowrap
+                overflow: hidden
+                text-overflow: ellipsis
+          - component: oh-link
+            config:
+              action: analyzer
+              style:
+                position: absolute
+                inset: '0'
+                display: block
+                border-radius: 12px
+              actionAnalyzerItems: =[props.prefix + '_current']
+      - component: div
+        config:
+          style:
+            padding: 10px 12px
+            border-radius: 12px
+            min-width: '0'
+            background: rgba(127, 127, 127, 0.08)
+            position: relative
+        slots:
+          default:
+          - component: Label
+            config:
+              text: Leistungsfaktor
+              style:
+                font-size: 12px
+                opacity: '0.65'
+          - component: Label
+            config:
+              text: '=(([''NULL'', ''UNDEF''].includes(items[props.prefix + ''_power_factor''].state) ? ''–'' : (items[props.prefix
+                + ''_power_factor''].displayState || items[props.prefix + ''_power_factor''].state)) || ''–'')'
+              style:
+                font-size: 20px
+                font-weight: '700'
+                line-height: 26px
+                white-space: nowrap
+                overflow: hidden
+                text-overflow: ellipsis
+          - component: oh-link
+            config:
+              action: analyzer
+              style:
+                position: absolute
+                inset: '0'
+                display: block
+                border-radius: 12px
+              actionAnalyzerItems: =[props.prefix + '_power_factor']
+      - component: div
+        config:
+          style:
+            padding: 10px 12px
+            border-radius: 12px
+            min-width: '0'
+            background: rgba(127, 127, 127, 0.08)
+            position: relative
+        slots:
+          default:
+          - component: Label
+            config:
+              text: Scheinleistung
+              style:
+                font-size: 12px
+                opacity: '0.65'
+          - component: Label
+            config:
+              text: '=(([''NULL'', ''UNDEF''].includes(items[props.prefix + ''_apparent_power''].state) ? ''–'' : (items[props.prefix
+                + ''_apparent_power''].displayState || items[props.prefix + ''_apparent_power''].state)) || ''–'')'
+              style:
+                font-size: 20px
+                font-weight: '700'
+                line-height: 26px
+                white-space: nowrap
+                overflow: hidden
+                text-overflow: ellipsis
+          - component: oh-link
+            config:
+              action: analyzer
+              style:
+                position: absolute
+                inset: '0'
+                display: block
+                border-radius: 12px
+              actionAnalyzerItems: =[props.prefix + '_apparent_power']
+      - component: div
+        config:
+          style:
+            padding: 10px 12px
+            border-radius: 12px
+            min-width: '0'
+            background: rgba(127, 127, 127, 0.08)
+            position: relative
+        slots:
+          default:
+          - component: Label
+            config:
+              text: Blindleistung
+              style:
+                font-size: 12px
+                opacity: '0.65'
+          - component: Label
+            config:
+              text: '=(([''NULL'', ''UNDEF''].includes(items[props.prefix + ''_reactive_power''].state) ? ''–'' : (items[props.prefix
+                + ''_reactive_power''].displayState || items[props.prefix + ''_reactive_power''].state)) || ''–'')'
+              style:
+                font-size: 20px
+                font-weight: '700'
+                line-height: 26px
+                white-space: nowrap
+                overflow: hidden
+                text-overflow: ellipsis
+          - component: oh-link
+            config:
+              action: analyzer
+              style:
+                position: absolute
+                inset: '0'
+                display: block
+                border-radius: 12px
+              actionAnalyzerItems: =[props.prefix + '_reactive_power']
