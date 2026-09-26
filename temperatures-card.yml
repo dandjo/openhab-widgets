@@ -1,0 +1,245 @@
+uid: temperatures-card
+tags:
+- overview
+props:
+  parameters:
+  - name: heatpumpIndoorAmbientTemp
+    label: ESPAltherma Raumtemperatur
+    description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpExtAmbientTemp
+    label: ESPAltherma Außentemperatur
+    description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
+  - name: temperatureIndoor15min
+    label: Temperatur innen 15 min
+    description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
+  - name: temperatureOutdoor15min
+    label: Temperatur außen 15 min
+    description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
+  parameterGroups: []
+timestamp: Sep 26, 2026, 4:41:07 AM
+component: oh-card
+config:
+  title: Temperaturen
+  style:
+    height: calc(100% - 2 * var(--f7-card-margin-vertical))
+slots:
+  content:
+  - component: div
+    config:
+      style:
+        display: grid
+        grid-template-columns: 1fr 1fr
+        gap: 12px
+        padding: 4px 16px 0
+    slots:
+      default:
+      - component: div
+        config:
+          style:
+            border-left: '4px solid #fb8c00'
+            padding: 4px 12px
+        slots:
+          default:
+          - component: Label
+            config:
+              text: Innen
+              style:
+                font-size: 13px
+                opacity: '0.7'
+          - component: Label
+            config:
+              text: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpIndoorAmbientTemp].state) ? ''–'' : (items[props.heatpumpIndoorAmbientTemp].displayState
+                || items[props.heatpumpIndoorAmbientTemp].state))'
+              style:
+                font-size: 30px
+                font-weight: '700'
+                line-height: 36px
+          - component: Label
+            config:
+              text: Fühler der Wärmepumpe
+              style:
+                font-size: 12px
+                opacity: '0.6'
+      - component: div
+        config:
+          style:
+            border-left: '4px solid #29b6f6'
+            padding: 4px 12px
+        slots:
+          default:
+          - component: Label
+            config:
+              text: Außen
+              style:
+                font-size: 13px
+                opacity: '0.7'
+          - component: Label
+            config:
+              text: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpExtAmbientTemp].state) ? ''–'' : (items[props.heatpumpExtAmbientTemp].displayState
+                || items[props.heatpumpExtAmbientTemp].state))'
+              style:
+                font-size: 30px
+                font-weight: '700'
+                line-height: 36px
+          - component: Label
+            config:
+              text: Fühler der Wärmepumpe
+              style:
+                font-size: 12px
+                opacity: '0.6'
+  - component: oh-chart
+    config:
+      chartType: ''
+      periodVisible: false
+      period: D
+      height: 320px
+    slots:
+      grid:
+      - component: oh-chart-grid
+        config:
+          top: '40'
+          bottom: '40'
+          left: '40'
+          right: '15'
+      xAxis:
+      - component: oh-time-axis
+        config:
+          gridIndex: 0
+      yAxis:
+      - component: oh-value-axis
+        config:
+          gridIndex: 0
+          name: °C
+          scale: true
+          nameGap: 14
+          nameTextStyle:
+            align: right
+            padding:
+            - 0
+            - 8
+            - 0
+            - 0
+          splitLine:
+            lineStyle:
+              type: dashed
+              opacity: 0.4
+      series:
+      - component: oh-time-series
+        config:
+          name: Innen
+          gridIndex: 0
+          xAxisIndex: 0
+          yAxisIndex: 0
+          type: line
+          item: =props.temperatureIndoor15min
+          smooth: 0.5
+          lineStyle:
+            width: 2.5
+            color: '#fb8c00'
+          itemStyle:
+            color: '#fb8c00'
+          markPoint:
+            data:
+            - type: max
+              name: max
+            - type: min
+              name: min
+              label:
+                position: bottom
+            symbol: circle
+            symbolSize: 12
+            itemStyle:
+              color: '#fb8c00'
+              borderColor: '#ffffff'
+              borderWidth: 2.5
+            label:
+              show: true
+              position: top
+              distance: 10
+              formatter: '{c} °C'
+              fontSize: 14
+              fontWeight: 700
+              color: '#ffffff'
+              backgroundColor: '#fb8c00'
+              padding:
+              - 3
+              - 7
+              borderRadius: 6
+      - component: oh-time-series
+        config:
+          name: Außen
+          gridIndex: 0
+          xAxisIndex: 0
+          yAxisIndex: 0
+          type: line
+          item: =props.temperatureOutdoor15min
+          smooth: 0.5
+          lineStyle:
+            width: 2.5
+            color: '#29b6f6'
+          itemStyle:
+            color: '#29b6f6'
+          areaStyle:
+            color:
+              type: linear
+              x: 0
+              y: 0
+              x2: 0
+              y2: 1
+              colorStops:
+              - offset: 0
+                color: rgba(41, 182, 246, 0.45)
+              - offset: 1
+                color: rgba(41, 182, 246, 0.02)
+          markPoint:
+            data:
+            - type: max
+              name: max
+            - type: min
+              name: min
+              label:
+                position: bottom
+            symbol: circle
+            symbolSize: 12
+            itemStyle:
+              color: '#29b6f6'
+              borderColor: '#ffffff'
+              borderWidth: 2.5
+            label:
+              show: true
+              position: top
+              distance: 10
+              formatter: '{c} °C'
+              fontSize: 14
+              fontWeight: 700
+              color: '#ffffff'
+              backgroundColor: '#29b6f6'
+              padding:
+              - 3
+              - 7
+              borderRadius: 6
+      tooltip:
+      - component: oh-chart-tooltip
+        config:
+          show: true
+          confine: true
+          trigger: axis
+          smartFormatter: true
+      legend:
+      - component: oh-chart-legend
+        config:
+          show: true
+          bottom: '0'
+          type: scroll

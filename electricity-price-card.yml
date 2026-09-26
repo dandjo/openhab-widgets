@@ -1,0 +1,220 @@
+uid: electricity-price-card
+tags:
+- overview
+props:
+  parameters:
+  - name: priceTotalGross
+    label: Strompreis gesamt brutto
+    description: Number:EnergyPrice item
+    type: TEXT
+    required: true
+    context: item
+  - name: priceCheapestHour
+    label: Günstigste Stunde
+    description: DateTime item
+    type: TEXT
+    required: true
+    context: item
+  - name: pricePriciestHour
+    label: Teuerste Stunde
+    description: DateTime item
+    type: TEXT
+    required: true
+    context: item
+  - name: priceTotalNet
+    label: Strompreis gesamt netto
+    description: Number:EnergyPrice item
+    type: TEXT
+    required: true
+    context: item
+  - name: priceMarketGross
+    label: Strompreis Markt brutto
+    description: Number:EnergyPrice item
+    type: TEXT
+    required: true
+    context: item
+  - name: priceMarketNet
+    label: Strompreis Markt netto
+    description: Number:EnergyPrice item
+    type: TEXT
+    required: true
+    context: item
+  parameterGroups: []
+timestamp: Sep 26, 2026, 4:41:07 AM
+component: oh-card
+config:
+  title: Strompreis
+  style:
+    height: calc(100% - 2 * var(--f7-card-margin-vertical))
+    display: flex
+    flex-direction: column
+  contentStyle:
+    flex: 1 1 auto
+    display: flex
+    flex-direction: column
+slots:
+  content:
+  - component: div
+    config:
+      style:
+        display: flex
+        flex-wrap: wrap
+        align-items: baseline
+        column-gap: 8px
+        padding: 0 16px
+    slots:
+      default:
+      - component: Label
+        config:
+          text: '=([''NULL'', ''UNDEF''].includes(items[props.priceTotalGross].state) ? ''–'' : (items[props.priceTotalGross].displayState
+            || items[props.priceTotalGross].state))'
+          style:
+            font-size: 32px
+            font-weight: '700'
+            color: '=(Number(items[props.priceTotalGross].numericState) || 0) < 0.2 ? ''#43a047'' : (Number(items[props.priceTotalGross].numericState)
+              || 0) < 0.3 ? ''#fb8c00'' : ''#e53935'''
+      - component: Label
+        config:
+          text: pro kWh gesamt
+          style:
+            opacity: '0.7'
+  - component: Label
+    config:
+      text: ='Günstigste ' + items[props.priceCheapestHour].displayState + ' · teuerste ' + items[props.pricePriciestHour].displayState
+      style:
+        padding: 0 16px
+        opacity: '0.7'
+        font-size: 13px
+        margin-bottom: 12px
+  - component: div
+    config:
+      style:
+        position: relative
+        flex: 1 1 auto
+        min-height: '=screen.width < 600 ? ''260px'' : ''280px'''
+    slots:
+      default:
+      - component: div
+        config:
+          style:
+            position: absolute
+            inset: '0'
+        slots:
+          default:
+          - component: oh-chart
+            config:
+              chartType: ''
+              periodVisible: false
+              period: 2D
+              future: '0.75'
+              height: 100%
+            slots:
+              grid:
+              - component: oh-chart-grid
+                config:
+                  top: '45'
+                  bottom: '30'
+                  left: '45'
+                  right: '15'
+              xAxis:
+              - component: oh-time-axis
+                config:
+                  gridIndex: 0
+              yAxis:
+              - component: oh-value-axis
+                config:
+                  gridIndex: 0
+                  name: EUR/kWh
+                  nameGap: 14
+                  nameTextStyle:
+                    align: right
+                    padding:
+                    - 0
+                    - 8
+                    - 0
+                    - 0
+              series:
+              - component: oh-time-series
+                config:
+                  name: Gesamtpreis
+                  gridIndex: 0
+                  xAxisIndex: 0
+                  yAxisIndex: 0
+                  type: line
+                  item: =props.priceTotalGross
+                  step: end
+                  areaStyle:
+                    opacity: 0.25
+                  markLine:
+                    symbol:
+                    - none
+                    - none
+                    silent: true
+                    label:
+                      show: false
+                    lineStyle:
+                      color: '#888'
+                      type: dashed
+                    data:
+                    - xAxis: =dayjs().valueOf()
+              - component: oh-time-series
+                config:
+                  name: Gesamt netto
+                  gridIndex: 0
+                  xAxisIndex: 0
+                  yAxisIndex: 0
+                  type: line
+                  item: =props.priceTotalNet
+                  lineStyle:
+                    opacity: 0
+                  itemStyle:
+                    color: '#fb8c00'
+                  symbol: none
+              - component: oh-time-series
+                config:
+                  name: Markt brutto
+                  gridIndex: 0
+                  xAxisIndex: 0
+                  yAxisIndex: 0
+                  type: line
+                  item: =props.priceMarketGross
+                  lineStyle:
+                    opacity: 0
+                  itemStyle:
+                    color: '#ffb74d'
+                  symbol: none
+              - component: oh-time-series
+                config:
+                  name: Markt netto
+                  gridIndex: 0
+                  xAxisIndex: 0
+                  yAxisIndex: 0
+                  type: line
+                  item: =props.priceMarketNet
+                  lineStyle:
+                    opacity: 0
+                  itemStyle:
+                    color: '#ffe0b2'
+                  symbol: none
+              visualMap:
+              - component: oh-chart-visualmap
+                config:
+                  show: false
+                  type: piecewise
+                  dimension: 1
+                  seriesIndex: 0
+                  pieces:
+                  - lt: 0.2
+                    color: '#43a047'
+                  - gte: 0.2
+                    lt: 0.3
+                    color: '#fb8c00'
+                  - gte: 0.3
+                    color: '#e53935'
+              tooltip:
+              - component: oh-chart-tooltip
+                config:
+                  show: true
+                  confine: true
+                  trigger: axis
+                  smartFormatter: true

@@ -1,0 +1,90 @@
+uid: plug-energy-days-card
+tags:
+- plug
+props:
+  parameters:
+  - name: prefix
+    label: Item prefix
+    description: 'Name prefix of the plug''s items: <prefix>_power, _switch, _energy_today, _energy_total, _voltage, _current,
+      _power_factor, _apparent_power, _reactive_power'
+    type: TEXT
+    required: true
+  - name: color
+    label: Colour
+    description: 'Device colour as #rrggbb'
+    type: TEXT
+    required: false
+    default: '#8d6e63'
+  parameterGroups: []
+timestamp: Sep 26, 2026, 4:41:07 AM
+component: oh-card
+config:
+  title: Energie pro Tag
+  style:
+    height: calc(100% - 2 * var(--f7-card-margin-vertical))
+slots:
+  content:
+  - component: oh-chart
+    config:
+      chartType: month
+      periodVisible: true
+      height: 260px
+    slots:
+      grid:
+      - component: oh-chart-grid
+        config:
+          top: '62'
+          bottom: '35'
+          left: '45'
+          right: '45'
+      xAxis:
+      - component: oh-category-axis
+        config:
+          gridIndex: 0
+          categoryType: month
+          name: Tag
+          nameGap: 12
+          axisTick:
+            show: false
+      yAxis:
+      - component: oh-value-axis
+        config:
+          gridIndex: 0
+          name: kWh
+          nameGap: 14
+          nameTextStyle:
+            align: right
+            padding:
+            - 0
+            - 8
+            - 0
+            - 0
+          splitLine:
+            lineStyle:
+              type: dashed
+              opacity: 0.4
+      series:
+      - component: oh-aggregate-series
+        config:
+          name: Energie
+          gridIndex: 0
+          xAxisIndex: 0
+          yAxisIndex: 0
+          type: bar
+          item: =props.prefix + '_energy_today'
+          aggregationFunction: last
+          dimension1: date
+          itemStyle:
+            color: =props.color
+            borderRadius:
+            - 4
+            - 4
+            - 0
+            - 0
+      tooltip:
+      - component: oh-chart-tooltip
+        config:
+          show: true
+          confine: true
+          trigger: axis
+          smartFormatter: true
