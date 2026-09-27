@@ -175,7 +175,7 @@ config:
 | `min` | The slider's lowest value | DECIMAL | `0` |
 | `max` | The slider's highest value | DECIMAL | `100` |
 | `step` | The slider's step | DECIMAL | `1` |
-| `unit` | Unit on the label while dragging, e.g. °C | TEXT |  |
+| `unit` | Unit on the label while dragging and of the command sent; must be the item's own (a difference in K sent to a °C item is taken as an absolute temperature) | TEXT |  |
 | `title` | Title above the slider | TEXT |  |
 | `icon` | The badge's icon, e.g. material:thermostat | TEXT | `material:tune` |
 | `ring` | A ring around a timer icon instead of the icon, emptying as the item runs down to 0 | BOOLEAN |  |
