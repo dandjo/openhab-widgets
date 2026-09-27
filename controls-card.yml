@@ -190,7 +190,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Sep 27, 2026, 7:07:59 PM
+timestamp: Sep 27, 2026, 8:52:40 PM
 component: oh-card
 config:
   title: Steuerung
@@ -533,15 +533,15 @@ slots:
               min: -10
               max: 10
               step: 1
-              unit: K
+              unit: °C
               title: Vorlauf-Offset
               value: '=(Math.round((Number(items[props.heatpumpLeavingWaterTempOffsetHeating].numericState) || 0)) > 0 ? ''+''
                 : '''') + Math.round((Number(items[props.heatpumpLeavingWaterTempOffsetHeating].numericState) || 0)) + ''
-                K'''
+                °C'''
               context: '=''Vorlauf-Soll '' + ([''NULL'', ''UNDEF''].includes(items[props.heatpumpLeavingWaterSetpoint].state)
                 ? ''–'' : (items[props.heatpumpLeavingWaterSetpoint].displayState || items[props.heatpumpLeavingWaterSetpoint].state))
                 + (items[props.heatpumpClimateControlPower].state === ''ON'' ? '''' : '' · Heizung aus'')'
-              marks: -10=−10 K;-5=−5;0=0;5=+5;10=+10 K
+              marks: -10=−10 °C;-5=−5;0=0;5=+5;10=+10 °C
               icon: material:tune
               opacity: '=items[props.heatpumpClimateControlPower].state === ''ON'' ? ''1'' : ''0.6'''
       - component: div
