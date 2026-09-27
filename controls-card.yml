@@ -21,14 +21,14 @@ props:
     type: TEXT
     required: true
     context: item
-  - name: heatpumpDhwPower
-    label: Pyaltherma Warmwasser Ein/Aus
+  - name: heatpumpClimateControlPower
+    label: Pyaltherma Heizung Ein/Aus
     description: Switch item
     type: TEXT
     required: true
     context: item
-  - name: heatpumpClimateControlPower
-    label: Pyaltherma Heizung Ein/Aus
+  - name: heatpumpDhwPower
+    label: Pyaltherma Warmwasser Ein/Aus
     description: Switch item
     type: TEXT
     required: true
@@ -84,6 +84,12 @@ props:
   - name: acFan
     label: Faikout Perfera Lüfter
     description: String item
+    type: TEXT
+    required: true
+    context: item
+  - name: acPowerful
+    label: Faikout Perfera Powerful
+    description: Switch item
     type: TEXT
     required: true
     context: item
@@ -184,7 +190,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Sep 27, 2026, 6:06:13 PM
+timestamp: Sep 27, 2026, 7:07:59 PM
 component: oh-card
 config:
   title: Steuerung
@@ -333,56 +339,30 @@ slots:
                   text: Betrieb
                   style:
                     font-size: 13px
-              - component: f7-segmented
+              - component: div
                 config:
-                  strong: true
                   style:
-                    width: 100%
-                  stylesheet: '.segmented-highlight { display: none; }'
+                    display: grid
+                    grid-template-columns: repeat(3, minmax(0, 1fr))
+                    gap: 6px
+                    padding: 6px 2px
                 slots:
                   default:
-                  - component: oh-button
+                  - component: widget:pill-switch
                     config:
-                      text: Warmwasser
-                      action: toggle
-                      actionItem: =props.heatpumpDhwPower
-                      actionCommand: 'ON'
-                      actionCommandAlt: 'OFF'
-                      small: true
-                      active: =items[props.heatpumpDhwPower].state === 'ON'
-                      style:
-                        font-size: 12px
-                        padding: 0 4px
-                        background-color: '=items[props.heatpumpDhwPower].state === ''ON'' ? ''#fb8c00'' : '''''
-                        color: '=items[props.heatpumpDhwPower].state === ''ON'' ? ''#ffffff'' : '''''
-                  - component: oh-button
+                      item: =props.heatpumpClimateControlPower
+                      title: Heizung
+                      color: '#fb8c00'
+                  - component: widget:pill-switch
                     config:
-                      text: Heizung
-                      action: toggle
-                      actionItem: =props.heatpumpClimateControlPower
-                      actionCommand: 'ON'
-                      actionCommandAlt: 'OFF'
-                      small: true
-                      active: =items[props.heatpumpClimateControlPower].state === 'ON'
-                      style:
-                        font-size: 12px
-                        padding: 0 4px
-                        background-color: '=items[props.heatpumpClimateControlPower].state === ''ON'' ? ''#fb8c00'' : '''''
-                        color: '=items[props.heatpumpClimateControlPower].state === ''ON'' ? ''#ffffff'' : '''''
-                  - component: oh-button
+                      item: =props.heatpumpDhwPower
+                      title: Wasser
+                      color: '#fb8c00'
+                  - component: widget:pill-switch
                     config:
-                      text: Automatik
-                      action: toggle
-                      actionItem: =props.heatpumpDhwManagement
-                      actionCommand: 'ON'
-                      actionCommandAlt: 'OFF'
-                      small: true
-                      active: =items[props.heatpumpDhwManagement].state === 'ON'
-                      style:
-                        font-size: 12px
-                        padding: 0 4px
-                        background-color: '=items[props.heatpumpDhwManagement].state === ''ON'' ? ''#fb8c00'' : '''''
-                        color: '=items[props.heatpumpDhwManagement].state === ''ON'' ? ''#ffffff'' : '''''
+                      item: =props.heatpumpDhwManagement
+                      title: WW-Auto
+                      color: '#fb8c00'
           - component: div
             config:
               style:
@@ -875,6 +855,149 @@ slots:
                         background-color: '=(items[props.acFan].state === ''5'') ? (items[props.acSwitch].state === ''ON''
                           ? ''#29b6f6'' : ''#90a4ae'') : '''''
                         color: '=(items[props.acFan].state === ''5'') ? ''#ffffff'' : '''''
+          - component: div
+            config:
+              style:
+                position: relative
+                display: flex
+                align-items: center
+                gap: 10px
+                padding: 6px 10px 6px 6px
+                border-radius: 26px
+                background: '=items[props.acPowerful].state === ''ON'' ? ''linear-gradient(135deg, #29b6f6, rgba(41, 182,
+                  246, 0.75))'' : ''rgba(127, 127, 127, 0.1)'''
+                color: '=items[props.acPowerful].state === ''ON'' ? ''#ffffff'' : '''''
+                transition: background 0.3s ease
+            slots:
+              default:
+              - component: div
+                config:
+                  style:
+                    position: relative
+                    width: 40px
+                    height: 40px
+                    flex: 0 0 auto
+                    border-radius: 50%
+                    display: flex
+                    align-items: center
+                    justify-content: center
+                    background: '=items[props.acPowerful].state === ''ON'' ? ''rgba(255, 255, 255, 0.22)'' : ''rgba(41, 182,
+                      246, 0.15)'''
+                slots:
+                  default:
+                  - component: svg
+                    config:
+                      viewBox: 0 0 40 40
+                      width: 40
+                      height: 40
+                      style:
+                        position: absolute
+                        inset: '0'
+                      visible: =items[props.acPowerful].state === 'ON'
+                    slots:
+                      default:
+                      - component: circle
+                        config:
+                          cx: 20
+                          cy: 20
+                          r: 11
+                          fill: none
+                          stroke: '#ffffff'
+                          stroke-width: 2
+                        slots:
+                          default:
+                          - component: animate
+                            config:
+                              attributeName: r
+                              values: 11;19
+                              dur: 1.6s
+                              begin: 0s
+                              repeatCount: indefinite
+                          - component: animate
+                            config:
+                              attributeName: opacity
+                              values: 0.7;0
+                              dur: 1.6s
+                              begin: 0s
+                              repeatCount: indefinite
+                      - component: circle
+                        config:
+                          cx: 20
+                          cy: 20
+                          r: 11
+                          fill: none
+                          stroke: '#ffffff'
+                          stroke-width: 2
+                        slots:
+                          default:
+                          - component: animate
+                            config:
+                              attributeName: r
+                              values: 11;19
+                              dur: 1.6s
+                              begin: 0.8s
+                              repeatCount: indefinite
+                          - component: animate
+                            config:
+                              attributeName: opacity
+                              values: 0.7;0
+                              dur: 1.6s
+                              begin: 0.8s
+                              repeatCount: indefinite
+                  - component: oh-icon
+                    config:
+                      icon: material:whatshot
+                      state: =items[props.acPowerful].state
+                      width: 22
+                      height: 22
+              - component: div
+                config:
+                  style:
+                    flex: '1'
+                    min-width: '0'
+                    display: flex
+                    flex-direction: column
+                slots:
+                  default:
+                  - component: Label
+                    config:
+                      text: Boost
+                      style:
+                        font-size: 14px
+                        font-weight: '600'
+                        line-height: 18px
+                  - component: Label
+                    config:
+                      text: '=items[props.acPowerful].state === ''ON'' ? ''volle Leistung'' : ''Aus'''
+                      style:
+                        font-size: 11px
+                        opacity: '0.8'
+                        line-height: 15px
+                        white-space: nowrap
+                        overflow: hidden
+                        text-overflow: ellipsis
+              - component: Label
+                config:
+                  text: '=items[props.acPowerful].state === ''ON'' ? ''Stoppen'' : ''Starten'''
+                  style:
+                    flex: 0 0 auto
+                    padding: 3px 12px
+                    border-radius: 999px
+                    font-size: 12px
+                    font-weight: '700'
+                    border: '=(items[props.acPowerful].state === ''ON'' ? ''1.5px solid #ffffff'' : ''1.5px solid #29b6f6'')'
+                    color: '=items[props.acPowerful].state === ''ON'' ? ''#ffffff'' : ''#29b6f6'''
+              - component: oh-link
+                config:
+                  action: toggle
+                  actionItem: =props.acPowerful
+                  actionCommand: 'ON'
+                  actionCommandAlt: 'OFF'
+                  style:
+                    position: absolute
+                    inset: '0'
+                    display: block
+                    border-radius: 26px
           - component: widget:pill-slider
             config:
               item: =props.acTemperatureSetpoint
