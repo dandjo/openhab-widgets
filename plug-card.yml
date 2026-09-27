@@ -45,7 +45,7 @@ props:
     required: false
     context: item
   parameterGroups: []
-timestamp: Sep 26, 2026, 1:08:03 PM
+timestamp: Sep 27, 2026, 2:17:48 AM
 component: oh-card
 config:
   title: =props.title
@@ -200,30 +200,48 @@ slots:
       - component: div
         config:
           style:
+            position: relative
+            overflow: hidden
             padding: 10px 12px
             border-radius: 12px
             min-width: '0'
             background: rgba(127, 127, 127, 0.08)
-            position: relative
         slots:
           default:
-          - component: Label
+          - component: oh-icon
             config:
-              text: Energie heute
+              icon: material:offline_bolt
+              width: 58
+              height: 58
               style:
-                font-size: 12px
-                opacity: '0.65'
-          - component: Label
+                position: absolute
+                right: -6px
+                bottom: -10px
+                opacity: '0.16'
+                color: '#ffa726'
+          - component: div
             config:
-              text: '=(([''NULL'', ''UNDEF''].includes(items[props.prefix + ''_energy_today''].state) ? ''–'' : (items[props.prefix
-                + ''_energy_today''].displayState || items[props.prefix + ''_energy_today''].state)) || ''–'')'
               style:
-                font-size: 20px
-                font-weight: '700'
-                line-height: 26px
-                white-space: nowrap
-                overflow: hidden
-                text-overflow: ellipsis
+                position: relative
+            slots:
+              default:
+              - component: Label
+                config:
+                  text: Energie heute
+                  style:
+                    font-size: 12px
+                    opacity: '0.65'
+              - component: Label
+                config:
+                  text: '=(([''NULL'', ''UNDEF''].includes(items[props.prefix + ''_energy_today''].state) ? ''–'' : (items[props.prefix
+                    + ''_energy_today''].displayState || items[props.prefix + ''_energy_today''].state)) || ''–'')'
+                  style:
+                    font-size: 20px
+                    font-weight: '700'
+                    line-height: 26px
+                    white-space: nowrap
+                    overflow: hidden
+                    text-overflow: ellipsis
           - component: oh-link
             config:
               action: popup
@@ -241,30 +259,48 @@ slots:
       - component: div
         config:
           style:
+            position: relative
+            overflow: hidden
             padding: 10px 12px
             border-radius: 12px
             min-width: '0'
             background: rgba(127, 127, 127, 0.08)
-            position: relative
         slots:
           default:
-          - component: Label
+          - component: oh-icon
             config:
-              text: Energie gesamt
+              icon: material:offline_bolt
+              width: 58
+              height: 58
               style:
-                font-size: 12px
-                opacity: '0.65'
-          - component: Label
+                position: absolute
+                right: -6px
+                bottom: -10px
+                opacity: '0.16'
+                color: '#ffa726'
+          - component: div
             config:
-              text: '=(([''NULL'', ''UNDEF''].includes(items[props.prefix + ''_energy_total''].state) ? ''–'' : (items[props.prefix
-                + ''_energy_total''].displayState || items[props.prefix + ''_energy_total''].state)) || ''–'')'
               style:
-                font-size: 20px
-                font-weight: '700'
-                line-height: 26px
-                white-space: nowrap
-                overflow: hidden
-                text-overflow: ellipsis
+                position: relative
+            slots:
+              default:
+              - component: Label
+                config:
+                  text: Energie gesamt
+                  style:
+                    font-size: 12px
+                    opacity: '0.65'
+              - component: Label
+                config:
+                  text: '=(([''NULL'', ''UNDEF''].includes(items[props.prefix + ''_energy_total''].state) ? ''–'' : (items[props.prefix
+                    + ''_energy_total''].displayState || items[props.prefix + ''_energy_total''].state)) || ''–'')'
+                  style:
+                    font-size: 20px
+                    font-weight: '700'
+                    line-height: 26px
+                    white-space: nowrap
+                    overflow: hidden
+                    text-overflow: ellipsis
           - component: oh-link
             config:
               action: popup

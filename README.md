@@ -33,6 +33,7 @@ Four cards for a metered plug, built from one item prefix: `<prefix>_power`, `_s
 `_energy_total`, `_voltage`, `_current`, `_power_factor`, `_apparent_power` and `_reactive_power`, as a Tasmota plug
 provides them. On a device page they stand two by two. `plug-card` also covers devices that are not plugs: give it
 the device's `title`, hide the switch with `controllable: false`, or take the switch from another item with `switch`.
+Every value tile carries a large pale icon of what it shows.
 
 ![Plug cards](screenshots/plug-cards.png)
 
@@ -235,7 +236,7 @@ The all-in price, the cheapest and priciest hour, and the prices 12 hours back a
 
 ### Heat pump: `heatpump-card`
 
-A section through the house: outdoor unit on the roof, wall unit, three-way valve and DHW tank in the basement, floor heating and radiators on their levels, with the flow animated along the pipes as the valve decides. Beside it the power, today's energies split into space heating, DHW and standby, and daily COPs. The drawing scales so its circles come out as large as the energy flow's.
+A section through the house: outdoor unit on the roof, wall unit, three-way valve and DHW tank in the basement, floor heating and radiators on their levels, with the flow animated along the pipes as the valve decides. Beside it the power, today's energies split into space heating, DHW and standby, and daily COPs. The drawing scales so its circles come out as large as the energy flow's. On a wide screen the figures beside it take the room the drawing leaves and grow with it, up to one and a half times their size.
 
 ![Heat pump](screenshots/heatpump-card.png)
 

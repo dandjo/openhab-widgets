@@ -172,7 +172,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Sep 26, 2026, 1:08:03 PM
+timestamp: Sep 27, 2026, 2:17:48 AM
 component: oh-card
 config:
   title: Wärmepumpe
@@ -208,7 +208,7 @@ slots:
               default:
               - component: svg
                 config:
-                  viewBox: 88 72 526 498
+                  viewBox: 92 72 526 498
                   width: 100%
                   style:
                     display: block
@@ -1296,7 +1296,7 @@ slots:
                     position: absolute
                     display: block
                     border-radius: 50%
-                    left: 86.88%
+                    left: 86.12%
                     top: 1.61%
                     width: 11.41%
                     height: 12.05%
@@ -1308,7 +1308,7 @@ slots:
                     position: absolute
                     display: block
                     border-radius: 50%
-                    left: 80.23%
+                    left: 79.47%
                     top: 69.48%
                     width: 11.41%
                     height: 12.05%
@@ -1320,7 +1320,7 @@ slots:
                     position: absolute
                     display: block
                     border-radius: 50%
-                    left: 60.08%
+                    left: 59.32%
                     top: 69.48%
                     width: 11.41%
                     height: 12.05%
@@ -1332,7 +1332,7 @@ slots:
                     position: absolute
                     display: block
                     border-radius: 50%
-                    left: 39.92%
+                    left: 39.16%
                     top: 69.48%
                     width: 11.41%
                     height: 12.05%
@@ -1344,7 +1344,7 @@ slots:
                     position: absolute
                     display: block
                     border-radius: 50%
-                    left: 19.77%
+                    left: 19.01%
                     top: 69.48%
                     width: 11.41%
                     height: 12.05%
@@ -1356,7 +1356,7 @@ slots:
                     position: absolute
                     display: block
                     border-radius: 50%
-                    left: 38.40%
+                    left: 37.64%
                     top: 45.38%
                     width: 11.41%
                     height: 12.05%
@@ -1368,7 +1368,7 @@ slots:
                     position: absolute
                     display: block
                     border-radius: 50%
-                    left: 38.40%
+                    left: 37.64%
                     top: 22.89%
                     width: 11.41%
                     height: 12.05%
@@ -1377,515 +1377,525 @@ slots:
           style:
             flex: 1 1 300px
             min-width: 260px
-            max-width: 460px
+            max-width: 690px
+            container-type: inline-size
         slots:
           default:
           - component: div
             config:
               style:
-                padding: 4px 4px 8px
-                font-size: 14px
+                font-size: clamp(14px, 3.04cqw, 21px)
             slots:
               default:
               - component: div
                 config:
                   style:
-                    display: grid
-                    grid-template-columns: repeat(3, 1fr)
-                    gap: 8px
-                    margin-bottom: 16px
+                    padding: 0.2857em 0.2857em 0.5714em
+                    font-size: 1em
                 slots:
                   default:
                   - component: div
                     config:
                       style:
-                        padding: 10px 12px
-                        border-radius: 12px
-                        background: rgba(127, 127, 127, 0.08)
-                    slots:
-                      default:
-                      - component: Label
-                        config:
-                          text: Elektrisch
-                          style:
-                            font-size: 12px
-                            opacity: '0.7'
-                      - component: Label
-                        config:
-                          text: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpPower].state) ? ''–'' : (items[props.heatpumpPower].displayState
-                            || items[props.heatpumpPower].state))'
-                          style:
-                            font-size: 22px
-                            font-weight: '700'
-                            color: '#ffa726'
-                            white-space: nowrap
-                  - component: div
-                    config:
-                      style:
-                        padding: 10px 12px
-                        border-radius: 12px
-                        background: rgba(127, 127, 127, 0.08)
-                    slots:
-                      default:
-                      - component: Label
-                        config:
-                          text: Wärme
-                          style:
-                            font-size: 12px
-                            opacity: '0.7'
-                      - component: Label
-                        config:
-                          text: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpHeatPower].state) ? ''–'' : (items[props.heatpumpHeatPower].displayState
-                            || items[props.heatpumpHeatPower].state))'
-                          style:
-                            font-size: 22px
-                            font-weight: '700'
-                            color: '#e57373'
-                            white-space: nowrap
-                  - component: div
-                    config:
-                      style:
-                        padding: 10px 12px
-                        border-radius: 12px
-                        background: rgba(127, 127, 127, 0.08)
-                    slots:
-                      default:
-                      - component: Label
-                        config:
-                          text: COP
-                          style:
-                            font-size: 12px
-                            opacity: '0.7'
-                      - component: Label
-                        config:
-                          text: '=(Number(items[props.heatpumpCop].numericState) || 0) > 0 ? ((Number(items[props.heatpumpCop].numericState)
-                            || 0)).toFixed(2).replace(''.'', '','') : ''–'''
-                          style:
-                            font-size: 22px
-                            font-weight: '700'
-                            color: '#66bb6a'
-                            white-space: nowrap
-              - component: Label
-                config:
-                  text: Heute
-                  style:
-                    font-weight: '700'
-                    margin-bottom: 8px
-              - component: div
-                config:
-                  stylesheet: '.k { transition: opacity 0.15s, transform 0.15s, background-color 0.15s; }
-
-                    .item { border-radius: 6px; padding: 3px 6px; margin: 0 -6px; }
-
-                    :host:has(.k:hover) .k { opacity: 0.3; }
-
-                    :host:has(.k-heizung:hover) .k-heizung { opacity: 1; }
-
-                    :host:has(.k-heizung:hover) .item.k-heizung { background-color: rgba(255, 183, 77, 0.4); font-weight:
-                    700; }
-
-                    :host:has(.k-heizung:hover) .seg.k-heizung { transform: scaleY(1.5); }
-
-                    :host:has(.k-warmwasser:hover) .k-warmwasser { opacity: 1; }
-
-                    :host:has(.k-warmwasser:hover) .item.k-warmwasser { background-color: rgba(229, 115, 115, 0.4); font-weight:
-                    700; }
-
-                    :host:has(.k-warmwasser:hover) .seg.k-warmwasser { transform: scaleY(1.5); }
-
-                    :host:has(.k-standby:hover) .k-standby { opacity: 1; }
-
-                    :host:has(.k-standby:hover) .item.k-standby { background-color: rgba(176, 190, 197, 0.4); font-weight:
-                    700; }
-
-                    :host:has(.k-standby:hover) .seg.k-standby { transform: scaleY(1.5); }'
-                  style: {}
-                slots:
-                  default:
-                  - component: div
-                    config:
-                      style:
-                        margin-bottom: 12px
+                        display: grid
+                        grid-template-columns: repeat(3, 1fr)
+                        gap: 0.5714em
+                        margin-bottom: 1.143em
                     slots:
                       default:
                       - component: div
                         config:
                           style:
-                            display: flex
-                            justify-content: space-between
-                            margin-bottom: 4px
+                            padding: 0.7143em 0.8571em
+                            border-radius: 0.8571em
+                            background: rgba(127, 127, 127, 0.08)
                         slots:
                           default:
                           - component: Label
                             config:
-                              text: Strom
+                              text: Elektrisch
                               style:
+                                font-size: 0.8571em
                                 opacity: '0.7'
                           - component: Label
                             config:
-                              text: =((Number(items[props.heatpumpEnergyToday].numericState) || 0)).toFixed(1).replace('.',
-                                ',') + ' kWh'
+                              text: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpPower].state) ? ''–'' : (items[props.heatpumpPower].displayState
+                                || items[props.heatpumpPower].state))'
                               style:
+                                font-size: 1.571em
                                 font-weight: '700'
+                                color: '#ffa726'
+                                white-space: nowrap
                       - component: div
                         config:
                           style:
-                            display: flex
-                            gap: 2px
-                            height: 14px
-                        slots:
-                          default:
-                          - component: div
-                            config:
-                              class: seg k k-heizung
-                              title: ='Heizung · ' + ((Number(items[props.heatpumpEnergySpaceToday].numericState) || 0)).toFixed(2).replace('.',
-                                ',') + ' kWh'
-                              visible: =(Number(items[props.heatpumpEnergySpaceToday].numericState) || 0) > 0.005
-                              style:
-                                width: '=((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ? 100 * (Number(items[props.heatpumpEnergySpaceToday].numericState)
-                                  || 0) / (Number(items[props.heatpumpEnergyToday].numericState) || 0) : 0).toFixed(1) + ''%'''
-                                background: '#ffb74d'
-                                height: 100%
-                                border-radius: 4px
-                            slots:
-                              default: []
-                          - component: div
-                            config:
-                              class: seg k k-warmwasser
-                              title: ='Warmwasser · ' + ((Number(items[props.heatpumpEnergyDhwToday].numericState) || 0)).toFixed(2).replace('.',
-                                ',') + ' kWh'
-                              visible: =(Number(items[props.heatpumpEnergyDhwToday].numericState) || 0) > 0.005
-                              style:
-                                width: '=((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ? 100 * (Number(items[props.heatpumpEnergyDhwToday].numericState)
-                                  || 0) / (Number(items[props.heatpumpEnergyToday].numericState) || 0) : 0).toFixed(1) + ''%'''
-                                background: '#e57373'
-                                height: 100%
-                                border-radius: 4px
-                            slots:
-                              default: []
-                          - component: div
-                            config:
-                              class: seg k k-standby
-                              title: ='Standby · ' + ((Number(items[props.heatpumpEnergyStandbyToday].numericState) || 0)).toFixed(2).replace('.',
-                                ',') + ' kWh'
-                              visible: =(Number(items[props.heatpumpEnergyStandbyToday].numericState) || 0) > 0.005
-                              style:
-                                width: '=((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ? 100 * (Number(items[props.heatpumpEnergyStandbyToday].numericState)
-                                  || 0) / (Number(items[props.heatpumpEnergyToday].numericState) || 0) : 0).toFixed(1) + ''%'''
-                                background: '#b0bec5'
-                                height: 100%
-                                border-radius: 4px
-                            slots:
-                              default: []
-                  - component: div
-                    config:
-                      style:
-                        margin-bottom: 12px
-                    slots:
-                      default:
-                      - component: div
-                        config:
-                          style:
-                            display: flex
-                            justify-content: space-between
-                            margin-bottom: 4px
+                            padding: 0.7143em 0.8571em
+                            border-radius: 0.8571em
+                            background: rgba(127, 127, 127, 0.08)
                         slots:
                           default:
                           - component: Label
                             config:
                               text: Wärme
                               style:
+                                font-size: 0.8571em
                                 opacity: '0.7'
                           - component: Label
                             config:
-                              text: =((Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0)).toFixed(1).replace('.',
-                                ',') + ' kWh'
+                              text: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpHeatPower].state) ? ''–'' : (items[props.heatpumpHeatPower].displayState
+                                || items[props.heatpumpHeatPower].state))'
                               style:
+                                font-size: 1.571em
                                 font-weight: '700'
+                                color: '#e57373'
+                                white-space: nowrap
                       - component: div
                         config:
                           style:
-                            display: flex
-                            gap: 2px
-                            height: 14px
+                            padding: 0.7143em 0.8571em
+                            border-radius: 0.8571em
+                            background: rgba(127, 127, 127, 0.08)
                         slots:
                           default:
-                          - component: div
+                          - component: Label
                             config:
-                              class: seg k k-heizung
-                              title: ='Heizung · ' + ((Number(items[props.heatpumpHeatingEnergySpaceToday].numericState) ||
-                                0)).toFixed(2).replace('.', ',') + ' kWh'
-                              visible: =(Number(items[props.heatpumpHeatingEnergySpaceToday].numericState) || 0) > 0.005
+                              text: COP
                               style:
-                                width: '=((Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0) > 0 ? 100 *
-                                  (Number(items[props.heatpumpHeatingEnergySpaceToday].numericState) || 0) / (Number(items[props.heatpumpHeatingEnergyToday].numericState)
-                                  || 0) : 0).toFixed(1) + ''%'''
-                                background: '#ffb74d'
-                                height: 100%
-                                border-radius: 4px
-                            slots:
-                              default: []
-                          - component: div
+                                font-size: 0.8571em
+                                opacity: '0.7'
+                          - component: Label
                             config:
-                              class: seg k k-warmwasser
-                              title: ='Warmwasser · ' + ((Number(items[props.heatpumpHeatingEnergyDhwToday].numericState)
-                                || 0)).toFixed(2).replace('.', ',') + ' kWh'
-                              visible: =(Number(items[props.heatpumpHeatingEnergyDhwToday].numericState) || 0) > 0.005
+                              text: '=(Number(items[props.heatpumpCop].numericState) || 0) > 0 ? ((Number(items[props.heatpumpCop].numericState)
+                                || 0)).toFixed(2).replace(''.'', '','') : ''–'''
                               style:
-                                width: '=((Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0) > 0 ? 100 *
-                                  (Number(items[props.heatpumpHeatingEnergyDhwToday].numericState) || 0) / (Number(items[props.heatpumpHeatingEnergyToday].numericState)
-                                  || 0) : 0).toFixed(1) + ''%'''
-                                background: '#e57373'
-                                height: 100%
-                                border-radius: 4px
-                            slots:
-                              default: []
+                                font-size: 1.571em
+                                font-weight: '700'
+                                color: '#66bb6a'
+                                white-space: nowrap
+                  - component: Label
+                    config:
+                      text: Heute
+                      style:
+                        font-weight: '700'
+                        margin-bottom: 0.5714em
                   - component: div
                     config:
-                      style:
-                        display: flex
-                        gap: 14px
-                        margin: -4px 0 14px
+                      stylesheet: '.k { transition: opacity 0.15s, transform 0.15s, background-color 0.15s; }
+
+                        .item { border-radius: 6px; padding: 3px 6px; margin: 0 -6px; }
+
+                        :host:has(.k:hover) .k { opacity: 0.3; }
+
+                        :host:has(.k-heizung:hover) .k-heizung { opacity: 1; }
+
+                        :host:has(.k-heizung:hover) .item.k-heizung { background-color: rgba(255, 183, 77, 0.4); font-weight:
+                        700; }
+
+                        :host:has(.k-heizung:hover) .seg.k-heizung { transform: scaleY(1.5); }
+
+                        :host:has(.k-warmwasser:hover) .k-warmwasser { opacity: 1; }
+
+                        :host:has(.k-warmwasser:hover) .item.k-warmwasser { background-color: rgba(229, 115, 115, 0.4); font-weight:
+                        700; }
+
+                        :host:has(.k-warmwasser:hover) .seg.k-warmwasser { transform: scaleY(1.5); }
+
+                        :host:has(.k-standby:hover) .k-standby { opacity: 1; }
+
+                        :host:has(.k-standby:hover) .item.k-standby { background-color: rgba(176, 190, 197, 0.4); font-weight:
+                        700; }
+
+                        :host:has(.k-standby:hover) .seg.k-standby { transform: scaleY(1.5); }'
+                      style: {}
                     slots:
                       default:
                       - component: div
                         config:
-                          class: item k k-heizung
                           style:
-                            display: flex
-                            align-items: center
-                            gap: 5px
+                            margin-bottom: 0.8571em
                         slots:
                           default:
                           - component: div
                             config:
                               style:
-                                width: 10px
-                                height: 10px
-                                border-radius: 3px
-                                background: '#ffb74d'
+                                display: flex
+                                justify-content: space-between
+                                margin-bottom: 0.2857em
                             slots:
-                              default: []
+                              default:
+                              - component: Label
+                                config:
+                                  text: Strom
+                                  style:
+                                    opacity: '0.7'
+                              - component: Label
+                                config:
+                                  text: =((Number(items[props.heatpumpEnergyToday].numericState) || 0)).toFixed(1).replace('.',
+                                    ',') + ' kWh'
+                                  style:
+                                    font-weight: '700'
+                          - component: div
+                            config:
+                              style:
+                                display: flex
+                                gap: 0.1429em
+                                height: 1em
+                            slots:
+                              default:
+                              - component: div
+                                config:
+                                  class: seg k k-heizung
+                                  title: ='Heizung · ' + ((Number(items[props.heatpumpEnergySpaceToday].numericState) || 0)).toFixed(2).replace('.',
+                                    ',') + ' kWh'
+                                  visible: =(Number(items[props.heatpumpEnergySpaceToday].numericState) || 0) > 0.005
+                                  style:
+                                    width: '=((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ? 100 * (Number(items[props.heatpumpEnergySpaceToday].numericState)
+                                      || 0) / (Number(items[props.heatpumpEnergyToday].numericState) || 0) : 0).toFixed(1)
+                                      + ''%'''
+                                    background: '#ffb74d'
+                                    height: 100%
+                                    border-radius: 0.2857em
+                                slots:
+                                  default: []
+                              - component: div
+                                config:
+                                  class: seg k k-warmwasser
+                                  title: ='Warmwasser · ' + ((Number(items[props.heatpumpEnergyDhwToday].numericState) ||
+                                    0)).toFixed(2).replace('.', ',') + ' kWh'
+                                  visible: =(Number(items[props.heatpumpEnergyDhwToday].numericState) || 0) > 0.005
+                                  style:
+                                    width: '=((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ? 100 * (Number(items[props.heatpumpEnergyDhwToday].numericState)
+                                      || 0) / (Number(items[props.heatpumpEnergyToday].numericState) || 0) : 0).toFixed(1)
+                                      + ''%'''
+                                    background: '#e57373'
+                                    height: 100%
+                                    border-radius: 0.2857em
+                                slots:
+                                  default: []
+                              - component: div
+                                config:
+                                  class: seg k k-standby
+                                  title: ='Standby · ' + ((Number(items[props.heatpumpEnergyStandbyToday].numericState) ||
+                                    0)).toFixed(2).replace('.', ',') + ' kWh'
+                                  visible: =(Number(items[props.heatpumpEnergyStandbyToday].numericState) || 0) > 0.005
+                                  style:
+                                    width: '=((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ? 100 * (Number(items[props.heatpumpEnergyStandbyToday].numericState)
+                                      || 0) / (Number(items[props.heatpumpEnergyToday].numericState) || 0) : 0).toFixed(1)
+                                      + ''%'''
+                                    background: '#b0bec5'
+                                    height: 100%
+                                    border-radius: 0.2857em
+                                slots:
+                                  default: []
+                      - component: div
+                        config:
+                          style:
+                            margin-bottom: 0.8571em
+                        slots:
+                          default:
+                          - component: div
+                            config:
+                              style:
+                                display: flex
+                                justify-content: space-between
+                                margin-bottom: 0.2857em
+                            slots:
+                              default:
+                              - component: Label
+                                config:
+                                  text: Wärme
+                                  style:
+                                    opacity: '0.7'
+                              - component: Label
+                                config:
+                                  text: =((Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0)).toFixed(1).replace('.',
+                                    ',') + ' kWh'
+                                  style:
+                                    font-weight: '700'
+                          - component: div
+                            config:
+                              style:
+                                display: flex
+                                gap: 0.1429em
+                                height: 1em
+                            slots:
+                              default:
+                              - component: div
+                                config:
+                                  class: seg k k-heizung
+                                  title: ='Heizung · ' + ((Number(items[props.heatpumpHeatingEnergySpaceToday].numericState)
+                                    || 0)).toFixed(2).replace('.', ',') + ' kWh'
+                                  visible: =(Number(items[props.heatpumpHeatingEnergySpaceToday].numericState) || 0) > 0.005
+                                  style:
+                                    width: '=((Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0) > 0 ? 100
+                                      * (Number(items[props.heatpumpHeatingEnergySpaceToday].numericState) || 0) / (Number(items[props.heatpumpHeatingEnergyToday].numericState)
+                                      || 0) : 0).toFixed(1) + ''%'''
+                                    background: '#ffb74d'
+                                    height: 100%
+                                    border-radius: 0.2857em
+                                slots:
+                                  default: []
+                              - component: div
+                                config:
+                                  class: seg k k-warmwasser
+                                  title: ='Warmwasser · ' + ((Number(items[props.heatpumpHeatingEnergyDhwToday].numericState)
+                                    || 0)).toFixed(2).replace('.', ',') + ' kWh'
+                                  visible: =(Number(items[props.heatpumpHeatingEnergyDhwToday].numericState) || 0) > 0.005
+                                  style:
+                                    width: '=((Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0) > 0 ? 100
+                                      * (Number(items[props.heatpumpHeatingEnergyDhwToday].numericState) || 0) / (Number(items[props.heatpumpHeatingEnergyToday].numericState)
+                                      || 0) : 0).toFixed(1) + ''%'''
+                                    background: '#e57373'
+                                    height: 100%
+                                    border-radius: 0.2857em
+                                slots:
+                                  default: []
+                      - component: div
+                        config:
+                          style:
+                            display: flex
+                            gap: 1em
+                            margin: -0.2857em 0 1em
+                        slots:
+                          default:
+                          - component: div
+                            config:
+                              class: item k k-heizung
+                              style:
+                                display: flex
+                                align-items: center
+                                gap: 0.3571em
+                            slots:
+                              default:
+                              - component: div
+                                config:
+                                  style:
+                                    width: 0.7143em
+                                    height: 0.7143em
+                                    border-radius: 0.2143em
+                                    background: '#ffb74d'
+                                slots:
+                                  default: []
+                              - component: Label
+                                config:
+                                  text: Heizung
+                                  style:
+                                    font-size: 0.8571em
+                                    opacity: '0.75'
+                          - component: div
+                            config:
+                              class: item k k-warmwasser
+                              style:
+                                display: flex
+                                align-items: center
+                                gap: 0.3571em
+                            slots:
+                              default:
+                              - component: div
+                                config:
+                                  style:
+                                    width: 0.7143em
+                                    height: 0.7143em
+                                    border-radius: 0.2143em
+                                    background: '#e57373'
+                                slots:
+                                  default: []
+                              - component: Label
+                                config:
+                                  text: Warmwasser
+                                  style:
+                                    font-size: 0.8571em
+                                    opacity: '0.75'
+                          - component: div
+                            config:
+                              class: item k k-standby
+                              style:
+                                display: flex
+                                align-items: center
+                                gap: 0.3571em
+                            slots:
+                              default:
+                              - component: div
+                                config:
+                                  style:
+                                    width: 0.7143em
+                                    height: 0.7143em
+                                    border-radius: 0.2143em
+                                    background: '#b0bec5'
+                                slots:
+                                  default: []
+                              - component: Label
+                                config:
+                                  text: Standby
+                                  style:
+                                    font-size: 0.8571em
+                                    opacity: '0.75'
+                  - component: div
+                    config:
+                      style:
+                        display: flex
+                        justify-content: space-around
+                    slots:
+                      default:
+                      - component: div
+                        config:
+                          style:
+                            display: flex
+                            flex-direction: column
+                            align-items: center
+                            gap: 0.2857em
+                        slots:
+                          default:
+                          - component: svg
+                            config:
+                              viewBox: 0 0 76 76
+                              width: 5.429em
+                              height: 5.429em
+                            slots:
+                              default:
+                              - component: circle
+                                config:
+                                  cx: 38
+                                  cy: 38
+                                  r: 28
+                                  stroke: '#9e9e9e'
+                                  stroke-width: 8
+                                  stroke-linecap: round
+                                  fill: none
+                                  stroke-opacity: '0.25'
+                              - component: circle
+                                config:
+                                  cx: 38
+                                  cy: 38
+                                  r: 28
+                                  transform: rotate(-90 38 38)
+                                  stroke: '#ffb74d'
+                                  stroke-width: 8
+                                  stroke-linecap: round
+                                  fill: none
+                                  stroke-dasharray: =(175.93 * Math.min(1, (Number(items[props.heatpumpDcopSpace].numericState)
+                                    || 0) / 6)).toFixed(1) + ' 175.93'
+                              - component: text
+                                config:
+                                  x: 38
+                                  y: 44
+                                  content: '=(Number(items[props.heatpumpDcopSpace].numericState) || 0) > 0 ? ((Number(items[props.heatpumpDcopSpace].numericState)
+                                    || 0)).toFixed(1).replace(''.'', '','') : ''–'''
+                                  fill: currentColor
+                                  font-size: 18
+                                  font-weight: 700
+                                  text-anchor: middle
                           - component: Label
                             config:
-                              text: Heizung
+                              text: COP Heizung
                               style:
-                                font-size: 12px
+                                font-size: 1em
                                 opacity: '0.75'
                       - component: div
                         config:
-                          class: item k k-warmwasser
                           style:
                             display: flex
+                            flex-direction: column
                             align-items: center
-                            gap: 5px
+                            gap: 0.2857em
                         slots:
                           default:
-                          - component: div
+                          - component: svg
                             config:
-                              style:
-                                width: 10px
-                                height: 10px
-                                border-radius: 3px
-                                background: '#e57373'
+                              viewBox: 0 0 76 76
+                              width: 5.429em
+                              height: 5.429em
                             slots:
-                              default: []
+                              default:
+                              - component: circle
+                                config:
+                                  cx: 38
+                                  cy: 38
+                                  r: 28
+                                  stroke: '#9e9e9e'
+                                  stroke-width: 8
+                                  stroke-linecap: round
+                                  fill: none
+                                  stroke-opacity: '0.25'
+                              - component: circle
+                                config:
+                                  cx: 38
+                                  cy: 38
+                                  r: 28
+                                  transform: rotate(-90 38 38)
+                                  stroke: '#e57373'
+                                  stroke-width: 8
+                                  stroke-linecap: round
+                                  fill: none
+                                  stroke-dasharray: =(175.93 * Math.min(1, (Number(items[props.heatpumpDcopDhw].numericState)
+                                    || 0) / 6)).toFixed(1) + ' 175.93'
+                              - component: text
+                                config:
+                                  x: 38
+                                  y: 44
+                                  content: '=(Number(items[props.heatpumpDcopDhw].numericState) || 0) > 0 ? ((Number(items[props.heatpumpDcopDhw].numericState)
+                                    || 0)).toFixed(1).replace(''.'', '','') : ''–'''
+                                  fill: currentColor
+                                  font-size: 18
+                                  font-weight: 700
+                                  text-anchor: middle
                           - component: Label
                             config:
-                              text: Warmwasser
+                              text: COP Warmwasser
                               style:
-                                font-size: 12px
+                                font-size: 1em
                                 opacity: '0.75'
                       - component: div
                         config:
-                          class: item k k-standby
                           style:
                             display: flex
+                            flex-direction: column
                             align-items: center
-                            gap: 5px
+                            gap: 0.2857em
                         slots:
                           default:
-                          - component: div
+                          - component: svg
                             config:
-                              style:
-                                width: 10px
-                                height: 10px
-                                border-radius: 3px
-                                background: '#b0bec5'
+                              viewBox: 0 0 76 76
+                              width: 5.429em
+                              height: 5.429em
                             slots:
-                              default: []
+                              default:
+                              - component: circle
+                                config:
+                                  cx: 38
+                                  cy: 38
+                                  r: 28
+                                  stroke: '#9e9e9e'
+                                  stroke-width: 8
+                                  stroke-linecap: round
+                                  fill: none
+                                  stroke-opacity: '0.25'
+                              - component: circle
+                                config:
+                                  cx: 38
+                                  cy: 38
+                                  r: 28
+                                  transform: rotate(-90 38 38)
+                                  stroke: '#66bb6a'
+                                  stroke-width: 8
+                                  stroke-linecap: round
+                                  fill: none
+                                  stroke-dasharray: =(175.93 * Math.min(1, (Number(items[props.heatpumpDcop].numericState)
+                                    || 0) / 6)).toFixed(1) + ' 175.93'
+                              - component: text
+                                config:
+                                  x: 38
+                                  y: 44
+                                  content: '=(Number(items[props.heatpumpDcop].numericState) || 0) > 0 ? ((Number(items[props.heatpumpDcop].numericState)
+                                    || 0)).toFixed(1).replace(''.'', '','') : ''–'''
+                                  fill: currentColor
+                                  font-size: 18
+                                  font-weight: 700
+                                  text-anchor: middle
                           - component: Label
                             config:
-                              text: Standby
+                              text: COP gesamt
                               style:
-                                font-size: 12px
+                                font-size: 1em
                                 opacity: '0.75'
-              - component: div
-                config:
-                  style:
-                    display: flex
-                    justify-content: space-around
-                slots:
-                  default:
-                  - component: div
-                    config:
-                      style:
-                        display: flex
-                        flex-direction: column
-                        align-items: center
-                        gap: 4px
-                    slots:
-                      default:
-                      - component: svg
-                        config:
-                          viewBox: 0 0 76 76
-                          width: 76
-                          height: 76
-                        slots:
-                          default:
-                          - component: circle
-                            config:
-                              cx: 38
-                              cy: 38
-                              r: 28
-                              stroke: '#9e9e9e'
-                              stroke-width: 8
-                              stroke-linecap: round
-                              fill: none
-                              stroke-opacity: '0.25'
-                          - component: circle
-                            config:
-                              cx: 38
-                              cy: 38
-                              r: 28
-                              transform: rotate(-90 38 38)
-                              stroke: '#ffb74d'
-                              stroke-width: 8
-                              stroke-linecap: round
-                              fill: none
-                              stroke-dasharray: =(175.93 * Math.min(1, (Number(items[props.heatpumpDcopSpace].numericState)
-                                || 0) / 6)).toFixed(1) + ' 175.93'
-                          - component: text
-                            config:
-                              x: 38
-                              y: 44
-                              content: '=(Number(items[props.heatpumpDcopSpace].numericState) || 0) > 0 ? ((Number(items[props.heatpumpDcopSpace].numericState)
-                                || 0)).toFixed(1).replace(''.'', '','') : ''–'''
-                              fill: currentColor
-                              font-size: 18
-                              font-weight: 700
-                              text-anchor: middle
-                      - component: Label
-                        config:
-                          text: COP Heizung
-                          style:
-                            font-size: 14px
-                            opacity: '0.75'
-                  - component: div
-                    config:
-                      style:
-                        display: flex
-                        flex-direction: column
-                        align-items: center
-                        gap: 4px
-                    slots:
-                      default:
-                      - component: svg
-                        config:
-                          viewBox: 0 0 76 76
-                          width: 76
-                          height: 76
-                        slots:
-                          default:
-                          - component: circle
-                            config:
-                              cx: 38
-                              cy: 38
-                              r: 28
-                              stroke: '#9e9e9e'
-                              stroke-width: 8
-                              stroke-linecap: round
-                              fill: none
-                              stroke-opacity: '0.25'
-                          - component: circle
-                            config:
-                              cx: 38
-                              cy: 38
-                              r: 28
-                              transform: rotate(-90 38 38)
-                              stroke: '#e57373'
-                              stroke-width: 8
-                              stroke-linecap: round
-                              fill: none
-                              stroke-dasharray: =(175.93 * Math.min(1, (Number(items[props.heatpumpDcopDhw].numericState)
-                                || 0) / 6)).toFixed(1) + ' 175.93'
-                          - component: text
-                            config:
-                              x: 38
-                              y: 44
-                              content: '=(Number(items[props.heatpumpDcopDhw].numericState) || 0) > 0 ? ((Number(items[props.heatpumpDcopDhw].numericState)
-                                || 0)).toFixed(1).replace(''.'', '','') : ''–'''
-                              fill: currentColor
-                              font-size: 18
-                              font-weight: 700
-                              text-anchor: middle
-                      - component: Label
-                        config:
-                          text: COP Warmwasser
-                          style:
-                            font-size: 14px
-                            opacity: '0.75'
-                  - component: div
-                    config:
-                      style:
-                        display: flex
-                        flex-direction: column
-                        align-items: center
-                        gap: 4px
-                    slots:
-                      default:
-                      - component: svg
-                        config:
-                          viewBox: 0 0 76 76
-                          width: 76
-                          height: 76
-                        slots:
-                          default:
-                          - component: circle
-                            config:
-                              cx: 38
-                              cy: 38
-                              r: 28
-                              stroke: '#9e9e9e'
-                              stroke-width: 8
-                              stroke-linecap: round
-                              fill: none
-                              stroke-opacity: '0.25'
-                          - component: circle
-                            config:
-                              cx: 38
-                              cy: 38
-                              r: 28
-                              transform: rotate(-90 38 38)
-                              stroke: '#66bb6a'
-                              stroke-width: 8
-                              stroke-linecap: round
-                              fill: none
-                              stroke-dasharray: =(175.93 * Math.min(1, (Number(items[props.heatpumpDcop].numericState) ||
-                                0) / 6)).toFixed(1) + ' 175.93'
-                          - component: text
-                            config:
-                              x: 38
-                              y: 44
-                              content: '=(Number(items[props.heatpumpDcop].numericState) || 0) > 0 ? ((Number(items[props.heatpumpDcop].numericState)
-                                || 0)).toFixed(1).replace(''.'', '','') : ''–'''
-                              fill: currentColor
-                              font-size: 18
-                              font-weight: 700
-                              text-anchor: middle
-                      - component: Label
-                        config:
-                          text: COP gesamt
-                          style:
-                            font-size: 14px
-                            opacity: '0.75'
