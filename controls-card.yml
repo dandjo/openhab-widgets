@@ -21,9 +21,45 @@ props:
     type: TEXT
     required: true
     context: item
+  - name: heatpumpDhwPower
+    label: Pyaltherma Warmwasser Ein/Aus
+    description: Switch item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpClimateControlPower
+    label: Pyaltherma Heizung Ein/Aus
+    description: Switch item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpDhwManagement
+    label: Wärmepumpe Warmwasser-Automatik
+    description: Switch item
+    type: TEXT
+    required: true
+    context: item
   - name: heatpumpDhwBoost
     label: Pyaltherma Warmwasser-Boost
     description: Switch item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpDhwTempHeating
+    label: Pyaltherma Warmwasser Solltemperatur
+    description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpLeavingWaterTempOffsetHeating
+    label: Pyaltherma Vorlauf-Offset Heizen
+    description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpLeavingWaterSetpoint
+    label: ESPAltherma Vorlauf Sollwert
+    description: Number:Temperature item
     type: TEXT
     required: true
     context: item
@@ -57,6 +93,12 @@ props:
     type: TEXT
     required: true
     context: item
+  - name: acTimer
+    label: Klimaanlage Timer
+    description: Number:Time item
+    type: TEXT
+    required: true
+    context: item
   - name: ventilationPower
     label: Lüftung Leistung
     description: Number:Power item
@@ -66,6 +108,18 @@ props:
   - name: ventilationLevel
     label: ESPLyfterl Stufe
     description: String item
+    type: TEXT
+    required: true
+    context: item
+  - name: ventilationTimer
+    label: Lüftung Timer
+    description: Number:Time item
+    type: TEXT
+    required: true
+    context: item
+  - name: ventilationManagement
+    label: Lüftung Automatik
+    description: Group item
     type: TEXT
     required: true
     context: item
@@ -130,7 +184,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Sep 27, 2026, 3:01:48 AM
+timestamp: Sep 27, 2026, 5:39:39 PM
 component: oh-card
 config:
   title: Steuerung
@@ -266,6 +320,69 @@ slots:
                         padding: 0 6px
                         background-color: '=(items[props.heatpumpSmartGrid].state === ''3'') ? ''#fb8c00'' : '''''
                         color: '=(items[props.heatpumpSmartGrid].state === ''3'') ? ''#ffffff'' : '''''
+          - component: div
+            config:
+              style:
+                display: flex
+                flex-direction: column
+                gap: 6px
+            slots:
+              default:
+              - component: Label
+                config:
+                  text: Betrieb
+                  style:
+                    font-size: 13px
+              - component: f7-segmented
+                config:
+                  strong: true
+                  style:
+                    width: 100%
+                  stylesheet: '.segmented-highlight { display: none; }'
+                slots:
+                  default:
+                  - component: oh-button
+                    config:
+                      text: Warmwasser
+                      action: toggle
+                      actionItem: =props.heatpumpDhwPower
+                      actionCommand: 'ON'
+                      actionCommandAlt: 'OFF'
+                      small: true
+                      active: =items[props.heatpumpDhwPower].state === 'ON'
+                      style:
+                        font-size: 12px
+                        padding: 0 4px
+                        background-color: '=items[props.heatpumpDhwPower].state === ''ON'' ? ''#fb8c00'' : '''''
+                        color: '=items[props.heatpumpDhwPower].state === ''ON'' ? ''#ffffff'' : '''''
+                  - component: oh-button
+                    config:
+                      text: Heizung
+                      action: toggle
+                      actionItem: =props.heatpumpClimateControlPower
+                      actionCommand: 'ON'
+                      actionCommandAlt: 'OFF'
+                      small: true
+                      active: =items[props.heatpumpClimateControlPower].state === 'ON'
+                      style:
+                        font-size: 12px
+                        padding: 0 4px
+                        background-color: '=items[props.heatpumpClimateControlPower].state === ''ON'' ? ''#fb8c00'' : '''''
+                        color: '=items[props.heatpumpClimateControlPower].state === ''ON'' ? ''#ffffff'' : '''''
+                  - component: oh-button
+                    config:
+                      text: Automatik
+                      action: toggle
+                      actionItem: =props.heatpumpDhwManagement
+                      actionCommand: 'ON'
+                      actionCommandAlt: 'OFF'
+                      small: true
+                      active: =items[props.heatpumpDhwManagement].state === 'ON'
+                      style:
+                        font-size: 12px
+                        padding: 0 4px
+                        background-color: '=items[props.heatpumpDhwManagement].state === ''ON'' ? ''#fb8c00'' : '''''
+                        color: '=items[props.heatpumpDhwManagement].state === ''ON'' ? ''#ffffff'' : '''''
           - component: div
             config:
               style:
@@ -411,6 +528,42 @@ slots:
                     inset: '0'
                     display: block
                     border-radius: 26px
+          - component: widget:pill-slider
+            config:
+              item: =props.heatpumpDhwTempHeating
+              color: '#fb8c00'
+              min: 30
+              max: 60
+              step: 5
+              unit: °C
+              title: Warmwasser Soll
+              value: '=((Number(items[props.heatpumpDhwTempHeating].numericState) || 0) % 1 ? ((Number(items[props.heatpumpDhwTempHeating].numericState)
+                || 0)).toFixed(1).replace(''.'', '','') : (Number(items[props.heatpumpDhwTempHeating].numericState) || 0))
+                + '' °C'''
+              context: '=''Speicher '' + ([''NULL'', ''UNDEF''].includes(items[props.heatpumpDhwTankTemp].state) ? ''–'' :
+                (items[props.heatpumpDhwTankTemp].displayState || items[props.heatpumpDhwTankTemp].state)) + (items[props.heatpumpDhwManagement].state
+                === ''ON'' ? '' · Automatik regelt'' : '''')'
+              marks: 30=30 °C;40=40;50=50;60=60 °C
+              icon: material:shower
+              opacity: '=items[props.heatpumpDhwPower].state === ''ON'' ? ''1'' : ''0.6'''
+          - component: widget:pill-slider
+            config:
+              item: =props.heatpumpLeavingWaterTempOffsetHeating
+              color: '#fb8c00'
+              min: -10
+              max: 10
+              step: 1
+              unit: K
+              title: Vorlauf-Offset
+              value: '=(Math.round((Number(items[props.heatpumpLeavingWaterTempOffsetHeating].numericState) || 0)) > 0 ? ''+''
+                : '''') + Math.round((Number(items[props.heatpumpLeavingWaterTempOffsetHeating].numericState) || 0)) + ''
+                K'''
+              context: '=''Vorlauf-Soll '' + ([''NULL'', ''UNDEF''].includes(items[props.heatpumpLeavingWaterSetpoint].state)
+                ? ''–'' : (items[props.heatpumpLeavingWaterSetpoint].displayState || items[props.heatpumpLeavingWaterSetpoint].state))
+                + (items[props.heatpumpClimateControlPower].state === ''ON'' ? '''' : '' · Heizung aus'')'
+              marks: -10=−10 K;-5=−5;0=0;5=+5;10=+10 K
+              icon: material:tune
+              opacity: '=items[props.heatpumpClimateControlPower].state === ''ON'' ? ''1'' : ''0.6'''
       - component: div
         config:
           style:
@@ -722,30 +875,44 @@ slots:
                         background-color: '=(items[props.acFan].state === ''5'') ? (items[props.acSwitch].state === ''ON''
                           ? ''#29b6f6'' : ''#90a4ae'') : '''''
                         color: '=(items[props.acFan].state === ''5'') ? ''#ffffff'' : '''''
-          - component: div
+          - component: widget:pill-slider
             config:
-              style:
-                display: flex
-                align-items: center
-                gap: 10px
-                opacity: '=items[props.acSwitch].state === ''ON'' ? ''1'' : ''0.6'''
-            slots:
-              default:
-              - component: Label
-                config:
-                  text: Soll
-                  style:
-                    font-size: 13px
-                    flex: '1'
-              - component: oh-stepper
-                config:
-                  item: =props.acTemperatureSetpoint
-                  min: 18
-                  max: 32
-                  step: 0.5
-                  small: true
-                  raised: true
-                  fill: true
+              item: =props.acTemperatureSetpoint
+              color: '#29b6f6'
+              min: 18
+              max: 32
+              step: 0.5
+              unit: °C
+              title: Soll
+              value: '=((Number(items[props.acTemperatureSetpoint].numericState) || 0) % 1 ? ((Number(items[props.acTemperatureSetpoint].numericState)
+                || 0)).toFixed(1).replace(''.'', '','') : (Number(items[props.acTemperatureSetpoint].numericState) || 0))
+                + '' °C'''
+              context: '=''Raum '' + ([''NULL'', ''UNDEF''].includes(items[props.acTemperature].state) ? ''–'' : (items[props.acTemperature].displayState
+                || items[props.acTemperature].state))'
+              marks: 18=18 °C;20=20;22=22;24=24;26=26;28=28;30=30;32=32 °C
+              icon: material:device_thermostat
+              opacity: '=items[props.acSwitch].state === ''ON'' ? ''1'' : ''0.6'''
+          - component: widget:pill-slider
+            config:
+              item: =props.acTimer
+              color: '#29b6f6'
+              min: 0
+              max: 720
+              step: 15
+              unit: min
+              title: Timer
+              value: '=(Number(items[props.acTimer].numericState) || 0) > 0 ? ((Number(items[props.acTimer].numericState)
+                || 0) >= 60 ? Math.floor((Number(items[props.acTimer].numericState) || 0) / 60) + '' h'' + (Math.round((Number(items[props.acTimer].numericState)
+                || 0) % 60) ? '' '' + Math.round((Number(items[props.acTimer].numericState) || 0) % 60) + '' min'' : '''')
+                : Math.round((Number(items[props.acTimer].numericState) || 0)) + '' min'') : ''Aus'''
+              context: '=(Number(items[props.acTimer].numericState) || 0) > 0 ? (items[props.acSwitch].state === ''ON'' ?
+                ''schaltet um '' + dayjs().add((Number(items[props.acTimer].numericState) || 0), ''minute'').format(''HH:mm'')
+                + '' aus'' : ''läuft bis '' + dayjs().add((Number(items[props.acTimer].numericState) || 0), ''minute'').format(''HH:mm''))
+                : (items[props.acSwitch].state === ''ON'' ? ''läuft ohne Timer'' : ''beim Einschalten 6 h'')'
+              marks: 0=0;180=3 h;360=6 h;540=9 h;720=12 h
+              ring: true
+              valueColor: '=(Number(items[props.acTimer].numericState) || 0) > 0 ? ''#29b6f6'' : '''''
+              opacity: '=items[props.acSwitch].state === ''ON'' ? ''1'' : ''0.6'''
       - component: div
         config:
           style:
@@ -830,6 +997,26 @@ slots:
                     padding: 0 4px
                     background-color: '=(items[props.ventilationLevel].state === ''3'') ? ''#26a69a'' : '''''
                     color: '=(items[props.ventilationLevel].state === ''3'') ? ''#ffffff'' : '''''
+          - component: widget:pill-slider
+            config:
+              item: =props.ventilationTimer
+              color: '#26a69a'
+              min: 0
+              max: 360
+              step: 15
+              unit: min
+              title: Timer
+              value: '=(Number(items[props.ventilationTimer].numericState) || 0) > 0 ? ((Number(items[props.ventilationTimer].numericState)
+                || 0) >= 60 ? Math.floor((Number(items[props.ventilationTimer].numericState) || 0) / 60) + '' h'' + (Math.round((Number(items[props.ventilationTimer].numericState)
+                || 0) % 60) ? '' '' + Math.round((Number(items[props.ventilationTimer].numericState) || 0) % 60) + '' min''
+                : '''') : Math.round((Number(items[props.ventilationTimer].numericState) || 0)) + '' min'') : ''Aus'''
+              context: '=(Number(items[props.ventilationTimer].numericState) || 0) > 0 ? (items[props.ventilationManagement].state
+                === ''ON'' ? ''Automatik pausiert bis '' : ''bis '') + dayjs().add((Number(items[props.ventilationTimer].numericState)
+                || 0), ''minute'').format(''HH:mm'') : (items[props.ventilationManagement].state === ''ON'' ? ''Automatik
+                regelt die Stufe'' : ''Automatik aus'')'
+              marks: 0=0;120=2 h;240=4 h;360=6 h
+              ring: true
+              valueColor: '=(Number(items[props.ventilationTimer].numericState) || 0) > 0 ? ''#26a69a'' : '''''
       - component: div
         config:
           style:

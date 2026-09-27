@@ -1,7 +1,8 @@
 # openHAB Widgets
 
 MainUI widgets from my openHAB 5 installation: the cards of an energy and home dashboard, and a set of cards for every
-metered plug, a popup for any item, and the tile their values stand in. The UI texts are German, numbers use a decimal comma. No widget names an item: every item comes in as a
+metered plug, a popup for any item, the tile their values stand in, and a slider and a switch row for settings. The UI
+texts are German, numbers use a decimal comma. No widget names an item: every item comes in as a
 prop, so the widgets work with any item names.
 
 ![Overview](screenshots/overview-light.png)
@@ -138,6 +139,75 @@ config:
 | `wrap` | A long text wraps across the whole row of the grid instead of being cut | BOOLEAN |  |
 | `fontSize` | The tile's base size, e.g. 1.1em to grow with its card; default 14px | TEXT |  |
 
+## Slider: `pill-slider`
+
+A setting as a wide pill slider in the device colour, for setpoints, offsets, powers and timers: a gradient fills the
+bar up to the value, the white knob stays inside the bar at both ends, and the value is sent once on release. Above the
+bar an icon in a tinted circle (for a timer, `ring: true`, a ring around a timer icon that empties as the item runs
+down to 0), the title with a line of context and the value large on the right; `marks` puts labels below the bar.
+`value` and `context` are expressions, evaluated where the slider is placed. The slider is only built once the item
+has a numeric state, because MainUI's slider starts at its minimum and a touch ending on it sends its value.
+
+```yaml
+component: widget:pill-slider
+config:
+  item: faikout_perfera_temperature_setpoint
+  color: "#29b6f6"
+  min: 18
+  max: 32
+  step: 0.5
+  unit: °C
+  title: Soll
+  icon: material:device_thermostat
+  value: =items.faikout_perfera_temperature_setpoint.displayState
+  context: ="Raum " + items.faikout_perfera_temperature.displayState
+  marks: 18=18 °C;22=22;26=26;32=32 °C
+```
+
+![Sliders](screenshots/pill-sliders.png)
+
+| Prop | Description | Type | Default |
+|---|---|---|---|
+| `item` | The number item the slider sets | Item |  |
+| `color` | Device colour as #rrggbb | TEXT | `#78909c` |
+| `min` | The slider's lowest value | DECIMAL | `0` |
+| `max` | The slider's highest value | DECIMAL | `100` |
+| `step` | The slider's step | DECIMAL | `1` |
+| `unit` | Unit on the label while dragging, e.g. °C | TEXT |  |
+| `title` | Title above the slider | TEXT |  |
+| `icon` | The badge's icon, e.g. material:thermostat | TEXT | `material:tune` |
+| `ring` | A ring around a timer icon instead of the icon, emptying as the item runs down to 0 | BOOLEAN |  |
+| `value` | The value to show, usually an expression on the item | TEXT |  |
+| `valueColor` | Colour of the value where it is not the device colour; empty: the text colour | TEXT |  |
+| `context` | A line under the title saying what the setting does, usually an expression | TEXT |  |
+| `marks` | value=label pairs below the bar, separated by semicolons, e.g. 0=0;60=1 h;120=2 h | TEXT |  |
+| `opacity` | e.g. 0.6 while the device is off | TEXT |  |
+| `row` | A row of a page's or popup's controls, with their divider | BOOLEAN |  |
+
+## Switch row: `switch-row`
+
+A switch in a row of controls: its icon in a circle tinted in the card's colour while on, the name, *An* or *Aus*, and
+a switch drawn in the card's colour, a track that fills while on and a white knob that slides over. A tap anywhere
+on the row switches the item.
+
+```yaml
+component: widget:switch-row
+config:
+  item: faikout_perfera_streamer_mode
+  title: Streamer
+  icon: material:air
+  color: "#29b6f6"
+```
+
+![Switch rows](screenshots/switch-rows.png)
+
+| Prop | Description | Type | Default |
+|---|---|---|---|
+| `item` | The switch item | Item |  |
+| `title` | Name of the switch | TEXT |  |
+| `icon` | The icon, e.g. material:eco | TEXT | `material:power_settings_new` |
+| `color` | The card's colour as #rrggbb, of the switch while on | TEXT | `#78909c` |
+
 ## Dashboard cards
 
 The cards of my overview page. Each takes the items it shows as props; the prop names say what an item is. Some
@@ -146,26 +216,37 @@ not part of this repository.
 
 ### Controls: `controls-card`
 
-Heat pump panel with Smart Grid mode and a DHW boost action pill, air conditioner panel with an on/off pill, mode, fan and setpoint (mode and fan stay selectable while the unit is off), ventilation level, and tiles that toggle plugs and show their power.
+Heat pump panel with Smart Grid mode, a bar that switches hot water, heating and the hot-water automation, a DHW boost action pill and sliders for the DHW setpoint and the leaving water offset; air conditioner panel with an on/off pill, mode, fan, a setpoint slider and a timer slider (mode, fan and sliders stay usable while the unit is off); ventilation level and timer slider; and tiles that toggle plugs and show their power. The sliders are instances of `pill-slider`, which has to be installed too.
 
 ![Controls](screenshots/controls-card.png)
 
+![Controls in dark mode](screenshots/controls-card-dark.png)
+
 <details>
-<summary>21 props</summary>
+<summary>30 props</summary>
 
 | Prop | Item | Item type |
 |---|---|---|
 | `heatpumpPower` | ESPAltherma Elektrische Leistung | Number:Power |
 | `heatpumpDhwTankTemp` | ESPAltherma Warmwasserspeicher Temperatur | Number:Temperature |
 | `heatpumpSmartGrid` | ESPAltherma Smart Grid | String |
+| `heatpumpDhwPower` | Pyaltherma Warmwasser Ein/Aus | Switch |
+| `heatpumpClimateControlPower` | Pyaltherma Heizung Ein/Aus | Switch |
+| `heatpumpDhwManagement` | Wärmepumpe Warmwasser-Automatik | Switch |
 | `heatpumpDhwBoost` | Pyaltherma Warmwasser-Boost | Switch |
+| `heatpumpDhwTempHeating` | Pyaltherma Warmwasser Solltemperatur | Number:Temperature |
+| `heatpumpLeavingWaterTempOffsetHeating` | Pyaltherma Vorlauf-Offset Heizen | Number:Temperature |
+| `heatpumpLeavingWaterSetpoint` | ESPAltherma Vorlauf Sollwert | Number:Temperature |
 | `acSwitch` | Faikout Perfera Schalter | Switch |
 | `acTemperature` | Faikout Perfera Temperatur | Number:Temperature |
 | `acMode` | Faikout Perfera Modus | String |
 | `acFan` | Faikout Perfera Lüfter | String |
 | `acTemperatureSetpoint` | Faikout Perfera Solltemperatur | Number:Temperature |
+| `acTimer` | Klimaanlage Timer | Number:Time |
 | `ventilationPower` | Lüftung Leistung | Number:Power |
 | `ventilationLevel` | ESPLyfterl Stufe | String |
+| `ventilationTimer` | Lüftung Timer | Number:Time |
+| `ventilationManagement` | Lüftung Automatik | Group |
 | `coffeeMachineSwitch` | Kaffeemaschine Schalter | Switch |
 | `coffeeMachinePower` | Kaffeemaschine Leistung | Number:Power |
 | `bicycleBatteriesSwitch` | Fahrradakkus Schalter | Switch |

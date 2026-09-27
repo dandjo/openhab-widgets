@@ -1,0 +1,117 @@
+uid: switch-row
+tags:
+- switch
+props:
+  parameters:
+  - name: item
+    label: Item
+    description: The switch item
+    type: TEXT
+    required: true
+    context: item
+  - name: title
+    label: Title
+    description: Name of the switch
+    type: TEXT
+    required: true
+  - name: icon
+    label: Icon
+    description: The icon, e.g. material:eco
+    type: TEXT
+    required: false
+    default: material:power_settings_new
+  - name: color
+    label: Colour
+    description: 'The card''s colour as #rrggbb, of the switch while on'
+    type: TEXT
+    required: false
+    default: '#78909c'
+  parameterGroups: []
+timestamp: Sep 27, 2026, 5:39:39 PM
+component: div
+config:
+  style:
+    --switch-color: =props.color || '#78909c'
+    position: relative
+    display: flex
+    align-items: center
+    gap: 8px
+    padding: 5px 2px
+    border-bottom: 1px solid rgba(127, 127, 127, 0.15)
+slots:
+  default:
+  - component: div
+    config:
+      style:
+        width: 26px
+        height: 26px
+        flex: 0 0 auto
+        border-radius: 50%
+        display: flex
+        align-items: center
+        justify-content: center
+        transition: background 0.2s ease
+        background: '=items[props.item].state === ''ON'' ? ''color-mix(in srgb, var(--switch-color) 22%, transparent)'' :
+          ''rgba(127, 127, 127, 0.12)'''
+    slots:
+      default:
+      - component: oh-icon
+        config:
+          icon: =props.icon || 'material:power_settings_new'
+          width: 15
+          height: 15
+  - component: Label
+    config:
+      text: =props.title
+      style:
+        flex: '1'
+        font-size: 14px
+        white-space: nowrap
+        overflow: hidden
+        text-overflow: ellipsis
+  - component: Label
+    config:
+      text: '=items[props.item].state === ''ON'' ? ''An'' : ''Aus'''
+      style:
+        font-size: 10px
+        font-weight: '700'
+        opacity: '0.6'
+        min-width: 24px
+        text-align: right
+  - component: div
+    config:
+      style:
+        position: relative
+        width: 42px
+        height: 24px
+        flex: 0 0 auto
+        border-radius: 12px
+        transition: background 0.2s ease
+        background: '=items[props.item].state === ''ON'' ? ''var(--switch-color)'' : ''rgba(127, 127, 127, 0.35)'''
+    slots:
+      default:
+      - component: div
+        config:
+          style:
+            position: absolute
+            top: 2px
+            left: '=items[props.item].state === ''ON'' ? ''20px'' : ''2px'''
+            width: 20px
+            height: 20px
+            border-radius: 50%
+            background: '#ffffff'
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3)
+            transition: left 0.2s ease
+        slots:
+          default: []
+  - component: oh-link
+    config:
+      action: toggle
+      actionItem: =props.item
+      actionCommand: 'ON'
+      actionCommandAlt: 'OFF'
+      style:
+        position: absolute
+        inset: '0'
+        display: block
+        border-radius: 8px
