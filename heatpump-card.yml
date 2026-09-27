@@ -172,7 +172,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Sep 27, 2026, 2:17:48 AM
+timestamp: Sep 27, 2026, 3:01:48 AM
 component: oh-card
 config:
   title: Wärmepumpe
@@ -1403,75 +1403,30 @@ slots:
                         margin-bottom: 1.143em
                     slots:
                       default:
-                      - component: div
+                      - component: widget:value-tile
                         config:
-                          style:
-                            padding: 0.7143em 0.8571em
-                            border-radius: 0.8571em
-                            background: rgba(127, 127, 127, 0.08)
-                        slots:
-                          default:
-                          - component: Label
-                            config:
-                              text: Elektrisch
-                              style:
-                                font-size: 0.8571em
-                                opacity: '0.7'
-                          - component: Label
-                            config:
-                              text: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpPower].state) ? ''–'' : (items[props.heatpumpPower].displayState
-                                || items[props.heatpumpPower].state))'
-                              style:
-                                font-size: 1.571em
-                                font-weight: '700'
-                                color: '#ffa726'
-                                white-space: nowrap
-                      - component: div
+                          title: Elektrisch
+                          value: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpPower].state) ? ''–'' : (items[props.heatpumpPower].displayState
+                            || items[props.heatpumpPower].state))'
+                          icon: material:bolt
+                          color: '#ffa726'
+                          fontSize: 1.1em
+                      - component: widget:value-tile
                         config:
-                          style:
-                            padding: 0.7143em 0.8571em
-                            border-radius: 0.8571em
-                            background: rgba(127, 127, 127, 0.08)
-                        slots:
-                          default:
-                          - component: Label
-                            config:
-                              text: Wärme
-                              style:
-                                font-size: 0.8571em
-                                opacity: '0.7'
-                          - component: Label
-                            config:
-                              text: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpHeatPower].state) ? ''–'' : (items[props.heatpumpHeatPower].displayState
-                                || items[props.heatpumpHeatPower].state))'
-                              style:
-                                font-size: 1.571em
-                                font-weight: '700'
-                                color: '#e57373'
-                                white-space: nowrap
-                      - component: div
+                          title: Wärme
+                          value: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpHeatPower].state) ? ''–'' : (items[props.heatpumpHeatPower].displayState
+                            || items[props.heatpumpHeatPower].state))'
+                          icon: material:local_fire_department
+                          color: '#e57373'
+                          fontSize: 1.1em
+                      - component: widget:value-tile
                         config:
-                          style:
-                            padding: 0.7143em 0.8571em
-                            border-radius: 0.8571em
-                            background: rgba(127, 127, 127, 0.08)
-                        slots:
-                          default:
-                          - component: Label
-                            config:
-                              text: COP
-                              style:
-                                font-size: 0.8571em
-                                opacity: '0.7'
-                          - component: Label
-                            config:
-                              text: '=(Number(items[props.heatpumpCop].numericState) || 0) > 0 ? ((Number(items[props.heatpumpCop].numericState)
-                                || 0)).toFixed(2).replace(''.'', '','') : ''–'''
-                              style:
-                                font-size: 1.571em
-                                font-weight: '700'
-                                color: '#66bb6a'
-                                white-space: nowrap
+                          title: COP
+                          value: '=(Number(items[props.heatpumpCop].numericState) || 0) > 0 ? ((Number(items[props.heatpumpCop].numericState)
+                            || 0)).toFixed(2).replace(''.'', '','') : ''–'''
+                          icon: material:eco
+                          color: '#66bb6a'
+                          fontSize: 1.1em
                   - component: Label
                     config:
                       text: Heute

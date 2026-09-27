@@ -45,7 +45,7 @@ props:
     required: false
     context: item
   parameterGroups: []
-timestamp: Sep 27, 2026, 2:17:48 AM
+timestamp: Sep 27, 2026, 3:01:48 AM
 component: oh-card
 config:
   title: =props.title
@@ -197,124 +197,24 @@ slots:
         padding: 4px 16px 16px
     slots:
       default:
-      - component: div
+      - component: widget:value-tile
         config:
-          style:
-            position: relative
-            overflow: hidden
-            padding: 10px 12px
-            border-radius: 12px
-            min-width: '0'
-            background: rgba(127, 127, 127, 0.08)
-        slots:
-          default:
-          - component: oh-icon
-            config:
-              icon: material:offline_bolt
-              width: 58
-              height: 58
-              style:
-                position: absolute
-                right: -6px
-                bottom: -10px
-                opacity: '0.16'
-                color: '#ffa726'
-          - component: div
-            config:
-              style:
-                position: relative
-            slots:
-              default:
-              - component: Label
-                config:
-                  text: Energie heute
-                  style:
-                    font-size: 12px
-                    opacity: '0.65'
-              - component: Label
-                config:
-                  text: '=(([''NULL'', ''UNDEF''].includes(items[props.prefix + ''_energy_today''].state) ? ''–'' : (items[props.prefix
-                    + ''_energy_today''].displayState || items[props.prefix + ''_energy_today''].state)) || ''–'')'
-                  style:
-                    font-size: 20px
-                    font-weight: '700'
-                    line-height: 26px
-                    white-space: nowrap
-                    overflow: hidden
-                    text-overflow: ellipsis
-          - component: oh-link
-            config:
-              action: popup
-              style:
-                position: absolute
-                inset: '0'
-                display: block
-                border-radius: 12px
-              actionModal: widget:item-popup
-              actionModalConfig:
-                item: =props.prefix + '_energy_today'
-                title: Energie heute
-                color: '#5c6bc0'
-                kind: number
-      - component: div
+          title: Energie heute
+          value: '=(([''NULL'', ''UNDEF''].includes(items[props.prefix + ''_energy_today''].state) ? ''–'' : (items[props.prefix
+            + ''_energy_today''].displayState || items[props.prefix + ''_energy_today''].state)) || ''–'')'
+          icon: material:offline_bolt
+          iconColor: '#ffa726'
+          item: =props.prefix + '_energy_today'
+          kind: number
+      - component: widget:value-tile
         config:
-          style:
-            position: relative
-            overflow: hidden
-            padding: 10px 12px
-            border-radius: 12px
-            min-width: '0'
-            background: rgba(127, 127, 127, 0.08)
-        slots:
-          default:
-          - component: oh-icon
-            config:
-              icon: material:offline_bolt
-              width: 58
-              height: 58
-              style:
-                position: absolute
-                right: -6px
-                bottom: -10px
-                opacity: '0.16'
-                color: '#ffa726'
-          - component: div
-            config:
-              style:
-                position: relative
-            slots:
-              default:
-              - component: Label
-                config:
-                  text: Energie gesamt
-                  style:
-                    font-size: 12px
-                    opacity: '0.65'
-              - component: Label
-                config:
-                  text: '=(([''NULL'', ''UNDEF''].includes(items[props.prefix + ''_energy_total''].state) ? ''–'' : (items[props.prefix
-                    + ''_energy_total''].displayState || items[props.prefix + ''_energy_total''].state)) || ''–'')'
-                  style:
-                    font-size: 20px
-                    font-weight: '700'
-                    line-height: 26px
-                    white-space: nowrap
-                    overflow: hidden
-                    text-overflow: ellipsis
-          - component: oh-link
-            config:
-              action: popup
-              style:
-                position: absolute
-                inset: '0'
-                display: block
-                border-radius: 12px
-              actionModal: widget:item-popup
-              actionModalConfig:
-                item: =props.prefix + '_energy_total'
-                title: Energie gesamt
-                color: '#5c6bc0'
-                kind: number
+          title: Energie gesamt
+          value: '=(([''NULL'', ''UNDEF''].includes(items[props.prefix + ''_energy_total''].state) ? ''–'' : (items[props.prefix
+            + ''_energy_total''].displayState || items[props.prefix + ''_energy_total''].state)) || ''–'')'
+          icon: material:offline_bolt
+          iconColor: '#ffa726'
+          item: =props.prefix + '_energy_total'
+          kind: number
   - component: Label
     config:
       text: =props.note

@@ -1,0 +1,135 @@
+uid: value-tile
+tags:
+- tile
+props:
+  parameters:
+  - name: title
+    label: Title
+    description: Title above the value
+    type: TEXT
+    required: true
+  - name: value
+    label: Value
+    description: The text to show, usually an expression on an item
+    type: TEXT
+    required: true
+  - name: icon
+    label: Icon
+    description: The pale icon, e.g. material:thermostat
+    type: TEXT
+    required: false
+    default: material:info
+  - name: color
+    label: Colour
+    description: 'Colour of the value and the icon as #rrggbb; empty: the text colour'
+    type: TEXT
+    required: false
+  - name: iconColor
+    label: Icon colour
+    description: 'Colour of the icon where the value keeps the text colour, as #rrggbb'
+    type: TEXT
+    required: false
+  - name: item
+    label: Item
+    description: 'The item whose popup a tap opens; empty: no tap'
+    type: TEXT
+    required: false
+    context: item
+  - name: action
+    label: Action
+    description: 'popup: the item popup (widget item-popup); options: the item''s command options'
+    type: TEXT
+    required: false
+    default: popup
+  - name: kind
+    label: Kind
+    description: 'What the item popup shows: number, state or none'
+    type: TEXT
+    required: false
+    default: number
+  - name: states
+    label: State labels
+    description: value=label pairs, comma-separated, for the item popup's band of states
+    type: TEXT
+    required: false
+  - name: wrap
+    label: Wrap
+    description: A long text wraps across the whole row of the grid instead of being cut
+    type: BOOLEAN
+    required: false
+  - name: fontSize
+    label: Font size
+    description: The tile's base size, e.g. 1.1em to grow with its card; default 14px
+    type: TEXT
+    required: false
+  parameterGroups: []
+timestamp: Sep 27, 2026, 3:01:48 AM
+component: div
+config:
+  style:
+    position: relative
+    overflow: hidden
+    box-sizing: border-box
+    height: 100%
+    min-width: '0'
+    font-size: =props.fontSize || '14px'
+    padding: 0.7143em 0.8571em
+    border-radius: 0.8571em
+    grid-column: '=props.wrap ? ''1 / -1'' : ''auto'''
+    background: rgba(127, 127, 127, 0.08)
+slots:
+  default:
+  - component: oh-icon
+    config:
+      icon: =props.icon || 'material:info'
+      width: 4.143em
+      height: 4.143em
+      style:
+        width: 1em
+        height: 1em
+        position: absolute
+        right: -0.1034em
+        bottom: -0.1724em
+        opacity: '0.16'
+        color: =props.iconColor || props.color || '#78909c'
+  - component: div
+    config:
+      style:
+        position: relative
+    slots:
+      default:
+      - component: Label
+        config:
+          text: =props.title
+          style:
+            font-size: 0.8571em
+            opacity: '0.65'
+      - component: Label
+        config:
+          text: =props.value
+          style:
+            font-size: '=props.wrap ? ''1em'' : ''1.429em'''
+            font-weight: '=props.wrap ? 600 : 700'
+            line-height: '=props.wrap ? ''1.357'' : ''1.3'''
+            white-space: '=props.wrap ? ''normal'' : ''nowrap'''
+            overflow: hidden
+            text-overflow: '=props.wrap ? ''clip'' : ''ellipsis'''
+            overflow-wrap: anywhere
+            color: =props.color || ''
+  - component: oh-link
+    config:
+      visible: =!!props.item
+      action: =props.action || 'popup'
+      actionItem: =props.item
+      actionModal: widget:item-popup
+      actionModalConfig:
+        item: =props.item
+        title: =props.title
+        color: =props.color || '#5c6bc0'
+        kind: =props.kind || 'number'
+        states: =props.states || ''
+      style:
+        position: absolute
+        inset: '0'
+        display: block
+        border-radius: 0.8571em
