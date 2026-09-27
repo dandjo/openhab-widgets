@@ -1,0 +1,181 @@
+uid: boost-pill
+tags:
+- switch
+props:
+  parameters:
+  - name: item
+    label: Item
+    description: The switch item
+    type: TEXT
+    required: true
+    context: item
+  - name: title
+    label: Title
+    description: Name of the boost
+    type: TEXT
+    required: false
+    default: Boost
+  - name: icon
+    label: Icon
+    description: Icon, e.g. oh:siren (its state follows the item)
+    type: TEXT
+    required: false
+    default: material:bolt
+  - name: color
+    label: Colour
+    description: 'Device colour as #rrggbb'
+    type: TEXT
+    required: false
+    default: '#fb8c00'
+  - name: running
+    label: Text while on
+    description: The line under the title while the boost runs; usually an expression
+    type: TEXT
+    required: false
+    default: läuft
+  parameterGroups: []
+timestamp: Sep 27, 2026, 9:44:33 PM
+component: div
+config:
+  style:
+    --boost-color: =props.color || '#fb8c00'
+    position: relative
+    display: flex
+    align-items: center
+    gap: 10px
+    padding: 6px 10px 6px 6px
+    border-radius: 26px
+    background: '=items[props.item].state === ''ON'' ? ''linear-gradient(135deg, var(--boost-color), color-mix(in srgb, var(--boost-color)
+      75%, transparent))'' : ''rgba(127, 127, 127, 0.1)'''
+    color: '=items[props.item].state === ''ON'' ? ''#ffffff'' : '''''
+    transition: background 0.3s ease
+slots:
+  default:
+  - component: div
+    config:
+      style:
+        position: relative
+        width: 40px
+        height: 40px
+        flex: 0 0 auto
+        border-radius: 50%
+        display: flex
+        align-items: center
+        justify-content: center
+        background: '=items[props.item].state === ''ON'' ? ''rgba(255, 255, 255, 0.22)'' : ''color-mix(in srgb, var(--boost-color)
+          15%, transparent)'''
+    slots:
+      default:
+      - component: svg
+        config:
+          viewBox: 0 0 40 40
+          width: 40
+          height: 40
+          style:
+            position: absolute
+            inset: '0'
+          visible: =items[props.item].state === 'ON'
+        slots:
+          default:
+          - component: circle
+            config:
+              cx: 20
+              cy: 20
+              r: 11
+              fill: none
+              stroke: '#ffffff'
+              stroke-width: 2
+            slots:
+              default:
+              - component: animate
+                config:
+                  attributeName: r
+                  values: 11;19
+                  dur: 1.6s
+                  begin: 0s
+                  repeatCount: indefinite
+              - component: animate
+                config:
+                  attributeName: opacity
+                  values: 0.7;0
+                  dur: 1.6s
+                  begin: 0s
+                  repeatCount: indefinite
+          - component: circle
+            config:
+              cx: 20
+              cy: 20
+              r: 11
+              fill: none
+              stroke: '#ffffff'
+              stroke-width: 2
+            slots:
+              default:
+              - component: animate
+                config:
+                  attributeName: r
+                  values: 11;19
+                  dur: 1.6s
+                  begin: 0.8s
+                  repeatCount: indefinite
+              - component: animate
+                config:
+                  attributeName: opacity
+                  values: 0.7;0
+                  dur: 1.6s
+                  begin: 0.8s
+                  repeatCount: indefinite
+      - component: oh-icon
+        config:
+          icon: =props.icon || 'material:bolt'
+          state: =items[props.item].state
+          width: 22
+          height: 22
+  - component: div
+    config:
+      style:
+        flex: '1'
+        min-width: '0'
+        display: flex
+        flex-direction: column
+    slots:
+      default:
+      - component: Label
+        config:
+          text: =props.title || 'Boost'
+          style:
+            font-size: 14px
+            font-weight: '600'
+            line-height: 18px
+      - component: Label
+        config:
+          text: '=items[props.item].state === ''ON'' ? (props.running || ''läuft'') : ''Aus'''
+          style:
+            font-size: 11px
+            opacity: '0.8'
+            line-height: 15px
+            white-space: nowrap
+            overflow: hidden
+            text-overflow: ellipsis
+  - component: Label
+    config:
+      text: '=items[props.item].state === ''ON'' ? ''Stoppen'' : ''Starten'''
+      style:
+        flex: 0 0 auto
+        padding: 3px 12px
+        border-radius: 999px
+        font-size: 12px
+        font-weight: '700'
+        border: '=(items[props.item].state === ''ON'' ? ''1.5px solid #ffffff'' : ''1.5px solid var(--boost-color)'')'
+        color: '=items[props.item].state === ''ON'' ? ''#ffffff'' : ''var(--boost-color)'''
+  - component: oh-link
+    config:
+      action: toggle
+      actionItem: =props.item
+      actionCommand: 'ON'
+      actionCommandAlt: 'OFF'
+      style:
+        position: absolute
+        inset: '0'
+        display: block
+        border-radius: 26px

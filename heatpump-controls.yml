@@ -1,0 +1,205 @@
+uid: heatpump-controls
+tags:
+- controls
+props:
+  parameters:
+  - name: heatpumpPower
+    label: ESPAltherma Elektrische Leistung
+    description: Number:Power item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpDhwBoost
+    label: Pyaltherma Warmwasser-Boost
+    description: Switch item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpDhwTankTemp
+    label: ESPAltherma Warmwasserspeicher Temperatur
+    description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpClimateControlPower
+    label: Pyaltherma Heizung Ein/Aus
+    description: Switch item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpDhwPower
+    label: Pyaltherma Warmwasser Ein/Aus
+    description: Switch item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpDhwManagement
+    label: Wärmepumpe Warmwasser-Automatik
+    description: Switch item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpSmartGrid
+    label: ESPAltherma Smart Grid
+    description: String item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpDhwTempHeating
+    label: Pyaltherma Warmwasser Solltemperatur
+    description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpLeavingWaterTempOffsetHeating
+    label: Pyaltherma Vorlauf-Offset Heizen
+    description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpLeavingWaterSetpoint
+    label: ESPAltherma Vorlauf Sollwert
+    description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
+  parameterGroups: []
+timestamp: Sep 27, 2026, 9:44:33 PM
+component: oh-context
+config:
+  variables:
+    controlsHeatpump: false
+slots:
+  default:
+  - component: div
+    config:
+      style:
+        display: flex
+        flex-direction: column
+        gap: 8px
+        padding: 10px 12px
+        margin-top: 4px
+        border-radius: 14px
+        background: '=(Number(items[props.heatpumpPower].numericState) || 0) > 50 ? ''rgba(251, 140, 0, 0.12)'' : ''rgba(127,
+          127, 127, 0.08)'''
+    slots:
+      default:
+      - component: widget:device-head
+        config:
+          icon: material:heat_pump
+          title: Wärmepumpe
+          line1: '=''Speicher '' + ([''NULL'', ''UNDEF''].includes(items[props.heatpumpDhwTankTemp].state) ? ''–'' : (items[props.heatpumpDhwTankTemp].displayState
+            || items[props.heatpumpDhwTankTemp].state)) + '' · '' + (Math.abs((Number(items[props.heatpumpPower].numericState)
+            || 0)) / 1000).toFixed(3).replace(''.'', '','') + '' kW'''
+          line2: '=''Heizung '' + (items[props.heatpumpClimateControlPower].state === ''ON'' ? ''an'' : items[props.heatpumpClimateControlPower].state
+            === ''OFF'' ? ''aus'' : ''–'') + '' · Wasser '' + (items[props.heatpumpDhwPower].state === ''ON'' ? ''an'' : items[props.heatpumpDhwPower].state
+            === ''OFF'' ? ''aus'' : ''–'') + '' · WW-Auto '' + (items[props.heatpumpDhwManagement].state === ''ON'' ? ''an''
+            : items[props.heatpumpDhwManagement].state === ''OFF'' ? ''aus'' : ''–'')'
+          color: '#fb8c00'
+          active: =(Number(items[props.heatpumpPower].numericState) || 0) > 50
+          var: controlsHeatpump
+          action: button
+          actionItem: =props.heatpumpDhwBoost
+          actionTitle: Boost
+      - component: div
+        config:
+          style:
+            display: flex
+            flex-direction: column
+            gap: 8px
+            padding-top: 4px
+          visible: =!!vars.controlsHeatpump
+        slots:
+          default:
+          - component: div
+            config:
+              style:
+                display: flex
+                flex-direction: column
+                gap: 6px
+            slots:
+              default:
+              - component: Label
+                config:
+                  text: Smart Grid
+                  style:
+                    font-size: 13px
+              - component: widget:state-bar
+                config:
+                  item: =props.heatpumpSmartGrid
+                  options: 0=Normal;1=Sperre;2=Empfehlung;3=Befehl
+                  color: '#fb8c00'
+                  byText: true
+          - component: div
+            config:
+              style:
+                display: flex
+                flex-direction: column
+                gap: 6px
+            slots:
+              default:
+              - component: Label
+                config:
+                  text: Betrieb
+                  style:
+                    font-size: 13px
+              - component: div
+                config:
+                  style:
+                    display: grid
+                    grid-template-columns: repeat(3, minmax(0, 1fr))
+                    gap: 6px
+                    padding: 6px 2px
+                slots:
+                  default:
+                  - component: widget:pill-switch
+                    config:
+                      item: =props.heatpumpClimateControlPower
+                      title: Heizung
+                      color: '#fb8c00'
+                  - component: widget:pill-switch
+                    config:
+                      item: =props.heatpumpDhwPower
+                      title: Wasser
+                      color: '#fb8c00'
+                  - component: widget:pill-switch
+                    config:
+                      item: =props.heatpumpDhwManagement
+                      title: WW-Auto
+                      color: '#fb8c00'
+          - component: widget:pill-slider
+            config:
+              item: =props.heatpumpDhwTempHeating
+              color: '#fb8c00'
+              min: 30
+              max: 60
+              step: 5
+              unit: °C
+              title: Warmwasser Soll
+              value: '=((Number(items[props.heatpumpDhwTempHeating].numericState) || 0) % 1 ? ((Number(items[props.heatpumpDhwTempHeating].numericState)
+                || 0)).toFixed(1).replace(''.'', '','') : (Number(items[props.heatpumpDhwTempHeating].numericState) || 0))
+                + '' °C'''
+              context: '=''Speicher '' + ([''NULL'', ''UNDEF''].includes(items[props.heatpumpDhwTankTemp].state) ? ''–'' :
+                (items[props.heatpumpDhwTankTemp].displayState || items[props.heatpumpDhwTankTemp].state)) + (items[props.heatpumpDhwManagement].state
+                === ''ON'' ? '' · Automatik regelt'' : '''')'
+              marks: 30=30 °C;40=40;50=50;60=60 °C
+              icon: material:shower
+              opacity: '=items[props.heatpumpDhwPower].state === ''ON'' ? ''1'' : ''0.6'''
+          - component: widget:pill-slider
+            config:
+              item: =props.heatpumpLeavingWaterTempOffsetHeating
+              color: '#fb8c00'
+              min: -10
+              max: 10
+              step: 1
+              unit: °C
+              title: Vorlauf-Offset
+              value: '=(Math.round((Number(items[props.heatpumpLeavingWaterTempOffsetHeating].numericState) || 0)) > 0 ? ''+''
+                : '''') + Math.round((Number(items[props.heatpumpLeavingWaterTempOffsetHeating].numericState) || 0)) + ''
+                °C'''
+              context: '=''Vorlauf-Soll '' + ([''NULL'', ''UNDEF''].includes(items[props.heatpumpLeavingWaterSetpoint].state)
+                ? ''–'' : (items[props.heatpumpLeavingWaterSetpoint].displayState || items[props.heatpumpLeavingWaterSetpoint].state))
+                + (items[props.heatpumpClimateControlPower].state === ''ON'' ? '''' : '' · Heizung aus'')'
+              marks: -10=−10 °C;-5=−5;0=0;5=+5;10=+10 °C
+              icon: material:tune
+              opacity: '=items[props.heatpumpClimateControlPower].state === ''ON'' ? ''1'' : ''0.6'''

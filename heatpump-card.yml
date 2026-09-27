@@ -172,7 +172,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Sep 27, 2026, 8:52:40 PM
+timestamp: Sep 27, 2026, 9:44:33 PM
 component: oh-card
 config:
   title: Wärmepumpe
@@ -670,156 +670,12 @@ slots:
                           calcMode: linear
                           keyPoints: 0.6667;1;0;0.6667
                           keyTimes: 0;0.3333;0.3333;1
-                  - component: g
-                    config: {}
-                    slots:
-                      default:
-                      - component: circle
-                        config:
-                          cx: 575
-                          cy: 110
-                          r: 30
-                          style:
-                            fill: 'var(--f7-card-bg-color, #fff)'
-                      - component: circle
-                        config:
-                          cx: 575
-                          cy: 110
-                          r: 30
-                          fill: '#fb8c00'
-                          stroke: '#fb8c00'
-                          fill-opacity: '0.12'
-                          stroke-width: 3
-                  - component: rect
+                  - component: widget:flow-node
                     config:
-                      x: 558
-                      y: 98
-                      width: 34
-                      height: 24
-                      rx: 3
-                      stroke: currentColor
-                      stroke-width: 1.6
-                      stroke-linecap: round
-                      fill: none
-                  - component: circle
-                    config:
-                      cx: 570
-                      cy: 110
-                      r: 9
-                      stroke: currentColor
-                      stroke-width: 1.2
-                      stroke-linecap: round
-                      fill: none
-                  - component: g
-                    config: {}
-                    slots:
-                      default:
-                      - component: path
-                        config:
-                          d: M570,110 q3.5,-3 0,-7.5 q-3.5,3 0,7.5
-                          fill: '#fb8c00'
-                          transform: rotate(0 570 110)
-                      - component: path
-                        config:
-                          d: M570,110 q3.5,-3 0,-7.5 q-3.5,3 0,7.5
-                          fill: '#fb8c00'
-                          transform: rotate(120 570 110)
-                      - component: path
-                        config:
-                          d: M570,110 q3.5,-3 0,-7.5 q-3.5,3 0,7.5
-                          fill: '#fb8c00'
-                          transform: rotate(240 570 110)
-                      - component: animateTransform
-                        config:
-                          attributeName: transform
-                          type: rotate
-                          from: 0 570 110
-                          to: 360 570 110
-                          dur: '=Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) < 800 ? ''1.4s'' : (Math.abs((Number(items[props.heatpumpPower].numericState)
-                            || 0)) < 2000 ? ''0.9s'' : (''0.5s''))'
-                          repeatCount: indefinite
-                          visible: =Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) > 100
-                  - component: circle
-                    config:
-                      cx: 570
-                      cy: 110
-                      r: 1.5
-                      fill: currentColor
-                  - component: line
-                    config:
-                      x1: 582
-                      y1: 103
-                      x2: 589
-                      y2: 103
-                      stroke: currentColor
-                      stroke-width: 1
-                      stroke-linecap: round
-                      fill: none
-                      opacity: '0.7'
-                  - component: line
-                    config:
-                      x1: 582
-                      y1: 106.5
-                      x2: 589
-                      y2: 106.5
-                      stroke: currentColor
-                      stroke-width: 1
-                      stroke-linecap: round
-                      fill: none
-                      opacity: '0.7'
-                  - component: line
-                    config:
-                      x1: 582
-                      y1: 110
-                      x2: 589
-                      y2: 110
-                      stroke: currentColor
-                      stroke-width: 1
-                      stroke-linecap: round
-                      fill: none
-                      opacity: '0.7'
-                  - component: line
-                    config:
-                      x1: 582
-                      y1: 113.5
-                      x2: 589
-                      y2: 113.5
-                      stroke: currentColor
-                      stroke-width: 1
-                      stroke-linecap: round
-                      fill: none
-                      opacity: '0.7'
-                  - component: line
-                    config:
-                      x1: 582
-                      y1: 117
-                      x2: 589
-                      y2: 117
-                      stroke: currentColor
-                      stroke-width: 1
-                      stroke-linecap: round
-                      fill: none
-                      opacity: '0.7'
-                  - component: line
-                    config:
-                      x1: 563
-                      y1: 122
-                      x2: 563
-                      y2: 125
-                      stroke: currentColor
-                      stroke-width: 1.6
-                      stroke-linecap: round
-                      fill: none
-                  - component: line
-                    config:
-                      x1: 587
-                      y1: 122
-                      x2: 587
-                      y2: 125
-                      stroke: currentColor
-                      stroke-width: 1.6
-                      stroke-linecap: round
-                      fill: none
+                      kind: heat-pump
+                      x: 575
+                      y: 110
+                      power: =(Number(items[props.heatpumpPower].numericState) || 0)
                   - component: g
                     config: {}
                     slots:

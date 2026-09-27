@@ -45,7 +45,7 @@ props:
     required: false
     context: item
   parameterGroups: []
-timestamp: Sep 27, 2026, 8:52:40 PM
+timestamp: Sep 27, 2026, 9:44:33 PM
 component: oh-card
 config:
   title: =props.title
@@ -127,67 +127,11 @@ slots:
       visible: =props.controllable !== false && props.controllable !== 'false'
     slots:
       default:
-      - component: div
+      - component: widget:power-pill
         config:
-          style:
-            position: relative
-            display: flex
-            align-items: center
-            height: 40px
-            border-radius: 20px
-            flex: 0 0 auto
-            background: '=items[(props.switch || props.prefix + ''_switch'')].state === ''ON'' ? props.color : ''rgba(127,
-              127, 127, 0.18)'''
-            transition: background 0.25s ease
-        slots:
-          default:
-          - component: Label
-            config:
-              text: '=items[(props.switch || props.prefix + ''_switch'')].state === ''ON'' ? ''An'' : ''Aus'''
-              style:
-                width: 100%
-                text-align: center
-                padding: 0 44px
-                font-size: 14px
-                font-weight: '600'
-                white-space: nowrap
-                overflow: hidden
-                text-overflow: ellipsis
-                color: '=items[(props.switch || props.prefix + ''_switch'')].state === ''ON'' ? ''#ffffff'' : '''''
-          - component: div
-            config:
-              style:
-                position: absolute
-                top: 4px
-                left: '=items[(props.switch || props.prefix + ''_switch'')].state === ''ON'' ? ''calc(100% - 36px)'' : ''4px'''
-                width: 32px
-                height: 32px
-                border-radius: 50%
-                display: flex
-                align-items: center
-                justify-content: center
-                background: '#ffffff'
-                color: '=items[(props.switch || props.prefix + ''_switch'')].state === ''ON'' ? props.color : ''#9e9e9e'''
-                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3)
-                transition: left 0.25s ease, color 0.25s ease
-            slots:
-              default:
-              - component: oh-icon
-                config:
-                  icon: material:power_settings_new
-                  width: 20
-                  height: 20
-          - component: oh-link
-            config:
-              action: toggle
-              actionItem: =(props.switch || props.prefix + '_switch')
-              actionCommand: 'ON'
-              actionCommandAlt: 'OFF'
-              style:
-                position: absolute
-                inset: '0'
-                display: block
-                border-radius: 20px
+          item: =(props.switch || props.prefix + '_switch')
+          color: =props.color
+          onText: ='An'
   - component: div
     config:
       style:

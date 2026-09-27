@@ -9,15 +9,15 @@ props:
     type: TEXT
     required: true
     context: item
-  - name: heatpumpDhwTankTemp
-    label: ESPAltherma Warmwasserspeicher Temperatur
-    description: Number:Temperature item
+  - name: heatpumpDhwBoost
+    label: Pyaltherma Warmwasser-Boost
+    description: Switch item
     type: TEXT
     required: true
     context: item
-  - name: heatpumpSmartGrid
-    label: ESPAltherma Smart Grid
-    description: String item
+  - name: heatpumpDhwTankTemp
+    label: ESPAltherma Warmwasserspeicher Temperatur
+    description: Number:Temperature item
     type: TEXT
     required: true
     context: item
@@ -39,9 +39,9 @@ props:
     type: TEXT
     required: true
     context: item
-  - name: heatpumpDhwBoost
-    label: Pyaltherma Warmwasser-Boost
-    description: Switch item
+  - name: heatpumpSmartGrid
+    label: ESPAltherma Smart Grid
+    description: String item
     type: TEXT
     required: true
     context: item
@@ -69,15 +69,27 @@ props:
     type: TEXT
     required: true
     context: item
+  - name: acMode
+    label: Faikout Perfera Modus
+    description: String item
+    type: TEXT
+    required: true
+    context: item
+  - name: acTemperatureSetpoint
+    label: Faikout Perfera Solltemperatur
+    description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
   - name: acTemperature
     label: Faikout Perfera Temperatur
     description: Number:Temperature item
     type: TEXT
     required: true
     context: item
-  - name: acMode
-    label: Faikout Perfera Modus
-    description: String item
+  - name: acTimer
+    label: Klimaanlage Timer
+    description: Number:Time item
     type: TEXT
     required: true
     context: item
@@ -93,15 +105,9 @@ props:
     type: TEXT
     required: true
     context: item
-  - name: acTemperatureSetpoint
-    label: Faikout Perfera Solltemperatur
-    description: Number:Temperature item
-    type: TEXT
-    required: true
-    context: item
-  - name: acTimer
-    label: Klimaanlage Timer
-    description: Number:Time item
+  - name: ventilationLevel
+    label: ESPLyfterl Stufe
+    description: String item
     type: TEXT
     required: true
     context: item
@@ -111,9 +117,9 @@ props:
     type: TEXT
     required: true
     context: item
-  - name: ventilationLevel
-    label: ESPLyfterl Stufe
-    description: String item
+  - name: netatmoWeatherstationCo2
+    label: Netatmo Wetterstation CO2
+    description: Number:Dimensionless item
     type: TEXT
     required: true
     context: item
@@ -190,7 +196,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Sep 27, 2026, 8:52:40 PM
+timestamp: Sep 27, 2026, 9:44:33 PM
 component: oh-card
 config:
   title: Steuerung
@@ -204,942 +210,34 @@ slots:
         padding: 4px 16px 14px
     slots:
       default:
-      - component: div
+      - component: widget:heatpump-controls
         config:
-          style:
-            display: flex
-            flex-direction: column
-            gap: 8px
-            padding: 10px 12px
-            margin-top: 4px
-            border-radius: 14px
-            background: '=(Number(items[props.heatpumpPower].numericState) || 0) > 50 ? ''rgba(251, 140, 0, 0.12)'' : ''rgba(127,
-              127, 127, 0.08)'''
-        slots:
-          default:
-          - component: div
-            config:
-              style:
-                display: flex
-                align-items: center
-                gap: 8px
-            slots:
-              default:
-              - component: oh-icon
-                config:
-                  icon: material:heat_pump
-                  width: 22
-                  height: 22
-              - component: Label
-                config:
-                  text: Wärmepumpe
-                  style:
-                    flex: '1'
-                    font-size: 14px
-                    font-weight: '600'
-              - component: Label
-                config:
-                  text: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpDhwTankTemp].state) ? ''–'' : (items[props.heatpumpDhwTankTemp].displayState
-                    || items[props.heatpumpDhwTankTemp].state)) + '' Speicher · '' + (Math.abs((Number(items[props.heatpumpPower].numericState)
-                    || 0)) / 1000).toFixed(3).replace(''.'', '','') + '' kW'''
-                  style:
-                    font-size: 12px
-                    opacity: '0.7'
-          - component: div
-            config:
-              style:
-                display: flex
-                flex-direction: column
-                gap: 6px
-            slots:
-              default:
-              - component: Label
-                config:
-                  text: Smart Grid
-                  style:
-                    font-size: 13px
-              - component: f7-segmented
-                config:
-                  strong: true
-                  style:
-                    width: 100%
-                  stylesheet: '.segmented-highlight { display: none; }'
-                slots:
-                  default:
-                  - component: oh-button
-                    config:
-                      text: Normal
-                      action: command
-                      actionItem: =props.heatpumpSmartGrid
-                      actionCommand: '0'
-                      small: true
-                      active: =items[props.heatpumpSmartGrid].state === '0'
-                      style:
-                        font-size: 12px
-                        flex: 1 1 auto
-                        width: auto
-                        padding: 0 6px
-                        background-color: '=(items[props.heatpumpSmartGrid].state === ''0'') ? ''#fb8c00'' : '''''
-                        color: '=(items[props.heatpumpSmartGrid].state === ''0'') ? ''#ffffff'' : '''''
-                  - component: oh-button
-                    config:
-                      text: Sperre
-                      action: command
-                      actionItem: =props.heatpumpSmartGrid
-                      actionCommand: '1'
-                      small: true
-                      active: =items[props.heatpumpSmartGrid].state === '1'
-                      style:
-                        font-size: 12px
-                        flex: 1 1 auto
-                        width: auto
-                        padding: 0 6px
-                        background-color: '=(items[props.heatpumpSmartGrid].state === ''1'') ? ''#fb8c00'' : '''''
-                        color: '=(items[props.heatpumpSmartGrid].state === ''1'') ? ''#ffffff'' : '''''
-                  - component: oh-button
-                    config:
-                      text: Empfehlung
-                      action: command
-                      actionItem: =props.heatpumpSmartGrid
-                      actionCommand: '2'
-                      small: true
-                      active: =items[props.heatpumpSmartGrid].state === '2'
-                      style:
-                        font-size: 12px
-                        flex: 1 1 auto
-                        width: auto
-                        padding: 0 6px
-                        background-color: '=(items[props.heatpumpSmartGrid].state === ''2'') ? ''#fb8c00'' : '''''
-                        color: '=(items[props.heatpumpSmartGrid].state === ''2'') ? ''#ffffff'' : '''''
-                  - component: oh-button
-                    config:
-                      text: Befehl
-                      action: command
-                      actionItem: =props.heatpumpSmartGrid
-                      actionCommand: '3'
-                      small: true
-                      active: =items[props.heatpumpSmartGrid].state === '3'
-                      style:
-                        font-size: 12px
-                        flex: 1 1 auto
-                        width: auto
-                        padding: 0 6px
-                        background-color: '=(items[props.heatpumpSmartGrid].state === ''3'') ? ''#fb8c00'' : '''''
-                        color: '=(items[props.heatpumpSmartGrid].state === ''3'') ? ''#ffffff'' : '''''
-          - component: div
-            config:
-              style:
-                display: flex
-                flex-direction: column
-                gap: 6px
-            slots:
-              default:
-              - component: Label
-                config:
-                  text: Betrieb
-                  style:
-                    font-size: 13px
-              - component: div
-                config:
-                  style:
-                    display: grid
-                    grid-template-columns: repeat(3, minmax(0, 1fr))
-                    gap: 6px
-                    padding: 6px 2px
-                slots:
-                  default:
-                  - component: widget:pill-switch
-                    config:
-                      item: =props.heatpumpClimateControlPower
-                      title: Heizung
-                      color: '#fb8c00'
-                  - component: widget:pill-switch
-                    config:
-                      item: =props.heatpumpDhwPower
-                      title: Wasser
-                      color: '#fb8c00'
-                  - component: widget:pill-switch
-                    config:
-                      item: =props.heatpumpDhwManagement
-                      title: WW-Auto
-                      color: '#fb8c00'
-          - component: div
-            config:
-              style:
-                position: relative
-                display: flex
-                align-items: center
-                gap: 10px
-                padding: 6px 10px 6px 6px
-                border-radius: 26px
-                background: '=items[props.heatpumpDhwBoost].state === ''ON'' ? ''linear-gradient(135deg, #fb8c00, rgba(251,
-                  140, 0, 0.75))'' : ''rgba(127, 127, 127, 0.1)'''
-                color: '=items[props.heatpumpDhwBoost].state === ''ON'' ? ''#ffffff'' : '''''
-                transition: background 0.3s ease
-            slots:
-              default:
-              - component: div
-                config:
-                  style:
-                    position: relative
-                    width: 40px
-                    height: 40px
-                    flex: 0 0 auto
-                    border-radius: 50%
-                    display: flex
-                    align-items: center
-                    justify-content: center
-                    background: '=items[props.heatpumpDhwBoost].state === ''ON'' ? ''rgba(255, 255, 255, 0.22)'' : ''rgba(251,
-                      140, 0, 0.15)'''
-                slots:
-                  default:
-                  - component: svg
-                    config:
-                      viewBox: 0 0 40 40
-                      width: 40
-                      height: 40
-                      style:
-                        position: absolute
-                        inset: '0'
-                      visible: =items[props.heatpumpDhwBoost].state === 'ON'
-                    slots:
-                      default:
-                      - component: circle
-                        config:
-                          cx: 20
-                          cy: 20
-                          r: 11
-                          fill: none
-                          stroke: '#ffffff'
-                          stroke-width: 2
-                        slots:
-                          default:
-                          - component: animate
-                            config:
-                              attributeName: r
-                              values: 11;19
-                              dur: 1.6s
-                              begin: 0s
-                              repeatCount: indefinite
-                          - component: animate
-                            config:
-                              attributeName: opacity
-                              values: 0.7;0
-                              dur: 1.6s
-                              begin: 0s
-                              repeatCount: indefinite
-                      - component: circle
-                        config:
-                          cx: 20
-                          cy: 20
-                          r: 11
-                          fill: none
-                          stroke: '#ffffff'
-                          stroke-width: 2
-                        slots:
-                          default:
-                          - component: animate
-                            config:
-                              attributeName: r
-                              values: 11;19
-                              dur: 1.6s
-                              begin: 0.8s
-                              repeatCount: indefinite
-                          - component: animate
-                            config:
-                              attributeName: opacity
-                              values: 0.7;0
-                              dur: 1.6s
-                              begin: 0.8s
-                              repeatCount: indefinite
-                  - component: oh-icon
-                    config:
-                      icon: oh:siren
-                      state: =items[props.heatpumpDhwBoost].state
-                      width: 22
-                      height: 22
-              - component: div
-                config:
-                  style:
-                    flex: '1'
-                    min-width: '0'
-                    display: flex
-                    flex-direction: column
-                slots:
-                  default:
-                  - component: Label
-                    config:
-                      text: Warmwasser-Boost
-                      style:
-                        font-size: 14px
-                        font-weight: '600'
-                        line-height: 18px
-                  - component: Label
-                    config:
-                      text: '=items[props.heatpumpDhwBoost].state === ''ON'' ? ''läuft · Speicher '' + ([''NULL'', ''UNDEF''].includes(items[props.heatpumpDhwTankTemp].state)
-                        ? ''–'' : (items[props.heatpumpDhwTankTemp].displayState || items[props.heatpumpDhwTankTemp].state))
-                        : ''Aus'''
-                      style:
-                        font-size: 11px
-                        opacity: '0.8'
-                        line-height: 15px
-                        white-space: nowrap
-                        overflow: hidden
-                        text-overflow: ellipsis
-              - component: Label
-                config:
-                  text: '=items[props.heatpumpDhwBoost].state === ''ON'' ? ''Stoppen'' : ''Starten'''
-                  style:
-                    flex: 0 0 auto
-                    padding: 3px 12px
-                    border-radius: 999px
-                    font-size: 12px
-                    font-weight: '700'
-                    border: '=(items[props.heatpumpDhwBoost].state === ''ON'' ? ''1.5px solid #ffffff'' : ''1.5px solid #fb8c00'')'
-                    color: '=items[props.heatpumpDhwBoost].state === ''ON'' ? ''#ffffff'' : ''#fb8c00'''
-              - component: oh-link
-                config:
-                  action: toggle
-                  actionItem: =props.heatpumpDhwBoost
-                  actionCommand: 'ON'
-                  actionCommandAlt: 'OFF'
-                  style:
-                    position: absolute
-                    inset: '0'
-                    display: block
-                    border-radius: 26px
-          - component: widget:pill-slider
-            config:
-              item: =props.heatpumpDhwTempHeating
-              color: '#fb8c00'
-              min: 30
-              max: 60
-              step: 5
-              unit: °C
-              title: Warmwasser Soll
-              value: '=((Number(items[props.heatpumpDhwTempHeating].numericState) || 0) % 1 ? ((Number(items[props.heatpumpDhwTempHeating].numericState)
-                || 0)).toFixed(1).replace(''.'', '','') : (Number(items[props.heatpumpDhwTempHeating].numericState) || 0))
-                + '' °C'''
-              context: '=''Speicher '' + ([''NULL'', ''UNDEF''].includes(items[props.heatpumpDhwTankTemp].state) ? ''–'' :
-                (items[props.heatpumpDhwTankTemp].displayState || items[props.heatpumpDhwTankTemp].state)) + (items[props.heatpumpDhwManagement].state
-                === ''ON'' ? '' · Automatik regelt'' : '''')'
-              marks: 30=30 °C;40=40;50=50;60=60 °C
-              icon: material:shower
-              opacity: '=items[props.heatpumpDhwPower].state === ''ON'' ? ''1'' : ''0.6'''
-          - component: widget:pill-slider
-            config:
-              item: =props.heatpumpLeavingWaterTempOffsetHeating
-              color: '#fb8c00'
-              min: -10
-              max: 10
-              step: 1
-              unit: °C
-              title: Vorlauf-Offset
-              value: '=(Math.round((Number(items[props.heatpumpLeavingWaterTempOffsetHeating].numericState) || 0)) > 0 ? ''+''
-                : '''') + Math.round((Number(items[props.heatpumpLeavingWaterTempOffsetHeating].numericState) || 0)) + ''
-                °C'''
-              context: '=''Vorlauf-Soll '' + ([''NULL'', ''UNDEF''].includes(items[props.heatpumpLeavingWaterSetpoint].state)
-                ? ''–'' : (items[props.heatpumpLeavingWaterSetpoint].displayState || items[props.heatpumpLeavingWaterSetpoint].state))
-                + (items[props.heatpumpClimateControlPower].state === ''ON'' ? '''' : '' · Heizung aus'')'
-              marks: -10=−10 °C;-5=−5;0=0;5=+5;10=+10 °C
-              icon: material:tune
-              opacity: '=items[props.heatpumpClimateControlPower].state === ''ON'' ? ''1'' : ''0.6'''
-      - component: div
+          heatpumpPower: =props.heatpumpPower
+          heatpumpDhwBoost: =props.heatpumpDhwBoost
+          heatpumpDhwTankTemp: =props.heatpumpDhwTankTemp
+          heatpumpClimateControlPower: =props.heatpumpClimateControlPower
+          heatpumpDhwPower: =props.heatpumpDhwPower
+          heatpumpDhwManagement: =props.heatpumpDhwManagement
+          heatpumpSmartGrid: =props.heatpumpSmartGrid
+          heatpumpDhwTempHeating: =props.heatpumpDhwTempHeating
+          heatpumpLeavingWaterTempOffsetHeating: =props.heatpumpLeavingWaterTempOffsetHeating
+          heatpumpLeavingWaterSetpoint: =props.heatpumpLeavingWaterSetpoint
+      - component: widget:air-conditioner-controls
         config:
-          style:
-            display: flex
-            flex-direction: column
-            gap: 8px
-            padding: 10px 12px
-            margin-top: 8px
-            border-radius: 14px
-            background: '=items[props.acSwitch].state === ''ON'' ? ''rgba(41, 182, 246, 0.12)'' : ''rgba(127, 127, 127, 0.08)'''
-        slots:
-          default:
-          - component: div
-            config:
-              style:
-                display: flex
-                align-items: center
-                gap: 8px
-            slots:
-              default:
-              - component: oh-icon
-                config:
-                  icon: material:ac_unit
-                  state: =items[props.acSwitch].state
-                  width: 22
-                  height: 22
-              - component: Label
-                config:
-                  text: Klimaanlage
-                  style:
-                    flex: '1'
-                    font-size: 14px
-                    font-weight: '600'
-              - component: Label
-                config:
-                  text: '=([''NULL'', ''UNDEF''].includes(items[props.acTemperature].state) ? ''–'' : (items[props.acTemperature].displayState
-                    || items[props.acTemperature].state)) + '' Raum'''
-                  style:
-                    font-size: 12px
-                    opacity: '0.7'
-          - component: div
-            config:
-              style:
-                position: relative
-                display: flex
-                align-items: center
-                height: 40px
-                border-radius: 20px
-                flex: 0 0 auto
-                background: '=items[props.acSwitch].state === ''ON'' ? ''#29b6f6'' : ''rgba(127, 127, 127, 0.18)'''
-                transition: background 0.25s ease
-            slots:
-              default:
-              - component: Label
-                config:
-                  text: '=items[props.acSwitch].state === ''ON'' ? ''An · '' + ([''NULL'', ''UNDEF''].includes(items[props.acMode].state)
-                    ? ''–'' : (items[props.acMode].displayState || items[props.acMode].state)) : ''Aus'''
-                  style:
-                    width: 100%
-                    text-align: center
-                    padding: 0 44px
-                    font-size: 14px
-                    font-weight: '600'
-                    white-space: nowrap
-                    overflow: hidden
-                    text-overflow: ellipsis
-                    color: '=items[props.acSwitch].state === ''ON'' ? ''#ffffff'' : '''''
-              - component: div
-                config:
-                  style:
-                    position: absolute
-                    top: 4px
-                    left: '=items[props.acSwitch].state === ''ON'' ? ''calc(100% - 36px)'' : ''4px'''
-                    width: 32px
-                    height: 32px
-                    border-radius: 50%
-                    display: flex
-                    align-items: center
-                    justify-content: center
-                    background: '#ffffff'
-                    color: '=items[props.acSwitch].state === ''ON'' ? ''#29b6f6'' : ''#9e9e9e'''
-                    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3)
-                    transition: left 0.25s ease, color 0.25s ease
-                slots:
-                  default:
-                  - component: oh-icon
-                    config:
-                      icon: material:power_settings_new
-                      width: 20
-                      height: 20
-              - component: oh-link
-                config:
-                  action: toggle
-                  actionItem: =props.acSwitch
-                  actionCommand: 'ON'
-                  actionCommandAlt: 'OFF'
-                  style:
-                    position: absolute
-                    inset: '0'
-                    display: block
-                    border-radius: 20px
-          - component: f7-segmented
-            config:
-              strong: true
-              style:
-                flex: 1 1 100%
-                width: 100%
-              stylesheet: '.segmented-highlight { display: none; }'
-            slots:
-              default:
-              - component: oh-button
-                config:
-                  text: Auto
-                  action: command
-                  actionItem: =props.acMode
-                  actionCommand: A
-                  small: true
-                  active: =items[props.acMode].state === 'A'
-                  style:
-                    font-size: 12px
-                    flex: 1 1 auto
-                    width: auto
-                    padding: 0 6px
-                    background-color: '=(items[props.acMode].state === ''A'') ? (items[props.acSwitch].state === ''ON'' ?
-                      ''#29b6f6'' : ''#90a4ae'') : '''''
-                    color: '=(items[props.acMode].state === ''A'') ? ''#ffffff'' : '''''
-              - component: oh-button
-                config:
-                  text: Heizen
-                  action: command
-                  actionItem: =props.acMode
-                  actionCommand: H
-                  small: true
-                  active: =items[props.acMode].state === 'H'
-                  style:
-                    font-size: 12px
-                    flex: 1 1 auto
-                    width: auto
-                    padding: 0 6px
-                    background-color: '=(items[props.acMode].state === ''H'') ? (items[props.acSwitch].state === ''ON'' ?
-                      ''#29b6f6'' : ''#90a4ae'') : '''''
-                    color: '=(items[props.acMode].state === ''H'') ? ''#ffffff'' : '''''
-              - component: oh-button
-                config:
-                  text: Kühlen
-                  action: command
-                  actionItem: =props.acMode
-                  actionCommand: C
-                  small: true
-                  active: =items[props.acMode].state === 'C'
-                  style:
-                    font-size: 12px
-                    flex: 1 1 auto
-                    width: auto
-                    padding: 0 6px
-                    background-color: '=(items[props.acMode].state === ''C'') ? (items[props.acSwitch].state === ''ON'' ?
-                      ''#29b6f6'' : ''#90a4ae'') : '''''
-                    color: '=(items[props.acMode].state === ''C'') ? ''#ffffff'' : '''''
-              - component: oh-button
-                config:
-                  text: Entfeuchten
-                  action: command
-                  actionItem: =props.acMode
-                  actionCommand: D
-                  small: true
-                  active: =items[props.acMode].state === 'D'
-                  style:
-                    font-size: 12px
-                    flex: 1 1 auto
-                    width: auto
-                    padding: 0 6px
-                    background-color: '=(items[props.acMode].state === ''D'') ? (items[props.acSwitch].state === ''ON'' ?
-                      ''#29b6f6'' : ''#90a4ae'') : '''''
-                    color: '=(items[props.acMode].state === ''D'') ? ''#ffffff'' : '''''
-              - component: oh-button
-                config:
-                  text: Lüften
-                  action: command
-                  actionItem: =props.acMode
-                  actionCommand: F
-                  small: true
-                  active: =items[props.acMode].state === 'F'
-                  style:
-                    font-size: 12px
-                    flex: 1 1 auto
-                    width: auto
-                    padding: 0 6px
-                    background-color: '=(items[props.acMode].state === ''F'') ? (items[props.acSwitch].state === ''ON'' ?
-                      ''#29b6f6'' : ''#90a4ae'') : '''''
-                    color: '=(items[props.acMode].state === ''F'') ? ''#ffffff'' : '''''
-          - component: div
-            config:
-              style:
-                display: flex
-                flex-wrap: wrap
-                align-items: center
-                gap: 6px 10px
-                opacity: '=items[props.acSwitch].state === ''ON'' ? ''1'' : ''0.6'''
-            slots:
-              default:
-              - component: Label
-                config:
-                  text: Lüfter
-                  style:
-                    font-size: 13px
-                    min-width: 60px
-              - component: f7-segmented
-                config:
-                  strong: true
-                  style:
-                    flex: 1 1 240px
-                slots:
-                  default:
-                  - component: oh-button
-                    config:
-                      text: Leise
-                      action: command
-                      actionItem: =props.acFan
-                      actionCommand: Q
-                      small: true
-                      active: =items[props.acFan].state === 'Q'
-                      style:
-                        font-size: 12px
-                        padding: 0 4px
-                        background-color: '=(items[props.acFan].state === ''Q'') ? (items[props.acSwitch].state === ''ON''
-                          ? ''#29b6f6'' : ''#90a4ae'') : '''''
-                        color: '=(items[props.acFan].state === ''Q'') ? ''#ffffff'' : '''''
-                  - component: oh-button
-                    config:
-                      text: Auto
-                      action: command
-                      actionItem: =props.acFan
-                      actionCommand: A
-                      small: true
-                      active: =items[props.acFan].state === 'A'
-                      style:
-                        font-size: 12px
-                        padding: 0 4px
-                        background-color: '=(items[props.acFan].state === ''A'') ? (items[props.acSwitch].state === ''ON''
-                          ? ''#29b6f6'' : ''#90a4ae'') : '''''
-                        color: '=(items[props.acFan].state === ''A'') ? ''#ffffff'' : '''''
-                  - component: oh-button
-                    config:
-                      text: '1'
-                      action: command
-                      actionItem: =props.acFan
-                      actionCommand: '1'
-                      small: true
-                      active: =items[props.acFan].state === '1'
-                      style:
-                        font-size: 12px
-                        padding: 0 4px
-                        background-color: '=(items[props.acFan].state === ''1'') ? (items[props.acSwitch].state === ''ON''
-                          ? ''#29b6f6'' : ''#90a4ae'') : '''''
-                        color: '=(items[props.acFan].state === ''1'') ? ''#ffffff'' : '''''
-                  - component: oh-button
-                    config:
-                      text: '2'
-                      action: command
-                      actionItem: =props.acFan
-                      actionCommand: '2'
-                      small: true
-                      active: =items[props.acFan].state === '2'
-                      style:
-                        font-size: 12px
-                        padding: 0 4px
-                        background-color: '=(items[props.acFan].state === ''2'') ? (items[props.acSwitch].state === ''ON''
-                          ? ''#29b6f6'' : ''#90a4ae'') : '''''
-                        color: '=(items[props.acFan].state === ''2'') ? ''#ffffff'' : '''''
-                  - component: oh-button
-                    config:
-                      text: '3'
-                      action: command
-                      actionItem: =props.acFan
-                      actionCommand: '3'
-                      small: true
-                      active: =items[props.acFan].state === '3'
-                      style:
-                        font-size: 12px
-                        padding: 0 4px
-                        background-color: '=(items[props.acFan].state === ''3'') ? (items[props.acSwitch].state === ''ON''
-                          ? ''#29b6f6'' : ''#90a4ae'') : '''''
-                        color: '=(items[props.acFan].state === ''3'') ? ''#ffffff'' : '''''
-                  - component: oh-button
-                    config:
-                      text: '4'
-                      action: command
-                      actionItem: =props.acFan
-                      actionCommand: '4'
-                      small: true
-                      active: =items[props.acFan].state === '4'
-                      style:
-                        font-size: 12px
-                        padding: 0 4px
-                        background-color: '=(items[props.acFan].state === ''4'') ? (items[props.acSwitch].state === ''ON''
-                          ? ''#29b6f6'' : ''#90a4ae'') : '''''
-                        color: '=(items[props.acFan].state === ''4'') ? ''#ffffff'' : '''''
-                  - component: oh-button
-                    config:
-                      text: '5'
-                      action: command
-                      actionItem: =props.acFan
-                      actionCommand: '5'
-                      small: true
-                      active: =items[props.acFan].state === '5'
-                      style:
-                        font-size: 12px
-                        padding: 0 4px
-                        background-color: '=(items[props.acFan].state === ''5'') ? (items[props.acSwitch].state === ''ON''
-                          ? ''#29b6f6'' : ''#90a4ae'') : '''''
-                        color: '=(items[props.acFan].state === ''5'') ? ''#ffffff'' : '''''
-          - component: div
-            config:
-              style:
-                position: relative
-                display: flex
-                align-items: center
-                gap: 10px
-                padding: 6px 10px 6px 6px
-                border-radius: 26px
-                background: '=items[props.acPowerful].state === ''ON'' ? ''linear-gradient(135deg, #29b6f6, rgba(41, 182,
-                  246, 0.75))'' : ''rgba(127, 127, 127, 0.1)'''
-                color: '=items[props.acPowerful].state === ''ON'' ? ''#ffffff'' : '''''
-                transition: background 0.3s ease
-            slots:
-              default:
-              - component: div
-                config:
-                  style:
-                    position: relative
-                    width: 40px
-                    height: 40px
-                    flex: 0 0 auto
-                    border-radius: 50%
-                    display: flex
-                    align-items: center
-                    justify-content: center
-                    background: '=items[props.acPowerful].state === ''ON'' ? ''rgba(255, 255, 255, 0.22)'' : ''rgba(41, 182,
-                      246, 0.15)'''
-                slots:
-                  default:
-                  - component: svg
-                    config:
-                      viewBox: 0 0 40 40
-                      width: 40
-                      height: 40
-                      style:
-                        position: absolute
-                        inset: '0'
-                      visible: =items[props.acPowerful].state === 'ON'
-                    slots:
-                      default:
-                      - component: circle
-                        config:
-                          cx: 20
-                          cy: 20
-                          r: 11
-                          fill: none
-                          stroke: '#ffffff'
-                          stroke-width: 2
-                        slots:
-                          default:
-                          - component: animate
-                            config:
-                              attributeName: r
-                              values: 11;19
-                              dur: 1.6s
-                              begin: 0s
-                              repeatCount: indefinite
-                          - component: animate
-                            config:
-                              attributeName: opacity
-                              values: 0.7;0
-                              dur: 1.6s
-                              begin: 0s
-                              repeatCount: indefinite
-                      - component: circle
-                        config:
-                          cx: 20
-                          cy: 20
-                          r: 11
-                          fill: none
-                          stroke: '#ffffff'
-                          stroke-width: 2
-                        slots:
-                          default:
-                          - component: animate
-                            config:
-                              attributeName: r
-                              values: 11;19
-                              dur: 1.6s
-                              begin: 0.8s
-                              repeatCount: indefinite
-                          - component: animate
-                            config:
-                              attributeName: opacity
-                              values: 0.7;0
-                              dur: 1.6s
-                              begin: 0.8s
-                              repeatCount: indefinite
-                  - component: oh-icon
-                    config:
-                      icon: material:whatshot
-                      state: =items[props.acPowerful].state
-                      width: 22
-                      height: 22
-              - component: div
-                config:
-                  style:
-                    flex: '1'
-                    min-width: '0'
-                    display: flex
-                    flex-direction: column
-                slots:
-                  default:
-                  - component: Label
-                    config:
-                      text: Boost
-                      style:
-                        font-size: 14px
-                        font-weight: '600'
-                        line-height: 18px
-                  - component: Label
-                    config:
-                      text: '=items[props.acPowerful].state === ''ON'' ? ''volle Leistung'' : ''Aus'''
-                      style:
-                        font-size: 11px
-                        opacity: '0.8'
-                        line-height: 15px
-                        white-space: nowrap
-                        overflow: hidden
-                        text-overflow: ellipsis
-              - component: Label
-                config:
-                  text: '=items[props.acPowerful].state === ''ON'' ? ''Stoppen'' : ''Starten'''
-                  style:
-                    flex: 0 0 auto
-                    padding: 3px 12px
-                    border-radius: 999px
-                    font-size: 12px
-                    font-weight: '700'
-                    border: '=(items[props.acPowerful].state === ''ON'' ? ''1.5px solid #ffffff'' : ''1.5px solid #29b6f6'')'
-                    color: '=items[props.acPowerful].state === ''ON'' ? ''#ffffff'' : ''#29b6f6'''
-              - component: oh-link
-                config:
-                  action: toggle
-                  actionItem: =props.acPowerful
-                  actionCommand: 'ON'
-                  actionCommandAlt: 'OFF'
-                  style:
-                    position: absolute
-                    inset: '0'
-                    display: block
-                    border-radius: 26px
-          - component: widget:pill-slider
-            config:
-              item: =props.acTemperatureSetpoint
-              color: '#29b6f6'
-              min: 18
-              max: 32
-              step: 0.5
-              unit: °C
-              title: Soll
-              value: '=((Number(items[props.acTemperatureSetpoint].numericState) || 0) % 1 ? ((Number(items[props.acTemperatureSetpoint].numericState)
-                || 0)).toFixed(1).replace(''.'', '','') : (Number(items[props.acTemperatureSetpoint].numericState) || 0))
-                + '' °C'''
-              context: '=''Raum '' + ([''NULL'', ''UNDEF''].includes(items[props.acTemperature].state) ? ''–'' : (items[props.acTemperature].displayState
-                || items[props.acTemperature].state))'
-              marks: 18=18 °C;20=20;22=22;24=24;26=26;28=28;30=30;32=32 °C
-              icon: material:device_thermostat
-              opacity: '=items[props.acSwitch].state === ''ON'' ? ''1'' : ''0.6'''
-          - component: widget:pill-slider
-            config:
-              item: =props.acTimer
-              color: '#29b6f6'
-              min: 0
-              max: 720
-              step: 15
-              unit: min
-              title: Timer
-              value: '=(Number(items[props.acTimer].numericState) || 0) > 0 ? ((Number(items[props.acTimer].numericState)
-                || 0) >= 60 ? Math.floor((Number(items[props.acTimer].numericState) || 0) / 60) + '' h'' + (Math.round((Number(items[props.acTimer].numericState)
-                || 0) % 60) ? '' '' + Math.round((Number(items[props.acTimer].numericState) || 0) % 60) + '' min'' : '''')
-                : Math.round((Number(items[props.acTimer].numericState) || 0)) + '' min'') : ''Aus'''
-              context: '=(Number(items[props.acTimer].numericState) || 0) > 0 ? (items[props.acSwitch].state === ''ON'' ?
-                ''schaltet um '' + dayjs().add((Number(items[props.acTimer].numericState) || 0), ''minute'').format(''HH:mm'')
-                + '' aus'' : ''läuft bis '' + dayjs().add((Number(items[props.acTimer].numericState) || 0), ''minute'').format(''HH:mm''))
-                : (items[props.acSwitch].state === ''ON'' ? ''läuft ohne Timer'' : ''beim Einschalten 6 h'')'
-              marks: 0=0;180=3 h;360=6 h;540=9 h;720=12 h
-              ring: true
-              valueColor: '=(Number(items[props.acTimer].numericState) || 0) > 0 ? ''#29b6f6'' : '''''
-              opacity: '=items[props.acSwitch].state === ''ON'' ? ''1'' : ''0.6'''
-      - component: div
+          acSwitch: =props.acSwitch
+          acMode: =props.acMode
+          acTemperatureSetpoint: =props.acTemperatureSetpoint
+          acTemperature: =props.acTemperature
+          acTimer: =props.acTimer
+          acFan: =props.acFan
+          acPowerful: =props.acPowerful
+      - component: widget:ventilation-controls
         config:
-          style:
-            display: flex
-            flex-direction: column
-            gap: 8px
-            padding: 10px 12px
-            margin-top: 8px
-            border-radius: 14px
-            background: rgba(38, 166, 154, 0.12)
-        slots:
-          default:
-          - component: div
-            config:
-              style:
-                display: flex
-                align-items: center
-                gap: 8px
-            slots:
-              default:
-              - component: oh-icon
-                config:
-                  icon: material:air
-                  width: 22
-                  height: 22
-              - component: Label
-                config:
-                  text: Lüftung
-                  style:
-                    flex: '1'
-                    font-size: 14px
-                    font-weight: '600'
-              - component: Label
-                config:
-                  text: =Math.round((Number(items[props.ventilationPower].numericState) || 0)) + ' W'
-                  style:
-                    font-size: 12px
-                    opacity: '0.7'
-          - component: f7-segmented
-            config:
-              strong: true
-              style:
-                width: 100%
-            slots:
-              default:
-              - component: oh-button
-                config:
-                  text: Niedrig
-                  action: command
-                  actionItem: =props.ventilationLevel
-                  actionCommand: '1'
-                  small: true
-                  active: =items[props.ventilationLevel].state === '1'
-                  style:
-                    font-size: 12px
-                    padding: 0 4px
-                    background-color: '=(items[props.ventilationLevel].state === ''1'') ? ''#26a69a'' : '''''
-                    color: '=(items[props.ventilationLevel].state === ''1'') ? ''#ffffff'' : '''''
-              - component: oh-button
-                config:
-                  text: Mittel
-                  action: command
-                  actionItem: =props.ventilationLevel
-                  actionCommand: '2'
-                  small: true
-                  active: =items[props.ventilationLevel].state === '2'
-                  style:
-                    font-size: 12px
-                    padding: 0 4px
-                    background-color: '=(items[props.ventilationLevel].state === ''2'') ? ''#26a69a'' : '''''
-                    color: '=(items[props.ventilationLevel].state === ''2'') ? ''#ffffff'' : '''''
-              - component: oh-button
-                config:
-                  text: Hoch
-                  action: command
-                  actionItem: =props.ventilationLevel
-                  actionCommand: '3'
-                  small: true
-                  active: =items[props.ventilationLevel].state === '3'
-                  style:
-                    font-size: 12px
-                    padding: 0 4px
-                    background-color: '=(items[props.ventilationLevel].state === ''3'') ? ''#26a69a'' : '''''
-                    color: '=(items[props.ventilationLevel].state === ''3'') ? ''#ffffff'' : '''''
-          - component: widget:pill-slider
-            config:
-              item: =props.ventilationTimer
-              color: '#26a69a'
-              min: 0
-              max: 360
-              step: 15
-              unit: min
-              title: Timer
-              value: '=(Number(items[props.ventilationTimer].numericState) || 0) > 0 ? ((Number(items[props.ventilationTimer].numericState)
-                || 0) >= 60 ? Math.floor((Number(items[props.ventilationTimer].numericState) || 0) / 60) + '' h'' + (Math.round((Number(items[props.ventilationTimer].numericState)
-                || 0) % 60) ? '' '' + Math.round((Number(items[props.ventilationTimer].numericState) || 0) % 60) + '' min''
-                : '''') : Math.round((Number(items[props.ventilationTimer].numericState) || 0)) + '' min'') : ''Aus'''
-              context: '=(Number(items[props.ventilationTimer].numericState) || 0) > 0 ? (items[props.ventilationManagement].state
-                === ''ON'' ? ''Automatik pausiert bis '' : ''bis '') + dayjs().add((Number(items[props.ventilationTimer].numericState)
-                || 0), ''minute'').format(''HH:mm'') : (items[props.ventilationManagement].state === ''ON'' ? ''Automatik
-                regelt die Stufe'' : ''Automatik aus'')'
-              marks: 0=0;120=2 h;240=4 h;360=6 h
-              ring: true
-              valueColor: '=(Number(items[props.ventilationTimer].numericState) || 0) > 0 ? ''#26a69a'' : '''''
+          ventilationLevel: =props.ventilationLevel
+          ventilationPower: =props.ventilationPower
+          netatmoWeatherstationCo2: =props.netatmoWeatherstationCo2
+          ventilationTimer: =props.ventilationTimer
+          ventilationManagement: =props.ventilationManagement
       - component: div
         config:
           style:
@@ -1149,308 +247,38 @@ slots:
             margin-top: 8px
         slots:
           default:
-          - component: div
+          - component: widget:switch-tile
             config:
-              style:
-                position: relative
-                padding: 10px 12px
-                border-radius: 14px
-                min-width: '0'
-                background: '=items[props.coffeeMachineSwitch].state === ''ON'' ? ''rgba(141, 110, 99, 0.2)'' : ''rgba(127,
-                  127, 127, 0.08)'''
-                box-shadow: '=items[props.coffeeMachineSwitch].state === ''ON'' ? ''inset 0 0 0 1.5px rgba(141, 110, 99, 0.6)''
-                  : ''none'''
-            slots:
-              default:
-              - component: div
-                config:
-                  style:
-                    display: flex
-                    justify-content: space-between
-                    align-items: flex-start
-                slots:
-                  default:
-                  - component: oh-icon
-                    config:
-                      icon: material:coffee
-                      state: =items[props.coffeeMachineSwitch].state
-                      width: 26
-                      height: 26
-                  - component: Label
-                    config:
-                      text: '=items[props.coffeeMachineSwitch].state === ''ON'' ? ''An'' : ''Aus'''
-                      style:
-                        font-size: 11px
-                        font-weight: '700'
-                        opacity: '0.7'
-              - component: Label
-                config:
-                  text: Kaffeemaschine
-                  style:
-                    font-size: 13px
-                    font-weight: '600'
-                    margin-top: 6px
-                    white-space: nowrap
-                    overflow: hidden
-                    text-overflow: ellipsis
-              - component: Label
-                config:
-                  text: =Math.round((Number(items[props.coffeeMachinePower].numericState) || 0)) + ' W'
-                  style:
-                    font-size: 12px
-                    opacity: '0.7'
-              - component: oh-link
-                config:
-                  action: toggle
-                  actionItem: =props.coffeeMachineSwitch
-                  actionCommand: 'ON'
-                  actionCommandAlt: 'OFF'
-                  style:
-                    position: absolute
-                    inset: '0'
-                    display: block
-                    border-radius: 14px
-          - component: div
+              item: =props.coffeeMachineSwitch
+              title: Kaffeemaschine
+              icon: material:coffee
+              color: '#8d6e63'
+              value: =Math.round((Number(items[props.coffeeMachinePower].numericState) || 0)) + ' W'
+          - component: widget:switch-tile
             config:
-              style:
-                position: relative
-                padding: 10px 12px
-                border-radius: 14px
-                min-width: '0'
-                background: '=items[props.bicycleBatteriesSwitch].state === ''ON'' ? ''rgba(124, 179, 66, 0.2)'' : ''rgba(127,
-                  127, 127, 0.08)'''
-                box-shadow: '=items[props.bicycleBatteriesSwitch].state === ''ON'' ? ''inset 0 0 0 1.5px rgba(124, 179, 66,
-                  0.6)'' : ''none'''
-            slots:
-              default:
-              - component: div
-                config:
-                  style:
-                    display: flex
-                    justify-content: space-between
-                    align-items: flex-start
-                slots:
-                  default:
-                  - component: oh-icon
-                    config:
-                      icon: material:electric_bike
-                      state: =items[props.bicycleBatteriesSwitch].state
-                      width: 26
-                      height: 26
-                  - component: Label
-                    config:
-                      text: '=items[props.bicycleBatteriesSwitch].state === ''ON'' ? ''An'' : ''Aus'''
-                      style:
-                        font-size: 11px
-                        font-weight: '700'
-                        opacity: '0.7'
-              - component: Label
-                config:
-                  text: Fahrradakkus
-                  style:
-                    font-size: 13px
-                    font-weight: '600'
-                    margin-top: 6px
-                    white-space: nowrap
-                    overflow: hidden
-                    text-overflow: ellipsis
-              - component: Label
-                config:
-                  text: =Math.round((Number(items[props.bicycleBatteriesPower].numericState) || 0)) + ' W'
-                  style:
-                    font-size: 12px
-                    opacity: '0.7'
-              - component: oh-link
-                config:
-                  action: toggle
-                  actionItem: =props.bicycleBatteriesSwitch
-                  actionCommand: 'ON'
-                  actionCommandAlt: 'OFF'
-                  style:
-                    position: absolute
-                    inset: '0'
-                    display: block
-                    border-radius: 14px
-          - component: div
+              item: =props.bicycleBatteriesSwitch
+              title: Fahrradakkus
+              icon: material:electric_bike
+              color: '#7cb342'
+              value: =Math.round((Number(items[props.bicycleBatteriesPower].numericState) || 0)) + ' W'
+          - component: widget:switch-tile
             config:
-              style:
-                position: relative
-                padding: 10px 12px
-                border-radius: 14px
-                min-width: '0'
-                background: '=items[props.office1Switch].state === ''ON'' ? ''rgba(171, 71, 188, 0.2)'' : ''rgba(127, 127,
-                  127, 0.08)'''
-                box-shadow: '=items[props.office1Switch].state === ''ON'' ? ''inset 0 0 0 1.5px rgba(171, 71, 188, 0.6)''
-                  : ''none'''
-            slots:
-              default:
-              - component: div
-                config:
-                  style:
-                    display: flex
-                    justify-content: space-between
-                    align-items: flex-start
-                slots:
-                  default:
-                  - component: oh-icon
-                    config:
-                      icon: material:computer
-                      state: =items[props.office1Switch].state
-                      width: 26
-                      height: 26
-                  - component: Label
-                    config:
-                      text: '=items[props.office1Switch].state === ''ON'' ? ''An'' : ''Aus'''
-                      style:
-                        font-size: 11px
-                        font-weight: '700'
-                        opacity: '0.7'
-              - component: Label
-                config:
-                  text: Büro 1
-                  style:
-                    font-size: 13px
-                    font-weight: '600'
-                    margin-top: 6px
-                    white-space: nowrap
-                    overflow: hidden
-                    text-overflow: ellipsis
-              - component: Label
-                config:
-                  text: =Math.round((Number(items[props.office1Power].numericState) || 0)) + ' W'
-                  style:
-                    font-size: 12px
-                    opacity: '0.7'
-              - component: oh-link
-                config:
-                  action: toggle
-                  actionItem: =props.office1Switch
-                  actionCommand: 'ON'
-                  actionCommandAlt: 'OFF'
-                  style:
-                    position: absolute
-                    inset: '0'
-                    display: block
-                    border-radius: 14px
-          - component: div
+              item: =props.office1Switch
+              title: Büro 1
+              icon: material:computer
+              color: '#ab47bc'
+              value: =Math.round((Number(items[props.office1Power].numericState) || 0)) + ' W'
+          - component: widget:switch-tile
             config:
-              style:
-                position: relative
-                padding: 10px 12px
-                border-radius: 14px
-                min-width: '0'
-                background: '=items[props.office2Switch].state === ''ON'' ? ''rgba(171, 71, 188, 0.2)'' : ''rgba(127, 127,
-                  127, 0.08)'''
-                box-shadow: '=items[props.office2Switch].state === ''ON'' ? ''inset 0 0 0 1.5px rgba(171, 71, 188, 0.6)''
-                  : ''none'''
-            slots:
-              default:
-              - component: div
-                config:
-                  style:
-                    display: flex
-                    justify-content: space-between
-                    align-items: flex-start
-                slots:
-                  default:
-                  - component: oh-icon
-                    config:
-                      icon: material:computer
-                      state: =items[props.office2Switch].state
-                      width: 26
-                      height: 26
-                  - component: Label
-                    config:
-                      text: '=items[props.office2Switch].state === ''ON'' ? ''An'' : ''Aus'''
-                      style:
-                        font-size: 11px
-                        font-weight: '700'
-                        opacity: '0.7'
-              - component: Label
-                config:
-                  text: Büro 2
-                  style:
-                    font-size: 13px
-                    font-weight: '600'
-                    margin-top: 6px
-                    white-space: nowrap
-                    overflow: hidden
-                    text-overflow: ellipsis
-              - component: Label
-                config:
-                  text: =Math.round((Number(items[props.office2Power].numericState) || 0)) + ' W'
-                  style:
-                    font-size: 12px
-                    opacity: '0.7'
-              - component: oh-link
-                config:
-                  action: toggle
-                  actionItem: =props.office2Switch
-                  actionCommand: 'ON'
-                  actionCommandAlt: 'OFF'
-                  style:
-                    position: absolute
-                    inset: '0'
-                    display: block
-                    border-radius: 14px
-          - component: div
+              item: =props.office2Switch
+              title: Büro 2
+              icon: material:computer
+              color: '#ab47bc'
+              value: =Math.round((Number(items[props.office2Power].numericState) || 0)) + ' W'
+          - component: widget:switch-tile
             config:
-              style:
-                position: relative
-                padding: 10px 12px
-                border-radius: 14px
-                min-width: '0'
-                background: '=items[props.terraceLightSwitch].state === ''ON'' ? ''rgba(251, 192, 45, 0.2)'' : ''rgba(127,
-                  127, 127, 0.08)'''
-                box-shadow: '=items[props.terraceLightSwitch].state === ''ON'' ? ''inset 0 0 0 1.5px rgba(251, 192, 45, 0.6)''
-                  : ''none'''
-            slots:
-              default:
-              - component: div
-                config:
-                  style:
-                    display: flex
-                    justify-content: space-between
-                    align-items: flex-start
-                slots:
-                  default:
-                  - component: oh-icon
-                    config:
-                      icon: material:light
-                      state: =items[props.terraceLightSwitch].state
-                      width: 26
-                      height: 26
-                  - component: Label
-                    config:
-                      text: '=items[props.terraceLightSwitch].state === ''ON'' ? ''An'' : ''Aus'''
-                      style:
-                        font-size: 11px
-                        font-weight: '700'
-                        opacity: '0.7'
-              - component: Label
-                config:
-                  text: Terrassenlicht
-                  style:
-                    font-size: 13px
-                    font-weight: '600'
-                    margin-top: 6px
-                    white-space: nowrap
-                    overflow: hidden
-                    text-overflow: ellipsis
-              - component: Label
-                config:
-                  text: =Math.round((Number(items[props.terraceLightPower].numericState) || 0)) + ' W'
-                  style:
-                    font-size: 12px
-                    opacity: '0.7'
-              - component: oh-link
-                config:
-                  action: toggle
-                  actionItem: =props.terraceLightSwitch
-                  actionCommand: 'ON'
-                  actionCommandAlt: 'OFF'
-                  style:
-                    position: absolute
-                    inset: '0'
-                    display: block
-                    border-radius: 14px
+              item: =props.terraceLightSwitch
+              title: Terrassenlicht
+              icon: material:light
+              color: '#fbc02d'
+              value: =Math.round((Number(items[props.terraceLightPower].numericState) || 0)) + ' W'

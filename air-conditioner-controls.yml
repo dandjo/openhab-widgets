@@ -1,0 +1,172 @@
+uid: air-conditioner-controls
+tags:
+- controls
+props:
+  parameters:
+  - name: acSwitch
+    label: Faikout Perfera Schalter
+    description: Switch item
+    type: TEXT
+    required: true
+    context: item
+  - name: acMode
+    label: Faikout Perfera Modus
+    description: String item
+    type: TEXT
+    required: true
+    context: item
+  - name: acTemperatureSetpoint
+    label: Faikout Perfera Solltemperatur
+    description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
+  - name: acTemperature
+    label: Faikout Perfera Temperatur
+    description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
+  - name: acTimer
+    label: Klimaanlage Timer
+    description: Number:Time item
+    type: TEXT
+    required: true
+    context: item
+  - name: acFan
+    label: Faikout Perfera Lüfter
+    description: String item
+    type: TEXT
+    required: true
+    context: item
+  - name: acPowerful
+    label: Faikout Perfera Powerful
+    description: Switch item
+    type: TEXT
+    required: true
+    context: item
+  parameterGroups: []
+timestamp: Sep 27, 2026, 9:44:33 PM
+component: oh-context
+config:
+  variables:
+    controlsAirConditioning: false
+slots:
+  default:
+  - component: div
+    config:
+      style:
+        display: flex
+        flex-direction: column
+        gap: 8px
+        padding: 10px 12px
+        margin-top: 8px
+        border-radius: 14px
+        background: '=items[props.acSwitch].state === ''ON'' ? ''rgba(41, 182, 246, 0.12)'' : ''rgba(127, 127, 127, 0.08)'''
+    slots:
+      default:
+      - component: widget:device-head
+        config:
+          icon: material:ac_unit
+          title: Klimaanlage
+          line1: '=(items[props.acSwitch].state === ''ON'' ? ''An · '' : ''Aus · '') + ([''NULL'', ''UNDEF''].includes(items[props.acMode].state)
+            ? ''–'' : (items[props.acMode].displayState || items[props.acMode].state)) + '' · Soll '' + ((Number(items[props.acTemperatureSetpoint].numericState)
+            || 0) % 1 ? ((Number(items[props.acTemperatureSetpoint].numericState) || 0)).toFixed(1).replace(''.'', '','')
+            : (Number(items[props.acTemperatureSetpoint].numericState) || 0)) + '' °C'''
+          line2: '=''Raum '' + ([''NULL'', ''UNDEF''].includes(items[props.acTemperature].state) ? ''–'' : (items[props.acTemperature].displayState
+            || items[props.acTemperature].state)) + ((Number(items[props.acTimer].numericState) || 0) > 0 ? '' · Timer noch
+            '' + ((Number(items[props.acTimer].numericState) || 0) >= 60 ? Math.floor((Number(items[props.acTimer].numericState)
+            || 0) / 60) + '' h'' + (Math.round((Number(items[props.acTimer].numericState) || 0) % 60) ? '' '' + Math.round((Number(items[props.acTimer].numericState)
+            || 0) % 60) + '' min'' : '''') : Math.round((Number(items[props.acTimer].numericState) || 0)) + '' min'') : ''
+            · kein Timer'')'
+          color: '#29b6f6'
+          active: =items[props.acSwitch].state === 'ON'
+          var: controlsAirConditioning
+          action: switch
+          actionItem: =props.acSwitch
+          actionTitle: An/Aus
+      - component: div
+        config:
+          style:
+            display: flex
+            flex-direction: column
+            gap: 8px
+            padding-top: 4px
+          visible: =!!vars.controlsAirConditioning
+        slots:
+          default:
+          - component: widget:state-bar
+            config:
+              item: =props.acMode
+              options: A=Auto;H=Heizen;C=Kühlen;D=Entfeuchten;F=Lüften
+              color: '=items[props.acSwitch].state === ''ON'' ? ''#29b6f6'' : ''#90a4ae'''
+              byText: true
+              flex: 1 1 100%
+          - component: div
+            config:
+              style:
+                display: flex
+                flex-wrap: wrap
+                align-items: center
+                gap: 6px 10px
+                opacity: '=items[props.acSwitch].state === ''ON'' ? ''1'' : ''0.6'''
+            slots:
+              default:
+              - component: Label
+                config:
+                  text: Lüfter
+                  style:
+                    font-size: 13px
+                    min-width: 60px
+              - component: widget:state-bar
+                config:
+                  item: =props.acFan
+                  options: Q=Leise;A=Auto;1=1;2=2;3=3;4=4;5=5
+                  color: '=items[props.acSwitch].state === ''ON'' ? ''#29b6f6'' : ''#90a4ae'''
+                  flex: 1 1 240px
+                  width: auto
+          - component: widget:boost-pill
+            config:
+              item: =props.acPowerful
+              icon: material:whatshot
+              color: '#29b6f6'
+              title: Boost
+              running: ='volle Leistung'
+          - component: widget:pill-slider
+            config:
+              item: =props.acTemperatureSetpoint
+              color: '#29b6f6'
+              min: 18
+              max: 32
+              step: 0.5
+              unit: °C
+              title: Soll
+              value: '=((Number(items[props.acTemperatureSetpoint].numericState) || 0) % 1 ? ((Number(items[props.acTemperatureSetpoint].numericState)
+                || 0)).toFixed(1).replace(''.'', '','') : (Number(items[props.acTemperatureSetpoint].numericState) || 0))
+                + '' °C'''
+              context: '=''Raum '' + ([''NULL'', ''UNDEF''].includes(items[props.acTemperature].state) ? ''–'' : (items[props.acTemperature].displayState
+                || items[props.acTemperature].state))'
+              marks: 18=18 °C;20=20;22=22;24=24;26=26;28=28;30=30;32=32 °C
+              icon: material:device_thermostat
+              opacity: '=items[props.acSwitch].state === ''ON'' ? ''1'' : ''0.6'''
+          - component: widget:pill-slider
+            config:
+              item: =props.acTimer
+              color: '#29b6f6'
+              min: 0
+              max: 720
+              step: 15
+              unit: min
+              title: Timer
+              value: '=(Number(items[props.acTimer].numericState) || 0) > 0 ? ((Number(items[props.acTimer].numericState)
+                || 0) >= 60 ? Math.floor((Number(items[props.acTimer].numericState) || 0) / 60) + '' h'' + (Math.round((Number(items[props.acTimer].numericState)
+                || 0) % 60) ? '' '' + Math.round((Number(items[props.acTimer].numericState) || 0) % 60) + '' min'' : '''')
+                : Math.round((Number(items[props.acTimer].numericState) || 0)) + '' min'') : ''Aus'''
+              context: '=(Number(items[props.acTimer].numericState) || 0) > 0 ? (items[props.acSwitch].state === ''ON'' ?
+                ''schaltet um '' + dayjs().add((Number(items[props.acTimer].numericState) || 0), ''minute'').format(''HH:mm'')
+                + '' aus'' : ''läuft bis '' + dayjs().add((Number(items[props.acTimer].numericState) || 0), ''minute'').format(''HH:mm''))
+                : (items[props.acSwitch].state === ''ON'' ? ''läuft ohne Timer'' : ''beim Einschalten 6 h'')'
+              marks: 0=0;180=3 h;360=6 h;540=9 h;720=12 h
+              ring: true
+              valueColor: '=(Number(items[props.acTimer].numericState) || 0) > 0 ? ''#29b6f6'' : '''''
+              opacity: '=items[props.acSwitch].state === ''ON'' ? ''1'' : ''0.6'''

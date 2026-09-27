@@ -1,0 +1,208 @@
+uid: appliance-tile
+tags:
+- appliance
+props:
+  parameters:
+  - name: kind
+    label: Kind
+    description: The appliance drawn
+    type: TEXT
+    required: true
+    limitToOptions: true
+    options:
+    - value: washer
+      label: washer
+    - value: dryer
+      label: dryer
+    - value: dish-washer
+      label: dish-washer
+  - name: title
+    label: Title
+    description: The appliance's name
+    type: TEXT
+    required: true
+  - name: popup
+    label: Popup
+    description: The uid of the page a tap opens as a popup
+    type: TEXT
+    required: true
+  - name: progress
+    label: Progress
+    description: Miele item _program_progress, e.g. miele_washing_machine_program_progress; set for a Miele machine
+    type: TEXT
+    required: false
+    context: item
+  - name: state
+    label: State
+    description: Miele item _operation_state, e.g. miele_washing_machine_operation_state; set for a Miele machine
+    type: TEXT
+    required: false
+    context: item
+  - name: program
+    label: Program
+    description: Miele item _active_program, e.g. miele_washing_machine_active_program; set for a Miele machine
+    type: TEXT
+    required: false
+    context: item
+  - name: phase
+    label: Phase
+    description: Miele item _program_phase, e.g. miele_washing_machine_program_phase; set for a Miele machine
+    type: TEXT
+    required: false
+    context: item
+  - name: finished
+    label: Finished
+    description: Miele item _program_finished_time, e.g. miele_washing_machine_program_finished_time; set for a Miele machine
+    type: TEXT
+    required: false
+    context: item
+  - name: remaining
+    label: Remaining
+    description: Miele item _program_remaining_time, e.g. miele_washing_machine_program_remaining_time; set for a Miele machine
+    type: TEXT
+    required: false
+    context: item
+  - name: power
+    label: Power item
+    description: The plug's power item, for a machine without program data
+    type: TEXT
+    required: false
+    context: item
+  - name: done
+    label: Finished item
+    description: Switch item that is on while the plug machine is finished
+    type: TEXT
+    required: false
+    context: item
+  parameterGroups: []
+timestamp: Sep 27, 2026, 9:44:33 PM
+component: div
+config:
+  style:
+    position: relative
+    display: flex
+    flex-direction: column
+    align-items: center
+    justify-content: center
+    gap: 6px
+    padding: 12px 8px
+    border-radius: 12px
+    text-align: center
+    background: rgba(127, 127, 127, 0.08)
+slots:
+  default:
+  - component: widget:appliance-icon
+    config:
+      kind: =props.kind
+      running: '=(!!props.progress ? (!!props.progress && items[props.progress].state !== ''UNDEF'' && items[props.progress].state
+        !== ''NULL'') : (Number(items[props.power].numericState) || 0) > 10)'
+      progress: '=!!props.progress ? Number(items[props.progress].numericState) || 0 : '''''
+  - component: Label
+    config:
+      text: =props.title
+      style:
+        font-weight: '600'
+  - component: div
+    config:
+      style:
+        display: flex
+        flex-wrap: wrap
+        justify-content: center
+        gap: 6px
+      visible: =!!props.progress
+    slots:
+      default:
+      - component: Label
+        config:
+          text: '=!!props.progress ? ((!!props.progress ? (!!props.progress && items[props.progress].state !== ''UNDEF'' &&
+            items[props.progress].state !== ''NULL'') : (Number(items[props.power].numericState) || 0) > 10) ? ([''NULL'',
+            ''UNDEF''].includes(items[props.progress].state) ? ''–'' : (items[props.progress].displayState || items[props.progress].state))
+            : ([''NULL'', ''UNDEF''].includes(items[props.state].state) ? ''–'' : (items[props.state].displayState || items[props.state].state)))
+            : ((!!props.progress ? (!!props.progress && items[props.progress].state !== ''UNDEF'' && items[props.progress].state
+            !== ''NULL'') : (Number(items[props.power].numericState) || 0) > 10) ? ''läuft · '' + ([''NULL'', ''UNDEF''].includes(items[props.power].state)
+            ? ''–'' : (items[props.power].displayState || items[props.power].state)) : (!!props.progress ? (('''' + items[props.state].state).toLowerCase().indexOf(''beendet'')
+            >= 0) : (!!props.done && items[props.done].state === ''ON'')) ? ''fertig'' : (Number(items[props.power].numericState)
+            || 0) >= 1 ? ''An'' : ''Aus'')'
+          style:
+            background: '=(!!props.progress ? (!!props.progress && items[props.progress].state !== ''UNDEF'' && items[props.progress].state
+              !== ''NULL'') : (Number(items[props.power].numericState) || 0) > 10) ? ''#1e88e5'' : (!!props.progress ? ((''''
+              + items[props.state].state).toLowerCase().indexOf(''beendet'') >= 0) : (!!props.done && items[props.done].state
+              === ''ON'')) ? ''#43a047'' : ''#9e9e9e'''
+            color: '#ffffff'
+            border-radius: 10px
+            padding: 2px 10px
+            font-size: 12px
+            font-weight: '600'
+            white-space: nowrap
+      - component: div
+        config:
+          style:
+            display: inline-flex
+            align-items: center
+            gap: 4px
+            color: '=themeOptions.dark === ''dark'' ? ''#64b5f6'' : ''#1565c0'''
+            background: rgba(30, 136, 229, 0.16)
+            border-radius: 10px
+            padding: 2px 8px
+            font-size: 12px
+            font-weight: '600'
+            white-space: nowrap
+          visible: '=!!props.progress && (!!props.progress ? (!!props.progress && items[props.progress].state !== ''UNDEF''
+            && items[props.progress].state !== ''NULL'') : (Number(items[props.power].numericState) || 0) > 10) && (!!props.remaining
+            && items[props.remaining].state !== ''UNDEF'' && items[props.remaining].state !== ''NULL'')'
+        slots:
+          default:
+          - component: f7-icon
+            config:
+              f7: timer
+              size: 13
+          - component: Label
+            config:
+              text: '=((Number(items[props.remaining].numericState) || 0) >= 3600 ? Math.floor((Number(items[props.remaining].numericState)
+                || 0) / 3600) + '':'' + (''0'' + Math.floor((Number(items[props.remaining].numericState) || 0) % 3600 / 60)).slice(-2)
+                + '' h'' : Math.ceil((Number(items[props.remaining].numericState) || 0) / 60) + '' min'')'
+  - component: Label
+    config:
+      text: '=!!props.progress ? ((!!props.progress ? (!!props.progress && items[props.progress].state !== ''UNDEF'' && items[props.progress].state
+        !== ''NULL'') : (Number(items[props.power].numericState) || 0) > 10) ? ([''NULL'', ''UNDEF''].includes(items[props.progress].state)
+        ? ''–'' : (items[props.progress].displayState || items[props.progress].state)) : ([''NULL'', ''UNDEF''].includes(items[props.state].state)
+        ? ''–'' : (items[props.state].displayState || items[props.state].state))) : ((!!props.progress ? (!!props.progress
+        && items[props.progress].state !== ''UNDEF'' && items[props.progress].state !== ''NULL'') : (Number(items[props.power].numericState)
+        || 0) > 10) ? ''läuft · '' + ([''NULL'', ''UNDEF''].includes(items[props.power].state) ? ''–'' : (items[props.power].displayState
+        || items[props.power].state)) : (!!props.progress ? (('''' + items[props.state].state).toLowerCase().indexOf(''beendet'')
+        >= 0) : (!!props.done && items[props.done].state === ''ON'')) ? ''fertig'' : (Number(items[props.power].numericState)
+        || 0) >= 1 ? ''An'' : ''Aus'')'
+      style:
+        background: '=(!!props.progress ? (!!props.progress && items[props.progress].state !== ''UNDEF'' && items[props.progress].state
+          !== ''NULL'') : (Number(items[props.power].numericState) || 0) > 10) ? ''#1e88e5'' : (!!props.progress ? ((''''
+          + items[props.state].state).toLowerCase().indexOf(''beendet'') >= 0) : (!!props.done && items[props.done].state
+          === ''ON'')) ? ''#43a047'' : ''#9e9e9e'''
+        color: '#ffffff'
+        border-radius: 10px
+        padding: 2px 10px
+        font-size: 12px
+        font-weight: '600'
+        white-space: nowrap
+      visible: =!!!props.progress
+  - component: Label
+    config:
+      text: '=((!!props.program && items[props.program].state !== ''UNDEF'' && items[props.program].state !== ''NULL'') ?
+        items[props.program].state : '''') + ((!!props.program && items[props.program].state !== ''UNDEF'' && items[props.program].state
+        !== ''NULL'') && (!!props.phase && items[props.phase].state !== ''UNDEF'' && items[props.phase].state !== ''NULL'')
+        ? '' · '' : '''') + ((!!props.phase && items[props.phase].state !== ''UNDEF'' && items[props.phase].state !== ''NULL'')
+        ? items[props.phase].state : '''') + ((!!props.finished && items[props.finished].state !== ''UNDEF'' && items[props.finished].state
+        !== ''NULL'') ? '' · fertig '' + dayjs(items[props.finished].state).format(''HH:mm'') : '''')'
+      visible: '=!!props.progress && (!!props.progress ? (!!props.progress && items[props.progress].state !== ''UNDEF'' &&
+        items[props.progress].state !== ''NULL'') : (Number(items[props.power].numericState) || 0) > 10)'
+      style:
+        font-size: 12px
+        opacity: '0.75'
+  - component: oh-link
+    config:
+      action: popup
+      actionModal: ='page:' + props.popup
+      style:
+        position: absolute
+        inset: '0'
+        display: block
+        border-radius: 12px

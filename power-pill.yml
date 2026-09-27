@@ -1,0 +1,86 @@
+uid: power-pill
+tags:
+- switch
+props:
+  parameters:
+  - name: item
+    label: Item
+    description: The switch item
+    type: TEXT
+    required: true
+    context: item
+  - name: color
+    label: Colour
+    description: 'Device colour as #rrggbb, of the pill while on'
+    type: TEXT
+    required: false
+    default: '#78909c'
+  - name: onText
+    label: Text while on
+    description: What the pill says while on, e.g. An · Lüften; usually an expression
+    type: TEXT
+    required: false
+    default: An
+  parameterGroups: []
+timestamp: Sep 27, 2026, 9:44:33 PM
+component: div
+config:
+  style:
+    --power-color: =props.color || '#78909c'
+    position: relative
+    display: flex
+    align-items: center
+    height: 40px
+    border-radius: 20px
+    flex: 0 0 auto
+    background: '=items[props.item].state === ''ON'' ? ''var(--power-color)'' : ''rgba(127, 127, 127, 0.18)'''
+    transition: background 0.25s ease
+slots:
+  default:
+  - component: Label
+    config:
+      text: '=items[props.item].state === ''ON'' ? (props.onText || ''An'') : ''Aus'''
+      style:
+        width: 100%
+        text-align: center
+        padding: 0 44px
+        font-size: 14px
+        font-weight: '600'
+        white-space: nowrap
+        overflow: hidden
+        text-overflow: ellipsis
+        color: '=items[props.item].state === ''ON'' ? ''#ffffff'' : '''''
+  - component: div
+    config:
+      style:
+        position: absolute
+        top: 4px
+        left: '=items[props.item].state === ''ON'' ? ''calc(100% - 36px)'' : ''4px'''
+        width: 32px
+        height: 32px
+        border-radius: 50%
+        display: flex
+        align-items: center
+        justify-content: center
+        background: '#ffffff'
+        color: '=items[props.item].state === ''ON'' ? ''var(--power-color)'' : ''#9e9e9e'''
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3)
+        transition: left 0.25s ease, color 0.25s ease
+    slots:
+      default:
+      - component: oh-icon
+        config:
+          icon: material:power_settings_new
+          width: 20
+          height: 20
+  - component: oh-link
+    config:
+      action: toggle
+      actionItem: =props.item
+      actionCommand: 'ON'
+      actionCommandAlt: 'OFF'
+      style:
+        position: absolute
+        inset: '0'
+        display: block
+        border-radius: 20px

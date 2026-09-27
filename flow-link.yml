@@ -1,0 +1,151 @@
+uid: flow-link
+tags:
+- flow
+props:
+  parameters:
+  - name: x1
+    label: x1
+    description: Start point's x in the flow's viewBox
+    type: DECIMAL
+    required: true
+  - name: y1
+    label: y1
+    description: Start point's y in the flow's viewBox
+    type: DECIMAL
+    required: true
+  - name: x2
+    label: x2
+    description: End point's x in the flow's viewBox
+    type: DECIMAL
+    required: true
+  - name: y2
+    label: y2
+    description: End point's y in the flow's viewBox
+    type: DECIMAL
+    required: true
+  - name: color
+    label: Colour
+    description: 'The link''s colour as #rrggbb; may be an expression'
+    type: TEXT
+    required: false
+    default: '#78909c'
+  - name: power
+    label: Power
+    description: The power in W; usually an expression on an item
+    type: TEXT
+    required: true
+  - name: forward
+    label: Forward
+    description: The dots run from (x1, y1) to (x2, y2) while it holds, else back; usually an expression
+    type: BOOLEAN
+    required: false
+  - name: threshold
+    label: Threshold
+    description: The power in W above which the dots run
+    type: DECIMAL
+    required: false
+    default: '10'
+  parameterGroups: []
+timestamp: Sep 27, 2026, 9:44:33 PM
+component: g
+config: {}
+slots:
+  default:
+  - component: line
+    config:
+      x1: =props.x1
+      y1: =props.y1
+      x2: =props.x2
+      y2: =props.y2
+      stroke: =props.color
+      stroke-width: 3
+      stroke-linecap: round
+      opacity: '=Math.abs(Number(props.power)) > Number(props.threshold !== undefined ? props.threshold : 10) ? ''0.45'' :
+        ''0.15'''
+  - component: circle
+    config:
+      r: 4.5
+      fill: =props.color
+      cx: 0
+      cy: 0
+      visible: '=Math.abs(Number(props.power)) > Number(props.threshold !== undefined ? props.threshold : 10)'
+    slots:
+      default:
+      - component: animateMotion
+        config:
+          path: '=props.forward ? ''M'' + (Number(props.x1) - (Number(props.x2) - Number(props.x1)) / Math.hypot(Number(props.x2)
+            - Number(props.x1), Number(props.y2) - Number(props.y1)) * 5).toFixed(1) + '','' + (Number(props.y1) - (Number(props.y2)
+            - Number(props.y1)) / Math.hypot(Number(props.x2) - Number(props.x1), Number(props.y2) - Number(props.y1)) * 5).toFixed(1)
+            + '' L'' + (Number(props.x2) + (Number(props.x2) - Number(props.x1)) / Math.hypot(Number(props.x2) - Number(props.x1),
+            Number(props.y2) - Number(props.y1)) * 5).toFixed(1) + '','' + (Number(props.y2) + (Number(props.y2) - Number(props.y1))
+            / Math.hypot(Number(props.x2) - Number(props.x1), Number(props.y2) - Number(props.y1)) * 5).toFixed(1) : ''M''
+            + (Number(props.x2) + (Number(props.x2) - Number(props.x1)) / Math.hypot(Number(props.x2) - Number(props.x1),
+            Number(props.y2) - Number(props.y1)) * 5).toFixed(1) + '','' + (Number(props.y2) + (Number(props.y2) - Number(props.y1))
+            / Math.hypot(Number(props.x2) - Number(props.x1), Number(props.y2) - Number(props.y1)) * 5).toFixed(1) + '' L''
+            + (Number(props.x1) - (Number(props.x2) - Number(props.x1)) / Math.hypot(Number(props.x2) - Number(props.x1),
+            Number(props.y2) - Number(props.y1)) * 5).toFixed(1) + '','' + (Number(props.y1) - (Number(props.y2) - Number(props.y1))
+            / Math.hypot(Number(props.x2) - Number(props.x1), Number(props.y2) - Number(props.y1)) * 5).toFixed(1)'
+          dur: '=(Math.abs(Number(props.power)) < 300 ? ''3.5s'' : Math.abs(Number(props.power)) < 1000 ? ''2.5s'' : Math.abs(Number(props.power))
+            < 2500 ? ''1.8s'' : ''1.2s'')'
+          repeatCount: indefinite
+          calcMode: linear
+          keyPoints: 0;1
+          keyTimes: 0;1
+  - component: circle
+    config:
+      r: 4.5
+      fill: =props.color
+      cx: 0
+      cy: 0
+      visible: '=Math.abs(Number(props.power)) > Number(props.threshold !== undefined ? props.threshold : 10)'
+    slots:
+      default:
+      - component: animateMotion
+        config:
+          path: '=props.forward ? ''M'' + (Number(props.x1) - (Number(props.x2) - Number(props.x1)) / Math.hypot(Number(props.x2)
+            - Number(props.x1), Number(props.y2) - Number(props.y1)) * 5).toFixed(1) + '','' + (Number(props.y1) - (Number(props.y2)
+            - Number(props.y1)) / Math.hypot(Number(props.x2) - Number(props.x1), Number(props.y2) - Number(props.y1)) * 5).toFixed(1)
+            + '' L'' + (Number(props.x2) + (Number(props.x2) - Number(props.x1)) / Math.hypot(Number(props.x2) - Number(props.x1),
+            Number(props.y2) - Number(props.y1)) * 5).toFixed(1) + '','' + (Number(props.y2) + (Number(props.y2) - Number(props.y1))
+            / Math.hypot(Number(props.x2) - Number(props.x1), Number(props.y2) - Number(props.y1)) * 5).toFixed(1) : ''M''
+            + (Number(props.x2) + (Number(props.x2) - Number(props.x1)) / Math.hypot(Number(props.x2) - Number(props.x1),
+            Number(props.y2) - Number(props.y1)) * 5).toFixed(1) + '','' + (Number(props.y2) + (Number(props.y2) - Number(props.y1))
+            / Math.hypot(Number(props.x2) - Number(props.x1), Number(props.y2) - Number(props.y1)) * 5).toFixed(1) + '' L''
+            + (Number(props.x1) - (Number(props.x2) - Number(props.x1)) / Math.hypot(Number(props.x2) - Number(props.x1),
+            Number(props.y2) - Number(props.y1)) * 5).toFixed(1) + '','' + (Number(props.y1) - (Number(props.y2) - Number(props.y1))
+            / Math.hypot(Number(props.x2) - Number(props.x1), Number(props.y2) - Number(props.y1)) * 5).toFixed(1)'
+          dur: '=(Math.abs(Number(props.power)) < 300 ? ''3.5s'' : Math.abs(Number(props.power)) < 1000 ? ''2.5s'' : Math.abs(Number(props.power))
+            < 2500 ? ''1.8s'' : ''1.2s'')'
+          repeatCount: indefinite
+          calcMode: linear
+          keyPoints: 0.3333;1;0;0.3333
+          keyTimes: 0;0.6667;0.6667;1
+  - component: circle
+    config:
+      r: 4.5
+      fill: =props.color
+      cx: 0
+      cy: 0
+      visible: '=Math.abs(Number(props.power)) > Number(props.threshold !== undefined ? props.threshold : 10)'
+    slots:
+      default:
+      - component: animateMotion
+        config:
+          path: '=props.forward ? ''M'' + (Number(props.x1) - (Number(props.x2) - Number(props.x1)) / Math.hypot(Number(props.x2)
+            - Number(props.x1), Number(props.y2) - Number(props.y1)) * 5).toFixed(1) + '','' + (Number(props.y1) - (Number(props.y2)
+            - Number(props.y1)) / Math.hypot(Number(props.x2) - Number(props.x1), Number(props.y2) - Number(props.y1)) * 5).toFixed(1)
+            + '' L'' + (Number(props.x2) + (Number(props.x2) - Number(props.x1)) / Math.hypot(Number(props.x2) - Number(props.x1),
+            Number(props.y2) - Number(props.y1)) * 5).toFixed(1) + '','' + (Number(props.y2) + (Number(props.y2) - Number(props.y1))
+            / Math.hypot(Number(props.x2) - Number(props.x1), Number(props.y2) - Number(props.y1)) * 5).toFixed(1) : ''M''
+            + (Number(props.x2) + (Number(props.x2) - Number(props.x1)) / Math.hypot(Number(props.x2) - Number(props.x1),
+            Number(props.y2) - Number(props.y1)) * 5).toFixed(1) + '','' + (Number(props.y2) + (Number(props.y2) - Number(props.y1))
+            / Math.hypot(Number(props.x2) - Number(props.x1), Number(props.y2) - Number(props.y1)) * 5).toFixed(1) + '' L''
+            + (Number(props.x1) - (Number(props.x2) - Number(props.x1)) / Math.hypot(Number(props.x2) - Number(props.x1),
+            Number(props.y2) - Number(props.y1)) * 5).toFixed(1) + '','' + (Number(props.y1) - (Number(props.y2) - Number(props.y1))
+            / Math.hypot(Number(props.x2) - Number(props.x1), Number(props.y2) - Number(props.y1)) * 5).toFixed(1)'
+          dur: '=(Math.abs(Number(props.power)) < 300 ? ''3.5s'' : Math.abs(Number(props.power)) < 1000 ? ''2.5s'' : Math.abs(Number(props.power))
+            < 2500 ? ''1.8s'' : ''1.2s'')'
+          repeatCount: indefinite
+          calcMode: linear
+          keyPoints: 0.6667;1;0;0.6667
+          keyTimes: 0;0.3333;0.3333;1

@@ -1,0 +1,109 @@
+uid: state-bar
+tags:
+- controls
+props:
+  parameters:
+  - name: item
+    label: Item
+    description: The item whose states the segments send
+    type: TEXT
+    required: true
+    context: item
+  - name: options
+    label: Options
+    description: value=label pairs separated by semicolons, e.g. 1=Niedrig;2=Mittel;3=Hoch
+    type: TEXT
+    required: true
+  - name: color
+    label: Colour
+    description: 'Colour of the current segment as #rrggbb; may be an expression'
+    type: TEXT
+    required: false
+    default: '#78909c'
+  - name: byText
+    label: Sized by text
+    description: Segments as wide as their labels instead of equal widths
+    type: BOOLEAN
+    required: false
+  - name: flex
+    label: Flex
+    description: CSS flex of the bar in a row, e.g. 1 1 240px
+    type: TEXT
+    required: false
+  - name: width
+    label: Width
+    description: CSS width of the bar
+    type: TEXT
+    required: false
+    default: 100%
+  parameterGroups: []
+timestamp: Sep 27, 2026, 9:44:33 PM
+component: div
+config:
+  style:
+    display: contents
+slots:
+  default:
+  - component: f7-segmented
+    config:
+      strong: true
+      visible: =!!props.byText
+      style:
+        flex: =props.flex || ''
+        width: =props.width || '100%'
+      stylesheet: '.segmented-highlight { display: none; }'
+    slots:
+      default:
+      - component: oh-repeater
+        config:
+          for: option
+          sourceType: array
+          in: =(props.options || '').split(';')
+          fragment: true
+        slots:
+          default:
+          - component: oh-button
+            config:
+              text: =loop.option.split('=')[1]
+              action: command
+              actionItem: =props.item
+              actionCommand: =loop.option.split('=')[0]
+              small: true
+              active: =items[props.item].state === loop.option.split('=')[0]
+              style:
+                font-size: 12px
+                flex: 1 1 auto
+                width: auto
+                padding: 0 6px
+                background-color: '=(items[props.item].state === loop.option.split(''='')[0]) ? props.color : '''''
+                color: '=(items[props.item].state === loop.option.split(''='')[0]) ? ''#ffffff'' : '''''
+  - component: f7-segmented
+    config:
+      strong: true
+      visible: =!props.byText
+      style:
+        flex: =props.flex || ''
+        width: =props.width || '100%'
+    slots:
+      default:
+      - component: oh-repeater
+        config:
+          for: option
+          sourceType: array
+          in: =(props.options || '').split(';')
+          fragment: true
+        slots:
+          default:
+          - component: oh-button
+            config:
+              text: =loop.option.split('=')[1]
+              action: command
+              actionItem: =props.item
+              actionCommand: =loop.option.split('=')[0]
+              small: true
+              active: =items[props.item].state === loop.option.split('=')[0]
+              style:
+                font-size: 12px
+                padding: 0 4px
+                background-color: '=(items[props.item].state === loop.option.split(''='')[0]) ? props.color : '''''
+                color: '=(items[props.item].state === loop.option.split(''='')[0]) ? ''#ffffff'' : '''''
