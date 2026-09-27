@@ -33,9 +33,9 @@ props:
     type: TEXT
     required: true
     context: item
-  - name: heatpumpDhwManagement
-    label: Wärmepumpe Warmwasser-Automatik
-    description: Switch item
+  - name: heatpumpManagement
+    label: Wärmepumpe Automatik
+    description: Group item
     type: TEXT
     required: true
     context: item
@@ -48,6 +48,12 @@ props:
   - name: heatpumpDhwTempHeating
     label: Pyaltherma Warmwasser Solltemperatur
     description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpDhwManagement
+    label: Wärmepumpe Warmwasser-Automatik
+    description: Switch item
     type: TEXT
     required: true
     context: item
@@ -64,7 +70,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Sep 27, 2026, 9:44:33 PM
+timestamp: Sep 27, 2026, 11:33:43 PM
 component: oh-context
 config:
   variables:
@@ -91,10 +97,11 @@ slots:
           line1: '=''Speicher '' + ([''NULL'', ''UNDEF''].includes(items[props.heatpumpDhwTankTemp].state) ? ''–'' : (items[props.heatpumpDhwTankTemp].displayState
             || items[props.heatpumpDhwTankTemp].state)) + '' · '' + (Math.abs((Number(items[props.heatpumpPower].numericState)
             || 0)) / 1000).toFixed(3).replace(''.'', '','') + '' kW'''
-          line2: '=''Heizung '' + (items[props.heatpumpClimateControlPower].state === ''ON'' ? ''an'' : items[props.heatpumpClimateControlPower].state
-            === ''OFF'' ? ''aus'' : ''–'') + '' · Wasser '' + (items[props.heatpumpDhwPower].state === ''ON'' ? ''an'' : items[props.heatpumpDhwPower].state
-            === ''OFF'' ? ''aus'' : ''–'') + '' · WW-Auto '' + (items[props.heatpumpDhwManagement].state === ''ON'' ? ''an''
-            : items[props.heatpumpDhwManagement].state === ''OFF'' ? ''aus'' : ''–'')'
+          line2: =[[[['Heizung', items[props.heatpumpClimateControlPower].state], ['Warmwasser', items[props.heatpumpDhwPower].state],
+            ['Automatik', items[props.heatpumpManagement].state]].filter(s => s[1] === 'ON').map(s => s[0]), ' an'], [[['Heizung',
+            items[props.heatpumpClimateControlPower].state], ['Warmwasser', items[props.heatpumpDhwPower].state], ['Automatik',
+            items[props.heatpumpManagement].state]].filter(s => s[1] === 'OFF').map(s => s[0]), ' aus']].filter(g => g[0].length).map(g
+            => g[0].join(', ') + g[1]).join(' · ')
           color: '#fb8c00'
           active: =(Number(items[props.heatpumpPower].numericState) || 0) > 50
           var: controlsHeatpump
@@ -117,13 +124,41 @@ slots:
                 display: flex
                 flex-direction: column
                 gap: 6px
+                padding: 4px 0 0
             slots:
               default:
-              - component: Label
+              - component: div
                 config:
-                  text: Smart Grid
                   style:
-                    font-size: 13px
+                    display: flex
+                    align-items: center
+                    gap: 8px
+                slots:
+                  default:
+                  - component: div
+                    config:
+                      style:
+                        width: 26px
+                        height: 26px
+                        flex: 0 0 auto
+                        border-radius: 50%
+                        background: 'color-mix(in srgb, #fb8c00 20%, transparent)'
+                        display: flex
+                        align-items: center
+                        justify-content: center
+                    slots:
+                      default:
+                      - component: oh-icon
+                        config:
+                          icon: material:power
+                          width: 15
+                          height: 15
+                  - component: Label
+                    config:
+                      text: Smart Grid
+                      style:
+                        font-size: 13px
+                        line-height: 16px
               - component: widget:state-bar
                 config:
                   item: =props.heatpumpSmartGrid
@@ -136,20 +171,47 @@ slots:
                 display: flex
                 flex-direction: column
                 gap: 6px
+                padding: 4px 0 0
             slots:
               default:
-              - component: Label
+              - component: div
                 config:
-                  text: Betrieb
                   style:
-                    font-size: 13px
+                    display: flex
+                    align-items: center
+                    gap: 8px
+                slots:
+                  default:
+                  - component: div
+                    config:
+                      style:
+                        width: 26px
+                        height: 26px
+                        flex: 0 0 auto
+                        border-radius: 50%
+                        background: 'color-mix(in srgb, #fb8c00 20%, transparent)'
+                        display: flex
+                        align-items: center
+                        justify-content: center
+                    slots:
+                      default:
+                      - component: oh-icon
+                        config:
+                          icon: material:toggle_on
+                          width: 15
+                          height: 15
+                  - component: Label
+                    config:
+                      text: Betrieb
+                      style:
+                        font-size: 13px
+                        line-height: 16px
               - component: div
                 config:
                   style:
                     display: grid
-                    grid-template-columns: repeat(3, minmax(0, 1fr))
+                    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr))
                     gap: 6px
-                    padding: 6px 2px
                 slots:
                   default:
                   - component: widget:pill-switch
@@ -157,16 +219,19 @@ slots:
                       item: =props.heatpumpClimateControlPower
                       title: Heizung
                       color: '#fb8c00'
+                      icon: material:local_fire_department
                   - component: widget:pill-switch
                     config:
                       item: =props.heatpumpDhwPower
-                      title: Wasser
+                      title: Warmwasser
                       color: '#fb8c00'
+                      icon: material:shower
                   - component: widget:pill-switch
                     config:
-                      item: =props.heatpumpDhwManagement
-                      title: WW-Auto
+                      item: =props.heatpumpManagement
+                      title: Automatik
                       color: '#fb8c00'
+                      icon: material:auto_mode
           - component: widget:pill-slider
             config:
               item: =props.heatpumpDhwTempHeating

@@ -14,6 +14,12 @@ props:
     description: Name of the switch, in the pill
     type: TEXT
     required: true
+  - name: icon
+    label: Icon
+    description: Icon on the knob, of what it switches, e.g. material:shower
+    type: TEXT
+    required: false
+    default: material:power_settings_new
   - name: color
     label: Colour
     description: 'The card''s colour as #rrggbb, of the pill while on'
@@ -21,7 +27,7 @@ props:
     required: false
     default: '#78909c'
   parameterGroups: []
-timestamp: Sep 27, 2026, 8:52:40 PM
+timestamp: Sep 27, 2026, 11:33:43 PM
 component: div
 config:
   style:
@@ -71,7 +77,7 @@ slots:
       default:
       - component: oh-icon
         config:
-          icon: material:power_settings_new
+          icon: =props.icon || 'material:power_settings_new'
           width: 16
           height: 16
   - component: oh-link
