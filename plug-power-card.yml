@@ -16,7 +16,7 @@ props:
     required: false
     default: '#8d6e63'
   parameterGroups: []
-timestamp: Sep 27, 2026, 2:17:48 AM
+timestamp: Sep 27, 2026, 3:01:48 AM
 component: oh-card
 config:
   title: Leistung heute

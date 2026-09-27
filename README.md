@@ -1,7 +1,7 @@
 # openHAB Widgets
 
 MainUI widgets from my openHAB 5 installation: the cards of an energy and home dashboard, and a set of cards for every
-metered plug, and a popup for any item. The UI texts are German, numbers use a decimal comma. No widget names an item: every item comes in as a
+metered plug, a popup for any item, and the tile their values stand in. The UI texts are German, numbers use a decimal comma. No widget names an item: every item comes in as a
 prop, so the widgets work with any item names.
 
 ![Overview](screenshots/overview-light.png)
@@ -103,6 +103,40 @@ actionModalConfig:
 | `color` | Colour of the course as #rrggbb | TEXT | `#5c6bc0` |
 | `kind` | number: its course as a line; state: a band of its states; none: only the value | TEXT | `number` |
 | `states` | value=label pairs, comma-separated, for the band of states | TEXT |  |
+
+## Value tile: `value-tile`
+
+The tile every value of my popups, device pages, plug cards and heat pump card stands in: a title, the value, and a
+large pale icon in the lower right corner, behind them. Pass the value as an expression; it is evaluated where the
+tile is placed. With `item` a tap opens the item popup. The tile's lengths are em of its font size, 14 px unless
+`fontSize` sets another, so `fontSize: 1.1em` makes it a tenth larger and lets it grow with a card that scales its
+font. `wrap` lets a long text wrap across the whole row of a grid.
+
+```yaml
+component: widget:value-tile
+config:
+  title: Vorlauf
+  value: =items.espaltherma_leaving_water_temp_after_buh.displayState
+  icon: material:thermostat
+  color: "#e57373"
+  item: espaltherma_leaving_water_temp_after_buh
+```
+
+![Value tiles](screenshots/value-tiles.png)
+
+| Prop | Description | Type | Default |
+|---|---|---|---|
+| `title` | Title above the value | TEXT |  |
+| `value` | The text to show, usually an expression on an item | TEXT |  |
+| `icon` | The pale icon, e.g. material:thermostat | TEXT | `material:info` |
+| `color` | Colour of the value and the icon as #rrggbb; empty: the text colour | TEXT |  |
+| `iconColor` | Colour of the icon where the value keeps the text colour, as #rrggbb | TEXT |  |
+| `item` | The item whose popup a tap opens; empty: no tap | Item |  |
+| `action` | popup: the item popup (widget item-popup); options: the item's command options | TEXT | `popup` |
+| `kind` | What the item popup shows: number, state or none | TEXT | `number` |
+| `states` | value=label pairs, comma-separated, for the item popup's band of states | TEXT |  |
+| `wrap` | A long text wraps across the whole row of the grid instead of being cut | BOOLEAN |  |
+| `fontSize` | The tile's base size, e.g. 1.1em to grow with its card; default 14px | TEXT |  |
 
 ## Dashboard cards
 
