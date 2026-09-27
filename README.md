@@ -142,7 +142,8 @@ config:
 ## Slider: `pill-slider`
 
 A setting as a wide pill slider in the device colour, for setpoints, offsets, powers and timers: a gradient fills the
-bar up to the value, the white knob stays inside the bar at both ends, and the value is sent once on release. Above the
+bar up to the value, the white knob stays inside the bar at both ends, and the value is sent once on release. Only the
+knob can be dragged, so scrolling across a slider on a phone leaves it alone. Above the
 bar an icon in a tinted circle (for a timer, `ring: true`, a ring around a timer icon that empties as the item runs
 down to 0), the title with a line of context and the value large on the right; `marks` puts labels below the bar.
 `value` and `context` are expressions, evaluated where the slider is placed. The slider is only built once the item
