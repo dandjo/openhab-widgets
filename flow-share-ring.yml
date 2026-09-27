@@ -1,0 +1,94 @@
+uid: flow-share-ring
+tags:
+- flow
+props:
+  parameters:
+  - name: x
+    label: x
+    description: Centre's x in the flow's viewBox
+    type: DECIMAL
+    required: true
+  - name: y
+    label: y
+    description: Centre's y in the flow's viewBox
+    type: DECIMAL
+    required: true
+  - name: title
+    label: Title
+    description: Text beside the ring, e.g. Eigenverbrauch
+    type: TEXT
+    required: true
+  - name: part
+    label: Part
+    description: The part, e.g. today's PV energy used at home; usually an expression
+    type: TEXT
+    required: true
+  - name: whole
+    label: Whole
+    description: The whole, e.g. today's PV energy; usually an expression
+    type: TEXT
+    required: true
+  parameterGroups: []
+timestamp: Sep 27, 2026, 9:44:33 PM
+component: g
+config:
+  transform: ='translate(' + props.x + ' ' + props.y + ')'
+slots:
+  default:
+  - component: g
+    config: {}
+    slots:
+      default:
+      - component: circle
+        config:
+          cx: 0
+          cy: 0
+          r: 22
+          stroke: '#9e9e9e'
+          stroke-width: 5
+          stroke-linecap: round
+          fill: none
+          stroke-opacity: '0.25'
+      - component: circle
+        config:
+          cx: 0
+          cy: 0
+          r: 22
+          transform: rotate(-90 0 0)
+          stroke: '#43a047'
+          stroke-width: 5
+          stroke-linecap: round
+          fill: none
+          stroke-dasharray: '=(138.23 * (Number(props.whole) > 0 ? Math.min(100, Math.round(100 * Number(props.part) / Number(props.whole)))
+            : 0) / 100).toFixed(1) + '' 138.23'''
+      - component: text
+        config:
+          x: 0
+          y: 5
+          content: '=(Number(props.whole) > 0 ? Math.min(100, Math.round(100 * Number(props.part) / Number(props.whole)))
+            : 0) + ''%'''
+          fill: currentColor
+          font-size: 13
+          font-weight: '700'
+          text-anchor: middle
+          opacity: '1'
+      - component: text
+        config:
+          x: 32
+          y: -2
+          content: =props.title
+          fill: currentColor
+          font-size: 12
+          font-weight: normal
+          text-anchor: start
+          opacity: '0.7'
+      - component: text
+        config:
+          x: 32
+          y: 14
+          content: heute
+          fill: currentColor
+          font-size: 11
+          font-weight: normal
+          text-anchor: start
+          opacity: '0.5'

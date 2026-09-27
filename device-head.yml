@@ -1,0 +1,190 @@
+uid: device-head
+tags:
+- controls
+props:
+  parameters:
+  - name: icon
+    label: Icon
+    description: The device's icon
+    type: TEXT
+    required: true
+  - name: title
+    label: Title
+    description: The device's name
+    type: TEXT
+    required: true
+  - name: line1
+    label: Line 1
+    description: First line of state; usually an expression
+    type: TEXT
+    required: false
+  - name: line2
+    label: Line 2
+    description: Second line of state; usually an expression
+    type: TEXT
+    required: false
+  - name: color
+    label: Colour
+    description: 'Device colour as #rrggbb'
+    type: TEXT
+    required: false
+    default: '#78909c'
+  - name: active
+    label: Active
+    description: Whether the device runs, which tints its icon; usually an expression
+    type: BOOLEAN
+    required: false
+  - name: var
+    label: Variable
+    description: The variable that folds the device's details in and out; declare it in an oh-context around the head and
+      the details
+    type: TEXT
+    required: true
+  - name: action
+    label: Main action
+    description: switch (a switch pill), button (a boost button), bar (a segmented bar) or empty
+    type: TEXT
+    required: false
+  - name: actionItem
+    label: Action item
+    description: The item of the main action
+    type: TEXT
+    required: false
+    context: item
+  - name: actionTitle
+    label: Action title
+    description: The switch pill's or button's text
+    type: TEXT
+    required: false
+  - name: actionOptions
+    label: Action options
+    description: The bar's value=label pairs separated by semicolons
+    type: TEXT
+    required: false
+  parameterGroups: []
+timestamp: Sep 27, 2026, 9:44:33 PM
+component: div
+config:
+  style:
+    --head-color: =props.color || '#78909c'
+    position: relative
+    display: flex
+    align-items: center
+    gap: 10px
+slots:
+  default:
+  - component: div
+    config:
+      style:
+        width: 44px
+        height: 44px
+        flex: 0 0 auto
+        border-radius: 50%
+        display: flex
+        align-items: center
+        justify-content: center
+        background: '=props.active ? ''color-mix(in srgb, var(--head-color) 25%, transparent)'' : ''rgba(127, 127, 127, 0.12)'''
+    slots:
+      default:
+      - component: oh-icon
+        config:
+          icon: =props.icon
+          width: 26
+          height: 26
+  - component: div
+    config:
+      style:
+        flex: '1'
+        min-width: '0'
+        display: flex
+        flex-direction: column
+        gap: 2px
+    slots:
+      default:
+      - component: div
+        config:
+          style:
+            display: flex
+            align-items: center
+            gap: 8px
+        slots:
+          default:
+          - component: Label
+            config:
+              text: =props.title
+              style:
+                flex: '1'
+                min-width: '0'
+                font-size: 15px
+                font-weight: '600'
+                white-space: nowrap
+                overflow: hidden
+                text-overflow: ellipsis
+          - component: oh-icon
+            config:
+              icon: f7:chevron_down
+              width: 16
+              height: 16
+              style:
+                flex: 0 0 auto
+                transition: transform 0.25s ease
+                transform: '=(!!vars[props.var]) ? ''rotate(180deg)'' : ''none'''
+                opacity: '0.6'
+          - component: div
+            config:
+              style:
+                flex: 0 0 104px
+                position: relative
+                z-index: '2'
+              visible: =!!props.action
+            slots:
+              default:
+              - component: widget:pill-switch
+                config:
+                  item: =props.actionItem
+                  title: =props.actionTitle
+                  color: =props.color
+                  visible: =props.action === 'switch'
+              - component: widget:boost-button
+                config:
+                  item: =props.actionItem
+                  title: =props.actionTitle
+                  color: =props.color
+                  visible: =props.action === 'button'
+              - component: widget:state-bar
+                config:
+                  item: =props.actionItem
+                  options: =props.actionOptions
+                  color: =props.color
+                  visible: =props.action === 'bar'
+      - component: Label
+        config:
+          text: =props.line1 || ''
+          style:
+            font-size: 12px
+            opacity: '0.7'
+            line-height: 16px
+            white-space: nowrap
+            overflow: hidden
+            text-overflow: ellipsis
+      - component: Label
+        config:
+          text: =props.line2 || ''
+          style:
+            font-size: 12px
+            opacity: '0.7'
+            line-height: 16px
+            white-space: nowrap
+            overflow: hidden
+            text-overflow: ellipsis
+  - component: oh-link
+    config:
+      action: variable
+      actionVariable: =props.var
+      actionVariableValue: =!(!!vars[props.var])
+      style:
+        position: absolute
+        inset: '0'
+        display: block
+        border-radius: 10px
+        z-index: '1'

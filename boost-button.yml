@@ -1,0 +1,61 @@
+uid: boost-button
+tags:
+- switch
+props:
+  parameters:
+  - name: item
+    label: Item
+    description: The switch item
+    type: TEXT
+    required: true
+    context: item
+  - name: title
+    label: Title
+    description: The button's text
+    type: TEXT
+    required: false
+    default: Boost
+  - name: color
+    label: Colour
+    description: 'Device colour as #rrggbb'
+    type: TEXT
+    required: false
+    default: '#fb8c00'
+  parameterGroups: []
+timestamp: Sep 27, 2026, 9:44:33 PM
+component: div
+config:
+  style:
+    --boost-color: =props.color || '#fb8c00'
+    position: relative
+    display: flex
+    align-items: center
+    justify-content: center
+    height: 34px
+    box-sizing: border-box
+    border-radius: 17px
+    border: '=items[props.item].state === ''ON'' ? ''1.5px solid transparent'' : ''1.5px solid var(--boost-color)'''
+    background: '=items[props.item].state === ''ON'' ? ''linear-gradient(135deg, var(--boost-color), color-mix(in srgb, var(--boost-color)
+      75%, transparent))'' : ''transparent'''
+    transition: background 0.3s ease
+slots:
+  default:
+  - component: Label
+    config:
+      text: =props.title || 'Boost'
+      style:
+        font-size: 13px
+        font-weight: '700'
+        white-space: nowrap
+        color: '=items[props.item].state === ''ON'' ? ''#ffffff'' : ''var(--boost-color)'''
+  - component: oh-link
+    config:
+      action: toggle
+      actionItem: =props.item
+      actionCommand: 'ON'
+      actionCommandAlt: 'OFF'
+      style:
+        position: absolute
+        inset: '0'
+        display: block
+        border-radius: 17px

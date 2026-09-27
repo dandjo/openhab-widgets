@@ -1,0 +1,96 @@
+uid: switch-tile
+tags:
+- switch
+props:
+  parameters:
+  - name: item
+    label: Item
+    description: The switch item
+    type: TEXT
+    required: true
+    context: item
+  - name: title
+    label: Title
+    description: Name of the plug or device
+    type: TEXT
+    required: true
+  - name: icon
+    label: Icon
+    description: Icon, e.g. material:coffee (its state follows the item)
+    type: TEXT
+    required: false
+  - name: color
+    label: Colour
+    description: 'Colour of the tile while on as #rrggbb'
+    type: TEXT
+    required: false
+    default: '#78909c'
+  - name: value
+    label: Value
+    description: A line under the name, e.g. the power; usually an expression
+    type: TEXT
+    required: false
+  parameterGroups: []
+timestamp: Sep 27, 2026, 9:44:33 PM
+component: div
+config:
+  style:
+    --tile-color: =props.color || '#78909c'
+    position: relative
+    padding: 10px 12px
+    border-radius: 14px
+    min-width: '0'
+    background: '=items[props.item].state === ''ON'' ? ''color-mix(in srgb, var(--tile-color) 20%, transparent)'' : ''rgba(127,
+      127, 127, 0.08)'''
+    box-shadow: '=items[props.item].state === ''ON'' ? ''inset 0 0 0 1.5px color-mix(in srgb, var(--tile-color) 60%, transparent)''
+      : ''none'''
+slots:
+  default:
+  - component: div
+    config:
+      style:
+        display: flex
+        justify-content: space-between
+        align-items: flex-start
+    slots:
+      default:
+      - component: oh-icon
+        config:
+          icon: =props.icon
+          state: =items[props.item].state
+          width: 26
+          height: 26
+      - component: Label
+        config:
+          text: '=items[props.item].state === ''ON'' ? ''An'' : ''Aus'''
+          style:
+            font-size: 11px
+            font-weight: '700'
+            opacity: '0.7'
+  - component: Label
+    config:
+      text: =props.title
+      style:
+        font-size: 13px
+        font-weight: '600'
+        margin-top: 6px
+        white-space: nowrap
+        overflow: hidden
+        text-overflow: ellipsis
+  - component: Label
+    config:
+      text: =props.value || ''
+      style:
+        font-size: 12px
+        opacity: '0.7'
+  - component: oh-link
+    config:
+      action: toggle
+      actionItem: =props.item
+      actionCommand: 'ON'
+      actionCommandAlt: 'OFF'
+      style:
+        position: absolute
+        inset: '0'
+        display: block
+        border-radius: 14px
