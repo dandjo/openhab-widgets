@@ -288,7 +288,7 @@ Needs `flow-node`, `item-popup`, `value-tile`.
 ### Consumption today: `consumption-card`
 
 Today's consumption as one bar split by source (PV, grid) and by consumer, with a legend in two columns; hovering a part
-lifts it everywhere.
+lifts it everywhere. The screenshot shows it with demo values.
 
 ![Consumption today](screenshots/consumption-card.png)
 
