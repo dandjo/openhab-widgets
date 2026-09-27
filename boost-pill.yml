@@ -17,7 +17,7 @@ props:
     default: Boost
   - name: icon
     label: Icon
-    description: Icon, e.g. oh:siren (its state follows the item)
+    description: Icon, e.g. material:rocket_launch; a classic openHAB icon follows the item's state
     type: TEXT
     required: false
     default: material:bolt
@@ -34,7 +34,7 @@ props:
     required: false
     default: läuft
   parameterGroups: []
-timestamp: Sep 27, 2026, 9:44:33 PM
+timestamp: Sep 27, 2026, 11:33:43 PM
 component: div
 config:
   style:

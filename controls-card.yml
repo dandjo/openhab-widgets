@@ -33,9 +33,9 @@ props:
     type: TEXT
     required: true
     context: item
-  - name: heatpumpDhwManagement
-    label: Wärmepumpe Warmwasser-Automatik
-    description: Switch item
+  - name: heatpumpManagement
+    label: Wärmepumpe Automatik
+    description: Group item
     type: TEXT
     required: true
     context: item
@@ -48,6 +48,12 @@ props:
   - name: heatpumpDhwTempHeating
     label: Pyaltherma Warmwasser Solltemperatur
     description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpDhwManagement
+    label: Wärmepumpe Warmwasser-Automatik
+    description: Switch item
     type: TEXT
     required: true
     context: item
@@ -196,7 +202,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Sep 27, 2026, 9:44:33 PM
+timestamp: Sep 27, 2026, 11:33:43 PM
 component: oh-card
 config:
   title: Steuerung
@@ -217,9 +223,10 @@ slots:
           heatpumpDhwTankTemp: =props.heatpumpDhwTankTemp
           heatpumpClimateControlPower: =props.heatpumpClimateControlPower
           heatpumpDhwPower: =props.heatpumpDhwPower
-          heatpumpDhwManagement: =props.heatpumpDhwManagement
+          heatpumpManagement: =props.heatpumpManagement
           heatpumpSmartGrid: =props.heatpumpSmartGrid
           heatpumpDhwTempHeating: =props.heatpumpDhwTempHeating
+          heatpumpDhwManagement: =props.heatpumpDhwManagement
           heatpumpLeavingWaterTempOffsetHeating: =props.heatpumpLeavingWaterTempOffsetHeating
           heatpumpLeavingWaterSetpoint: =props.heatpumpLeavingWaterSetpoint
       - component: widget:air-conditioner-controls

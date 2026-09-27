@@ -46,7 +46,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Sep 27, 2026, 9:44:33 PM
+timestamp: Sep 27, 2026, 11:33:43 PM
 component: oh-context
 config:
   variables:
@@ -95,43 +95,101 @@ slots:
           visible: =!!vars.controlsAirConditioning
         slots:
           default:
-          - component: widget:state-bar
-            config:
-              item: =props.acMode
-              options: A=Auto;H=Heizen;C=Kühlen;D=Entfeuchten;F=Lüften
-              color: '=items[props.acSwitch].state === ''ON'' ? ''#29b6f6'' : ''#90a4ae'''
-              byText: true
-              flex: 1 1 100%
           - component: div
             config:
               style:
                 display: flex
-                flex-wrap: wrap
-                align-items: center
-                gap: 6px 10px
+                flex-direction: column
+                gap: 6px
+                padding: 4px 0 0
+            slots:
+              default:
+              - component: div
+                config:
+                  style:
+                    display: flex
+                    align-items: center
+                    gap: 8px
+                slots:
+                  default:
+                  - component: div
+                    config:
+                      style:
+                        width: 26px
+                        height: 26px
+                        flex: 0 0 auto
+                        border-radius: 50%
+                        background: 'color-mix(in srgb, #29b6f6 20%, transparent)'
+                        display: flex
+                        align-items: center
+                        justify-content: center
+                    slots:
+                      default:
+                      - component: oh-icon
+                        config:
+                          icon: material:thermostat_auto
+                          width: 15
+                          height: 15
+                  - component: Label
+                    config:
+                      text: Modus
+                      style:
+                        font-size: 13px
+                        line-height: 16px
+              - component: widget:state-bar
+                config:
+                  item: =props.acMode
+                  options: A=Auto;H=Heizen;C=Kühlen;D=Entfeuchten;F=Lüften
+                  color: '=items[props.acSwitch].state === ''ON'' ? ''#29b6f6'' : ''#90a4ae'''
+                  byText: true
+                  flex: 1 1 100%
+          - component: div
+            config:
+              style:
+                display: flex
+                flex-direction: column
+                gap: 6px
+                padding: 4px 0 0
                 opacity: '=items[props.acSwitch].state === ''ON'' ? ''1'' : ''0.6'''
             slots:
               default:
-              - component: Label
+              - component: div
                 config:
-                  text: Lüfter
                   style:
-                    font-size: 13px
-                    min-width: 60px
+                    display: flex
+                    align-items: center
+                    gap: 8px
+                slots:
+                  default:
+                  - component: div
+                    config:
+                      style:
+                        width: 26px
+                        height: 26px
+                        flex: 0 0 auto
+                        border-radius: 50%
+                        background: 'color-mix(in srgb, #29b6f6 20%, transparent)'
+                        display: flex
+                        align-items: center
+                        justify-content: center
+                    slots:
+                      default:
+                      - component: oh-icon
+                        config:
+                          icon: material:air
+                          width: 15
+                          height: 15
+                  - component: Label
+                    config:
+                      text: Lüfter
+                      style:
+                        font-size: 13px
+                        line-height: 16px
               - component: widget:state-bar
                 config:
                   item: =props.acFan
                   options: Q=Leise;A=Auto;1=1;2=2;3=3;4=4;5=5
                   color: '=items[props.acSwitch].state === ''ON'' ? ''#29b6f6'' : ''#90a4ae'''
-                  flex: 1 1 240px
-                  width: auto
-          - component: widget:boost-pill
-            config:
-              item: =props.acPowerful
-              icon: material:whatshot
-              color: '#29b6f6'
-              title: Boost
-              running: ='volle Leistung'
           - component: widget:pill-slider
             config:
               item: =props.acTemperatureSetpoint
@@ -149,6 +207,13 @@ slots:
               marks: 18=18 °C;20=20;22=22;24=24;26=26;28=28;30=30;32=32 °C
               icon: material:device_thermostat
               opacity: '=items[props.acSwitch].state === ''ON'' ? ''1'' : ''0.6'''
+          - component: widget:boost-pill
+            config:
+              item: =props.acPowerful
+              icon: material:rocket_launch
+              color: '#29b6f6'
+              title: Boost
+              running: ='volle Leistung'
           - component: widget:pill-slider
             config:
               item: =props.acTimer

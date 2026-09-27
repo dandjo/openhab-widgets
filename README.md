@@ -77,11 +77,13 @@ not part of this repository.
 ### Controls: `controls-card`
 
 Heat pump, air conditioner and ventilation, each folded to a head of three lines with its main action on the right: a
-Boost button for the heat pump's hot water, the air conditioner's on/off pill, the ventilation levels 1 to 3. A tap on a
-head folds out its details: Smart Grid, the heating, hot water and hot-water automation pills and sliders for the DHW
-setpoint and the leaving water offset; mode, fan, boost, setpoint and timer (usable while the unit is off); the
-ventilation timer. Below them tiles that toggle plugs and show their power. The three devices are the widgets
-`heatpump-controls`, `air-conditioner-controls` and `ventilation-controls`, the tiles `switch-tile`.
+Boost button for the heat pump's hot water, the air conditioner's on/off pill, the ventilation levels 1 to 3; the heat
+pump's second line names which of its switches are on and which off. A tap on a head folds out its details, each group
+under its icon and title: Smart Grid, Betrieb (the switch pills Heizung, Warmwasser and Automatik, each with the icon of
+what it switches, three abreast where there is room and two and one on a phone) and sliders for the DHW setpoint and the
+leaving water offset; mode, fan, setpoint, boost and timer (usable while the unit is off); the ventilation timer. Below
+them tiles that toggle plugs and show their power. The three devices are the widgets `heatpump-controls`,
+`air-conditioner-controls` and `ventilation-controls`, the tiles `switch-tile`.
 
 Needs `air-conditioner-controls`, `boost-button`, `boost-pill`, `device-head`, `heatpump-controls`, `pill-slider`,
 `pill-switch`, `state-bar`, `switch-tile`, `ventilation-controls`.
@@ -93,7 +95,7 @@ Needs `air-conditioner-controls`, `boost-button`, `boost-pill`, `device-head`, `
 ![Controls in dark mode](screenshots/controls-card-dark.png)
 
 <details>
-<summary>32 props</summary>
+<summary>33 props</summary>
 
 | Prop | Item | Item type |
 |---|---|---|
@@ -102,9 +104,10 @@ Needs `air-conditioner-controls`, `boost-button`, `boost-pill`, `device-head`, `
 | `heatpumpDhwTankTemp` | ESPAltherma Warmwasserspeicher Temperatur | Number:Temperature |
 | `heatpumpClimateControlPower` | Pyaltherma Heizung Ein/Aus | Switch |
 | `heatpumpDhwPower` | Pyaltherma Warmwasser Ein/Aus | Switch |
-| `heatpumpDhwManagement` | Wärmepumpe Warmwasser-Automatik | Switch |
+| `heatpumpManagement` | Wärmepumpe Automatik | Group |
 | `heatpumpSmartGrid` | ESPAltherma Smart Grid | String |
 | `heatpumpDhwTempHeating` | Pyaltherma Warmwasser Solltemperatur | Number:Temperature |
+| `heatpumpDhwManagement` | Wärmepumpe Warmwasser-Automatik | Switch |
 | `heatpumpLeavingWaterTempOffsetHeating` | Pyaltherma Vorlauf-Offset Heizen | Number:Temperature |
 | `heatpumpLeavingWaterSetpoint` | ESPAltherma Vorlauf Sollwert | Number:Temperature |
 | `acSwitch` | Faikout Perfera Schalter | Switch |
@@ -379,12 +382,13 @@ widgets placed inside it.
 
 The three devices of the controls card, each a widget of its own that takes its items as props:
 
-- `heatpump-controls`, the heat pump: storage temperature, power and the three switches in its head, Boost as its main
-  action; folded out Smart Grid (`state-bar`), the switch pills (`pill-switch`) and the sliders for DHW setpoint and
-  leaving water offset (`pill-slider`).
+- `heatpump-controls`, the heat pump: storage temperature and power in its head, and which of its three switches are on
+  (Warmwasser, Automatik an · Heizung aus), Boost as its main action; folded out Smart Grid (`state-bar`), Betrieb
+  (`pill-switch`: Heizung, Warmwasser, and Automatik, which switches a group of the heat pump's automations) and the
+  sliders for DHW setpoint and leaving water offset (`pill-slider`).
 - `air-conditioner-controls`, the air conditioner: state, mode, setpoint, room temperature and timer in its head, on/off
-  as its main action; folded out mode and fan (`state-bar`), boost (`boost-pill`) and the sliders for setpoint and
-  timer, faded while the unit is off but usable.
+  as its main action; folded out mode and fan (`state-bar`), setpoint, boost (`boost-pill`) and timer, in the order of
+  its popup, faded while the unit is off but usable.
 - `ventilation-controls`, the ventilation: level, power, CO₂ and what the automation does in its head, the levels 1 to 3
   as its main action; folded out the timer slider. It always runs, so its panel is always tinted.
 
@@ -401,7 +405,7 @@ Each panel is tinted in its device's colour while the device runs; place them on
 `ventilation-controls` needs `boost-button`, `device-head`, `pill-slider`, `pill-switch`, `state-bar`.
 
 <details>
-<summary><code>heatpump-controls</code>: 10 props</summary>
+<summary><code>heatpump-controls</code>: 11 props</summary>
 
 | Prop | Item | Item type |
 |---|---|---|
@@ -410,9 +414,10 @@ Each panel is tinted in its device's colour while the device runs; place them on
 | `heatpumpDhwTankTemp` | ESPAltherma Warmwasserspeicher Temperatur | Number:Temperature |
 | `heatpumpClimateControlPower` | Pyaltherma Heizung Ein/Aus | Switch |
 | `heatpumpDhwPower` | Pyaltherma Warmwasser Ein/Aus | Switch |
-| `heatpumpDhwManagement` | Wärmepumpe Warmwasser-Automatik | Switch |
+| `heatpumpManagement` | Wärmepumpe Automatik | Group |
 | `heatpumpSmartGrid` | ESPAltherma Smart Grid | String |
 | `heatpumpDhwTempHeating` | Pyaltherma Warmwasser Solltemperatur | Number:Temperature |
+| `heatpumpDhwManagement` | Wärmepumpe Warmwasser-Automatik | Switch |
 | `heatpumpLeavingWaterTempOffsetHeating` | Pyaltherma Vorlauf-Offset Heizen | Number:Temperature |
 | `heatpumpLeavingWaterSetpoint` | ESPAltherma Vorlauf Sollwert | Number:Temperature |
 
@@ -567,7 +572,7 @@ A device's on and off as a wide pill: a white knob with the power symbol slides 
 device colour while on, with `onText` in it (an expression, e.g. the mode it runs in); a tap anywhere switches. The plug
 cards and the device pages switch with it.
 
-![On/off pill, boost pills and boost button](screenshots/power-and-boost-pills.png)
+![On/off pill](screenshots/power-pill.png)
 
 ```yaml
 component: widget:power-pill
@@ -586,15 +591,18 @@ config:
 ### Boost pill: `boost-pill`
 
 A boost that runs for a while, as a pill: its icon in a tinted circle, the name, what it does while it runs (`running`,
-an expression) or *Aus*, and *Starten* or *Stoppen*; while it runs the pill fills with a gradient of the device colour.
-A tap anywhere switches the item.
+an expression) or *Aus*, and *Starten* or *Stoppen*; while it runs the pill fills with a gradient of the device colour
+and rings pulse from the icon. A tap anywhere switches the item. My heat pump's hot-water boost and my air conditioner's
+boost both carry a rocket.
+
+![Boost pills](screenshots/boost-pills.png)
 
 ```yaml
 component: widget:boost-pill
 config:
   item: pyaltherma_dhw_powerful
   title: Warmwasser-Boost
-  icon: oh:siren
+  icon: material:rocket_launch
   color: "#fb8c00"
   running: ="läuft · Speicher " + items.espaltherma_dhw_tank_temp.displayState
 ```
@@ -603,7 +611,7 @@ config:
 |---|---|---|---|
 | `item` | The switch item | Item |  |
 | `title` | Name of the boost | TEXT | `Boost` |
-| `icon` | Icon, e.g. oh:siren (its state follows the item) | TEXT | `material:bolt` |
+| `icon` | Icon, e.g. material:rocket_launch; a classic openHAB icon follows the item's state | TEXT | `material:bolt` |
 | `color` | Device colour as #rrggbb | TEXT | `#fb8c00` |
 | `running` | The line under the title while the boost runs; usually an expression | TEXT | `läuft` |
 
@@ -674,16 +682,19 @@ config:
 
 ### Switch pill: `pill-switch`
 
-A switch for switches that stand side by side: a pill 34 px high in which a white knob with the power symbol slides
-to the right while the pill fills with the card's colour, the name in the part the knob leaves free. Every pill has
-the same sizes; put several in a grid and keep the names short where the pills are narrow. A tap anywhere on the pill
-switches the item.
+A switch for switches that stand side by side: a pill 34 px high in which a white knob with the icon of what it
+switches (`icon`; the power symbol without one) slides to the right while the pill fills with the card's colour, the
+name in the part the knob leaves free. Every pill has the same sizes and 12 px text. Put several in a grid that places
+as many as fit, e.g. `grid-template-columns: repeat(auto-fit, minmax(120px, 1fr))`, which holds a name such as
+*Warmwasser* and lets three pills stand abreast where there is room and two and one on a phone. A tap anywhere on the
+pill switches the item.
 
 ```yaml
 component: widget:pill-switch
 config:
   item: pyaltherma_climate_control_power
   title: Heizung
+  icon: material:local_fire_department
   color: "#fb8c00"
 ```
 
@@ -693,6 +704,7 @@ config:
 |---|---|---|---|
 | `item` | The switch item | Item |  |
 | `title` | Name of the switch, in the pill | TEXT |  |
+| `icon` | Icon on the knob, of what it switches, e.g. material:shower | TEXT | `material:power_settings_new` |
 | `color` | The card's colour as #rrggbb, of the pill while on | TEXT | `#78909c` |
 
 ### Switch row: `switch-row`
@@ -704,9 +716,9 @@ on the row switches the item.
 ```yaml
 component: widget:switch-row
 config:
-  item: faikout_perfera_streamer_mode
-  title: Streamer
-  icon: material:air
+  item: faikout_perfera_eco_mode
+  title: Eco
+  icon: material:eco
   color: "#29b6f6"
 ```
 
