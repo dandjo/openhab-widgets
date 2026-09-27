@@ -1,0 +1,259 @@
+uid: pill-slider
+tags:
+- slider
+props:
+  parameters:
+  - name: item
+    label: Item
+    description: The number item the slider sets
+    type: TEXT
+    required: true
+    context: item
+  - name: color
+    label: Colour
+    description: 'Device colour as #rrggbb'
+    type: TEXT
+    required: false
+    default: '#78909c'
+  - name: min
+    label: Minimum
+    description: The slider's lowest value
+    type: DECIMAL
+    required: false
+    default: '0'
+  - name: max
+    label: Maximum
+    description: The slider's highest value
+    type: DECIMAL
+    required: false
+    default: '100'
+  - name: step
+    label: Step
+    description: The slider's step
+    type: DECIMAL
+    required: false
+    default: '1'
+  - name: unit
+    label: Unit
+    description: Unit on the label while dragging, e.g. °C
+    type: TEXT
+    required: false
+  - name: title
+    label: Title
+    description: Title above the slider
+    type: TEXT
+    required: true
+  - name: icon
+    label: Icon
+    description: The badge's icon, e.g. material:thermostat
+    type: TEXT
+    required: false
+    default: material:tune
+  - name: ring
+    label: Timer ring
+    description: A ring around a timer icon instead of the icon, emptying as the item runs down to 0
+    type: BOOLEAN
+    required: false
+  - name: value
+    label: Value
+    description: The value to show, usually an expression on the item
+    type: TEXT
+    required: true
+  - name: valueColor
+    label: Value colour
+    description: 'Colour of the value where it is not the device colour; empty: the text colour'
+    type: TEXT
+    required: false
+  - name: context
+    label: Context
+    description: A line under the title saying what the setting does, usually an expression
+    type: TEXT
+    required: false
+  - name: marks
+    label: Marks
+    description: value=label pairs below the bar, separated by semicolons, e.g. 0=0;60=1 h;120=2 h
+    type: TEXT
+    required: false
+  - name: opacity
+    label: Opacity
+    description: e.g. 0.6 while the device is off
+    type: TEXT
+    required: false
+  - name: row
+    label: Row
+    description: A row of a page's or popup's controls, with their divider
+    type: BOOLEAN
+    required: false
+  parameterGroups: []
+timestamp: Sep 27, 2026, 5:39:39 PM
+component: div
+config:
+  stylesheet: ".range-slider { --f7-range-size: 32px; --f7-range-bar-size: 32px; --f7-range-bar-border-radius: 16px;\n  --f7-range-bar-bg-color:\
+    \ color-mix(in srgb, var(--pill-color) 18%, transparent);\n  --f7-range-bar-active-bg-color: var(--pill-color); --f7-range-knob-size:\
+    \ 28px; --f7-range-knob-color: #ffffff;\n  --f7-range-knob-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35); --f7-range-label-bg-color:\
+    \ var(--pill-color);\n  --f7-range-label-text-color: #ffffff; margin: 0; }\n.range-bar-active { background: linear-gradient(90deg,\
+    \ color-mix(in srgb, var(--pill-color) 55%, transparent),\n  var(--pill-color)) !important; }"
+  style:
+    --pill-color: =props.color || '#78909c'
+    display: flex
+    flex-direction: column
+    gap: 6px
+    padding: '=props.row ? ''8px 2px 10px'' : ''4px 0 0'''
+    border-bottom: '=props.row ? ''1px solid rgba(127, 127, 127, 0.15)'' : ''none'''
+    opacity: =props.opacity || '1'
+slots:
+  default:
+  - component: div
+    config:
+      style:
+        display: flex
+        align-items: center
+        gap: 8px
+    slots:
+      default:
+      - component: div
+        config:
+          style:
+            position: relative
+            width: 26px
+            height: 26px
+            flex: 0 0 auto
+            display: flex
+            align-items: center
+            justify-content: center
+          visible: =!!props.ring
+        slots:
+          default:
+          - component: svg
+            config:
+              viewBox: 0 0 26 26
+              width: 26
+              height: 26
+              style:
+                position: absolute
+                inset: '0'
+            slots:
+              default:
+              - component: circle
+                config:
+                  cx: 13
+                  cy: 13
+                  r: 10
+                  fill: none
+                  stroke: =props.color
+                  stroke-width: 3
+                  stroke-opacity: 0.25
+              - component: circle
+                config:
+                  cx: 13
+                  cy: 13
+                  r: 10
+                  fill: none
+                  stroke: =props.color
+                  transform: rotate(-90 13 13)
+                  stroke-width: 3
+                  stroke-linecap: round
+                  stroke-dasharray: =Math.min(1, Math.max(0, Number(items[props.item].numericState)) / Number(props.max))
+                    * 62.83 + ' 62.83'
+                  opacity: '=Number(items[props.item].numericState) > 0 ? 1 : 0'
+          - component: oh-icon
+            config:
+              icon: material:timer
+              width: 14
+              height: 14
+      - component: div
+        config:
+          style:
+            width: 26px
+            height: 26px
+            flex: 0 0 auto
+            border-radius: 50%
+            background: color-mix(in srgb, var(--pill-color) 20%, transparent)
+            display: flex
+            align-items: center
+            justify-content: center
+          visible: =!props.ring
+        slots:
+          default:
+          - component: oh-icon
+            config:
+              icon: =props.icon || 'material:tune'
+              width: 15
+              height: 15
+      - component: div
+        config:
+          style:
+            flex: '1'
+            min-width: '0'
+            display: flex
+            flex-direction: column
+        slots:
+          default:
+          - component: Label
+            config:
+              text: =props.title
+              style:
+                font-size: 13px
+                line-height: 16px
+          - component: Label
+            config:
+              text: =props.context || ''
+              style:
+                font-size: 11px
+                opacity: '0.7'
+                line-height: 14px
+                white-space: nowrap
+                overflow: hidden
+                text-overflow: ellipsis
+      - component: Label
+        config:
+          text: =props.value
+          style:
+            font-size: 15px
+            font-weight: '700'
+            white-space: nowrap
+            color: '=props.valueColor !== undefined ? props.valueColor : props.color'
+  - component: div
+    config:
+      style:
+        min-height: 32px
+    slots:
+      default:
+      - component: oh-slider
+        config:
+          item: =props.item
+          min: =Number(props.min)
+          max: =Number(props.max)
+          step: =Number(props.step)
+          releaseOnly: true
+          label: true
+          unit: =props.unit
+          limitKnobPosition: true
+          visible: =!isNaN(parseFloat(items[props.item].state))
+  - component: div
+    config:
+      style:
+        position: relative
+        height: 13px
+    slots:
+      default:
+      - component: oh-repeater
+        config:
+          for: mark
+          sourceType: array
+          in: =(props.marks || '').split(';')
+          fragment: true
+        slots:
+          default:
+          - component: Label
+            config:
+              text: =loop.mark.split('=')[1]
+              style:
+                position: absolute
+                left: =(Number(loop.mark.split('=')[0]) - Number(props.min)) / (Number(props.max) - Number(props.min)) * 100
+                  + '%'
+                transform: '=loop.mark_idx === 0 ? ''translateX(0)'' : loop.mark_idx === loop.mark_source.length - 1 ? ''translateX(-100%)''
+                  : ''translateX(-50%)'''
+                font-size: 10px
+                opacity: '0.55'
+                white-space: nowrap
