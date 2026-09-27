@@ -16,7 +16,7 @@ props:
     required: false
     default: Elektrisch
   parameterGroups: []
-timestamp: Sep 27, 2026, 6:06:13 PM
+timestamp: Sep 27, 2026, 7:07:59 PM
 component: oh-card
 config:
   title: =props.title

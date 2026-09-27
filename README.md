@@ -1,7 +1,8 @@
 # openHAB Widgets
 
 MainUI widgets from my openHAB 5 installation: the cards of an energy and home dashboard, and a set of cards for every
-metered plug, a popup for any item, the tile their values stand in, and a slider and a switch row for settings. The UI
+metered plug, a popup for any item, the tile their values stand in, and a slider, a switch pill and a switch row for
+settings. The UI
 texts are German, numbers use a decimal comma. No widget names an item: every item comes in as a
 prop, so the widgets work with any item names.
 
@@ -185,9 +186,32 @@ config:
 | `opacity` | e.g. 0.6 while the device is off | TEXT |  |
 | `row` | A row of a page's or popup's controls, with their divider | BOOLEAN |  |
 
+## Switch pill: `pill-switch`
+
+A switch for switches that stand side by side: a pill 34 px high in which a white knob with the power symbol slides
+to the right while the pill fills with the card's colour, the name in the part the knob leaves free. Every pill has
+the same sizes; put several in a grid and keep the names short where the pills are narrow. A tap anywhere on the pill
+switches the item.
+
+```yaml
+component: widget:pill-switch
+config:
+  item: pyaltherma_climate_control_power
+  title: Heizung
+  color: "#fb8c00"
+```
+
+![Switch pills](screenshots/pill-switches.png)
+
+| Prop | Description | Type | Default |
+|---|---|---|---|
+| `item` | The switch item | Item |  |
+| `title` | Name of the switch, in the pill | TEXT |  |
+| `color` | The card's colour as #rrggbb, of the pill while on | TEXT | `#78909c` |
+
 ## Switch row: `switch-row`
 
-A switch in a row of controls: its icon in a circle tinted in the card's colour while on, the name, *An* or *Aus*, and
+A switch in a list of switches: its icon in a circle tinted in the card's colour while on, the name, *An* or *Aus*, and
 a switch drawn in the card's colour, a track that fills while on and a white knob that slides over. A tap anywhere
 on the row switches the item.
 
@@ -217,22 +241,22 @@ not part of this repository.
 
 ### Controls: `controls-card`
 
-Heat pump panel with Smart Grid mode, a bar that switches hot water, heating and the hot-water automation, a DHW boost action pill and sliders for the DHW setpoint and the leaving water offset; air conditioner panel with an on/off pill, mode, fan, a setpoint slider and a timer slider (mode, fan and sliders stay usable while the unit is off); ventilation level and timer slider; and tiles that toggle plugs and show their power. The sliders are instances of `pill-slider`, which has to be installed too.
+Heat pump panel with Smart Grid mode, three switch pills for heating, hot water and the hot-water automation, a DHW boost action pill and sliders for the DHW setpoint and the leaving water offset; air conditioner panel with an on/off pill, mode, fan, a boost action pill, a setpoint slider and a timer slider (mode, fan and sliders stay usable while the unit is off); ventilation level and timer slider; and tiles that toggle plugs and show their power. The sliders and pills are instances of `pill-slider` and `pill-switch`, which have to be installed too.
 
 ![Controls](screenshots/controls-card.png)
 
 ![Controls in dark mode](screenshots/controls-card-dark.png)
 
 <details>
-<summary>30 props</summary>
+<summary>31 props</summary>
 
 | Prop | Item | Item type |
 |---|---|---|
 | `heatpumpPower` | ESPAltherma Elektrische Leistung | Number:Power |
 | `heatpumpDhwTankTemp` | ESPAltherma Warmwasserspeicher Temperatur | Number:Temperature |
 | `heatpumpSmartGrid` | ESPAltherma Smart Grid | String |
-| `heatpumpDhwPower` | Pyaltherma Warmwasser Ein/Aus | Switch |
 | `heatpumpClimateControlPower` | Pyaltherma Heizung Ein/Aus | Switch |
+| `heatpumpDhwPower` | Pyaltherma Warmwasser Ein/Aus | Switch |
 | `heatpumpDhwManagement` | Wärmepumpe Warmwasser-Automatik | Switch |
 | `heatpumpDhwBoost` | Pyaltherma Warmwasser-Boost | Switch |
 | `heatpumpDhwTempHeating` | Pyaltherma Warmwasser Solltemperatur | Number:Temperature |
@@ -242,6 +266,7 @@ Heat pump panel with Smart Grid mode, a bar that switches hot water, heating and
 | `acTemperature` | Faikout Perfera Temperatur | Number:Temperature |
 | `acMode` | Faikout Perfera Modus | String |
 | `acFan` | Faikout Perfera Lüfter | String |
+| `acPowerful` | Faikout Perfera Powerful | Switch |
 | `acTemperatureSetpoint` | Faikout Perfera Solltemperatur | Number:Temperature |
 | `acTimer` | Klimaanlage Timer | Number:Time |
 | `ventilationPower` | Lüftung Leistung | Number:Power |

@@ -85,7 +85,7 @@ props:
     type: BOOLEAN
     required: false
   parameterGroups: []
-timestamp: Sep 27, 2026, 6:06:13 PM
+timestamp: Sep 27, 2026, 7:07:59 PM
 component: div
 config:
   stylesheet: ".range-slider { --f7-range-size: 32px; --f7-range-bar-size: 32px; --f7-range-bar-border-radius: 16px;\n  --f7-range-bar-bg-color:\
