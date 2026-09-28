@@ -177,12 +177,12 @@ Needs `air-conditioner-controls`, `boost-button`, `boost-pill`, `device-head`, `
 
 ### Energy flow: `energy-flow-card`
 
-A regular star around the house: PV, heat pump, air conditioner, E-Car, battery and grid, each with its power and
-today's energy. Dots run along the lines in the direction of the flow at four speeds and slide under the node rims; the
-icons move with the power (sun rays, fan, air streams, pylon dashes, a pulsing bolt over the charging car, the battery
-filled to its state of charge). Rings for today's self-consumption and self-sufficiency sit in the free corner. The card
-places its lines, nodes and rings as `flow-link`, `flow-node` and `flow-share-ring`. The recording and the dark
-screenshot show it with demo values.
+A regular star around the house: PV, heat pump, air conditioner, E-Car, the household appliances together, battery and
+grid, each with its power and today's energy. Dots run along the lines in the direction of the flow at four speeds and
+slide under the node rims; the icons move with the power (sun rays, fan, air streams, pylon dashes, a pulsing bolt over
+the charging car, a power symbol pulsing while the appliances run, the battery filled to its state of charge). Rings for
+today's self-consumption and self-sufficiency sit in the free corner. The card places its lines, nodes and rings as
+`flow-link`, `flow-node` and `flow-share-ring`. The recording and the dark screenshot show it with demo values.
 
 Needs `flow-link`, `flow-node`, `flow-share-ring`.
 
@@ -191,7 +191,7 @@ Needs `flow-link`, `flow-node`, `flow-share-ring`.
 ![Energy flow in dark mode](screenshots/energy-flow-card-dark.png)
 
 <details>
-<summary>19 props</summary>
+<summary>27 props</summary>
 
 | Prop | Item | Item type |
 |---|---|---|
@@ -201,6 +201,10 @@ Needs `flow-link`, `flow-node`, `flow-share-ring`.
 | `acSwitch` | Faikout Perfera Schalter | Switch |
 | `acUnitPower` | Klimaanlage Geräteleistung | Number:Power |
 | `ecarPower` | E-Auto Leistung | Number:Power |
+| `washingMachine1Power` | Waschmaschine 1 Leistung | Number:Power |
+| `washingMachine2Power` | Waschmaschine 2 Leistung | Number:Power |
+| `tumbleDryerPower` | Wäschetrockner Leistung | Number:Power |
+| `dishwasherPower` | Geschirrspüler Leistung | Number:Power |
 | `batteryPower` | Batteriespeicher Leistung | Number:Power |
 | `homePower` | Haus Leistung | Number:Power |
 | `batterySoc` | Batteriespeicher Ladestand | Number:Dimensionless |
@@ -212,6 +216,10 @@ Needs `flow-link`, `flow-node`, `flow-share-ring`.
 | `heatpumpEnergyToday` | ESPAltherma Energie heute | Number:Energy |
 | `acUnitEnergyToday` | Klimaanlage Geräteenergie heute | Number:Energy |
 | `ecarEnergyToday` | E-Auto Energie heute | Number:Energy |
+| `washingMachine1EnergyToday` | Waschmaschine 1 Energie heute | Number:Energy |
+| `washingMachine2EnergyToday` | Waschmaschine 2 Energie heute | Number:Energy |
+| `tumbleDryerEnergyToday` | Wäschetrockner Energie heute | Number:Energy |
+| `dishwasherEnergyToday` | Geschirrspüler Energie heute | Number:Energy |
 | `batteryChargeToday` | Batteriespeicher Ladung heute | Number:Energy |
 | `batteryDischargeToday` | Batteriespeicher Entladung heute | Number:Energy |
 
@@ -808,7 +816,8 @@ A device in a ring, its animation driven by `power`: `pv` (a tilted module under
 rays turning faster), `grid` (a pylon, red on import and green on export, dashes running along its wires), `home` (a
 house whose windows glow and pulse with the consumption), `heat-pump` (an outdoor unit whose fan turns above 100 W),
 `air-conditioner` (an indoor unit whose air streams flow), `e-car` (a car with a bolt fading in and out while it
-charges) and `battery` (filled to `soc`, red, orange or green). The ring has an opaque disc in the card colour under its
+charges), `battery` (filled to `soc`, red, orange or green) and `appliances` (an appliance's housing with a power symbol
+that lights up, a ring pulsing out of it, while they run). The ring has an opaque disc in the card colour under its
 tint, so dots running under it disappear.
 
 ![Flow nodes](screenshots/flow-node.gif)

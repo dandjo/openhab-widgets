@@ -457,6 +457,25 @@ def ecar_node(cx, cy, power):
             *wheels, bolt]
 
 
+def appliances_node(cx, cy, power):
+    """The household appliances together: the housing of the appliance tiles with a power symbol for a front; while
+    they draw more than APPL_ON watts together, the symbol lights up and a ring pulses out of it, faster the more
+    they draw."""
+    active = f"Math.abs({power}) > {APPL_ON}"
+    x, y, r = 32, 35, 6.5  # drawn in the tiles' 64 × 64 icon, then moved onto the node
+    gap = math.radians(40)  # half the opening at the top of the symbol's circle
+    sx, sy = round(x + r * math.sin(gap), 2), round(y - r * math.cos(gap), 2)
+    symbol = [svg("path", d=f"M{sx},{sy} A{r},{r} 0 1,1 {round(2 * x - sx, 2)},{sy}", **stroke(2, APPL_COLOR)),
+              svg("line", x1=x, y1=27, x2=x, y2=34, **stroke(2, APPL_COLOR))]
+    dur = steps(power, [500, 1500], ["2.4s", "1.6s", "1s"])
+    pulse = svg("circle", [svg("animate", attributeName="r", values="7.5;10.5", dur=dur, repeatCount="indefinite"),
+                           svg("animate", attributeName="opacity", values="0.6;0", dur=dur, repeatCount="indefinite")],
+                cx=x, cy=y, r=7.5, visible=f"={active}", **stroke(1.4, APPL_COLOR))
+    return [ring(cx, cy, APPL_COLOR),
+            svg("g", machine_body([pulse, svg("g", symbol, opacity=f"={active} ? '1' : '0.45'")]),
+                transform=f"translate({cx - 32} {cy - 32})")]
+
+
 PV = "huawei_inverter_input_power"
 HP = "espaltherma_electrical_power"
 ECAR = "e_car_power"
@@ -475,6 +494,15 @@ ECAR_CALC = ("Berechnet aus der Messung der Klimaanlage (Shelly EM) abzüglich d
              "Grundlast der Klimaanlage (Standby, Innengerät); unter 300 W lädt das Auto nicht.")
 HP_ON = 50  # watts; the heat pump idles at about 20 W
 HOME = "home_active_power"
+# the household appliances with a plug of their own, as on the appliance tiles; the fridge, running most of the day,
+# and the coffee machine, a switch among the controls, stay out
+FLOW_APPLIANCES = [("washing_machine_1", "Washing Machine 1", "#5c6bc0"),
+                   ("washing_machine_2", "Washing Machine 2", "#9575cd"),
+                   ("tumble_dryer", "Tumble Dryer", "#ffb74d"), ("dishwasher", "Dishwasher", "#4fc3f7")]
+APPL_POWER = "(" + " + ".join(num(p + "_power") for p, _, _ in FLOW_APPLIANCES) + ")"
+APPL_DAY = "(" + " + ".join(num(p + "_energy_today") for p, _, _ in FLOW_APPLIANCES) + ")"
+APPL_ON = 10  # watts; together they idle at a few watts
+APPL_COLOR = "#5c6bc0"
 GRID_COLOR = f"={num(GRID)} < 0 ? '#43a047' : '#e53935'"
 signed_kw = f"{fixed(f'{num(GRID)} / 1000', 3)} + ' kW'"
 
@@ -495,9 +523,10 @@ def share_ring(cx, cy, title, part, whole, r=22, visible=None):
 
 SELF_CONSUMPTION = ("Self-consumption", num("photovoltaics_own_ec_day"), num("huawei_inverter_e_day"))
 SELF_SUFFICIENCY = ("Self-sufficiency", num("photovoltaics_own_ec_day"), num("home_ec_day"))
-HOME_XY = (250, 215)
+HOME_XY = (245.5, 208.3)
 SPOKE = 176  # distance of every node from the house
 FLOW_W, FLOW_H = 470, 460
+STEP, TURN = 45, 8  # degrees between two nodes, and the star's turn clockwise from PV straight up
 
 
 def at(angle):
@@ -506,18 +535,23 @@ def at(angle):
     return round(HOME_XY[0] + SPOKE * math.cos(a), 1), round(HOME_XY[1] + SPOKE * math.sin(a), 1)
 
 
-# A regular star: the top-left quarter stays free for the two rings, the six nodes share the other 270° at
-# 54° each. Radius and viewBox come from the bounding boxes of each node's icon and texts as the browser
-# measures them (no titles, the icons say what a node is; the PV texts to the right, all others below, the
-# house's above it left of the PV line): at this size every box keeps at least 12 units from every other
-# box, the rings and the house label, and no line crosses a box.
-PV_XY, HP_XY, AC_XY = at(-90), at(-36), at(18)
+# A regular star: the top-left quarter stays free for the two rings, the seven nodes share the other 270° at
+# 45° each, turned by 8° so that the heat pump's texts keep clear of PV's at today's size. Radius and viewBox
+# come from the boxes of each node's icon and of each of its text lines as the browser measures them (no titles,
+# the icons say what a node is; the PV texts to the right, all others below, the house's above it to the left):
+# at this size every box keeps at least 12 units from every other box, the rings and the house label, and no line
+# crosses a box.
+PV_XY, HP_XY, AC_XY, ECAR_XY, APPL_XY, BATT_XY, GRID_XY = (at(-90 + TURN + k * STEP) for k in range(7))
 TEXT_GAP = 8  # between a circle and the texts beside it
-HOUSE_LABEL_X, HOUSE_LABEL_Y = (round(HOME_XY[0] - (30 + TEXT_GAP) * math.sqrt(0.5), 1),
-                                round(HOME_XY[1] - (30 + TEXT_GAP) * math.sqrt(0.5), 1))
-ECAR_XY, BATT_XY, GRID_XY = at(72), at(126), at(180)
+# the bottom-right corner of the house's values sits off its circle as far as the texts under the other nodes
+# stand off theirs, in the direction that keeps the values as far from the PV line as from the grid line
+HOUSE_LABEL_ANGLE = 247
+HOUSE_LABEL_X, HOUSE_LABEL_Y = (round(HOME_XY[0] + (30 + TEXT_GAP) * math.cos(math.radians(HOUSE_LABEL_ANGLE)), 1),
+                                round(HOME_XY[1] + (30 + TEXT_GAP) * math.sin(math.radians(HOUSE_LABEL_ANGLE)), 1))
+RINGS_XY = [(32.2, 32), (32.2, 93)]  # self-consumption over self-sufficiency, in the free quarter
 NODE_POPUPS = [(*PV_XY, "photovoltaics"), (*GRID_XY, "power_meter"), (*HOME_XY, "home"), (*HP_XY, "heatpump"),
-               (*AC_XY, "air_conditioning"), (*BATT_XY, "energy_storage"), (*ECAR_XY, "e_car")]
+               (*AC_XY, "air_conditioning"), (*BATT_XY, "energy_storage"), (*ECAR_XY, "e_car"),
+               (*APPL_XY, "appliances")]
 def node_link(cx, cy, popup, size=68):
     """Transparent link over a node that opens its popup, positioned in percent of the FLOW_W × FLOW_H viewBox."""
     return comp("oh-link", {"action": "popup", "actionModal": f"page:flow_{popup}", "style": {
@@ -588,12 +622,15 @@ FLOW_KINDS = {  # kind: (builder of the drawing around (0, 0) from the power exp
     "air-conditioner": (lambda p: ac_node(0, 0, p), "air conditioner: an indoor unit whose air streams flow"),
     "e-car": (lambda p: ecar_node(0, 0, p), "E-Car: a car whose bolt fades in and out while it charges"),
     "battery": (lambda p: battery_node(0, 0, "Number(props.soc)"), "battery: filled to its state of charge"),
+    "appliances": (lambda p: appliances_node(0, 0, p),
+                   "appliances: an appliance with a power symbol that lights up and pulses while they run"),
 }
 
 
 def flow_node_widget():
     """The widget every node of the energy flow is an instance of: a device drawn in a ring of 30 around (x, y), its
-    animations driven by power (the battery by soc). kind: pv, grid, home, heat-pump, air-conditioner, e-car or battery.
+    animations driven by power (the battery by soc). kind: pv, grid, home, heat-pump, air-conditioner, e-car, battery
+    or appliances.
     The ring has an opaque disc in the card colour under its tint, so link dots slide under it."""
     power = "Number(props.power)"
     drawings = [svg("g", build(power), visible=f"=props.kind === '{kind}'") for kind, (build, _) in FLOW_KINDS.items()]
@@ -628,6 +665,7 @@ flow = div([div([svg("svg", [
     *spoke(HP_XY, "#fb8c00", num(HP), "false", threshold=HP_ON),
     *spoke(AC_XY, "#29b6f6", AC_FLOW, "false", threshold=AC_ON),
     *spoke(ECAR_XY, ECAR_COLOR, num(ECAR), "false", threshold=ECAR_ON),
+    *spoke(APPL_XY, APPL_COLOR, APPL_POWER, "false", threshold=APPL_ON),
     *spoke(BATT_XY, "#7cb342", num(BATT), f"{num(BATT)} > 0"),
     flow_node("pv", PV_XY, num(PV)),
     flow_node("grid", GRID_XY, num(GRID)),
@@ -635,14 +673,13 @@ flow = div([div([svg("svg", [
     flow_node("heat-pump", HP_XY, num(HP)),
     flow_node("air-conditioner", AC_XY, AC_FLOW),
     flow_node("e-car", ECAR_XY, num(ECAR)),
+    flow_node("appliances", APPL_XY, APPL_POWER),
     flow_node("battery", BATT_XY, soc=num(SOC)),
     svg_text(PV_XY[0] + 42, PV_XY[1] + 1, f"={kw(PV)}", 18, "700", anchor="start"),
     svg_text(PV_XY[0] + 42, PV_XY[1] + 18, f"={disp('huawei_inverter_e_day')} + ' heute'", 12, anchor="start",
              opacity="0.7"),
-    flow_share_ring((40, 40), *SELF_CONSUMPTION),
-    flow_share_ring((40, 116), *SELF_SUFFICIENCY),
-    # the bottom-right corner of the house's values sits off its circle at the upper-left 45° point, as far as
-    # the texts under the other nodes stand off theirs
+    flow_share_ring(RINGS_XY[0], *SELF_CONSUMPTION),
+    flow_share_ring(RINGS_XY[1], *SELF_SUFFICIENCY),
     svg_text(HOUSE_LABEL_X, HOUSE_LABEL_Y - 19, f"={kw(HOME)}", 18, "700", anchor="end"),
     svg_text(HOUSE_LABEL_X, HOUSE_LABEL_Y - 4, kwh(num("home_ec_day")), 12, anchor="end", opacity="0.7"),
     *below(GRID_XY, f"={signed_kw}",
@@ -653,6 +690,7 @@ flow = div([div([svg("svg", [
            kwh(num("air_conditioning_unit_energy_today"))),
     *below(ECAR_XY, f"={kw(ECAR)}",
            kwh(num("e_car_energy_today"))),
+    *below(APPL_XY, f"={fixed(f'{APPL_POWER} / 1000', 3)} + ' kW'", kwh(APPL_DAY)),
     *below(BATT_XY, f"={fixed(f'{num(BATT)} / 1000', 3)} + ' kW'",  # negative while charging
            kwh(num("huawei_inverter_energy_storage_day_charge"), " kWh", "Geladen "),
            kwh(num("huawei_inverter_energy_storage_day_discharge"), " kWh", "Entladen ")),
@@ -2916,6 +2954,28 @@ FLOW_POPUPS = {
                        value_tile("Current", f"={disp('e_car_current')}")]),
             label(ECAR_CALC, **{"font-size": "12px", "opacity": "0.6", "padding": "0 16px 14px"})]),
         card("Power", [day_chart([area("Power", ECAR, ECAR_COLOR)])]),
+    ]),
+    "appliances": ("Appliances", [
+        card("Now", [tile_grid([
+            # in W as the four tiles beside it, with a decimal below 100 W as the plugs give it
+            value_tile("Total", f"=({APPL_POWER} >= 100 ? Math.round({APPL_POWER}) : {fixed(APPL_POWER, 1)}) + ' W'",
+                       color=APPL_COLOR),
+            *[value_tile(title, f"={disp(p + '_power')}") for p, title, _ in FLOW_APPLIANCES]])]),
+        card("Today", [tile_grid([
+            value_tile("Total", f"={fixed(APPL_DAY, 2)} + ' kWh'", color=APPL_COLOR),
+            *[value_tile(title, f"={disp(p + '_energy_today')}") for p, title, _ in FLOW_APPLIANCES]])]),
+        # lines, not stacked areas: ECharts stacks a time axis by the points' index, not their time, and the four
+        # plugs are persisted at different moments
+        card("Power", [day_chart([line(title, p + "_power", color) for p, title, color in FLOW_APPLIANCES])]),
+        card("Energy per Day", [chart(
+            {"chartType": "month", "periodVisible": True, "height": "260px"},
+            grid=[comp("oh-chart-grid", {"top": "40", "bottom": "60", "left": "45", "right": "20"})],
+            xAxis=[comp("oh-category-axis", {"gridIndex": 0, "categoryType": "month", "name": "Tag", "nameGap": 12,
+                                             "axisTick": {"show": False}})],
+            yAxis=[value_axis("kWh")],
+            series=[daily(title, p + "_energy_today", color, stack="appliances")
+                    for p, title, color in FLOW_APPLIANCES],
+            tooltip=tooltip(trigger="axis", smartFormatter=True), legend=legend())]),
     ]),
 }
 

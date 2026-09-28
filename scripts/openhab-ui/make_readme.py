@@ -24,12 +24,13 @@ OVERVIEW = [
      "mode, fan, setpoint, boost and timer (usable while the unit is off); the ventilation timer. Below them tiles "
      "that toggle plugs and show their power. The three devices are the widgets `heatpump-controls`, "
      "`air-conditioner-controls` and `ventilation-controls`, the tiles `switch-tile`."),
-    ("energy-flow-card", "Energy flow", "A regular star around the house: PV, heat pump, air conditioner, E-Car, battery "
-     "and grid, each with its power and today's energy. Dots run along the lines in the direction of the flow at four "
-     "speeds and slide under the node rims; the icons move with the power (sun rays, fan, air streams, pylon dashes, a "
-     "pulsing bolt over the charging car, the battery filled to its state of charge). Rings for today's "
-     "self-consumption and self-sufficiency sit in the free corner. The card places its lines, nodes and rings as "
-     "`flow-link`, `flow-node` and `flow-share-ring`. The recording and the dark screenshot show it with demo values."),
+    ("energy-flow-card", "Energy flow", "A regular star around the house: PV, heat pump, air conditioner, E-Car, the "
+     "household appliances together, battery and grid, each with its power and today's energy. Dots run along the "
+     "lines in the direction of the flow at four speeds and slide under the node rims; the icons move with the power "
+     "(sun rays, fan, air streams, pylon dashes, a pulsing bolt over the charging car, a power symbol pulsing while "
+     "the appliances run, the battery filled to its state of charge). Rings for today's self-consumption and "
+     "self-sufficiency sit in the free corner. The card places its lines, nodes and rings as `flow-link`, `flow-node` "
+     "and `flow-share-ring`. The recording and the dark screenshot show it with demo values."),
     ("appliances-card", "Appliances", "Washing machines, dryer and dishwasher as `appliance-tile`s, each drawn inside a "
      "ring filled with the program progress; drums and paddles turn and the spray arm sprays while they run, with a "
      "pill for the remaining time."),
@@ -406,7 +407,8 @@ md.append(section("Node", "flow-node", """A device in a ring, its animation driv
 under a sun, both brighter with the power, rays turning faster), `grid` (a pylon, red on import and green on export,
 dashes running along its wires), `home` (a house whose windows glow and pulse with the consumption), `heat-pump` (an
 outdoor unit whose fan turns above 100 W), `air-conditioner` (an indoor unit whose air streams flow), `e-car` (a car
-with a bolt fading in and out while it charges) and `battery` (filled to `soc`, red, orange or green). The ring has
+with a bolt fading in and out while it charges), `battery` (filled to `soc`, red, orange or green) and `appliances`
+(an appliance's housing with a power symbol that lights up, a ring pulsing out of it, while they run). The ring has
 an opaque disc in the card colour under its tint, so dots running under it disappear.""", shot=img("flow-node.gif", "Flow nodes")))
 md.append(section("Line", "flow-link", """A line from (`x1`, `y1`) to (`x2`, `y2`) in `color`. While
 |`power`| exceeds `threshold` three dots run along it, towards (`x2`, `y2`) while `forward` holds and back otherwise, at

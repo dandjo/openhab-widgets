@@ -39,6 +39,30 @@ props:
     type: TEXT
     required: true
     context: item
+  - name: washingMachine1Power
+    label: Waschmaschine 1 Leistung
+    description: Number:Power item
+    type: TEXT
+    required: true
+    context: item
+  - name: washingMachine2Power
+    label: Waschmaschine 2 Leistung
+    description: Number:Power item
+    type: TEXT
+    required: true
+    context: item
+  - name: tumbleDryerPower
+    label: Wäschetrockner Leistung
+    description: Number:Power item
+    type: TEXT
+    required: true
+    context: item
+  - name: dishwasherPower
+    label: Geschirrspüler Leistung
+    description: Number:Power item
+    type: TEXT
+    required: true
+    context: item
   - name: batteryPower
     label: Batteriespeicher Leistung
     description: Number:Power item
@@ -105,6 +129,30 @@ props:
     type: TEXT
     required: true
     context: item
+  - name: washingMachine1EnergyToday
+    label: Waschmaschine 1 Energie heute
+    description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  - name: washingMachine2EnergyToday
+    label: Waschmaschine 2 Energie heute
+    description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  - name: tumbleDryerEnergyToday
+    label: Wäschetrockner Energie heute
+    description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  - name: dishwasherEnergyToday
+    label: Geschirrspüler Energie heute
+    description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
   - name: batteryChargeToday
     label: Batteriespeicher Ladung heute
     description: Number:Energy item
@@ -118,7 +166,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Sep 27, 2026, 9:44:33 PM
+timestamp: Sep 28, 2026, 7:59:48 PM
 component: oh-card
 config:
   title: Energiefluss
@@ -162,40 +210,40 @@ slots:
               default:
               - component: widget:flow-link
                 config:
-                  x1: 250.0
-                  y1: 69.0
-                  x2: 250.0
-                  y2: 185.0
+                  x1: 265.8
+                  y1: 63.7
+                  x2: 249.7
+                  y2: 178.6
                   color: '#ffb300'
                   power: =(Number(items[props.pvPower].numericState) || 0)
                   forward: =true
                   threshold: 10
               - component: widget:flow-link
                 config:
-                  x1: 104.0
-                  y1: 215.0
-                  x2: 220.0
-                  y2: 215.0
+                  x1: 100.9
+                  y1: 188.0
+                  x2: 215.8
+                  y2: 204.1
                   color: '=(Number(items[props.gridPower].numericState) || 0) < 0 ? ''#43a047'' : ''#e53935'''
                   power: =(Number(items[props.gridPower].numericState) || 0)
                   forward: =(Number(items[props.gridPower].numericState) || 0) > 0
                   threshold: 10
               - component: widget:flow-link
                 config:
-                  x1: 368.1
-                  y1: 129.1
-                  x2: 274.3
-                  y2: 197.4
+                  x1: 362.1
+                  y1: 120.4
+                  x2: 269.5
+                  y2: 190.3
                   color: '#fb8c00'
                   power: =(Number(items[props.heatpumpPower].numericState) || 0)
                   forward: =false
                   threshold: 50
               - component: widget:flow-link
                 config:
-                  x1: 388.9
-                  y1: 260.1
-                  x2: 278.5
-                  y2: 224.3
+                  x1: 390.1
+                  y1: 228.6
+                  x2: 275.2
+                  y2: 212.5
                   color: '#29b6f6'
                   power: '=(items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState) || 0)
                     : 0)'
@@ -203,20 +251,32 @@ slots:
                   threshold: 5
               - component: widget:flow-link
                 config:
-                  x1: 295.1
-                  y1: 353.9
-                  x2: 259.3
-                  y2: 243.5
+                  x1: 333.4
+                  y1: 324.9
+                  x2: 263.5
+                  y2: 232.3
                   color: '#26a69a'
                   power: =(Number(items[props.ecarPower].numericState) || 0)
                   forward: =false
                   threshold: 100
               - component: widget:flow-link
                 config:
-                  x1: 164.1
-                  y1: 333.1
-                  x2: 232.4
-                  y2: 239.3
+                  x1: 225.2
+                  y1: 352.9
+                  x2: 241.3
+                  y2: 238.0
+                  color: '#5c6bc0'
+                  power: =((Number(items[props.washingMachine1Power].numericState) || 0) + (Number(items[props.washingMachine2Power].numericState)
+                    || 0) + (Number(items[props.tumbleDryerPower].numericState) || 0) + (Number(items[props.dishwasherPower].numericState)
+                    || 0))
+                  forward: =false
+                  threshold: 10
+              - component: widget:flow-link
+                config:
+                  x1: 128.9
+                  y1: 296.2
+                  x2: 221.5
+                  y2: 226.3
                   color: '#7cb342'
                   power: =(Number(items[props.batteryPower].numericState) || 0)
                   forward: =(Number(items[props.batteryPower].numericState) || 0) > 0
@@ -224,50 +284,58 @@ slots:
               - component: widget:flow-node
                 config:
                   kind: pv
-                  x: 250.0
-                  y: 39.0
+                  x: 270.0
+                  y: 34.0
                   power: =(Number(items[props.pvPower].numericState) || 0)
               - component: widget:flow-node
                 config:
                   kind: grid
-                  x: 74.0
-                  y: 215.0
+                  x: 71.2
+                  y: 183.8
                   power: =(Number(items[props.gridPower].numericState) || 0)
               - component: widget:flow-node
                 config:
                   kind: home
-                  x: 250
-                  y: 215
+                  x: 245.5
+                  y: 208.3
                   power: =(Number(items[props.homePower].numericState) || 0)
               - component: widget:flow-node
                 config:
                   kind: heat-pump
-                  x: 392.4
-                  y: 111.5
+                  x: 386.1
+                  y: 102.4
                   power: =(Number(items[props.heatpumpPower].numericState) || 0)
               - component: widget:flow-node
                 config:
                   kind: air-conditioner
-                  x: 417.4
-                  y: 269.4
+                  x: 419.8
+                  y: 232.8
                   power: '=(items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState) || 0)
                     : 0)'
               - component: widget:flow-node
                 config:
                   kind: e-car
-                  x: 304.4
-                  y: 382.4
+                  x: 351.4
+                  y: 348.9
                   power: =(Number(items[props.ecarPower].numericState) || 0)
               - component: widget:flow-node
                 config:
+                  kind: appliances
+                  x: 221.0
+                  y: 382.6
+                  power: =((Number(items[props.washingMachine1Power].numericState) || 0) + (Number(items[props.washingMachine2Power].numericState)
+                    || 0) + (Number(items[props.tumbleDryerPower].numericState) || 0) + (Number(items[props.dishwasherPower].numericState)
+                    || 0))
+              - component: widget:flow-node
+                config:
                   kind: battery
-                  x: 146.5
-                  y: 357.4
+                  x: 104.9
+                  y: 314.2
                   soc: =(Number(items[props.batterySoc].numericState) || 0)
               - component: text
                 config:
-                  x: 292.0
-                  y: 40.0
+                  x: 312.0
+                  y: 35.0
                   content: =(Math.abs((Number(items[props.pvPower].numericState) || 0)) / 1000).toFixed(3).replace('.', ',')
                     + ' kW'
                   fill: currentColor
@@ -277,8 +345,8 @@ slots:
                   opacity: '1'
               - component: text
                 config:
-                  x: 292.0
-                  y: 57.0
+                  x: 312.0
+                  y: 52.0
                   content: '=([''NULL'', ''UNDEF''].includes(items[props.pvEnergyToday].state) ? ''–'' : (items[props.pvEnergyToday].displayState
                     || items[props.pvEnergyToday].state)) + '' heute'''
                   fill: currentColor
@@ -288,22 +356,22 @@ slots:
                   opacity: '0.7'
               - component: widget:flow-share-ring
                 config:
-                  x: 40
-                  y: 40
+                  x: 32.2
+                  y: 32
                   title: Eigenverbrauch
                   part: =(Number(items[props.pvSelfUseToday].numericState) || 0)
                   whole: =(Number(items[props.pvEnergyToday].numericState) || 0)
               - component: widget:flow-share-ring
                 config:
-                  x: 40
-                  y: 116
+                  x: 32.2
+                  y: 93
                   title: Autarkie
                   part: =(Number(items[props.pvSelfUseToday].numericState) || 0)
                   whole: =(Number(items[props.homeEnergyToday].numericState) || 0)
               - component: text
                 config:
-                  x: 223.1
-                  y: 169.1
+                  x: 230.7
+                  y: 154.3
                   content: =(Math.abs((Number(items[props.homePower].numericState) || 0)) / 1000).toFixed(3).replace('.',
                     ',') + ' kW'
                   fill: currentColor
@@ -313,8 +381,8 @@ slots:
                   opacity: '1'
               - component: text
                 config:
-                  x: 223.1
-                  y: 184.1
+                  x: 230.7
+                  y: 169.3
                   content: ='' + ((Number(items[props.homeEnergyToday].numericState) || 0)).toFixed(2).replace('.', ',') +
                     ' kWh heute'
                   fill: currentColor
@@ -324,8 +392,8 @@ slots:
                   opacity: '0.7'
               - component: text
                 config:
-                  x: 74.0
-                  y: 267.0
+                  x: 71.2
+                  y: 235.8
                   content: =((Number(items[props.gridPower].numericState) || 0) / 1000).toFixed(3).replace('.', ',') + ' kW'
                   fill: currentColor
                   font-size: 18
@@ -334,8 +402,8 @@ slots:
                   opacity: '1'
               - component: text
                 config:
-                  x: 74.0
-                  y: 283.0
+                  x: 71.2
+                  y: 251.8
                   content: ='Bezug ' + ((Number(items[props.gridImportToday].numericState) || 0)).toFixed(2).replace('.',
                     ',') + ' kWh'
                   fill: currentColor
@@ -345,8 +413,8 @@ slots:
                   opacity: '0.7'
               - component: text
                 config:
-                  x: 74.0
-                  y: 298.0
+                  x: 71.2
+                  y: 266.8
                   content: ='Einspeisung ' + ((Number(items[props.gridExportToday].numericState) || 0)).toFixed(2).replace('.',
                     ',') + ' kWh'
                   fill: currentColor
@@ -356,8 +424,8 @@ slots:
                   opacity: '0.7'
               - component: text
                 config:
-                  x: 392.4
-                  y: 163.5
+                  x: 386.1
+                  y: 154.4
                   content: =(Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) / 1000).toFixed(3).replace('.',
                     ',') + ' kW'
                   fill: currentColor
@@ -367,8 +435,8 @@ slots:
                   opacity: '1'
               - component: text
                 config:
-                  x: 392.4
-                  y: 179.5
+                  x: 386.1
+                  y: 170.4
                   content: ='' + ((Number(items[props.heatpumpEnergyToday].numericState) || 0)).toFixed(2).replace('.', ',')
                     + ' kWh heute'
                   fill: currentColor
@@ -378,8 +446,8 @@ slots:
                   opacity: '0.7'
               - component: text
                 config:
-                  x: 417.4
-                  y: 321.4
+                  x: 419.8
+                  y: 284.8
                   content: =((Number(items[props.acUnitPower].numericState) || 0) / 1000).toFixed(3).replace('.', ',') + '
                     kW'
                   fill: currentColor
@@ -389,8 +457,8 @@ slots:
                   opacity: '1'
               - component: text
                 config:
-                  x: 417.4
-                  y: 337.4
+                  x: 419.8
+                  y: 300.8
                   content: ='' + ((Number(items[props.acUnitEnergyToday].numericState) || 0)).toFixed(2).replace('.', ',')
                     + ' kWh heute'
                   fill: currentColor
@@ -400,8 +468,8 @@ slots:
                   opacity: '0.7'
               - component: text
                 config:
-                  x: 304.4
-                  y: 434.4
+                  x: 351.4
+                  y: 400.9
                   content: =(Math.abs((Number(items[props.ecarPower].numericState) || 0)) / 1000).toFixed(3).replace('.',
                     ',') + ' kW'
                   fill: currentColor
@@ -411,8 +479,8 @@ slots:
                   opacity: '1'
               - component: text
                 config:
-                  x: 304.4
-                  y: 450.4
+                  x: 351.4
+                  y: 416.9
                   content: ='' + ((Number(items[props.ecarEnergyToday].numericState) || 0)).toFixed(2).replace('.', ',') +
                     ' kWh heute'
                   fill: currentColor
@@ -422,8 +490,32 @@ slots:
                   opacity: '0.7'
               - component: text
                 config:
-                  x: 146.5
-                  y: 409.4
+                  x: 221.0
+                  y: 434.6
+                  content: =(((Number(items[props.washingMachine1Power].numericState) || 0) + (Number(items[props.washingMachine2Power].numericState)
+                    || 0) + (Number(items[props.tumbleDryerPower].numericState) || 0) + (Number(items[props.dishwasherPower].numericState)
+                    || 0)) / 1000).toFixed(3).replace('.', ',') + ' kW'
+                  fill: currentColor
+                  font-size: 18
+                  font-weight: '700'
+                  text-anchor: middle
+                  opacity: '1'
+              - component: text
+                config:
+                  x: 221.0
+                  y: 450.6
+                  content: ='' + (((Number(items[props.washingMachine1EnergyToday].numericState) || 0) + (Number(items[props.washingMachine2EnergyToday].numericState)
+                    || 0) + (Number(items[props.tumbleDryerEnergyToday].numericState) || 0) + (Number(items[props.dishwasherEnergyToday].numericState)
+                    || 0))).toFixed(2).replace('.', ',') + ' kWh heute'
+                  fill: currentColor
+                  font-size: 12
+                  font-weight: normal
+                  text-anchor: middle
+                  opacity: '0.7'
+              - component: text
+                config:
+                  x: 104.9
+                  y: 366.2
                   content: =((Number(items[props.batteryPower].numericState) || 0) / 1000).toFixed(3).replace('.', ',') +
                     ' kW'
                   fill: currentColor
@@ -433,8 +525,8 @@ slots:
                   opacity: '1'
               - component: text
                 config:
-                  x: 146.5
-                  y: 425.4
+                  x: 104.9
+                  y: 382.2
                   content: ='Geladen ' + ((Number(items[props.batteryChargeToday].numericState) || 0)).toFixed(2).replace('.',
                     ',') + ' kWh'
                   fill: currentColor
@@ -444,8 +536,8 @@ slots:
                   opacity: '0.7'
               - component: text
                 config:
-                  x: 146.5
-                  y: 440.4
+                  x: 104.9
+                  y: 397.2
                   content: ='Entladen ' + ((Number(items[props.batteryDischargeToday].numericState) || 0)).toFixed(2).replace('.',
                     ',') + ' kWh'
                   fill: currentColor
@@ -461,8 +553,8 @@ slots:
                 position: absolute
                 display: block
                 border-radius: 50%
-                left: 45.96%
-                top: 1.09%
+                left: 50.21%
+                top: 0.00%
                 width: 14.47%
                 height: 14.78%
           - component: oh-link
@@ -473,8 +565,8 @@ slots:
                 position: absolute
                 display: block
                 border-radius: 50%
-                left: 8.51%
-                top: 39.35%
+                left: 7.91%
+                top: 32.57%
                 width: 14.47%
                 height: 14.78%
           - component: oh-link
@@ -485,8 +577,8 @@ slots:
                 position: absolute
                 display: block
                 border-radius: 50%
-                left: 45.96%
-                top: 39.35%
+                left: 45.00%
+                top: 37.89%
                 width: 14.47%
                 height: 14.78%
           - component: oh-link
@@ -497,8 +589,8 @@ slots:
                 position: absolute
                 display: block
                 border-radius: 50%
-                left: 76.26%
-                top: 16.85%
+                left: 74.91%
+                top: 14.87%
                 width: 14.47%
                 height: 14.78%
           - component: oh-link
@@ -509,8 +601,8 @@ slots:
                 position: absolute
                 display: block
                 border-radius: 50%
-                left: 81.57%
-                top: 51.17%
+                left: 82.09%
+                top: 43.22%
                 width: 14.47%
                 height: 14.78%
           - component: oh-link
@@ -521,8 +613,8 @@ slots:
                 position: absolute
                 display: block
                 border-radius: 50%
-                left: 23.94%
-                top: 70.30%
+                left: 15.09%
+                top: 60.91%
                 width: 14.47%
                 height: 14.78%
           - component: oh-link
@@ -533,7 +625,19 @@ slots:
                 position: absolute
                 display: block
                 border-radius: 50%
-                left: 57.53%
-                top: 75.74%
+                left: 67.53%
+                top: 68.46%
+                width: 14.47%
+                height: 14.78%
+          - component: oh-link
+            config:
+              action: popup
+              actionModal: page:flow_appliances
+              style:
+                position: absolute
+                display: block
+                border-radius: 50%
+                left: 39.79%
+                top: 75.78%
                 width: 14.47%
                 height: 14.78%
