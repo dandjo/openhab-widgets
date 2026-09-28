@@ -39,9 +39,9 @@ OVERVIEW = [
     ("heatpump-card", "Heat pump", "A section through the house: outdoor unit on the roof (the energy flow's "
      "`flow-node`), wall unit, three-way valve and DHW tank in the basement, floor heating and radiators on their "
      "levels, with the flow animated along the pipes as the valve decides. Beside it the power, today's energies split "
-     "into space heating, DHW and standby, and daily COPs. The drawing scales so its circles come out as large as the "
-     "energy flow's. On a wide screen the figures beside it take the room the drawing leaves and grow with it, up to "
-     "one and a half times their size."),
+     "into space heating, DHW and standby, and daily COPs. On a phone the drawing takes the card's width; on a wider "
+     "screen it stands at most at its own size, as the energy flow does, so their texts keep the UI's sizes and "
+     "their circles come out the same."),
     ("consumption-card", "Consumption today", "Today's consumption as one bar split by source (PV, grid) and by "
      "consumer, with a legend in two columns; hovering a part lifts it everywhere. The screenshot shows it with demo "
      "values."),
@@ -474,8 +474,9 @@ nodes: the sun, its rays turning slowly, or the moon while `day` is false, alone
 a small cloud when partly cloudy (1, 2); a cloud (3), raised over fog (45, 48), falling rain (drizzle, rain and
 showers: 51 to 67, 80 to 82), drifting snow (71 to 77, 85, 86) or a flickering bolt (95 to 99). Nothing while `code`
 is no number, as an item is `NULL` after a restart. My weather bar shows the present weather with it, and my forecast
-popup each day's, above a chart of the next 60 hours: temperature over the precipitation of each hour, the wind
-below. That popup is a page of my installation, not a widget of this repository; its rule writes the forecast as JSON
+popup each day's, beside the strongest wind with an arrow of its dominant direction and its compass point, above a
+chart of the next 60 hours: temperature over the precipitation of each hour, the wind below with arrows of its
+direction every three hours. That popup is a page of my installation, not a widget of this repository; its rule writes the forecast as JSON
 into String items, and the chart reads them through an `oh-data-series` whose `data` is an expression such as
 `=JSON.parse(items.weather_hourly.state).map((r) => [r[0] * 1000, r[1]])`, with no persistence involved. The
 warnings in the screenshots are demo values.""", """

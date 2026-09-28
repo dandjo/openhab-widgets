@@ -10,13 +10,16 @@
 // run's by their time: what this run brings replaces the old, and an hour or a day it lacks keeps the last run's
 // value, so a failed request never shortens the forecast; days before today are dropped.
 //
-// weather_hourly: [[epoch seconds, temperature °C, precipitation of the hour before in mm, wind km/h], ...]
+// weather_hourly: [[epoch seconds, temperature °C, precipitation of the hour before in mm, wind km/h,
+//                   wind direction ° (where it comes from, 0 north, 90 east)], ...]
 // weather_daily: [{t: epoch seconds of the day's midnight, c: WMO code, lo, hi: °C, p: precipitation mm,
-//                  pp: probability of precipitation % (best match) or null, w: maximum wind km/h}, ...]
+//                  pp: probability of precipitation % (best match) or null, w: maximum wind km/h,
+//                  wd: the day's dominant wind direction °}, ...]
 const BASE = 'https://api.open-meteo.com/v1/forecast?latitude=48.21&longitude=16.37&timezone=Europe%2FVienna'
   + '&forecast_days=5&timeformat=unixtime&current=weather_code,is_day'
-  + '&hourly=temperature_2m,precipitation,wind_speed_10m';
-const DAILY = '&daily=weather_code,temperature_2m_min,temperature_2m_max,precipitation_sum,wind_speed_10m_max';
+  + '&hourly=temperature_2m,precipitation,wind_speed_10m,wind_direction_10m';
+const DAILY = '&daily=weather_code,temperature_2m_min,temperature_2m_max,precipitation_sum,wind_speed_10m_max'
+  + ',wind_direction_10m_dominant';
 const HOURS = 61;
 const DAYS = 5;
 const TRIES = 3;
@@ -70,7 +73,8 @@ function day(arome, best, t) {
   const v = (field) => value([model], 'daily', field, t);
   return {t: t, c: v('weather_code'), lo: round(v('temperature_2m_min'), 1), hi: round(v('temperature_2m_max'), 1),
           p: round(v('precipitation_sum'), 1), pp: value([best], 'daily', 'precipitation_probability_max', t),
-          w: round(v('wind_speed_10m_max'), 0)};
+          w: round(v('wind_speed_10m_max'), 0),
+          wd: round(value([model, best], 'daily', 'wind_direction_10m_dominant', t), 0)};
 }
 
 // the last run's list of an item, or none
@@ -109,7 +113,8 @@ if (arome || best) {
     const temp = value(models, 'hourly', 'temperature_2m', t);
     if (temp != null) {
       fresh.push([t, round(temp, 1), round(value(models, 'hourly', 'precipitation', t), 1),
-                  round(value(models, 'hourly', 'wind_speed_10m', t), 0)]);
+                  round(value(models, 'hourly', 'wind_speed_10m', t), 0),
+                  round(value(models, 'hourly', 'wind_direction_10m', t), 0)]);
     }
   }
   const hourly = merged(fresh, last('weather_hourly'), (h) => h[0], hour, HOURS);

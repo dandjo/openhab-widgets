@@ -166,7 +166,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Sep 28, 2026, 7:59:48 PM
+timestamp: Sep 28, 2026, 8:45:25 PM
 component: oh-card
 config:
   title: Energiefluss
@@ -194,7 +194,7 @@ slots:
         config:
           style:
             position: relative
-            max-width: 620px
+            max-width: 470px
             width: 100%
             margin: 0 auto
         slots:
