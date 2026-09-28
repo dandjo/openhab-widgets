@@ -679,7 +679,8 @@ def wx_item(day, key):
 def wx_kind():
     """What the WMO code shows: clear, partly (cloudy), cloudy, fog, rain (drizzle and showers too), snow, thunder."""
     c = f"Number(items.{WX_CODE}.state)"
-    return (f"(isNaN(parseFloat(items.{WX_CODE}.state)) ? '' : {c} === 0 ? 'clear' : {c} <= 2 ? 'partly' : "
+    return (f"(Number.isNaN(Number.parseFloat(items.{WX_CODE}.state)) ? '' : {c} === 0 ? 'clear' : "
+            f"{c} <= 2 ? 'partly' : "
             f"{c} === 3 ? 'cloudy' : {c} <= 48 ? 'fog' : {c} <= 67 ? 'rain' : {c} <= 77 ? 'snow' : "
             f"{c} <= 82 ? 'rain' : {c} <= 86 ? 'snow' : 'thunder')")
 
@@ -786,9 +787,13 @@ def weather_card():
 
 
 def weather_popup(now):
+    # the widget's height follows its width, 434 px at 293 px wide and 0.36 px more per pixel (measured); the frame
+    # is the popup's width less 52 px on a phone and 507 px in the popup of a wider screen. A page cannot read the
+    # height of a frame from another site, so it is worked out from the width
+    width = "Math.min(507, screen.width - 52)"
     frame = comp("oh-webframe", {"src": f"='{METEOBLUE}' + (themeOptions.dark === 'dark' ? 'dark' : 'light')",
-                                 "height": "480px", "frameborder": "0",
-                                 "style": {"width": "100%", "border": "0", "display": "block"}})
+                                 "height": f"=Math.ceil(434 + ({width} - 293) * 0.36) + 8 + 'px'", "frameborder": "0",
+                                 "scrolling": "no", "style": {"width": "100%", "border": "0", "display": "block"}})
     orf = div([comp("oh-icon", {"icon": "material:open_in_new", "width": 22, "height": 22}),
                label("Prognose für Wien bei wetter.orf.at", **{"flex": "1", "font-size": "14px"}),
                comp("oh-button", {"text": "Öffnen", "action": "url", "actionUrl": ORF_WEATHER,
@@ -1482,12 +1487,14 @@ def pill_slider_widget():
     header = div([ring, badge, texts, big], **{"display": "flex", "align-items": "center", "gap": "8px"})
     # oh-slider starts at its minimum while the item's state is not known yet, and any touch that ends on it sends
     # its value, so it is only built once the state is a number (a reload, a reconnect after a restart); the box
-    # keeps the bar's height meanwhile. Only the knob can be dragged (draggableBar off): otherwise a finger that lands
-    # on the bar while scrolling a phone sets the value there, and oh-slider sends it when the finger lifts
+    # keeps the bar's height meanwhile. MainUI's expressions know Number, Math, JSON and dayjs but not the global
+    # isNaN or parseFloat, and an expression that fails counts as visible, hence Number.isNaN(Number.parseFloat(…)).
+    # Only the knob can be dragged (draggableBar off): otherwise a finger that lands on the bar while scrolling a phone
+    # sets the value there, and oh-slider sends it when the finger lifts
     slider = div([comp("oh-slider", {"item": "=props.item", "min": "=Number(props.min)", "max": "=Number(props.max)",
                                      "step": "=Number(props.step)", "releaseOnly": True, "label": True,
                                      "unit": "=props.unit", "limitKnobPosition": True, "draggableBar": False,
-                                     "visible": "=!isNaN(parseFloat(items[props.item].state))"})],
+                                     "visible": "=!Number.isNaN(Number.parseFloat(items[props.item].state))"})],
                  **{"min-height": "32px"})
     span = "(Number(props.max) - Number(props.min))"
     mark = label("=loop.mark.split('=')[1]", **{
@@ -3540,10 +3547,10 @@ def page(now):
     props = overview_widget_props()
     w = lambda uid: widget_ref(uid, **props[uid])  # every item a widget reads comes in as a prop
     return layout_page(PAGE_UID, {"label": "Overview", "stylesheet": SCROLLBAR}, [
-        # the weather as a slim bar across the top; each card below fills the height of its row: the flow centres
-        # itself, the appliance tiles and the price chart stretch
-        block(row(full(w("weather-card")))),
-        block(row(col([w("controls-card")]), col([w("energy-flow-card")]))),
+        # the weather as a slim bar across the top, in the first block, so it keeps a card's gap to the cards below;
+        # each card fills the height of its row: the flow centres itself, the appliance tiles and the price chart
+        # stretch
+        block(row(full(w("weather-card"))), row(col([w("controls-card")]), col([w("energy-flow-card")]))),
         block(row(col([w("appliances-card")]), col([w("electricity-price-card")]))),
         block(row(full(w("heatpump-card")))),
         block(row(col([w("consumption-card")]), col([w("energy-days-card")]))),

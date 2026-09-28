@@ -1,5 +1,5 @@
 (() => {
-  const card = document.querySelector(".page-current .card");
+  const card = [...document.querySelectorAll(".page-current .card")].find(c => (c.querySelector(".card-header") || {}).innerText === "Steuerung");
   const panel = t => { let e = [...card.querySelectorAll("*")].find(x => x.childElementCount === 0 && x.textContent.trim() === t);
     while (e && !(getComputedStyle(e).borderRadius === "14px" && getComputedStyle(e).paddingTop === "10px")) e = e.parentElement;
     return e.getBoundingClientRect(); };
