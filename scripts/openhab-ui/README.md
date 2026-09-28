@@ -1,13 +1,13 @@
 # openHAB UI generator
 
-`dashboard.py` generates homepi's MainUI: the `overview` page with its popups (`appliance_*`, `flow_*`, `hp_*`),
-the 23 device pages in the sidebar, and the widgets these pages are built from. It writes them into
+`dashboard.py` generates homepi's MainUI: the `overview` page with its popups (`appliance_*`, `flow_*`, `hp_*`,
+`forecast`), the 23 device pages in the sidebar, and the widgets these pages are built from. It writes them into
 `uicomponents_ui_page.json` and `uicomponents_ui_widget.json` in `/var/lib/openhab/jsondb`. Every page it
 generates is replaced on each run, and so is every widget tagged `generated`; widgets made in the UI stay.
 Changes made in the UI to a generated page or widget are overwritten by the next run, so this script is the
 source of the UI.
 
-The widgets are the overview's nine cards (`controls-card`, `energy-flow-card`, `appliances-card`,
+The widgets are the overview's ten cards (`weather-card`, `controls-card`, `energy-flow-card`, `appliances-card`,
 `electricity-price-card`, `heatpump-card`, `consumption-card`, `energy-days-card`, `pv-days-card`,
 `temperatures-card`) and the parts they are built from, wherever a part stands in more than one place or makes sense
 on its own:
@@ -19,6 +19,7 @@ on its own:
 - the energy flow: `flow-link`, `flow-node` and `flow-share-ring`, its lines, nodes and rings; the heat pump card's
   outdoor unit is a `flow-node` too;
 - the appliances: `appliance-tile` and `appliance-icon`, which the appliance popups show too;
+- the weather: `weather-icon`, the weather drawn from a WMO code, in the weather bar and in the forecast popup's days;
 - four parametrised plug cards used by every metered device page (`plug-card`, `plug-power-card`,
   `plug-energy-days-card`, `plug-electric-card`), `item-popup`, the popup every tile of the device pages opens, and
   `value-tile`, the tile itself: title and value over a large pale icon.
@@ -78,5 +79,6 @@ insertion in their sorted order.
     only, by stopping MainUI's state tracking. `widget_gallery.py check|apply` puts up the page `widget_gallery`
     with the energy flow's and the appliances' widgets on demo values and the controls' small widgets, for the
     screenshots (openHAB stopped); the generator's next run removes it. `shoot_all.sh` takes every screenshot of the GitHub repository with
-    these tools and the element scripts in `screenshot-js/`, the energy flow and the consumption card on demo values
-    (`demo_flow.js`, `demo_consumption.js`), while the gallery is up.
+    these tools and the element scripts in `screenshot-js/`, the energy flow, the consumption card and the forecast
+    popup's warnings on demo values (`demo_flow.js`, `demo_consumption.js`, `demo_weather.js`), while the gallery is
+    up.

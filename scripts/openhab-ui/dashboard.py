@@ -665,31 +665,37 @@ flow = div([div([svg("svg", [
 # ---------------------------------------------------------------- 2a. weather, a slim bar at the top
 
 # the rule weather_forecast fills these from Open-Meteo every 30 minutes, with GeoSphere's AROME Austria model: the
-# present weather as a WMO code with day or night, and today's and the next two days' minimum and maximum; the bar
-# takes the present temperature from the heat pump's sensor, as the temperatures card does
+# present weather as a WMO code with day or night, today's and the next two days' minimum and maximum, and for the
+# popup the next 61 hours and five days as JSON; the rule weather_warnings fills the warning items from GeoSphere
+# Austria every 15 minutes. The bar takes the present temperature from the heat pump's sensor, as the temperatures
+# card does
 WX_CODE, WX_DAY = "weather_code", "weather_is_day"
+WX_HOURLY, WX_DAILY = "weather_hourly", "weather_daily"
+WX_LEVEL, WX_WARNINGS = "weather_warning_level", "weather_warning_list"
 WX_DAYS = 3
 WX_WEEKDAYS = "['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa']"
+# the warning levels 0 to 3: none, yellow, orange, red, in GeoSphere's colours as Material shades
+WX_LEVEL_COLORS = "['#9e9e9e', '#fdd835', '#fb8c00', '#e53935']"
+WX_LEVEL_NAMES = "['', 'Gelb', 'Orange', 'Rot']"
 
 
 def wx_item(day, key):
     return f"weather_day{day}_{key}"
 
 
-def wx_kind():
-    """What the WMO code shows: clear, partly (cloudy), cloudy, fog, rain (drizzle and showers too), snow, thunder."""
-    c = f"Number(items.{WX_CODE}.state)"
-    return (f"(Number.isNaN(Number.parseFloat(items.{WX_CODE}.state)) ? '' : {c} === 0 ? 'clear' : "
-            f"{c} <= 2 ? 'partly' : "
+def wx_json(item):
+    """A String item holding a JSON list, parsed; an empty list while it holds none (NULL after a restart)."""
+    return f"(('' + items.{item}.state).startsWith('[') ? JSON.parse(items.{item}.state) : [])"
+
+
+def wx_kind(code):
+    """What a WMO code shows: clear, partly (cloudy), cloudy, fog, rain (drizzle and showers too), snow, thunder."""
+    c = f"Number({code})"
+    return (f"(Number.isNaN(Number.parseFloat({code})) ? '' : {c} === 0 ? 'clear' : {c} <= 2 ? 'partly' : "
             f"{c} === 3 ? 'cloudy' : {c} <= 48 ? 'fog' : {c} <= 67 ? 'rain' : {c} <= 77 ? 'snow' : "
             f"{c} <= 82 ? 'rain' : {c} <= 86 ? 'snow' : 'thunder')")
 
 
-def wx_is(*kinds):
-    return "(" + " || ".join(f"{wx_kind()} === '{k}'" for k in kinds) + ")"
-
-
-WX_NIGHT = f"items.{WX_DAY}.state === 'OFF'"
 WX_CLOUD = "M14,38 H34 A6,6 0 0,0 35.5,26.2 A9,9 0 0,0 18.6,24.4 A7,7 0 0,0 14,38 Z"
 # a crescent: a circle of 10 around (24, 24) less one of 8.5 around (29.5, 18.5)
 WX_MOON = "M22.19,14.17 A10,10 0 1,0 33.83,25.81 A8.5,8.5 0 1,1 22.19,14.17 Z"
@@ -709,10 +715,15 @@ def wx_cloud(transform):
                **stroke(1.6, "#90a4ae", fill="#cfd8dc", **{"stroke-linejoin": "round"}))
 
 
-def weather_icon(size):
-    """The present weather drawn in the style of the energy flow's nodes: the sun (its rays turning slowly) or the
-    moon by day and night, alone when it is clear, behind a small cloud when partly cloudy; a cloud, raised over
-    falling rain, drifting snow, a flickering bolt or fog."""
+def weather_icon_widget():
+    """The widget the weather is drawn with, in the style of the energy flow's nodes: code is a WMO code, day whether
+    the sun is up (the moon while it is false). The sun (its rays turning slowly) or the moon, alone when it is clear, behind a small cloud when
+    partly cloudy; a cloud, raised over falling rain, drifting snow, a flickering bolt or fog. Nothing while code is
+    no number."""
+    kind, night = wx_kind("props.code"), "props.day === false"
+
+    def shows(k):
+        return f"{kind} === '{k}'"
     partly = "translate(17 17) scale(0.72) translate(-24 -24)"
     drops = [svg("line", [dash_flow("0.9s", "true", to="-6")], x1=x, y1=36, x2=x - 2, y2=42,
                  **stroke(2.2, "#42a5f5", **{"stroke-dasharray": "3 3"})) for x in (18, 25, 32)]
@@ -724,34 +735,55 @@ def weather_icon(size):
                points="26,31 20,40 24.5,40 22,47 30,37 25.5,37 28,31", fill="#ffca28",
                **{"stroke": "#f9a825", "stroke-width": 0.8, "stroke-linejoin": "round"})
     fog = [svg("line", x1=a, y1=y, x2=b, y2=y, **stroke(2.2, "#90a4ae")) for a, b, y in ((12, 36, 37), (15, 33, 42))]
+    size = "=props.size || 36"
     return svg("svg", [
-        svg("g", wx_sun(), visible=f"={wx_is('clear')} && !({WX_NIGHT})"),
-        svg("path", d=WX_MOON, fill="#9fa8da", visible=f"={wx_is('clear')} && {WX_NIGHT}"),
-        svg("g", wx_sun(), transform=partly, visible=f"={wx_is('partly')} && !({WX_NIGHT})"),
+        svg("g", wx_sun(), visible=f"={shows('clear')} && !({night})"),
+        svg("path", d=WX_MOON, fill="#9fa8da", visible=f"={shows('clear')} && {night}"),
+        svg("g", wx_sun(), transform=partly, visible=f"={shows('partly')} && !({night})"),
         svg("path", d=WX_MOON, fill="#9fa8da", transform="translate(17 16) scale(0.7) translate(-24 -24)",
-            visible=f"={wx_is('partly')} && {WX_NIGHT}"),
-        svg("g", [wx_cloud("translate(27 34) scale(0.9) translate(-27 -31)")], visible=f"={wx_is('partly')}"),
-        svg("g", [wx_cloud("translate(0 -2)")], visible=f"={wx_is('cloudy')}"),
-        svg("g", [wx_cloud("translate(0 -6)"), *drops], visible=f"={wx_is('rain')}"),
-        svg("g", [wx_cloud("translate(0 -6)"), *flakes], visible=f"={wx_is('snow')}"),
-        svg("g", [wx_cloud("translate(0 -8)"), bolt], visible=f"={wx_is('thunder')}"),
-        svg("g", [wx_cloud("translate(24 23) scale(0.9) translate(-24 -31)"), *fog], visible=f"={wx_is('fog')}"),
+            visible=f"={shows('partly')} && {night}"),
+        svg("g", [wx_cloud("translate(27 34) scale(0.9) translate(-27 -31)")], visible=f"={shows('partly')}"),
+        svg("g", [wx_cloud("translate(0 -2)")], visible=f"={shows('cloudy')}"),
+        svg("g", [wx_cloud("translate(0 -6)"), *drops], visible=f"={shows('rain')}"),
+        svg("g", [wx_cloud("translate(0 -6)"), *flakes], visible=f"={shows('snow')}"),
+        svg("g", [wx_cloud("translate(0 -8)"), bolt], visible=f"={shows('thunder')}"),
+        svg("g", [wx_cloud("translate(24 23) scale(0.9) translate(-24 -31)"), *fog], visible=f"={shows('fog')}"),
     ], viewBox="0 0 48 48", width=size, height=size, style={"display": "block", "flex": "0 0 auto"})
+
+
+def weather_icon(code, day, size):
+    """An instance of the weather drawing; code and day are expressions, evaluated where it stands."""
+    return comp("widget:weather-icon", {"code": f"={code}", "day": f"={day}", "size": size})
+
+
+def wx_alert(level, size, **style):
+    """A warning sign, a rounded triangle in the level's colour with a dark exclamation mark, readable on either
+    theme; level is an expression."""
+    return svg("svg", [
+        svg("path", d="M12,2.6 L22.4,20.6 H1.6 Z", fill=f"={WX_LEVEL_COLORS}[Number({level})] || '#9e9e9e'",
+            **{"stroke": f"={WX_LEVEL_COLORS}[Number({level})] || '#9e9e9e'", "stroke-width": 2.4,
+               "stroke-linejoin": "round"}),
+        svg("rect", x=10.9, y=8.2, width=2.2, height=7, rx=1.1, fill="#212121"),
+        svg("circle", cx=12, cy=18, r=1.3, fill="#212121"),
+    ], viewBox="0 0 24 24", width=size, height=size, style={"display": "block", "flex": "0 0 auto", **style})
 
 
 def wx_degrees(item):
     return f"({ok(item)} ? Math.round(Number(items.{item}.numericState)) + '°' : '–')"
 
 
+def wx_min_max(low, high, size="13px"):
+    """A day's minimum pale and maximum bold, as texts."""
+    return div([label(f"={low}", **{"opacity": "0.65"}), label("/", **{"opacity": "0.35"}),
+                label(f"={high}", **{"font-weight": "700"})],
+               **{"display": "flex", "gap": "3px", "font-size": size, "line-height": "18px", "white-space": "nowrap"})
+
+
 def wx_day(day):
-    """A day of the forecast: its name, the minimum pale and the maximum bold."""
+    """A day of the bar: its name, the minimum pale and the maximum bold."""
     name = "'Heute'" if day == 0 else f"{WX_WEEKDAYS}[dayjs().add({day}, 'day').day()]"
     return div([label(f"={name}", **{"font-size": "11px", "opacity": "0.65", "line-height": "14px"}),
-                div([label(f"={wx_degrees(wx_item(day, 'min'))}", **{"opacity": "0.65"}),
-                     label("/", **{"opacity": "0.35"}),
-                     label(f"={wx_degrees(wx_item(day, 'max'))}", **{"font-weight": "700"})],
-                    **{"display": "flex", "gap": "3px", "font-size": "13px", "line-height": "18px",
-                       "white-space": "nowrap"})],
+                wx_min_max(wx_degrees(wx_item(day, 'min')), wx_degrees(wx_item(day, 'max')))],
                **{"display": "flex", "flex-direction": "column", "align-items": "center"})
 
 
@@ -768,9 +800,13 @@ WEATHER_POPUP = "forecast"
 
 
 def weather_card():
-    """The weather as a slim bar across the overview: the present weather drawn, the outdoor temperature, and the
-    minimum and maximum of today and the next two days; a tap opens the forecast in a popup."""
-    now = div([weather_icon(36),
+    """The weather as a slim bar across the overview: the present weather drawn, while a warning is in effect or
+    near a warning sign in its level's colour, the outdoor temperature, and the minimum and maximum of today and the
+    next two days; a tap opens the forecast in a popup."""
+    # the sign takes the drawing's empty right margin, so the bar keeps its fit on a phone
+    alert = wx_alert(f"items.{WX_LEVEL}.state", 16, **{"margin-left": "-14px", "align-self": "flex-start"})
+    alert["config"]["visible"] = f"=Number(items.{WX_LEVEL}.state) > 0"
+    now = div([weather_icon(f"items.{WX_CODE}.state", f"items.{WX_DAY}.state !== 'OFF'", 36), alert,
                div([label(f"={disp(OUTDOOR)}", **{"font-size": "18px", "font-weight": "700", "line-height": "22px",
                                                   "white-space": "nowrap"}),
                     label("Außen", **{"font-size": "11px", "opacity": "0.65", "line-height": "14px"})],
@@ -786,23 +822,158 @@ def weather_card():
     return comp("oh-card", {"contentStyle": {"padding": "8px 14px"}}, content=[bar])
 
 
+def wx_day_name(t):
+    """Heute, morgen or the weekday of a time in epoch seconds."""
+    d = f"dayjs({t} * 1000)"
+    return (f"({d}.isSame(dayjs(), 'day') ? 'heute' : {d}.isSame(dayjs().add(1, 'day'), 'day') ? 'morgen' : "
+            f"{WX_WEEKDAYS}[{d}.day()])")
+
+
+def wx_when(t):
+    return f"{wx_day_name(t)} + ' ' + dayjs({t} * 1000).format('HH:mm')"
+
+
+def weather_warnings_card():
+    """GeoSphere's warnings that have not ended, each in its level's colour: type and level, period and text."""
+    w = "loop.warning"
+    color = f"({WX_LEVEL_COLORS}[{w}.level] || '#9e9e9e')"
+    chip = label(f"={WX_LEVEL_NAMES}[{w}.level]", **{
+        "background": f"={color}", "color": f"={w}.level === 1 ? '#212121' : '#ffffff'", "border-radius": "10px",
+        "padding": "1px 9px", "font-size": "12px", "font-weight": "600", "white-space": "nowrap"})
+    head = div([wx_alert(f"{w}.level", 20), label(f"={w}.type", **{"font-size": "15px", "font-weight": "700"}), chip],
+               **{"display": "flex", "align-items": "center", "gap": "8px"})
+    period = label(f"={wx_when(w + '.start')} + ' – ' + {wx_when(w + '.end')}",
+                   **{"font-size": "13px", "opacity": "0.7", "margin-top": "2px"})
+    text = label(f"={w}.text", visible=f"=!!{w}.text",
+                 **{"font-size": "13px", "line-height": "1.4", "margin-top": "6px", "overflow-wrap": "anywhere"})
+    one = div([head, period, text], **{
+        "border-left": f"=('4px solid ' + {color})", "background": f"='color-mix(in srgb, ' + {color} + ' 14%, transparent)'",
+        "border-radius": "8px", "padding": "8px 12px", "margin": "0 12px 8px"})
+    listed = div([comp("oh-repeater", {"for": "warning", "sourceType": "array", "in": f"={wx_json(WX_WARNINGS)}",
+                                       "fragment": True}, default=[one])], **{"padding-top": "4px", "padding-bottom": "4px"})
+    return card("Warnungen", [listed])
+
+
+# the forecast chart's three series: temperature over precipitation in the upper grid, wind in the lower
+WX_TEMP_COLOR, WX_RAIN_COLOR, WX_WIND_COLOR = "#f4511e", "#42a5f5", "#78909c"
+
+
+def wx_hourly(index):
+    """One column of the hourly forecast as chart data, [time in ms, value]."""
+    return f"={wx_json(WX_HOURLY)}.map((r) => [r[0] * 1000, r[{index}]])"
+
+
+def wx_series(name, unit, index, color, x, y, **cfg):
+    # the id carries the unit, which the chart's tooltip appends to the value, as for an item's series
+    return comp("oh-data-series", {"id": f"oh-data-series#{index}#{unit}", "name": name, "xAxisIndex": x,
+                                   "yAxisIndex": y, "data": wx_hourly(index),
+                                   "itemStyle": {"color": color}, **cfg})
+
+
+def wx_midnights():
+    """Dashed lines at the next three midnights."""
+    return {"symbol": ["none", "none"], "silent": True, "label": {"show": False},
+            "lineStyle": {"color": "#888", "type": "dashed", "opacity": 0.5},
+            "data": [{"xAxis": f"=dayjs().add({d}, 'day').startOf('day').valueOf()"} for d in (1, 2, 3)]}
+
+
+# the time axis' labels: the weekday in bold at midnight, the hours between, on a phone only noon
+WX_TIME_LABEL = (f"=(v) => dayjs(v).hour() === 0 && dayjs(v).minute() === 0 ? '{{day|' + {WX_WEEKDAYS}[dayjs(v).day()] "
+                 f"+ '}}' : {NARROW} && dayjs(v).hour() % 12 !== 0 ? '' : dayjs(v).format('HH:mm')")
+
+
+def weather_forecast_chart():
+    """The next 60 hours: temperature as a line over the precipitation of each hour as bars, the wind below, one
+    tooltip for all three."""
+    grids = [comp("oh-chart-grid", {"top": "35", "height": "140", "left": "45", "right": "45"}),
+             comp("oh-chart-grid", {"top": "205", "bottom": "60", "left": "45", "right": "45"})]
+    x_axes = [comp("oh-time-axis", {"gridIndex": 0, "axisLabel": {"show": False}}),
+              comp("oh-time-axis", {"gridIndex": 1, "axisLabel": {"formatter": WX_TIME_LABEL,
+                                                                   "rich": {"day": {"fontWeight": "bold"}}}})]
+    dashed = {"splitLine": {"lineStyle": {"type": "dashed", "opacity": 0.4}}}
+    y_axes = [value_axis("°C", scale=True, minInterval=1),
+              comp("oh-value-axis", {"gridIndex": 0, "name": "mm", "nameGap": 14, "min": 0,
+                                     "max": "=(v) => Math.max(v.max, 2)", "splitLine": {"show": False},
+                                     "nameTextStyle": {"align": "left", "padding": [0, 0, 0, 8]}}),
+              comp("oh-value-axis", {"gridIndex": 1, "name": "km/h", "nameGap": 10, "nameTextStyle": AXIS_NAME,
+                                     "min": 0, "max": "=(v) => Math.max(v.max, 20)", "splitNumber": 2, **dashed})]
+    series = [wx_series("Temperatur", "°C", 1, WX_TEMP_COLOR, 0, 0, type="line", smooth=0.5, symbol="none",
+                        lineStyle={"width": 2.5, "color": WX_TEMP_COLOR}, markLine=wx_midnights(), z=3),
+              # precipitation is the sum of the hour before its time; the bar stands on that time all the same, as
+              # the axis tooltip lists only the series with a point at the time it snaps to
+              wx_series("Niederschlag", "mm", 2, WX_RAIN_COLOR, 0, 1, type="bar", barMaxWidth=6,
+                        itemStyle={"color": WX_RAIN_COLOR, "borderRadius": [2, 2, 0, 0]}),
+              wx_series("Wind", "km/h", 3, WX_WIND_COLOR, 1, 2, type="line", smooth=0.5, symbol="none",
+                        lineStyle={"width": 2, "color": WX_WIND_COLOR}, areaStyle={"color": gradient(rgb_of(WX_WIND_COLOR))},
+                        markLine=wx_midnights())]
+    return chart({"period": "60h", "future": 1, "height": "320px",
+                  # one tooltip for both grids
+                  "options": {"axisPointer": {"link": [{"xAxisIndex": "all"}]}}},
+                 grid=grids, xAxis=x_axes, yAxis=y_axes, series=series,
+                 tooltip=tooltip(trigger="axis", smartFormatter=True), legend=legend())
+
+
+def wx_day_row():
+    """A day of the popup: its name, the weather drawn, minimum and maximum, precipitation with its probability
+    under it, and the strongest wind."""
+    d = "loop.day"
+    name = f"(dayjs({d}.t * 1000).isSame(dayjs(), 'day') ? 'Heute' : {WX_WEEKDAYS}[dayjs({d}.t * 1000).day()])"
+    degrees = lambda v: f"({v} == null ? '–' : Math.round({v}) + '°')"
+    rain = f"({d}.p == null ? '–' : {d}.p < 0.05 ? '0 mm' : {fixed(d + '.p', 1)} + ' mm')"
+    small_icon = lambda icon, color: comp("oh-icon", {"icon": icon, "width": 15, "height": 15,
+                                                      "style": {"color": color, "flex": "0 0 auto"}})
+    cell = {"display": "flex", "align-items": "center", "gap": "5px", "font-size": "13px", "white-space": "nowrap"}
+    return div([
+        label(f"={name}", **{"font-size": "14px", "font-weight": "600"}),
+        weather_icon(f"{d}.c", "true", 32),
+        wx_min_max(degrees(f"{d}.lo"), degrees(f"{d}.hi"), "14px"),
+        div([small_icon("material:water_drop", WX_RAIN_COLOR),
+             div([label(f"={rain}", **{"line-height": "16px"}),
+                  label(f"={d}.pp + ' %'", visible=f"={d}.pp != null",
+                        **{"font-size": "11px", "opacity": "0.65", "line-height": "13px"})],
+                 **{"display": "flex", "flex-direction": "column"})],
+            **{**cell, "opacity": f"=({d}.p || 0) < 0.05 ? '0.55' : '1'"}),
+        div([small_icon("material:air", WX_WIND_COLOR), label(f"=({d}.w == null ? '–' : {d}.w) + ' km/h'")],
+            **{**cell, "justify-content": "flex-end"}),
+    ], **{"display": "grid", "grid-template-columns": "40px 32px 64px 1fr auto", "align-items": "center",
+          "column-gap": "8px", "min-height": "40px", "padding": "4px 16px",
+          "border-top": "1px solid rgba(127, 127, 127, 0.15)"})
+
+
+def weather_forecast_card():
+    days = div([comp("oh-repeater", {"for": "day", "sourceType": "array", "in": f"={wx_json(WX_DAILY)}.slice(0, 5)",
+                                     "fragment": True}, default=[wx_day_row()])],
+               # a gap between the chart's legend and the first day
+               **{"margin-top": "14px", "padding-bottom": "4px"})
+    return card("Vorhersage", [div([weather_forecast_chart()], **{"padding": "0 4px"}), days])
+
+
 def weather_popup(now):
     # the widget's height follows its width, 434 px at 293 px wide and 0.36 px more per pixel (measured); the frame
     # is the popup's width less 52 px on a phone and 507 px in the popup of a wider screen. A page cannot read the
     # height of a frame from another site, so it is worked out from the width
     width = "Math.min(507, screen.width - 52)"
+    # the widget's document declares no color-scheme: in MainUI's dark theme Chrome would paint an opaque white
+    # canvas behind it, and the dark layout's white text would vanish; a light scheme keeps the canvas transparent
     frame = comp("oh-webframe", {"src": f"='{METEOBLUE}' + (themeOptions.dark === 'dark' ? 'dark' : 'light')",
                                  "height": f"=Math.ceil(434 + ({width} - 293) * 0.36) + 8 + 'px'", "frameborder": "0",
-                                 "scrolling": "no", "style": {"width": "100%", "border": "0", "display": "block"}})
+                                 "scrolling": "no", "style": {"width": "100%", "border": "0", "display": "block",
+                                                              "color-scheme": "light"}})
     orf = div([comp("oh-icon", {"icon": "material:open_in_new", "width": 22, "height": 22}),
                label("Prognose für Wien bei wetter.orf.at", **{"flex": "1", "font-size": "14px"}),
                comp("oh-button", {"text": "Öffnen", "action": "url", "actionUrl": ORF_WEATHER,
                                   "actionUrlSameWindow": False, "outline": True, "small": True})],
               **{"display": "flex", "align-items": "center", "gap": "10px", "padding": "6px 16px"})
-    note = label("Die Leiste der Übersicht zeigt die Außentemperatur vom Sensor der Wärmepumpe und die Prognose von "
-                 "Open-Meteo.com (CC BY 4.0), Modell GeoSphere AROME Austria.",
+    note = label("Die Außentemperatur der Leiste misst der Sensor der Wärmepumpe. Vorhersage von Open-Meteo.com "
+                 "(CC BY 4.0), Modell GeoSphere AROME Austria, spätere Stunden und Tage sowie die "
+                 "Regenwahrscheinlichkeit aus dem Best Match; Warnungen von GeoSphere Austria (warnungen.zamg.at).",
                  **{"font-size": "12px", "opacity": "0.6", "padding": "4px 16px 14px"})
-    blocks = [block(row(full(card("Meteoblue · 5 Tage", [div([frame], **{"padding": "4px 12px 12px"})])))),
+    # the warnings only while there are any; without them the forecast stands at the top
+    warnings = block(row(full(weather_warnings_card())))
+    warnings["config"]["visible"] = f"={wx_json(WX_WARNINGS)}.length > 0"
+    blocks = [warnings,
+              block(row(full(weather_forecast_card()))),
+              block(row(full(card("Meteoblue · 5 Tage", [div([frame], **{"padding": "4px 12px 12px"})])))),
               block(row(full(card("Weitere Quellen", [orf, note]))))]
     return {WEATHER_POPUP: layout_page(WEATHER_POPUP, {"label": "Wetter", "sidebar": False}, blocks, now)}
 
@@ -3817,6 +3988,12 @@ FLOW_SHARE_RING_PARAMS = [
     param("title", "Title", "Text beside the ring, e.g. Eigenverbrauch", required=True),
     param("part", "Part", "The part, e.g. today's PV energy used at home; usually an expression", required=True),
     param("whole", "Whole", "The whole, e.g. today's PV energy; usually an expression", required=True)]
+WEATHER_ICON_PARAMS = [
+    param("code", "WMO code", "The weather as a WMO code, 0 (clear) to 99 (thunderstorm with hail); usually an "
+          "expression", "DECIMAL", required=True),
+    param("day", "Day", "Whether the sun is up; false draws the moon; usually an expression", "BOOLEAN",
+          default="true"),
+    param("size", "Size", "Width and height in px", "INTEGER", default="36")]
 APPLIANCE_KIND = dict(param("kind", "Kind", "The appliance drawn", required=True), limitToOptions=True,
                       options=[{"value": k, "label": k} for k, _ in APPLIANCE_FRONTS])
 APPLIANCE_ICON_PARAMS = [
@@ -3871,6 +4048,7 @@ def widgets():
     out["flow-share-ring"] = (share_ring_widget(), FLOW_SHARE_RING_PARAMS, ["flow"])
     out["appliance-icon"] = (appliance_icon_widget(), APPLIANCE_ICON_PARAMS, ["appliance"])
     out["appliance-tile"] = (appliance_tile_widget(), APPLIANCE_TILE_PARAMS, ["appliance"])
+    out["weather-icon"] = (weather_icon_widget(), WEATHER_ICON_PARAMS, ["weather"])
     for uid, (tree, props) in ROLE_WIDGETS.items():
         params = [dict(param(p, names.get(i, (p, ""))[0], f"{names.get(i, ('', 'Item'))[1]} item", required=True),
                        context="item") for i, p in props.items()]
