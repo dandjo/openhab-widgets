@@ -10,7 +10,6 @@ const URL = 'https://warnungen.zamg.at/wsapp/api/getWarningsForCoords?lon=16.37&
 const TYPES = {1: 'Wind', 2: 'Regen', 3: 'Schnee', 4: 'Glatteis', 5: 'Gewitter', 6: 'Hitze', 7: 'Kälte'};
 const WEEKDAYS = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
 const AHEAD = 24 * 3600;
-const LEVELS = {1: 'Gelb', 2: 'Orange', 3: 'Rot'};
 
 // GeoSphere's warnings, or null without an answer; rawinfo carries type, level and period as numbers
 function fetched() {
@@ -64,7 +63,7 @@ const summary = top ? top.type + (top.start <= now ? ' bis ' + when(top.end) : '
 const before = items.weather_warning_level.numericState;
 if (level >= 2 && before !== null && before !== undefined && level > before) {
   actions.NotificationAction.sendBroadcastNotification(
-    'Wetterwarnung ' + LEVELS[level] + ': ' + summary + (top.text ? '\n' + top.text : ''));
+    'Wetterwarnung, Warnstufe ' + level + ' von 3: ' + summary + (top.text ? '\n' + top.text : ''));
 }
 
 items.weather_warning_level.postUpdate(level);
