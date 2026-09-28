@@ -941,11 +941,11 @@ def wx_day_row():
 
 
 def weather_forecast_card():
+    # the days first, the chart of the next hours below them, a gap between the last day and the chart
     days = div([comp("oh-repeater", {"for": "day", "sourceType": "array", "in": f"={wx_json(WX_DAILY)}.slice(0, 5)",
                                      "fragment": True}, default=[wx_day_row()])],
-               # a gap between the chart's legend and the first day
-               **{"margin-top": "14px", "padding-bottom": "4px"})
-    return card("Vorhersage", [div([weather_forecast_chart()], **{"padding": "0 4px"}), days])
+               **{"padding-top": "2px", "margin-bottom": "12px"})
+    return card("Vorhersage", [days, div([weather_forecast_chart()], **{"padding": "0 4px 6px"})])
 
 
 def weather_popup(now):
