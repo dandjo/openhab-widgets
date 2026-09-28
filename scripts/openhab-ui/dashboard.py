@@ -1056,16 +1056,19 @@ def weather_forecast_card():
     return card("Vorhersage", [days, div([weather_forecast_chart()], **{"padding": "0 4px 6px"})])
 
 
-def weather_popup(now):
+def weather_cards():
+    """The weather's cards, for its popup and its page: warnings, forecast, Meteoblue and the other sources."""
     # the widget's height follows its width, 434 px at 293 px wide and 0.36 px more per pixel (measured); the frame
-    # is the popup's width less 52 px on a phone and 507 px in the popup of a wider screen. A page cannot read the
-    # height of a frame from another site, so it is worked out from the width
+    # is the card's width less 52 px on a phone and 507 px at most, in the popup of a wider screen as on the page,
+    # where it stands in the middle of a wider card. A page cannot read the height of a frame from another site, so
+    # it is worked out from the width
     width = "Math.min(507, screen.width - 52)"
     # the widget's document declares no color-scheme: in MainUI's dark theme Chrome would paint an opaque white
     # canvas behind it, and the dark layout's white text would vanish; a light scheme keeps the canvas transparent
     frame = comp("oh-webframe", {"src": f"='{METEOBLUE}' + (themeOptions.dark === 'dark' ? 'dark' : 'light')",
                                  "height": f"=Math.ceil(434 + ({width} - 293) * 0.36) + 8 + 'px'", "frameborder": "0",
-                                 "scrolling": "no", "style": {"width": "100%", "border": "0", "display": "block",
+                                 "scrolling": "no", "style": {"width": "100%", "max-width": "507px", "margin": "0 auto",
+                                                              "border": "0", "display": "block",
                                                               "color-scheme": "light"}})
     orf = div([comp("oh-icon", {"icon": "material:open_in_new", "width": 22, "height": 22}),
                label("Prognose für Wien bei wetter.orf.at", **{"flex": "1", "font-size": "14px"}),
@@ -1076,15 +1079,29 @@ def weather_popup(now):
                  "(CC BY 4.0), Modell GeoSphere AROME Austria, spätere Stunden und Tage sowie die "
                  "Regenwahrscheinlichkeit aus dem Best Match; Warnungen von GeoSphere Austria (warnungen.zamg.at).",
                  **{"font-size": "12px", "opacity": "0.6", "padding": "4px 16px 14px"})
-    # the cards as rows of one block, as in the other popups, so they keep a card's gap and not a block's; the
-    # warnings only while there are any, without them the forecast stands at the top
-    warnings = row(full(weather_warnings_card()))
-    warnings["config"]["visible"] = f"={wx_json(WX_WARNINGS)}.length > 0"
-    blocks = [block(warnings,
-                    row(full(weather_forecast_card())),
-                    row(full(card("Meteoblue · 5 Tage", [div([frame], **{"padding": "4px 12px 12px"})]))),
-                    row(full(card("Weitere Quellen", [orf, note]))))]
+    return (weather_warnings_card(), weather_forecast_card(),
+            card("Meteoblue · 5 Tage", [div([frame], **{"padding": "4px 12px 12px"})]), card("Weitere Quellen", [orf, note]))
+
+
+def wx_warnings_row(warnings):
+    """The warnings across the page, only while there are any; without them the forecast stands at the top."""
+    out = row(full(warnings))
+    out["config"]["visible"] = f"={wx_json(WX_WARNINGS)}.length > 0"
+    return out
+
+
+def weather_popup(now):
+    # the cards as rows of one block, as in the other popups, so they keep a card's gap and not a block's
+    warnings, forecast, meteoblue, sources = weather_cards()
+    blocks = [block(wx_warnings_row(warnings), row(full(forecast)), row(full(meteoblue)), row(full(sources)))]
     return {WEATHER_POPUP: layout_page(WEATHER_POPUP, {"label": "Wetter", "sidebar": False}, blocks, now)}
+
+
+def weather_blocks():
+    """The weather's page in the sidebar, of the popup's cards: on a wider screen the forecast beside Meteoblue and
+    the other sources, the warnings across both."""
+    warnings, forecast, meteoblue, sources = weather_cards()
+    return [block(wx_warnings_row(warnings), row(col([forecast]), col([div([meteoblue, sources])])))]
 
 
 # ---------------------------------------------------------------- 2b. heat pump, in the style of the energy flow
@@ -3603,8 +3620,11 @@ def below_controls(builder):
     return lambda: plots_below_controls(builder())
 
 
+# the label, icon and sidebar order of a page the generator adds, until the UI changes them
+NEW_PAGES = {"weather": {"label": "Wetter", "icon": "material:wb_sunny", "order": "1"}}
 DEVICE_PAGES = {
     # uid: builder of the blocks; label, icon and sidebar order stay those of the existing page
+    "weather": weather_blocks,
     "netatmo": netatmo_blocks,
     "smartpi": meter_blocks("smartpi_ptot", SMARTPI_SIGN,
                             [("Bezug heute", "smartpi_ecday", "#e53935"), ("Einspeisung heute", "smartpi_epday", "#43a047")],
@@ -4204,7 +4224,7 @@ def migrate_pages(d):
                    **popup_pages_of("hp", HP_POPUPS, now)}.items():
         d = m.insert(d, uid, p)
     for uid, blocks in DEVICE_PAGES.items():  # the device pages, label, icon and sidebar order kept
-        old = d[uid]["value"]["config"]
+        old = d[uid]["value"]["config"] if uid in d else NEW_PAGES[uid]
         config = {"label": old["label"], "icon": old.get("icon"), "order": old.get("order"), "sidebar": True}
         d = m.insert(d, uid, layout_page(uid, config, blocks(), now))
     # the home page shows the overview alone: with all three model tabs hidden MainUI drops the tab bar
