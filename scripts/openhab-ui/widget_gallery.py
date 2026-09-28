@@ -29,7 +29,7 @@ def caption(x, y, text):
 
 
 NODES = [("pv", 5200, None), ("grid", -800, None), ("home", 2400, None), ("heat-pump", 1500, None),
-         ("air-conditioner", 600, None), ("e-car", 2000, None), ("battery", None, 72)]
+         ("air-conditioner", 600, None), ("e-car", 2000, None), ("battery", None, 72), ("appliances", 1950, None)]
 
 
 def nodes_card():
@@ -38,7 +38,8 @@ def nodes_card():
         x = 45 + 85 * i
         items += [g.flow_node(kind, (x, 45), None if power is None else str(power), None if soc is None else str(soc)),
                   caption(x, 100, kind)]
-    return g.card("flow-node", [drawing(items, 600, 110, 720)])
+    width = 90 + 85 * (len(NODES) - 1)
+    return g.card("flow-node", [drawing(items, width, 110, round(width * 1.2))])
 
 
 def links_card():
