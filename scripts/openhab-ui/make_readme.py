@@ -5,10 +5,13 @@ W = {f[:-4]: yaml.safe_load(open(os.path.join(EXPORT, f))) for f in os.listdir(E
 
 OVERVIEW = [
     ("weather-card", "Weather", "A slim bar across the top: the present weather drawn in the style of the energy "
-     "flow (sun or moon, alone or behind a cloud, clouds with rain, snow, a bolt or fog, gently animated), the outdoor "
-     "temperature from a local sensor, and the minimum and maximum of today and the next two days. A tap opens a "
-     "forecast popup of my installation. Its items come from a rule that reads Open-Meteo's GeoSphere AROME Austria "
-     "model, `scripts/openhab-ui/applied/weather_forecast_rule.js`."),
+     "flow (`weather-icon`: sun or moon, alone or behind a cloud, clouds with rain, snow, a bolt or fog, gently "
+     "animated), the outdoor temperature from a local sensor, and the minimum and maximum of today and the next two "
+     "days. While an official warning of GeoSphere Austria is in effect or begins within 24 hours, a small warning "
+     "sign in its level's colour (yellow, orange, red) sits at the drawing's corner. A tap opens the forecast popup of "
+     "my installation (see [Weather](#weather)). Its items come from two rules, "
+     "`scripts/openhab-ui/applied/weather_forecast_rule.js`, which reads Open-Meteo's GeoSphere AROME Austria model, "
+     "and `weather_warnings_rule.js`, which reads GeoSphere Austria's warnings."),
     ("controls-card", "Controls", "Heat pump, air conditioner and ventilation, each folded to a head of three lines "
      "with its main action on the right: a Boost button for the heat pump's hot water, the air conditioner's on/off "
      "pill, the ventilation levels 1 to 3; the heat pump's second line names which of its switches are on and "
@@ -142,9 +145,9 @@ md = ["""# openHAB Widgets
 
 MainUI widgets from my openHAB 5 installation: the cards of an energy and home dashboard and the parts they are built
 from, which work on their own too: device panels with their heads, pills, bars and sliders, the nodes and lines of the
-energy flow, appliance icons and tiles; besides them a set of cards for every metered plug, a popup for any item and
-the tile their values stand in. The UI texts are German, numbers use a decimal comma. No widget names an item: every
-item comes in as a prop, so the widgets work with any item names.
+energy flow, appliance icons and tiles, a weather drawing; besides them a set of cards for every metered plug, a popup
+for any item and the tile their values stand in. The UI texts are German, numbers use a decimal comma. No widget names
+an item: every item comes in as a prop, so the widgets work with any item names.
 
 ![Overview](screenshots/overview-light.png)
 
@@ -183,8 +186,8 @@ for uid in sorted(W):
 md.append("""## Dashboard cards
 
 The cards of my overview page. Each takes the items it shows as props; the prop names say what an item is. Some
-elements open popup pages of my installation when tapped (`page:flow_*`, `page:hp_*`, `page:appliance_*`); they are
-not part of this repository.
+elements open popup pages of my installation when tapped (`page:flow_*`, `page:hp_*`, `page:appliance_*`,
+`page:forecast`); they are not part of this repository.
 """)
 for uid, title, what in OVERVIEW:
     shots = []
@@ -459,6 +462,25 @@ e.g. two columns.""", """
     power: washing_machine_2_power
     done: washing_machine_2_finished
 """, img("appliances-card.png", "Appliance tiles")))
+md.append("""## Weather
+
+""" + section("Weather icon", "weather-icon", """The weather drawn from a WMO code in the style of the energy flow's
+nodes: the sun, its rays turning slowly, or the moon while `day` is false, alone when it is clear (code 0) and behind
+a small cloud when partly cloudy (1, 2); a cloud (3), raised over fog (45, 48), falling rain (drizzle, rain and
+showers: 51 to 67, 80 to 82), drifting snow (71 to 77, 85, 86) or a flickering bolt (95 to 99). Nothing while `code`
+is no number, as an item is `NULL` after a restart. My weather bar shows the present weather with it, and my forecast
+popup each day's, below a chart of the next 60 hours: temperature over the precipitation of each hour, the wind
+below. That popup is a page of my installation, not a widget of this repository; its rule writes the forecast as JSON
+into String items, and the chart reads them through an `oh-data-series` whose `data` is an expression such as
+`=JSON.parse(items.weather_hourly.state).map((r) => [r[0] * 1000, r[1]])`, with no persistence involved. The
+warnings in the screenshots are demo values.""", """
+component: widget:weather-icon
+config:
+  code: =items.weather_code.state
+  day: =items.weather_is_day.state !== 'OFF'
+  size: 36
+""", "| Light | Dark |\n|---|---|\n| " + img("forecast-popup.png", "Forecast popup: warnings, chart and days") + " | "
+      + img("forecast-popup-dark.png", "Forecast popup in dark mode") + " |"))
 md.append("""## Plug cards
 
 Four cards for a metered plug, built from one item prefix: `<prefix>_power`, `_switch`, `_energy_today`,

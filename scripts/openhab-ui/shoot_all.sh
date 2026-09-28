@@ -1,7 +1,8 @@
 #!/bin/bash
 # every screenshot of the widget repository, into shots/v4/repo under the repository's names; needs the page
-# widget_gallery (widget_gallery.py apply) and the SSH tunnel on 18080. The energy flow and the consumption card are
-# shot with demo values (demo_flow.js, demo_consumption.js), set in the browser only
+# widget_gallery (widget_gallery.py apply) and the SSH tunnel on 18080. The energy flow, the consumption card and the
+# forecast popup's warnings are shot with demo values (demo_flow.js, demo_consumption.js, demo_weather.js), set in the
+# browser only
 set -u
 B=http://127.0.0.1:18080/page
 O=shots/v4; R=$O/repo; mkdir -p $O $R
@@ -23,7 +24,7 @@ cp $(shot ovcons verbrauch-heute*) $R/consumption-card.png
 step open; python3 cdp_cards_js.py $B/overview $O/ovopen 1400 light "$(cat screenshot-js/unfold.js)" >/dev/null
 cp $(shot ovopen steuerung) $R/controls-card-open.png
 step flow; PRE_JS=demo_flow.js FPS=20 python3 cdp_gif.py $B/overview 2 1400 $R/energy-flow-card.gif 6 light 1.5
-python3 cdp_cards_js.py $B/overview $O/ovdemo-dark 1400 dark "$(cat screenshot-js/demo_flow.js)" >/dev/null
+python3 cdp_cards_js.py $B/overview $O/ovdemo-dark 1400 dark "$(cat demo_flow.js)" >/dev/null
 cp $(shot ovdemo-dark energiefluss) $R/energy-flow-card-dark.png
 step panels; python3 cdp_elems.py $B/overview 1400 $O/folded "$(cat screenshot-js/panels.js)" >/dev/null
 python3 cdp_elems.py $B/overview 1400 $O/unfolded "$(cat screenshot-js/panels.js)" "$(cat screenshot-js/unfold.js)" >/dev/null
@@ -41,7 +42,11 @@ from PIL import Image
 a = Image.open('$O/crops/boost-dhw.png'); b = Image.open('$O/crops/boost-ac.png')
 s = Image.new('RGB', (max(a.size[0], b.size[0]), a.size[1] + b.size[1]), 'white'); s.paste(a, (0, 0)); s.paste(b, (0, a.size[1]))
 s.save('$R/boost-pills.png')"
-step popup; python3 cdp_tap2.py $B/coffee_machine $R/item-popup.png "Energie heute"
+step popup; python3 cdp_tap.py $B/coffee_machine $R/item-popup.png "Energie heute"
+# the forecast popup's warnings and forecast, the warnings on demo values (demo_weather.js)
+step forecast; python3 cdp_elems.py $B/forecast 390 $O/forecast "$(cat screenshot-js/forecast.js)" "$(cat demo_weather.js)" >/dev/null
+python3 cdp_elems.py $B/forecast 390 $O/forecast-dark "$(cat screenshot-js/forecast.js)" "$(cat demo_weather.js)" dark >/dev/null
+cp $O/forecast/forecast-popup.png $R/; cp $O/forecast-dark/forecast-popup.png $R/forecast-popup-dark.png
 if [ "${GALLERY:-1}" = 1 ]; then  # GALLERY=0 leaves the gallery's shots as they are
 step gallery; python3 cdp_cards.py $B/widget_gallery $O/g900 900 >/dev/null
 cp $O/g900-2-flow-share-ring.png $R/flow-share-rings.png; cp $O/g900-5-state-bar.png $R/state-bars.png
