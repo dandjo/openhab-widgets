@@ -11,7 +11,8 @@ OVERVIEW = [
      "sign in its level's colour (yellow, orange, red) sits at the drawing's corner. A tap opens the forecast popup of "
      "my installation (see [Weather](#weather)). Its items come from two rules, "
      "`scripts/openhab-ui/applied/weather_forecast_rule.js`, which reads Open-Meteo's GeoSphere AROME Austria model, "
-     "and `weather_warnings_rule.js`, which reads GeoSphere Austria's warnings."),
+     "and `weather_warnings_rule.js`, which reads GeoSphere Austria's warnings and sends a broadcast notification "
+     "when their level rises to orange or red."),
     ("controls-card", "Controls", "Heat pump, air conditioner and ventilation, each folded to a head of three lines "
      "with its main action on the right: a Boost button for the heat pump's hot water, the air conditioner's on/off "
      "pill, the ventilation levels 1 to 3; the heat pump's second line names which of its switches are on and "
@@ -469,7 +470,7 @@ nodes: the sun, its rays turning slowly, or the moon while `day` is false, alone
 a small cloud when partly cloudy (1, 2); a cloud (3), raised over fog (45, 48), falling rain (drizzle, rain and
 showers: 51 to 67, 80 to 82), drifting snow (71 to 77, 85, 86) or a flickering bolt (95 to 99). Nothing while `code`
 is no number, as an item is `NULL` after a restart. My weather bar shows the present weather with it, and my forecast
-popup each day's, below a chart of the next 60 hours: temperature over the precipitation of each hour, the wind
+popup each day's, above a chart of the next 60 hours: temperature over the precipitation of each hour, the wind
 below. That popup is a page of my installation, not a widget of this repository; its rule writes the forecast as JSON
 into String items, and the chart reads them through an `oh-data-series` whose `data` is an expression such as
 `=JSON.parse(items.weather_hourly.state).map((r) => [r[0] * 1000, r[1]])`, with no persistence involved. The
@@ -479,7 +480,7 @@ config:
   code: =items.weather_code.state
   day: =items.weather_is_day.state !== 'OFF'
   size: 36
-""", "| Light | Dark |\n|---|---|\n| " + img("forecast-popup.png", "Forecast popup: warnings, chart and days") + " | "
+""", "| Light | Dark |\n|---|---|\n| " + img("forecast-popup.png", "Forecast popup: warnings, days and chart") + " | "
       + img("forecast-popup-dark.png", "Forecast popup in dark mode") + " |"))
 md.append("""## Plug cards
 

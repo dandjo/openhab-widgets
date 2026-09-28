@@ -2,13 +2,15 @@
 // the overview's weather bar and its forecast popup: the highest level of the warnings in effect now or beginning
 // within the next 24 hours (0 none, 1 yellow, 2 orange, 3 red), that warning as a short German text ("Gewitter bis
 // 20:00", "Wind ab morgen 06:00"), and as JSON every warning that has not ended yet, by its start. When GeoSphere does
-// not answer, the warnings of the last answer are kept until they end.
+// not answer, the warnings of the last answer are kept until they end. From orange on a rising level goes out as a
+// broadcast notification.
 //
 // weather_warning_list: [{type: German name, level: 1-3, start, end: epoch seconds, text: GeoSphere's text}, ...]
 const URL = 'https://warnungen.zamg.at/wsapp/api/getWarningsForCoords?lon=16.37&lat=48.21&lang=de';
 const TYPES = {1: 'Wind', 2: 'Regen', 3: 'Schnee', 4: 'Glatteis', 5: 'Gewitter', 6: 'Hitze', 7: 'Kälte'};
 const WEEKDAYS = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
 const AHEAD = 24 * 3600;
+const LEVELS = {1: 'Gelb', 2: 'Orange', 3: 'Rot'};
 
 // GeoSphere's warnings, or null without an answer; rawinfo carries type, level and period as numbers
 function fetched() {
@@ -53,7 +55,18 @@ if (warnings === null) {
 }
 warnings = warnings.filter((w) => w.end > now).sort((a, b) => a.start - b.start || b.level - a.level);
 const top = warnings.filter((w) => w.start < now + AHEAD).reduce((m, w) => (!m || w.level > m.level ? w : m), null);
-items.weather_warning_level.postUpdate(top ? top.level : 0);
-items.weather_warning_text.postUpdate(top ? top.type + (top.start <= now ? ' bis ' + when(top.end)
-                                                                        : ' ab ' + when(top.start)) : 'Keine Warnung');
+const level = top ? top.level : 0;
+const summary = top ? top.type + (top.start <= now ? ' bis ' + when(top.end) : ' ab ' + when(top.start)) : 'Keine Warnung';
+
+// a broadcast from orange on, when the level rises to orange or red: a new warning (also one beginning within the
+// next 24 hours) or one made worse, not again while the level stays; not after a restart either, as the level is
+// restored then and does not rise, and not when the level before is unknown
+const before = items.weather_warning_level.numericState;
+if (level >= 2 && before !== null && before !== undefined && level > before) {
+  actions.NotificationAction.sendBroadcastNotification(
+    'Wetterwarnung ' + LEVELS[level] + ': ' + summary + (top.text ? '\n' + top.text : ''));
+}
+
+items.weather_warning_level.postUpdate(level);
+items.weather_warning_text.postUpdate(summary);
 items.weather_warning_list.postUpdate(JSON.stringify(warnings));
