@@ -672,6 +672,7 @@ flow = div([div([svg("svg", [
 WX_CODE, WX_DAY = "weather_code", "weather_is_day"
 WX_HOURLY, WX_DAILY = "weather_hourly", "weather_daily"
 WX_LEVEL, WX_WARNINGS = "weather_warning_level", "weather_warning_list"
+WX_WARNING_TEXT = "weather_warning_text"
 WX_DAYS = 3
 WX_WEEKDAYS = "['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa']"
 # the warning levels 0 to 3: none, yellow, orange, red, in GeoSphere's colours as Material shades
@@ -756,16 +757,42 @@ def weather_icon(code, day, size):
     return comp("widget:weather-icon", {"code": f"={code}", "day": f"={day}", "size": size})
 
 
+def wx_alert_parts(level):
+    """A warning sign in a 28 box: a disc in the level's colour with an exclamation mark, white on orange and red and
+    dark on yellow; level is an expression."""
+    color = f"={WX_LEVEL_COLORS}[Number({level})] || '#9e9e9e'"
+    mark = f"=Number({level}) === 1 ? '#3e2723' : '#ffffff'"
+    return [svg("circle", cx=14, cy=14, r=9, fill=color),
+            svg("rect", x=12.7, y=8.6, width=2.6, height=6.6, rx=1.3, fill=mark),
+            svg("circle", cx=14, cy=18.17, r=1.35, fill=mark)]
+
+
 def wx_alert(level, size, **style):
-    """A warning sign, a rounded triangle in the level's colour with a dark exclamation mark, readable on either
-    theme; level is an expression."""
-    return svg("svg", [
-        svg("path", d="M12,2.6 L22.4,20.6 H1.6 Z", fill=f"={WX_LEVEL_COLORS}[Number({level})] || '#9e9e9e'",
-            **{"stroke": f"={WX_LEVEL_COLORS}[Number({level})] || '#9e9e9e'", "stroke-width": 2.4,
-               "stroke-linejoin": "round"}),
-        svg("rect", x=10.9, y=8.2, width=2.2, height=7, rx=1.1, fill="#212121"),
-        svg("circle", cx=12, cy=18, r=1.3, fill="#212121"),
-    ], viewBox="0 0 24 24", width=size, height=size, style={"display": "block", "flex": "0 0 auto", **style})
+    """The warning sign on its own."""
+    return svg("svg", wx_alert_parts(level), viewBox="0 0 28 28", width=size, height=size,
+               style={"display": "block", "flex": "0 0 auto", **style})
+
+
+def wx_teaser():
+    """The warning teased beside the temperature while one is in effect or near: the sign with a ring pulsing out
+    of it in the level's colour; on a wider screen in a pill tinted the same way, with the warning's short text
+    (Gewitter bis 20:00)."""
+    level = f"items.{WX_LEVEL}.state"
+    color = f"({WX_LEVEL_COLORS}[Number({level})] || '#9e9e9e')"
+    wide = "screen.width >= 600"
+    pulse = svg("circle", [svg("animate", attributeName="r", values="9;13.5", dur="2.2s", repeatCount="indefinite"),
+                           svg("animate", attributeName="opacity", values="0.7;0", dur="2.2s",
+                               repeatCount="indefinite")],
+                cx=14, cy=14, r=9, fill="none", stroke=f"={color}", **{"stroke-width": 1.6})
+    size = f"={wide} ? 28 : 24"
+    badge = svg("svg", [pulse, *wx_alert_parts(level)], viewBox="0 0 28 28", width=size, height=size,
+                style={"display": "block", "flex": "0 0 auto"})
+    text = label(f"=items.{WX_WARNING_TEXT}.state", visible=f"={wide}",
+                 **{"font-size": "12px", "font-weight": "600", "white-space": "nowrap"})
+    return div([badge, text], visible=f"=Number({level}) > 0",
+               **{"display": "flex", "align-items": "center", "gap": "4px", "border-radius": "14px",
+                  "padding": f"={wide} ? '0 10px 0 0' : '0'",
+                  "background": f"={wide} ? 'color-mix(in srgb, ' + {color} + ' 16%, transparent)' : 'transparent'"})
 
 
 def wx_degrees(item):
@@ -800,25 +827,27 @@ WEATHER_POPUP = "forecast"
 
 
 def weather_card():
-    """The weather as a slim bar across the overview: the present weather drawn, while a warning is in effect or
-    near a warning sign in its level's colour, the outdoor temperature, and the minimum and maximum of today and the
-    next two days; a tap opens the forecast in a popup."""
-    # the sign takes the drawing's empty right margin, so the bar keeps its fit on a phone
-    alert = wx_alert(f"items.{WX_LEVEL}.state", 16, **{"margin-left": "-14px", "align-self": "flex-start"})
-    alert["config"]["visible"] = f"=Number(items.{WX_LEVEL}.state) > 0"
-    now = div([weather_icon(f"items.{WX_CODE}.state", f"items.{WX_DAY}.state !== 'OFF'", 36), alert,
+    """The weather as a slim bar across the overview: the present weather drawn, the outdoor temperature with a
+    warning teased beside it while one is in effect or near, and the minimum and maximum of today and the next two
+    days; a tap opens the forecast in a popup. On a phone the gaps narrow, and below 380 px the chevron goes, so the
+    teaser fits beside the days."""
+    narrow = "screen.width < 600"
+    now = div([weather_icon(f"items.{WX_CODE}.state", f"items.{WX_DAY}.state !== 'OFF'", 36),
                div([label(f"={disp(OUTDOOR)}", **{"font-size": "18px", "font-weight": "700", "line-height": "22px",
                                                   "white-space": "nowrap"}),
                     label("Außen", **{"font-size": "11px", "opacity": "0.65", "line-height": "14px"})],
-                   **{"display": "flex", "flex-direction": "column"})],
-              **{"display": "flex", "align-items": "center", "gap": "8px"})
+                   **{"display": "flex", "flex-direction": "column"}),
+               wx_teaser()],
+              **{"display": "flex", "align-items": "center", "gap": f"={narrow} ? '6px' : '8px'"})
     days = div([wx_day(d) for d in range(WX_DAYS)],
-               **{"display": "flex", "align-items": "center", "gap": "14px", "margin-left": "auto"})
-    chevron = comp("oh-icon", {"icon": "f7:chevron_right", "width": 14, "height": 14, "style": {"opacity": "0.45"}})
+               **{"display": "flex", "align-items": "center", "gap": f"={narrow} ? '8px' : '14px'",
+                  "margin-left": "auto"})
+    chevron = comp("oh-icon", {"icon": "f7:chevron_right", "width": 14, "height": 14, "visible": "=screen.width >= 380",
+                               "style": {"opacity": "0.45"}})
     link = comp("oh-link", {"action": "popup", "actionModal": f"page:{WEATHER_POPUP}", "style": {
         "position": "absolute", "inset": "0", "display": "block", "border-radius": "12px"}})
     bar = div([now, days, chevron, link], **{"position": "relative", "display": "flex", "align-items": "center",
-                                             "gap": "12px", "padding": "2px 4px"})
+                                             "gap": f"={narrow} ? '8px' : '12px'", "padding": "2px 4px"})
     return comp("oh-card", {"contentStyle": {"padding": "8px 14px"}}, content=[bar])
 
 
