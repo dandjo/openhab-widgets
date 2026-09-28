@@ -941,13 +941,17 @@ def wx_wind_arrow(deg, size, visible):
 
 
 def wx_wind_arrows():
-    """The wind's direction along its line, every three hours, every six on a phone: arrows a little above it."""
+    """The wind's direction along its line, every three hours, every six on a phone: arrows a little above it. Each
+    stands over the strongest wind from two hours before to two after, as wide as an arrow is on the time axis, so
+    a steep line beside it never touches it."""
     every = f"({NARROW} ? 6 : 3)"
-    rows = f"{wx_json(WX_HOURLY)}.filter((r) => r[3] != null && r[4] != null && dayjs(r[0] * 1000).hour() % {every} === 0)"
+    shown = f"r[3] != null && r[4] != null && dayjs(r[0] * 1000).hour() % {every} === 0"
+    peak = "a.slice(Math.max(0, i - 2), i + 3).reduce((m, x) => Math.max(m, x[3] || 0), 0)"
     return {"symbol": f"path://{WX_ARROW}", "symbolSize": 11, "symbolKeepAspect": True, "symbolOffset": [0, -13],
             "silent": True, "label": {"show": False}, "itemStyle": {"color": WX_ARROW_COLOR},
             # ECharts turns a symbol counter-clockwise
-            "data": f"={rows}.map((r) => ({{coord: [r[0] * 1000, r[3]], symbolRotate: -(r[4] + 180)}}))"}
+            "data": f"={wx_json(WX_HOURLY)}.map((r, i, a) => {shown} ? ({{coord: [r[0] * 1000, {peak}], "
+                    f"symbolRotate: -(r[4] + 180)}}) : null).filter((p) => p)"}
 
 
 def wx_hourly(index):
