@@ -104,6 +104,16 @@ def block(*children, title=None):
     return comp("oh-block", {"title": title} if title else {}, default=list(children))
 
 
+def stack(*cards):
+    """Cards one above the other in a column: a flex column, so their margins do not collapse into one and they keep
+    a card's gap, as in two rows. It fills the column, the last card takes the height the row leaves over."""
+    cards = copy.deepcopy(list(cards))
+    for c in cards:
+        c["config"]["style"]["height"] = "auto"
+    cards[-1]["config"]["style"]["flex"] = "1 1 auto"
+    return div(cards, **{"display": "flex", "flex-direction": "column", "height": "100%"})
+
+
 def card(title, content, fill=False):
     cfg = {"title": title, "style": {"height": "calc(100% - 2 * var(--f7-card-margin-vertical))"}}
     if fill:
@@ -1091,7 +1101,6 @@ def wx_warnings_row(warnings):
 
 
 def weather_popup(now):
-    # the cards as rows of one block, as in the other popups, so they keep a card's gap and not a block's
     warnings, forecast, meteoblue, sources = weather_cards()
     blocks = [block(wx_warnings_row(warnings), row(full(forecast)), row(full(meteoblue)), row(full(sources)))]
     return {WEATHER_POPUP: layout_page(WEATHER_POPUP, {"label": "Wetter", "sidebar": False}, blocks, now)}
@@ -1101,7 +1110,7 @@ def weather_blocks():
     """The weather's page in the sidebar, of the popup's cards: on a wider screen the forecast beside Meteoblue and
     the other sources, the warnings across both."""
     warnings, forecast, meteoblue, sources = weather_cards()
-    return [block(wx_warnings_row(warnings), row(col([forecast]), col([div([meteoblue, sources])])))]
+    return [block(wx_warnings_row(warnings), row(col([forecast]), col([stack(meteoblue, sources)])))]
 
 
 # ---------------------------------------------------------------- 2b. heat pump, in the style of the energy flow
@@ -3425,7 +3434,7 @@ def air_conditioning_blocks():
                              line("Außen", "faikout_perfera_outdoor_temperature", "#26a69a"),
                              line("Flüssigkeit", "faikout_perfera_liquid_temperature", "#29b6f6")],
                             [value_axis("°C", scale=True)])
-    return [two(card("Steuerung", [controls]), div([card("Jetzt", now), card("Temperaturen heute", [temps_chart])])),
+    return [two(card("Steuerung", [controls]), stack(card("Jetzt", now), card("Temperaturen heute", [temps_chart]))),
             *plug_cards("air_conditioning_unit", "material:ac_unit", AC_BLUE, title="Klimaanlage",
                         switch="air_conditioning_switch", electric_prefix="air_conditioning",
                         electric_title="Elektrisch · Shelly EM")]
@@ -3783,7 +3792,14 @@ def timestamp(now):
 PERIOD_MENU = ".menu-item-dropdown:not(.menu-item-dropdown-opened) .menu-dropdown { display: none; }"
 
 
+def one_block(blocks):
+    """The rows of all blocks in one block: the cards keep a card's gap of 20 px between them, not a block's 36."""
+    assert all(b["component"] == "oh-block" and not b["config"] for b in blocks), "a block with a config of its own"
+    return [block(*[c for b in blocks for c in b["slots"]["default"]])]
+
+
 def layout_page(uid, config, blocks, now):
+    blocks = one_block(blocks)
     germanize(blocks, MISSING_DE)
     if config.get("label") in GEN_DE:
         config = {**config, "label": GEN_DE[config["label"]]}
@@ -3837,15 +3853,15 @@ def page(now):
     props = overview_widget_props()
     w = lambda uid: widget_ref(uid, **props[uid])  # every item a widget reads comes in as a prop
     return layout_page(PAGE_UID, {"label": "Overview", "stylesheet": SCROLLBAR}, [
-        # the weather as a slim bar across the top, in the first block, so it keeps a card's gap to the cards below;
-        # each card fills the height of its row: the flow centres itself, the appliance tiles and the price chart
-        # stretch
-        block(row(full(w("weather-card"))), row(col([w("controls-card")]), col([w("energy-flow-card")]))),
-        block(row(col([w("appliances-card")]), col([w("electricity-price-card")]))),
-        block(row(full(w("heatpump-card")))),
-        block(row(col([w("consumption-card")]), col([w("energy-days-card")]))),
-        block(row(full(w("pv-days-card")))),
-        block(row(full(w("temperatures-card")))),
+        # the weather as a slim bar across the top; each card fills the height of its row: the flow centres itself,
+        # the appliance tiles and the price chart stretch
+        block(row(full(w("weather-card"))),
+              row(col([w("controls-card")]), col([w("energy-flow-card")])),
+              row(col([w("appliances-card")]), col([w("electricity-price-card")])),
+              row(full(w("heatpump-card"))),
+              row(col([w("consumption-card")]), col([w("energy-days-card")])),
+              row(full(w("pv-days-card"))),
+              row(full(w("temperatures-card")))),
     ], now)
 
 
