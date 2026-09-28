@@ -4,6 +4,11 @@ EXPORT = os.environ.get("EXPORT", "export")
 W = {f[:-4]: yaml.safe_load(open(os.path.join(EXPORT, f))) for f in os.listdir(EXPORT) if f.endswith(".yml")}
 
 OVERVIEW = [
+    ("weather-card", "Weather", "A slim bar across the top: the present weather drawn in the style of the energy "
+     "flow (sun or moon, alone or behind a cloud, clouds with rain, snow, a bolt or fog, gently animated), the outdoor "
+     "temperature from a local sensor, and the minimum and maximum of today and the next two days. A tap opens a "
+     "forecast popup of my installation. Its items come from a rule that reads Open-Meteo's GeoSphere AROME Austria "
+     "model, `scripts/openhab-ui/applied/weather_forecast_rule.js`."),
     ("controls-card", "Controls", "Heat pump, air conditioner and ventilation, each folded to a head of three lines "
      "with its main action on the right: a Boost button for the heat pump's hot water, the air conditioner's on/off "
      "pill, the ventilation levels 1 to 3; the heat pump's second line names which of its switches are on and "
@@ -511,7 +516,9 @@ config:
 md.append("""## About these widgets
 
 The widgets are generated from Python by the script that builds my whole MainUI, which keeps the cards of the
-dashboard and the device pages consistent; that is why their YAML is dense and machine-formatted. The cards are
+dashboard and the device pages consistent; that is why their YAML is dense and machine-formatted. The script and its
+tools are in [`scripts/openhab-ui/`](scripts/openhab-ui/): `dashboard.py`, the headless-Chrome tools behind the
+screenshots, and the one-off JSONDB changes in `applied/`. The cards are
 built from the smaller widgets wherever a part stands in more than one place or makes sense on its own, so a fix in
 one widget reaches every place it stands. The widgets in this repository are exported from that script unchanged.
 """)

@@ -282,6 +282,7 @@ RULE_DESCRIPTIONS = {
     "heatpump_dcop": "Berechnet jede Minute die Tages-COPs aus den Energie-Integralen von heatpump_metering; das 5-Sekunden-Fenster um Mitternacht in persistCop ist Absicht.",
     "heatpump_error": "Schickt eine Benachrichtigung mit Code und deutscher Beschreibung, wenn die Wärmepumpe einen anderen Fehlertyp als Normal meldet.",
     "heatpump_dhw_management": "Warmwasser-Steuerung: wählt den Warmwasser-Sollwert nach Tageszeit und PV-Überschuss und zwingt die Wärmepumpe über Smart Grid an, wenn der Speicher voll und der Überschuss hoch ist.",
+    "weather_forecast": "Holt alle 30 Minuten und beim Start das aktuelle Wetter und Min./Max. für heute und die zwei Folgetage von Open-Meteo, Modell GeoSphere AROME Austria (Tage außerhalb seiner Reichweite aus dem Best Match), für Wien, für die Wetterleiste der Übersicht.",
     "heatpump_metering": "Teilt die elektrische Leistung der Wärmepumpe in Heizung, Warmwasser und Standby, leitet die Heizleistung aus Durchfluss und Spreizung ab, berechnet momentane COPs und integriert alles mit einem gemeinsamen Zeitschritt zu den Energien von heute.",
     "home_energy": "Berechnet den Energieverbrauch des Hauses heute aus PV-Ertrag und Netzbezug/-einspeisung seit Mitternacht.",
     "home_power": "Berechnet alle 10 Sekunden die Wirkleistung des Hauses aus Wechselrichter-Ausgang und Leistung am Netzzähler.",
