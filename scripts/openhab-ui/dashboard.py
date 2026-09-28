@@ -696,7 +696,8 @@ flow = div([div([svg("svg", [
            kwh(num("huawei_inverter_energy_storage_day_discharge"), " kWh", "Entladen ")),
 ], viewBox=f"0 0 {FLOW_W} {FLOW_H}", width="100%", style={"display": "block", "overflow": "visible"}),
     *[node_link(cx, cy, popup) for cx, cy, popup in NODE_POPUPS]],
-    **{"position": "relative", "max-width": "620px", "width": "100%", "margin": "0 auto"})],
+    # at most at its own size, one unit a pixel, so its texts keep the sizes of the rest of the UI on a wide screen
+    **{"position": "relative", "max-width": f"{FLOW_W}px", "width": "100%", "margin": "0 auto"})],
     **{"padding": f"={NARROW} ? '4px' : '12px'", "flex": "1 1 auto", "display": "flex", "flex-direction": "column",
        "justify-content": "center"})
 
@@ -922,6 +923,31 @@ def weather_warnings_card():
 
 # the forecast chart's three series: temperature over precipitation in the upper grid, wind in the lower
 WX_TEMP_COLOR, WX_RAIN_COLOR, WX_WIND_COLOR = "#f4511e", "#42a5f5", "#78909c"
+# the wind's direction as the forecast gives it, the degrees it comes from (0 north, 90 east), drawn as an arrow the way
+# it blows, pointing up at 0 before it is turned; the 16 points of the compass in German, O for east
+WX_ARROW = "M12,3 L18.5,19.5 L12,15.5 L5.5,19.5 Z"
+WX_POINTS = "['N', 'NNO', 'NO', 'ONO', 'O', 'OSO', 'SO', 'SSO', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW']"
+WX_ARROW_COLOR = "=themeOptions.dark === 'dark' ? '#b0bec5' : '#546e7a'"  # lighter on the dark theme
+
+
+def wx_compass(deg):
+    """The compass point of a direction in degrees, NNW for 337.5."""
+    return f"{WX_POINTS}[Math.round({deg} / 22.5) % 16]"
+
+
+def wx_wind_arrow(deg, size, visible):
+    return svg("svg", [svg("path", d=WX_ARROW, fill=WX_ARROW_COLOR, transform=f"='rotate(' + ({deg} + 180) + ' 12 12)'")],
+               viewBox="0 0 24 24", width=size, height=size, visible=visible, style={"display": "block", "flex": "0 0 auto"})
+
+
+def wx_wind_arrows():
+    """The wind's direction along its line, every three hours, every six on a phone: arrows a little above it."""
+    every = f"({NARROW} ? 6 : 3)"
+    rows = f"{wx_json(WX_HOURLY)}.filter((r) => r[3] != null && r[4] != null && dayjs(r[0] * 1000).hour() % {every} === 0)"
+    return {"symbol": f"path://{WX_ARROW}", "symbolSize": 11, "symbolKeepAspect": True, "symbolOffset": [0, -13],
+            "silent": True, "label": {"show": False}, "itemStyle": {"color": WX_ARROW_COLOR},
+            # ECharts turns a symbol counter-clockwise
+            "data": f"={rows}.map((r) => ({{coord: [r[0] * 1000, r[3]], symbolRotate: -(r[4] + 180)}}))"}
 
 
 def wx_hourly(index):
@@ -949,10 +975,11 @@ WX_TIME_LABEL = (f"=(v) => dayjs(v).hour() === 0 && dayjs(v).minute() === 0 ? '{
 
 
 def weather_forecast_chart():
-    """The next 60 hours: temperature as a line over the precipitation of each hour as bars, the wind below, one
-    tooltip for all three."""
+    """The next 60 hours: temperature as a line over the precipitation of each hour as bars, the wind below with
+    arrows of its direction, one tooltip for all three."""
+    # the wind's grid 75 px high, 55 px below the temperature's, room for its axis name and the arrows above it
     grids = [comp("oh-chart-grid", {"top": "35", "height": "140", "left": "45", "right": "45"}),
-             comp("oh-chart-grid", {"top": "205", "bottom": "60", "left": "45", "right": "45"})]
+             comp("oh-chart-grid", {"top": "230", "bottom": "60", "left": "45", "right": "45"})]
     x_axes = [comp("oh-time-axis", {"gridIndex": 0, "axisLabel": {"show": False}}),
               comp("oh-time-axis", {"gridIndex": 1, "axisLabel": {"formatter": WX_TIME_LABEL,
                                                                    "rich": {"day": {"fontWeight": "bold"}}}})]
@@ -962,7 +989,9 @@ def weather_forecast_chart():
                                      "max": "=(v) => Math.max(v.max, 2)", "splitLine": {"show": False},
                                      "nameTextStyle": {"align": "left", "padding": [0, 0, 0, 8]}}),
               comp("oh-value-axis", {"gridIndex": 1, "name": "km/h", "nameGap": 10, "nameTextStyle": AXIS_NAME,
-                                     "min": 0, "max": "=(v) => Math.max(v.max, 20)", "splitNumber": 2, **dashed})]
+                                     # up to the next 20, halved by splitNumber: the peak gets no label of its own
+                                     "min": 0, "max": "=(v) => Math.max(20, Math.ceil(v.max / 20) * 20)", "splitNumber": 2,
+                                     **dashed})]
     series = [wx_series("Temperatur", "°C", 1, WX_TEMP_COLOR, 0, 0, type="line", smooth=0.5, symbol="none",
                         lineStyle={"width": 2.5, "color": WX_TEMP_COLOR}, markLine=wx_midnights(), z=3),
               # precipitation is the sum of the hour before its time; the bar stands on that time all the same, as
@@ -971,8 +1000,8 @@ def weather_forecast_chart():
                         itemStyle={"color": WX_RAIN_COLOR, "borderRadius": [2, 2, 0, 0]}),
               wx_series("Wind", "km/h", 3, WX_WIND_COLOR, 1, 2, type="line", smooth=0.5, symbol="none",
                         lineStyle={"width": 2, "color": WX_WIND_COLOR}, areaStyle={"color": gradient(rgb_of(WX_WIND_COLOR))},
-                        markLine=wx_midnights())]
-    return chart({"period": "60h", "future": 1, "height": "320px",
+                        markLine=wx_midnights(), markPoint=wx_wind_arrows())]
+    return chart({"period": "60h", "future": 1, "height": "365px",
                   # one tooltip for both grids
                   "options": {"axisPointer": {"link": [{"xAxisIndex": "all"}]}}},
                  grid=grids, xAxis=x_axes, yAxis=y_axes, series=series,
@@ -981,7 +1010,7 @@ def weather_forecast_chart():
 
 def wx_day_row():
     """A day of the popup: its name, the weather drawn, minimum and maximum, precipitation with its probability
-    under it, and the strongest wind."""
+    under it, and the strongest wind with an arrow of the day's main direction and its compass point under it."""
     d = "loop.day"
     name = f"(dayjs({d}.t * 1000).isSame(dayjs(), 'day') ? 'Heute' : {WX_WEEKDAYS}[dayjs({d}.t * 1000).day()])"
     degrees = lambda v: f"({v} == null ? '–' : Math.round({v}) + '°')"
@@ -999,7 +1028,14 @@ def wx_day_row():
                         **{"font-size": "11px", "opacity": "0.65", "line-height": "13px"})],
                  **{"display": "flex", "flex-direction": "column"})],
             **{**cell, "opacity": f"=({d}.p || 0) < 0.05 ? '0.55' : '1'"}),
-        div([small_icon("material:air", WX_WIND_COLOR), label(f"=({d}.w == null ? '–' : {d}.w) + ' km/h'")],
+        # the plain wind icon until the forecast brings a direction
+        div([wx_wind_arrow(f"{d}.wd", 15, f"={d}.wd != null"),
+             comp("oh-icon", {"icon": "material:air", "width": 15, "height": 15, "visible": f"={d}.wd == null",
+                              "style": {"color": WX_WIND_COLOR, "flex": "0 0 auto"}}),
+             div([label(f"=({d}.w == null ? '–' : {d}.w) + ' km/h'", **{"line-height": "16px"}),
+                  label(f"={wx_compass(d + '.wd')}", visible=f"={d}.wd != null",
+                        **{"font-size": "11px", "opacity": "0.65", "line-height": "13px"})],
+                 **{"display": "flex", "flex-direction": "column"})],
             **{**cell, "justify-content": "flex-end"}),
     ], **{"display": "grid", "grid-template-columns": "40px 32px 64px 1fr auto", "align-items": "center",
           "column-gap": "8px", "min-height": "40px", "padding": "4px 16px",
@@ -1217,7 +1253,7 @@ hp_svg = svg("svg", [
 
 
 def stat_tile(title, value, color, icon):
-    """A figure of the heat pump card: a value tile a tenth larger, in em of the card's font, so it grows with it."""
+    """A figure of the heat pump card: a value tile a tenth larger than elsewhere."""
     return comp("widget:value-tile", {"title": title, "value": value, "icon": f"material:{icon}", "color": color,
                                       "fontSize": "1.1em"})
 
@@ -1285,47 +1321,15 @@ def hp_link(node, popup, size=60):
 
 HP_LINKS = [(OUT, "outdoor_unit"), (WALL, "indoor_unit"), (VALVE, "valve"), (TANK, "dhw_tank"),
             (RADIATORS, "space_heating"), (GROUND_FH, "space_heating"), (UPPER_FH, "space_heating")]
-# On a phone the drawing takes the whole card width. From 1024 px on, where the energy flow shares its row and
-# is 50vw - 229px wide up to 620 px, the drawing is as much wider as its viewBox, so the circles of both come
-# out the same size; below that its column is narrower than that anyway. The second term of max() is huge
-# below 1024 px and lifts the limit there.
-HP_MATCH_FLOW = (f"max(min({round(620 * HP_VB[2] / FLOW_W)}px, calc({round(50 * HP_VB[2] / FLOW_W, 2)}vw - "
-                 f"{round(229 * HP_VB[2] / FLOW_W)}px)), calc((1024px - 100vw) * 1000))")
-
-
-def em_sized(node, font=14):
-    """A component tree with its px lengths in em, so all of it grows with the font size set above it. font is
-    the inherited size in px: an own font size becomes a share of it, every other length a share of the element's
-    own size. Expressions stay as they are."""
-    if isinstance(node, list):
-        return [em_sized(x, font) for x in node]
-    cfg = dict(node.get("config", {}))
-    style = dict(cfg.get("style") or {})
-    own = float(style["font-size"][:-2]) if str(style.get("font-size", "")).endswith("px") else font
-    for key, v in style.items():
-        if isinstance(v, str) and not v.startswith("="):
-            base = font if key == "font-size" else own
-            style[key] = re.sub(r"(-?\d+(?:\.\d+)?)px", lambda m: f"{float(m.group(1)) / base:.4g}em", v)
-    if "style" in cfg:
-        cfg["style"] = style
-    if node["component"] == "svg":
-        cfg.update({k: f"{cfg[k] / own:.4g}em" for k in ("width", "height") if isinstance(cfg.get(k), (int, float))})
-    out = {**node, "config": cfg}
-    if "slots" in node:
-        out["slots"] = {name: em_sized(children, own) for name, children in node["slots"].items()}
-    return out
-
-
-# In one row, drawing and figures stand with even room: the free width goes in equal parts to the left, the
-# middle and the right, the column gap matching the card's own padding at the sides. The figures take the width
-# the drawing leaves, up to 690 px, and grow with their column from 460 px on to one and a half times their size
-# (the font size in container units, everything in em); on a phone they stay as they are.
+# On a phone the drawing takes the whole card width. On a wider screen it stands at its own size at most, one
+# unit a pixel, so its texts keep the sizes of the rest of the UI instead of growing with the card, and the
+# figures keep the font size they have on a phone. In one row, drawing and figures stand with even room: the free
+# width goes in equal parts to the left, the middle and the right, the column gap matching the card's own padding
+# at the sides; the figures take the width the drawing leaves, up to 460 px.
 heatpump_schema = [div([div([div([hp_svg, *[hp_link(n, p) for n, p in HP_LINKS]], **{"position": "relative"})],
                             **{"flex": "0 1 auto", "min-width": "0", "max-width": "100%",
-                               "width": f"={NARROW} ? '100%' : '{HP_MATCH_FLOW}'"}),
-                        div([div([em_sized(hp_stats)], **{"font-size": "clamp(14px, 3.04cqw, 21px)"})],
-                            **{"flex": "1 1 300px", "min-width": "260px", "max-width": "690px",
-                               "container-type": "inline-size"})],
+                               "width": f"={NARROW} ? '100%' : '{HP_VB[2]}px'"}),
+                        div([hp_stats], **{"flex": "1 1 300px", "min-width": "260px", "max-width": "460px"})],
                        **{"display": "flex", "flex-wrap": "wrap", "justify-content": "space-evenly",
                           "align-items": "center", "gap": "20px 16px",
                           "padding": f"={NARROW} ? '8px 4px 12px' : '8px 0 16px'"})]
