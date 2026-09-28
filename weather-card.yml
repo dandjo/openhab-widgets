@@ -15,6 +15,12 @@ props:
     type: TEXT
     required: true
     context: item
+  - name: weatherWarningLevel
+    label: Wetterwarnung Stufe
+    description: Number item
+    type: TEXT
+    required: true
+    context: item
   - name: heatpumpExtAmbientTemp
     label: ESPAltherma Außentemperatur
     description: Number:Temperature item
@@ -58,7 +64,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Sep 28, 2026, 9:45:26 AM
+timestamp: Sep 28, 2026, 10:34:11 AM
 component: oh-card
 config:
   contentStyle:
@@ -83,504 +89,46 @@ slots:
             gap: 8px
         slots:
           default:
+          - component: widget:weather-icon
+            config:
+              code: =items[props.weatherCode].state
+              day: =items[props.weatherIsDay].state !== 'OFF'
+              size: 36
           - component: svg
             config:
-              viewBox: 0 0 48 48
-              width: 36
-              height: 36
+              viewBox: 0 0 24 24
+              width: 16
+              height: 16
               style:
                 display: block
                 flex: 0 0 auto
+                margin-left: -14px
+                align-self: flex-start
+              visible: =Number(items[props.weatherWarningLevel].state) > 0
             slots:
               default:
-              - component: g
-                config:
-                  visible: '=((Number.isNaN(Number.parseFloat(items[props.weatherCode].state)) ? '''' : Number(items[props.weatherCode].state)
-                    === 0 ? ''clear'' : Number(items[props.weatherCode].state) <= 2 ? ''partly'' : Number(items[props.weatherCode].state)
-                    === 3 ? ''cloudy'' : Number(items[props.weatherCode].state) <= 48 ? ''fog'' : Number(items[props.weatherCode].state)
-                    <= 67 ? ''rain'' : Number(items[props.weatherCode].state) <= 77 ? ''snow'' : Number(items[props.weatherCode].state)
-                    <= 82 ? ''rain'' : Number(items[props.weatherCode].state) <= 86 ? ''snow'' : ''thunder'') === ''clear'')
-                    && !(items[props.weatherIsDay].state === ''OFF'')'
-                slots:
-                  default:
-                  - component: g
-                    config: {}
-                    slots:
-                      default:
-                      - component: line
-                        config:
-                          x1: 34.5
-                          y1: 24.0
-                          x2: 38.5
-                          y2: 24.0
-                          stroke: '#ffb300'
-                          stroke-width: 2.2
-                          stroke-linecap: round
-                          fill: none
-                      - component: line
-                        config:
-                          x1: 31.42
-                          y1: 31.42
-                          x2: 34.25
-                          y2: 34.25
-                          stroke: '#ffb300'
-                          stroke-width: 2.2
-                          stroke-linecap: round
-                          fill: none
-                      - component: line
-                        config:
-                          x1: 24.0
-                          y1: 34.5
-                          x2: 24.0
-                          y2: 38.5
-                          stroke: '#ffb300'
-                          stroke-width: 2.2
-                          stroke-linecap: round
-                          fill: none
-                      - component: line
-                        config:
-                          x1: 16.58
-                          y1: 31.42
-                          x2: 13.75
-                          y2: 34.25
-                          stroke: '#ffb300'
-                          stroke-width: 2.2
-                          stroke-linecap: round
-                          fill: none
-                      - component: line
-                        config:
-                          x1: 13.5
-                          y1: 24.0
-                          x2: 9.5
-                          y2: 24.0
-                          stroke: '#ffb300'
-                          stroke-width: 2.2
-                          stroke-linecap: round
-                          fill: none
-                      - component: line
-                        config:
-                          x1: 16.58
-                          y1: 16.58
-                          x2: 13.75
-                          y2: 13.75
-                          stroke: '#ffb300'
-                          stroke-width: 2.2
-                          stroke-linecap: round
-                          fill: none
-                      - component: line
-                        config:
-                          x1: 24.0
-                          y1: 13.5
-                          x2: 24.0
-                          y2: 9.5
-                          stroke: '#ffb300'
-                          stroke-width: 2.2
-                          stroke-linecap: round
-                          fill: none
-                      - component: line
-                        config:
-                          x1: 31.42
-                          y1: 16.58
-                          x2: 34.25
-                          y2: 13.75
-                          stroke: '#ffb300'
-                          stroke-width: 2.2
-                          stroke-linecap: round
-                          fill: none
-                      - component: animateTransform
-                        config:
-                          attributeName: transform
-                          type: rotate
-                          from: 0 24 24
-                          to: 360 24 24
-                          dur: 24s
-                          repeatCount: indefinite
-                          visible: =true
-                  - component: circle
-                    config:
-                      cx: 24
-                      cy: 24
-                      r: 7
-                      fill: '#ffb300'
               - component: path
                 config:
-                  d: M22.19,14.17 A10,10 0 1,0 33.83,25.81 A8.5,8.5 0 1,1 22.19,14.17 Z
-                  fill: '#9fa8da'
-                  visible: '=((Number.isNaN(Number.parseFloat(items[props.weatherCode].state)) ? '''' : Number(items[props.weatherCode].state)
-                    === 0 ? ''clear'' : Number(items[props.weatherCode].state) <= 2 ? ''partly'' : Number(items[props.weatherCode].state)
-                    === 3 ? ''cloudy'' : Number(items[props.weatherCode].state) <= 48 ? ''fog'' : Number(items[props.weatherCode].state)
-                    <= 67 ? ''rain'' : Number(items[props.weatherCode].state) <= 77 ? ''snow'' : Number(items[props.weatherCode].state)
-                    <= 82 ? ''rain'' : Number(items[props.weatherCode].state) <= 86 ? ''snow'' : ''thunder'') === ''clear'')
-                    && items[props.weatherIsDay].state === ''OFF'''
-              - component: g
+                  d: M12,2.6 L22.4,20.6 H1.6 Z
+                  fill: =['#9e9e9e', '#fdd835', '#fb8c00', '#e53935'][Number(items[props.weatherWarningLevel].state)] || '#9e9e9e'
+                  stroke: =['#9e9e9e', '#fdd835', '#fb8c00', '#e53935'][Number(items[props.weatherWarningLevel].state)] ||
+                    '#9e9e9e'
+                  stroke-width: 2.4
+                  stroke-linejoin: round
+              - component: rect
                 config:
-                  transform: translate(17 17) scale(0.72) translate(-24 -24)
-                  visible: '=((Number.isNaN(Number.parseFloat(items[props.weatherCode].state)) ? '''' : Number(items[props.weatherCode].state)
-                    === 0 ? ''clear'' : Number(items[props.weatherCode].state) <= 2 ? ''partly'' : Number(items[props.weatherCode].state)
-                    === 3 ? ''cloudy'' : Number(items[props.weatherCode].state) <= 48 ? ''fog'' : Number(items[props.weatherCode].state)
-                    <= 67 ? ''rain'' : Number(items[props.weatherCode].state) <= 77 ? ''snow'' : Number(items[props.weatherCode].state)
-                    <= 82 ? ''rain'' : Number(items[props.weatherCode].state) <= 86 ? ''snow'' : ''thunder'') === ''partly'')
-                    && !(items[props.weatherIsDay].state === ''OFF'')'
-                slots:
-                  default:
-                  - component: g
-                    config: {}
-                    slots:
-                      default:
-                      - component: line
-                        config:
-                          x1: 34.5
-                          y1: 24.0
-                          x2: 38.5
-                          y2: 24.0
-                          stroke: '#ffb300'
-                          stroke-width: 2.2
-                          stroke-linecap: round
-                          fill: none
-                      - component: line
-                        config:
-                          x1: 31.42
-                          y1: 31.42
-                          x2: 34.25
-                          y2: 34.25
-                          stroke: '#ffb300'
-                          stroke-width: 2.2
-                          stroke-linecap: round
-                          fill: none
-                      - component: line
-                        config:
-                          x1: 24.0
-                          y1: 34.5
-                          x2: 24.0
-                          y2: 38.5
-                          stroke: '#ffb300'
-                          stroke-width: 2.2
-                          stroke-linecap: round
-                          fill: none
-                      - component: line
-                        config:
-                          x1: 16.58
-                          y1: 31.42
-                          x2: 13.75
-                          y2: 34.25
-                          stroke: '#ffb300'
-                          stroke-width: 2.2
-                          stroke-linecap: round
-                          fill: none
-                      - component: line
-                        config:
-                          x1: 13.5
-                          y1: 24.0
-                          x2: 9.5
-                          y2: 24.0
-                          stroke: '#ffb300'
-                          stroke-width: 2.2
-                          stroke-linecap: round
-                          fill: none
-                      - component: line
-                        config:
-                          x1: 16.58
-                          y1: 16.58
-                          x2: 13.75
-                          y2: 13.75
-                          stroke: '#ffb300'
-                          stroke-width: 2.2
-                          stroke-linecap: round
-                          fill: none
-                      - component: line
-                        config:
-                          x1: 24.0
-                          y1: 13.5
-                          x2: 24.0
-                          y2: 9.5
-                          stroke: '#ffb300'
-                          stroke-width: 2.2
-                          stroke-linecap: round
-                          fill: none
-                      - component: line
-                        config:
-                          x1: 31.42
-                          y1: 16.58
-                          x2: 34.25
-                          y2: 13.75
-                          stroke: '#ffb300'
-                          stroke-width: 2.2
-                          stroke-linecap: round
-                          fill: none
-                      - component: animateTransform
-                        config:
-                          attributeName: transform
-                          type: rotate
-                          from: 0 24 24
-                          to: 360 24 24
-                          dur: 24s
-                          repeatCount: indefinite
-                          visible: =true
-                  - component: circle
-                    config:
-                      cx: 24
-                      cy: 24
-                      r: 7
-                      fill: '#ffb300'
-              - component: path
+                  x: 10.9
+                  y: 8.2
+                  width: 2.2
+                  height: 7
+                  rx: 1.1
+                  fill: '#212121'
+              - component: circle
                 config:
-                  d: M22.19,14.17 A10,10 0 1,0 33.83,25.81 A8.5,8.5 0 1,1 22.19,14.17 Z
-                  fill: '#9fa8da'
-                  transform: translate(17 16) scale(0.7) translate(-24 -24)
-                  visible: '=((Number.isNaN(Number.parseFloat(items[props.weatherCode].state)) ? '''' : Number(items[props.weatherCode].state)
-                    === 0 ? ''clear'' : Number(items[props.weatherCode].state) <= 2 ? ''partly'' : Number(items[props.weatherCode].state)
-                    === 3 ? ''cloudy'' : Number(items[props.weatherCode].state) <= 48 ? ''fog'' : Number(items[props.weatherCode].state)
-                    <= 67 ? ''rain'' : Number(items[props.weatherCode].state) <= 77 ? ''snow'' : Number(items[props.weatherCode].state)
-                    <= 82 ? ''rain'' : Number(items[props.weatherCode].state) <= 86 ? ''snow'' : ''thunder'') === ''partly'')
-                    && items[props.weatherIsDay].state === ''OFF'''
-              - component: g
-                config:
-                  visible: '=((Number.isNaN(Number.parseFloat(items[props.weatherCode].state)) ? '''' : Number(items[props.weatherCode].state)
-                    === 0 ? ''clear'' : Number(items[props.weatherCode].state) <= 2 ? ''partly'' : Number(items[props.weatherCode].state)
-                    === 3 ? ''cloudy'' : Number(items[props.weatherCode].state) <= 48 ? ''fog'' : Number(items[props.weatherCode].state)
-                    <= 67 ? ''rain'' : Number(items[props.weatherCode].state) <= 77 ? ''snow'' : Number(items[props.weatherCode].state)
-                    <= 82 ? ''rain'' : Number(items[props.weatherCode].state) <= 86 ? ''snow'' : ''thunder'') === ''partly'')'
-                slots:
-                  default:
-                  - component: path
-                    config:
-                      d: M14,38 H34 A6,6 0 0,0 35.5,26.2 A9,9 0 0,0 18.6,24.4 A7,7 0 0,0 14,38 Z
-                      transform: translate(27 34) scale(0.9) translate(-27 -31)
-                      stroke: '#90a4ae'
-                      stroke-width: 1.6
-                      stroke-linecap: round
-                      fill: '#cfd8dc'
-                      stroke-linejoin: round
-              - component: g
-                config:
-                  visible: '=((Number.isNaN(Number.parseFloat(items[props.weatherCode].state)) ? '''' : Number(items[props.weatherCode].state)
-                    === 0 ? ''clear'' : Number(items[props.weatherCode].state) <= 2 ? ''partly'' : Number(items[props.weatherCode].state)
-                    === 3 ? ''cloudy'' : Number(items[props.weatherCode].state) <= 48 ? ''fog'' : Number(items[props.weatherCode].state)
-                    <= 67 ? ''rain'' : Number(items[props.weatherCode].state) <= 77 ? ''snow'' : Number(items[props.weatherCode].state)
-                    <= 82 ? ''rain'' : Number(items[props.weatherCode].state) <= 86 ? ''snow'' : ''thunder'') === ''cloudy'')'
-                slots:
-                  default:
-                  - component: path
-                    config:
-                      d: M14,38 H34 A6,6 0 0,0 35.5,26.2 A9,9 0 0,0 18.6,24.4 A7,7 0 0,0 14,38 Z
-                      transform: translate(0 -2)
-                      stroke: '#90a4ae'
-                      stroke-width: 1.6
-                      stroke-linecap: round
-                      fill: '#cfd8dc'
-                      stroke-linejoin: round
-              - component: g
-                config:
-                  visible: '=((Number.isNaN(Number.parseFloat(items[props.weatherCode].state)) ? '''' : Number(items[props.weatherCode].state)
-                    === 0 ? ''clear'' : Number(items[props.weatherCode].state) <= 2 ? ''partly'' : Number(items[props.weatherCode].state)
-                    === 3 ? ''cloudy'' : Number(items[props.weatherCode].state) <= 48 ? ''fog'' : Number(items[props.weatherCode].state)
-                    <= 67 ? ''rain'' : Number(items[props.weatherCode].state) <= 77 ? ''snow'' : Number(items[props.weatherCode].state)
-                    <= 82 ? ''rain'' : Number(items[props.weatherCode].state) <= 86 ? ''snow'' : ''thunder'') === ''rain'')'
-                slots:
-                  default:
-                  - component: path
-                    config:
-                      d: M14,38 H34 A6,6 0 0,0 35.5,26.2 A9,9 0 0,0 18.6,24.4 A7,7 0 0,0 14,38 Z
-                      transform: translate(0 -6)
-                      stroke: '#90a4ae'
-                      stroke-width: 1.6
-                      stroke-linecap: round
-                      fill: '#cfd8dc'
-                      stroke-linejoin: round
-                  - component: line
-                    config:
-                      x1: 18
-                      y1: 36
-                      x2: 16
-                      y2: 42
-                      stroke: '#42a5f5'
-                      stroke-width: 2.2
-                      stroke-linecap: round
-                      fill: none
-                      stroke-dasharray: 3 3
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: stroke-dashoffset
-                          from: '0'
-                          to: '-6'
-                          dur: 0.9s
-                          repeatCount: indefinite
-                          visible: =true
-                  - component: line
-                    config:
-                      x1: 25
-                      y1: 36
-                      x2: 23
-                      y2: 42
-                      stroke: '#42a5f5'
-                      stroke-width: 2.2
-                      stroke-linecap: round
-                      fill: none
-                      stroke-dasharray: 3 3
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: stroke-dashoffset
-                          from: '0'
-                          to: '-6'
-                          dur: 0.9s
-                          repeatCount: indefinite
-                          visible: =true
-                  - component: line
-                    config:
-                      x1: 32
-                      y1: 36
-                      x2: 30
-                      y2: 42
-                      stroke: '#42a5f5'
-                      stroke-width: 2.2
-                      stroke-linecap: round
-                      fill: none
-                      stroke-dasharray: 3 3
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: stroke-dashoffset
-                          from: '0'
-                          to: '-6'
-                          dur: 0.9s
-                          repeatCount: indefinite
-                          visible: =true
-              - component: g
-                config:
-                  visible: '=((Number.isNaN(Number.parseFloat(items[props.weatherCode].state)) ? '''' : Number(items[props.weatherCode].state)
-                    === 0 ? ''clear'' : Number(items[props.weatherCode].state) <= 2 ? ''partly'' : Number(items[props.weatherCode].state)
-                    === 3 ? ''cloudy'' : Number(items[props.weatherCode].state) <= 48 ? ''fog'' : Number(items[props.weatherCode].state)
-                    <= 67 ? ''rain'' : Number(items[props.weatherCode].state) <= 77 ? ''snow'' : Number(items[props.weatherCode].state)
-                    <= 82 ? ''rain'' : Number(items[props.weatherCode].state) <= 86 ? ''snow'' : ''thunder'') === ''snow'')'
-                slots:
-                  default:
-                  - component: path
-                    config:
-                      d: M14,38 H34 A6,6 0 0,0 35.5,26.2 A9,9 0 0,0 18.6,24.4 A7,7 0 0,0 14,38 Z
-                      transform: translate(0 -6)
-                      stroke: '#90a4ae'
-                      stroke-width: 1.6
-                      stroke-linecap: round
-                      fill: '#cfd8dc'
-                      stroke-linejoin: round
-                  - component: circle
-                    config:
-                      cx: 18
-                      cy: 38
-                      r: 1.8
-                      fill: '#81d4fa'
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: cy
-                          values: 38;41;38
-                          dur: 2.0s
-                          repeatCount: indefinite
-                  - component: circle
-                    config:
-                      cx: 25
-                      cy: 41
-                      r: 1.8
-                      fill: '#81d4fa'
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: cy
-                          values: 41;44;41
-                          dur: 2.4s
-                          repeatCount: indefinite
-                  - component: circle
-                    config:
-                      cx: 32
-                      cy: 38
-                      r: 1.8
-                      fill: '#81d4fa'
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: cy
-                          values: 38;41;38
-                          dur: 2.8s
-                          repeatCount: indefinite
-              - component: g
-                config:
-                  visible: '=((Number.isNaN(Number.parseFloat(items[props.weatherCode].state)) ? '''' : Number(items[props.weatherCode].state)
-                    === 0 ? ''clear'' : Number(items[props.weatherCode].state) <= 2 ? ''partly'' : Number(items[props.weatherCode].state)
-                    === 3 ? ''cloudy'' : Number(items[props.weatherCode].state) <= 48 ? ''fog'' : Number(items[props.weatherCode].state)
-                    <= 67 ? ''rain'' : Number(items[props.weatherCode].state) <= 77 ? ''snow'' : Number(items[props.weatherCode].state)
-                    <= 82 ? ''rain'' : Number(items[props.weatherCode].state) <= 86 ? ''snow'' : ''thunder'') === ''thunder'')'
-                slots:
-                  default:
-                  - component: path
-                    config:
-                      d: M14,38 H34 A6,6 0 0,0 35.5,26.2 A9,9 0 0,0 18.6,24.4 A7,7 0 0,0 14,38 Z
-                      transform: translate(0 -8)
-                      stroke: '#90a4ae'
-                      stroke-width: 1.6
-                      stroke-linecap: round
-                      fill: '#cfd8dc'
-                      stroke-linejoin: round
-                  - component: polygon
-                    config:
-                      points: 26,31 20,40 24.5,40 22,47 30,37 25.5,37 28,31
-                      fill: '#ffca28'
-                      stroke: '#f9a825'
-                      stroke-width: 0.8
-                      stroke-linejoin: round
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          values: 1;0.35;1;1
-                          dur: 1.8s
-                          repeatCount: indefinite
-              - component: g
-                config:
-                  visible: '=((Number.isNaN(Number.parseFloat(items[props.weatherCode].state)) ? '''' : Number(items[props.weatherCode].state)
-                    === 0 ? ''clear'' : Number(items[props.weatherCode].state) <= 2 ? ''partly'' : Number(items[props.weatherCode].state)
-                    === 3 ? ''cloudy'' : Number(items[props.weatherCode].state) <= 48 ? ''fog'' : Number(items[props.weatherCode].state)
-                    <= 67 ? ''rain'' : Number(items[props.weatherCode].state) <= 77 ? ''snow'' : Number(items[props.weatherCode].state)
-                    <= 82 ? ''rain'' : Number(items[props.weatherCode].state) <= 86 ? ''snow'' : ''thunder'') === ''fog'')'
-                slots:
-                  default:
-                  - component: path
-                    config:
-                      d: M14,38 H34 A6,6 0 0,0 35.5,26.2 A9,9 0 0,0 18.6,24.4 A7,7 0 0,0 14,38 Z
-                      transform: translate(24 23) scale(0.9) translate(-24 -31)
-                      stroke: '#90a4ae'
-                      stroke-width: 1.6
-                      stroke-linecap: round
-                      fill: '#cfd8dc'
-                      stroke-linejoin: round
-                  - component: line
-                    config:
-                      x1: 12
-                      y1: 37
-                      x2: 36
-                      y2: 37
-                      stroke: '#90a4ae'
-                      stroke-width: 2.2
-                      stroke-linecap: round
-                      fill: none
-                  - component: line
-                    config:
-                      x1: 15
-                      y1: 42
-                      x2: 33
-                      y2: 42
-                      stroke: '#90a4ae'
-                      stroke-width: 2.2
-                      stroke-linecap: round
-                      fill: none
+                  cx: 12
+                  cy: 18
+                  r: 1.3
+                  fill: '#212121'
           - component: div
             config:
               style:
