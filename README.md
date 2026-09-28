@@ -84,7 +84,8 @@ and the minimum and maximum of today and the next two days. While an official wa
 or begins within 24 hours, a small warning sign in its level's colour (yellow, orange, red) sits at the drawing's
 corner. A tap opens the forecast popup of my installation (see [Weather](#weather)). Its items come from two rules,
 `scripts/openhab-ui/applied/weather_forecast_rule.js`, which reads Open-Meteo's GeoSphere AROME Austria model, and
-`weather_warnings_rule.js`, which reads GeoSphere Austria's warnings.
+`weather_warnings_rule.js`, which reads GeoSphere Austria's warnings and sends a broadcast notification when their level
+rises to orange or red.
 
 Needs `weather-icon`.
 
@@ -947,7 +948,7 @@ The weather drawn from a WMO code in the style of the energy flow's nodes: the s
 while `day` is false, alone when it is clear (code 0) and behind a small cloud when partly cloudy (1, 2); a cloud (3),
 raised over fog (45, 48), falling rain (drizzle, rain and showers: 51 to 67, 80 to 82), drifting snow (71 to 77, 85, 86)
 or a flickering bolt (95 to 99). Nothing while `code` is no number, as an item is `NULL` after a restart. My weather bar
-shows the present weather with it, and my forecast popup each day's, below a chart of the next 60 hours: temperature
+shows the present weather with it, and my forecast popup each day's, above a chart of the next 60 hours: temperature
 over the precipitation of each hour, the wind below. That popup is a page of my installation, not a widget of this
 repository; its rule writes the forecast as JSON into String items, and the chart reads them through an `oh-data-series`
 whose `data` is an expression such as `=JSON.parse(items.weather_hourly.state).map((r) => [r[0] * 1000, r[1]])`, with no
@@ -955,7 +956,7 @@ persistence involved. The warnings in the screenshots are demo values.
 
 | Light | Dark |
 |---|---|
-| ![Forecast popup: warnings, chart and days](screenshots/forecast-popup.png) | ![Forecast popup in dark mode](screenshots/forecast-popup-dark.png) |
+| ![Forecast popup: warnings, days and chart](screenshots/forecast-popup.png) | ![Forecast popup in dark mode](screenshots/forecast-popup-dark.png) |
 
 ```yaml
 component: widget:weather-icon
