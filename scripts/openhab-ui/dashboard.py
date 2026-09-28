@@ -677,7 +677,6 @@ WX_DAYS = 3
 WX_WEEKDAYS = "['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa']"
 # the warning levels 0 to 3: none, yellow, orange, red, in GeoSphere's colours as Material shades
 WX_LEVEL_COLORS = "['#9e9e9e', '#fdd835', '#fb8c00', '#e53935']"
-WX_LEVEL_NAMES = "['', 'Gelb', 'Orange', 'Rot']"
 
 
 def wx_item(day, key):
@@ -866,7 +865,7 @@ def weather_warnings_card():
     """GeoSphere's warnings that have not ended, each in its level's colour: type and level, period and text."""
     w = "loop.warning"
     color = f"({WX_LEVEL_COLORS}[{w}.level] || '#9e9e9e')"
-    chip = label(f"={WX_LEVEL_NAMES}[{w}.level]", **{
+    chip = label(f"='Warnstufe ' + {w}.level + ' von 3'", **{
         "background": f"={color}", "color": f"={w}.level === 1 ? '#212121' : '#ffffff'", "border-radius": "10px",
         "padding": "1px 9px", "font-size": "12px", "font-weight": "600", "white-space": "nowrap"})
     head = div([wx_alert(f"{w}.level", 20), label(f"={w}.type", **{"font-size": "15px", "font-weight": "700"}), chip],
@@ -971,7 +970,9 @@ def wx_day_row():
 
 def weather_forecast_card():
     # the days first, the chart of the next hours below them, a gap between the last day and the chart
-    days = div([comp("oh-repeater", {"for": "day", "sourceType": "array", "in": f"={wx_json(WX_DAILY)}.slice(0, 5)",
+    # from today on: after midnight a run that failed would leave yesterday first
+    upcoming = f"{wx_json(WX_DAILY)}.filter((d) => d.t * 1000 >= dayjs().startOf('day').valueOf()).slice(0, 5)"
+    days = div([comp("oh-repeater", {"for": "day", "sourceType": "array", "in": f"={upcoming}",
                                      "fragment": True}, default=[wx_day_row()])],
                **{"padding-top": "2px", "margin-bottom": "12px"})
     return card("Vorhersage", [days, div([weather_forecast_chart()], **{"padding": "0 4px 6px"})])
