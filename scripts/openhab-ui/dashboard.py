@@ -467,22 +467,32 @@ def ecar_node(cx, cy, power):
             *wheels, bolt]
 
 
+def sparkle(x, y, size):
+    """A four-pointed sparkle around (x, y), its points size away, its sides curved in."""
+    k = size * 0.16
+    p = [f"{round(x + dx, 2):g},{round(y + dy, 2):g}"
+         for dx, dy in ((0, -size), (k, -k), (size, 0), (k, k), (0, size), (-k, k), (-size, 0), (-k, -k))]
+    return f"M{p[0]} Q{p[1]} {p[2]} Q{p[3]} {p[4]} Q{p[5]} {p[6]} Q{p[7]} {p[0]} Z"
+
+
 def appliances_node(cx, cy, power):
-    """The household appliances together: the housing of the appliance tiles with a power symbol for a front; while
-    they draw more than APPL_ON watts together, the symbol lights up and a ring pulses out of it, faster the more
-    they draw."""
+    """The household appliances together: the housing of the appliance tiles with sparkles for a front, as all of
+    them clean something; while they draw more than APPL_ON watts together, the sparkles light up, the big one
+    breathes and the small ones twinkle by turns, faster the more they draw."""
     active = f"Math.abs({power}) > {APPL_ON}"
-    x, y, r = 32, 35, 6.5  # drawn in the tiles' 64 × 64 icon, then moved onto the node
-    gap = math.radians(40)  # half the opening at the top of the symbol's circle
-    sx, sy = round(x + r * math.sin(gap), 2), round(y - r * math.cos(gap), 2)
-    symbol = [svg("path", d=f"M{sx},{sy} A{r},{r} 0 1,1 {round(2 * x - sx, 2)},{sy}", **stroke(2, APPL_COLOR)),
-              svg("line", x1=x, y1=27, x2=x, y2=34, **stroke(2, APPL_COLOR))]
-    dur = steps(power, [500, 1500], ["2.4s", "1.6s", "1s"])
-    pulse = svg("circle", [svg("animate", attributeName="r", values="7.5;10.5", dur=dur, repeatCount="indefinite"),
-                           svg("animate", attributeName="opacity", values="0.6;0", dur=dur, repeatCount="indefinite")],
-                cx=x, cy=y, r=7.5, visible=f"={active}", **stroke(1.4, APPL_COLOR))
+    ease = {"calcMode": "spline", "keyTimes": "0;0.5;1", "keySplines": "0.42 0 0.58 1;0.42 0 0.58 1"}
+    # the big one drawn around (0, 0), as SVG scales around the origin, then moved to (31, 36) of the tiles' 64 × 64
+    # icon, which in turn is moved onto the node
+    breathe = svg("animateTransform", attributeName="transform", type="scale", values="0.82;1.05;0.82",
+                  dur=steps(power, [500, 1500], ["2.4s", "1.6s", "1s"]), repeatCount="indefinite",
+                  visible=f"={active}", **ease)
+    blink = steps(power, [500, 1500], ["1.8s", "1.2s", "0.75s"])
+    small = [svg("path", [svg("animate", attributeName="opacity", values=values, dur=blink, repeatCount="indefinite",
+                              visible=f"={active}", **ease)], d=sparkle(x, y, size), fill=APPL_COLOR)
+             for x, y, size, values in ((38.6, 28, 2.9, "0.2;1;0.2"), (25.2, 43.2, 2.1, "1;0.2;1"))]
+    big = svg("g", [svg("path", [breathe], d=sparkle(0, 0, 8), fill=APPL_COLOR)], transform="translate(31 36)")
     return [ring(cx, cy, APPL_COLOR),
-            svg("g", machine_body([pulse, svg("g", symbol, opacity=f"={active} ? '1' : '0.45'")]),
+            svg("g", machine_body([svg("g", [big, *small], opacity=f"={active} ? '1' : '0.45'")]),
                 transform=f"translate({cx - 32} {cy - 32})")]
 
 
@@ -633,7 +643,7 @@ FLOW_KINDS = {  # kind: (builder of the drawing around (0, 0) from the power exp
     "e-car": (lambda p: ecar_node(0, 0, p), "E-Car: a car whose bolt fades in and out while it charges"),
     "battery": (lambda p: battery_node(0, 0, "Number(props.soc)"), "battery: filled to its state of charge"),
     "appliances": (lambda p: appliances_node(0, 0, p),
-                   "appliances: an appliance with a power symbol that lights up and pulses while they run"),
+                   "appliances: an appliance with sparkles that breathe and twinkle while they run"),
 }
 
 
