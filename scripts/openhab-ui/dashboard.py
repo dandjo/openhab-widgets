@@ -968,13 +968,14 @@ def weather_popup(now):
                  "(CC BY 4.0), Modell GeoSphere AROME Austria, spätere Stunden und Tage sowie die "
                  "Regenwahrscheinlichkeit aus dem Best Match; Warnungen von GeoSphere Austria (warnungen.zamg.at).",
                  **{"font-size": "12px", "opacity": "0.6", "padding": "4px 16px 14px"})
-    # the warnings only while there are any; without them the forecast stands at the top
-    warnings = block(row(full(weather_warnings_card())))
+    # the cards as rows of one block, as in the other popups, so they keep a card's gap and not a block's; the
+    # warnings only while there are any, without them the forecast stands at the top
+    warnings = row(full(weather_warnings_card()))
     warnings["config"]["visible"] = f"={wx_json(WX_WARNINGS)}.length > 0"
-    blocks = [warnings,
-              block(row(full(weather_forecast_card()))),
-              block(row(full(card("Meteoblue · 5 Tage", [div([frame], **{"padding": "4px 12px 12px"})])))),
-              block(row(full(card("Weitere Quellen", [orf, note]))))]
+    blocks = [block(warnings,
+                    row(full(weather_forecast_card())),
+                    row(full(card("Meteoblue · 5 Tage", [div([frame], **{"padding": "4px 12px 12px"})]))),
+                    row(full(card("Weitere Quellen", [orf, note]))))]
     return {WEATHER_POPUP: layout_page(WEATHER_POPUP, {"label": "Wetter", "sidebar": False}, blocks, now)}
 
 
