@@ -67,12 +67,41 @@ number formats come from the items.
 | `temperatures-card` | – |
 | `value-tile` | `item-popup` |
 | `ventilation-controls` | `boost-button`, `device-head`, `pill-slider`, `pill-switch`, `state-bar` |
+| `weather-card` | – |
 
 ## Dashboard cards
 
 The cards of my overview page. Each takes the items it shows as props; the prop names say what an item is. Some
 elements open popup pages of my installation when tapped (`page:flow_*`, `page:hp_*`, `page:appliance_*`); they are
 not part of this repository.
+
+### Weather: `weather-card`
+
+A slim bar across the top: the present weather drawn in the style of the energy flow (sun or moon, alone or behind a
+cloud, clouds with rain, snow, a bolt or fog, gently animated), the outdoor temperature from a local sensor, and the
+minimum and maximum of today and the next two days. A tap opens a forecast popup of my installation. Its items come from
+a rule that reads Open-Meteo's GeoSphere AROME Austria model, `scripts/openhab-ui/applied/weather_forecast_rule.js`.
+
+![Weather](screenshots/weather-card.png)
+
+![Weather in dark mode](screenshots/weather-card-dark.png)
+
+<details>
+<summary>9 props</summary>
+
+| Prop | Item | Item type |
+|---|---|---|
+| `weatherCode` | Wetter aktuell | Number |
+| `weatherIsDay` | Wetter Tag | Switch |
+| `heatpumpExtAmbientTemp` | ESPAltherma Außentemperatur | Number:Temperature |
+| `weatherDay0Min` | Wetter heute Min. | Number:Temperature |
+| `weatherDay0Max` | Wetter heute Max. | Number:Temperature |
+| `weatherDay1Min` | Wetter morgen Min. | Number:Temperature |
+| `weatherDay1Max` | Wetter morgen Max. | Number:Temperature |
+| `weatherDay2Min` | Wetter übermorgen Min. | Number:Temperature |
+| `weatherDay2Max` | Wetter übermorgen Max. | Number:Temperature |
+
+</details>
 
 ### Controls: `controls-card`
 
@@ -1017,6 +1046,8 @@ config:
 ## About these widgets
 
 The widgets are generated from Python by the script that builds my whole MainUI, which keeps the cards of the
-dashboard and the device pages consistent; that is why their YAML is dense and machine-formatted. The cards are
+dashboard and the device pages consistent; that is why their YAML is dense and machine-formatted. The script and its
+tools are in [`scripts/openhab-ui/`](scripts/openhab-ui/): `dashboard.py`, the headless-Chrome tools behind the
+screenshots, and the one-off JSONDB changes in `applied/`. The cards are
 built from the smaller widgets wherever a part stands in more than one place or makes sense on its own, so a fix in
 one widget reaches every place it stands. The widgets in this repository are exported from that script unchanged.

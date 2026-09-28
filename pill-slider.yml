@@ -86,7 +86,7 @@ props:
     type: BOOLEAN
     required: false
   parameterGroups: []
-timestamp: Sep 27, 2026, 8:52:40 PM
+timestamp: Sep 28, 2026, 9:45:26 AM
 component: div
 config:
   stylesheet: ".range-slider { --f7-range-size: 32px; --f7-range-bar-size: 32px; --f7-range-bar-border-radius: 16px;\n  --f7-range-bar-bg-color:\
@@ -231,7 +231,7 @@ slots:
           unit: =props.unit
           limitKnobPosition: true
           draggableBar: false
-          visible: =!isNaN(parseFloat(items[props.item].state))
+          visible: =!Number.isNaN(Number.parseFloat(items[props.item].state))
   - component: div
     config:
       style:

@@ -1,0 +1,757 @@
+uid: weather-card
+tags:
+- overview
+props:
+  parameters:
+  - name: weatherCode
+    label: Wetter aktuell
+    description: Number item
+    type: TEXT
+    required: true
+    context: item
+  - name: weatherIsDay
+    label: Wetter Tag
+    description: Switch item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpExtAmbientTemp
+    label: ESPAltherma Außentemperatur
+    description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
+  - name: weatherDay0Min
+    label: Wetter heute Min.
+    description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
+  - name: weatherDay0Max
+    label: Wetter heute Max.
+    description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
+  - name: weatherDay1Min
+    label: Wetter morgen Min.
+    description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
+  - name: weatherDay1Max
+    label: Wetter morgen Max.
+    description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
+  - name: weatherDay2Min
+    label: Wetter übermorgen Min.
+    description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
+  - name: weatherDay2Max
+    label: Wetter übermorgen Max.
+    description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
+  parameterGroups: []
+timestamp: Sep 28, 2026, 9:45:26 AM
+component: oh-card
+config:
+  contentStyle:
+    padding: 8px 14px
+slots:
+  content:
+  - component: div
+    config:
+      style:
+        position: relative
+        display: flex
+        align-items: center
+        gap: 12px
+        padding: 2px 4px
+    slots:
+      default:
+      - component: div
+        config:
+          style:
+            display: flex
+            align-items: center
+            gap: 8px
+        slots:
+          default:
+          - component: svg
+            config:
+              viewBox: 0 0 48 48
+              width: 36
+              height: 36
+              style:
+                display: block
+                flex: 0 0 auto
+            slots:
+              default:
+              - component: g
+                config:
+                  visible: '=((Number.isNaN(Number.parseFloat(items[props.weatherCode].state)) ? '''' : Number(items[props.weatherCode].state)
+                    === 0 ? ''clear'' : Number(items[props.weatherCode].state) <= 2 ? ''partly'' : Number(items[props.weatherCode].state)
+                    === 3 ? ''cloudy'' : Number(items[props.weatherCode].state) <= 48 ? ''fog'' : Number(items[props.weatherCode].state)
+                    <= 67 ? ''rain'' : Number(items[props.weatherCode].state) <= 77 ? ''snow'' : Number(items[props.weatherCode].state)
+                    <= 82 ? ''rain'' : Number(items[props.weatherCode].state) <= 86 ? ''snow'' : ''thunder'') === ''clear'')
+                    && !(items[props.weatherIsDay].state === ''OFF'')'
+                slots:
+                  default:
+                  - component: g
+                    config: {}
+                    slots:
+                      default:
+                      - component: line
+                        config:
+                          x1: 34.5
+                          y1: 24.0
+                          x2: 38.5
+                          y2: 24.0
+                          stroke: '#ffb300'
+                          stroke-width: 2.2
+                          stroke-linecap: round
+                          fill: none
+                      - component: line
+                        config:
+                          x1: 31.42
+                          y1: 31.42
+                          x2: 34.25
+                          y2: 34.25
+                          stroke: '#ffb300'
+                          stroke-width: 2.2
+                          stroke-linecap: round
+                          fill: none
+                      - component: line
+                        config:
+                          x1: 24.0
+                          y1: 34.5
+                          x2: 24.0
+                          y2: 38.5
+                          stroke: '#ffb300'
+                          stroke-width: 2.2
+                          stroke-linecap: round
+                          fill: none
+                      - component: line
+                        config:
+                          x1: 16.58
+                          y1: 31.42
+                          x2: 13.75
+                          y2: 34.25
+                          stroke: '#ffb300'
+                          stroke-width: 2.2
+                          stroke-linecap: round
+                          fill: none
+                      - component: line
+                        config:
+                          x1: 13.5
+                          y1: 24.0
+                          x2: 9.5
+                          y2: 24.0
+                          stroke: '#ffb300'
+                          stroke-width: 2.2
+                          stroke-linecap: round
+                          fill: none
+                      - component: line
+                        config:
+                          x1: 16.58
+                          y1: 16.58
+                          x2: 13.75
+                          y2: 13.75
+                          stroke: '#ffb300'
+                          stroke-width: 2.2
+                          stroke-linecap: round
+                          fill: none
+                      - component: line
+                        config:
+                          x1: 24.0
+                          y1: 13.5
+                          x2: 24.0
+                          y2: 9.5
+                          stroke: '#ffb300'
+                          stroke-width: 2.2
+                          stroke-linecap: round
+                          fill: none
+                      - component: line
+                        config:
+                          x1: 31.42
+                          y1: 16.58
+                          x2: 34.25
+                          y2: 13.75
+                          stroke: '#ffb300'
+                          stroke-width: 2.2
+                          stroke-linecap: round
+                          fill: none
+                      - component: animateTransform
+                        config:
+                          attributeName: transform
+                          type: rotate
+                          from: 0 24 24
+                          to: 360 24 24
+                          dur: 24s
+                          repeatCount: indefinite
+                          visible: =true
+                  - component: circle
+                    config:
+                      cx: 24
+                      cy: 24
+                      r: 7
+                      fill: '#ffb300'
+              - component: path
+                config:
+                  d: M22.19,14.17 A10,10 0 1,0 33.83,25.81 A8.5,8.5 0 1,1 22.19,14.17 Z
+                  fill: '#9fa8da'
+                  visible: '=((Number.isNaN(Number.parseFloat(items[props.weatherCode].state)) ? '''' : Number(items[props.weatherCode].state)
+                    === 0 ? ''clear'' : Number(items[props.weatherCode].state) <= 2 ? ''partly'' : Number(items[props.weatherCode].state)
+                    === 3 ? ''cloudy'' : Number(items[props.weatherCode].state) <= 48 ? ''fog'' : Number(items[props.weatherCode].state)
+                    <= 67 ? ''rain'' : Number(items[props.weatherCode].state) <= 77 ? ''snow'' : Number(items[props.weatherCode].state)
+                    <= 82 ? ''rain'' : Number(items[props.weatherCode].state) <= 86 ? ''snow'' : ''thunder'') === ''clear'')
+                    && items[props.weatherIsDay].state === ''OFF'''
+              - component: g
+                config:
+                  transform: translate(17 17) scale(0.72) translate(-24 -24)
+                  visible: '=((Number.isNaN(Number.parseFloat(items[props.weatherCode].state)) ? '''' : Number(items[props.weatherCode].state)
+                    === 0 ? ''clear'' : Number(items[props.weatherCode].state) <= 2 ? ''partly'' : Number(items[props.weatherCode].state)
+                    === 3 ? ''cloudy'' : Number(items[props.weatherCode].state) <= 48 ? ''fog'' : Number(items[props.weatherCode].state)
+                    <= 67 ? ''rain'' : Number(items[props.weatherCode].state) <= 77 ? ''snow'' : Number(items[props.weatherCode].state)
+                    <= 82 ? ''rain'' : Number(items[props.weatherCode].state) <= 86 ? ''snow'' : ''thunder'') === ''partly'')
+                    && !(items[props.weatherIsDay].state === ''OFF'')'
+                slots:
+                  default:
+                  - component: g
+                    config: {}
+                    slots:
+                      default:
+                      - component: line
+                        config:
+                          x1: 34.5
+                          y1: 24.0
+                          x2: 38.5
+                          y2: 24.0
+                          stroke: '#ffb300'
+                          stroke-width: 2.2
+                          stroke-linecap: round
+                          fill: none
+                      - component: line
+                        config:
+                          x1: 31.42
+                          y1: 31.42
+                          x2: 34.25
+                          y2: 34.25
+                          stroke: '#ffb300'
+                          stroke-width: 2.2
+                          stroke-linecap: round
+                          fill: none
+                      - component: line
+                        config:
+                          x1: 24.0
+                          y1: 34.5
+                          x2: 24.0
+                          y2: 38.5
+                          stroke: '#ffb300'
+                          stroke-width: 2.2
+                          stroke-linecap: round
+                          fill: none
+                      - component: line
+                        config:
+                          x1: 16.58
+                          y1: 31.42
+                          x2: 13.75
+                          y2: 34.25
+                          stroke: '#ffb300'
+                          stroke-width: 2.2
+                          stroke-linecap: round
+                          fill: none
+                      - component: line
+                        config:
+                          x1: 13.5
+                          y1: 24.0
+                          x2: 9.5
+                          y2: 24.0
+                          stroke: '#ffb300'
+                          stroke-width: 2.2
+                          stroke-linecap: round
+                          fill: none
+                      - component: line
+                        config:
+                          x1: 16.58
+                          y1: 16.58
+                          x2: 13.75
+                          y2: 13.75
+                          stroke: '#ffb300'
+                          stroke-width: 2.2
+                          stroke-linecap: round
+                          fill: none
+                      - component: line
+                        config:
+                          x1: 24.0
+                          y1: 13.5
+                          x2: 24.0
+                          y2: 9.5
+                          stroke: '#ffb300'
+                          stroke-width: 2.2
+                          stroke-linecap: round
+                          fill: none
+                      - component: line
+                        config:
+                          x1: 31.42
+                          y1: 16.58
+                          x2: 34.25
+                          y2: 13.75
+                          stroke: '#ffb300'
+                          stroke-width: 2.2
+                          stroke-linecap: round
+                          fill: none
+                      - component: animateTransform
+                        config:
+                          attributeName: transform
+                          type: rotate
+                          from: 0 24 24
+                          to: 360 24 24
+                          dur: 24s
+                          repeatCount: indefinite
+                          visible: =true
+                  - component: circle
+                    config:
+                      cx: 24
+                      cy: 24
+                      r: 7
+                      fill: '#ffb300'
+              - component: path
+                config:
+                  d: M22.19,14.17 A10,10 0 1,0 33.83,25.81 A8.5,8.5 0 1,1 22.19,14.17 Z
+                  fill: '#9fa8da'
+                  transform: translate(17 16) scale(0.7) translate(-24 -24)
+                  visible: '=((Number.isNaN(Number.parseFloat(items[props.weatherCode].state)) ? '''' : Number(items[props.weatherCode].state)
+                    === 0 ? ''clear'' : Number(items[props.weatherCode].state) <= 2 ? ''partly'' : Number(items[props.weatherCode].state)
+                    === 3 ? ''cloudy'' : Number(items[props.weatherCode].state) <= 48 ? ''fog'' : Number(items[props.weatherCode].state)
+                    <= 67 ? ''rain'' : Number(items[props.weatherCode].state) <= 77 ? ''snow'' : Number(items[props.weatherCode].state)
+                    <= 82 ? ''rain'' : Number(items[props.weatherCode].state) <= 86 ? ''snow'' : ''thunder'') === ''partly'')
+                    && items[props.weatherIsDay].state === ''OFF'''
+              - component: g
+                config:
+                  visible: '=((Number.isNaN(Number.parseFloat(items[props.weatherCode].state)) ? '''' : Number(items[props.weatherCode].state)
+                    === 0 ? ''clear'' : Number(items[props.weatherCode].state) <= 2 ? ''partly'' : Number(items[props.weatherCode].state)
+                    === 3 ? ''cloudy'' : Number(items[props.weatherCode].state) <= 48 ? ''fog'' : Number(items[props.weatherCode].state)
+                    <= 67 ? ''rain'' : Number(items[props.weatherCode].state) <= 77 ? ''snow'' : Number(items[props.weatherCode].state)
+                    <= 82 ? ''rain'' : Number(items[props.weatherCode].state) <= 86 ? ''snow'' : ''thunder'') === ''partly'')'
+                slots:
+                  default:
+                  - component: path
+                    config:
+                      d: M14,38 H34 A6,6 0 0,0 35.5,26.2 A9,9 0 0,0 18.6,24.4 A7,7 0 0,0 14,38 Z
+                      transform: translate(27 34) scale(0.9) translate(-27 -31)
+                      stroke: '#90a4ae'
+                      stroke-width: 1.6
+                      stroke-linecap: round
+                      fill: '#cfd8dc'
+                      stroke-linejoin: round
+              - component: g
+                config:
+                  visible: '=((Number.isNaN(Number.parseFloat(items[props.weatherCode].state)) ? '''' : Number(items[props.weatherCode].state)
+                    === 0 ? ''clear'' : Number(items[props.weatherCode].state) <= 2 ? ''partly'' : Number(items[props.weatherCode].state)
+                    === 3 ? ''cloudy'' : Number(items[props.weatherCode].state) <= 48 ? ''fog'' : Number(items[props.weatherCode].state)
+                    <= 67 ? ''rain'' : Number(items[props.weatherCode].state) <= 77 ? ''snow'' : Number(items[props.weatherCode].state)
+                    <= 82 ? ''rain'' : Number(items[props.weatherCode].state) <= 86 ? ''snow'' : ''thunder'') === ''cloudy'')'
+                slots:
+                  default:
+                  - component: path
+                    config:
+                      d: M14,38 H34 A6,6 0 0,0 35.5,26.2 A9,9 0 0,0 18.6,24.4 A7,7 0 0,0 14,38 Z
+                      transform: translate(0 -2)
+                      stroke: '#90a4ae'
+                      stroke-width: 1.6
+                      stroke-linecap: round
+                      fill: '#cfd8dc'
+                      stroke-linejoin: round
+              - component: g
+                config:
+                  visible: '=((Number.isNaN(Number.parseFloat(items[props.weatherCode].state)) ? '''' : Number(items[props.weatherCode].state)
+                    === 0 ? ''clear'' : Number(items[props.weatherCode].state) <= 2 ? ''partly'' : Number(items[props.weatherCode].state)
+                    === 3 ? ''cloudy'' : Number(items[props.weatherCode].state) <= 48 ? ''fog'' : Number(items[props.weatherCode].state)
+                    <= 67 ? ''rain'' : Number(items[props.weatherCode].state) <= 77 ? ''snow'' : Number(items[props.weatherCode].state)
+                    <= 82 ? ''rain'' : Number(items[props.weatherCode].state) <= 86 ? ''snow'' : ''thunder'') === ''rain'')'
+                slots:
+                  default:
+                  - component: path
+                    config:
+                      d: M14,38 H34 A6,6 0 0,0 35.5,26.2 A9,9 0 0,0 18.6,24.4 A7,7 0 0,0 14,38 Z
+                      transform: translate(0 -6)
+                      stroke: '#90a4ae'
+                      stroke-width: 1.6
+                      stroke-linecap: round
+                      fill: '#cfd8dc'
+                      stroke-linejoin: round
+                  - component: line
+                    config:
+                      x1: 18
+                      y1: 36
+                      x2: 16
+                      y2: 42
+                      stroke: '#42a5f5'
+                      stroke-width: 2.2
+                      stroke-linecap: round
+                      fill: none
+                      stroke-dasharray: 3 3
+                    slots:
+                      default:
+                      - component: animate
+                        config:
+                          attributeName: stroke-dashoffset
+                          from: '0'
+                          to: '-6'
+                          dur: 0.9s
+                          repeatCount: indefinite
+                          visible: =true
+                  - component: line
+                    config:
+                      x1: 25
+                      y1: 36
+                      x2: 23
+                      y2: 42
+                      stroke: '#42a5f5'
+                      stroke-width: 2.2
+                      stroke-linecap: round
+                      fill: none
+                      stroke-dasharray: 3 3
+                    slots:
+                      default:
+                      - component: animate
+                        config:
+                          attributeName: stroke-dashoffset
+                          from: '0'
+                          to: '-6'
+                          dur: 0.9s
+                          repeatCount: indefinite
+                          visible: =true
+                  - component: line
+                    config:
+                      x1: 32
+                      y1: 36
+                      x2: 30
+                      y2: 42
+                      stroke: '#42a5f5'
+                      stroke-width: 2.2
+                      stroke-linecap: round
+                      fill: none
+                      stroke-dasharray: 3 3
+                    slots:
+                      default:
+                      - component: animate
+                        config:
+                          attributeName: stroke-dashoffset
+                          from: '0'
+                          to: '-6'
+                          dur: 0.9s
+                          repeatCount: indefinite
+                          visible: =true
+              - component: g
+                config:
+                  visible: '=((Number.isNaN(Number.parseFloat(items[props.weatherCode].state)) ? '''' : Number(items[props.weatherCode].state)
+                    === 0 ? ''clear'' : Number(items[props.weatherCode].state) <= 2 ? ''partly'' : Number(items[props.weatherCode].state)
+                    === 3 ? ''cloudy'' : Number(items[props.weatherCode].state) <= 48 ? ''fog'' : Number(items[props.weatherCode].state)
+                    <= 67 ? ''rain'' : Number(items[props.weatherCode].state) <= 77 ? ''snow'' : Number(items[props.weatherCode].state)
+                    <= 82 ? ''rain'' : Number(items[props.weatherCode].state) <= 86 ? ''snow'' : ''thunder'') === ''snow'')'
+                slots:
+                  default:
+                  - component: path
+                    config:
+                      d: M14,38 H34 A6,6 0 0,0 35.5,26.2 A9,9 0 0,0 18.6,24.4 A7,7 0 0,0 14,38 Z
+                      transform: translate(0 -6)
+                      stroke: '#90a4ae'
+                      stroke-width: 1.6
+                      stroke-linecap: round
+                      fill: '#cfd8dc'
+                      stroke-linejoin: round
+                  - component: circle
+                    config:
+                      cx: 18
+                      cy: 38
+                      r: 1.8
+                      fill: '#81d4fa'
+                    slots:
+                      default:
+                      - component: animate
+                        config:
+                          attributeName: cy
+                          values: 38;41;38
+                          dur: 2.0s
+                          repeatCount: indefinite
+                  - component: circle
+                    config:
+                      cx: 25
+                      cy: 41
+                      r: 1.8
+                      fill: '#81d4fa'
+                    slots:
+                      default:
+                      - component: animate
+                        config:
+                          attributeName: cy
+                          values: 41;44;41
+                          dur: 2.4s
+                          repeatCount: indefinite
+                  - component: circle
+                    config:
+                      cx: 32
+                      cy: 38
+                      r: 1.8
+                      fill: '#81d4fa'
+                    slots:
+                      default:
+                      - component: animate
+                        config:
+                          attributeName: cy
+                          values: 38;41;38
+                          dur: 2.8s
+                          repeatCount: indefinite
+              - component: g
+                config:
+                  visible: '=((Number.isNaN(Number.parseFloat(items[props.weatherCode].state)) ? '''' : Number(items[props.weatherCode].state)
+                    === 0 ? ''clear'' : Number(items[props.weatherCode].state) <= 2 ? ''partly'' : Number(items[props.weatherCode].state)
+                    === 3 ? ''cloudy'' : Number(items[props.weatherCode].state) <= 48 ? ''fog'' : Number(items[props.weatherCode].state)
+                    <= 67 ? ''rain'' : Number(items[props.weatherCode].state) <= 77 ? ''snow'' : Number(items[props.weatherCode].state)
+                    <= 82 ? ''rain'' : Number(items[props.weatherCode].state) <= 86 ? ''snow'' : ''thunder'') === ''thunder'')'
+                slots:
+                  default:
+                  - component: path
+                    config:
+                      d: M14,38 H34 A6,6 0 0,0 35.5,26.2 A9,9 0 0,0 18.6,24.4 A7,7 0 0,0 14,38 Z
+                      transform: translate(0 -8)
+                      stroke: '#90a4ae'
+                      stroke-width: 1.6
+                      stroke-linecap: round
+                      fill: '#cfd8dc'
+                      stroke-linejoin: round
+                  - component: polygon
+                    config:
+                      points: 26,31 20,40 24.5,40 22,47 30,37 25.5,37 28,31
+                      fill: '#ffca28'
+                      stroke: '#f9a825'
+                      stroke-width: 0.8
+                      stroke-linejoin: round
+                    slots:
+                      default:
+                      - component: animate
+                        config:
+                          attributeName: opacity
+                          values: 1;0.35;1;1
+                          dur: 1.8s
+                          repeatCount: indefinite
+              - component: g
+                config:
+                  visible: '=((Number.isNaN(Number.parseFloat(items[props.weatherCode].state)) ? '''' : Number(items[props.weatherCode].state)
+                    === 0 ? ''clear'' : Number(items[props.weatherCode].state) <= 2 ? ''partly'' : Number(items[props.weatherCode].state)
+                    === 3 ? ''cloudy'' : Number(items[props.weatherCode].state) <= 48 ? ''fog'' : Number(items[props.weatherCode].state)
+                    <= 67 ? ''rain'' : Number(items[props.weatherCode].state) <= 77 ? ''snow'' : Number(items[props.weatherCode].state)
+                    <= 82 ? ''rain'' : Number(items[props.weatherCode].state) <= 86 ? ''snow'' : ''thunder'') === ''fog'')'
+                slots:
+                  default:
+                  - component: path
+                    config:
+                      d: M14,38 H34 A6,6 0 0,0 35.5,26.2 A9,9 0 0,0 18.6,24.4 A7,7 0 0,0 14,38 Z
+                      transform: translate(24 23) scale(0.9) translate(-24 -31)
+                      stroke: '#90a4ae'
+                      stroke-width: 1.6
+                      stroke-linecap: round
+                      fill: '#cfd8dc'
+                      stroke-linejoin: round
+                  - component: line
+                    config:
+                      x1: 12
+                      y1: 37
+                      x2: 36
+                      y2: 37
+                      stroke: '#90a4ae'
+                      stroke-width: 2.2
+                      stroke-linecap: round
+                      fill: none
+                  - component: line
+                    config:
+                      x1: 15
+                      y1: 42
+                      x2: 33
+                      y2: 42
+                      stroke: '#90a4ae'
+                      stroke-width: 2.2
+                      stroke-linecap: round
+                      fill: none
+          - component: div
+            config:
+              style:
+                display: flex
+                flex-direction: column
+            slots:
+              default:
+              - component: Label
+                config:
+                  text: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpExtAmbientTemp].state) ? ''–'' : (items[props.heatpumpExtAmbientTemp].displayState
+                    || items[props.heatpumpExtAmbientTemp].state))'
+                  style:
+                    font-size: 18px
+                    font-weight: '700'
+                    line-height: 22px
+                    white-space: nowrap
+              - component: Label
+                config:
+                  text: Außen
+                  style:
+                    font-size: 11px
+                    opacity: '0.65'
+                    line-height: 14px
+      - component: div
+        config:
+          style:
+            display: flex
+            align-items: center
+            gap: 14px
+            margin-left: auto
+        slots:
+          default:
+          - component: div
+            config:
+              style:
+                display: flex
+                flex-direction: column
+                align-items: center
+            slots:
+              default:
+              - component: Label
+                config:
+                  text: ='Heute'
+                  style:
+                    font-size: 11px
+                    opacity: '0.65'
+                    line-height: 14px
+              - component: div
+                config:
+                  style:
+                    display: flex
+                    gap: 3px
+                    font-size: 13px
+                    line-height: 18px
+                    white-space: nowrap
+                slots:
+                  default:
+                  - component: Label
+                    config:
+                      text: '=((items[props.weatherDay0Min].state !== ''UNDEF'' && items[props.weatherDay0Min].state !== ''NULL'')
+                        ? Math.round(Number(items[props.weatherDay0Min].numericState)) + ''°'' : ''–'')'
+                      style:
+                        opacity: '0.65'
+                  - component: Label
+                    config:
+                      text: /
+                      style:
+                        opacity: '0.35'
+                  - component: Label
+                    config:
+                      text: '=((items[props.weatherDay0Max].state !== ''UNDEF'' && items[props.weatherDay0Max].state !== ''NULL'')
+                        ? Math.round(Number(items[props.weatherDay0Max].numericState)) + ''°'' : ''–'')'
+                      style:
+                        font-weight: '700'
+          - component: div
+            config:
+              style:
+                display: flex
+                flex-direction: column
+                align-items: center
+            slots:
+              default:
+              - component: Label
+                config:
+                  text: =['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'][dayjs().add(1, 'day').day()]
+                  style:
+                    font-size: 11px
+                    opacity: '0.65'
+                    line-height: 14px
+              - component: div
+                config:
+                  style:
+                    display: flex
+                    gap: 3px
+                    font-size: 13px
+                    line-height: 18px
+                    white-space: nowrap
+                slots:
+                  default:
+                  - component: Label
+                    config:
+                      text: '=((items[props.weatherDay1Min].state !== ''UNDEF'' && items[props.weatherDay1Min].state !== ''NULL'')
+                        ? Math.round(Number(items[props.weatherDay1Min].numericState)) + ''°'' : ''–'')'
+                      style:
+                        opacity: '0.65'
+                  - component: Label
+                    config:
+                      text: /
+                      style:
+                        opacity: '0.35'
+                  - component: Label
+                    config:
+                      text: '=((items[props.weatherDay1Max].state !== ''UNDEF'' && items[props.weatherDay1Max].state !== ''NULL'')
+                        ? Math.round(Number(items[props.weatherDay1Max].numericState)) + ''°'' : ''–'')'
+                      style:
+                        font-weight: '700'
+          - component: div
+            config:
+              style:
+                display: flex
+                flex-direction: column
+                align-items: center
+            slots:
+              default:
+              - component: Label
+                config:
+                  text: =['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'][dayjs().add(2, 'day').day()]
+                  style:
+                    font-size: 11px
+                    opacity: '0.65'
+                    line-height: 14px
+              - component: div
+                config:
+                  style:
+                    display: flex
+                    gap: 3px
+                    font-size: 13px
+                    line-height: 18px
+                    white-space: nowrap
+                slots:
+                  default:
+                  - component: Label
+                    config:
+                      text: '=((items[props.weatherDay2Min].state !== ''UNDEF'' && items[props.weatherDay2Min].state !== ''NULL'')
+                        ? Math.round(Number(items[props.weatherDay2Min].numericState)) + ''°'' : ''–'')'
+                      style:
+                        opacity: '0.65'
+                  - component: Label
+                    config:
+                      text: /
+                      style:
+                        opacity: '0.35'
+                  - component: Label
+                    config:
+                      text: '=((items[props.weatherDay2Max].state !== ''UNDEF'' && items[props.weatherDay2Max].state !== ''NULL'')
+                        ? Math.round(Number(items[props.weatherDay2Max].numericState)) + ''°'' : ''–'')'
+                      style:
+                        font-weight: '700'
+      - component: oh-icon
+        config:
+          icon: f7:chevron_right
+          width: 14
+          height: 14
+          style:
+            opacity: '0.45'
+      - component: oh-link
+        config:
+          action: popup
+          actionModal: page:forecast
+          style:
+            position: absolute
+            inset: '0'
+            display: block
+            border-radius: 12px
