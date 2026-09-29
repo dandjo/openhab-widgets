@@ -1054,6 +1054,14 @@ WX_TIME_LABEL = (f"=(v) => dayjs(v).hour() === 0 && dayjs(v).minute() === 0 ? '{
                  f"+ '}}' : {NARROW} && dayjs(v).hour() % 12 !== 0 ? '' : dayjs(v).format('HH:mm')")
 
 
+# a precipitation bar as a bar series of barMaxWidth 6 draws it: centred on its hour, 6 px wide at most and about
+# two thirds of an hour where hours are narrower (a phone), its top corners rounded
+WX_RAIN_BAR = ("=(params, api) => api.value(1) > 0 ? ((w, top, base) => ({type: 'rect', shape: {x: top[0] - w / 2, "
+               "y: top[1], width: w, height: base[1] - top[1], r: [2, 2, 0, 0]}, style: {fill: '" + WX_RAIN_COLOR
+               + "'}}))(Math.min(6, api.size([3600000, 0])[0] * 0.68), api.coord([api.value(0), api.value(1)]), "
+               "api.coord([api.value(0), 0])) : null")
+
+
 def weather_forecast_chart():
     """The next 60 hours: temperature as a line with the weather drawn above it, over the precipitation of each hour
     as bars, the wind below with arrows of its direction, one tooltip for all three."""
@@ -1080,9 +1088,11 @@ def weather_forecast_chart():
                         lineStyle={"width": 2.5, "color": WX_TEMP_COLOR}, markLine=wx_midnights(),
                         markPoint=wx_weather_symbols(), z=3),
               # precipitation is the sum of the hour before its time; the bar stands on that time all the same, as
-              # the axis tooltip lists only the series with a point at the time it snaps to
-              wx_series("Niederschlag", "mm", 2, WX_RAIN_COLOR, 0, 1, type="bar", barMaxWidth=6,
-                        itemStyle={"color": WX_RAIN_COLOR, "borderRadius": [2, 2, 0, 0]}),
+              # the axis tooltip lists only the series with a point at the time it snaps to. Drawn by a custom
+              # series, not a bar series: a bar series widens its time axis by half an hour on each side for its
+              # outer bars, so the upper grid would map time to x otherwise than the wind's below it
+              wx_series("Niederschlag", "mm", 2, WX_RAIN_COLOR, 0, 1, type="custom", renderItem=WX_RAIN_BAR,
+                        encode={"x": 0, "y": 1}, clip=True, itemStyle={"color": WX_RAIN_COLOR}),
               wx_series("Wind", "km/h", 3, WX_WIND_COLOR, 1, 2, type="line", smooth=0.5, symbol="none",
                         lineStyle={"width": 2, "color": WX_WIND_COLOR}, areaStyle={"color": gradient(rgb_of(WX_WIND_COLOR))},
                         markLine=wx_midnights(), markPoint=wx_wind_arrows())]
@@ -1096,9 +1106,9 @@ def weather_forecast_chart():
 def wx_day_row():
     """A day of the popup: its name, the weather drawn, minimum and maximum, the hours of sunshine with their share
     of the daylight under it, precipitation with its probability under it, and the strongest wind with an arrow of the
-    day's main direction and its compass point under it. On a phone the maximum stands over the minimum, as every
-    other cell stands its second value under its first, and icons, type and gaps are a little smaller, so a day keeps
-    its line down to 360 px."""
+    day's main direction and its compass point under it. The maximum stands over the minimum, as every other cell
+    stands its second value under its first; on a phone icons, type and gaps are a little smaller, so a day keeps its
+    line down to 360 px."""
     d = "loop.day"
     n = NARROW
     name = f"(dayjs({d}.t * 1000).isSame(dayjs(), 'day') ? 'Heute' : {WX_WEEKDAYS}[dayjs({d}.t * 1000).day()])"
@@ -1115,12 +1125,9 @@ def wx_day_row():
     def pair(first, second, second_visible):
         return div([label(f"={first}", **{"line-height": "16px"}), label(f"={second}", visible=second_visible, **sub)],
                    **{"display": "flex", "flex-direction": "column"})
-    temps = div([label(f"={degrees(d + '.lo')}", **{"opacity": "0.65", "font-size": f"={n} ? '11px' : '14px'",
-                                                     "line-height": f"={n} ? '13px' : '18px'"}),
-                 label("/", visible=f"=!({n})", **{"opacity": "0.35"}),
-                 label(f"={degrees(d + '.hi')}", **{"font-weight": "700", "line-height": f"={n} ? '16px' : '18px'"})],
-                **{"display": "flex", "flex-direction": f"={n} ? 'column-reverse' : 'row'",
-                   "gap": f"={n} ? '0' : '3px'", "font-size": "14px", "white-space": "nowrap"})
+    temps = div([label(f"={degrees(d + '.lo')}", **{"opacity": "0.65", "font-size": "11px", "line-height": "13px"}),
+                 label(f"={degrees(d + '.hi')}", **{"font-weight": "700", "line-height": "16px"})],
+                **{"display": "flex", "flex-direction": "column-reverse", "font-size": "14px", "white-space": "nowrap"})
     return div([
         label(f"={name}", **{"font-size": f"={n} ? '13px' : '14px'", "font-weight": "600"}),
         weather_icon(f"{d}.c", "true", f"={n} ? 28 : 32"),
@@ -1138,8 +1145,8 @@ def wx_day_row():
             **{**cell, "justify-content": "flex-end"}),
     ], **{"display": "grid", "align-items": "center",
           # fixed columns but the precipitation's, so the days' cells stand under each other
-          "grid-template-columns": f"={n} ? '36px 28px 34px 52px 1fr auto' : '40px 32px 64px 58px 1fr auto'",
-          "column-gap": f"={n} ? '6px' : '8px'", "min-height": "40px", "padding": f"={n} ? '4px 12px' : '4px 16px'",
+          "grid-template-columns": f"={n} ? '38px 28px 30px 52px 1fr auto' : '40px 32px 30px 58px 1fr auto'",
+          "column-gap": f"={n} ? '5px' : '8px'", "min-height": "40px", "padding": f"={n} ? '4px 12px' : '4px 16px'",
           "border-top": "1px solid rgba(127, 127, 127, 0.15)"})
 
 
