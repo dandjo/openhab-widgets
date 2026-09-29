@@ -22,7 +22,7 @@ const peak = power_item.persistence.maximumSince(now.minusMinutes(15));
 if (finished_item.state === 'OFF' && power !== null && power >= 1
     && average !== null && average.numericState <= 5 && peak !== null && peak.numericState >= 50) {
   finished_item.postUpdate('ON');
-  actions.NotificationAction.sendBroadcastNotification('Washing Machine 2 is ready!');
+  actions.NotificationAction.sendBroadcastNotification('Waschmaschine 2 ist fertig!');
 }
 
 // emptied: the machine is switched off to unload it (below 1 W), or a new program starts

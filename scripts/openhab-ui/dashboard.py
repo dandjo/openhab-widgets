@@ -978,6 +978,7 @@ def weather_warnings_card():
 
 # the forecast chart's three series: temperature over precipitation in the upper grid, wind in the lower
 WX_TEMP_COLOR, WX_RAIN_COLOR, WX_WIND_COLOR = "#f4511e", "#42a5f5", "#78909c"
+WX_SUN_COLOR = "#ffb300"  # the sun's of the weather drawings
 # the wind's direction as the forecast gives it, the degrees it comes from (0 north, 90 east), drawn as an arrow the way
 # it blows, pointing up at 0 before it is turned; the 16 points of the compass in German, O for east
 WX_ARROW = "M12,3 L18.5,19.5 L12,15.5 L5.5,19.5 Z"
@@ -1093,36 +1094,52 @@ def weather_forecast_chart():
 
 
 def wx_day_row():
-    """A day of the popup: its name, the weather drawn, minimum and maximum, precipitation with its probability
-    under it, and the strongest wind with an arrow of the day's main direction and its compass point under it."""
+    """A day of the popup: its name, the weather drawn, minimum and maximum, the hours of sunshine with their share
+    of the daylight under it, precipitation with its probability under it, and the strongest wind with an arrow of the
+    day's main direction and its compass point under it. On a phone the maximum stands over the minimum, as every
+    other cell stands its second value under its first, and icons, type and gaps are a little smaller, so a day keeps
+    its line down to 360 px."""
     d = "loop.day"
+    n = NARROW
     name = f"(dayjs({d}.t * 1000).isSame(dayjs(), 'day') ? 'Heute' : {WX_WEEKDAYS}[dayjs({d}.t * 1000).day()])"
     degrees = lambda v: f"({v} == null ? '–' : Math.round({v}) + '°')"
     rain = f"({d}.p == null ? '–' : {d}.p < 0.05 ? '0 mm' : {fixed(d + '.p', 1)} + ' mm')"
-    small_icon = lambda icon, color: comp("oh-icon", {"icon": icon, "width": 15, "height": 15,
+    sun = f"({d}.s == null ? '–' : {fixed(d + '.s', 1)} + ' h')"
+    icon_size = f"={n} ? 13 : 15"
+    small_icon = lambda icon, color: comp("oh-icon", {"icon": icon, "width": icon_size, "height": icon_size,
                                                       "style": {"color": color, "flex": "0 0 auto"}})
-    cell = {"display": "flex", "align-items": "center", "gap": "5px", "font-size": "13px", "white-space": "nowrap"}
+    cell = {"display": "flex", "align-items": "center", "gap": f"={n} ? '4px' : '5px'",
+            "font-size": f"={n} ? '12px' : '13px'", "white-space": "nowrap"}
+    sub = {"font-size": "11px", "opacity": "0.65", "line-height": "13px"}
+
+    def pair(first, second, second_visible):
+        return div([label(f"={first}", **{"line-height": "16px"}), label(f"={second}", visible=second_visible, **sub)],
+                   **{"display": "flex", "flex-direction": "column"})
+    temps = div([label(f"={degrees(d + '.lo')}", **{"opacity": "0.65", "font-size": f"={n} ? '11px' : '14px'",
+                                                     "line-height": f"={n} ? '13px' : '18px'"}),
+                 label("/", visible=f"=!({n})", **{"opacity": "0.35"}),
+                 label(f"={degrees(d + '.hi')}", **{"font-weight": "700", "line-height": f"={n} ? '16px' : '18px'"})],
+                **{"display": "flex", "flex-direction": f"={n} ? 'column-reverse' : 'row'",
+                   "gap": f"={n} ? '0' : '3px'", "font-size": "14px", "white-space": "nowrap"})
     return div([
-        label(f"={name}", **{"font-size": "14px", "font-weight": "600"}),
-        weather_icon(f"{d}.c", "true", 32),
-        wx_min_max(degrees(f"{d}.lo"), degrees(f"{d}.hi"), "14px"),
-        div([small_icon("material:water_drop", WX_RAIN_COLOR),
-             div([label(f"={rain}", **{"line-height": "16px"}),
-                  label(f"={d}.pp + ' %'", visible=f"={d}.pp != null",
-                        **{"font-size": "11px", "opacity": "0.65", "line-height": "13px"})],
-                 **{"display": "flex", "flex-direction": "column"})],
+        label(f"={name}", **{"font-size": f"={n} ? '13px' : '14px'", "font-weight": "600"}),
+        weather_icon(f"{d}.c", "true", f"={n} ? 28 : 32"),
+        temps,
+        # the share of the daylight, from sunrise to sunset, the most the sun could shine
+        div([small_icon("material:wb_sunny", WX_SUN_COLOR), pair(sun, f"{d}.sp + ' %'", f"={d}.sp != null")],
+            **cell),
+        div([small_icon("material:water_drop", WX_RAIN_COLOR), pair(rain, f"{d}.pp + ' %'", f"={d}.pp != null")],
             **{**cell, "opacity": f"=({d}.p || 0) < 0.05 ? '0.55' : '1'"}),
         # the plain wind icon until the forecast brings a direction
-        div([wx_wind_arrow(f"{d}.wd", 15, f"={d}.wd != null"),
-             comp("oh-icon", {"icon": "material:air", "width": 15, "height": 15, "visible": f"={d}.wd == null",
-                              "style": {"color": WX_WIND_COLOR, "flex": "0 0 auto"}}),
-             div([label(f"=({d}.w == null ? '–' : {d}.w) + ' km/h'", **{"line-height": "16px"}),
-                  label(f"={wx_compass(d + '.wd')}", visible=f"={d}.wd != null",
-                        **{"font-size": "11px", "opacity": "0.65", "line-height": "13px"})],
-                 **{"display": "flex", "flex-direction": "column"})],
+        div([wx_wind_arrow(f"{d}.wd", icon_size, f"={d}.wd != null"),
+             comp("oh-icon", {"icon": "material:air", "width": icon_size, "height": icon_size,
+                              "visible": f"={d}.wd == null", "style": {"color": WX_WIND_COLOR, "flex": "0 0 auto"}}),
+             pair(f"({d}.w == null ? '–' : {d}.w) + ' km/h'", wx_compass(d + '.wd'), f"={d}.wd != null")],
             **{**cell, "justify-content": "flex-end"}),
-    ], **{"display": "grid", "grid-template-columns": "40px 32px 64px 1fr auto", "align-items": "center",
-          "column-gap": "8px", "min-height": "40px", "padding": "4px 16px",
+    ], **{"display": "grid", "align-items": "center",
+          # fixed columns but the precipitation's, so the days' cells stand under each other
+          "grid-template-columns": f"={n} ? '36px 28px 34px 52px 1fr auto' : '40px 32px 64px 58px 1fr auto'",
+          "column-gap": f"={n} ? '6px' : '8px'", "min-height": "40px", "padding": f"={n} ? '4px 12px' : '4px 16px'",
           "border-top": "1px solid rgba(127, 127, 127, 0.15)"})
 
 
