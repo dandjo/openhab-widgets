@@ -2885,6 +2885,14 @@ def signed(item, unit="kW"):
     return (f"={fixed(f'{num(item)} / 1000', 3)} + ' kW'" if unit == "kW" else f"=Math.round({num(item)}) + ' W'")
 
 
+def sign_colors():
+    """Colours the first series by its sign: green below zero, red above. The pieces must be finite: with only
+    open-ended ones ECharts has no colour stops for the line gradient and throws instead of drawing."""
+    return [comp("oh-chart-visualmap", {"show": False, "type": "piecewise", "dimension": 1, "seriesIndex": 0,
+                                        "pieces": [{"min": -100000, "max": 0, "color": "#43a047"},
+                                                   {"min": 0, "max": 100000, "color": "#e53935"}]})]
+
+
 def controls_box(*rows):
     return div(list(rows), **{"padding": "4px 16px 12px"})
 
@@ -2919,10 +2927,9 @@ FLOW_POPUPS = {
         card("Today", [tile_grid([
             value_tile("Imported", f"={disp('huawei_inverter_power_meter_ec_day')}", color="#e53935"),
             value_tile("Exported", f"={disp('huawei_inverter_power_meter_ep_day')}", color="#43a047")])]),
-        card("Power", [day_chart([time_series("Grid", GRID, symbol="none", lineStyle={"width": 1.5},
-                                              areaStyle={"opacity": 0.25})], visualMap=[comp("oh-chart-visualmap", {
-            "show": False, "type": "piecewise", "dimension": 1, "seriesIndex": 0,
-            "pieces": [{"lt": 0, "color": "#43a047"}, {"gte": 0, "color": "#e53935"}]})])]),
+        # sampled, a day of 5-second readings is too much to draw
+        card("Power", [day_chart([time_series("Grid", GRID, symbol="none", sampling="lttb", lineStyle={"width": 1.5},
+                                              areaStyle={"opacity": 0.25})], visualMap=sign_colors())]),
     ]),
     "home": ("Home", [
         card("Now", [tile_grid([
@@ -3544,14 +3551,9 @@ def meter_blocks(title_item, color_expr, today, phases, heads, extra, chart_item
         now = [hero("material:electric_meter", "#5c6bc0", f"={num(title_item)} < 0 ? 'Einspeisung' : 'Bezug'",
                     kw_signed(title_item), value_color=color_expr),
                wide_grid([vtile(t, i, color=c) for t, i, c in today] + [vtile(t, i) for t, i in extra])]
-        # sampled, a day of 5-second readings is too much to draw; the pieces must be finite, with only open-ended
-        # ones ECharts has no colour stops for the line gradient and throws instead of drawing
+        # sampled, a day of 5-second readings is too much to draw
         chart_ = day_chart([time_series("Leistung", chart_item, symbol="none", sampling="lttb", lineStyle={"width": 1.5},
-                                        areaStyle={"opacity": 0.25})], height="100%",
-                           visualMap=[comp("oh-chart-visualmap", {
-                               "show": False, "type": "piecewise", "dimension": 1, "seriesIndex": 0,
-                               "pieces": [{"min": -100000, "max": 0, "color": "#43a047"},
-                                          {"min": 0, "max": 100000, "color": "#e53935"}]})])
+                                        areaStyle={"opacity": 0.25})], height="100%", visualMap=sign_colors())
         return [two(card("Jetzt", now), card("Leistung heute", [fill_chart(chart_, "260px")], fill=True)),
                 one(card("Phasen", [phase_table(heads, phases)]))]
     return blocks
