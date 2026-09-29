@@ -387,7 +387,9 @@ The month's daily home consumption as stacked bars: from PV and from the grid, w
 
 ### PV production per day: `pv-days-card`
 
-A calendar heatmap of the daily PV yield.
+The daily PV yield of a year in four views a bar switches: a calendar heatmap of the year, two half-years, twelve month
+calendars and the months' sums as bars; a wider screen gets the year, the month calendars and the bars, a phone the
+half-years instead of the year.
 
 ![PV production per day](screenshots/pv-days-card.png)
 

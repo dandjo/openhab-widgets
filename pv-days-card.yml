@@ -10,7 +10,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Sep 27, 2026, 8:52:40 PM
+timestamp: Sep 30, 2026, 1:06:31 AM
 component: oh-card
 config:
   title: PV-Ertrag pro Tag
@@ -18,58 +18,529 @@ config:
     height: calc(100% - 2 * var(--f7-card-margin-vertical))
 slots:
   content:
-  - component: oh-chart
+  - component: oh-context
     config:
-      chartType: year
-      periodVisible: true
-      height: 250px
+      variables:
+        pvView: ''
     slots:
-      calendar:
-      - component: oh-calendar-axis
+      default:
+      - component: div
         config:
-          orient: horizontal
-          cellSize:
-          - auto
-          - auto
-          top: '75'
-          bottom: '10'
-          left: '40'
-          right: '20'
-          dayLabel:
-            firstDay: 1
-          yearLabel:
-            show: false
-          monthLabel:
-            fontSize: '=screen.width < 600 ? 8 : 12'
-      series:
-      - component: oh-calendar-series
+          style:
+            padding: 4px 12px 0
+        slots:
+          default:
+          - component: f7-segmented
+            config:
+              strong: true
+              stylesheet: '.segmented-highlight { display: none; }'
+              style:
+                width: 100%
+                max-width: '=screen.width < 600 ? ''none'' : ''440px'''
+            slots:
+              default:
+              - component: oh-button
+                config:
+                  text: Jahr
+                  action: variable
+                  actionVariable: pvView
+                  actionVariableValue: year
+                  small: true
+                  active: '=(vars.pvView || (screen.width < 600 ? ''halves'' : ''year'')) === ''year'''
+                  visible: =!(screen.width < 600)
+                  style:
+                    font-size: 12px
+                    flex: 1 1 auto
+                    width: auto
+                    padding: 0 6px
+                    background-color: '=((vars.pvView || (screen.width < 600 ? ''halves'' : ''year'')) === ''year'') ? ''#ffb300''
+                      : '''''
+                    color: '=((vars.pvView || (screen.width < 600 ? ''halves'' : ''year'')) === ''year'') ? ''#ffffff'' :
+                      '''''
+              - component: oh-button
+                config:
+                  text: Halbjahre
+                  action: variable
+                  actionVariable: pvView
+                  actionVariableValue: halves
+                  small: true
+                  active: '=(vars.pvView || (screen.width < 600 ? ''halves'' : ''year'')) === ''halves'''
+                  visible: =screen.width < 600
+                  style:
+                    font-size: 12px
+                    flex: 1 1 auto
+                    width: auto
+                    padding: 0 6px
+                    background-color: '=((vars.pvView || (screen.width < 600 ? ''halves'' : ''year'')) === ''halves'') ? ''#ffb300''
+                      : '''''
+                    color: '=((vars.pvView || (screen.width < 600 ? ''halves'' : ''year'')) === ''halves'') ? ''#ffffff''
+                      : '''''
+              - component: oh-button
+                config:
+                  text: Monate
+                  action: variable
+                  actionVariable: pvView
+                  actionVariableValue: months
+                  small: true
+                  active: '=(vars.pvView || (screen.width < 600 ? ''halves'' : ''year'')) === ''months'''
+                  style:
+                    font-size: 12px
+                    flex: 1 1 auto
+                    width: auto
+                    padding: 0 6px
+                    background-color: '=((vars.pvView || (screen.width < 600 ? ''halves'' : ''year'')) === ''months'') ? ''#ffb300''
+                      : '''''
+                    color: '=((vars.pvView || (screen.width < 600 ? ''halves'' : ''year'')) === ''months'') ? ''#ffffff''
+                      : '''''
+              - component: oh-button
+                config:
+                  text: Balken
+                  action: variable
+                  actionVariable: pvView
+                  actionVariableValue: bars
+                  small: true
+                  active: '=(vars.pvView || (screen.width < 600 ? ''halves'' : ''year'')) === ''bars'''
+                  style:
+                    font-size: 12px
+                    flex: 1 1 auto
+                    width: auto
+                    padding: 0 6px
+                    background-color: '=((vars.pvView || (screen.width < 600 ? ''halves'' : ''year'')) === ''bars'') ? ''#ffb300''
+                      : '''''
+                    color: '=((vars.pvView || (screen.width < 600 ? ''halves'' : ''year'')) === ''bars'') ? ''#ffffff'' :
+                      '''''
+      - component: oh-chart
         config:
-          name: PV-Ertrag
-          type: heatmap
-          calendarIndex: 0
-          item: =props.dailyPv
-          aggregationFunction: last
-      visualMap:
-      - component: oh-chart-visualmap
+          chartType: year
+          periodVisible: true
+          height: 250px
+          visible: '=!(screen.width < 600) && (vars.pvView || (screen.width < 600 ? ''halves'' : ''year'')) === ''year'''
+        slots:
+          calendar:
+          - component: oh-calendar-axis
+            config:
+              orient: horizontal
+              cellSize:
+              - auto
+              - auto
+              top: '75'
+              bottom: '10'
+              left: '40'
+              right: '20'
+              dayLabel:
+                firstDay: 1
+              yearLabel:
+                show: false
+              monthLabel:
+                fontSize: '=screen.width < 600 ? 8 : 12'
+          series:
+          - component: oh-calendar-series
+            config:
+              name: PV-Ertrag
+              type: heatmap
+              calendarIndex: 0
+              item: =props.dailyPv
+              aggregationFunction: last
+          visualMap:
+          - component: oh-chart-visualmap
+            config:
+              show: =!(screen.width < 600)
+              min: 0
+              max: 60
+              type: continuous
+              calculable: true
+              orient: horizontal
+              left: center
+              top: '8'
+              itemWidth: 12
+              itemHeight: 200
+              inRange:
+                color:
+                - '#eeeeee'
+                - '#ffe082'
+                - '#ffb300'
+                - '#e65100'
+          tooltip:
+          - component: oh-chart-tooltip
+            config:
+              show: true
+              confine: true
+      - component: oh-chart
         config:
-          show: =!(screen.width < 600)
-          min: 0
-          max: 60
-          type: continuous
-          calculable: true
-          orient: horizontal
-          left: center
-          top: '8'
-          itemWidth: 12
-          itemHeight: 200
-          inRange:
-            color:
-            - '#eeeeee'
-            - '#ffe082'
-            - '#ffb300'
-            - '#e65100'
-      tooltip:
-      - component: oh-chart-tooltip
+          chartType: year
+          periodVisible: true
+          height: 318px
+          visible: '=(screen.width < 600) && (vars.pvView || (screen.width < 600 ? ''halves'' : ''year'')) === ''halves'''
+          options:
+            graphic:
+            - type: rect
+              z: 100
+              shape:
+                x: =28 + 26 * (screen.width - 64) / 27
+                y: 58
+                width: =screen.width
+                height: 120
+              style:
+                fill: '=themeOptions.dark === ''dark'' ? ''#121212'' : ''#ffffff'''
+            - type: rect
+              z: 100
+              shape:
+                x: =28 + 27 * (screen.width - 64) / 27
+                y: 190
+                width: =screen.width
+                height: 120
+              style:
+                fill: '=themeOptions.dark === ''dark'' ? ''#121212'' : ''#ffffff'''
+            - type: rect
+              z: 100
+              shape:
+                x: 0
+                y: 190
+                width: 27
+                height: 120
+              style:
+                fill: '=themeOptions.dark === ''dark'' ? ''#121212'' : ''#ffffff'''
+            - type: text
+              z: 101
+              silent: true
+              style:
+                text: M
+                x: 23
+                y: 217.0
+                textAlign: right
+                textVerticalAlign: middle
+                fontSize: 12
+                fill: '=themeOptions.dark === ''dark'' ? ''#aaa'' : ''#000'''
+            - type: text
+              z: 101
+              silent: true
+              style:
+                text: D
+                x: 23
+                y: 231.0
+                textAlign: right
+                textVerticalAlign: middle
+                fontSize: 12
+                fill: '=themeOptions.dark === ''dark'' ? ''#aaa'' : ''#000'''
+            - type: text
+              z: 101
+              silent: true
+              style:
+                text: M
+                x: 23
+                y: 245.0
+                textAlign: right
+                textVerticalAlign: middle
+                fontSize: 12
+                fill: '=themeOptions.dark === ''dark'' ? ''#aaa'' : ''#000'''
+            - type: text
+              z: 101
+              silent: true
+              style:
+                text: D
+                x: 23
+                y: 259.0
+                textAlign: right
+                textVerticalAlign: middle
+                fontSize: 12
+                fill: '=themeOptions.dark === ''dark'' ? ''#aaa'' : ''#000'''
+            - type: text
+              z: 101
+              silent: true
+              style:
+                text: F
+                x: 23
+                y: 273.0
+                textAlign: right
+                textVerticalAlign: middle
+                fontSize: 12
+                fill: '=themeOptions.dark === ''dark'' ? ''#aaa'' : ''#000'''
+            - type: text
+              z: 101
+              silent: true
+              style:
+                text: S
+                x: 23
+                y: 287.0
+                textAlign: right
+                textVerticalAlign: middle
+                fontSize: 12
+                fill: '=themeOptions.dark === ''dark'' ? ''#aaa'' : ''#000'''
+            - type: text
+              z: 101
+              silent: true
+              style:
+                text: S
+                x: 23
+                y: 301.0
+                textAlign: right
+                textVerticalAlign: middle
+                fontSize: 12
+                fill: '=themeOptions.dark === ''dark'' ? ''#aaa'' : ''#000'''
+        slots:
+          calendar:
+          - component: oh-calendar-axis
+            config:
+              orient: horizontal
+              cellSize:
+              - auto
+              - auto
+              width: =53 * (screen.width - 64) / 27
+              height: 98
+              top: '78'
+              bottom: '10'
+              left: 28
+              right: '20'
+              dayLabel:
+                firstDay: 1
+              yearLabel:
+                show: false
+              monthLabel:
+                fontSize: 10
+          - component: oh-calendar-axis
+            config:
+              orient: horizontal
+              cellSize:
+              - auto
+              - auto
+              width: =53 * (screen.width - 64) / 27
+              height: 98
+              top: '210'
+              bottom: '10'
+              left: =28 - 26 * (screen.width - 64) / 27
+              right: '20'
+              dayLabel:
+                firstDay: 1
+              yearLabel:
+                show: false
+              monthLabel:
+                fontSize: 10
+          series:
+          - component: oh-calendar-series
+            config:
+              name: PV-Ertrag
+              type: heatmap
+              calendarIndex: 0
+              item: =props.dailyPv
+              aggregationFunction: last
+          - component: oh-calendar-series
+            config:
+              name: PV-Ertrag
+              type: heatmap
+              calendarIndex: 1
+              item: =props.dailyPv
+              aggregationFunction: last
+          visualMap:
+          - component: oh-chart-visualmap
+            config:
+              show: true
+              min: 0
+              max: 60
+              type: continuous
+              calculable: true
+              orient: horizontal
+              left: 28
+              top: '8'
+              itemWidth: 10
+              itemHeight: 110
+              inRange:
+                color:
+                - '#eeeeee'
+                - '#ffe082'
+                - '#ffb300'
+                - '#e65100'
+          tooltip:
+          - component: oh-chart-tooltip
+            config:
+              show: true
+              confine: true
+      - component: oh-chart
         config:
-          show: true
-          confine: true
+          chartType: year
+          periodVisible: true
+          height: '=screen.width < 600 ? (84 + 4 * (28 + 6 * Math.floor((screen.width - 60) / 21))) + ''px'' : ''420px'''
+          visible: '=(vars.pvView || (screen.width < 600 ? ''halves'' : ''year'')) === ''months'''
+        slots:
+          calendar:
+          - component: oh-calendar-axis
+            config:
+              orient: horizontal
+              cellSize:
+              - auto
+              - auto
+              top: '75'
+              bottom: '10'
+              left: '40'
+              right: '20'
+              dayLabel:
+                firstDay: 1
+                show: false
+              yearLabel:
+                show: false
+              monthLabel:
+                show: false
+              splitLine:
+                show: false
+              itemStyle:
+                opacity: 0
+          series:
+          - component: oh-calendar-series
+            config:
+              name: PV-Ertrag
+              calendarIndex: 0
+              type: custom
+              renderItem: '=(params, api) => ((W, H, y) => ((c6, c4) => ((n) => ((c) => ((x0) => ((bx, by, off) => params.dataIndex
+                === 0 ? ({type: ''group'', children: [({type: ''group'', silent: true, children: [0,1,2,3,4,5,6,7,8,9,10,11].map((m)
+                => ({type: ''group'', silent: true, children: [{type: ''text'', silent: true, style: {x: bx(m), y: by(m),
+                text: [''Jänner'', ''Februar'', ''März'', ''April'', ''Mai'', ''Juni'', ''Juli'', ''August'', ''September'',
+                ''Oktober'', ''November'', ''Dezember''][m], fontSize: 11, fontWeight: 600, fill: (themeOptions.dark === ''dark''
+                ? ''#bdbdbd'' : ''#616161'')}}].concat([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30].slice(0,
+                dayjs().date(1).year(y).month(m).daysInMonth()).map((i) => ({type: ''rect'', silent: true, shape: {x: bx(m)
+                + (off(m) + i) % 7 * c + 1, y: by(m) + 16 + Math.floor((off(m) + i) / 7) * c + 1, width: c - 2, height: c
+                - 2, r: 2}, style: {fill: (themeOptions.dark === ''dark'' ? ''#2b2b2b'' : ''#eeeeee'')}})))})).concat([0,1,2,3,4,5].slice(0,
+                n).map((m) => [''M'', ''D'', ''M'', ''D'', ''F'', ''S'', ''S''].map((w, k) => ({type: ''text'', silent: true,
+                style: {x: bx(m) + k * c + c / 2, y: 64, text: w, fontSize: 9, fill: (themeOptions.dark === ''dark'' ? ''#bdbdbd''
+                : ''#616161''), align: ''center''}}))).reduce((a, b) => a.concat(b), []))}), ({type: ''rect'', silent: false,
+                shape: {x: bx(dayjs(api.value(0)).month()) + (off(dayjs(api.value(0)).month()) + dayjs(api.value(0)).date()
+                - 1) % 7 * c + 1, y: by(dayjs(api.value(0)).month()) + 16 + Math.floor((off(dayjs(api.value(0)).month()) +
+                dayjs(api.value(0)).date() - 1) / 7) * c + 1, width: c - 2, height: c - 2, r: 2}, style: {fill: api.visual(''color'')}})]})
+                : ({type: ''rect'', silent: false, shape: {x: bx(dayjs(api.value(0)).month()) + (off(dayjs(api.value(0)).month())
+                + dayjs(api.value(0)).date() - 1) % 7 * c + 1, y: by(dayjs(api.value(0)).month()) + 16 + Math.floor((off(dayjs(api.value(0)).month())
+                + dayjs(api.value(0)).date() - 1) / 7) * c + 1, width: c - 2, height: c - 2, r: 2}, style: {fill: api.visual(''color'')}}))((m)
+                => x0 + (m % n) * (7 * c + 10), (m) => 80 + Math.floor(m / n) * (16 + 6 * c + 12), (m) => (dayjs().date(1).year(y).month(m).day()
+                + 6) % 7))((W - n * 7 * c - (n - 1) * 10) / 2))(Math.floor(n === 3 ? Math.min((W - 32) / 21, (H - 196) / 24)
+                : n === 6 ? c6 : c4)))(W < 600 ? 3 : c6 >= c4 ? 6 : 4))(Math.min((W - 82) / 42, (H - 136) / 12), Math.min((W
+                - 62) / 28, (H - 164) / 18)))(api.getWidth(), api.getHeight(), params.coordSys.rangeInfo.start.y)'
+              item: =props.dailyPv
+              aggregationFunction: last
+          visualMap:
+          - component: oh-chart-visualmap
+            config:
+              show: true
+              min: 0
+              max: 60
+              type: continuous
+              calculable: false
+              orient: horizontal
+              left: 4
+              top: '22'
+              itemWidth: 10
+              itemHeight: 60
+              text:
+              - 60 kWh
+              - '0'
+              inRange:
+                color:
+                - '#eeeeee'
+                - '#ffe082'
+                - '#ffb300'
+                - '#e65100'
+          tooltip:
+          - component: oh-chart-tooltip
+            config:
+              show: true
+              confine: true
+      - component: oh-chart
+        config:
+          chartType: year
+          periodVisible: true
+          height: 250px
+          visible: '=(vars.pvView || (screen.width < 600 ? ''halves'' : ''year'')) === ''bars'''
+        slots:
+          grid:
+          - component: oh-chart-grid
+            config:
+              top: '62'
+              bottom: '28'
+              left: '45'
+              right: '12'
+          xAxis:
+          - component: oh-category-axis
+            config:
+              gridIndex: 0
+              categoryType: values
+              data:
+              - Jänner
+              - Februar
+              - März
+              - April
+              - Mai
+              - Juni
+              - Juli
+              - August
+              - September
+              - Oktober
+              - November
+              - Dezember
+              name: ' '
+              axisTick:
+                show: false
+              axisLabel:
+                interval: 0
+                fontSize: '=screen.width < 600 ? 10 : 12'
+                formatter: =(v, i) => ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'][i]
+          yAxis:
+          - component: oh-value-axis
+            config:
+              gridIndex: 0
+              name: kWh
+              nameGap: 14
+              nameTextStyle:
+                align: right
+                padding:
+                - 0
+                - 8
+                - 0
+                - 0
+              axisLabel:
+                formatter: =(v) => v.toLocaleString('de-AT')
+              splitLine:
+                lineStyle:
+                  type: dashed
+                  opacity: 0.4
+          - component: oh-value-axis
+            config:
+              gridIndex: 0
+              show: false
+          series:
+          - component: oh-aggregate-series
+            config:
+              name: PV-Ertrag
+              gridIndex: 0
+              xAxisIndex: 0
+              yAxisIndex: 0
+              type: bar
+              item: =props.dailyPv
+              aggregationFunction: sum
+              dimension1: month
+              itemStyle:
+                color: '#ffb300'
+                borderRadius:
+                - 4
+                - 4
+                - 0
+                - 0
+          - component: oh-aggregate-series
+            config:
+              name: Ø pro Tag
+              gridIndex: 0
+              xAxisIndex: 0
+              yAxisIndex: 1
+              type: line
+              item: =props.dailyPv
+              aggregationFunction: average
+              dimension1: month
+              symbol: none
+              lineStyle:
+                opacity: 0
+              itemStyle:
+                color: '#e65100'
+          tooltip:
+          - component: oh-chart-tooltip
+            config:
+              show: true
+              confine: true
+              trigger: axis
+              smartFormatter: false
+              valueFormatter: '=(v) => v == null ? ''–'' : Number(v).toLocaleString(''de-AT'', {minimumFractionDigits: Number(v)
+                >= 100 ? 0 : 1, maximumFractionDigits: Number(v) >= 100 ? 0 : 1}) + '' kWh'''

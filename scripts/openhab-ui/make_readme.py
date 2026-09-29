@@ -47,7 +47,9 @@ OVERVIEW = [
      "values."),
     ("energy-days-card", "Energy per day", "The month's daily home consumption as stacked bars: from PV and from the "
      "grid, with PV production beside it."),
-    ("pv-days-card", "PV production per day", "A calendar heatmap of the daily PV yield."),
+    ("pv-days-card", "PV production per day", "The daily PV yield of a year in four views a bar switches: a "
+     "calendar heatmap of the year, two half-years, twelve month calendars and the months' sums as bars; a wider "
+     "screen gets the year, the month calendars and the bars, a phone the half-years instead of the year."),
     ("temperatures-card", "Temperatures", "Indoor and outdoor temperature now, the day's minimum and maximum, and the "
      "last day as a chart from 15-minute means."),
 ]
