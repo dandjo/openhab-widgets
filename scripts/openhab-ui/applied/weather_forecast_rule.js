@@ -1,5 +1,5 @@
 // The weather for the overview's weather bar and its forecast popup, from Open-Meteo (free, no key; CC BY 4.0) for
-// Vienna at city level, as the sitemap's Meteoblue widget: the present weather as a WMO code with day or night, today's
+// Vienna at city level, as the sitemap's Meteoblue widget: the present weather as a symbol with day or night, today's
 // and the next two days' minimum and maximum, and as JSON the next 61 hours from the running one and the five days
 // from today. The model is GeoSphere's AROME Austria (2.5 km); it reaches about two and a half days ahead, so an hour
 // or a day it does not cover comes from Open-Meteo's best match, a second request, which also gives the probability of
@@ -10,16 +10,19 @@
 // run's by their time: what this run brings replaces the old, and an hour or a day it lacks keeps the last run's
 // value, so a failed request never shortens the forecast; days before today are dropped.
 //
-// The weather is drawn from WMO codes, but not from Open-Meteo's as they come: its sky counts thin high clouds (cirrus)
-// as overcast though the sun shines through them, and a day's code is the worst of its hours, the night's included.
-// So a day's sky follows the share of its daylight the sun shines, and fog, precipitation or a thunderstorm replaces
-// it only when it marks the day: fog below 30 % of sunshine, precipitation and thunder from 1 mm, a precipitation day.
-// The present sky and each hour's follow the cloud layers, the high ones counted half; precipitation or thunder shows
-// only while some falls.
+// The weather is drawn as a symbol the rule works out itself, as Open-Meteo's WMO codes know four skies only, count
+// thin high clouds (cirrus) as overcast though the sun shines through them, and give a day the worst of its hours, the
+// night's included. The sky has five levels: clear, fair, partly, mostly (cloudy), overcast. A day's follows the share
+// of its daylight the sun shines (from 85, 65, 40, 15 %), the present's and each hour's the cloud cover, the high
+// clouds counted half (below 15, 40, 65, 90 %); an hour with thin high clouds alone is veil. Fog, rain (drizzle and
+// showers too), snow and thunder come from the WMO code, only where they mark the weather: a day's fog below 30 % of
+// sunshine, its precipitation and thunder from 1 mm, a precipitation day, an hour's while some falls. With the sun out
+// as well (a day from 30 % of sunshine, an hour up to partly cloudy) they are showers: rain_sun, snow_sun, thunder_sun.
+// Without sunshine or cloud layers the symbol follows the code alone.
 //
 // weather_hourly: [[epoch seconds, temperature °C, precipitation of the hour before in mm, wind km/h,
-//                   wind direction ° (where it comes from, 0 north, 90 east), WMO code, 1 by day or 0 by night], ...]
-// weather_daily: [{t: epoch seconds of the day's midnight, c: WMO code, lo, hi: °C, p: precipitation mm,
+//                   wind direction ° (where it comes from, 0 north, 90 east), symbol, 1 by day or 0 by night], ...]
+// weather_daily: [{t: epoch seconds of the day's midnight, sym: symbol, lo, hi: °C, p: precipitation mm,
 //                  pp: probability of precipitation % (best match) or null, w: maximum wind km/h,
 //                  wd: the day's dominant wind direction °, s: sunshine h,
 //                  sp: sunshine in % of the daylight, the most the sun could shine}, ...]
@@ -72,50 +75,62 @@ function value(models, part, field, t) {
   return null;
 }
 
-// a sky by its cloud cover in %: clear, mainly clear, partly cloudy, overcast
-const skyByCover = (cover) => (cover < 20 ? 0 : cover < 50 ? 1 : cover < 80 ? 2 : 3);
-// a day's sky by the share of its daylight the sun shines
-const skyBySun = (share) => (share >= 0.85 ? 0 : share >= 0.6 ? 1 : share >= 0.3 ? 2 : 3);
+const SKIES = ['clear', 'fair', 'partly', 'mostly', 'overcast'];
+// a day's sky by the share of its daylight the sun shines, an hour's by its cloud cover in %
+const skyBySun = (share) => SKIES[share >= 0.85 ? 0 : share >= 0.65 ? 1 : share >= 0.4 ? 2 : share >= 0.15 ? 3 : 4];
+const skyByCover = (cover) => SKIES[cover < 15 ? 0 : cover < 40 ? 1 : cover < 65 ? 2 : cover < 90 ? 3 : 4];
+// the sky of a WMO code alone, for want of sunshine or cloud layers
+const skyByCode = (code) => ({0: 'clear', 1: 'fair', 2: 'partly'})[code] || 'overcast';
+const isFog = (code) => code === 45 || code === 48;
+// what falls by a WMO code: rain (drizzle and showers too), snow, thunder, or nothing
+const fall = (code) => (code >= 95 ? 'thunder' : (code >= 71 && code <= 77) || code === 85 || code === 86 ? 'snow'
+  : code >= 51 ? 'rain' : null);
 
-// the present's or an hour's WMO code: the sky from the cloud layers, the high ones counted half, as the sun shines
-// through them; fog as it comes, precipitation and thunder only while some falls (wet), or as they come while that is
-// unknown (null)
-function hourCode(code, wet, low, mid, high) {
+// the present's or an hour's symbol: the sky from the cloud layers, the high ones counted half, veil for thin high
+// clouds alone; fog as it comes; precipitation and thunder while some falls (wet), or as they come while that is
+// unknown (null), as showers up to a partly cloudy sky
+function hourSymbol(code, wet, low, mid, high) {
   if (code == null) {
     return null;
   }
-  if (code <= 3 || (code >= 51 && wet === false)) {
-    return low == null || mid == null || high == null ? Math.min(code, 3)
-      : skyByCover(Math.max(low, mid, high / 2));
+  const layered = low != null && mid != null && high != null;
+  const sky = layered ? skyByCover(Math.max(low, mid, high / 2)) : skyByCode(code);
+  if (isFog(code)) {
+    return 'fog';
   }
-  return code;
+  const kind = fall(code);
+  if (kind && wet !== false) {
+    return layered && ['clear', 'fair', 'partly'].includes(sky) ? kind + '_sun' : kind;
+  }
+  return layered && Math.max(low, mid) < 15 && high >= 40 ? 'veil' : sky;
 }
 
-// a day's WMO code: the sky from its sunshine, fog only below 30 % of it, precipitation and thunder from 1 mm; the
-// code as it comes while the sunshine is unknown
-function dayCode(code, precipitation, sunshine, daylight) {
+// a day's symbol: the sky from its sunshine, fog only below 30 % of it, precipitation and thunder from 1 mm, as
+// showers from 30 % of sunshine; the code alone while the sunshine is unknown
+function daySymbol(code, precipitation, sunshine, daylight) {
   if (code == null || sunshine == null || !daylight) {
-    return code;
+    return hourSymbol(code, null, null, null, null);
   }
-  const sky = skyBySun(sunshine / daylight);
-  if (code <= 3) {
-    return sky;
+  const share = sunshine / daylight;
+  if (isFog(code) && share < 0.3) {
+    return 'fog';
   }
-  if (code <= 48) {
-    return sky === 3 ? code : sky;
+  const kind = fall(code);
+  if (kind && (precipitation == null || precipitation >= 1)) {
+    return share >= 0.3 ? kind + '_sun' : kind;
   }
-  return precipitation == null || precipitation >= 1 ? code : sky;
+  return skyBySun(share);
 }
 
-// an hour's WMO code and whether it is day, both from the first model with a code for it, the layers from that model
+// an hour's symbol and whether it is day, both from the first model with a code for it, the layers from that model
 function hourSky(models, t) {
   for (const model of models) {
     const code = value([model], 'hourly', 'weather_code', t);
     if (code != null) {
       const v = (field) => value([model], 'hourly', field, t);
       const precipitation = v('precipitation');
-      return [hourCode(code, precipitation == null ? null : round(precipitation, 1) > 0, v('cloud_cover_low'),
-                       v('cloud_cover_mid'), v('cloud_cover_high')), v('is_day')];
+      return [hourSymbol(code, precipitation == null ? null : round(precipitation, 1) > 0, v('cloud_cover_low'),
+                         v('cloud_cover_mid'), v('cloud_cover_high')), v('is_day')];
     }
   }
   return [null, null];
@@ -132,7 +147,7 @@ function day(arome, best, t) {
   const v = (field) => value([model], 'daily', field, t);
   const sunshine = v('sunshine_duration');
   const daylight = v('daylight_duration');
-  return {t: t, c: dayCode(v('weather_code'), v('precipitation_sum'), sunshine, daylight),
+  return {t: t, sym: daySymbol(v('weather_code'), v('precipitation_sum'), sunshine, daylight),
           lo: round(v('temperature_2m_min'), 1), hi: round(v('temperature_2m_max'), 1),
           p: round(v('precipitation_sum'), 1), pp: value([best], 'daily', 'precipitation_probability_max', t),
           w: round(v('wind_speed_10m_max'), 0),
@@ -165,7 +180,7 @@ const models = [arome, best];
 
 const current = models.map((m) => m && m.current).find((c) => c && c.weather_code != null);
 if (current) {
-  items.weather_code.postUpdate(hourCode(current.weather_code, current.precipitation == null ? null
+  items.weather_symbol.postUpdate(hourSymbol(current.weather_code, current.precipitation == null ? null
     : current.precipitation > 0, current.cloud_cover_low, current.cloud_cover_mid, current.cloud_cover_high));
   items.weather_is_day.postUpdate(current.is_day ? 'ON' : 'OFF');
 }
@@ -177,10 +192,10 @@ if (arome || best) {
     const t = hour + k * 3600;
     const temp = value(models, 'hourly', 'temperature_2m', t);
     if (temp != null) {
-      const [code, isDay] = hourSky(models, t);
+      const [symbol, isDay] = hourSky(models, t);
       fresh.push([t, round(temp, 1), round(value(models, 'hourly', 'precipitation', t), 1),
                   round(value(models, 'hourly', 'wind_speed_10m', t), 0),
-                  round(value(models, 'hourly', 'wind_direction_10m', t), 0), code, isDay]);
+                  round(value(models, 'hourly', 'wind_direction_10m', t), 0), symbol, isDay]);
     }
   }
   const hourly = merged(fresh, last('weather_hourly'), (h) => h[0], hour, HOURS);

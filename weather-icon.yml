@@ -3,10 +3,11 @@ tags:
 - weather
 props:
   parameters:
-  - name: code
-    label: WMO code
-    description: The weather as a WMO code, 0 (clear) to 99 (thunderstorm with hail); usually an expression
-    type: DECIMAL
+  - name: symbol
+    label: Symbol
+    description: 'The weather drawn: clear, fair, partly, mostly, overcast, veil, fog, rain, snow, thunder, rain_sun, snow_sun,
+      thunder_sun; usually an expression'
+    type: TEXT
     required: true
   - name: day
     label: Day
@@ -21,7 +22,7 @@ props:
     required: false
     default: '36'
   parameterGroups: []
-timestamp: Sep 28, 2026, 10:34:11 AM
+timestamp: Sep 29, 2026, 11:22:19 PM
 component: svg
 config:
   viewBox: 0 0 48 48
@@ -34,242 +35,378 @@ slots:
   default:
   - component: g
     config:
-      visible: '=(Number.isNaN(Number.parseFloat(props.code)) ? '''' : Number(props.code) === 0 ? ''clear'' : Number(props.code)
-        <= 2 ? ''partly'' : Number(props.code) === 3 ? ''cloudy'' : Number(props.code) <= 48 ? ''fog'' : Number(props.code)
-        <= 67 ? ''rain'' : Number(props.code) <= 77 ? ''snow'' : Number(props.code) <= 82 ? ''rain'' : Number(props.code)
-        <= 86 ? ''snow'' : ''thunder'') === ''clear'' && !(props.day === false)'
+      visible: =(props.symbol === 'clear') && !(props.day === false)
     slots:
       default:
       - component: g
-        config: {}
+        config:
+          transform: translate(24 24) scale(1) translate(-24 -24)
         slots:
           default:
-          - component: line
+          - component: g
+            config: {}
+            slots:
+              default:
+              - component: line
+                config:
+                  x1: 34.5
+                  y1: 24.0
+                  x2: 38.5
+                  y2: 24.0
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 31.42
+                  y1: 31.42
+                  x2: 34.25
+                  y2: 34.25
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 24.0
+                  y1: 34.5
+                  x2: 24.0
+                  y2: 38.5
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 16.58
+                  y1: 31.42
+                  x2: 13.75
+                  y2: 34.25
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 13.5
+                  y1: 24.0
+                  x2: 9.5
+                  y2: 24.0
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 16.58
+                  y1: 16.58
+                  x2: 13.75
+                  y2: 13.75
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 24.0
+                  y1: 13.5
+                  x2: 24.0
+                  y2: 9.5
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 31.42
+                  y1: 16.58
+                  x2: 34.25
+                  y2: 13.75
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
+              - component: animateTransform
+                config:
+                  attributeName: transform
+                  type: rotate
+                  from: 0 24 24
+                  to: 360 24 24
+                  dur: 24s
+                  repeatCount: indefinite
+                  visible: =true
+          - component: circle
             config:
-              x1: 34.5
-              y1: 24.0
-              x2: 38.5
-              y2: 24.0
-              stroke: '#ffb300'
-              stroke-width: 2.2
-              stroke-linecap: round
-              fill: none
-          - component: line
-            config:
-              x1: 31.42
-              y1: 31.42
-              x2: 34.25
-              y2: 34.25
-              stroke: '#ffb300'
-              stroke-width: 2.2
-              stroke-linecap: round
-              fill: none
-          - component: line
-            config:
-              x1: 24.0
-              y1: 34.5
-              x2: 24.0
-              y2: 38.5
-              stroke: '#ffb300'
-              stroke-width: 2.2
-              stroke-linecap: round
-              fill: none
-          - component: line
-            config:
-              x1: 16.58
-              y1: 31.42
-              x2: 13.75
-              y2: 34.25
-              stroke: '#ffb300'
-              stroke-width: 2.2
-              stroke-linecap: round
-              fill: none
-          - component: line
-            config:
-              x1: 13.5
-              y1: 24.0
-              x2: 9.5
-              y2: 24.0
-              stroke: '#ffb300'
-              stroke-width: 2.2
-              stroke-linecap: round
-              fill: none
-          - component: line
-            config:
-              x1: 16.58
-              y1: 16.58
-              x2: 13.75
-              y2: 13.75
-              stroke: '#ffb300'
-              stroke-width: 2.2
-              stroke-linecap: round
-              fill: none
-          - component: line
-            config:
-              x1: 24.0
-              y1: 13.5
-              x2: 24.0
-              y2: 9.5
-              stroke: '#ffb300'
-              stroke-width: 2.2
-              stroke-linecap: round
-              fill: none
-          - component: line
-            config:
-              x1: 31.42
-              y1: 16.58
-              x2: 34.25
-              y2: 13.75
-              stroke: '#ffb300'
-              stroke-width: 2.2
-              stroke-linecap: round
-              fill: none
-          - component: animateTransform
-            config:
-              attributeName: transform
-              type: rotate
-              from: 0 24 24
-              to: 360 24 24
-              dur: 24s
-              repeatCount: indefinite
-              visible: =true
-      - component: circle
-        config:
-          cx: 24
-          cy: 24
-          r: 7
-          fill: '#ffb300'
-  - component: path
-    config:
-      d: M22.19,14.17 A10,10 0 1,0 33.83,25.81 A8.5,8.5 0 1,1 22.19,14.17 Z
-      fill: '#9fa8da'
-      visible: '=(Number.isNaN(Number.parseFloat(props.code)) ? '''' : Number(props.code) === 0 ? ''clear'' : Number(props.code)
-        <= 2 ? ''partly'' : Number(props.code) === 3 ? ''cloudy'' : Number(props.code) <= 48 ? ''fog'' : Number(props.code)
-        <= 67 ? ''rain'' : Number(props.code) <= 77 ? ''snow'' : Number(props.code) <= 82 ? ''rain'' : Number(props.code)
-        <= 86 ? ''snow'' : ''thunder'') === ''clear'' && props.day === false'
+              cx: 24
+              cy: 24
+              r: 7
+              fill: '#ffb300'
   - component: g
     config:
-      transform: translate(17 17) scale(0.72) translate(-24 -24)
-      visible: '=(Number.isNaN(Number.parseFloat(props.code)) ? '''' : Number(props.code) === 0 ? ''clear'' : Number(props.code)
-        <= 2 ? ''partly'' : Number(props.code) === 3 ? ''cloudy'' : Number(props.code) <= 48 ? ''fog'' : Number(props.code)
-        <= 67 ? ''rain'' : Number(props.code) <= 77 ? ''snow'' : Number(props.code) <= 82 ? ''rain'' : Number(props.code)
-        <= 86 ? ''snow'' : ''thunder'') === ''partly'' && !(props.day === false)'
+      visible: =(props.symbol === 'clear') && props.day === false
+    slots:
+      default:
+      - component: path
+        config:
+          d: M22.19,14.17 A10,10 0 1,0 33.83,25.81 A8.5,8.5 0 1,1 22.19,14.17 Z
+          fill: '#9fa8da'
+          transform: translate(24 24) scale(1) translate(-24 -24)
+  - component: g
+    config:
+      visible: =(props.symbol === 'fair') && !(props.day === false)
     slots:
       default:
       - component: g
-        config: {}
+        config:
+          transform: translate(21 21) scale(0.85) translate(-24 -24)
         slots:
           default:
-          - component: line
+          - component: g
+            config: {}
+            slots:
+              default:
+              - component: line
+                config:
+                  x1: 34.5
+                  y1: 24.0
+                  x2: 38.5
+                  y2: 24.0
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 31.42
+                  y1: 31.42
+                  x2: 34.25
+                  y2: 34.25
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 24.0
+                  y1: 34.5
+                  x2: 24.0
+                  y2: 38.5
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 16.58
+                  y1: 31.42
+                  x2: 13.75
+                  y2: 34.25
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 13.5
+                  y1: 24.0
+                  x2: 9.5
+                  y2: 24.0
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 16.58
+                  y1: 16.58
+                  x2: 13.75
+                  y2: 13.75
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 24.0
+                  y1: 13.5
+                  x2: 24.0
+                  y2: 9.5
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 31.42
+                  y1: 16.58
+                  x2: 34.25
+                  y2: 13.75
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
+              - component: animateTransform
+                config:
+                  attributeName: transform
+                  type: rotate
+                  from: 0 24 24
+                  to: 360 24 24
+                  dur: 24s
+                  repeatCount: indefinite
+                  visible: =true
+          - component: circle
             config:
-              x1: 34.5
-              y1: 24.0
-              x2: 38.5
-              y2: 24.0
-              stroke: '#ffb300'
-              stroke-width: 2.2
-              stroke-linecap: round
-              fill: none
-          - component: line
-            config:
-              x1: 31.42
-              y1: 31.42
-              x2: 34.25
-              y2: 34.25
-              stroke: '#ffb300'
-              stroke-width: 2.2
-              stroke-linecap: round
-              fill: none
-          - component: line
-            config:
-              x1: 24.0
-              y1: 34.5
-              x2: 24.0
-              y2: 38.5
-              stroke: '#ffb300'
-              stroke-width: 2.2
-              stroke-linecap: round
-              fill: none
-          - component: line
-            config:
-              x1: 16.58
-              y1: 31.42
-              x2: 13.75
-              y2: 34.25
-              stroke: '#ffb300'
-              stroke-width: 2.2
-              stroke-linecap: round
-              fill: none
-          - component: line
-            config:
-              x1: 13.5
-              y1: 24.0
-              x2: 9.5
-              y2: 24.0
-              stroke: '#ffb300'
-              stroke-width: 2.2
-              stroke-linecap: round
-              fill: none
-          - component: line
-            config:
-              x1: 16.58
-              y1: 16.58
-              x2: 13.75
-              y2: 13.75
-              stroke: '#ffb300'
-              stroke-width: 2.2
-              stroke-linecap: round
-              fill: none
-          - component: line
-            config:
-              x1: 24.0
-              y1: 13.5
-              x2: 24.0
-              y2: 9.5
-              stroke: '#ffb300'
-              stroke-width: 2.2
-              stroke-linecap: round
-              fill: none
-          - component: line
-            config:
-              x1: 31.42
-              y1: 16.58
-              x2: 34.25
-              y2: 13.75
-              stroke: '#ffb300'
-              stroke-width: 2.2
-              stroke-linecap: round
-              fill: none
-          - component: animateTransform
-            config:
-              attributeName: transform
-              type: rotate
-              from: 0 24 24
-              to: 360 24 24
-              dur: 24s
-              repeatCount: indefinite
-              visible: =true
-      - component: circle
-        config:
-          cx: 24
-          cy: 24
-          r: 7
-          fill: '#ffb300'
-  - component: path
-    config:
-      d: M22.19,14.17 A10,10 0 1,0 33.83,25.81 A8.5,8.5 0 1,1 22.19,14.17 Z
-      fill: '#9fa8da'
-      transform: translate(17 16) scale(0.7) translate(-24 -24)
-      visible: '=(Number.isNaN(Number.parseFloat(props.code)) ? '''' : Number(props.code) === 0 ? ''clear'' : Number(props.code)
-        <= 2 ? ''partly'' : Number(props.code) === 3 ? ''cloudy'' : Number(props.code) <= 48 ? ''fog'' : Number(props.code)
-        <= 67 ? ''rain'' : Number(props.code) <= 77 ? ''snow'' : Number(props.code) <= 82 ? ''rain'' : Number(props.code)
-        <= 86 ? ''snow'' : ''thunder'') === ''partly'' && props.day === false'
+              cx: 24
+              cy: 24
+              r: 7
+              fill: '#ffb300'
   - component: g
     config:
-      visible: '=(Number.isNaN(Number.parseFloat(props.code)) ? '''' : Number(props.code) === 0 ? ''clear'' : Number(props.code)
-        <= 2 ? ''partly'' : Number(props.code) === 3 ? ''cloudy'' : Number(props.code) <= 48 ? ''fog'' : Number(props.code)
-        <= 67 ? ''rain'' : Number(props.code) <= 77 ? ''snow'' : Number(props.code) <= 82 ? ''rain'' : Number(props.code)
-        <= 86 ? ''snow'' : ''thunder'') === ''partly'''
+      visible: =(props.symbol === 'fair') && props.day === false
+    slots:
+      default:
+      - component: path
+        config:
+          d: M22.19,14.17 A10,10 0 1,0 33.83,25.81 A8.5,8.5 0 1,1 22.19,14.17 Z
+          fill: '#9fa8da'
+          transform: translate(21 20) scale(0.82) translate(-24 -24)
+  - component: g
+    config:
+      visible: =(props.symbol === 'fair')
+    slots:
+      default:
+      - component: path
+        config:
+          d: M14,38 H34 A6,6 0 0,0 35.5,26.2 A9,9 0 0,0 18.6,24.4 A7,7 0 0,0 14,38 Z
+          transform: translate(34 37) scale(0.55) translate(-27 -31)
+          stroke: '#90a4ae'
+          stroke-width: 1.6
+          stroke-linecap: round
+          fill: '#cfd8dc'
+          stroke-linejoin: round
+  - component: g
+    config:
+      visible: =(props.symbol === 'partly') && !(props.day === false)
+    slots:
+      default:
+      - component: g
+        config:
+          transform: translate(17 17) scale(0.72) translate(-24 -24)
+        slots:
+          default:
+          - component: g
+            config: {}
+            slots:
+              default:
+              - component: line
+                config:
+                  x1: 34.5
+                  y1: 24.0
+                  x2: 38.5
+                  y2: 24.0
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 31.42
+                  y1: 31.42
+                  x2: 34.25
+                  y2: 34.25
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 24.0
+                  y1: 34.5
+                  x2: 24.0
+                  y2: 38.5
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 16.58
+                  y1: 31.42
+                  x2: 13.75
+                  y2: 34.25
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 13.5
+                  y1: 24.0
+                  x2: 9.5
+                  y2: 24.0
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 16.58
+                  y1: 16.58
+                  x2: 13.75
+                  y2: 13.75
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 24.0
+                  y1: 13.5
+                  x2: 24.0
+                  y2: 9.5
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 31.42
+                  y1: 16.58
+                  x2: 34.25
+                  y2: 13.75
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
+              - component: animateTransform
+                config:
+                  attributeName: transform
+                  type: rotate
+                  from: 0 24 24
+                  to: 360 24 24
+                  dur: 24s
+                  repeatCount: indefinite
+                  visible: =true
+          - component: circle
+            config:
+              cx: 24
+              cy: 24
+              r: 7
+              fill: '#ffb300'
+  - component: g
+    config:
+      visible: =(props.symbol === 'partly') && props.day === false
+    slots:
+      default:
+      - component: path
+        config:
+          d: M22.19,14.17 A10,10 0 1,0 33.83,25.81 A8.5,8.5 0 1,1 22.19,14.17 Z
+          fill: '#9fa8da'
+          transform: translate(17 16) scale(0.7) translate(-24 -24)
+  - component: g
+    config:
+      visible: =(props.symbol === 'partly')
     slots:
       default:
       - component: path
@@ -283,16 +420,141 @@ slots:
           stroke-linejoin: round
   - component: g
     config:
-      visible: '=(Number.isNaN(Number.parseFloat(props.code)) ? '''' : Number(props.code) === 0 ? ''clear'' : Number(props.code)
-        <= 2 ? ''partly'' : Number(props.code) === 3 ? ''cloudy'' : Number(props.code) <= 48 ? ''fog'' : Number(props.code)
-        <= 67 ? ''rain'' : Number(props.code) <= 77 ? ''snow'' : Number(props.code) <= 82 ? ''rain'' : Number(props.code)
-        <= 86 ? ''snow'' : ''thunder'') === ''cloudy'''
+      visible: =(props.symbol === 'mostly') && !(props.day === false)
+    slots:
+      default:
+      - component: g
+        config:
+          transform: translate(14 13) scale(0.58) translate(-24 -24)
+        slots:
+          default:
+          - component: g
+            config: {}
+            slots:
+              default:
+              - component: line
+                config:
+                  x1: 34.5
+                  y1: 24.0
+                  x2: 38.5
+                  y2: 24.0
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 31.42
+                  y1: 31.42
+                  x2: 34.25
+                  y2: 34.25
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 24.0
+                  y1: 34.5
+                  x2: 24.0
+                  y2: 38.5
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 16.58
+                  y1: 31.42
+                  x2: 13.75
+                  y2: 34.25
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 13.5
+                  y1: 24.0
+                  x2: 9.5
+                  y2: 24.0
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 16.58
+                  y1: 16.58
+                  x2: 13.75
+                  y2: 13.75
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 24.0
+                  y1: 13.5
+                  x2: 24.0
+                  y2: 9.5
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 31.42
+                  y1: 16.58
+                  x2: 34.25
+                  y2: 13.75
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
+              - component: animateTransform
+                config:
+                  attributeName: transform
+                  type: rotate
+                  from: 0 24 24
+                  to: 360 24 24
+                  dur: 24s
+                  repeatCount: indefinite
+                  visible: =true
+          - component: circle
+            config:
+              cx: 24
+              cy: 24
+              r: 7
+              fill: '#ffb300'
+  - component: g
+    config:
+      visible: =(props.symbol === 'mostly') && props.day === false
+    slots:
+      default:
+      - component: path
+        config:
+          d: M22.19,14.17 A10,10 0 1,0 33.83,25.81 A8.5,8.5 0 1,1 22.19,14.17 Z
+          fill: '#9fa8da'
+          transform: translate(14 12) scale(0.55) translate(-24 -24)
+  - component: g
+    config:
+      visible: =(props.symbol === 'mostly')
     slots:
       default:
       - component: path
         config:
           d: M14,38 H34 A6,6 0 0,0 35.5,26.2 A9,9 0 0,0 18.6,24.4 A7,7 0 0,0 14,38 Z
-          transform: translate(0 -2)
+          transform: translate(33 26) scale(0.72) translate(-27 -31)
+          stroke: '#78909c'
+          stroke-width: 1.6
+          stroke-linecap: round
+          fill: '#b0bec5'
+          stroke-linejoin: round
+      - component: path
+        config:
+          d: M14,38 H34 A6,6 0 0,0 35.5,26.2 A9,9 0 0,0 18.6,24.4 A7,7 0 0,0 14,38 Z
+          transform: translate(24 35) scale(0.95) translate(-27 -31)
           stroke: '#90a4ae'
           stroke-width: 1.6
           stroke-linecap: round
@@ -300,16 +562,348 @@ slots:
           stroke-linejoin: round
   - component: g
     config:
-      visible: '=(Number.isNaN(Number.parseFloat(props.code)) ? '''' : Number(props.code) === 0 ? ''clear'' : Number(props.code)
-        <= 2 ? ''partly'' : Number(props.code) === 3 ? ''cloudy'' : Number(props.code) <= 48 ? ''fog'' : Number(props.code)
-        <= 67 ? ''rain'' : Number(props.code) <= 77 ? ''snow'' : Number(props.code) <= 82 ? ''rain'' : Number(props.code)
-        <= 86 ? ''snow'' : ''thunder'') === ''rain'''
+      visible: =(props.symbol === 'overcast')
     slots:
       default:
       - component: path
         config:
           d: M14,38 H34 A6,6 0 0,0 35.5,26.2 A9,9 0 0,0 18.6,24.4 A7,7 0 0,0 14,38 Z
-          transform: translate(0 -6)
+          transform: translate(32 25) scale(0.78) translate(-27 -31)
+          stroke: '#78909c'
+          stroke-width: 1.6
+          stroke-linecap: round
+          fill: '#b0bec5'
+          stroke-linejoin: round
+      - component: path
+        config:
+          d: M14,38 H34 A6,6 0 0,0 35.5,26.2 A9,9 0 0,0 18.6,24.4 A7,7 0 0,0 14,38 Z
+          transform: translate(22 35) scale(0.95) translate(-27 -31)
+          stroke: '#90a4ae'
+          stroke-width: 1.6
+          stroke-linecap: round
+          fill: '#cfd8dc'
+          stroke-linejoin: round
+  - component: g
+    config:
+      visible: =(props.symbol === 'veil') && !(props.day === false)
+    slots:
+      default:
+      - component: g
+        config:
+          transform: translate(24 21) scale(0.95) translate(-24 -24)
+        slots:
+          default:
+          - component: g
+            config: {}
+            slots:
+              default:
+              - component: line
+                config:
+                  x1: 34.5
+                  y1: 24.0
+                  x2: 38.5
+                  y2: 24.0
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 31.42
+                  y1: 31.42
+                  x2: 34.25
+                  y2: 34.25
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 24.0
+                  y1: 34.5
+                  x2: 24.0
+                  y2: 38.5
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 16.58
+                  y1: 31.42
+                  x2: 13.75
+                  y2: 34.25
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 13.5
+                  y1: 24.0
+                  x2: 9.5
+                  y2: 24.0
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 16.58
+                  y1: 16.58
+                  x2: 13.75
+                  y2: 13.75
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 24.0
+                  y1: 13.5
+                  x2: 24.0
+                  y2: 9.5
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 31.42
+                  y1: 16.58
+                  x2: 34.25
+                  y2: 13.75
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
+              - component: animateTransform
+                config:
+                  attributeName: transform
+                  type: rotate
+                  from: 0 24 24
+                  to: 360 24 24
+                  dur: 24s
+                  repeatCount: indefinite
+                  visible: =true
+          - component: circle
+            config:
+              cx: 24
+              cy: 24
+              r: 7
+              fill: '#ffb300'
+  - component: g
+    config:
+      visible: =(props.symbol === 'veil') && props.day === false
+    slots:
+      default:
+      - component: path
+        config:
+          d: M22.19,14.17 A10,10 0 1,0 33.83,25.81 A8.5,8.5 0 1,1 22.19,14.17 Z
+          fill: '#9fa8da'
+          transform: translate(24 21) scale(0.95) translate(-24 -24)
+  - component: g
+    config:
+      visible: =(props.symbol === 'veil')
+    slots:
+      default:
+      - component: line
+        config:
+          x1: 8
+          y1: 27
+          x2: 30
+          y2: 27
+          opacity: 0.95
+          stroke: '#b0bec5'
+          stroke-width: 2
+          stroke-linecap: round
+          fill: none
+      - component: line
+        config:
+          x1: 16
+          y1: 32
+          x2: 40
+          y2: 32
+          opacity: 0.95
+          stroke: '#b0bec5'
+          stroke-width: 2
+          stroke-linecap: round
+          fill: none
+      - component: line
+        config:
+          x1: 10
+          y1: 37
+          x2: 32
+          y2: 37
+          opacity: 0.95
+          stroke: '#b0bec5'
+          stroke-width: 2
+          stroke-linecap: round
+          fill: none
+  - component: g
+    config:
+      visible: =(props.symbol === 'fog')
+    slots:
+      default:
+      - component: path
+        config:
+          d: M14,38 H34 A6,6 0 0,0 35.5,26.2 A9,9 0 0,0 18.6,24.4 A7,7 0 0,0 14,38 Z
+          transform: translate(24 23) scale(0.9) translate(-24 -31)
+          stroke: '#90a4ae'
+          stroke-width: 1.6
+          stroke-linecap: round
+          fill: '#cfd8dc'
+          stroke-linejoin: round
+      - component: line
+        config:
+          x1: 12
+          y1: 37
+          x2: 36
+          y2: 37
+          stroke: '#90a4ae'
+          stroke-width: 2.2
+          stroke-linecap: round
+          fill: none
+      - component: line
+        config:
+          x1: 15
+          y1: 42
+          x2: 33
+          y2: 42
+          stroke: '#90a4ae'
+          stroke-width: 2.2
+          stroke-linecap: round
+          fill: none
+  - component: g
+    config:
+      visible: =(props.symbol === 'rain_sun' || props.symbol === 'snow_sun' || props.symbol === 'thunder_sun') && !(props.day
+        === false)
+    slots:
+      default:
+      - component: g
+        config:
+          transform: translate(14 12) scale(0.6) translate(-24 -24)
+        slots:
+          default:
+          - component: g
+            config: {}
+            slots:
+              default:
+              - component: line
+                config:
+                  x1: 34.5
+                  y1: 24.0
+                  x2: 38.5
+                  y2: 24.0
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 31.42
+                  y1: 31.42
+                  x2: 34.25
+                  y2: 34.25
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 24.0
+                  y1: 34.5
+                  x2: 24.0
+                  y2: 38.5
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 16.58
+                  y1: 31.42
+                  x2: 13.75
+                  y2: 34.25
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 13.5
+                  y1: 24.0
+                  x2: 9.5
+                  y2: 24.0
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 16.58
+                  y1: 16.58
+                  x2: 13.75
+                  y2: 13.75
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 24.0
+                  y1: 13.5
+                  x2: 24.0
+                  y2: 9.5
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 31.42
+                  y1: 16.58
+                  x2: 34.25
+                  y2: 13.75
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
+              - component: animateTransform
+                config:
+                  attributeName: transform
+                  type: rotate
+                  from: 0 24 24
+                  to: 360 24 24
+                  dur: 24s
+                  repeatCount: indefinite
+                  visible: =true
+          - component: circle
+            config:
+              cx: 24
+              cy: 24
+              r: 7
+              fill: '#ffb300'
+  - component: g
+    config:
+      visible: =(props.symbol === 'rain_sun' || props.symbol === 'snow_sun' || props.symbol === 'thunder_sun') && props.day
+        === false
+    slots:
+      default:
+      - component: path
+        config:
+          d: M22.19,14.17 A10,10 0 1,0 33.83,25.81 A8.5,8.5 0 1,1 22.19,14.17 Z
+          fill: '#9fa8da'
+          transform: translate(14 11) scale(0.58) translate(-24 -24)
+  - component: g
+    config:
+      visible: =(props.symbol === 'rain' || props.symbol === 'rain_sun')
+    slots:
+      default:
+      - component: path
+        config:
+          d: M14,38 H34 A6,6 0 0,0 35.5,26.2 A9,9 0 0,0 18.6,24.4 A7,7 0 0,0 14,38 Z
+          transform: translate(27 25) scale(1.0) translate(-27 -31)
           stroke: '#90a4ae'
           stroke-width: 1.6
           stroke-linecap: round
@@ -380,16 +974,13 @@ slots:
               visible: =true
   - component: g
     config:
-      visible: '=(Number.isNaN(Number.parseFloat(props.code)) ? '''' : Number(props.code) === 0 ? ''clear'' : Number(props.code)
-        <= 2 ? ''partly'' : Number(props.code) === 3 ? ''cloudy'' : Number(props.code) <= 48 ? ''fog'' : Number(props.code)
-        <= 67 ? ''rain'' : Number(props.code) <= 77 ? ''snow'' : Number(props.code) <= 82 ? ''rain'' : Number(props.code)
-        <= 86 ? ''snow'' : ''thunder'') === ''snow'''
+      visible: =(props.symbol === 'snow' || props.symbol === 'snow_sun')
     slots:
       default:
       - component: path
         config:
           d: M14,38 H34 A6,6 0 0,0 35.5,26.2 A9,9 0 0,0 18.6,24.4 A7,7 0 0,0 14,38 Z
-          transform: translate(0 -6)
+          transform: translate(27 25) scale(1.0) translate(-27 -31)
           stroke: '#90a4ae'
           stroke-width: 1.6
           stroke-linecap: round
@@ -398,57 +989,60 @@ slots:
       - component: circle
         config:
           cx: 18
-          cy: 38
-          r: 1.8
-          fill: '#81d4fa'
+          cy: 38.5
+          r: 2.6
+          fill: '#ffffff'
+          stroke: '#90a4ae'
+          stroke-width: 1
         slots:
           default:
           - component: animate
             config:
               attributeName: cy
-              values: 38;41;38
+              values: 38.5;41.5;38.5
               dur: 2.0s
               repeatCount: indefinite
       - component: circle
         config:
-          cx: 25
-          cy: 41
-          r: 1.8
-          fill: '#81d4fa'
+          cx: 25.5
+          cy: 42
+          r: 2.6
+          fill: '#ffffff'
+          stroke: '#90a4ae'
+          stroke-width: 1
         slots:
           default:
           - component: animate
             config:
               attributeName: cy
-              values: 41;44;41
+              values: 42;45;42
               dur: 2.4s
               repeatCount: indefinite
       - component: circle
         config:
-          cx: 32
-          cy: 38
-          r: 1.8
-          fill: '#81d4fa'
+          cx: 33
+          cy: 38.5
+          r: 2.6
+          fill: '#ffffff'
+          stroke: '#90a4ae'
+          stroke-width: 1
         slots:
           default:
           - component: animate
             config:
               attributeName: cy
-              values: 38;41;38
+              values: 38.5;41.5;38.5
               dur: 2.8s
               repeatCount: indefinite
   - component: g
     config:
-      visible: '=(Number.isNaN(Number.parseFloat(props.code)) ? '''' : Number(props.code) === 0 ? ''clear'' : Number(props.code)
-        <= 2 ? ''partly'' : Number(props.code) === 3 ? ''cloudy'' : Number(props.code) <= 48 ? ''fog'' : Number(props.code)
-        <= 67 ? ''rain'' : Number(props.code) <= 77 ? ''snow'' : Number(props.code) <= 82 ? ''rain'' : Number(props.code)
-        <= 86 ? ''snow'' : ''thunder'') === ''thunder'''
+      visible: =(props.symbol === 'thunder' || props.symbol === 'thunder_sun')
     slots:
       default:
       - component: path
         config:
           d: M14,38 H34 A6,6 0 0,0 35.5,26.2 A9,9 0 0,0 18.6,24.4 A7,7 0 0,0 14,38 Z
-          transform: translate(0 -8)
+          transform: translate(27 23) scale(1.0) translate(-27 -31)
           stroke: '#90a4ae'
           stroke-width: 1.6
           stroke-linecap: round
@@ -469,40 +1063,3 @@ slots:
               values: 1;0.35;1;1
               dur: 1.8s
               repeatCount: indefinite
-  - component: g
-    config:
-      visible: '=(Number.isNaN(Number.parseFloat(props.code)) ? '''' : Number(props.code) === 0 ? ''clear'' : Number(props.code)
-        <= 2 ? ''partly'' : Number(props.code) === 3 ? ''cloudy'' : Number(props.code) <= 48 ? ''fog'' : Number(props.code)
-        <= 67 ? ''rain'' : Number(props.code) <= 77 ? ''snow'' : Number(props.code) <= 82 ? ''rain'' : Number(props.code)
-        <= 86 ? ''snow'' : ''thunder'') === ''fog'''
-    slots:
-      default:
-      - component: path
-        config:
-          d: M14,38 H34 A6,6 0 0,0 35.5,26.2 A9,9 0 0,0 18.6,24.4 A7,7 0 0,0 14,38 Z
-          transform: translate(24 23) scale(0.9) translate(-24 -31)
-          stroke: '#90a4ae'
-          stroke-width: 1.6
-          stroke-linecap: round
-          fill: '#cfd8dc'
-          stroke-linejoin: round
-      - component: line
-        config:
-          x1: 12
-          y1: 37
-          x2: 36
-          y2: 37
-          stroke: '#90a4ae'
-          stroke-width: 2.2
-          stroke-linecap: round
-          fill: none
-      - component: line
-        config:
-          x1: 15
-          y1: 42
-          x2: 33
-          y2: 42
-          stroke: '#90a4ae'
-          stroke-width: 2.2
-          stroke-linecap: round
-          fill: none
