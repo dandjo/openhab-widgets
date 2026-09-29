@@ -469,11 +469,14 @@ e.g. two columns.""", """
 """, img("appliances-card.png", "Appliance tiles")))
 md.append("""## Weather
 
-""" + section("Weather icon", "weather-icon", """The weather drawn from a WMO code in the style of the energy flow's
-nodes: the sun, its rays turning slowly, or the moon while `day` is false, alone when it is clear (code 0) and behind
-a small cloud when partly cloudy (1, 2); a cloud (3), raised over fog (45, 48), falling rain (drizzle, rain and
-showers: 51 to 67, 80 to 82), drifting snow (71 to 77, 85, 86) or a flickering bolt (95 to 99). Nothing while `code`
-is no number, as an item is `NULL` after a restart. My weather bar shows the present weather with it, and my forecast
+""" + section("Weather icon", "weather-icon", """The weather drawn from a symbol in the style of the energy flow's
+nodes: the sun, its rays turning slowly, or the moon while `day` is false. The sky in five levels: `clear` alone,
+`fair` with a small cloud, `partly` behind a cloud of its size, `mostly` peeking out behind a large cloud with a darker
+one behind it, `overcast` as two clouds; `veil` behind three thin streaks; a raised cloud over `fog`, falling `rain`,
+drifting white `snow` or a flickering bolt (`thunder`), with the sun peeking out at its top left for showers
+(`rain_sun`, `snow_sun`, `thunder_sun`). Nothing for any other value, as an item is `NULL` after a restart. My rule
+works the symbol out from Open-Meteo: a day's sky from the share of its daylight the sun shines, an hour's from the
+cloud layers, the high ones counted half. My weather bar shows the present weather with it, and my forecast
 popup each day's, beside its hours of sunshine with their share of the daylight and the strongest wind with an arrow
 of its dominant direction and its compass point, above a
 chart of the next 60 hours: temperature with the weather drawn above it and over the precipitation of each hour, the
@@ -484,7 +487,7 @@ into String items, and the chart reads them through an `oh-data-series` whose `d
 warnings in the screenshots are demo values.""", """
 component: widget:weather-icon
 config:
-  code: =items.weather_code.state
+  symbol: =items.weather_symbol.state
   day: =items.weather_is_day.state !== 'OFF'
   size: 36
 """, "| Light | Dark |\n|---|---|\n| " + img("forecast-popup.png", "Forecast popup: warnings, days and chart") + " | "

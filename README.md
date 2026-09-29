@@ -100,7 +100,7 @@ Needs `weather-icon`.
 
 | Prop | Item | Item type |
 |---|---|---|
-| `weatherCode` | Wetter aktuell | Number |
+| `weatherSymbol` | Wetter aktuell | String |
 | `weatherIsDay` | Wetter Tag | Switch |
 | `heatpumpExtAmbientTemp` | ESPAltherma Außentemperatur | Number:Temperature |
 | `weatherWarningLevel` | Wetterwarnung Stufe | Number |
@@ -956,18 +956,21 @@ Needs `appliance-icon`.
 
 ### Weather icon: `weather-icon`
 
-The weather drawn from a WMO code in the style of the energy flow's nodes: the sun, its rays turning slowly, or the moon
-while `day` is false, alone when it is clear (code 0) and behind a small cloud when partly cloudy (1, 2); a cloud (3),
-raised over fog (45, 48), falling rain (drizzle, rain and showers: 51 to 67, 80 to 82), drifting snow (71 to 77, 85, 86)
-or a flickering bolt (95 to 99). Nothing while `code` is no number, as an item is `NULL` after a restart. My weather bar
-shows the present weather with it, and my forecast popup each day's, beside its hours of sunshine with their share of
-the daylight and the strongest wind with an arrow of its dominant direction and its compass point, above a chart of the
-next 60 hours: temperature with the weather drawn above it and over the precipitation of each hour, the wind below with
-arrows of its direction, both every three hours; ECharts takes no widget, so the drawings there are this widget's layers
-as still SVG images. That popup is a page of my installation, not a widget of this repository; its rule writes the
-forecast as JSON into String items, and the chart reads them through an `oh-data-series` whose `data` is an expression
-such as `=JSON.parse(items.weather_hourly.state).map((r) => [r[0] * 1000, r[1]])`, with no persistence involved. The
-warnings in the screenshots are demo values.
+The weather drawn from a symbol in the style of the energy flow's nodes: the sun, its rays turning slowly, or the moon
+while `day` is false. The sky in five levels: `clear` alone, `fair` with a small cloud, `partly` behind a cloud of its
+size, `mostly` peeking out behind a large cloud with a darker one behind it, `overcast` as two clouds; `veil` behind
+three thin streaks; a raised cloud over `fog`, falling `rain`, drifting white `snow` or a flickering bolt (`thunder`),
+with the sun peeking out at its top left for showers (`rain_sun`, `snow_sun`, `thunder_sun`). Nothing for any other
+value, as an item is `NULL` after a restart. My rule works the symbol out from Open-Meteo: a day's sky from the share of
+its daylight the sun shines, an hour's from the cloud layers, the high ones counted half. My weather bar shows the
+present weather with it, and my forecast popup each day's, beside its hours of sunshine with their share of the daylight
+and the strongest wind with an arrow of its dominant direction and its compass point, above a chart of the next 60
+hours: temperature with the weather drawn above it and over the precipitation of each hour, the wind below with arrows
+of its direction, both every three hours; ECharts takes no widget, so the drawings there are this widget's layers as
+still SVG images. That popup is a page of my installation, not a widget of this repository; its rule writes the forecast
+as JSON into String items, and the chart reads them through an `oh-data-series` whose `data` is an expression such as
+`=JSON.parse(items.weather_hourly.state).map((r) => [r[0] * 1000, r[1]])`, with no persistence involved. The warnings in
+the screenshots are demo values.
 
 | Light | Dark |
 |---|---|
@@ -976,14 +979,14 @@ warnings in the screenshots are demo values.
 ```yaml
 component: widget:weather-icon
 config:
-  code: =items.weather_code.state
+  symbol: =items.weather_symbol.state
   day: =items.weather_is_day.state !== 'OFF'
   size: 36
 ```
 
 | Prop | Description | Type | Default |
 |---|---|---|---|
-| `code` | The weather as a WMO code, 0 (clear) to 99 (thunderstorm with hail); usually an expression | DECIMAL |  |
+| `symbol` | The weather drawn: clear, fair, partly, mostly, overcast, veil, fog, rain, snow, thunder, rain_sun, snow_sun, thunder_sun; usually an expression | TEXT |  |
 | `day` | Whether the sun is up; false draws the moon; usually an expression | BOOLEAN | `true` |
 | `size` | Width and height in px | INTEGER | `36` |
 

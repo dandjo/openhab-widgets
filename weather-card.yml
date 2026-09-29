@@ -3,9 +3,9 @@ tags:
 - overview
 props:
   parameters:
-  - name: weatherCode
+  - name: weatherSymbol
     label: Wetter aktuell
-    description: Number item
+    description: String item
     type: TEXT
     required: true
     context: item
@@ -70,7 +70,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Sep 28, 2026, 6:27:44 PM
+timestamp: Sep 29, 2026, 11:22:19 PM
 component: oh-card
 config:
   contentStyle:
@@ -97,7 +97,7 @@ slots:
           default:
           - component: widget:weather-icon
             config:
-              code: =items[props.weatherCode].state
+              symbol: =items[props.weatherSymbol].state
               day: =items[props.weatherIsDay].state !== 'OFF'
               size: 36
           - component: div
