@@ -21,7 +21,8 @@
 //                   wind direction ° (where it comes from, 0 north, 90 east), WMO code, 1 by day or 0 by night], ...]
 // weather_daily: [{t: epoch seconds of the day's midnight, c: WMO code, lo, hi: °C, p: precipitation mm,
 //                  pp: probability of precipitation % (best match) or null, w: maximum wind km/h,
-//                  wd: the day's dominant wind direction °}, ...]
+//                  wd: the day's dominant wind direction °, s: sunshine h,
+//                  sp: sunshine in % of the daylight, the most the sun could shine}, ...]
 const BASE = 'https://api.open-meteo.com/v1/forecast?latitude=48.21&longitude=16.37&timezone=Europe%2FVienna'
   + '&forecast_days=5&timeformat=unixtime'
   + '&current=weather_code,is_day,precipitation,cloud_cover_low,cloud_cover_mid,cloud_cover_high'
@@ -129,11 +130,15 @@ function day(arome, best, t) {
     return null;
   }
   const v = (field) => value([model], 'daily', field, t);
-  return {t: t, c: dayCode(v('weather_code'), v('precipitation_sum'), v('sunshine_duration'), v('daylight_duration')),
+  const sunshine = v('sunshine_duration');
+  const daylight = v('daylight_duration');
+  return {t: t, c: dayCode(v('weather_code'), v('precipitation_sum'), sunshine, daylight),
           lo: round(v('temperature_2m_min'), 1), hi: round(v('temperature_2m_max'), 1),
           p: round(v('precipitation_sum'), 1), pp: value([best], 'daily', 'precipitation_probability_max', t),
           w: round(v('wind_speed_10m_max'), 0),
-          wd: round(value([model, best], 'daily', 'wind_direction_10m_dominant', t), 0)};
+          wd: round(value([model, best], 'daily', 'wind_direction_10m_dominant', t), 0),
+          s: sunshine == null ? null : round(sunshine / 3600, 1),
+          sp: sunshine == null || !daylight ? null : Math.round(sunshine / daylight * 100)};
 }
 
 // the last run's list of an item, or none

@@ -474,7 +474,8 @@ nodes: the sun, its rays turning slowly, or the moon while `day` is false, alone
 a small cloud when partly cloudy (1, 2); a cloud (3), raised over fog (45, 48), falling rain (drizzle, rain and
 showers: 51 to 67, 80 to 82), drifting snow (71 to 77, 85, 86) or a flickering bolt (95 to 99). Nothing while `code`
 is no number, as an item is `NULL` after a restart. My weather bar shows the present weather with it, and my forecast
-popup each day's, beside the strongest wind with an arrow of its dominant direction and its compass point, above a
+popup each day's, beside its hours of sunshine with their share of the daylight and the strongest wind with an arrow
+of its dominant direction and its compass point, above a
 chart of the next 60 hours: temperature with the weather drawn above it and over the precipitation of each hour, the
 wind below with arrows of its direction, both every three hours; ECharts takes no widget, so the drawings there are
 this widget's layers as still SVG images. That popup is a page of my installation, not a widget of this repository; its rule writes the forecast as JSON
