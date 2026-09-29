@@ -4,6 +4,7 @@ they are built from; on first use also the daily energy total items and their ru
 
 Usage: dashboard.py update|update-apply   (update-apply as root with openHAB stopped)
 """
+import base64
 import copy
 import datetime
 import math
@@ -774,15 +775,9 @@ def wx_cloud(transform):
                **stroke(1.6, "#90a4ae", fill="#cfd8dc", **{"stroke-linejoin": "round"}))
 
 
-def weather_icon_widget():
-    """The widget the weather is drawn with, in the style of the energy flow's nodes: code is a WMO code, day whether
-    the sun is up (the moon while it is false). The sun (its rays turning slowly) or the moon, alone when it is clear, behind a small cloud when
-    partly cloudy; a cloud, raised over falling rain, drifting snow, a flickering bolt or fog. Nothing while code is
-    no number."""
-    kind, night = wx_kind("props.code"), "props.day === false"
-
-    def shows(k):
-        return f"{kind} === '{k}'"
+def wx_layers():
+    """The weather drawing's layers in a box of 48, each with the kind it shows and when: only by day (False), only by
+    night (True) or both (None)."""
     partly = "translate(17 17) scale(0.72) translate(-24 -24)"
     drops = [svg("line", [dash_flow("0.9s", "true", to="-6")], x1=x, y1=36, x2=x - 2, y2=42,
                  **stroke(2.2, "#42a5f5", **{"stroke-dasharray": "3 3"})) for x in (18, 25, 32)]
@@ -794,20 +789,60 @@ def weather_icon_widget():
                points="26,31 20,40 24.5,40 22,47 30,37 25.5,37 28,31", fill="#ffca28",
                **{"stroke": "#f9a825", "stroke-width": 0.8, "stroke-linejoin": "round"})
     fog = [svg("line", x1=a, y1=y, x2=b, y2=y, **stroke(2.2, "#90a4ae")) for a, b, y in ((12, 36, 37), (15, 33, 42))]
+    return [("clear", False, svg("g", wx_sun())),
+            ("clear", True, svg("path", d=WX_MOON, fill="#9fa8da")),
+            ("partly", False, svg("g", wx_sun(), transform=partly)),
+            ("partly", True, svg("path", d=WX_MOON, fill="#9fa8da",
+                                 transform="translate(17 16) scale(0.7) translate(-24 -24)")),
+            ("partly", None, svg("g", [wx_cloud("translate(27 34) scale(0.9) translate(-27 -31)")])),
+            ("cloudy", None, svg("g", [wx_cloud("translate(0 -2)")])),
+            ("rain", None, svg("g", [wx_cloud("translate(0 -6)"), *drops])),
+            ("snow", None, svg("g", [wx_cloud("translate(0 -6)"), *flakes])),
+            ("thunder", None, svg("g", [wx_cloud("translate(0 -8)"), bolt])),
+            ("fog", None, svg("g", [wx_cloud("translate(24 23) scale(0.9) translate(-24 -31)"), *fog]))]
+
+
+def weather_icon_widget():
+    """The widget the weather is drawn with, in the style of the energy flow's nodes: code is a WMO code, day whether
+    the sun is up (the moon while it is false). The sun (its rays turning slowly) or the moon, alone when it is clear, behind a small cloud when
+    partly cloudy; a cloud, raised over falling rain, drifting snow, a flickering bolt or fog. Nothing while code is
+    no number."""
+    kind, night = wx_kind("props.code"), "props.day === false"
+    layers = []
+    for k, by_night, layer in wx_layers():
+        when = "" if by_night is None else f" && {night}" if by_night else f" && !({night})"
+        layer["config"]["visible"] = f"={kind} === '{k}'{when}"
+        layers.append(layer)
     size = "=props.size || 36"
-    return svg("svg", [
-        svg("g", wx_sun(), visible=f"={shows('clear')} && !({night})"),
-        svg("path", d=WX_MOON, fill="#9fa8da", visible=f"={shows('clear')} && {night}"),
-        svg("g", wx_sun(), transform=partly, visible=f"={shows('partly')} && !({night})"),
-        svg("path", d=WX_MOON, fill="#9fa8da", transform="translate(17 16) scale(0.7) translate(-24 -24)",
-            visible=f"={shows('partly')} && {night}"),
-        svg("g", [wx_cloud("translate(27 34) scale(0.9) translate(-27 -31)")], visible=f"={shows('partly')}"),
-        svg("g", [wx_cloud("translate(0 -2)")], visible=f"={shows('cloudy')}"),
-        svg("g", [wx_cloud("translate(0 -6)"), *drops], visible=f"={shows('rain')}"),
-        svg("g", [wx_cloud("translate(0 -6)"), *flakes], visible=f"={shows('snow')}"),
-        svg("g", [wx_cloud("translate(0 -8)"), bolt], visible=f"={shows('thunder')}"),
-        svg("g", [wx_cloud("translate(24 23) scale(0.9) translate(-24 -31)"), *fog], visible=f"={shows('fog')}"),
-    ], viewBox="0 0 48 48", width=size, height=size, style={"display": "block", "flex": "0 0 auto"})
+    return svg("svg", layers, viewBox="0 0 48 48", width=size, height=size,
+               style={"display": "block", "flex": "0 0 auto"})
+
+
+def svg_markup(node):
+    """svg() components as SVG markup, without their animations."""
+    tag = node["component"]
+    if tag.startswith("animate"):
+        return ""
+    attrs = "".join(f' {k}="{v}"' for k, v in node["config"].items() if k != "visible")
+    inner = "".join(svg_markup(child) for child in node.get("slots", {}).get("default", []))
+    return f"<{tag}{attrs}>{inner}</{tag}>"
+
+
+def wx_symbols():
+    """The weather drawings as images for a chart, standing still, by kind; those drawn otherwise by night (clear,
+    partly) once more as <kind>_night."""
+    layers = wx_layers()
+    symbols = {}
+    for night in (False, True):
+        for k in dict.fromkeys(key for key, _, _ in layers):
+            if night and all(by_night is None for key, by_night, _ in layers if key == k):
+                continue
+            drawn = "".join(svg_markup(layer) for key, by_night, layer in layers
+                            if key == k and by_night in (None, night))
+            markup = f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">{drawn}</svg>'
+            symbols[f"{k}_night" if night else k] = ("image://data:image/svg+xml;base64,"
+                                                     + base64.b64encode(markup.encode()).decode())
+    return symbols
 
 
 def weather_icon(code, day, size):
@@ -974,6 +1009,26 @@ def wx_wind_arrows():
                     f"symbolRotate: -(r[4] + 180)}}) : null).filter((p) => p)"}
 
 
+# the weather's drawings over the temperature, in a box of 24: the drawing fills about two thirds of it, so three
+# hours apart they keep a gap in the weather page's column
+WX_SYMBOL = 24
+
+
+def wx_weather_symbols():
+    """The weather along the temperature's line, as the wind's arrows along the wind's: every three hours, every six
+    on a phone, a little above the warmest hour from two hours before to two after, drawn as the widget weather-icon
+    draws it, standing still."""
+    every = f"({NARROW} ? 6 : 3)"
+    shown = f"r[1] != null && r[5] != null && dayjs(r[0] * 1000).hour() % {every} === 0"
+    peak = "a.slice(Math.max(0, i - 2), i + 3).reduce((m, x) => (x[1] == null ? m : Math.max(m, x[1])), r[1])"
+    symbols = "{" + ", ".join(f"{k}: '{v}'" for k, v in wx_symbols().items()) + "}"
+    symbol = (f"((k) => {symbols}[r[6] === 0 && (k === 'clear' || k === 'partly') ? k + '_night' : k])"
+              f"({wx_kind('r[5]')})")
+    return {"symbolSize": WX_SYMBOL, "symbolOffset": [0, -12], "silent": True, "label": {"show": False},
+            "data": f"={wx_json(WX_HOURLY)}.map((r, i, a) => {shown} ? ({{coord: [r[0] * 1000, {peak}], "
+                    f"symbol: {symbol}}}) : null).filter((p) => p)"}
+
+
 def wx_hourly(index):
     """One column of the hourly forecast as chart data, [time in ms, value]."""
     return f"={wx_json(WX_HOURLY)}.map((r) => [r[0] * 1000, r[{index}]])"
@@ -999,8 +1054,8 @@ WX_TIME_LABEL = (f"=(v) => dayjs(v).hour() === 0 && dayjs(v).minute() === 0 ? '{
 
 
 def weather_forecast_chart():
-    """The next 60 hours: temperature as a line over the precipitation of each hour as bars, the wind below with
-    arrows of its direction, one tooltip for all three."""
+    """The next 60 hours: temperature as a line with the weather drawn above it, over the precipitation of each hour
+    as bars, the wind below with arrows of its direction, one tooltip for all three."""
     # the wind's grid 75 px high, 55 px below the temperature's, room for its axis name and the arrows above it
     grids = [comp("oh-chart-grid", {"top": "35", "height": "140", "left": "45", "right": "45"}),
              comp("oh-chart-grid", {"top": "230", "bottom": "60", "left": "45", "right": "45"})]
@@ -1008,7 +1063,11 @@ def weather_forecast_chart():
               comp("oh-time-axis", {"gridIndex": 1, "axisLabel": {"formatter": WX_TIME_LABEL,
                                                                    "rich": {"day": {"fontWeight": "bold"}}}})]
     dashed = {"splitLine": {"lineStyle": {"type": "dashed", "opacity": 0.4}}}
-    y_axes = [value_axis("°C", scale=True, minInterval=1),
+    # a quarter of the temperature's span above its maximum, at least a degree, for the weather's drawings; the label
+    # at that odd top would crowd the one below it
+    y_axes = [value_axis("°C", scale=True, minInterval=1,
+                         max="=(v) => Math.ceil(v.max + Math.max(1, (v.max - v.min) * 0.25))",
+                         axisLabel={"showMaxLabel": False}),
               comp("oh-value-axis", {"gridIndex": 0, "name": "mm", "nameGap": 14, "min": 0,
                                      "max": "=(v) => Math.max(v.max, 2)", "splitLine": {"show": False},
                                      "nameTextStyle": {"align": "left", "padding": [0, 0, 0, 8]}}),
@@ -1017,7 +1076,8 @@ def weather_forecast_chart():
                                      "min": 0, "max": "=(v) => Math.max(20, Math.ceil(v.max / 20) * 20)", "splitNumber": 2,
                                      **dashed})]
     series = [wx_series("Temperatur", "°C", 1, WX_TEMP_COLOR, 0, 0, type="line", smooth=0.5, symbol="none",
-                        lineStyle={"width": 2.5, "color": WX_TEMP_COLOR}, markLine=wx_midnights(), z=3),
+                        lineStyle={"width": 2.5, "color": WX_TEMP_COLOR}, markLine=wx_midnights(),
+                        markPoint=wx_weather_symbols(), z=3),
               # precipitation is the sum of the hour before its time; the bar stands on that time all the same, as
               # the axis tooltip lists only the series with a point at the time it snaps to
               wx_series("Niederschlag", "mm", 2, WX_RAIN_COLOR, 0, 1, type="bar", barMaxWidth=6,

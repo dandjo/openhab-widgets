@@ -475,8 +475,9 @@ a small cloud when partly cloudy (1, 2); a cloud (3), raised over fog (45, 48), 
 showers: 51 to 67, 80 to 82), drifting snow (71 to 77, 85, 86) or a flickering bolt (95 to 99). Nothing while `code`
 is no number, as an item is `NULL` after a restart. My weather bar shows the present weather with it, and my forecast
 popup each day's, beside the strongest wind with an arrow of its dominant direction and its compass point, above a
-chart of the next 60 hours: temperature over the precipitation of each hour, the wind below with arrows of its
-direction every three hours. That popup is a page of my installation, not a widget of this repository; its rule writes the forecast as JSON
+chart of the next 60 hours: temperature with the weather drawn above it and over the precipitation of each hour, the
+wind below with arrows of its direction, both every three hours; ECharts takes no widget, so the drawings there are
+this widget's layers as still SVG images. That popup is a page of my installation, not a widget of this repository; its rule writes the forecast as JSON
 into String items, and the chart reads them through an `oh-data-series` whose `data` is an expression such as
 `=JSON.parse(items.weather_hourly.state).map((r) => [r[0] * 1000, r[1]])`, with no persistence involved. The
 warnings in the screenshots are demo values.""", """

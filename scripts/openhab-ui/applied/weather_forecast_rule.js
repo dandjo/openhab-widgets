@@ -10,16 +10,25 @@
 // run's by their time: what this run brings replaces the old, and an hour or a day it lacks keeps the last run's
 // value, so a failed request never shortens the forecast; days before today are dropped.
 //
+// The weather is drawn from WMO codes, but not from Open-Meteo's as they come: its sky counts thin high clouds (cirrus)
+// as overcast though the sun shines through them, and a day's code is the worst of its hours, the night's included.
+// So a day's sky follows the share of its daylight the sun shines, and fog, precipitation or a thunderstorm replaces
+// it only when it marks the day: fog below 30 % of sunshine, precipitation and thunder from 1 mm, a precipitation day.
+// The present sky and each hour's follow the cloud layers, the high ones counted half; precipitation or thunder shows
+// only while some falls.
+//
 // weather_hourly: [[epoch seconds, temperature °C, precipitation of the hour before in mm, wind km/h,
-//                   wind direction ° (where it comes from, 0 north, 90 east)], ...]
+//                   wind direction ° (where it comes from, 0 north, 90 east), WMO code, 1 by day or 0 by night], ...]
 // weather_daily: [{t: epoch seconds of the day's midnight, c: WMO code, lo, hi: °C, p: precipitation mm,
 //                  pp: probability of precipitation % (best match) or null, w: maximum wind km/h,
 //                  wd: the day's dominant wind direction °}, ...]
 const BASE = 'https://api.open-meteo.com/v1/forecast?latitude=48.21&longitude=16.37&timezone=Europe%2FVienna'
-  + '&forecast_days=5&timeformat=unixtime&current=weather_code,is_day'
-  + '&hourly=temperature_2m,precipitation,wind_speed_10m,wind_direction_10m';
+  + '&forecast_days=5&timeformat=unixtime'
+  + '&current=weather_code,is_day,precipitation,cloud_cover_low,cloud_cover_mid,cloud_cover_high'
+  + '&hourly=temperature_2m,precipitation,wind_speed_10m,wind_direction_10m,weather_code,is_day'
+  + ',cloud_cover_low,cloud_cover_mid,cloud_cover_high';
 const DAILY = '&daily=weather_code,temperature_2m_min,temperature_2m_max,precipitation_sum,wind_speed_10m_max'
-  + ',wind_direction_10m_dominant';
+  + ',wind_direction_10m_dominant,sunshine_duration,daylight_duration';
 const HOURS = 61;
 const DAYS = 5;
 const TRIES = 3;
@@ -62,6 +71,55 @@ function value(models, part, field, t) {
   return null;
 }
 
+// a sky by its cloud cover in %: clear, mainly clear, partly cloudy, overcast
+const skyByCover = (cover) => (cover < 20 ? 0 : cover < 50 ? 1 : cover < 80 ? 2 : 3);
+// a day's sky by the share of its daylight the sun shines
+const skyBySun = (share) => (share >= 0.85 ? 0 : share >= 0.6 ? 1 : share >= 0.3 ? 2 : 3);
+
+// the present's or an hour's WMO code: the sky from the cloud layers, the high ones counted half, as the sun shines
+// through them; fog as it comes, precipitation and thunder only while some falls (wet), or as they come while that is
+// unknown (null)
+function hourCode(code, wet, low, mid, high) {
+  if (code == null) {
+    return null;
+  }
+  if (code <= 3 || (code >= 51 && wet === false)) {
+    return low == null || mid == null || high == null ? Math.min(code, 3)
+      : skyByCover(Math.max(low, mid, high / 2));
+  }
+  return code;
+}
+
+// a day's WMO code: the sky from its sunshine, fog only below 30 % of it, precipitation and thunder from 1 mm; the
+// code as it comes while the sunshine is unknown
+function dayCode(code, precipitation, sunshine, daylight) {
+  if (code == null || sunshine == null || !daylight) {
+    return code;
+  }
+  const sky = skyBySun(sunshine / daylight);
+  if (code <= 3) {
+    return sky;
+  }
+  if (code <= 48) {
+    return sky === 3 ? code : sky;
+  }
+  return precipitation == null || precipitation >= 1 ? code : sky;
+}
+
+// an hour's WMO code and whether it is day, both from the first model with a code for it, the layers from that model
+function hourSky(models, t) {
+  for (const model of models) {
+    const code = value([model], 'hourly', 'weather_code', t);
+    if (code != null) {
+      const v = (field) => value([model], 'hourly', field, t);
+      const precipitation = v('precipitation');
+      return [hourCode(code, precipitation == null ? null : round(precipitation, 1) > 0, v('cloud_cover_low'),
+                       v('cloud_cover_mid'), v('cloud_cover_high')), v('is_day')];
+    }
+  }
+  return [null, null];
+}
+
 // a whole day from one model: AROME while it covers the day's minimum and maximum, else the best match
 function day(arome, best, t) {
   const complete = (model) => model && model.daily && model.daily.time
@@ -71,7 +129,8 @@ function day(arome, best, t) {
     return null;
   }
   const v = (field) => value([model], 'daily', field, t);
-  return {t: t, c: v('weather_code'), lo: round(v('temperature_2m_min'), 1), hi: round(v('temperature_2m_max'), 1),
+  return {t: t, c: dayCode(v('weather_code'), v('precipitation_sum'), v('sunshine_duration'), v('daylight_duration')),
+          lo: round(v('temperature_2m_min'), 1), hi: round(v('temperature_2m_max'), 1),
           p: round(v('precipitation_sum'), 1), pp: value([best], 'daily', 'precipitation_probability_max', t),
           w: round(v('wind_speed_10m_max'), 0),
           wd: round(value([model, best], 'daily', 'wind_direction_10m_dominant', t), 0)};
@@ -101,7 +160,8 @@ const models = [arome, best];
 
 const current = models.map((m) => m && m.current).find((c) => c && c.weather_code != null);
 if (current) {
-  items.weather_code.postUpdate(current.weather_code);
+  items.weather_code.postUpdate(hourCode(current.weather_code, current.precipitation == null ? null
+    : current.precipitation > 0, current.cloud_cover_low, current.cloud_cover_mid, current.cloud_cover_high));
   items.weather_is_day.postUpdate(current.is_day ? 'ON' : 'OFF');
 }
 
@@ -112,9 +172,10 @@ if (arome || best) {
     const t = hour + k * 3600;
     const temp = value(models, 'hourly', 'temperature_2m', t);
     if (temp != null) {
+      const [code, isDay] = hourSky(models, t);
       fresh.push([t, round(temp, 1), round(value(models, 'hourly', 'precipitation', t), 1),
                   round(value(models, 'hourly', 'wind_speed_10m', t), 0),
-                  round(value(models, 'hourly', 'wind_direction_10m', t), 0)]);
+                  round(value(models, 'hourly', 'wind_direction_10m', t), 0), code, isDay]);
     }
   }
   const hourly = merged(fresh, last('weather_hourly'), (h) => h[0], hour, HOURS);
