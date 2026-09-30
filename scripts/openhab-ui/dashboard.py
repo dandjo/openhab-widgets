@@ -1251,7 +1251,7 @@ HPX = {  # heat pump items
     "valve": "espaltherma_3way_valve_mode", "pump": "espaltherma_water_pump_operation",
     "flow": "espaltherma_flow_sensor", "hz": "espaltherma_inv_frequency", "buh1": "espaltherma_buh_step1_mode",
     "buh2": "espaltherma_buh_step2_mode", "bsh": "espaltherma_bsh_mode", "tank": "espaltherma_dhw_tank_temp",
-    "tank_set": "espaltherma_dhw_setpoint", "supply": "espaltherma_leaving_water_temp_after_buh",
+    "tank_set": "espaltherma_dhw_setpoint", "water_pressure": "espaltherma_water_pressure", "supply": "espaltherma_leaving_water_temp_after_buh",
     "return": "espaltherma_inlet_water_temp", "outdoor": "espaltherma_ext_ambient_temp",
     "indoor": "espaltherma_indoor_ambient_temp", "power": "espaltherma_electrical_power",
     "heat": "espaltherma_heating_power", "cop": "espaltherma_cop", "defrost": "espaltherma_defrost_operaton",
@@ -1388,6 +1388,9 @@ water_heat_color = (f"=['NULL', 'UNDEF'].includes(items.{HPX['water_heat']}.stat
                     f"{WATER_HEAT} < 5000 ? '#fb8c00' : '#e57373'")
 # the refrigerant's badge in its colour while the compressor runs, grey while it stands
 refrigerant_color = f"={COMPRESSOR} ? '{REFRIGERANT}' : '#9e9e9e'"
+# the heating water's pressure outside the range of 1 to 2,5 bar (no value is not out of range)
+WATER_PRESSURE_BAD = (f"(!['NULL', 'UNDEF'].includes(items.{HPX['water_pressure']}.state) && "
+                      f"({num(HPX['water_pressure'])} < 1 || {num(HPX['water_pressure'])} > 2.5))")
 ROOM_X = (VALVE[0] + REFRIGERANT_X) / 2  # the middle of the room right of the riser, where the badges sit
 BADGE_W = 124  # both badges, wide enough for a label and its value side by side
 # the ground floor's free middle, between the lower edge of its floor line (1.4 wide) and the upper edge of the
@@ -1477,13 +1480,19 @@ hp_svg = svg("svg", [
         hp_text(ROOM_X, GROUND_MID + 35, "Wärme", 12, opacity="0.7")]),
     hp_text(RADIATORS[0] - 40, BASEMENT_Y - 6, "Basement", 16, "700", anchor="end"),
     hp_text(RADIATORS[0] - 40, BASEMENT_Y + 13, "Radiators", 12, anchor="end", opacity="0.7"),
-    # the tank's and the indoor unit's names and details, centred below them
-    hp_text(TANK[0], BOTTOM + 30, "Warmwasserspeicher", 15, "700"),
-    hp_text(TANK[0], BOTTOM + 50, f"='Soll ' + {disp(HPX['tank_set'])} + ' · Zusatzheizung ' + ({BSH_ON} ? "
-            f"{kw2(HPX['bsh_power'])} : 'Aus')", 12, opacity="0.7"),
-    hp_text(WALL[0], BOTTOM + 30, "Innengerät", 15, "700"),
-    hp_text(WALL[0], BOTTOM + 50, f"={disp(HPX['flow'])} + ' · Heizstab ' + ({BUH_ON} ? {kw2(HPX['buh_power'])} : 'Aus')", 12,
-            opacity="0.7"),
+    # the tank's and the indoor unit's names, centred below them, each with its water below (the tank's setpoint, the
+    # wall unit's flow and the circuit's pressure, red outside its range) and its own heater below that
+    hp_text(TANK[0], BOTTOM + 26, "Warmwasserspeicher", 15, "700"),
+    hp_text(TANK[0], BOTTOM + 42, f"='Soll ' + {disp(HPX['tank_set'])}", 12, opacity="0.7"),
+    hp_text(TANK[0], BOTTOM + 57, f"='Zusatzheizung ' + ({BSH_ON} ? {kw2(HPX['bsh_power'])} : 'Aus')", 12, opacity="0.7"),
+    hp_text(WALL[0], BOTTOM + 26, "Innengerät", 15, "700"),
+    svg("text", [svg("tspan", content=f"={disp(HPX['flow'])} + ' · '", **{"fill-opacity": "0.7"}),
+                 svg("tspan", content=f"={disp(HPX['water_pressure'])}",
+                     fill=f"={WATER_PRESSURE_BAD} ? '#e57373' : 'currentColor'",
+                     **{"fill-opacity": f"={WATER_PRESSURE_BAD} ? '1' : '0.7'",
+                        "font-weight": f"={WATER_PRESSURE_BAD} ? '700' : 'normal'"})],
+        x=WALL[0], y=BOTTOM + 42, fill="currentColor", **{"font-size": 12, "text-anchor": "middle"}),
+    hp_text(WALL[0], BOTTOM + 57, f"='Heizstab ' + ({BUH_ON} ? {kw2(HPX['buh_power'])} : 'Aus')", 12, opacity="0.7"),
 ], viewBox=" ".join(map(str, HP_VB)), width="100%", style={"display": "block", "overflow": "visible"})
 
 

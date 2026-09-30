@@ -135,6 +135,12 @@ props:
     type: TEXT
     required: true
     context: item
+  - name: heatpumpWaterPressure
+    label: ESPAltherma Wasserdruck
+    description: Number:Pressure item
+    type: TEXT
+    required: true
+    context: item
   - name: heatpumpBuhPower
     label: ESPAltherma Elektrische Leistung Heizstab
     description: Number:Power item
@@ -214,7 +220,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Sep 30, 2026, 3:41:16 PM
+timestamp: Sep 30, 2026, 4:18:44 PM
 component: oh-card
 config:
   title: Wärmepumpe
@@ -1332,7 +1338,7 @@ slots:
                   - component: text
                     config:
                       x: 328
-                      y: 540
+                      y: 536
                       content: Warmwasserspeicher
                       fill: currentColor
                       font-size: 15
@@ -1342,10 +1348,19 @@ slots:
                   - component: text
                     config:
                       x: 328
-                      y: 560
+                      y: 552
                       content: '=''Soll '' + ([''NULL'', ''UNDEF''].includes(items[props.heatpumpDhwSetpoint].state) ? ''–''
-                        : (items[props.heatpumpDhwSetpoint].displayState || items[props.heatpumpDhwSetpoint].state)) + ''
-                        · Zusatzheizung '' + (items[props.heatpumpBshMode].state === ''ON'' ? ([''NULL'', ''UNDEF''].includes(items[props.heatpumpBshPower].state)
+                        : (items[props.heatpumpDhwSetpoint].displayState || items[props.heatpumpDhwSetpoint].state))'
+                      fill: currentColor
+                      font-size: 12
+                      font-weight: normal
+                      text-anchor: middle
+                      opacity: '0.7'
+                  - component: text
+                    config:
+                      x: 328
+                      y: 567
+                      content: '=''Zusatzheizung '' + (items[props.heatpumpBshMode].state === ''ON'' ? ([''NULL'', ''UNDEF''].includes(items[props.heatpumpBshPower].state)
                         ? ''–'' : ((Number(items[props.heatpumpBshPower].numericState) || 0) / 1000).toFixed(2).replace(''.'',
                         '','') + '' kW'') : ''Aus'')'
                       fill: currentColor
@@ -1356,7 +1371,7 @@ slots:
                   - component: text
                     config:
                       x: 540
-                      y: 540
+                      y: 536
                       content: Innengerät
                       fill: currentColor
                       font-size: 15
@@ -1366,12 +1381,37 @@ slots:
                   - component: text
                     config:
                       x: 540
-                      y: 560
-                      content: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpFlowSensor].state) ? ''–'' : (items[props.heatpumpFlowSensor].displayState
-                        || items[props.heatpumpFlowSensor].state)) + '' · Heizstab '' + ((items[props.heatpumpBuhStep1Mode].state
-                        === ''ON'' || items[props.heatpumpBuhStep2Mode].state === ''ON'') ? ([''NULL'', ''UNDEF''].includes(items[props.heatpumpBuhPower].state)
-                        ? ''–'' : ((Number(items[props.heatpumpBuhPower].numericState) || 0) / 1000).toFixed(2).replace(''.'',
-                        '','') + '' kW'') : ''Aus'')'
+                      y: 552
+                      fill: currentColor
+                      font-size: 12
+                      text-anchor: middle
+                    slots:
+                      default:
+                      - component: tspan
+                        config:
+                          content: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpFlowSensor].state) ? ''–'' : (items[props.heatpumpFlowSensor].displayState
+                            || items[props.heatpumpFlowSensor].state)) + '' · '''
+                          fill-opacity: '0.7'
+                      - component: tspan
+                        config:
+                          content: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpWaterPressure].state) ? ''–'' : (items[props.heatpumpWaterPressure].displayState
+                            || items[props.heatpumpWaterPressure].state))'
+                          fill: '=(![''NULL'', ''UNDEF''].includes(items[props.heatpumpWaterPressure].state) && ((Number(items[props.heatpumpWaterPressure].numericState)
+                            || 0) < 1 || (Number(items[props.heatpumpWaterPressure].numericState) || 0) > 2.5)) ? ''#e57373''
+                            : ''currentColor'''
+                          fill-opacity: '=(![''NULL'', ''UNDEF''].includes(items[props.heatpumpWaterPressure].state) && ((Number(items[props.heatpumpWaterPressure].numericState)
+                            || 0) < 1 || (Number(items[props.heatpumpWaterPressure].numericState) || 0) > 2.5)) ? ''1'' :
+                            ''0.7'''
+                          font-weight: '=(![''NULL'', ''UNDEF''].includes(items[props.heatpumpWaterPressure].state) && ((Number(items[props.heatpumpWaterPressure].numericState)
+                            || 0) < 1 || (Number(items[props.heatpumpWaterPressure].numericState) || 0) > 2.5)) ? ''700''
+                            : ''normal'''
+                  - component: text
+                    config:
+                      x: 540
+                      y: 567
+                      content: '=''Heizstab '' + ((items[props.heatpumpBuhStep1Mode].state === ''ON'' || items[props.heatpumpBuhStep2Mode].state
+                        === ''ON'') ? ([''NULL'', ''UNDEF''].includes(items[props.heatpumpBuhPower].state) ? ''–'' : ((Number(items[props.heatpumpBuhPower].numericState)
+                        || 0) / 1000).toFixed(2).replace(''.'', '','') + '' kW'') : ''Aus'')'
                       fill: currentColor
                       font-size: 12
                       font-weight: normal
