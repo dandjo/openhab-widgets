@@ -220,7 +220,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Sep 30, 2026, 8:17:32 PM
+timestamp: Sep 30, 2026, 9:19:15 PM
 component: oh-card
 config:
   title: Wärmepumpe
@@ -1083,7 +1083,7 @@ slots:
                   - component: text
                     config:
                       x: 455.0
-                      y: 200.0
+                      y: 200.65
                       content: Heißgas
                       fill: currentColor
                       font-size: 11
@@ -1104,7 +1104,7 @@ slots:
                   - component: text
                     config:
                       x: 455.0
-                      y: 219.0
+                      y: 219.65
                       content: Flüssig
                       fill: currentColor
                       font-size: 11
@@ -1125,7 +1125,7 @@ slots:
                   - component: text
                     config:
                       x: 455.0
-                      y: 238.0
+                      y: 238.65
                       content: Druck
                       fill: currentColor
                       font-size: 11
