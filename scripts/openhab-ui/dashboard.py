@@ -202,6 +202,8 @@ ITEM_PROP_NAMES = {
     "huawei_inverter_energy_storage_day_discharge": "batteryDischargeToday", "home_active_power": "homePower",
     "home_ec_day": "homeEnergyToday", "photovoltaics_own_ec_day": "pvSelfUseToday", "epex_spot_awattar": "priceMarketNet",
     "espaltherma_electrical_power": "heatpumpPower", "espaltherma_heating_power": "heatpumpHeatPower",
+    "heatpump_power": "heatpumpCircuitPower", "espaltherma_electrical_power_buh": "heatpumpBuhPower",
+    "espaltherma_electrical_power_bsh": "heatpumpBshPower",
     "espaltherma_3way_valve_mode": "heatpumpValve", "pyaltherma_dhw_powerful": "heatpumpDhwBoost",
     "air_conditioning_timer": "acTimer", "espaltherma_refrig_temp_liquid_side": "heatpumpRefrigerantTemp",
     "espaltherma_refrigerant_pressure_sensor": "heatpumpRefrigerantPressure",
@@ -1254,6 +1256,12 @@ HPX = {  # heat pump items
     "indoor": "espaltherma_indoor_ambient_temp", "power": "espaltherma_electrical_power",
     "heat": "espaltherma_heating_power", "cop": "espaltherma_cop", "defrost": "espaltherma_defrost_operaton",
     "refrigerant": "espaltherma_refrig_temp_liquid_side", "pressure": "espaltherma_refrigerant_pressure_sensor",
+    # each device's own draw: the measured circuit of the outdoor unit, the nominal powers of the backup heater in the
+    # wall unit and of the booster heater in the tank; "power" is their sum
+    "circuit": "heatpump_power", "buh_power": "espaltherma_electrical_power_buh",
+    "bsh_power": "espaltherma_electrical_power_bsh",
+    # the water's heat after the backup heater, what the pipe from the wall unit carries to the valve
+    "water_heat": "espaltherma_heating_power_after_buh",
 }
 PUMP_ON = f"(items.{HPX['pump']}.state === 'ON' || {num(HPX['flow'])} > 0)"
 DHW_MODE = f"items.{HPX['valve']}.state === 'DHW'"
@@ -1365,6 +1373,39 @@ REFRIGERANT_X = 588
 HOUSE = 0.4  # outline opacity
 HP_VB = (92, 72, 526, BOTTOM + 60 - 72)  # viewBox: x, y, width, height; 7 units beside the house on both sides
 
+# the water's heat, measured after the backup heater: the pipe from the wall unit carries it to the valve, the tank's
+# booster heater adds its own behind that. Its badge is framed in a colour from its size: grey while idle, yellow up to
+# 2 kW, orange up to 5 kW, red above, blue while it is negative (a defrost draws heat from the water)
+WATER_HEAT = num(HPX["water_heat"])
+water_heat_color = (f"=['NULL', 'UNDEF'].includes(items.{HPX['water_heat']}.state) ? '#9e9e9e' : "
+                    f"{WATER_HEAT} < -50 ? '#64b5f6' : {WATER_HEAT} < 50 ? '#9e9e9e' : {WATER_HEAT} < 2000 ? '#fbc02d' : "
+                    f"{WATER_HEAT} < 5000 ? '#fb8c00' : '#e57373'")
+# the refrigerant's badge in its colour while the compressor runs, grey while it stands
+refrigerant_color = f"={COMPRESSOR} ? '{REFRIGERANT}' : '#9e9e9e'"
+ROOM_X = (VALVE[0] + REFRIGERANT_X) / 2  # the middle of the room right of the riser, where the badges sit
+# the ground floor's free middle, between the lower edge of its floor line (1.4 wide) and the upper edge of the
+# green ground level (3 wide)
+GROUND_MID = (FLOOR_1 + 0.7 + GROUND_LEVEL - 1.5) / 2
+
+
+def triangle(x, y, up, color, size=1):
+    """The leaving water's triangle pointing up, the inlet water's pointing down, its left corner at x, its base at y."""
+    w, h = 9 * size, 7.5 * size
+    tip = y - h if up else y + h
+    return svg("polygon", points=f"{x},{y} {x + w / 2},{tip} {x + w},{y}", fill=color)
+
+
+def hp_badge(cx, y, w, h, color, leader, rows):
+    """A framed badge centred on cx from y, sized w×h, faintly filled in `color`, with a dotted line in that colour
+    between `leader`'s two points (x1, y1, x2, y2), from its pipe to the badge; `rows` its contents."""
+    x1, y1, x2, y2 = leader
+    return [svg("line", x1=x1, y1=y1, x2=x2, y2=y2, stroke=color,
+                **{"stroke-width": 1.4, "stroke-dasharray": "2 3", "opacity": "0.8"}),
+            svg("rect", x=cx - w / 2, y=y, width=w, height=h, rx=10, stroke=color, fill=color,
+                **{"stroke-width": 1.5, "fill-opacity": "0.08"}),
+            *rows]
+
+
 hp_svg = svg("svg", [
     svg("defs", [grad("hpLoopV", [("0%", SUPPLY, "1"), ("100%", RETURN, "1")]),
                  grad("hpTank", [("0%", tank_top, "0.95"), ("100%", "#bbdefb", "0.85")])]),
@@ -1383,43 +1424,49 @@ hp_svg = svg("svg", [
     *hp_route(f"M{VALVE[0]},{GROUND_FH[1]} H{GROUND_FH[0] + 30}", SUPPLY, HEATING_FLOW, "1.6s"),
     *hp_route(f"M{VALVE[0]},{GROUND_LEVEL + 18} H{RADIATORS[0]} V{RADIATORS[1] - 30}", SUPPLY, HEATING_FLOW, "2s"),
     # devices where they are, drawn like the energy flow nodes
-    flow_node("heat-pump", OUT, num(HPX["power"])),
+    flow_node("heat-pump", OUT, num(HPX["circuit"])),
     *wall_unit_node(*WALL), *valve_node(*VALVE), *tank_node(*TANK),
     *radiator_node(*RADIATORS), *floor_node(*GROUND_FH), *floor_node(*UPPER_FH),
     # values beside their devices
     hp_text(OUT[0] - 38, OUT[1] - 22, f"='Außengerät · ' + {disp(HPX['outdoor'])}", 13, anchor="end", opacity="0.7"),
-    hp_text(OUT[0] - 38, OUT[1] - 2, f"={kw2(HPX['power'])} + ' · ' + {disp(HPX['hz'])}", 17, "700", anchor="end"),
+    hp_text(OUT[0] - 38, OUT[1] - 2, f"={kw2(HPX['circuit'])} + ' · ' + {disp(HPX['hz'])}", 17, "700", anchor="end"),
     svg("text", x=OUT[0] - 38, y=OUT[1] + 16, content="Defrosting", fill="#4fc3f7",
         visible=f"=items.{HPX['defrost']}.state === 'ON'", **{"font-size": 13, "text-anchor": "end"}),
-    # the refrigerant's temperature over its pressure left of its line, the three lines centred on the upper floor
-    hp_text(REFRIGERANT_X - 12, UPPER_Y - 12, f"={disp(HPX['refrigerant'])}", 16, "700", anchor="end", color=REFRIGERANT),
-    hp_text(REFRIGERANT_X - 12, UPPER_Y + 7, f"={disp(HPX['pressure'])}", 16, "700", anchor="end", color=REFRIGERANT),
-    hp_text(REFRIGERANT_X - 12, UPPER_Y + 24, "Kältemittel", 12, anchor="end", opacity="0.7"),
+    # the refrigerant's temperature over its pressure in a badge in the upper floor, a dotted line across to its line
+    *hp_badge(ROOM_X, UPPER_Y - 36, 100, 72, refrigerant_color, (ROOM_X + 50, UPPER_Y, REFRIGERANT_X - 1.5, UPPER_Y), [
+        hp_text(ROOM_X, UPPER_Y - 12, f"={disp(HPX['refrigerant'])}", 16, "700", color=REFRIGERANT),
+        hp_text(ROOM_X, UPPER_Y + 7, f"={disp(HPX['pressure'])}", 16, "700", color=REFRIGERANT),
+        hp_text(ROOM_X, UPPER_Y + 24, "Kältemittel", 12, opacity="0.7")]),
     hp_text(UPPER_FH[0] - 40, UPPER_Y - 6, "Upper Floor", 16, "700", anchor="end"),
     hp_text(UPPER_FH[0] - 40, UPPER_Y + 13, f"='Fußbodenheizung · ' + {disp('faikout_perfera_temperature')}", 12, anchor="end",
             opacity="0.7"),
     hp_text(GROUND_FH[0] - 40, GROUND_Y - 6, "Ground Floor", 16, "700", anchor="end"),
     hp_text(GROUND_FH[0] - 40, GROUND_Y + 13, f"='Fußbodenheizung · ' + {disp(HPX['indoor'])}", 12, anchor="end",
             opacity="0.7"),
-    # leaving water: red triangle up the riser; inlet water: blue triangle back down
-    svg("polygon", points=f"{VALVE[0] + 15},{GROUND_Y - 7} {VALVE[0] + 24},{GROUND_Y - 22} {VALVE[0] + 33},{GROUND_Y - 7}",
-        fill=SUPPLY),
-    hp_text(VALVE[0] + 40, GROUND_Y - 7, f"={disp(HPX['supply'])}", 20, "700", anchor="start", color=SUPPLY),
-    svg("polygon", points=f"{VALVE[0] + 15},{GROUND_Y + 7} {VALVE[0] + 24},{GROUND_Y + 22} {VALVE[0] + 33},{GROUND_Y + 7}",
-        fill=RETURN),
-    hp_text(VALVE[0] + 40, GROUND_Y + 23, f"={disp(HPX['return'])}", 20, "700", anchor="start", color=RETURN),
     hp_text(VALVE[0], VALVE[1] + 47, f"={DHW_MODE} ? 'Warmwasser' : 'Heizung'", 14, "700", color="#ffa726"),
-    # the tank's temperature and the indoor unit's heating power below them, on the valve's line
+    # the tank's temperature below it, on the valve's line
     hp_text(TANK[0], TANK[1] + 47, f"={disp(HPX['tank'])}", 14, "700", color=tank_text),
-    hp_text(WALL[0], WALL[1] + 47, f"={kw2(HPX['heat'])}", 14, "700", color=SUPPLY),
+    # the sum of all electrical consumers below the wall unit
+    hp_text(WALL[0], WALL[1] + 47, f"={kw2(HPX['power'])}", 14, "700", color="#fb8c00"),
+    # the water's heat over its leaving and inlet temperatures in a badge in the ground floor, a dotted line from the
+    # middle of the pipe between wall unit and valve up to it
+    *hp_badge(ROOM_X, GROUND_MID - 47, 100, 94, water_heat_color,
+              ((VALVE[0] + WALL[0]) / 2, WALL[1] - 3, ROOM_X, GROUND_MID + 47), [
+        hp_text(ROOM_X, GROUND_MID - 22, f"={kw2(HPX['water_heat'])}", 18, "700"),
+        triangle(ROOM_X - 35, GROUND_MID - 1, True, SUPPLY, 1.1),
+        hp_text(ROOM_X - 21, GROUND_MID - 1, f"={disp(HPX['supply'])}", 16, "700", anchor="start", color=SUPPLY),
+        triangle(ROOM_X - 35, GROUND_MID + 7, False, RETURN, 1.1),
+        hp_text(ROOM_X - 21, GROUND_MID + 18, f"={disp(HPX['return'])}", 16, "700", anchor="start", color=RETURN),
+        hp_text(ROOM_X, GROUND_MID + 35, "Wärme", 12, opacity="0.7")]),
     hp_text(RADIATORS[0] - 40, BASEMENT_Y - 6, "Basement", 16, "700", anchor="end"),
     hp_text(RADIATORS[0] - 40, BASEMENT_Y + 13, "Radiators", 12, anchor="end", opacity="0.7"),
     # the tank's and the indoor unit's names and details, centred below them
     hp_text(TANK[0], BOTTOM + 30, "Warmwasserspeicher", 15, "700"),
-    hp_text(TANK[0], BOTTOM + 50, f"='Soll ' + {disp(HPX['tank_set'])} + ' · Zusatzheizung ' + ({BSH_ON} ? 'An' : 'Aus')", 12,
-            opacity="0.7"),
+    hp_text(TANK[0], BOTTOM + 50, f"='Soll ' + {disp(HPX['tank_set'])} + ' · Zusatzheizung ' + ({BSH_ON} ? "
+            f"{kw2(HPX['bsh_power'])} : 'Aus')", 12, opacity="0.7"),
     hp_text(WALL[0], BOTTOM + 30, "Innengerät", 15, "700"),
-    hp_text(WALL[0], BOTTOM + 50, f"={disp(HPX['flow'])} + ' · Heizstab ' + ({BUH_ON} ? 'An' : 'Aus')", 12, opacity="0.7"),
+    hp_text(WALL[0], BOTTOM + 50, f"={disp(HPX['flow'])} + ' · Heizstab ' + ({BUH_ON} ? {kw2(HPX['buh_power'])} : 'Aus')", 12,
+            opacity="0.7"),
 ], viewBox=" ".join(map(str, HP_VB)), width="100%", style={"display": "block", "overflow": "visible"})
 
 
@@ -2865,7 +2912,7 @@ TILE_ITEM_TYPES = {
                "miele_tumble_dryer_twc560wp_program_remaining_time miele_washing_machine_wwg360_program_elapsed_time "
                "miele_washing_machine_wwg360_program_remaining_time netatmo_outdoor_signal_strength "
                "netatmo_weatherstation_noise netatmo_weatherstation_signal_strength zzpfx_power_factor"),
-    "Power": ("air_conditioning_unit_power dishwasher_power e_car_power espaltherma_electrical_power "
+    "Power": ("air_conditioning_unit_power dishwasher_power e_car_power espaltherma_electrical_power heatpump_power "
               "espaltherma_electrical_power_dhw espaltherma_electrical_power_space "
               "espaltherma_electrical_power_standby espaltherma_heating_power espaltherma_heating_power_after_buh "
               "espaltherma_heating_power_before_buh espaltherma_heating_power_dhw espaltherma_heating_power_space "
@@ -3367,7 +3414,7 @@ LW_OFFSET = lw_offset(row=True)
 HP_POPUPS = {
     "outdoor_unit": ("Outdoor Unit", [
         card("Now", [tile_grid([
-            value_tile("Electrical", f"={disp(HPX['power'])}", color="#fb8c00"),
+            value_tile("Electrical", f"={disp(HPX['circuit'])}", color="#fb8c00"),
             value_tile("Compressor", f"={disp(HPX['hz'])}"),
             value_tile("Inverter Current", f"={disp('espaltherma_inv_primary_current')}"),
             value_tile("Operation", f"={disp('espaltherma_operation_mode')}"),
@@ -3377,7 +3424,7 @@ HP_POPUPS = {
             value_tile("Heat Exchanger", f"={disp('espaltherma_heat_exchanger_mid_temp')}"),
             value_tile("Refrigerant", f"={disp('espaltherma_refrigerant_pressure_sensor')}")])]),
         card("Controls", [controls_box(smart_grid_section(row=True))]),
-        card("Today", [day_chart([area("Electrical", HPX["power"], "#fb8c00"),
+        card("Today", [day_chart([area("Electrical", HPX["circuit"], "#fb8c00"),
                                   line("Compressor", HPX["hz"], "#8d6e63", y=1)],
                                  [value_axis("W"), value_axis("Hz", splitLine={"show": False})])]),
     ]),
