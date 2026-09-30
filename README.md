@@ -303,7 +303,7 @@ Needs `flow-node`, `item-popup`, `value-tile`.
 ![Heat pump in dark mode](screenshots/heatpump-card-dark.png)
 
 <details>
-<summary>35 props</summary>
+<summary>36 props</summary>
 
 | Prop | Item | Item type |
 |---|---|---|
@@ -329,6 +329,7 @@ Needs `flow-node`, `item-popup`, `value-tile`.
 | `heatpumpInletWaterTemp` | ESPAltherma Rücklauftemperatur | Number:Temperature |
 | `heatpumpDhwSetpoint` | ESPAltherma Warmwasser Sollwert | Number:Temperature |
 | `heatpumpBshPower` | ESPAltherma Elektrische Leistung Zusatzheizung | Number:Power |
+| `heatpumpWaterPressure` | ESPAltherma Wasserdruck | Number:Pressure |
 | `heatpumpBuhPower` | ESPAltherma Elektrische Leistung Heizstab | Number:Power |
 | `heatpumpHeatPower` | ESPAltherma Heizleistung | Number:Power |
 | `heatpumpCop` | ESPAltherma COP | Number |
