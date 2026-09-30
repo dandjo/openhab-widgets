@@ -289,8 +289,10 @@ orange and red by price.
 
 A section through the house: outdoor unit on the roof (the energy flow's `flow-node`), wall unit, three-way valve and
 DHW tank in the basement, floor heating and radiators on their levels, with the flow animated along the pipes as the
-valve decides, the refrigerant's temperature and pressure beside its line, the tank's temperature below it in a colour
-from blue to red, powers in kW. Beside it the power, today's energies split into space heating, DHW and standby, and
+valve decides. Two framed badges, each joined to its pipe by a dotted line, hold the refrigerant's temperature and
+pressure (violet while the compressor runs) and the water's heat with its leaving and inlet temperatures (coloured by
+that heat); the tank's temperature stands below it in a colour from blue to red, the sum of all electrical consumers
+below the wall unit, powers in kW. Beside it the power, today's energies split into space heating, DHW and standby, and
 daily COPs. On a phone the drawing takes the card's width; on a wider screen it stands at most at its own size, as the
 energy flow does, so their texts keep the UI's sizes and their circles come out the same.
 
@@ -301,7 +303,7 @@ Needs `flow-node`, `item-popup`, `value-tile`.
 ![Heat pump in dark mode](screenshots/heatpump-card-dark.png)
 
 <details>
-<summary>30 props</summary>
+<summary>34 props</summary>
 
 | Prop | Item | Item type |
 |---|---|---|
@@ -310,7 +312,7 @@ Needs `flow-node`, `item-popup`, `value-tile`.
 | `heatpumpWaterPumpOperation` | ESPAltherma Umwälzpumpe | Switch |
 | `heatpumpFlowSensor` | ESPAltherma Durchfluss | Number:VolumetricFlowRate |
 | `heatpumpValve` | ESPAltherma 3-Wege-Ventil | String |
-| `heatpumpPower` | ESPAltherma Elektrische Leistung | Number:Power |
+| `heatpumpCircuitPower` | Wärmepumpe Leistung | Number:Power |
 | `heatpumpBuhStep1Mode` | ESPAltherma Heizstab Stufe 1 | Switch |
 | `heatpumpBuhStep2Mode` | ESPAltherma Heizstab Stufe 2 | Switch |
 | `heatpumpBshMode` | ESPAltherma Zusatzheizung Speicher | Switch |
@@ -320,10 +322,14 @@ Needs `flow-node`, `item-popup`, `value-tile`.
 | `heatpumpRefrigerantPressure` | ESPAltherma Kältemitteldruck | Number:Pressure |
 | `acTemperature` | Faikout Perfera Temperatur | Number:Temperature |
 | `heatpumpIndoorAmbientTemp` | ESPAltherma Raumtemperatur | Number:Temperature |
+| `heatpumpPower` | ESPAltherma Elektrische Leistung | Number:Power |
+| `heatpumpHeatingPowerAfterBuh` | ESPAltherma Heizleistung nach Heizstab | Number:Power |
 | `heatpumpLeavingWaterTempAfterBuh` | ESPAltherma Vorlauftemperatur nach Heizstab | Number:Temperature |
 | `heatpumpInletWaterTemp` | ESPAltherma Rücklauftemperatur | Number:Temperature |
-| `heatpumpHeatPower` | ESPAltherma Heizleistung | Number:Power |
 | `heatpumpDhwSetpoint` | ESPAltherma Warmwasser Sollwert | Number:Temperature |
+| `heatpumpBshPower` | ESPAltherma Elektrische Leistung Zusatzheizung | Number:Power |
+| `heatpumpBuhPower` | ESPAltherma Elektrische Leistung Heizstab | Number:Power |
+| `heatpumpHeatPower` | ESPAltherma Heizleistung | Number:Power |
 | `heatpumpCop` | ESPAltherma COP | Number |
 | `heatpumpEnergyToday` | ESPAltherma Energie heute | Number:Energy |
 | `heatpumpEnergySpaceToday` | ESPAltherma Energie Heizung heute | Number:Energy |

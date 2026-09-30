@@ -39,9 +39,11 @@ OVERVIEW = [
      "12 hours back and 36 hours ahead, coloured green, orange and red by price."),
     ("heatpump-card", "Heat pump", "A section through the house: outdoor unit on the roof (the energy flow's "
      "`flow-node`), wall unit, three-way valve and DHW tank in the basement, floor heating and radiators on their "
-     "levels, with the flow animated along the pipes as the valve decides, the refrigerant's temperature and pressure "
-     "beside its line, the tank's temperature below it in a colour from blue to red, powers in kW. Beside it the power, "
-     "today's energies split "
+     "levels, with the flow animated along the pipes as the valve decides. Two framed badges, each joined to its pipe "
+     "by a dotted line, hold the refrigerant's temperature and pressure (violet while the compressor runs) and the "
+     "water's heat with its leaving and inlet temperatures (coloured by that heat); the tank's temperature stands "
+     "below it in a colour from blue to red, the sum of all electrical consumers below the wall unit, powers in kW. "
+     "Beside it the power, today's energies split "
      "into space heating, DHW and standby, and daily COPs. On a phone the drawing takes the card's width; on a wider "
      "screen it stands at most at its own size, as the energy flow does, so their texts keep the UI's sizes and "
      "their circles come out the same."),
