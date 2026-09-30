@@ -220,7 +220,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Sep 30, 2026, 4:18:44 PM
+timestamp: Sep 30, 2026, 4:40:27 PM
 component: oh-card
 config:
   title: Wärmepumpe
@@ -1061,7 +1061,7 @@ slots:
                       visible: =items[props.heatpumpDefrostOperaton].state === 'ON'
                   - component: line
                     config:
-                      x1: 573.0
+                      x1: 576.0
                       y1: 216
                       x2: 586.5
                       y2: 216
@@ -1071,9 +1071,9 @@ slots:
                       opacity: '0.8'
                   - component: rect
                     config:
-                      x: 449.0
+                      x: 446.0
                       y: 171
-                      width: 124
+                      width: 130
                       height: 90
                       rx: 10
                       stroke: '=(Number(items[props.heatpumpInvFrequency].numericState) || 0) > 0 ? ''#ba68c8'' : ''#9e9e9e'''
@@ -1082,7 +1082,7 @@ slots:
                       fill-opacity: '0.08'
                   - component: text
                     config:
-                      x: 458.0
+                      x: 455.0
                       y: 191.5
                       content: Heißgas
                       fill: currentColor
@@ -1092,7 +1092,7 @@ slots:
                       opacity: '0.7'
                   - component: text
                     config:
-                      x: 564.0
+                      x: 567.0
                       y: 194
                       content: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpDischargePipeTemp].state) ? ''–'' : (items[props.heatpumpDischargePipeTemp].displayState
                         || items[props.heatpumpDischargePipeTemp].state))'
@@ -1103,7 +1103,7 @@ slots:
                       opacity: '1'
                   - component: text
                     config:
-                      x: 458.0
+                      x: 455.0
                       y: 210.5
                       content: Flüssig
                       fill: currentColor
@@ -1113,7 +1113,7 @@ slots:
                       opacity: '0.7'
                   - component: text
                     config:
-                      x: 564.0
+                      x: 567.0
                       y: 213
                       content: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpRefrigerantTemp].state) ? ''–'' : (items[props.heatpumpRefrigerantTemp].displayState
                         || items[props.heatpumpRefrigerantTemp].state))'
@@ -1124,7 +1124,7 @@ slots:
                       opacity: '1'
                   - component: text
                     config:
-                      x: 458.0
+                      x: 455.0
                       y: 229.5
                       content: Druck
                       fill: currentColor
@@ -1134,7 +1134,7 @@ slots:
                       opacity: '0.7'
                   - component: text
                     config:
-                      x: 564.0
+                      x: 567.0
                       y: 232
                       content: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpRefrigerantPressure].state) ? ''–'' :
                         (items[props.heatpumpRefrigerantPressure].displayState || items[props.heatpumpRefrigerantPressure].state))'
@@ -1246,9 +1246,9 @@ slots:
                       opacity: '0.8'
                   - component: rect
                     config:
-                      x: 449.0
+                      x: 446.0
                       y: 280.6
-                      width: 124
+                      width: 130
                       height: 94
                       rx: 10
                       stroke: '=[''NULL'', ''UNDEF''].includes(items[props.heatpumpHeatingPowerAfterBuh].state) ? ''#9e9e9e''
