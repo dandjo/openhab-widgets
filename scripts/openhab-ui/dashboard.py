@@ -1307,11 +1307,16 @@ tank_text = (f"=['NULL', 'UNDEF'].includes(items.{HPX['tank']}.state) ? 'current
 
 
 def tank_node(cx, cy):
-    """TWL tank shaded from its temperature colour at the top to cool blue, Effect Heater lit on its side."""
+    """TWL tank shaded from its temperature colour at the top to cool blue; the Effect Heater stands beside it, as it
+    is mounted, joined by its two pipes: cold water from the tank's bottom into its foot, hot water from its head back
+    into the tank's top. While it heats it is lit and its pipes run blue and red."""
+    on = BSH_ON
     return [ring(cx, cy, "#e57373"),
-            svg("rect", x=cx - 8, y=cy - 17, width=18, height=34, rx=9, **stroke(1.5, fill="url(#hpTank)")),
-            svg("rect", x=cx - 14, y=cy - 6, width=5, height=12, rx=1.5,
-                **stroke(1.2, fill=f"={BSH_ON} ? '#ff8a65' : 'none'"))]
+            svg("rect", x=cx - 15, y=cy - 17, width=16, height=34, rx=8, **stroke(1.5, fill="url(#hpTank)")),
+            svg("path", d=f"M{cx + 1},{cy + 9} H{cx + 8}", **stroke(1.4, f"={on} ? '{RETURN}' : 'currentColor'")),
+            svg("path", d=f"M{cx + 11.5},{cy - 6} V{cy - 12} H{cx + 0.5}",
+                **stroke(1.4, f"={on} ? '{SUPPLY}' : 'currentColor'", **{"stroke-linejoin": "round"})),
+            svg("rect", x=cx + 8, y=cy - 6, width=7, height=18, rx=3.5, **stroke(1.2, fill=f"={on} ? '#ff8a65' : 'none'"))]
 
 
 def floor_node(cx, cy):
