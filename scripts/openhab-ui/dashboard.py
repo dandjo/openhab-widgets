@@ -1392,7 +1392,7 @@ refrigerant_color = f"={COMPRESSOR} ? '{REFRIGERANT}' : '#9e9e9e'"
 WATER_PRESSURE_BAD = (f"(!['NULL', 'UNDEF'].includes(items.{HPX['water_pressure']}.state) && "
                       f"({num(HPX['water_pressure'])} < 1 || {num(HPX['water_pressure'])} > 2.5))")
 ROOM_X = (VALVE[0] + REFRIGERANT_X) / 2  # the middle of the room right of the riser, where the badges sit
-BADGE_W = 124  # both badges, wide enough for a label and its value side by side
+BADGE_W = 130  # both badges, wide enough for a label and its value side by side
 # the ground floor's free middle, between the lower edge of its floor line (1.4 wide) and the upper edge of the
 # green ground level (3 wide)
 GROUND_MID = (FLOOR_1 + 0.7 + GROUND_LEVEL - 1.5) / 2
