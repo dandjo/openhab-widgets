@@ -916,18 +916,19 @@ def wx_degrees(item):
     return f"({ok(item)} ? Math.round(Number(items.{item}.numericState)) + '°' : '–')"
 
 
-def wx_min_max(low, high, size="13px"):
-    """A day's minimum pale and maximum bold, as texts."""
-    return div([label(f"={low}", **{"opacity": "0.65"}), label("/", **{"opacity": "0.35"}),
-                label(f"={high}", **{"font-weight": "700"})],
-               **{"display": "flex", "gap": "3px", "font-size": size, "line-height": "18px", "white-space": "nowrap"})
-
-
 def wx_day(day):
-    """A day of the bar: its name, the minimum pale and the maximum bold."""
+    """A day of the bar: its name above the day's weather drawn beside its maximum bold over its minimum pale, as in
+    the forecast's day rows; the drawing is the day's symbol from the forecast's days (weather_daily), by its date,
+    and nothing while the forecast has no such day."""
     name = "'Heute'" if day == 0 else f"{WX_WEEKDAYS}[dayjs().add({day}, 'day').day()]"
+    symbol = (f"({wx_json(WX_DAILY)}.find((d) => dayjs(d.t * 1000).isSame(dayjs().add({day}, 'day'), 'day')) "
+              f"|| {{}}).sym")
+    temps = div([label(f"={wx_degrees(wx_item(day, 'max'))}", **{"font-weight": "700", "line-height": "15px"}),
+                 label(f"={wx_degrees(wx_item(day, 'min'))}",
+                       **{"font-size": "11px", "opacity": "0.65", "line-height": "13px"})],
+                **{"display": "flex", "flex-direction": "column", "font-size": "13px", "white-space": "nowrap"})
     return div([label(f"={name}", **{"font-size": "11px", "opacity": "0.65", "line-height": "14px"}),
-                wx_min_max(wx_degrees(wx_item(day, 'min')), wx_degrees(wx_item(day, 'max')))],
+                div([weather_icon(symbol, "true", 24), temps], **{"display": "flex", "align-items": "center", "gap": "3px"})],
                **{"display": "flex", "flex-direction": "column", "align-items": "center"})
 
 
@@ -946,8 +947,8 @@ WEATHER_POPUP = "forecast"
 def weather_card():
     """The weather as a slim bar across the overview: the present weather drawn, the outdoor temperature with a
     warning teased beside it while one is in effect or near, and the minimum and maximum of today and the next two
-    days; a tap opens the forecast in a popup. On a phone the gaps narrow, and below 380 px the chevron goes, so the
-    teaser fits beside the days."""
+    days, each with its weather drawn; a tap opens the forecast in a popup. On a phone the gaps narrow, and below 380 px
+    the chevron goes, so the teaser fits beside the days."""
     narrow = "screen.width < 600"
     now = div([weather_icon(f"items.{WX_NOW}.state", f"items.{WX_DAY}.state !== 'OFF'", 36),
                div([label(f"={disp(OUTDOOR)}", **{"font-size": "18px", "font-weight": "700", "line-height": "22px",

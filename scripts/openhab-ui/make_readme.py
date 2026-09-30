@@ -5,9 +5,10 @@ W = {f[:-4]: yaml.safe_load(open(os.path.join(EXPORT, f))) for f in os.listdir(E
 
 OVERVIEW = [
     ("weather-card", "Weather", "A slim bar across the top: the present weather drawn in the style of the energy "
-     "flow (`weather-icon`: sun or moon, alone or behind a cloud, clouds with rain, snow, a bolt or fog, gently "
-     "animated), the outdoor temperature from a local sensor, and the minimum and maximum of today and the next two "
-     "days. While an official warning of GeoSphere Austria is in effect or begins within 24 hours, it is teased "
+     "flow (`weather-icon`: sun or moon, clear, behind one or two clouds or veil streaks, clouds with rain, snow, a "
+     "bolt or fog, the sun peeking out for showers, gently "
+     "animated), the outdoor temperature from a local sensor, and today and the next two days, each with its weather "
+     "drawn beside its maximum over its minimum. While an official warning of GeoSphere Austria is in effect or begins within 24 hours, it is teased "
      "beside the temperature: a disc in its level's colour (yellow, orange, red) with an exclamation mark and a ring "
      "pulsing out of it, on a wider screen in a pill with the warning's short text (*Gewitter bis 20:00*). On a "
      "phone the gaps narrow, and below 380 px the chevron goes, so the bar keeps its fit. A tap opens the forecast popup of "

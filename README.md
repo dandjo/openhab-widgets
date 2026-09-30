@@ -78,13 +78,14 @@ elements open popup pages of my installation when tapped (`page:flow_*`, `page:h
 
 ### Weather: `weather-card`
 
-A slim bar across the top: the present weather drawn in the style of the energy flow (`weather-icon`: sun or moon, alone
-or behind a cloud, clouds with rain, snow, a bolt or fog, gently animated), the outdoor temperature from a local sensor,
-and the minimum and maximum of today and the next two days. While an official warning of GeoSphere Austria is in effect
-or begins within 24 hours, it is teased beside the temperature: a disc in its level's colour (yellow, orange, red) with
-an exclamation mark and a ring pulsing out of it, on a wider screen in a pill with the warning's short text (*Gewitter
-bis 20:00*). On a phone the gaps narrow, and below 380 px the chevron goes, so the bar keeps its fit. A tap opens the
-forecast popup of my installation (see [Weather](#weather)). Its items come from two rules,
+A slim bar across the top: the present weather drawn in the style of the energy flow (`weather-icon`: sun or moon,
+clear, behind one or two clouds or veil streaks, clouds with rain, snow, a bolt or fog, the sun peeking out for showers,
+gently animated), the outdoor temperature from a local sensor, and today and the next two days, each with its weather
+drawn beside its maximum over its minimum. While an official warning of GeoSphere Austria is in effect or begins within
+24 hours, it is teased beside the temperature: a disc in its level's colour (yellow, orange, red) with an exclamation
+mark and a ring pulsing out of it, on a wider screen in a pill with the warning's short text (*Gewitter bis 20:00*). On
+a phone the gaps narrow, and below 380 px the chevron goes, so the bar keeps its fit. A tap opens the forecast popup of
+my installation (see [Weather](#weather)). Its items come from two rules,
 `scripts/openhab-ui/applied/weather_forecast_rule.js`, which reads Open-Meteo's GeoSphere AROME Austria model, and
 `weather_warnings_rule.js`, which reads GeoSphere Austria's warnings and sends a broadcast notification when their level
 rises to orange or red.
@@ -96,7 +97,7 @@ Needs `weather-icon`.
 ![Weather in dark mode](screenshots/weather-card-dark.png)
 
 <details>
-<summary>11 props</summary>
+<summary>12 props</summary>
 
 | Prop | Item | Item type |
 |---|---|---|
@@ -105,12 +106,13 @@ Needs `weather-icon`.
 | `heatpumpExtAmbientTemp` | ESPAltherma Außentemperatur | Number:Temperature |
 | `weatherWarningLevel` | Wetterwarnung Stufe | Number |
 | `weatherWarningText` | Wetterwarnung | String |
-| `weatherDay0Min` | Wetter heute Min. | Number:Temperature |
+| `weatherDaily` | Wetter Tagesprognose | String |
 | `weatherDay0Max` | Wetter heute Max. | Number:Temperature |
-| `weatherDay1Min` | Wetter morgen Min. | Number:Temperature |
+| `weatherDay0Min` | Wetter heute Min. | Number:Temperature |
 | `weatherDay1Max` | Wetter morgen Max. | Number:Temperature |
-| `weatherDay2Min` | Wetter übermorgen Min. | Number:Temperature |
+| `weatherDay1Min` | Wetter morgen Min. | Number:Temperature |
 | `weatherDay2Max` | Wetter übermorgen Max. | Number:Temperature |
+| `weatherDay2Min` | Wetter übermorgen Min. | Number:Temperature |
 
 </details>
 

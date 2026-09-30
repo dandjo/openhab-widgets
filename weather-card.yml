@@ -33,9 +33,9 @@ props:
     type: TEXT
     required: true
     context: item
-  - name: weatherDay0Min
-    label: Wetter heute Min.
-    description: Number:Temperature item
+  - name: weatherDaily
+    label: Wetter Tagesprognose
+    description: String item
     type: TEXT
     required: true
     context: item
@@ -45,8 +45,8 @@ props:
     type: TEXT
     required: true
     context: item
-  - name: weatherDay1Min
-    label: Wetter morgen Min.
+  - name: weatherDay0Min
+    label: Wetter heute Min.
     description: Number:Temperature item
     type: TEXT
     required: true
@@ -57,8 +57,8 @@ props:
     type: TEXT
     required: true
     context: item
-  - name: weatherDay2Min
-    label: Wetter übermorgen Min.
+  - name: weatherDay1Min
+    label: Wetter morgen Min.
     description: Number:Temperature item
     type: TEXT
     required: true
@@ -69,8 +69,14 @@ props:
     type: TEXT
     required: true
     context: item
+  - name: weatherDay2Min
+    label: Wetter übermorgen Min.
+    description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
   parameterGroups: []
-timestamp: Sep 29, 2026, 11:22:19 PM
+timestamp: Sep 30, 2026, 3:06:57 AM
 component: oh-card
 config:
   contentStyle:
@@ -226,29 +232,40 @@ slots:
                 config:
                   style:
                     display: flex
+                    align-items: center
                     gap: 3px
-                    font-size: 13px
-                    line-height: 18px
-                    white-space: nowrap
                 slots:
                   default:
-                  - component: Label
+                  - component: widget:weather-icon
                     config:
-                      text: '=((items[props.weatherDay0Min].state !== ''UNDEF'' && items[props.weatherDay0Min].state !== ''NULL'')
-                        ? Math.round(Number(items[props.weatherDay0Min].numericState)) + ''°'' : ''–'')'
-                      style:
-                        opacity: '0.65'
-                  - component: Label
+                      symbol: '=((('''' + items[props.weatherDaily].state).startsWith(''['') ? JSON.parse(items[props.weatherDaily].state)
+                        : []).find((d) => dayjs(d.t * 1000).isSame(dayjs().add(0, ''day''), ''day'')) || {}).sym'
+                      day: =true
+                      size: 24
+                  - component: div
                     config:
-                      text: /
                       style:
-                        opacity: '0.35'
-                  - component: Label
-                    config:
-                      text: '=((items[props.weatherDay0Max].state !== ''UNDEF'' && items[props.weatherDay0Max].state !== ''NULL'')
-                        ? Math.round(Number(items[props.weatherDay0Max].numericState)) + ''°'' : ''–'')'
-                      style:
-                        font-weight: '700'
+                        display: flex
+                        flex-direction: column
+                        font-size: 13px
+                        white-space: nowrap
+                    slots:
+                      default:
+                      - component: Label
+                        config:
+                          text: '=((items[props.weatherDay0Max].state !== ''UNDEF'' && items[props.weatherDay0Max].state !==
+                            ''NULL'') ? Math.round(Number(items[props.weatherDay0Max].numericState)) + ''°'' : ''–'')'
+                          style:
+                            font-weight: '700'
+                            line-height: 15px
+                      - component: Label
+                        config:
+                          text: '=((items[props.weatherDay0Min].state !== ''UNDEF'' && items[props.weatherDay0Min].state !==
+                            ''NULL'') ? Math.round(Number(items[props.weatherDay0Min].numericState)) + ''°'' : ''–'')'
+                          style:
+                            font-size: 11px
+                            opacity: '0.65'
+                            line-height: 13px
           - component: div
             config:
               style:
@@ -268,29 +285,40 @@ slots:
                 config:
                   style:
                     display: flex
+                    align-items: center
                     gap: 3px
-                    font-size: 13px
-                    line-height: 18px
-                    white-space: nowrap
                 slots:
                   default:
-                  - component: Label
+                  - component: widget:weather-icon
                     config:
-                      text: '=((items[props.weatherDay1Min].state !== ''UNDEF'' && items[props.weatherDay1Min].state !== ''NULL'')
-                        ? Math.round(Number(items[props.weatherDay1Min].numericState)) + ''°'' : ''–'')'
-                      style:
-                        opacity: '0.65'
-                  - component: Label
+                      symbol: '=((('''' + items[props.weatherDaily].state).startsWith(''['') ? JSON.parse(items[props.weatherDaily].state)
+                        : []).find((d) => dayjs(d.t * 1000).isSame(dayjs().add(1, ''day''), ''day'')) || {}).sym'
+                      day: =true
+                      size: 24
+                  - component: div
                     config:
-                      text: /
                       style:
-                        opacity: '0.35'
-                  - component: Label
-                    config:
-                      text: '=((items[props.weatherDay1Max].state !== ''UNDEF'' && items[props.weatherDay1Max].state !== ''NULL'')
-                        ? Math.round(Number(items[props.weatherDay1Max].numericState)) + ''°'' : ''–'')'
-                      style:
-                        font-weight: '700'
+                        display: flex
+                        flex-direction: column
+                        font-size: 13px
+                        white-space: nowrap
+                    slots:
+                      default:
+                      - component: Label
+                        config:
+                          text: '=((items[props.weatherDay1Max].state !== ''UNDEF'' && items[props.weatherDay1Max].state !==
+                            ''NULL'') ? Math.round(Number(items[props.weatherDay1Max].numericState)) + ''°'' : ''–'')'
+                          style:
+                            font-weight: '700'
+                            line-height: 15px
+                      - component: Label
+                        config:
+                          text: '=((items[props.weatherDay1Min].state !== ''UNDEF'' && items[props.weatherDay1Min].state !==
+                            ''NULL'') ? Math.round(Number(items[props.weatherDay1Min].numericState)) + ''°'' : ''–'')'
+                          style:
+                            font-size: 11px
+                            opacity: '0.65'
+                            line-height: 13px
           - component: div
             config:
               style:
@@ -310,29 +338,40 @@ slots:
                 config:
                   style:
                     display: flex
+                    align-items: center
                     gap: 3px
-                    font-size: 13px
-                    line-height: 18px
-                    white-space: nowrap
                 slots:
                   default:
-                  - component: Label
+                  - component: widget:weather-icon
                     config:
-                      text: '=((items[props.weatherDay2Min].state !== ''UNDEF'' && items[props.weatherDay2Min].state !== ''NULL'')
-                        ? Math.round(Number(items[props.weatherDay2Min].numericState)) + ''°'' : ''–'')'
-                      style:
-                        opacity: '0.65'
-                  - component: Label
+                      symbol: '=((('''' + items[props.weatherDaily].state).startsWith(''['') ? JSON.parse(items[props.weatherDaily].state)
+                        : []).find((d) => dayjs(d.t * 1000).isSame(dayjs().add(2, ''day''), ''day'')) || {}).sym'
+                      day: =true
+                      size: 24
+                  - component: div
                     config:
-                      text: /
                       style:
-                        opacity: '0.35'
-                  - component: Label
-                    config:
-                      text: '=((items[props.weatherDay2Max].state !== ''UNDEF'' && items[props.weatherDay2Max].state !== ''NULL'')
-                        ? Math.round(Number(items[props.weatherDay2Max].numericState)) + ''°'' : ''–'')'
-                      style:
-                        font-weight: '700'
+                        display: flex
+                        flex-direction: column
+                        font-size: 13px
+                        white-space: nowrap
+                    slots:
+                      default:
+                      - component: Label
+                        config:
+                          text: '=((items[props.weatherDay2Max].state !== ''UNDEF'' && items[props.weatherDay2Max].state !==
+                            ''NULL'') ? Math.round(Number(items[props.weatherDay2Max].numericState)) + ''°'' : ''–'')'
+                          style:
+                            font-weight: '700'
+                            line-height: 15px
+                      - component: Label
+                        config:
+                          text: '=((items[props.weatherDay2Min].state !== ''UNDEF'' && items[props.weatherDay2Min].state !==
+                            ''NULL'') ? Math.round(Number(items[props.weatherDay2Min].numericState)) + ''°'' : ''–'')'
+                          style:
+                            font-size: 11px
+                            opacity: '0.65'
+                            line-height: 13px
       - component: oh-icon
         config:
           icon: f7:chevron_right
