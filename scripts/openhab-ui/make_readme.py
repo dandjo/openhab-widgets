@@ -40,7 +40,7 @@ OVERVIEW = [
     ("heatpump-card", "Heat pump", "A section through the house: outdoor unit on the roof (the energy flow's "
      "`flow-node`), wall unit, three-way valve and DHW tank in the basement, floor heating and radiators on their "
      "levels, with the flow animated along the pipes as the valve decides. Two framed badges, each joined to its pipe "
-     "by a dotted line, hold the refrigerant's temperature and pressure (violet while the compressor runs) and the "
+     "by a dotted line, hold the refrigerant's hot gas, liquid and pressure (violet while the compressor runs) and the "
      "water's heat with its leaving and inlet temperatures (coloured by that heat); the tank's temperature stands "
      "below it in a colour from blue to red, the sum of all electrical consumers below the wall unit, powers in kW. "
      "Beside it the power, today's energies split "

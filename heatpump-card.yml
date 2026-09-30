@@ -69,6 +69,12 @@ props:
     type: TEXT
     required: true
     context: item
+  - name: heatpumpDischargePipeTemp
+    label: ESPAltherma Heißgastemperatur
+    description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
   - name: heatpumpRefrigerantTemp
     label: ESPAltherma Kältemittel flüssig
     description: Number:Temperature item
@@ -208,7 +214,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Sep 30, 2026, 2:44:39 PM
+timestamp: Sep 30, 2026, 3:41:16 PM
 component: oh-card
 config:
   title: Wärmepumpe
@@ -1049,7 +1055,7 @@ slots:
                       visible: =items[props.heatpumpDefrostOperaton].state === 'ON'
                   - component: line
                     config:
-                      x1: 561.0
+                      x1: 573.0
                       y1: 216
                       x2: 586.5
                       y2: 216
@@ -1059,10 +1065,10 @@ slots:
                       opacity: '0.8'
                   - component: rect
                     config:
-                      x: 461.0
-                      y: 180
-                      width: 100
-                      height: 72
+                      x: 449.0
+                      y: 171
+                      width: 124
+                      height: 90
                       rx: 10
                       stroke: '=(Number(items[props.heatpumpInvFrequency].numericState) || 0) > 0 ? ''#ba68c8'' : ''#9e9e9e'''
                       fill: '=(Number(items[props.heatpumpInvFrequency].numericState) || 0) > 0 ? ''#ba68c8'' : ''#9e9e9e'''
@@ -1070,30 +1076,71 @@ slots:
                       fill-opacity: '0.08'
                   - component: text
                     config:
-                      x: 511.0
-                      y: 204
+                      x: 458.0
+                      y: 191.5
+                      content: Heißgas
+                      fill: currentColor
+                      font-size: 11
+                      font-weight: normal
+                      text-anchor: start
+                      opacity: '0.7'
+                  - component: text
+                    config:
+                      x: 564.0
+                      y: 194
+                      content: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpDischargePipeTemp].state) ? ''–'' : (items[props.heatpumpDischargePipeTemp].displayState
+                        || items[props.heatpumpDischargePipeTemp].state))'
+                      fill: '#ba68c8'
+                      font-size: 16
+                      font-weight: '700'
+                      text-anchor: end
+                      opacity: '1'
+                  - component: text
+                    config:
+                      x: 458.0
+                      y: 210.5
+                      content: Flüssig
+                      fill: currentColor
+                      font-size: 11
+                      font-weight: normal
+                      text-anchor: start
+                      opacity: '0.7'
+                  - component: text
+                    config:
+                      x: 564.0
+                      y: 213
                       content: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpRefrigerantTemp].state) ? ''–'' : (items[props.heatpumpRefrigerantTemp].displayState
                         || items[props.heatpumpRefrigerantTemp].state))'
                       fill: '#ba68c8'
                       font-size: 16
                       font-weight: '700'
-                      text-anchor: middle
+                      text-anchor: end
                       opacity: '1'
                   - component: text
                     config:
-                      x: 511.0
-                      y: 223
+                      x: 458.0
+                      y: 229.5
+                      content: Druck
+                      fill: currentColor
+                      font-size: 11
+                      font-weight: normal
+                      text-anchor: start
+                      opacity: '0.7'
+                  - component: text
+                    config:
+                      x: 564.0
+                      y: 232
                       content: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpRefrigerantPressure].state) ? ''–'' :
                         (items[props.heatpumpRefrigerantPressure].displayState || items[props.heatpumpRefrigerantPressure].state))'
                       fill: '#ba68c8'
                       font-size: 16
                       font-weight: '700'
-                      text-anchor: middle
+                      text-anchor: end
                       opacity: '1'
                   - component: text
                     config:
                       x: 511.0
-                      y: 240
+                      y: 249
                       content: Kältemittel
                       fill: currentColor
                       font-size: 12
@@ -1193,9 +1240,9 @@ slots:
                       opacity: '0.8'
                   - component: rect
                     config:
-                      x: 461.0
+                      x: 449.0
                       y: 280.6
-                      width: 100
+                      width: 124
                       height: 94
                       rx: 10
                       stroke: '=[''NULL'', ''UNDEF''].includes(items[props.heatpumpHeatingPowerAfterBuh].state) ? ''#9e9e9e''

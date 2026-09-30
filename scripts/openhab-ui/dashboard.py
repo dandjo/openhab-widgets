@@ -1256,6 +1256,7 @@ HPX = {  # heat pump items
     "indoor": "espaltherma_indoor_ambient_temp", "power": "espaltherma_electrical_power",
     "heat": "espaltherma_heating_power", "cop": "espaltherma_cop", "defrost": "espaltherma_defrost_operaton",
     "refrigerant": "espaltherma_refrig_temp_liquid_side", "pressure": "espaltherma_refrigerant_pressure_sensor",
+    "hot_gas": "espaltherma_discharge_pipe_temp",
     # each device's own draw: the measured circuit of the outdoor unit, the nominal powers of the backup heater in the
     # wall unit and of the booster heater in the tank; "power" is their sum
     "circuit": "heatpump_power", "buh_power": "espaltherma_electrical_power_buh",
@@ -1388,9 +1389,17 @@ water_heat_color = (f"=['NULL', 'UNDEF'].includes(items.{HPX['water_heat']}.stat
 # the refrigerant's badge in its colour while the compressor runs, grey while it stands
 refrigerant_color = f"={COMPRESSOR} ? '{REFRIGERANT}' : '#9e9e9e'"
 ROOM_X = (VALVE[0] + REFRIGERANT_X) / 2  # the middle of the room right of the riser, where the badges sit
+BADGE_W = 124  # both badges, wide enough for a label and its value side by side
 # the ground floor's free middle, between the lower edge of its floor line (1.4 wide) and the upper edge of the
 # green ground level (3 wide)
 GROUND_MID = (FLOOR_1 + 0.7 + GROUND_LEVEL - 1.5) / 2
+
+
+def badge_row(y, label, value, color):
+    """A row of a badge centred on ROOM_X: a small label at its left, raised so its middle meets the value's, the
+    value bold at its right on the baseline y."""
+    return [hp_text(ROOM_X - BADGE_W / 2 + 9, y - 2.5, label, 11, anchor="start", opacity="0.7"),
+            hp_text(ROOM_X + BADGE_W / 2 - 9, y, value, 16, "700", anchor="end", color=color)]
 
 
 def triangle(x, y, up, color, size=1):
@@ -1437,11 +1446,14 @@ hp_svg = svg("svg", [
     hp_text(OUT[0] - 38, OUT[1] - 2, f"={kw2(HPX['circuit'])} + ' · ' + {disp(HPX['hz'])}", 17, "700", anchor="end"),
     svg("text", x=OUT[0] - 38, y=OUT[1] + 16, content="Defrosting", fill="#4fc3f7",
         visible=f"=items.{HPX['defrost']}.state === 'ON'", **{"font-size": 13, "text-anchor": "end"}),
-    # the refrigerant's temperature over its pressure in a badge in the upper floor, a dotted line across to its line
-    *hp_badge(ROOM_X, UPPER_Y - 36, 100, 72, refrigerant_color, (ROOM_X + 50, UPPER_Y, REFRIGERANT_X - 1.5, UPPER_Y), [
-        hp_text(ROOM_X, UPPER_Y - 12, f"={disp(HPX['refrigerant'])}", 16, "700", color=REFRIGERANT),
-        hp_text(ROOM_X, UPPER_Y + 7, f"={disp(HPX['pressure'])}", 16, "700", color=REFRIGERANT),
-        hp_text(ROOM_X, UPPER_Y + 24, "Kältemittel", 12, opacity="0.7")]),
+    # the refrigerant's hot gas over its liquid temperature and its pressure in a badge in the upper floor, each row
+    # labelled, a dotted line across to its line
+    *hp_badge(ROOM_X, UPPER_Y - 45, BADGE_W, 90, refrigerant_color,
+              (ROOM_X + BADGE_W / 2, UPPER_Y, REFRIGERANT_X - 1.5, UPPER_Y), [
+        *badge_row(UPPER_Y - 22, "Heißgas", f"={disp(HPX['hot_gas'])}", REFRIGERANT),
+        *badge_row(UPPER_Y - 3, "Flüssig", f"={disp(HPX['refrigerant'])}", REFRIGERANT),
+        *badge_row(UPPER_Y + 16, "Druck", f"={disp(HPX['pressure'])}", REFRIGERANT),
+        hp_text(ROOM_X, UPPER_Y + 33, "Kältemittel", 12, opacity="0.7")]),
     hp_text(UPPER_FH[0] - 40, UPPER_Y - 6, "Upper Floor", 16, "700", anchor="end"),
     hp_text(UPPER_FH[0] - 40, UPPER_Y + 13, f"='Fußbodenheizung · ' + {disp('faikout_perfera_temperature')}", 12, anchor="end",
             opacity="0.7"),
@@ -1455,7 +1467,7 @@ hp_svg = svg("svg", [
     hp_text(WALL[0], WALL[1] + 47, f"={kw2(HPX['power'])}", 14, "700", color="#fb8c00"),
     # the water's heat over its leaving and inlet temperatures in a badge in the ground floor, a dotted line from the
     # middle of the pipe between wall unit and valve up to it
-    *hp_badge(ROOM_X, GROUND_MID - 47, 100, 94, water_heat_color,
+    *hp_badge(ROOM_X, GROUND_MID - 47, BADGE_W, 94, water_heat_color,
               ((VALVE[0] + WALL[0]) / 2, WALL[1] - 3, ROOM_X, GROUND_MID + 47), [
         hp_text(ROOM_X, GROUND_MID - 22, f"={kw2(HPX['water_heat'])}", 18, "700"),
         triangle(ROOM_X - 35, GROUND_MID - 1, True, SUPPLY, 1.1),
