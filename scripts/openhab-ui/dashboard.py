@@ -1396,6 +1396,11 @@ BADGE_W = 130  # both badges, wide enough for a label and its value side by side
 # the ground floor's free middle, between the lower edge of its floor line (1.4 wide) and the upper edge of the
 # green ground level (3 wide)
 GROUND_MID = (FLOOR_1 + 0.7 + GROUND_LEVEL - 1.5) / 2
+# a badge's caption stands above it, its baseline CAPTION_GAP above the frame; its capitals are CAPTION_CAP high at 12 px
+CAPTION_GAP, CAPTION_CAP = 7, 8.6
+# the water badge sits low enough that caption and badge together are centred on GROUND_MID; the refrigerant badge
+# keeps its place, the roof leaves room above it
+WATER_MID = round(GROUND_MID + (CAPTION_CAP + CAPTION_GAP) / 2, 1)  # rounded, so no float noise reaches the JSON
 
 
 def badge_row(y, label, value, color):
@@ -1414,12 +1419,14 @@ def triangle(x, y, up, color, size=1):
     return svg("polygon", points=f"{x},{y} {x + w / 2},{tip} {x + w},{y}", fill=color)
 
 
-def hp_badge(cx, y, w, h, color, leader, rows):
+def hp_badge(cx, y, w, h, color, leader, caption, rows):
     """A framed badge centred on cx from y, sized w×h, faintly filled in `color`, with a dotted line in that colour
-    between `leader`'s two points (x1, y1, x2, y2), from its pipe to the badge; `rows` its contents."""
+    between `leader`'s two points (x1, y1, x2, y2), from its pipe to the badge; `caption` above it, `rows` its
+    contents."""
     x1, y1, x2, y2 = leader
     return [svg("line", x1=x1, y1=y1, x2=x2, y2=y2, stroke=color,
                 **{"stroke-width": 1.4, "stroke-dasharray": "2 3", "opacity": "0.8"}),
+            hp_text(cx, y - CAPTION_GAP, caption, 12, opacity="0.7"),
             svg("rect", x=cx - w / 2, y=y, width=w, height=h, rx=10, stroke=color, fill=color,
                 **{"stroke-width": 1.5, "fill-opacity": "0.08"}),
             *rows]
@@ -1454,7 +1461,7 @@ hp_svg = svg("svg", [
     # the refrigerant's hot gas over its liquid temperature and its pressure in a badge in the upper floor, each row
     # labelled, a dotted line across to its line
     *hp_badge(ROOM_X, UPPER_Y - 36.5, BADGE_W, 73, refrigerant_color,
-              (ROOM_X + BADGE_W / 2, UPPER_Y, REFRIGERANT_X - 1.5, UPPER_Y), [
+              (ROOM_X + BADGE_W / 2, UPPER_Y, REFRIGERANT_X - 1.5, UPPER_Y), "Kältemittel", [
         *badge_row(UPPER_Y - 13.5, "Heißgas", f"={disp(HPX['hot_gas'])}", REFRIGERANT),
         *badge_row(UPPER_Y + 5.5, "Flüssig", f"={disp(HPX['refrigerant'])}", REFRIGERANT),
         *badge_row(UPPER_Y + 24.5, "Druck", f"={disp(HPX['pressure'])}", REFRIGERANT)]),
@@ -1471,13 +1478,13 @@ hp_svg = svg("svg", [
     hp_text(WALL[0], WALL[1] + 47, f"={kw2(HPX['power'])}", 14, "700", color="#fb8c00"),
     # the water's heat over its leaving and inlet temperatures in a badge in the ground floor, a dotted line from the
     # middle of the pipe between wall unit and valve up to it
-    *hp_badge(ROOM_X, GROUND_MID - 38.5, BADGE_W, 77, water_heat_color,
-              ((VALVE[0] + WALL[0]) / 2, WALL[1] - 3, ROOM_X, GROUND_MID + 38.5), [
-        hp_text(ROOM_X, GROUND_MID - 13.5, f"={kw2(HPX['water_heat'])}", 18, "700"),
-        triangle(ROOM_X - 35, GROUND_MID + 7.5, True, SUPPLY, 1.1),
-        hp_text(ROOM_X - 21, GROUND_MID + 7.5, f"={disp(HPX['supply'])}", 16, "700", anchor="start", color=SUPPLY),
-        triangle(ROOM_X - 35, GROUND_MID + 15.5, False, RETURN, 1.1),
-        hp_text(ROOM_X - 21, GROUND_MID + 26.5, f"={disp(HPX['return'])}", 16, "700", anchor="start", color=RETURN)]),
+    *hp_badge(ROOM_X, WATER_MID - 38.5, BADGE_W, 77, water_heat_color,
+              ((VALVE[0] + WALL[0]) / 2, WALL[1] - 3, ROOM_X, WATER_MID + 38.5), "Wärmeleistung", [
+        hp_text(ROOM_X, WATER_MID - 13.5, f"={kw2(HPX['water_heat'])}", 18, "700"),
+        triangle(ROOM_X - 35, WATER_MID + 7.5, True, SUPPLY, 1.1),
+        hp_text(ROOM_X - 21, WATER_MID + 7.5, f"={disp(HPX['supply'])}", 16, "700", anchor="start", color=SUPPLY),
+        triangle(ROOM_X - 35, WATER_MID + 15.5, False, RETURN, 1.1),
+        hp_text(ROOM_X - 21, WATER_MID + 26.5, f"={disp(HPX['return'])}", 16, "700", anchor="start", color=RETURN)]),
     hp_text(RADIATORS[0] - 40, BASEMENT_Y - 6, "Basement", 16, "700", anchor="end"),
     hp_text(RADIATORS[0] - 40, BASEMENT_Y + 13, "Radiators", 12, anchor="end", opacity="0.7"),
     # the tank's and the indoor unit's names, centred below them, each with its water below (the tank's setpoint, the
