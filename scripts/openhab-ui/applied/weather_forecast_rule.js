@@ -14,7 +14,8 @@
 // thin high clouds (cirrus) as overcast though the sun shines through them, and give a day the worst of its hours, the
 // night's included. The sky has five levels: clear, fair, partly, mostly (cloudy), overcast. A day's follows the share
 // of its daylight the sun shines (from 85, 65, 40, 15 %), the present's and each hour's the cloud cover, the high
-// clouds counted half (below 15, 40, 65, 90 %); an hour with thin high clouds alone is veil. Fog, rain (drizzle and
+// clouds counted half (below 15, 40, 65, 90 %); an hour with thin high clouds alone is veil, and so is a day from
+// 65 % of sunshine when at least half of its daylight hours are veil. Fog, rain (drizzle and
 // showers too), snow and thunder come from the WMO code, only where they mark the weather: a day's fog below 30 % of
 // sunshine, its precipitation and thunder from 1 mm, a precipitation day, an hour's while some falls. With the sun out
 // as well (a day from 30 % of sunshine, an hour up to partly cloudy) they are showers: rain_sun, snow_sun, thunder_sun.
@@ -106,8 +107,9 @@ function hourSymbol(code, wet, low, mid, high) {
 }
 
 // a day's symbol: the sky from its sunshine, fog only below 30 % of it, precipitation and thunder from 1 mm, as
-// showers from 30 % of sunshine; the code alone while the sunshine is unknown
-function daySymbol(code, precipitation, sunshine, daylight) {
+// showers from 30 % of sunshine, veil from 65 % of sunshine when at least half of its daylight hours are veil (veil,
+// that share, or null while unknown); the code alone while the sunshine is unknown
+function daySymbol(code, precipitation, sunshine, daylight, veil) {
   if (code == null || sunshine == null || !daylight) {
     return hourSymbol(code, null, null, null, null);
   }
@@ -119,7 +121,32 @@ function daySymbol(code, precipitation, sunshine, daylight) {
   if (kind && (precipitation == null || precipitation >= 1)) {
     return share >= 0.3 ? kind + '_sun' : kind;
   }
+  if (share >= 0.65 && veil != null && veil >= 0.5) {
+    return 'veil';
+  }
   return skyBySun(share);
+}
+
+// the share of a day's daylight hours that are veil, from the model the day is taken from, or null without hours
+function veilShare(model, t) {
+  const h = model && model.hourly;
+  if (!h || !h.time) {
+    return null;
+  }
+  let light = 0;
+  let veil = 0;
+  h.time.forEach((ht, i) => {
+    if (ht < t || ht >= t + 86400 || h.is_day[i] !== 1) {
+      return;
+    }
+    light++;
+    const p = h.precipitation[i];
+    if (hourSymbol(h.weather_code[i], p == null ? null : round(p, 1) > 0, h.cloud_cover_low[i], h.cloud_cover_mid[i],
+                   h.cloud_cover_high[i]) === 'veil') {
+      veil++;
+    }
+  });
+  return light ? veil / light : null;
 }
 
 // an hour's symbol and whether it is day, both from the first model with a code for it, the layers from that model
@@ -147,7 +174,7 @@ function day(arome, best, t) {
   const v = (field) => value([model], 'daily', field, t);
   const sunshine = v('sunshine_duration');
   const daylight = v('daylight_duration');
-  return {t: t, sym: daySymbol(v('weather_code'), v('precipitation_sum'), sunshine, daylight),
+  return {t: t, sym: daySymbol(v('weather_code'), v('precipitation_sum'), sunshine, daylight, veilShare(model, t)),
           lo: round(v('temperature_2m_min'), 1), hi: round(v('temperature_2m_max'), 1),
           p: round(v('precipitation_sum'), 1), pp: value([best], 'daily', 'precipitation_probability_max', t),
           w: round(v('wind_speed_10m_max'), 0),
