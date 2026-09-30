@@ -69,6 +69,18 @@ props:
     type: TEXT
     required: true
     context: item
+  - name: heatpumpRefrigerantTemp
+    label: ESPAltherma Kältemittel flüssig
+    description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpRefrigerantPressure
+    label: ESPAltherma Kältemitteldruck
+    description: Number:Pressure item
+    type: TEXT
+    required: true
+    context: item
   - name: acTemperature
     label: Faikout Perfera Temperatur
     description: Number:Temperature item
@@ -93,15 +105,15 @@ props:
     type: TEXT
     required: true
     context: item
-  - name: heatpumpDhwSetpoint
-    label: ESPAltherma Warmwasser Sollwert
-    description: Number:Temperature item
-    type: TEXT
-    required: true
-    context: item
   - name: heatpumpHeatPower
     label: ESPAltherma Heizleistung
     description: Number:Power item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpDhwSetpoint
+    label: ESPAltherma Warmwasser Sollwert
+    description: Number:Temperature item
     type: TEXT
     required: true
     context: item
@@ -172,7 +184,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Sep 28, 2026, 8:45:25 PM
+timestamp: Sep 30, 2026, 11:21:26 AM
 component: oh-card
 config:
   title: Wärmepumpe
@@ -979,8 +991,8 @@ slots:
                     config:
                       x: 537
                       y: 108
-                      content: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpPower].state) ? ''–'' : (items[props.heatpumpPower].displayState
-                        || items[props.heatpumpPower].state)) + '' · '' + ([''NULL'', ''UNDEF''].includes(items[props.heatpumpInvFrequency].state)
+                      content: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpPower].state) ? ''–'' : ((Number(items[props.heatpumpPower].numericState)
+                        || 0) / 1000).toFixed(2).replace(''.'', '','') + '' kW'') + '' · '' + ([''NULL'', ''UNDEF''].includes(items[props.heatpumpInvFrequency].state)
                         ? ''–'' : (items[props.heatpumpInvFrequency].displayState || items[props.heatpumpInvFrequency].state))'
                       fill: currentColor
                       font-size: 17
@@ -996,6 +1008,38 @@ slots:
                       font-size: 13
                       text-anchor: end
                       visible: =items[props.heatpumpDefrostOperaton].state === 'ON'
+                  - component: text
+                    config:
+                      x: 576
+                      y: 204
+                      content: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpRefrigerantTemp].state) ? ''–'' : (items[props.heatpumpRefrigerantTemp].displayState
+                        || items[props.heatpumpRefrigerantTemp].state))'
+                      fill: '#ba68c8'
+                      font-size: 16
+                      font-weight: '700'
+                      text-anchor: end
+                      opacity: '1'
+                  - component: text
+                    config:
+                      x: 576
+                      y: 223
+                      content: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpRefrigerantPressure].state) ? ''–'' :
+                        (items[props.heatpumpRefrigerantPressure].displayState || items[props.heatpumpRefrigerantPressure].state))'
+                      fill: '#ba68c8'
+                      font-size: 16
+                      font-weight: '700'
+                      text-anchor: end
+                      opacity: '1'
+                  - component: text
+                    config:
+                      x: 576
+                      y: 240
+                      content: Kältemittel
+                      fill: currentColor
+                      font-size: 12
+                      font-weight: normal
+                      text-anchor: end
+                      opacity: '0.7'
                   - component: text
                     config:
                       x: 280
@@ -1080,6 +1124,31 @@ slots:
                       opacity: '1'
                   - component: text
                     config:
+                      x: 328
+                      y: 495
+                      content: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpDhwTankTemp].state) ? ''–'' : (items[props.heatpumpDhwTankTemp].displayState
+                        || items[props.heatpumpDhwTankTemp].state))'
+                      fill: '=[''NULL'', ''UNDEF''].includes(items[props.heatpumpDhwTankTemp].state) ? ''currentColor'' :
+                        (Number(items[props.heatpumpDhwTankTemp].numericState) || 0) > 50 ? ''#e57373'' : (Number(items[props.heatpumpDhwTankTemp].numericState)
+                        || 0) >= 40 ? ''#fb8c00'' : (Number(items[props.heatpumpDhwTankTemp].numericState) || 0) >= 35 ? ''#fbc02d''
+                        : ''#64b5f6'''
+                      font-size: 14
+                      font-weight: '700'
+                      text-anchor: middle
+                      opacity: '1'
+                  - component: text
+                    config:
+                      x: 540
+                      y: 495
+                      content: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpHeatPower].state) ? ''–'' : ((Number(items[props.heatpumpHeatPower].numericState)
+                        || 0) / 1000).toFixed(2).replace(''.'', '','') + '' kW'')'
+                      fill: '#e57373'
+                      font-size: 14
+                      font-weight: '700'
+                      text-anchor: middle
+                      opacity: '1'
+                  - component: text
+                    config:
                       x: 182
                       y: 442
                       content: Keller
@@ -1100,10 +1169,9 @@ slots:
                       opacity: '0.7'
                   - component: text
                     config:
-                      x: 308
+                      x: 328
                       y: 540
-                      content: '=''Warmwasserspeicher · '' + ([''NULL'', ''UNDEF''].includes(items[props.heatpumpDhwTankTemp].state)
-                        ? ''–'' : (items[props.heatpumpDhwTankTemp].displayState || items[props.heatpumpDhwTankTemp].state))'
+                      content: Warmwasserspeicher
                       fill: currentColor
                       font-size: 15
                       font-weight: '700'
@@ -1111,7 +1179,7 @@ slots:
                       opacity: '1'
                   - component: text
                     config:
-                      x: 308
+                      x: 328
                       y: 560
                       content: '=''Soll '' + ([''NULL'', ''UNDEF''].includes(items[props.heatpumpDhwSetpoint].state) ? ''–''
                         : (items[props.heatpumpDhwSetpoint].displayState || items[props.heatpumpDhwSetpoint].state)) + ''
@@ -1123,18 +1191,17 @@ slots:
                       opacity: '0.7'
                   - component: text
                     config:
-                      x: 610
+                      x: 540
                       y: 540
-                      content: '=''Altherma 3 · '' + ([''NULL'', ''UNDEF''].includes(items[props.heatpumpHeatPower].state)
-                        ? ''–'' : (items[props.heatpumpHeatPower].displayState || items[props.heatpumpHeatPower].state))'
+                      content: Innengerät
                       fill: currentColor
                       font-size: 15
                       font-weight: '700'
-                      text-anchor: end
+                      text-anchor: middle
                       opacity: '1'
                   - component: text
                     config:
-                      x: 610
+                      x: 540
                       y: 560
                       content: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpFlowSensor].state) ? ''–'' : (items[props.heatpumpFlowSensor].displayState
                         || items[props.heatpumpFlowSensor].state)) + '' · Heizstab '' + ((items[props.heatpumpBuhStep1Mode].state
@@ -1142,7 +1209,7 @@ slots:
                       fill: currentColor
                       font-size: 12
                       font-weight: normal
-                      text-anchor: end
+                      text-anchor: middle
                       opacity: '0.7'
               - component: oh-link
                 config:
@@ -1255,19 +1322,19 @@ slots:
                   - component: widget:value-tile
                     config:
                       title: Elektrisch
-                      value: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpPower].state) ? ''–'' : (items[props.heatpumpPower].displayState
-                        || items[props.heatpumpPower].state))'
+                      value: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpPower].state) ? ''–'' : ((Number(items[props.heatpumpPower].numericState)
+                        || 0) / 1000).toFixed(2).replace(''.'', '','') + '' kW'')'
                       icon: material:bolt
                       color: '#ffa726'
-                      fontSize: 1.1em
+                      fontSize: '=screen.width < 600 ? ''0.85em'' : ''1.1em'''
                   - component: widget:value-tile
                     config:
                       title: Wärme
-                      value: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpHeatPower].state) ? ''–'' : (items[props.heatpumpHeatPower].displayState
-                        || items[props.heatpumpHeatPower].state))'
+                      value: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpHeatPower].state) ? ''–'' : ((Number(items[props.heatpumpHeatPower].numericState)
+                        || 0) / 1000).toFixed(2).replace(''.'', '','') + '' kW'')'
                       icon: material:local_fire_department
                       color: '#e57373'
-                      fontSize: 1.1em
+                      fontSize: '=screen.width < 600 ? ''0.85em'' : ''1.1em'''
                   - component: widget:value-tile
                     config:
                       title: COP
@@ -1275,7 +1342,7 @@ slots:
                         || 0)).toFixed(2).replace(''.'', '','') : ''–'''
                       icon: material:eco
                       color: '#66bb6a'
-                      fontSize: 1.1em
+                      fontSize: '=screen.width < 600 ? ''0.85em'' : ''1.1em'''
               - component: Label
                 config:
                   text: Heute
