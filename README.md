@@ -289,9 +289,10 @@ orange and red by price.
 
 A section through the house: outdoor unit on the roof (the energy flow's `flow-node`), wall unit, three-way valve and
 DHW tank in the basement, floor heating and radiators on their levels, with the flow animated along the pipes as the
-valve decides. Beside it the power, today's energies split into space heating, DHW and standby, and daily COPs. On a
-phone the drawing takes the card's width; on a wider screen it stands at most at its own size, as the energy flow does,
-so their texts keep the UI's sizes and their circles come out the same.
+valve decides, the refrigerant's temperature and pressure beside its line, the tank's temperature below it in a colour
+from blue to red, powers in kW. Beside it the power, today's energies split into space heating, DHW and standby, and
+daily COPs. On a phone the drawing takes the card's width; on a wider screen it stands at most at its own size, as the
+energy flow does, so their texts keep the UI's sizes and their circles come out the same.
 
 Needs `flow-node`, `item-popup`, `value-tile`.
 
@@ -300,7 +301,7 @@ Needs `flow-node`, `item-popup`, `value-tile`.
 ![Heat pump in dark mode](screenshots/heatpump-card-dark.png)
 
 <details>
-<summary>28 props</summary>
+<summary>30 props</summary>
 
 | Prop | Item | Item type |
 |---|---|---|
@@ -315,12 +316,14 @@ Needs `flow-node`, `item-popup`, `value-tile`.
 | `heatpumpBshMode` | ESPAltherma Zusatzheizung Speicher | Switch |
 | `heatpumpExtAmbientTemp` | ESPAltherma Außentemperatur | Number:Temperature |
 | `heatpumpDefrostOperaton` | ESPAltherma Abtauen | Switch |
+| `heatpumpRefrigerantTemp` | ESPAltherma Kältemittel flüssig | Number:Temperature |
+| `heatpumpRefrigerantPressure` | ESPAltherma Kältemitteldruck | Number:Pressure |
 | `acTemperature` | Faikout Perfera Temperatur | Number:Temperature |
 | `heatpumpIndoorAmbientTemp` | ESPAltherma Raumtemperatur | Number:Temperature |
 | `heatpumpLeavingWaterTempAfterBuh` | ESPAltherma Vorlauftemperatur nach Heizstab | Number:Temperature |
 | `heatpumpInletWaterTemp` | ESPAltherma Rücklauftemperatur | Number:Temperature |
-| `heatpumpDhwSetpoint` | ESPAltherma Warmwasser Sollwert | Number:Temperature |
 | `heatpumpHeatPower` | ESPAltherma Heizleistung | Number:Power |
+| `heatpumpDhwSetpoint` | ESPAltherma Warmwasser Sollwert | Number:Temperature |
 | `heatpumpCop` | ESPAltherma COP | Number |
 | `heatpumpEnergyToday` | ESPAltherma Energie heute | Number:Energy |
 | `heatpumpEnergySpaceToday` | ESPAltherma Energie Heizung heute | Number:Energy |

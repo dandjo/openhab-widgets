@@ -66,6 +66,11 @@ def kw(item):
     return f"{fixed(f'Math.abs({num(item)}) / 1000', 3)} + ' kW'"
 
 
+def kw2(item):
+    """A power item's state in kW to two decimals, a dash while it has none."""
+    return f"(['NULL', 'UNDEF'].includes(items.{item}.state) ? '–' : {fixed(f'{num(item)} / 1000', 2)} + ' kW')"
+
+
 def comp(component, config=None, **slots):
     config = config or {}
     if component == "oh-label-cell":
@@ -198,7 +203,8 @@ ITEM_PROP_NAMES = {
     "home_ec_day": "homeEnergyToday", "photovoltaics_own_ec_day": "pvSelfUseToday", "epex_spot_awattar": "priceMarketNet",
     "espaltherma_electrical_power": "heatpumpPower", "espaltherma_heating_power": "heatpumpHeatPower",
     "espaltherma_3way_valve_mode": "heatpumpValve", "pyaltherma_dhw_powerful": "heatpumpDhwBoost",
-    "air_conditioning_timer": "acTimer",
+    "air_conditioning_timer": "acTimer", "espaltherma_refrig_temp_liquid_side": "heatpumpRefrigerantTemp",
+    "espaltherma_refrigerant_pressure_sensor": "heatpumpRefrigerantPressure",
 }
 ITEM_REF = re.compile(r"items\.([a-z][a-z0-9_]*)")
 ITEM_KEYS = ("item", "actionItem")  # config keys that take an item's name
@@ -1247,6 +1253,7 @@ HPX = {  # heat pump items
     "return": "espaltherma_inlet_water_temp", "outdoor": "espaltherma_ext_ambient_temp",
     "indoor": "espaltherma_indoor_ambient_temp", "power": "espaltherma_electrical_power",
     "heat": "espaltherma_heating_power", "cop": "espaltherma_cop", "defrost": "espaltherma_defrost_operaton",
+    "refrigerant": "espaltherma_refrig_temp_liquid_side", "pressure": "espaltherma_refrigerant_pressure_sensor",
 }
 PUMP_ON = f"(items.{HPX['pump']}.state === 'ON' || {num(HPX['flow'])} > 0)"
 DHW_MODE = f"items.{HPX['valve']}.state === 'DHW'"
@@ -1286,6 +1293,9 @@ def valve_node(cx, cy):
 
 tank_top = (f"={num(HPX['tank'])} >= 50 ? '#ef9a9a' : {num(HPX['tank'])} >= 40 ? '#ffab91' : "
             f"{num(HPX['tank'])} >= 30 ? '#ffe0b2' : '#bbdefb'")
+# the tank's temperature below it: reddish above 50 °C, orange from 40, yellow from 35, bluish below
+tank_text = (f"=['NULL', 'UNDEF'].includes(items.{HPX['tank']}.state) ? 'currentColor' : {num(HPX['tank'])} > 50 ? "
+             f"'#e57373' : {num(HPX['tank'])} >= 40 ? '#fb8c00' : {num(HPX['tank'])} >= 35 ? '#fbc02d' : '#64b5f6'")
 
 
 def tank_node(cx, cy):
@@ -1378,9 +1388,13 @@ hp_svg = svg("svg", [
     *radiator_node(*RADIATORS), *floor_node(*GROUND_FH), *floor_node(*UPPER_FH),
     # values beside their devices
     hp_text(OUT[0] - 38, OUT[1] - 22, f"='Außengerät · ' + {disp(HPX['outdoor'])}", 13, anchor="end", opacity="0.7"),
-    hp_text(OUT[0] - 38, OUT[1] - 2, f"={disp(HPX['power'])} + ' · ' + {disp(HPX['hz'])}", 17, "700", anchor="end"),
+    hp_text(OUT[0] - 38, OUT[1] - 2, f"={kw2(HPX['power'])} + ' · ' + {disp(HPX['hz'])}", 17, "700", anchor="end"),
     svg("text", x=OUT[0] - 38, y=OUT[1] + 16, content="Defrosting", fill="#4fc3f7",
         visible=f"=items.{HPX['defrost']}.state === 'ON'", **{"font-size": 13, "text-anchor": "end"}),
+    # the refrigerant's temperature over its pressure left of its line, the three lines centred on the upper floor
+    hp_text(REFRIGERANT_X - 12, UPPER_Y - 12, f"={disp(HPX['refrigerant'])}", 16, "700", anchor="end", color=REFRIGERANT),
+    hp_text(REFRIGERANT_X - 12, UPPER_Y + 7, f"={disp(HPX['pressure'])}", 16, "700", anchor="end", color=REFRIGERANT),
+    hp_text(REFRIGERANT_X - 12, UPPER_Y + 24, "Kältemittel", 12, anchor="end", opacity="0.7"),
     hp_text(UPPER_FH[0] - 40, UPPER_Y - 6, "Upper Floor", 16, "700", anchor="end"),
     hp_text(UPPER_FH[0] - 40, UPPER_Y + 13, f"='Fußbodenheizung · ' + {disp('faikout_perfera_temperature')}", 12, anchor="end",
             opacity="0.7"),
@@ -1395,21 +1409,25 @@ hp_svg = svg("svg", [
         fill=RETURN),
     hp_text(VALVE[0] + 40, GROUND_Y + 23, f"={disp(HPX['return'])}", 20, "700", anchor="start", color=RETURN),
     hp_text(VALVE[0], VALVE[1] + 47, f"={DHW_MODE} ? 'Warmwasser' : 'Heizung'", 14, "700", color="#ffa726"),
+    # the tank's temperature and the indoor unit's heating power below them, on the valve's line
+    hp_text(TANK[0], TANK[1] + 47, f"={disp(HPX['tank'])}", 14, "700", color=tank_text),
+    hp_text(WALL[0], WALL[1] + 47, f"={kw2(HPX['heat'])}", 14, "700", color=SUPPLY),
     hp_text(RADIATORS[0] - 40, BASEMENT_Y - 6, "Basement", 16, "700", anchor="end"),
     hp_text(RADIATORS[0] - 40, BASEMENT_Y + 13, "Radiators", 12, anchor="end", opacity="0.7"),
-    hp_text(TANK[0] - 20, BOTTOM + 30, f"='Warmwasserspeicher · ' + {disp(HPX['tank'])}", 15, "700"),
-    hp_text(TANK[0] - 20, BOTTOM + 50, f"='Soll ' + {disp(HPX['tank_set'])} + ' · Zusatzheizung ' + ({BSH_ON} ? 'An' : 'Aus')", 12,
+    # the tank's and the indoor unit's names and details, centred below them
+    hp_text(TANK[0], BOTTOM + 30, "Warmwasserspeicher", 15, "700"),
+    hp_text(TANK[0], BOTTOM + 50, f"='Soll ' + {disp(HPX['tank_set'])} + ' · Zusatzheizung ' + ({BSH_ON} ? 'An' : 'Aus')", 12,
             opacity="0.7"),
-    hp_text(RIGHT, BOTTOM + 30, f"='Altherma 3 · ' + {disp(HPX['heat'])}", 15, "700", anchor="end"),
-    hp_text(RIGHT, BOTTOM + 50, f"={disp(HPX['flow'])} + ' · Heizstab ' + ({BUH_ON} ? 'An' : 'Aus')", 12, anchor="end",
-            opacity="0.7"),
+    hp_text(WALL[0], BOTTOM + 30, "Innengerät", 15, "700"),
+    hp_text(WALL[0], BOTTOM + 50, f"={disp(HPX['flow'])} + ' · Heizstab ' + ({BUH_ON} ? 'An' : 'Aus')", 12, opacity="0.7"),
 ], viewBox=" ".join(map(str, HP_VB)), width="100%", style={"display": "block", "overflow": "visible"})
 
 
 def stat_tile(title, value, color, icon):
-    """A figure of the heat pump card: a value tile a tenth larger than elsewhere."""
+    """A figure of the heat pump card: a value tile a tenth larger than elsewhere; on a phone, where three share
+    the width, smaller, so a power in kW to two decimals fits."""
     return comp("widget:value-tile", {"title": title, "value": value, "icon": f"material:{icon}", "color": color,
-                                      "fontSize": "1.1em"})
+                                      "fontSize": f"={NARROW} ? '0.85em' : '1.1em'"})
 
 
 def stacked_bar(title, total, parts):
@@ -1443,8 +1461,8 @@ legend_dot = lambda name, c: keyed(f"item k k-{name.lower()}", [
     div([], **{"width": "10px", "height": "10px", "border-radius": "3px", "background": c}),
     label(name, **{"font-size": "12px", "opacity": "0.75"})], style={"display": "flex", "align-items": "center", "gap": "5px"})
 hp_stats = div([
-    div([stat_tile("Electrical", f"={disp(HPX['power'])}", "#ffa726", "bolt"),
-         stat_tile("Heat", f"={disp(HPX['heat'])}", SUPPLY, "local_fire_department"),
+    div([stat_tile("Electrical", f"={kw2(HPX['power'])}", "#ffa726", "bolt"),
+         stat_tile("Heat", f"={kw2(HPX['heat'])}", SUPPLY, "local_fire_department"),
          stat_tile("COP", f"={num(HPX['cop'])} > 0 ? {fixed(num(HPX['cop']), 2)} : '–'", "#66bb6a", "eco")],
         **{"display": "grid", "grid-template-columns": "repeat(3, 1fr)", "gap": "8px", "margin-bottom": "16px"}),
     label("Today", **{"font-weight": "700", "margin-bottom": "8px"}),
@@ -3363,7 +3381,7 @@ HP_POPUPS = {
                                   line("Compressor", HPX["hz"], "#8d6e63", y=1)],
                                  [value_axis("W"), value_axis("Hz", splitLine={"show": False})])]),
     ]),
-    "indoor_unit": ("Altherma 3", [
+    "indoor_unit": ("Indoor Unit", [
         card("Controls", [controls_box(operation_section("Heizung", "Warmwasser", row=True), LW_OFFSET)]),
         card("Now", [tile_grid([
             value_tile("Heating", f"={disp(HPX['heat'])}", color="#e53935"),
@@ -4016,7 +4034,7 @@ GEN_DE = {
     "PV Production per Day": "PV-Ertrag pro Tag", "Temperatures": "Temperaturen", "Temperature": "Temperatur",
     "Now": "Jetzt", "Today": "Heute", "Power": "Leistung", "Program": "Programm",
     "Photovoltaics": "Photovoltaik", "Power Meter": "Stromzähler", "Home": "Haus", "Air Conditioning": "Klimaanlage",
-    "Energy Storage": "Batteriespeicher", "E-Car": "E-Auto", "Outdoor Unit": "Außengerät", "Altherma 3": "Altherma 3",
+    "Energy Storage": "Batteriespeicher", "E-Car": "E-Auto", "Outdoor Unit": "Außengerät", "Indoor Unit": "Innengerät",
     "Three-Way Valve": "3-Wege-Ventil", "DHW Tank": "Warmwasserspeicher", "Space Heating": "Heizkreis",
     "Washing Machine 1": "Waschmaschine 1", "Washing Machine 2": "Waschmaschine 2", "Tumble Dryer": "Wäschetrockner",
     "Dishwasher": "Geschirrspüler",
