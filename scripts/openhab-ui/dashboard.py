@@ -1399,9 +1399,11 @@ GROUND_MID = (FLOOR_1 + 0.7 + GROUND_LEVEL - 1.5) / 2
 
 
 def badge_row(y, label, value, color):
-    """A row of a badge centred on ROOM_X: a small label at its left, raised so its middle meets the value's, the
-    value bold at its right on the baseline y."""
-    return [hp_text(ROOM_X - BADGE_W / 2 + 9, y - 2.5, label, 11, anchor="start", opacity="0.7"),
+    """A row of a badge centred on ROOM_X: a small label at its left, raised so the middle of its capitals meets the
+    middle of the value's digits, the value bold at its right on the baseline y. The raise is half the difference of
+    their heights, (11.5 - 7.75) / 2 at 16 and 11 px in the system font, measured on the live page; 2.5 left the
+    labels 0.6 px high."""
+    return [hp_text(ROOM_X - BADGE_W / 2 + 9, y - 1.85, label, 11, anchor="start", opacity="0.7"),
             hp_text(ROOM_X + BADGE_W / 2 - 9, y, value, 16, "700", anchor="end", color=color)]
 
 
