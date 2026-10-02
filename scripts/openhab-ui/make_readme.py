@@ -11,19 +11,16 @@ OVERVIEW = [
      "drawn beside its maximum over its minimum. While an official warning of GeoSphere Austria is in effect or begins within 24 hours, it is teased "
      "beside the temperature: a disc in its level's colour (yellow, orange, red) with an exclamation mark and a ring "
      "pulsing out of it, on a wider screen in a pill with the warning's short text (*Gewitter bis 20:00*). On a "
-     "phone the gaps narrow, and below 380 px the chevron goes, so the bar keeps its fit. A tap opens the forecast popup of "
-     "my installation (see [Weather](#weather)). Its items come from two rules, "
+     "phone the gaps narrow, and below 380 px the chevron goes, so the bar keeps its fit. A tap opens the weather page of "
+     "my installation as a popup (see [Weather](#weather)). Its items come from two rules, "
      "`scripts/openhab-ui/applied/weather_forecast_rule.js`, which reads Open-Meteo's GeoSphere AROME Austria model, "
      "and `weather_warnings_rule.js`, which reads GeoSphere Austria's warnings and sends a broadcast notification "
      "when their level rises to orange or red."),
-    ("controls-card", "Controls", "Heat pump, air conditioner and ventilation, each folded to a head of three lines "
-     "with its main action on the right: a Boost button for the heat pump's hot water, the air conditioner's on/off "
-     "pill, the ventilation levels 1 to 3; the heat pump's second line names which of its switches are on and "
-     "which off. A tap on a head folds out its details, each group under its icon and title: Smart Grid, Betrieb "
-     "(the switch pills Heizung, Warmwasser and Automatik, each with the icon of what it switches, three abreast "
-     "where there is room and two and one on a phone) and sliders for the DHW setpoint and the leaving water offset; "
-     "mode, fan, setpoint, boost and timer (usable while the unit is off); the ventilation timer. Below them tiles "
-     "that toggle plugs and show their power. The three devices are the widgets `heatpump-controls`, "
+    ("controls-card", "Controls", "Heat pump, air conditioner and ventilation, each a panel of three lines with its "
+     "main action on the right: a Boost button for the heat pump's hot water, the air conditioner's on/off pill, the "
+     "ventilation levels 1 to 3; the heat pump's second line names which of its switches are on and which off. A tap "
+     "on a panel, anywhere but on the action, opens the device's page of my installation as a popup, with all its "
+     "controls. Below them tiles that toggle plugs and show their power. The three devices are the widgets `heatpump-controls`, "
      "`air-conditioner-controls` and `ventilation-controls`, the tiles `switch-tile`."),
     ("energy-flow-card", "Energy flow", "A regular star around the house: PV, heat pump, air conditioner, E-Car, the "
      "household appliances together, battery and grid, each with its power and today's energy. Dots run along the "
@@ -62,15 +59,13 @@ PLUG = [("plug-card", "Now: power, on/off pill, energy today and total"), ("plug
         ("plug-energy-days-card", "Energy per day of the month"), ("plug-electric-card", "Voltage, current, power factor, "
                                                                                       "apparent and reactive power")]
 DEVICES = [("heatpump-controls", "Heat pump", "storage temperature and power in its head, and which of its three "
-            "switches are on (Warmwasser, Automatik an · Heizung aus), Boost as its main action; folded out Smart Grid "
-            "(`state-bar`), Betrieb (`pill-switch`: Heizung, Warmwasser, and Automatik, which switches a group of the "
-            "heat pump's automations) and the sliders for DHW setpoint and leaving water offset (`pill-slider`)"),
+            "switches are on (Warmwasser, Automatik an · Heizung aus), Boost as its main action; a tap opens the page "
+            "`heatpump`"),
            ("air-conditioner-controls", "Air conditioner", "state, mode, setpoint, room temperature and timer in its "
-            "head, on/off as its main action; folded out mode and fan (`state-bar`), setpoint, boost (`boost-pill`) "
-            "and timer, in the order of its popup, faded while the unit is off but usable"),
+            "head, on/off as its main action; a tap opens the page `air_conditioning`"),
            ("ventilation-controls", "Ventilation", "level, power, CO₂ and what the automation does in its head, the "
-            "levels 1 to 3 as its main action; folded out the timer slider. It always runs, so its panel is always "
-            "tinted")]
+            "levels 1 to 3 as its main action; a tap opens the page `ventilation`. It always runs, so its panel is "
+            "always tinted")]
 
 
 def fill(text, indent=""):
@@ -138,13 +133,13 @@ def img(name, alt):
 
 
 def panels():
-    """The three device panels: what each shows, folded out side by side, and what each needs."""
+    """The three device panels: what each shows, side by side, and what each needs."""
     rows = ["### Device panels: " + ", ".join(f"`{u}`" for u, _, _ in DEVICES), "",
             "The three devices of the controls card, each a widget of its own that takes its items as props:", ""]
     rows += [fill(f"- `{u}`, the {t.lower()}: {w}.", "  ") for u, t, w in DEVICES]
     rows += ["", "Each panel is tinted in its device's colour while the device runs; place them one under the other.",
              "", "| " + " | ".join(t for _, t, _ in DEVICES) + " |", "|---|---|---|",
-             "| " + " | ".join(img(f"{u}.png", f"{t}, folded out") for u, t, _ in DEVICES) + " |", ""]
+             "| " + " | ".join(img(f"{u}.png", t) for u, t, _ in DEVICES) + " |", ""]
     for u, t, _ in DEVICES:
         rows += [f"`{u}` needs " + ", ".join(f"`{d}`" for d in sorted(needs(u))) + ".", ""]
     for u, _, _ in DEVICES:
@@ -196,14 +191,14 @@ for uid in sorted(W):
 
 md.append("""## Dashboard cards
 
-The cards of my overview page. Each takes the items it shows as props; the prop names say what an item is. Some
-elements open popup pages of my installation when tapped (`page:flow_*`, `page:hp_*`, `page:appliance_*`,
-`page:forecast`); they are not part of this repository.
+The cards of my overview page. Each takes the items it shows as props; the prop names say what an item is. Most
+elements open a page of my installation as a popup when tapped: the page of their device (`page:heatpump`,
+`page:weather` …), or for the energy flow's house and appliances a popup of its own (`page:flow_home`,
+`page:flow_appliances`). The pages are not part of this repository.
 """)
 for uid, title, what in OVERVIEW:
     shots = []
-    for name, alt in ((f"{uid}.gif", title), (f"{uid}.png", title), (f"{uid}-open.png", f"{title}, folded out"),
-                      (f"{uid}-dark.png", f"{title} in dark mode")):
+    for name, alt in ((f"{uid}.gif", title), (f"{uid}.png", title), (f"{uid}-dark.png", f"{title} in dark mode")):
         if os.path.exists(os.path.join(EXPORT, "screenshots", name)):
             shots.append(img(name, alt))
     deps = needs(uid)
@@ -212,53 +207,29 @@ for uid, title, what in OVERVIEW:
 
 md.append("""## Device controls
 
-The parts of the controls card. A device panel is a `device-head` over its details, which fold out on a tap on the
-head. Folding sends no command: the head sets a variable, which the panel declares in an `oh-context` around head and
-details. It has to be a context variable: MainUI gives every widget instance its own copy of the page's variables, so
-a page variable the head widget set would never reach the details, while a context's variables reach through the
-widgets placed inside it.
+The parts of the controls card and of my device pages' controls. A device panel is a `device-head`: a tap on it opens
+the device's page as a popup, where the pills, bars and sliders below make up the controls.
 
 """ + panels() + "\n")
-md.append(section("Device head", "device-head", """A device in three lines: its icon in a circle, tinted in the
-device's colour while `active` holds; beside it the name with a chevron and the main action, and under them two lines
-of state that run the whole width, under the action too, so they stay readable on a phone. A tap anywhere but on the
-action folds the details in or out through the variable `var`. The main action is a switch pill (`action: switch`,
-`pill-switch`), a boost button (`button`, `boost-button`) or a segmented bar (`bar`, `state-bar` with
-`actionOptions`) on `actionItem`. Declare `var` in an `oh-context` around the head and the details, and show the
-details while `vars.<var>` holds:""", """
-component: oh-context
+md.append(section("Device head", "device-head", """A device in a panel of three lines, tinted in the device's colour
+while `active` holds: its icon in a circle; beside it the name and the main action, and under them two lines of state
+that run the whole width, under the action too, so they stay readable on a phone. A tap anywhere but on the action
+opens the page `popup` as a popup, e.g. the device's page; without `popup` the panel takes no tap. The main action is a
+switch pill (`action: switch`, `pill-switch`), a boost button (`button`, `boost-button`) or a segmented bar (`bar`,
+`state-bar` with `actionOptions`) on `actionItem`:""", """
+component: widget:device-head
 config:
-  variables:
-    acOpen: false
-slots:
-  default:
-    - component: div
-      slots:
-        default:
-          - component: widget:device-head
-            config:
-              icon: material:ac_unit
-              title: Klimaanlage
-              line1: "=(items.faikout_perfera_switch.state === 'ON' ? 'An · ' : 'Aus · ') + items.faikout_perfera_mode.displayState"
-              line2: ="Raum " + items.faikout_perfera_temperature.displayState
-              color: "#29b6f6"
-              active: =items.faikout_perfera_switch.state === 'ON'
-              var: acOpen
-              action: switch
-              actionItem: faikout_perfera_switch
-              actionTitle: An/Aus
-          - component: div
-            config:
-              visible: =!!vars.acOpen
-            slots:
-              default:
-                - component: widget:state-bar
-                  config:
-                    item: faikout_perfera_mode
-                    options: A=Auto;H=Heizen;C=Kühlen;D=Entfeuchten;F=Lüften
-                    color: "#29b6f6"
-                    byText: true
-""", img("device-heads.png", "Device heads, folded")))
+  icon: material:ac_unit
+  title: Klimaanlage
+  line1: "=(items.faikout_perfera_switch.state === 'ON' ? 'An · ' : 'Aus · ') + items.faikout_perfera_mode.displayState"
+  line2: ="Raum " + items.faikout_perfera_temperature.displayState
+  color: "#29b6f6"
+  active: =items.faikout_perfera_switch.state === 'ON'
+  popup: air_conditioning
+  action: switch
+  actionItem: faikout_perfera_switch
+  actionTitle: An/Aus
+""", img("device-heads.png", "Device heads")))
 md.append(section("Segmented bar", "state-bar", """The states of one item as the segments of a bar, the current one
 filled in the colour; a tap sends a segment's state. `options` holds `value=label` pairs separated by semicolons.
 With `byText` the segments are as wide as their labels, so a long one such as *Entfeuchten* fits on a phone;
@@ -459,7 +430,7 @@ e.g. two columns.""", """
   config:
     kind: washer
     title: Waschmaschine 1
-    popup: appliance_washing_machine_1
+    popup: washing_machine_1
     progress: miele_washing_machine_wwg360_program_progress
     state: miele_washing_machine_wwg360_operation_state
     program: miele_washing_machine_wwg360_active_program
@@ -470,7 +441,7 @@ e.g. two columns.""", """
   config:
     kind: washer
     title: Waschmaschine 2
-    popup: appliance_washing_machine_2
+    popup: washing_machine_2
     power: washing_machine_2_power
     done: washing_machine_2_finished
 """, img("appliances-card.png", "Appliance tiles")))
@@ -483,12 +454,12 @@ one behind it, `overcast` as two clouds; `veil` behind three thin streaks; a rai
 drifting white `snow` or a flickering bolt (`thunder`), with the sun peeking out at its top left for showers
 (`rain_sun`, `snow_sun`, `thunder_sun`). Nothing for any other value, as an item is `NULL` after a restart. My rule
 works the symbol out from Open-Meteo: a day's sky from the share of its daylight the sun shines, an hour's from the
-cloud layers, the high ones counted half. My weather bar shows the present weather with it, and my forecast
-popup each day's, beside its hours of sunshine with their share of the daylight and the strongest wind with an arrow
+cloud layers, the high ones counted half. My weather bar shows the present weather with it, and my weather
+page each day's, beside its hours of sunshine with their share of the daylight and the strongest wind with an arrow
 of its dominant direction and its compass point, above a
 chart of the next 60 hours: temperature with the weather drawn above it and over the precipitation of each hour, the
 wind below with arrows of its direction, both every three hours; ECharts takes no widget, so the drawings there are
-this widget's layers as still SVG images. That popup is a page of my installation, not a widget of this repository; its rule writes the forecast as JSON
+this widget's layers as still SVG images. That page is part of my installation, not a widget of this repository; its rule writes the forecast as JSON
 into String items, and the chart reads them through an `oh-data-series` whose `data` is an expression such as
 `=JSON.parse(items.weather_hourly.state).map((r) => [r[0] * 1000, r[1]])`, with no persistence involved. The
 warnings in the screenshots are demo values.""", """
@@ -497,8 +468,8 @@ config:
   symbol: =items.weather_symbol.state
   day: =items.weather_is_day.state !== 'OFF'
   size: 36
-""", "| Light | Dark |\n|---|---|\n| " + img("forecast-popup.png", "Forecast popup: warnings, days and chart") + " | "
-      + img("forecast-popup-dark.png", "Forecast popup in dark mode") + " |"))
+""", "| Light | Dark |\n|---|---|\n| " + img("weather-forecast.png", "Weather page: warnings, days and chart") + " | "
+      + img("weather-forecast-dark.png", "Weather page in dark mode") + " |"))
 md.append("""## Plug cards
 
 Four cards for a metered plug, built from one item prefix: `<prefix>_power`, `_switch`, `_energy_today`,

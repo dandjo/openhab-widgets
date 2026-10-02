@@ -518,7 +518,7 @@ AC_ON = 5  # watts
 ECAR_ON = 100  # watts; standby and an LED light behind the same plug draw a few watts
 ECAR_CHARGING = 500  # it charges with 1.4 to 2.2 kW
 ECAR_COLOR = "#26a69a"
-# how the car's figures come about, under them in its popup and on its page
+# how the car's figures come about, under them on its page
 ECAR_CALC = ("Berechnet aus der Messung der Klimaanlage (Shelly EM) abzüglich der Leistung laut Faikin und der "
              "Grundlast der Klimaanlage (Standby, Innengerät); unter 300 W lädt das Auto nicht.")
 HP_ON = 50  # watts; the heat pump idles at about 20 W
@@ -578,12 +578,14 @@ HOUSE_LABEL_ANGLE = 247
 HOUSE_LABEL_X, HOUSE_LABEL_Y = (round(HOME_XY[0] + (30 + TEXT_GAP) * math.cos(math.radians(HOUSE_LABEL_ANGLE)), 1),
                                 round(HOME_XY[1] + (30 + TEXT_GAP) * math.sin(math.radians(HOUSE_LABEL_ANGLE)), 1))
 RINGS_XY = [(32.2, 32), (32.2, 93)]  # self-consumption over self-sufficiency, in the free quarter
-NODE_POPUPS = [(*PV_XY, "photovoltaics"), (*GRID_XY, "power_meter"), (*HOME_XY, "home"), (*HP_XY, "heatpump"),
+# the page each node opens as a popup: the device's page; house and appliances, which have none, a popup of their own
+NODE_POPUPS = [(*PV_XY, "photovoltaics"), (*GRID_XY, "power_meter"), (*HOME_XY, "flow_home"), (*HP_XY, "heatpump"),
                (*AC_XY, "air_conditioning"), (*BATT_XY, "energy_storage"), (*ECAR_XY, "e_car"),
-               (*APPL_XY, "appliances")]
+               (*APPL_XY, "flow_appliances")]
 def node_link(cx, cy, popup, size=68):
-    """Transparent link over a node that opens its popup, positioned in percent of the FLOW_W × FLOW_H viewBox."""
-    return comp("oh-link", {"action": "popup", "actionModal": f"page:flow_{popup}", "style": {
+    """Transparent link over a node that opens the page named by popup in a popup, positioned in percent of the
+    FLOW_W × FLOW_H viewBox."""
+    return comp("oh-link", {"action": "popup", "actionModal": f"page:{popup}", "style": {
         "position": "absolute", "display": "block", "border-radius": "50%",
         "left": f"{(cx - size / 2) / FLOW_W * 100:.2f}%", "top": f"{(cy - size / 2) / FLOW_H * 100:.2f}%",
         "width": f"{size / FLOW_W * 100:.2f}%", "height": f"{size / FLOW_H * 100:.2f}%"}})
@@ -734,7 +736,7 @@ flow = div([div([svg("svg", [
 
 # the rule weather_forecast fills these from Open-Meteo every 30 minutes, with GeoSphere's AROME Austria model: the
 # present weather as a WMO code with day or night, today's and the next two days' minimum and maximum, and for the
-# popup the next 61 hours and five days as JSON; the rule weather_warnings fills the warning items from GeoSphere
+# weather page the next 61 hours and five days as JSON; the rule weather_warnings fills the warning items from GeoSphere
 # Austria every 15 minutes. The bar takes the present temperature from the heat pump's sensor, as the temperatures
 # card does
 WX_NOW, WX_DAY = "weather_symbol", "weather_is_day"
@@ -940,7 +942,7 @@ def wx_day(day):
                **{"display": "flex", "flex-direction": "column", "align-items": "center"})
 
 
-# the popup's sources: Meteoblue's widget as in the sitemap, in the theme's colours; ORF only allows frames on its own
+# the weather page's sources: Meteoblue's widget as in the sitemap, in the theme's colours; ORF only allows frames on its own
 # pages (Content-Security-Policy frame-ancestors), so it opens in a tab of its own
 METEOBLUE = ("https://www.meteoblue.com/de/wetter/widget/daily/wien_%c3%96sterreich_2761369?geoloc=fixed&days=5"
              "&tempunit=CELSIUS&windunit=KILOMETER_PER_HOUR&precipunit=MILLIMETER&coloured=monochrome&pictoicon=0"
@@ -949,13 +951,13 @@ METEOBLUE = ("https://www.meteoblue.com/de/wetter/widget/daily/wien_%c3%96sterre
              "&precipitation=0&precipitation=1&precipitationprobability=0&precipitationprobability=1&spot=0&spot=1"
              "&pressure=0&pressure=1&layout=")
 ORF_WEATHER = "https://wetter.orf.at/wien/prognose"
-WEATHER_POPUP = "forecast"
+WEATHER_PAGE = "weather"
 
 
 def weather_card():
     """The weather as a slim bar across the overview: the present weather drawn, the outdoor temperature with a
     warning teased beside it while one is in effect or near, and the minimum and maximum of today and the next two
-    days, each with its weather drawn; a tap opens the forecast in a popup. On a phone the gaps narrow, and below 380 px
+    days, each with its weather drawn; a tap opens the weather page in a popup. On a phone the gaps narrow, and below 380 px
     the chevron goes, so the teaser fits beside the days."""
     narrow = "screen.width < 600"
     now = div([weather_icon(f"items.{WX_NOW}.state", f"items.{WX_DAY}.state !== 'OFF'", 36),
@@ -970,7 +972,7 @@ def weather_card():
                   "margin-left": "auto"})
     chevron = comp("oh-icon", {"icon": "f7:chevron_right", "width": 14, "height": 14, "visible": "=screen.width >= 380",
                                "style": {"opacity": "0.45"}})
-    link = comp("oh-link", {"action": "popup", "actionModal": f"page:{WEATHER_POPUP}", "style": {
+    link = comp("oh-link", {"action": "popup", "actionModal": f"page:{WEATHER_PAGE}", "style": {
         "position": "absolute", "inset": "0", "display": "block", "border-radius": "12px"}})
     bar = div([now, days, chevron, link], **{"position": "relative", "display": "flex", "align-items": "center",
                                              "gap": f"={narrow} ? '8px' : '12px'", "padding": "2px 4px"})
@@ -1142,7 +1144,7 @@ def weather_forecast_chart():
 
 
 def wx_day_row():
-    """A day of the popup: its name, the weather drawn, minimum and maximum, the hours of sunshine with their share
+    """A day of the forecast: its name, the weather drawn, minimum and maximum, the hours of sunshine with their share
     of the daylight under it, precipitation with its probability under it, and the strongest wind with an arrow of the
     day's main direction and its compass point under it. The maximum stands over the minimum, as every other cell
     stands its second value under its first; on a phone icons, type and gaps are a little smaller, so a day keeps its
@@ -1199,11 +1201,10 @@ def weather_forecast_card():
 
 
 def weather_cards():
-    """The weather's cards, for its popup and its page: warnings, forecast, Meteoblue and the other sources."""
+    """The weather page's cards: warnings, forecast, Meteoblue and the other sources."""
     # the widget's height follows its width, 434 px at 293 px wide and 0.36 px more per pixel (measured); the frame
-    # is the card's width less 52 px on a phone and 507 px at most, in the popup of a wider screen as on the page,
-    # where it stands in the middle of a wider card. A page cannot read the height of a frame from another site, so
-    # it is worked out from the width
+    # is the card's width less 52 px on a phone and 507 px at most, in the middle of a wider card on a wider screen.
+    # A page cannot read the height of a frame from another site, so it is worked out from the width
     width = "Math.min(507, screen.width - 52)"
     # the widget's document declares no color-scheme: in MainUI's dark theme Chrome would paint an opaque white
     # canvas behind it, and the dark layout's white text would vanish; a light scheme keeps the canvas transparent
@@ -1232,15 +1233,9 @@ def wx_warnings_row(warnings):
     return out
 
 
-def weather_popup(now):
-    warnings, forecast, meteoblue, sources = weather_cards()
-    blocks = [block(wx_warnings_row(warnings), row(full(forecast)), row(full(meteoblue)), row(full(sources)))]
-    return {WEATHER_POPUP: layout_page(WEATHER_POPUP, {"label": "Wetter", "sidebar": False}, blocks, now)}
-
-
 def weather_blocks():
-    """The weather's page in the sidebar, of the popup's cards: on a wider screen the forecast beside Meteoblue and
-    the other sources, the warnings across both."""
+    """The weather's page, in the sidebar and the weather bar's popup: on a wider screen the forecast beside
+    Meteoblue and the other sources, the warnings across both."""
     warnings, forecast, meteoblue, sources = weather_cards()
     return [block(wx_warnings_row(warnings), row(col([forecast]), col([stack(meteoblue, sources)])))]
 
@@ -1562,23 +1557,23 @@ hp_stats = div([
         **{"display": "flex", "justify-content": "space-around"}),
 ], **{"padding": "4px 4px 8px", "font-size": "14px"})
 
-def hp_link(node, popup, size=60):
-    """Transparent link over a node of the heat pump drawing, in percent of its viewBox."""
+def hp_link(node, size=60):
+    """Transparent link over a node of the heat pump drawing that opens the heat pump's page as a popup, in percent of
+    its viewBox."""
     (cx, cy), (x0, y0, w, h) = node, HP_VB
-    return comp("oh-link", {"action": "popup", "actionModal": f"page:hp_{popup}", "style": {
+    return comp("oh-link", {"action": "popup", "actionModal": "page:heatpump", "style": {
         "position": "absolute", "display": "block", "border-radius": "50%",
         "left": f"{(cx - size / 2 - x0) / w * 100:.2f}%", "top": f"{(cy - size / 2 - y0) / h * 100:.2f}%",
         "width": f"{size / w * 100:.2f}%", "height": f"{size / h * 100:.2f}%"}})
 
 
-HP_LINKS = [(OUT, "outdoor_unit"), (WALL, "indoor_unit"), (VALVE, "valve"), (TANK, "dhw_tank"),
-            (RADIATORS, "space_heating"), (GROUND_FH, "space_heating"), (UPPER_FH, "space_heating")]
+HP_LINKS = [OUT, WALL, VALVE, TANK, RADIATORS, GROUND_FH, UPPER_FH]
 # On a phone the drawing takes the whole card width. On a wider screen it stands at its own size at most, one
 # unit a pixel, so its texts keep the sizes of the rest of the UI instead of growing with the card, and the
 # figures keep the font size they have on a phone. In one row, drawing and figures stand with even room: the free
 # width goes in equal parts to the left, the middle and the right, the column gap matching the card's own padding
 # at the sides; the figures take the width the drawing leaves, up to 460 px.
-heatpump_schema = [div([div([div([hp_svg, *[hp_link(n, p) for n, p in HP_LINKS]], **{"position": "relative"})],
+heatpump_schema = [div([div([div([hp_svg, *[hp_link(n) for n in HP_LINKS]], **{"position": "relative"})],
                             **{"flex": "0 1 auto", "min-width": "0", "max-width": "100%",
                                "width": f"={NARROW} ? '100%' : '{HP_VB[2]}px'"}),
                         div([hp_stats], **{"flex": "1 1 300px", "min-width": "260px", "max-width": "460px"})],
@@ -1805,8 +1800,8 @@ def pill_switches(*pills, columns=None, min_width="150px"):
 
 def section(icon, title, color, children, row=False, divider=True, dim=None):
     """A group of controls under its title: the icon in a circle tinted in the device colour and the title, as on a
-    slider (pill-slider), the controls below. In the controls of a page or popup (row) it has the slider rows' padding
-    and divider, in the overview's panels neither."""
+    slider (pill-slider), the controls below. In the controls of a page (row) it has the slider rows' padding and
+    divider, without row neither."""
     badge = div([comp("oh-icon", {"icon": icon, "width": 15, "height": 15})],
                 **{"width": "26px", "height": "26px", "flex": "0 0 auto", "border-radius": "50%",
                    "background": f"color-mix(in srgb, {color} 20%, transparent)", "display": "flex",
@@ -1918,7 +1913,7 @@ def ac_modes_section(row=False):
 
 
 def ac_control_rows():
-    """The air conditioner's controls on its popup and its page, in one order."""
+    """The air conditioner's controls on its page, in one order."""
     return [ac_power(), ac_mode_section(row=True), ac_fan_section(row=True), ac_airflow_section(row=True),
             ac_setpoint(row=True), ac_boost(), ac_timer(row=True), ac_modes_section(row=True)]
 
@@ -2121,33 +2116,23 @@ def operation_section(*titles, row=False):
                    row=row)
 
 
-def device_panel(children, color, active, var, first=False):
-    """A device of the controls in a panel tinted in its colour while it runs. The variable var that folds its details
-    lives in an oh-context around the panel: MainUI gives every widget instance its own copy of the page variables, so
-    one the head widget set would never reach the details, while a context's variables reach through widgets."""
-    panel = div(children, **{"display": "flex", "flex-direction": "column", "gap": "8px", "padding": "10px 12px",
-                             "margin-top": "4px" if first else "8px", "border-radius": "14px",
-                             "background": f"={active} ? '{rgba(color, 0.12)}' : 'rgba(127, 127, 127, 0.08)'"})
-    return comp("oh-context", {"variables": {var: False}}, default=[panel])
+def device_panel(head, first=False):
+    """A device of the controls: its head, which draws the panel and opens the device's page."""
+    return div([head], **{"margin-top": "4px" if first else "8px"})
 
 
 def device_head_widget():
-    """The widget every device head is an instance of: a device in three lines, its icon (26 px, as on the switch
-    tiles) in a circle tinted while it runs; beside it the name with a chevron and the main action, and under them two
-    lines of state that run the whole width, under the action too, so they stay readable on a phone. A tap anywhere
-    folds the device's details in or out, through the variable named by var, which sends no command; an oh-context
-    around head and details declares it, as a page variable set in here would stay in this widget; the action
-    lies above that and takes its own taps. action: switch (a switch pill), button (a boost button) or bar (a segmented
-    bar of actionOptions), on actionItem."""
-    open_ = "!!vars[props.var]"
+    """The widget every device head is an instance of: a device in a panel of three lines, tinted in its colour while
+    it runs: its icon (26 px, as on the switch tiles) in a circle, beside it the name and the main action, and under
+    them two lines of state that run the whole width, under the action too, so they stay readable on a phone. A tap
+    anywhere but on the action opens the page named by popup in a popup; the action lies above that and takes its own
+    taps. action: switch (a switch pill), button (a boost button) or bar (a segmented bar of actionOptions), on
+    actionItem."""
     badge = div([comp("oh-icon", {"icon": "=props.icon", "width": 26, "height": 26})],
                 **{"width": "44px", "height": "44px", "flex": "0 0 auto", "border-radius": "50%", "display": "flex",
                    "align-items": "center", "justify-content": "center",
                    "background": "=props.active ? 'color-mix(in srgb, var(--head-color) 25%, transparent)' : "
                                  "'rgba(127, 127, 127, 0.12)'"})
-    chevron = comp("oh-icon", {"icon": "f7:chevron_down", "width": 16, "height": 16, "style": {
-        "flex": "0 0 auto", "transition": "transform 0.25s ease",
-        "transform": f"=({open_}) ? 'rotate(180deg)' : 'none'", "opacity": "0.6"}})
     actions = [comp(f"widget:{uid}", {"item": "=props.actionItem", key: f"=props.{prop}", "color": "=props.color",
                                       "visible": f"=props.action === '{kind}'"})
                for kind, uid, key, prop in (("switch", "pill-switch", "title", "actionTitle"),
@@ -2155,7 +2140,6 @@ def device_head_widget():
                                             ("bar", "state-bar", "options", "actionOptions"))]
     top = div([label("=props.title", **{"flex": "1", "min-width": "0", "font-size": "15px", "font-weight": "600",
                                         "white-space": "nowrap", "overflow": "hidden", "text-overflow": "ellipsis"}),
-               chevron,
                div(actions, visible="=!!props.action",
                    **{"flex": "0 0 104px", "position": "relative", "z-index": "2"})],
               **{"display": "flex", "align-items": "center", "gap": "8px"})
@@ -2165,18 +2149,21 @@ def device_head_widget():
             for line in ("line1", "line2")]
     body = div([top, *info], **{"flex": "1", "min-width": "0", "display": "flex", "flex-direction": "column",
                                 "gap": "2px"})
-    link = comp("oh-link", {"action": "variable", "actionVariable": "=props.var", "actionVariableValue": f"=!({open_})",
-                            "style": {"position": "absolute", "inset": "0", "display": "block", "border-radius": "10px",
+    link = comp("oh-link", {"visible": "=!!props.popup", "action": "popup", "actionModal": "='page:' + props.popup",
+                            "style": {"position": "absolute", "inset": "0", "display": "block", "border-radius": "14px",
                                       "z-index": "1"}})
     return div([badge, body, link], **{"--head-color": "=props.color || '#78909c'", "position": "relative",
-                                       "display": "flex", "align-items": "center", "gap": "10px"})
+                                       "display": "flex", "align-items": "center", "gap": "10px",
+                                       "padding": "10px 12px", "border-radius": "14px",
+                                       "background": "=props.active ? 'color-mix(in srgb, var(--head-color) 12%, "
+                                                     "transparent)' : 'rgba(127, 127, 127, 0.08)'"})
 
 
-def device_head(icon, title, lines, color, active, var, action=None, action_item=None, action_title=None,
+def device_head(icon, title, lines, color, active, popup, action=None, action_item=None, action_title=None,
                 action_options=None):
     """An instance of the device head widget; lines and active are expressions, evaluated where the head stands."""
     cfg = {"icon": icon, "title": title, "line1": f"={lines[0]}", "line2": f"={lines[1]}", "color": color,
-           "active": f"={active}", "var": var}
+           "active": f"={active}", "popup": popup}
     if action:
         cfg.update({"action": action, "actionItem": action_item})
     if action_title:
@@ -2184,12 +2171,6 @@ def device_head(icon, title, lines, color, active, var, action=None, action_item
     if action_options:
         cfg["actionOptions"] = ";".join(f"{v}={t}" for v, t in action_options)
     return comp("widget:device-head", cfg)
-
-
-def device_details(var, children):
-    """A device's controls under its head, folded in until the head is tapped."""
-    return div(children, visible=f"=!!vars.{var}",
-               **{"display": "flex", "flex-direction": "column", "gap": "8px", "padding-top": "4px"})
 
 
 def grouped_states(switches):
@@ -2205,35 +2186,24 @@ def on_off_text(item):
 
 
 def hp_controls():
-    """The heat pump: storage temperature, power and the three switches in its head, Boost as its main action;
-    folded out Smart Grid, the switch pills and the sliders for DHW setpoint and leaving-water offset."""
+    """The heat pump: storage temperature, power and the three switches in its head, Boost as its main action; a tap
+    opens its page."""
     lines = [f"'Speicher ' + {disp(HPX['tank'])} + ' · ' + {kw(HPX['power'])}",
              grouped_states([(t, item) for t, item, _ in HP_SWITCH_BAR])]
-    return device_panel([
-        device_head("material:heat_pump", "Wärmepumpe", lines, HP_ORANGE, HP_RUNNING, "controlsHeatpump",
-                    "button", "pyaltherma_dhw_powerful", "Boost"),
-        device_details("controlsHeatpump", [
-            smart_grid_section(), operation_section(),
-            dhw_setpoint({"opacity": f"={is_on('pyaltherma_dhw_power')} ? '1' : '0.6'"}),
-            lw_offset({"opacity": f"={is_on('pyaltherma_climate_control_power')} ? '1' : '0.6'"})])],
-        HP_ORANGE, HP_RUNNING, "controlsHeatpump", first=True)
+    return device_panel(device_head("material:heat_pump", "Wärmepumpe", lines, HP_ORANGE, HP_RUNNING, "heatpump",
+                                    "button", "pyaltherma_dhw_powerful", "Boost"), first=True)
 
 
 def ac_controls():
-    """The air conditioner: state, mode, setpoint, room and timer in its head, An/Aus as its main action; folded out
-    mode, fan, setpoint, boost and timer in the order of its popup, fading while the unit is off but usable."""
-    dim = {"opacity": f"={AC_ON_STATE} ? '1' : '0.6'"}
+    """The air conditioner: state, mode, setpoint, room and timer in its head, An/Aus as its main action; a tap opens
+    its page."""
     m = num("air_conditioning_timer")
     lines = [f"({AC_ON_STATE} ? 'An · ' : 'Aus · ') + {disp('faikout_perfera_mode')} + ' · Soll ' + "
              f"{degrees('faikout_perfera_temperature_setpoint')}",
              f"'Raum ' + {disp('faikout_perfera_temperature')} + ({m} > 0 ? ' · Timer noch ' + {minutes_text(m)} : "
              f"' · kein Timer')"]
-    return device_panel([
-        device_head("material:ac_unit", "Klimaanlage", lines, AC_BLUE, AC_ON_STATE, "controlsAirConditioning",
-                    "switch", "faikout_perfera_switch", "An/Aus"),
-        device_details("controlsAirConditioning", [
-            ac_mode_section(), ac_fan_section(dim=dim), ac_setpoint(dim), ac_boost(), ac_timer(dim)])],
-        AC_BLUE, AC_ON_STATE, "controlsAirConditioning")
+    return device_panel(device_head("material:ac_unit", "Klimaanlage", lines, AC_BLUE, AC_ON_STATE, "air_conditioning",
+                                    "switch", "faikout_perfera_switch", "An/Aus"))
 
 
 VENT_TEAL = "#26a69a"
@@ -2241,18 +2211,15 @@ VENT_TEAL = "#26a69a"
 
 def vent_controls():
     """The ventilation: level, power, CO2 and what the automation does in its head, the levels 1 to 3 as its main
-    action; folded out the timer. It always runs, so the panel is always tinted."""
+    action; a tap opens its page. It always runs, so the panel is always tinted."""
     m = num("ventilation_timer")
     auto = is_on("ventilation_management")
     lines = [f"'Stufe ' + {disp('esplyfterl_level')} + ' · ' + Math.round({num('ventilation_power')}) + ' W · CO₂ ' + "
              f"{disp('netatmo_weatherstation_co2')}",
              f"{m} > 0 ? ({auto} ? 'Automatik pausiert bis ' : 'Timer bis ') + {ends_at(m)} : "
              f"({auto} ? 'Automatik regelt die Stufe' : 'Automatik aus')"]
-    return device_panel([
-        device_head("material:air", "Lüftung", lines, VENT_TEAL, "true", "controlsVentilation", "bar",
-                    "esplyfterl_level", action_options=[("1", "1"), ("2", "2"), ("3", "3")]),
-        device_details("controlsVentilation", [vent_timer()])],
-        VENT_TEAL, "true", "controlsVentilation")
+    return device_panel(device_head("material:air", "Lüftung", lines, VENT_TEAL, "true", "ventilation", "bar",
+                                    "esplyfterl_level", action_options=[("1", "1"), ("2", "2"), ("3", "3")]))
 
 
 # widgets whose props are items named by their role, built with the items and turned into props (see widgets()):
@@ -2305,7 +2272,7 @@ def control_tiles():
 
 
 # heat pump, air conditioner and ventilation in panels of their own, each a head of three lines with its main action
-# and its controls folded in until the head is tapped; the switches as tiles: tap one to switch it, ON is tinted in
+# that opens the device's page in a popup when tapped; the switches as tiles: tap one to switch it, ON is tinted in
 # its colour
 controls = control_tiles()
 
@@ -2778,7 +2745,8 @@ def chips(*children):
 
 
 def tile(children, popup):
-    """Appliance tile; a transparent link over it opens the appliance's popup page (popup may be an expression)."""
+    """Appliance tile; a transparent link over it opens the appliance's page as a popup (popup may be an
+    expression)."""
     modal = f"='page:' + {popup[1:]}" if popup.startswith("=") else f"page:{popup}"
     link = comp("oh-link", {"action": "popup", "actionModal": modal, "style": {
         "position": "absolute", "inset": "0", "display": "block", "border-radius": "12px"}})
@@ -2791,15 +2759,11 @@ def tile(children, popup):
 
 APPLIANCE_FRONTS = [("washer", washer_front), ("dryer", dryer_front), ("dish-washer", dishwasher_front)]
 APPLIANCES = [
-    # popup page, title, front drawing, Miele item prefix (None: plug only), plug item prefix, extra program values
-    ("appliance_washing_machine_1", "Washing Machine 1", washer_front, "miele_washing_machine_wwg360",
-     "washing_machine_1", [("Temperature", "target_temperature"), ("Spin Speed", "spinning_speed"),
-                           ("Program Water", "current_water_consumption")]),
-    ("appliance_washing_machine_2", "Washing Machine 2", washer_front, None, "washing_machine_2", []),
-    ("appliance_tumble_dryer", "Tumble Dryer", dryer_front, "miele_tumble_dryer_twc560wp", "tumble_dryer",
-     [("Drying Target", "drying_target")]),
-    ("appliance_dishwasher", "Dishwasher", dishwasher_front, "miele_dishwasher_g7465", "dishwasher",
-     [("Program Water", "current_water_consumption")]),
+    # the device page a tap opens as a popup, title, front drawing, Miele item prefix (None: plug only), plug prefix
+    ("washing_machine_1", "Washing Machine 1", washer_front, "miele_washing_machine_wwg360", "washing_machine_1"),
+    ("washing_machine_2", "Washing Machine 2", washer_front, None, "washing_machine_2"),
+    ("tumble_dryer", "Tumble Dryer", dryer_front, "miele_tumble_dryer_twc560wp", "tumble_dryer"),
+    ("dishwasher", "Dishwasher", dishwasher_front, "miele_dishwasher_g7465", "dishwasher"),
 ]
 
 
@@ -2828,7 +2792,7 @@ WM2_COLOR = f"={WM2_RUNNING} ? '#1e88e5' : {WM2_FINISHED} ? '#43a047' : '#9e9e9e
 
 def appliance_tile_widget():
     """The widget every appliance tile is an instance of: the appliance's icon, its name and state, a tap opening its
-    popup page. A Miele machine (progress given) shows program progress in the ring, its state as a chip in blue while
+    page as a popup. A Miele machine (progress given) shows program progress in the ring, its state as a chip in blue while
     it runs, green when it is finished, grey otherwise, the remaining time, and program, phase and end time while it
     runs; a machine behind a metered plug (power given) runs above 10 W, is finished when done is on, and pulses."""
     it = lambda key: f"items[props.{key}]"
@@ -2866,7 +2830,7 @@ APPLIANCE_TILE_ITEMS = {  # prop: the Miele item suffix, or the plug's
 ITEM_PARAMS["appliance-tile"] = {*APPLIANCE_TILE_ITEMS, "power", "done"}
 
 
-def appliance_tile(uid, title, front, p, plug, extra):
+def appliance_tile(uid, title, front, p, plug):
     """An instance of the appliance tile widget: a Miele machine through its items, else the plug's power."""
     cfg = {"kind": front_kind(front), "title": title, "popup": uid}
     if p:
@@ -2891,7 +2855,7 @@ appliances = [div([appliance_tile(*a) for a in APPLIANCES],
                   **{"display": "grid", "grid-template-columns": "1fr 1fr", "grid-auto-rows": "1fr", "gap": "10px",
                      "padding": "12px 16px 16px", "flex": "1 1 auto"})]
 
-# ---------------------------------------------------------------- 8b. appliance popups
+# ---------------------------------------------------------------- 8b. appliance pages
 
 
 # ---- watermark icons of the value tiles
@@ -3148,7 +3112,8 @@ def progress_bar(p):
     ], visible=f"={miele_state(p)[0]}", **{"padding": "0 16px 16px"})
 
 
-def popup_header(front, p):
+def appliance_header(front, p):
+    """The machine drawn large beside its state; while a Miele program runs also program, phase and ready time."""
     if p:
         running, color, status, details = miele_state(p)
         lines = [chips(chip(status, color), remaining_chip(p, running)),
@@ -3163,47 +3128,6 @@ def popup_header(front, p):
                               "min-width": "0"})],
                **{"display": "flex", "align-items": "center", "gap": "18px", "padding": "12px 16px 16px"})
 
-
-def program_tiles(p, extra):
-    tiles = [value_tile("Program", f"=items.{p}_active_program.state", f"={ok(p + '_active_program')}"),
-             value_tile("Phase", f"=items.{p}_program_phase.state", f"={ok(p + '_program_phase')}"),
-             *[value_tile(t, f"={disp(p + '_' + suffix)}", f"={ok(p + '_' + suffix)}") for t, suffix in extra],
-             value_tile("Program Energy", f"={disp(p + '_current_energy_consumption')}",
-                        f"={ok(p + '_current_energy_consumption')}"),
-             value_tile("Delayed Start", f"=dayjs(items.{p}_delayed_start_time_absolute.state).format('ddd HH:mm')",
-                        f"={ok(p + '_delayed_start_time_absolute')}")]
-    return tile_grid(tiles)
-
-
-def power_chart(item):
-    return chart({"period": "D", "periodVisible": True, "height": "260px"},
-                 grid=[comp("oh-chart-grid", {"top": "35", "bottom": "35", "left": "50", "right": "20"})],
-                 xAxis=[comp("oh-time-axis", {"gridIndex": 0})],
-                 yAxis=[comp("oh-value-axis", {"gridIndex": 0, "name": "W", "nameGap": 14, "nameTextStyle": AXIS_NAME,
-                                               "splitLine": {"lineStyle": {"type": "dashed", "opacity": 0.4}}})],
-                 series=[time_series("Power", item, symbol="none", sampling="lttb",
-                                     lineStyle={"width": 1.5, "color": "#42a5f5"}, itemStyle={"color": "#42a5f5"},
-                                     areaStyle={"color": gradient("66, 165, 245")}),
-                         # one invisible point at 100 W keeps the axis from scaling standby noise of 0.2 W to full height
-                         comp("oh-data-series", {"name": "", "type": "line", "xAxisIndex": 0, "yAxisIndex": 0,
-                                                 "data": [["=dayjs().valueOf()", 100]], "symbol": "none",
-                                                 "silent": True, "tooltip": {"show": False}})],
-                 tooltip=tooltip(trigger="axis", smartFormatter=True))
-
-
-def appliance_cards(uid, title, front, p, plug, extra):
-    now_content = [popup_header(front, p)]
-    if p:
-        now_content.append(progress_bar(p))
-    now_content.append(tile_grid([value_tile("Power", f"={disp(plug + '_power')}"),
-                                  value_tile("Energy Today", f"={disp(plug + '_energy_today')}"),
-                                  value_tile("Energy Total", f"={disp(plug + '_energy_total')}")]))
-    cards = [card("Now", now_content)]
-    if p:
-        cards.append(comp("oh-card", {"title": "Program", "visible": f"={miele_state(p)[0]}"},
-                          content=[program_tiles(p, extra)]))
-    cards.append(card("Power", [power_chart(f"{plug}_power")]))
-    return cards
 
 # ---------------------------------------------------------------- 8c. energy flow popups
 
@@ -3289,10 +3213,6 @@ def pct(part, whole):
     return f"=({num(whole)} > 0 ? Math.round(100 * {num(part)} / {num(whole)}) : 0) + ' %'"
 
 
-def signed(item, unit="kW"):
-    return (f"={fixed(f'{num(item)} / 1000', 3)} + ' kW'" if unit == "kW" else f"=Math.round({num(item)}) + ' W'")
-
-
 def sign_colors():
     """Colours the first series by its sign: green below zero, red above. The pieces must be finite: with only
     open-ended ones ECharts has no colour stops for the line gradient and throws instead of drawing."""
@@ -3305,236 +3225,126 @@ def controls_box(*rows):
     return div(list(rows), **{"padding": "4px 16px 12px"})
 
 
-GRID_SIGN_COLOR = f"={num(GRID)} < 0 ? '#43a047' : '#e53935'"
-BATT_STATE = f"={num(BATT)} < -10 ? 'lädt' : {num(BATT)} > 10 ? 'entlädt' : 'ruht'"
-FLOW_POPUPS = {
-    "photovoltaics": ("Photovoltaics", [
-        card("Now", [tile_grid([
-            value_tile("Input Power", f"={kw(PV)}"),
-            value_tile("Output Power", f"={kw('huawei_inverter_active_power')}"),
-            value_tile("Peak Today", f"={kw('huawei_inverter_active_peak_of_current_day')}"),
-            value_tile("String 1", f"={disp('huawei_inverter_pv1_power')}"),
-            value_tile("String 2", f"={disp('huawei_inverter_pv2_power')}", f"={ok('huawei_inverter_pv2_power')}"),
-            value_tile("Inverter", f"={disp('huawei_inverter_internal_temperature')}")])]),
-        card("Today", [tile_grid([
-            value_tile("Production", f"={disp('huawei_inverter_e_day')}"),
-            value_tile("Self-used", f"={disp('photovoltaics_own_ec_day')}"),
-            value_tile("Fed In", f"={disp('huawei_inverter_power_meter_ep_day')}"),
-            value_tile("Self-consumption", pct("photovoltaics_own_ec_day", "huawei_inverter_e_day")),
-            value_tile("Total", f"={disp('huawei_inverter_e_total')}")])]),
-        card("Power", [day_chart([area("PV", PV, "#ffb300")])]),
-    ]),
-    "power_meter": ("Power Meter", [
-        card("Now", [tile_grid([
-            value_tile(f"={num(GRID)} < 0 ? 'Einspeisung' : 'Bezug'", f"={signed_kw}", color=GRID_SIGN_COLOR),
-            value_tile("Phase A", signed("huawei_inverter_power_meter_phase_a_active_power", "W")),
-            value_tile("Phase B", signed("huawei_inverter_power_meter_phase_b_active_power", "W")),
-            value_tile("Phase C", signed("huawei_inverter_power_meter_phase_c_active_power", "W")),
-            value_tile("Frequency", f"={disp('huawei_inverter_power_meter_frequency')}"),
-            value_tile("Price All-in", f"={disp(PRICE)}", color=price_color)])]),
-        card("Today", [tile_grid([
-            value_tile("Imported", f"={disp('huawei_inverter_power_meter_ec_day')}", color="#e53935"),
-            value_tile("Exported", f"={disp('huawei_inverter_power_meter_ep_day')}", color="#43a047")])]),
-        # sampled, a day of 5-second readings is too much to draw
-        card("Power", [day_chart([time_series("Grid", GRID, symbol="none", sampling="lttb", lineStyle={"width": 1.5},
-                                              areaStyle={"opacity": 0.25})], visualMap=sign_colors())]),
-    ]),
-    "home": ("Home", [
-        card("Now", [tile_grid([
-            value_tile("Power", f"={kw(HOME)}"),
-            value_tile("Self-consumption", pct("photovoltaics_own_ec_day", "huawei_inverter_e_day"), color="#43a047"),
-            value_tile("Self-sufficiency", pct("photovoltaics_own_ec_day", "home_ec_day"), color="#43a047")])]),
-        card("Today", [tile_grid([
-            value_tile("Consumption", f"={disp('home_ec_day')}"),
-            value_tile("From PV", f"={disp('photovoltaics_own_ec_day')}", color="#43a047"),
-            value_tile("From Grid", f"={disp('huawei_inverter_power_meter_ec_day')}", color="#e53935")])]),
-        card("Power", [day_chart([area("Home", HOME, "#1e88e5")])]),
-    ]),
-    "heatpump": ("Heatpump", [
-        card("Controls", [controls_box(
-            smart_grid_section(row=True),
-            operation_section(row=True),
-            dhw_setpoint(row=True),
-            dhw_boost(),
-            lw_offset(row=True))]),
-        card("Now", [tile_grid([
-            value_tile("Electrical", f"={disp(HPX['power'])}", color="#fb8c00"),
-            value_tile("Heating", f"={disp(HPX['heat'])}", color="#e53935"),
-            value_tile("COP", f"={num(HPX['cop'])} > 0 ? {fixed(num(HPX['cop']), 1)} : '–'"),
-            value_tile("Operation", f"={disp('espaltherma_i_u_operation_mode')}"),
-            value_tile("Valve", f"={disp(HPX['valve'])}"),
-            value_tile("DHW Tank", f"={disp(HPX['tank'])}"),
-            value_tile("Leaving Water", f"={disp(HPX['supply'])}"),
-            value_tile("Inlet Water", f"={disp(HPX['return'])}"),
-            value_tile("Outdoor", f"={disp(HPX['outdoor'])}")])]),
-        card("Today", [tile_grid([
-            value_tile("Electricity", f"={disp('espaltherma_energy_today')}"),
-            value_tile("Heat", f"={disp('espaltherma_heating_energy_today')}"),
-            value_tile("COP", f"={num('espaltherma_dcop')} > 0 ? {fixed(num('espaltherma_dcop'), 1)} : '–'")])]),
-        card("Power", [day_chart([area("Electrical", HPX["power"], "#fb8c00"),
-                                  line("Heating", HPX["heat"], "#e53935")])]),
-    ]),
-    "air_conditioning": ("Air Conditioning", [
-        card("Controls", [controls_box(*ac_control_rows())]),
-        card("Now", [tile_grid([
-            value_tile("Power", f"={disp('air_conditioning_unit_power')}", color="#29b6f6"),
-            value_tile("Outdoor Unit", f"={disp('faikout_perfera_power')}"),
-            value_tile("Room", f"={disp('faikout_perfera_temperature')}"),
-            value_tile("Setpoint", f"={disp('faikout_perfera_temperature_setpoint')}"),
-            value_tile("Outdoor", f"={disp('faikout_perfera_outdoor_temperature')}"),
-            value_tile("Compressor", f"={disp('faikout_perfera_compressor_frequency')}"),
-            value_tile("Fan Speed", f"={disp('faikout_perfera_fan_speed')}")])]),
-        card("Power", [day_chart([area("Power", "faikout_perfera_power", "#29b6f6"),
-                                  line("Room", "faikout_perfera_temperature", "#fb8c00", y=1)],
-                                 [value_axis("W"), value_axis("°C", scale=True, splitLine={"show": False})])]),
-    ]),
-    "energy_storage": ("Energy Storage", [
-        card("Now", [tile_grid([
-            value_tile("State of Charge", f"={disp(SOC)}", color="#7cb342"),
-            value_tile(f"='Leistung · ' + ({BATT_STATE[1:]})", f"={fixed(f'{num(BATT)} / 1000', 3)} + ' kW'"),
-            value_tile("Status", f"={disp('huawei_inverter_energy_storage_running_status')}"),
-            value_tile("Temperature", f"={disp('huawei_inverter_energy_storage_unit_1_temperature')}")])]),
-        card("Today", [tile_grid([
-            value_tile("Charged", f"={disp('huawei_inverter_energy_storage_day_charge')}"),
-            value_tile("Discharged", f"={disp('huawei_inverter_energy_storage_day_discharge')}")])]),
-        card("Power", [day_chart([area("Power", BATT, "#7cb342"), line("State of Charge", SOC, "#43a047", y=1)],
-                                 [value_axis("W"), value_axis("", min=0, max=100, splitLine={"show": False},
-                                                              axisLabel={"formatter": "{value} %"})])]),
-    ]),
-    "e_car": ("E-Car", [
-        card("Now", [
-            div([chip(f"={num(ECAR)} > {ECAR_CHARGING} ? 'lädt' : 'lädt nicht'",
-                      f"={num(ECAR)} > {ECAR_CHARGING} ? '{ECAR_COLOR}' : '#9e9e9e'")],
-                **{"padding": "8px 16px 4px"}),
-            tile_grid([value_tile("Power", f"={kw(ECAR)}", color=ECAR_COLOR),
-                       value_tile("Energy Today", f"={disp('e_car_energy_today')}"),
-                       value_tile("Energy Total", f"={disp('e_car_energy_total')}"),
-                       value_tile("Voltage", f"={disp('e_car_voltage')}"),
-                       value_tile("Current", f"={disp('e_car_current')}")]),
-            label(ECAR_CALC, **{"font-size": "12px", "opacity": "0.6", "padding": "0 16px 14px"})]),
-        card("Power", [day_chart([area("Power", ECAR, ECAR_COLOR)])]),
-    ]),
-    "appliances": ("Appliances", [
-        card("Now", [tile_grid([
-            # in W as the four tiles beside it, with a decimal below 100 W as the plugs give it
-            value_tile("Total", f"=({APPL_POWER} >= 100 ? Math.round({APPL_POWER}) : {fixed(APPL_POWER, 1)}) + ' W'",
-                       color=APPL_COLOR),
-            *[value_tile(title, f"={disp(p + '_power')}") for p, title, _ in FLOW_APPLIANCES]])]),
-        card("Today", [tile_grid([
-            value_tile("Total", f"={fixed(APPL_DAY, 2)} + ' kWh'", color=APPL_COLOR),
-            *[value_tile(title, f"={disp(p + '_energy_today')}") for p, title, _ in FLOW_APPLIANCES]])]),
-        # lines, not stacked areas: ECharts stacks a time axis by the points' index, not their time, and the four
-        # plugs are persisted at different moments
-        card("Power", [day_chart([line(title, p + "_power", color) for p, title, color in FLOW_APPLIANCES])]),
-        card("Energy per Day", [chart(
-            {"chartType": "month", "periodVisible": True, "height": "260px"},
-            grid=[comp("oh-chart-grid", {"top": "40", "bottom": "60", "left": "45", "right": "20"})],
-            xAxis=[comp("oh-category-axis", {"gridIndex": 0, "categoryType": "month", "name": "Tag", "nameGap": 12,
-                                             "axisTick": {"show": False}})],
-            yAxis=[value_axis("kWh")],
-            series=[daily(title, p + "_energy_today", color, stack="appliances")
-                    for p, title, color in FLOW_APPLIANCES],
-            tooltip=tooltip(trigger="axis", smartFormatter=True), legend=legend())]),
-    ]),
-}
+HOME_BLUE = "#1e88e5"
 
 
-def on_off(item):
-    return f"=items.{item}.state === 'ON' ? 'An' : 'Aus'"
+def home_sources():
+    """Where the house's power comes from now: from PV directly, from the battery and from the grid, each with its
+    share, as a split bar over three tiles. The grid counts only while it imports, the battery only while it
+    discharges; PV covers the rest, at most its own power."""
+    grid_in, batt_out = f"Math.max(0, {num(GRID)})", f"Math.max(0, {num(BATT)})"
+    pv = f"Math.max(0, Math.min({num(PV)}, {num(HOME)} - {grid_in} - {batt_out}))"
+    whole = f"Math.max(1, {pv} + {batt_out} + {grid_in})"
+    sources = [("aus PV", pv, "#ffb300", "solar_power"), ("aus der Batterie", batt_out, BATTERY_GREEN, "battery_full"),
+               ("aus dem Netz", grid_in, "#e53935", "electric_meter")]
+    share_ = lambda v: f"Math.round(100 * {v} / {whole})"
+    bar = div([div([], visible=f"={v} > 5", **{"width": f"=(100 * {v} / {whole}).toFixed(2) + '%'", "height": "100%",
+                                               "background": c, "border-radius": "4px"})
+               for _, v, c, _ in sources], **{"display": "flex", "gap": "2px", "height": "10px", "margin": "0 16px 10px"})
+    tiles = []
+    for t, v, c, icon in sources:
+        tile = value_tile(f"='{t} · ' + {share_(v)} + ' %'", f"={fixed(f'{v} / 1000', 3)} + ' kW'", color=c)
+        tile["config"]["icon"] = f"material:{icon}"  # the title's share names other items, which would mislead the rules
+        tiles.append(tile)
+    tiles = wide_grid(tiles)
+    return [label("Woher der Strom jetzt kommt", **{"font-size": "13px", "opacity": "0.7", "padding": "4px 16px 6px"}),
+            bar, tiles]
 
 
-LW_OFFSET = lw_offset(row=True)
-HP_POPUPS = {
-    "outdoor_unit": ("Outdoor Unit", [
-        card("Now", [tile_grid([
-            value_tile("Electrical", f"={disp(HPX['circuit'])}", color="#fb8c00"),
-            value_tile("Compressor", f"={disp(HPX['hz'])}"),
-            value_tile("Inverter Current", f"={disp('espaltherma_inv_primary_current')}"),
-            value_tile("Operation", f"={disp('espaltherma_operation_mode')}"),
-            value_tile("Defrost", on_off(HPX["defrost"])),
-            value_tile("Outdoor", f"={disp(HPX['outdoor'])}"),
-            value_tile("Discharge Pipe", f"={disp('espaltherma_discharge_pipe_temp')}"),
-            value_tile("Heat Exchanger", f"={disp('espaltherma_heat_exchanger_mid_temp')}"),
-            value_tile("Refrigerant", f"={disp('espaltherma_refrigerant_pressure_sensor')}")])]),
-        card("Controls", [controls_box(smart_grid_section(row=True))]),
-        card("Today", [day_chart([area("Electrical", HPX["circuit"], "#fb8c00"),
-                                  line("Compressor", HPX["hz"], "#8d6e63", y=1)],
-                                 [value_axis("W"), value_axis("Hz", splitLine={"show": False})])]),
-    ]),
-    "indoor_unit": ("Indoor Unit", [
-        card("Controls", [controls_box(operation_section("Heizung", "Warmwasser", row=True), LW_OFFSET)]),
-        card("Now", [tile_grid([
-            value_tile("Heating", f"={disp(HPX['heat'])}", color="#e53935"),
-            value_tile("Flow", f"={disp(HPX['flow'])}"),
-            value_tile("Pump", f"={on_off(HPX['pump'])[1:]} + ' · ' + {disp('espaltherma_water_pump_signal')}"),
-            value_tile("Water Pressure", f"={disp('espaltherma_water_pressure')}"),
-            value_tile("Leaving Water", f"={disp(HPX['supply'])}"),
-            value_tile("Before Backup Heater", f"={disp('espaltherma_leaving_water_temp_before_buh')}"),
-            value_tile("Inlet Water", f"={disp(HPX['return'])}"),
-            value_tile("LW Setpoint", f"={disp('espaltherma_leaving_water_setpoint')}"),
-            value_tile("Backup Heater", f"={BUH_ON} ? 'An' : 'Aus'"),
-            value_tile("Error Code", f"={disp('espaltherma_error_code')}")])]),
-        card("Today", [day_chart([line("Leaving Water", HPX["supply"], "#e53935"),
-                                  line("Inlet Water", HPX["return"], "#1e88e5")],
-                                 [value_axis("°C", scale=True)])]),
-    ]),
-    "valve": ("Three-Way Valve", [
-        card("Now", [tile_grid([
-            value_tile("Position", f"={disp(HPX['valve'])}"),
-            value_tile("Indoor Operation", f"={disp('espaltherma_i_u_operation_mode')}"),
-            value_tile("Space Heating", on_off("espaltherma_space_heating_operation")),
-            value_tile("Powerful DHW", on_off("espaltherma_powerful_dhw_operation")),
-            value_tile("Electrical Space", f"={disp('espaltherma_electrical_power_space')}", color="#fb8c00"),
-            value_tile("Electrical DHW", f"={disp('espaltherma_electrical_power_dhw')}", color="#e53935")])]),
-        card("Controls", [controls_box(operation_section("Heizung", "Warmwasser", row=True))]),
-        card("Today", [day_chart([area("Space", "espaltherma_electrical_power_space", "#ffb74d"),
-                                  area("DHW", "espaltherma_electrical_power_dhw", "#e57373")])]),
-    ]),
-    "dhw_tank": ("DHW Tank", [
-        card("Controls", [controls_box(
-            operation_section("Warmwasser", "Automatik", row=True),
-            dhw_setpoint(row=True),
-            dhw_boost())]),
-        card("Now", [tile_grid([
-            value_tile("Tank", f"={disp(HPX['tank'])}", color="#e53935"),
-            value_tile("Setpoint", f"={disp(HPX['tank_set'])}"),
-            value_tile("Effect Heater", on_off(HPX["bsh"])),
-            value_tile("Powerful", on_off("espaltherma_powerful_dhw_operation")),
-            value_tile("Reheat", on_off("espaltherma_reheat")),
-            value_tile("Storage Eco", on_off("espaltherma_storage_eco_mode"))])]),
-        card("Today", [tile_grid([
-            value_tile("Electricity", f"={disp('espaltherma_energy_dhw_today')}"),
-            value_tile("Heat", f"={disp('espaltherma_heating_energy_dhw_today')}"),
-            value_tile("COP", f"={num('espaltherma_dcop_dhw')} > 0 ? {fixed(num('espaltherma_dcop_dhw'), 1)} : '–'")])]),
-        card("Temperature", [day_chart([line("Tank", HPX["tank"], "#e53935"),
-                                        line("Setpoint", HPX["tank_set"], "#9e9e9e", dashed=True)],
-                                       [value_axis("°C", scale=True)])]),
-    ]),
-    "space_heating": ("Space Heating", [
-        card("Controls", [controls_box(operation_section("Heizung", row=True), LW_OFFSET)]),
-        card("Now", [tile_grid([
-            value_tile("Upper Floor", f"={disp('faikout_perfera_temperature')}"),
-            value_tile("Ground Floor", f"={disp(HPX['indoor'])}"),
-            value_tile("Room Setpoint", f"={disp('espaltherma_room_temp_setpoint')}"),
-            value_tile("Heating", f"={disp('espaltherma_heating_power_space')}", color="#e53935"),
-            value_tile("Leaving Water", f"={disp(HPX['supply'])}"),
-            value_tile("Inlet Water", f"={disp(HPX['return'])}")])]),
-        card("Today", [tile_grid([
-            value_tile("Electricity", f"={disp('espaltherma_energy_space_today')}"),
-            value_tile("Heat", f"={disp('espaltherma_heating_energy_space_today')}"),
-            value_tile("COP", f"={num('espaltherma_dcop_space')} > 0 ? {fixed(num('espaltherma_dcop_space'), 1)} : '–'")])]),
-        card("Temperatures", [day_chart([line("Ground Floor", "temperature_indoor_15min", "#fb8c00"),
-                                         line("Upper Floor", "faikout_perfera_temperature", "#ab47bc"),
-                                         line("Leaving Water", HPX["supply"], "#e53935")],
-                                        [value_axis("°C", scale=True)])]),
-    ]),
-}
+def month_sums(series):
+    """Sums per month of the daily total items over a year, the arrows paging through years; series: (name, item,
+    colour, extra), bars unless extra says otherwise."""
+    return chart({"chartType": "year", "periodVisible": True, "height": "260px"},
+                 grid=[comp("oh-chart-grid", {"top": "40", "bottom": "60", "left": "45", "right": "12"})],
+                 xAxis=[comp("oh-category-axis", {"gridIndex": 0, "categoryType": "values", "data": PV_MONTHS,
+                                                  "name": " ", "axisTick": {"show": False},
+                                                  "axisLabel": {"interval": 0, "fontSize": f"={NARROW} ? 10 : 12",
+                                                                "formatter": f"=(v, i) => {PV_MONTHS_SHORT}[i]"}})],
+                 yAxis=[comp("oh-value-axis", {"gridIndex": 0, "name": "kWh", "nameGap": 14, "nameTextStyle": AXIS_NAME,
+                                               "axisLabel": {"formatter": "=(v) => v.toLocaleString('de-AT')"},
+                                               "splitLine": {"lineStyle": {"type": "dashed", "opacity": 0.4}}})],
+                 series=[comp("oh-aggregate-series", {"name": name, "gridIndex": 0, "xAxisIndex": 0, "yAxisIndex": 0,
+                                                      "type": "bar", "item": item, "aggregationFunction": "sum",
+                                                      "dimension1": "month", "itemStyle": {"color": color}, **extra})
+                         for name, item, color, extra in series],
+                 # MainUI's smart formatter, on unless switched off, would override valueFormatter
+                 tooltip=tooltip(trigger="axis", smartFormatter=False, valueFormatter=PV_MONTH_VALUE), legend=legend())
 
 
-def popup_pages_of(prefix, popups, now):
-    return {f"{prefix}_{key}": layout_page(f"{prefix}_{key}", {"label": title, "sidebar": False},
-                                           plots_below_controls([block(*[row(full(c)) for c in cards])]), now)
-            for key, (title, cards) in popups.items()}
+def home_blocks():
+    """The house, which has no device page: where its power comes from now, its power over the day beside PV and the
+    grid, the day's balance, the consumers of the day (the overview's card), and its energy per day and per month."""
+    pv_share = f"Math.round(100 * Math.max(0, Math.min({num(PV)}, {num(HOME)} - Math.max(0, {num(GRID)}) - " \
+               f"Math.max(0, {num(BATT)}))) / Math.max(1, {num(HOME)}))"
+    now = [hero("material:home", HOME_BLUE, "Hausverbrauch", f"={kw(HOME)}",
+                [chip(f"='jetzt ' + {pv_share} + ' % aus PV'", "#ffb300")]),
+           *home_sources()]
+    power = day_chart([area("Haus", HOME, HOME_BLUE), line("PV", PV, "#ffb300", sampling="lttb"),
+                       # sampled, a day of 5-second readings is too much to draw
+                       line("Netz", GRID, "#e53935", sampling="lttb")], height="100%")
+    today = wide_grid([vtile("Verbrauch heute", "home_ec_day", color=HOME_BLUE),
+                       vtile("aus PV", "photovoltaics_own_ec_day", color="#43a047"),
+                       vtile("aus dem Netz", "huawei_inverter_power_meter_ec_day", color="#e53935"),
+                       value_tile("Self-sufficiency", pct("photovoltaics_own_ec_day", "home_ec_day"), color="#43a047"),
+                       value_tile("Self-consumption", pct("photovoltaics_own_ec_day", "huawei_inverter_e_day"),
+                                  color="#43a047"),
+                       vtile("PV-Ertrag", "huawei_inverter_e_day"),
+                       vtile("Einspeisung", "huawei_inverter_power_meter_ep_day", color="#43a047"),
+                       vtile("Batterie geladen", "huawei_inverter_energy_storage_day_charge"),
+                       vtile("Batterie entladen", "huawei_inverter_energy_storage_day_discharge")])
+    props = overview_widget_props()
+    months = month_sums([("From PV", "energy_daily_self_use", SELF_C, {"stack": "home"}),
+                         ("From Grid", "energy_daily_grid_import", IMPORT_C,
+                          {"stack": "home", "itemStyle": {"color": IMPORT_C, "borderRadius": [4, 4, 0, 0]}}),
+                         ("PV Production", "energy_daily_pv", PV_C,
+                          {"type": "line", "symbol": "circle", "symbolSize": 7, "lineStyle": {"width": 2.5, "color": PV_C},
+                           "z": 3})])
+    return [two(card("Jetzt", now), card("Leistung heute", [fill_chart(power, "260px")], fill=True)),
+            block(row(col([card("Heute", [today])]), col([widget_ref("consumption-card", **props["consumption-card"])]))),
+            block(row(col([widget_ref("energy-days-card", **props["energy-days-card"])]),
+                      col([card("Energie pro Monat", [months])])))]
+
+
+def appliances_blocks():
+    """The household appliances together, which have no device page: their tiles, each opening its machine's page,
+    the power now and over the day, the day's energy and its share of the house's, energy per day and the meters."""
+    powers = [num(p + "_power") for p, _, _ in FLOW_APPLIANCES]
+    running = "[" + ", ".join(powers) + f"].filter((w) => w > {APPL_ON}).length"
+    state = f"=((n) => n === 0 ? 'alle aus' : n === 1 ? '1 läuft' : n + ' laufen')({running})"
+    total = f"({APPL_POWER} >= 100 ? Math.round({APPL_POWER}) : {fixed(APPL_POWER, 1)}) + ' W'"
+    now = [hero("material:local_laundry_service", APPL_COLOR, "Leistung", f"={total}",
+                [chip(state, f"=({running}) > 0 ? '#1e88e5' : '#9e9e9e'")]),
+           wide_grid([vtile(title, p + "_power") for p, title, _ in FLOW_APPLIANCES])]
+    # lines, not stacked areas: ECharts stacks a time axis by the points' index, not their time, and the four plugs
+    # are persisted at different moments
+    floor = comp("oh-data-series", {"name": "", "type": "line", "xAxisIndex": 0, "yAxisIndex": 0,
+                                     "data": [["=dayjs().valueOf()", 100]], "symbol": "none", "silent": True,
+                                     "tooltip": {"show": False}})  # keeps their standby noise from filling the axis
+    power = day_chart([*[line(title, p + "_power", color) for p, title, color in FLOW_APPLIANCES], floor],
+                      height="100%")
+    home_share = f"({num('home_ec_day')} > 0 ? 100 * {APPL_DAY} / {num('home_ec_day')} : 0)"
+    today = wide_grid([value_tile("Total", f"={fixed(APPL_DAY, 2)} + ' kWh'", color=APPL_COLOR),
+                       *[vtile(title, p + "_energy_today") for p, title, _ in FLOW_APPLIANCES],
+                       # a decimal below 10 %, so a small day shows more than 0 %
+                       value_tile("Anteil am Hausverbrauch", f"=({home_share} < 10 ? {fixed(home_share, 1)} : "
+                                  f"Math.round({home_share})) + ' %'", color=HOME_BLUE)])
+    days = chart({"chartType": "month", "periodVisible": True, "height": "260px"},
+                 grid=[comp("oh-chart-grid", {"top": "40", "bottom": "60", "left": "45", "right": "20"})],
+                 xAxis=[comp("oh-category-axis", {"gridIndex": 0, "categoryType": "month", "name": "Tag", "nameGap": 12,
+                                                  "axisTick": {"show": False}})],
+                 yAxis=[value_axis("kWh")],
+                 series=[daily(title, p + "_energy_today", color, stack="appliances")
+                         for p, title, color in FLOW_APPLIANCES],
+                 tooltip=tooltip(trigger="axis", smartFormatter=True), legend=legend())
+    meters = wide_grid([vtile(title, p + "_energy_total") for p, title, _ in FLOW_APPLIANCES])
+    return [two(card("Geräte", copy.deepcopy(appliances)), card("Jetzt", now)),
+            two(card("Leistung heute", [fill_chart(power, "260px")], fill=True), card("Heute", [today])),
+            two(card("Energie pro Tag", [days]), card("Zählerstände", [meters]))]
+
+
+# the energy flow's own popups, for the two nodes without a device page, laid out like the device pages and opened as
+# wide as they are: uid: (label, builder of the blocks)
+FLOW_POPUPS = {"flow_home": ("Home", home_blocks), "flow_appliances": ("Appliances", appliances_blocks)}
 
 
 # ---------------------------------------------------------------- 10. device pages
@@ -3705,13 +3515,12 @@ def plug_electric_card(prefix, title="Elektrisch"):
         vtile("Blindleistung", f"{prefix}_reactive_power")])])
 
 
-def plug_cards(prefix, icon, color, title="Steckdose", controllable=True, note=None, switch=None,
+def plug_cards(prefix, icon, color, title="Nous Steckdose", controllable=True, note=None, switch=None,
                electric_prefix=None, electric_title=None):
     """The cards every metered plug gets, as widgets: now with switch, power today, energy per day, electrical.
     A device behind a shared meter takes its switch and its electrical values from the meter's items."""
-    now = {"prefix": prefix, "icon": icon, "color": color}
-    if title != "Steckdose":
-        now["title"] = title
+    # the first card is titled after what measures and switches: a Nous A1T socket, a Shelly EM on a circuit
+    now = {"prefix": prefix, "icon": icon, "color": color, "title": title}
     if not controllable:
         now["controllable"] = False
     if note:
@@ -3749,7 +3558,7 @@ def miele_page(uid, title, front, p, plug, extra, icon, color):
         states = status_grid([status_tile("Fertig (Miele)", f"{p}_finished", "#43a047"),
                               status_tile("Tür offen", f"{p}_door_signal", "#fb8c00"),
                               status_tile("Fertig (Steckdose)", f"{plug}_finished", "#43a047")])
-        now = [popup_header(front, p), progress_bar(p), states]
+        now = [appliance_header(front, p), progress_bar(p), states]
         return [two(card("Jetzt", now), card("Programm", [program])),
                 *plug_cards(plug, icon, color)]
     return blocks
@@ -3834,7 +3643,7 @@ def heatpump_blocks():
             two(card("Temperaturen", [temps]), card("Sollwerte", [setpoints])),
             one(card("Modi", [modes])),
             two(card("Kältemittel", [refrigerant]), card("Betrieb", [operation])),
-            *plug_cards("heatpump", "material:heat_pump", "#fb8c00")]
+            *plug_cards("heatpump", "material:heat_pump", "#fb8c00", title="Shelly EM")]
 
 
 def air_conditioning_blocks():
@@ -3860,7 +3669,7 @@ def air_conditioning_blocks():
                              line("Flüssigkeit", "faikout_perfera_liquid_temperature", "#29b6f6")],
                             [value_axis("°C", scale=True)])
     return [two(card("Steuerung", [controls]), stack(card("Jetzt", now), card("Temperaturen heute", [temps_chart]))),
-            *plug_cards("air_conditioning_unit", "material:ac_unit", AC_BLUE, title="Klimaanlage",
+            *plug_cards("air_conditioning_unit", "material:ac_unit", AC_BLUE, title="Shelly EM",
                         switch="air_conditioning_switch", electric_prefix="air_conditioning",
                         electric_title="Elektrisch · Shelly EM")]
 
@@ -4111,53 +3920,30 @@ GEN_DE = {
     # page and card titles
     "Overview": "Übersicht", "Controls": "Steuerung", "Energy Flow": "Energiefluss", "Appliances": "Haushaltsgeräte",
     "Electricity Price": "Strompreis", "Heatpump": "Wärmepumpe", "Energy per Day": "Energie pro Tag",
-    "PV Production per Day": "PV-Ertrag pro Tag", "Temperatures": "Temperaturen", "Temperature": "Temperatur",
-    "Now": "Jetzt", "Today": "Heute", "Power": "Leistung", "Program": "Programm",
-    "Photovoltaics": "Photovoltaik", "Power Meter": "Stromzähler", "Home": "Haus", "Air Conditioning": "Klimaanlage",
-    "Energy Storage": "Batteriespeicher", "E-Car": "E-Auto", "Outdoor Unit": "Außengerät", "Indoor Unit": "Innengerät",
-    "Three-Way Valve": "3-Wege-Ventil", "DHW Tank": "Warmwasserspeicher", "Space Heating": "Heizkreis",
-    "Washing Machine 1": "Waschmaschine 1", "Washing Machine 2": "Waschmaschine 2", "Tumble Dryer": "Wäschetrockner",
-    "Dishwasher": "Geschirrspüler",
+    "PV Production per Day": "PV-Ertrag pro Tag", "Temperatures": "Temperaturen", "Now": "Jetzt", "Today": "Heute",
+    "Power": "Leistung", "Home": "Haus", "Washing Machine 1": "Waschmaschine 1", "Washing Machine 2": "Waschmaschine 2",
+    "Tumble Dryer": "Wäschetrockner", "Dishwasher": "Geschirrspüler",
     # energy flow and heat pump drawing
     "Self-consumption": "Eigenverbrauch", "Self-sufficiency": "Autarkie", "today": "heute", "Defrosting": "Abtauen",
     "Upper Floor": "Obergeschoss", "Ground Floor": "Erdgeschoss", "Radiators": "Heizkörper", "Basement": "Keller",
     # heat pump panel and controls
     "Electrical": "Elektrisch", "Heat": "Wärme", "COP": "COP", "COP Space": "COP Heizung", "COP DHW": "COP Warmwasser",
-    "COP Total": "COP gesamt", "Electricity": "Strom", "Heizung": "Heizung", "Warmwasser": "Warmwasser", "Standby": "Standby",
-    "Smart Grid": "Smart Grid", "Powerful DHW": "Warmwasser-Boost", "Ventilation": "Lüftung", "Fan": "Lüfter",
-    "Setpoint": "Soll", "Mode": "Modus", "Timer": "Timer", "Auto": "Auto",
+    "COP Total": "COP gesamt", "Electricity": "Strom", "Heizung": "Heizung", "Warmwasser": "Warmwasser",
+    "Standby": "Standby", "Smart Grid": "Smart Grid", "Ventilation": "Lüftung", "Fan": "Lüfter", "Mode": "Modus",
+    "Timer": "Timer", "Auto": "Auto",
     # price
-    "per kWh all-in": "pro kWh gesamt", "EUR/kWh": "EUR/kWh", "All-in price": "Gesamtpreis", "Total Net": "Gesamt netto",
-    "Market Gross": "Markt brutto", "Market Net": "Markt netto",
+    "per kWh all-in": "pro kWh gesamt", "EUR/kWh": "EUR/kWh", "All-in price": "Gesamtpreis",
+    "Total Net": "Gesamt netto", "Market Gross": "Markt brutto", "Market Net": "Markt netto",
     # consumption, daily energy, calendar, temperatures
-    "Consumers": "Verbraucher", "From PV": "Aus PV", "From Grid": "Aus dem Netz", "PV Production": "PV-Ertrag", "Average per Day": "Ø pro Tag",
-    "kWh": "kWh", "Tag": "Tag", "Indoor": "Innen", "Outdoor": "Außen", "Heatpump sensor": "Fühler der Wärmepumpe",
-    "°C": "°C", "W": "W", "Hz": "Hz",
-    # appliance popups
-    "Energy Today": "Energie heute", "Energy Total": "Energie gesamt", "Phase": "Phase", "Program Energy": "Energie Programm",
-    "Delayed Start": "Startvorwahl", "Spin Speed": "Schleuderdrehzahl", "Program Water": "Wasser Programm",
-    "Drying Target": "Trocknungsziel",
-    # energy flow popups
-    "Input Power": "Eingangsleistung", "Output Power": "Ausgangsleistung", "Peak Today": "Spitze heute",
-    "String 1": "String 1", "String 2": "String 2", "Inverter": "Wechselrichter", "Production": "Ertrag",
-    "Self-used": "Selbst verbraucht", "Fed In": "Eingespeist", "Total": "Gesamt", "PV": "PV", "Phase A": "Phase A",
-    "Phase B": "Phase B", "Phase C": "Phase C", "Frequency": "Frequenz", "Price All-in": "Strompreis gesamt",
-    "Imported": "Bezogen", "Exported": "Eingespeist", "Grid": "Netz", "Consumption": "Verbrauch",
-    "Heating": "Heizleistung", "Operation": "Betrieb", "Valve": "Ventil", "Leaving Water": "Vorlauf",
-    "Inlet Water": "Rücklauf", "DHW": "Warmwasser", "Climate Control": "Heizung", "DHW Management": "Warmwasser-Automatik",
-    "DHW Setpoint": "Warmwasser Soll", "Leaving Water Offset": "Vorlauf-Offset", "Room": "Raum", "Compressor": "Verdichter",
-    "Fan Speed": "Lüfterdrehzahl", "Powerful": "Boost", "Eco": "Eco", "Quiet": "Leise", "Comfort": "Komfort",
+    "Consumers": "Verbraucher", "From PV": "Aus PV", "From Grid": "Aus dem Netz", "PV Production": "PV-Ertrag",
+    "Average per Day": "Ø pro Tag", "kWh": "kWh", "Tag": "Tag", "Indoor": "Innen", "Outdoor": "Außen",
+    "Heatpump sensor": "Fühler der Wärmepumpe", "°C": "°C", "W": "W",
+    # energy flow popups and the controls
+    "Total": "Gesamt", "Consumption": "Verbrauch", "Climate Control": "Heizung",
+    "DHW Management": "Warmwasser-Automatik", "DHW Setpoint": "Warmwasser Soll",
+    "Leaving Water Offset": "Vorlauf-Offset", "Eco": "Eco", "Quiet": "Leise", "Comfort": "Komfort",
     "Streamer": "Streamer", "Swing Horizontal": "Schwenken horizontal", "Swing Vertical": "Schwenken vertikal",
-    "Swing H": "Schwenken H", "Swing V": "Schwenken V",
-    "State of Charge": "Ladestand", "Status": "Status", "Charged": "Geladen", "Discharged": "Entladen",
-    "Voltage": "Spannung", "Current": "Strom",
-    # heat pump popups
-    "Inverter Current": "Inverter-Strom", "Defrost": "Abtauen", "Discharge Pipe": "Heißgas", "Heat Exchanger": "Wärmetauscher",
-    "Refrigerant": "Kältemitteldruck", "Flow": "Durchfluss", "Pump": "Pumpe", "Water Pressure": "Wasserdruck",
-    "Before Backup Heater": "Vor Heizstab", "LW Setpoint": "Vorlauf Soll", "Backup Heater": "Heizstab",
-    "Error Code": "Fehlercode", "Position": "Stellung", "Indoor Operation": "Innengerät", "Electrical Space": "Elektrisch Heizung",
-    "Electrical DHW": "Elektrisch Warmwasser", "Space": "Heizung", "Tank": "Speicher", "Effect Heater": "Zusatzheizung",
-    "Reheat": "Nachheizen", "Storage Eco": "Speicher Eco", "Room Setpoint": "Raum Soll",
+    "Swing H": "Schwenken H", "Swing V": "Schwenken V", "Status": "Status",
 }
 
 # classic icons in the generated pages become material ones
@@ -4216,6 +4002,16 @@ def one_block(blocks):
     """The rows of all blocks in one block: the cards keep a card's gap of 20 px between them, not a block's 36."""
     assert all(b["component"] == "oh-block" and not b["config"] for b in blocks), "a block with a config of its own"
     return [block(*[c for b in blocks for c in b["slots"]["default"]])]
+
+
+# A device page opened as a popup (from the overview's controls, energy flow, appliances, heat pump drawing or
+# weather bar), and the energy flow's own popups, take nearly the whole window instead of Framework7's 630 × 630 px,
+# so their two columns keep their width. MainUI puts a popup page's config.style on the popup's page element; the mark
+# there tells such a popup from the item popups opened over it. ":root" keeps the rule unscoped, it holds while the page is shown; a
+# phone shows every popup full screen anyway.
+WIDE_POPUP_MARK = {"--page-popup": "wide"}
+WIDE_POPUP = (':root .popup:has(> .oh-popup[style*="--page-popup"]) { --f7-popup-tablet-width: min(1240px, '
+              'calc(100vw - 64px)); --f7-popup-tablet-height: calc(100vh - 64px); }')
 
 
 def layout_page(uid, config, blocks, now):
@@ -4283,12 +4079,6 @@ def page(now):
               row(full(w("pv-days-card"))),
               row(full(w("temperatures-card")))),
     ], now)
-
-
-def popup_pages(now):
-    return {a[0]: layout_page(a[0], {"label": a[1], "sidebar": False},
-                              plots_below_controls([block(*[row(full(c)) for c in appliance_cards(*a)])]), now)
-            for a in APPLIANCES}
 
 
 # ---------------------------------------------------------------- 11. widgets
@@ -4502,9 +4292,9 @@ DEVICE_HEAD_PARAMS = [
     param("line1", "Line 1", "First line of state; usually an expression"),
     param("line2", "Line 2", "Second line of state; usually an expression"),
     param("color", "Colour", "Device colour as #rrggbb", default="#78909c"),
-    param("active", "Active", "Whether the device runs, which tints its icon; usually an expression", "BOOLEAN"),
-    param("var", "Variable", "The variable that folds the device's details in and out; declare it in an oh-context "
-          "around the head and the details", required=True),
+    param("active", "Active", "Whether the device runs, which tints its panel and icon; usually an expression",
+          "BOOLEAN"),
+    param("popup", "Popup", "The uid of the page a tap opens as a popup, e.g. the device's page; empty: no tap"),
     param("action", "Main action", "switch (a switch pill), button (a boost button), bar (a segmented bar) or empty"),
     dict(param("actionItem", "Action item", "The item of the main action"), context="item"),
     param("actionTitle", "Action title", "The switch pill's or button's text"),
@@ -4611,8 +4401,10 @@ def widgets():
     out["pill-switch"] = (pill_switch_widget(), PILL_SWITCH_PARAMS, ["switch"])
     for uid, (card_, _, _) in out.items():
         assert not has_placeholder(str(card_)) and "1, 2, 3" not in str(card_), uid
-        # references to other widgets carry names such as heatpump-controls, which a group item may share
-        text = re.sub(r'"widget:[a-z0-9-]+"', '""', m.json.dumps(card_))
+        # references to other widgets carry names such as heatpump-controls, which a group item may share, and the
+        # pages a tap opens are named after their device, as its group item is (weather, heatpump)
+        text = re.sub(r'"(widget:[a-z0-9-]+|page:[a-z0-9_]+)"', '""', m.json.dumps(card_))
+        text = re.sub(r'"popup": "[a-z0-9_]+"', '""', text)
         left = [n for n in names if re.search(r"(?<![A-Za-z0-9_])" + re.escape(n) + r"(?![A-Za-z0-9_])", text)]
         assert not left, f"{uid} still names items: {left[:5]}"
     return out
@@ -4648,7 +4440,12 @@ OBSOLETE_PAGES = ["dashboard",  # became the overview page
                   "widget_gallery",  # the widget repository's screenshots, put up by widget_gallery.py while they are taken
                   "dashboard_smart_meter", "dashboard_battery", "dashboard_hot_water", "dashboard_pv", "dashboard_home",
                   "dashboard_power_meter", "dashboard_energy_storage", "dashboard_pv_days", "dashboard_energy_days",
-                  "dashboard_outdoor", "dashboard_indoor", "dashboard_heatpump_dhw"]
+                  "dashboard_outdoor", "dashboard_indoor", "dashboard_heatpump_dhw",
+                  # popups of their own, replaced by the device pages they now open
+                  "flow_photovoltaics", "flow_power_meter", "flow_heatpump", "flow_air_conditioning",
+                  "flow_energy_storage", "flow_e_car", "hp_outdoor_unit", "hp_indoor_unit", "hp_valve", "hp_dhw_tank",
+                  "hp_space_heating", "appliance_washing_machine_1", "appliance_washing_machine_2",
+                  "appliance_tumble_dryer", "appliance_dishwasher", "forecast"]
 def migrate_pages(d):
     now = datetime.datetime.now()
     if not sys.argv[1].startswith("update"):
@@ -4656,12 +4453,13 @@ def migrate_pages(d):
     d = m.insert(d, PAGE_UID, page(now))
     for uid in OBSOLETE_PAGES:
         d.pop(uid, None)
-    for uid, p in {**popup_pages(now), **weather_popup(now), **popup_pages_of("flow", FLOW_POPUPS, now),
-                   **popup_pages_of("hp", HP_POPUPS, now)}.items():
-        d = m.insert(d, uid, p)
+    for uid, (title, blocks) in FLOW_POPUPS.items():
+        config = {"label": title, "sidebar": False, "style": WIDE_POPUP_MARK, "stylesheet": WIDE_POPUP}
+        d = m.insert(d, uid, layout_page(uid, config, plots_below_controls(blocks()), now))
     for uid, blocks in DEVICE_PAGES.items():  # the device pages, label, icon and sidebar order kept
         old = d[uid]["value"]["config"] if uid in d else NEW_PAGES[uid]
-        config = {"label": old["label"], "icon": old.get("icon"), "order": old.get("order"), "sidebar": True}
+        config = {"label": old["label"], "icon": old.get("icon"), "order": old.get("order"), "sidebar": True,
+                  "style": WIDE_POPUP_MARK, "stylesheet": WIDE_POPUP}
         d = m.insert(d, uid, layout_page(uid, config, blocks(), now))
     # the home page shows the overview alone: with all three model tabs hidden MainUI drops the tab bar
     d["home"]["value"]["config"]["hiddenModelTabs"] = ["locations", "equipment", "properties"]

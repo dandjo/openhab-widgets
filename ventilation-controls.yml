@@ -34,70 +34,28 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Sep 27, 2026, 9:44:33 PM
-component: oh-context
+timestamp: Oct 2, 2026, 2:13:02 PM
+component: div
 config:
-  variables:
-    controlsVentilation: false
+  style:
+    margin-top: 8px
 slots:
   default:
-  - component: div
+  - component: widget:device-head
     config:
-      style:
-        display: flex
-        flex-direction: column
-        gap: 8px
-        padding: 10px 12px
-        margin-top: 8px
-        border-radius: 14px
-        background: '=true ? ''rgba(38, 166, 154, 0.12)'' : ''rgba(127, 127, 127, 0.08)'''
-    slots:
-      default:
-      - component: widget:device-head
-        config:
-          icon: material:air
-          title: Lüftung
-          line1: '=''Stufe '' + ([''NULL'', ''UNDEF''].includes(items[props.ventilationLevel].state) ? ''–'' : (items[props.ventilationLevel].displayState
-            || items[props.ventilationLevel].state)) + '' · '' + Math.round((Number(items[props.ventilationPower].numericState)
-            || 0)) + '' W · CO₂ '' + ([''NULL'', ''UNDEF''].includes(items[props.netatmoWeatherstationCo2].state) ? ''–''
-            : (items[props.netatmoWeatherstationCo2].displayState || items[props.netatmoWeatherstationCo2].state))'
-          line2: '=(Number(items[props.ventilationTimer].numericState) || 0) > 0 ? (items[props.ventilationManagement].state
-            === ''ON'' ? ''Automatik pausiert bis '' : ''Timer bis '') + dayjs().add((Number(items[props.ventilationTimer].numericState)
-            || 0), ''minute'').format(''HH:mm'') : (items[props.ventilationManagement].state === ''ON'' ? ''Automatik regelt
-            die Stufe'' : ''Automatik aus'')'
-          color: '#26a69a'
-          active: =true
-          var: controlsVentilation
-          action: bar
-          actionItem: =props.ventilationLevel
-          actionOptions: 1=1;2=2;3=3
-      - component: div
-        config:
-          style:
-            display: flex
-            flex-direction: column
-            gap: 8px
-            padding-top: 4px
-          visible: =!!vars.controlsVentilation
-        slots:
-          default:
-          - component: widget:pill-slider
-            config:
-              item: =props.ventilationTimer
-              color: '#26a69a'
-              min: 0
-              max: 360
-              step: 15
-              unit: min
-              title: Timer
-              value: '=(Number(items[props.ventilationTimer].numericState) || 0) > 0 ? ((Number(items[props.ventilationTimer].numericState)
-                || 0) >= 60 ? Math.floor((Number(items[props.ventilationTimer].numericState) || 0) / 60) + '' h'' + (Math.round((Number(items[props.ventilationTimer].numericState)
-                || 0) % 60) ? '' '' + Math.round((Number(items[props.ventilationTimer].numericState) || 0) % 60) + '' min''
-                : '''') : Math.round((Number(items[props.ventilationTimer].numericState) || 0)) + '' min'') : ''Aus'''
-              context: '=(Number(items[props.ventilationTimer].numericState) || 0) > 0 ? (items[props.ventilationManagement].state
-                === ''ON'' ? ''Automatik pausiert bis '' : ''bis '') + dayjs().add((Number(items[props.ventilationTimer].numericState)
-                || 0), ''minute'').format(''HH:mm'') : (items[props.ventilationManagement].state === ''ON'' ? ''Automatik
-                regelt die Stufe'' : ''Automatik aus'')'
-              marks: 0=0;120=2 h;240=4 h;360=6 h
-              ring: true
-              valueColor: '=(Number(items[props.ventilationTimer].numericState) || 0) > 0 ? ''#26a69a'' : '''''
+      icon: material:air
+      title: Lüftung
+      line1: '=''Stufe '' + ([''NULL'', ''UNDEF''].includes(items[props.ventilationLevel].state) ? ''–'' : (items[props.ventilationLevel].displayState
+        || items[props.ventilationLevel].state)) + '' · '' + Math.round((Number(items[props.ventilationPower].numericState)
+        || 0)) + '' W · CO₂ '' + ([''NULL'', ''UNDEF''].includes(items[props.netatmoWeatherstationCo2].state) ? ''–'' : (items[props.netatmoWeatherstationCo2].displayState
+        || items[props.netatmoWeatherstationCo2].state))'
+      line2: '=(Number(items[props.ventilationTimer].numericState) || 0) > 0 ? (items[props.ventilationManagement].state ===
+        ''ON'' ? ''Automatik pausiert bis '' : ''Timer bis '') + dayjs().add((Number(items[props.ventilationTimer].numericState)
+        || 0), ''minute'').format(''HH:mm'') : (items[props.ventilationManagement].state === ''ON'' ? ''Automatik regelt die
+        Stufe'' : ''Automatik aus'')'
+      color: '#26a69a'
+      active: =true
+      popup: ventilation
+      action: bar
+      actionItem: =props.ventilationLevel
+      actionOptions: 1=1;2=2;3=3

@@ -76,7 +76,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Sep 30, 2026, 3:06:57 AM
+timestamp: Oct 2, 2026, 2:13:02 PM
 component: oh-card
 config:
   contentStyle:
@@ -383,7 +383,7 @@ slots:
       - component: oh-link
         config:
           action: popup
-          actionModal: page:forecast
+          actionModal: page:weather
           style:
             position: absolute
             inset: '0'

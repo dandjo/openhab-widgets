@@ -166,7 +166,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Sep 28, 2026, 8:45:25 PM
+timestamp: Oct 2, 2026, 2:13:02 PM
 component: oh-card
 config:
   title: Energiefluss
@@ -548,7 +548,7 @@ slots:
           - component: oh-link
             config:
               action: popup
-              actionModal: page:flow_photovoltaics
+              actionModal: page:photovoltaics
               style:
                 position: absolute
                 display: block
@@ -560,7 +560,7 @@ slots:
           - component: oh-link
             config:
               action: popup
-              actionModal: page:flow_power_meter
+              actionModal: page:power_meter
               style:
                 position: absolute
                 display: block
@@ -584,7 +584,7 @@ slots:
           - component: oh-link
             config:
               action: popup
-              actionModal: page:flow_heatpump
+              actionModal: page:heatpump
               style:
                 position: absolute
                 display: block
@@ -596,7 +596,7 @@ slots:
           - component: oh-link
             config:
               action: popup
-              actionModal: page:flow_air_conditioning
+              actionModal: page:air_conditioning
               style:
                 position: absolute
                 display: block
@@ -608,7 +608,7 @@ slots:
           - component: oh-link
             config:
               action: popup
-              actionModal: page:flow_energy_storage
+              actionModal: page:energy_storage
               style:
                 position: absolute
                 display: block
@@ -620,7 +620,7 @@ slots:
           - component: oh-link
             config:
               action: popup
-              actionModal: page:flow_e_car
+              actionModal: page:e_car
               style:
                 position: absolute
                 display: block

@@ -3,12 +3,6 @@ tags:
 - overview
 props:
   parameters:
-  - name: heatpumpPower
-    label: ESPAltherma Elektrische Leistung
-    description: Number:Power item
-    type: TEXT
-    required: true
-    context: item
   - name: heatpumpDhwBoost
     label: Pyaltherma Warmwasser-Boost
     description: Switch item
@@ -18,6 +12,12 @@ props:
   - name: heatpumpDhwTankTemp
     label: ESPAltherma Warmwasserspeicher Temperatur
     description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpPower
+    label: ESPAltherma Elektrische Leistung
+    description: Number:Power item
     type: TEXT
     required: true
     context: item
@@ -36,36 +36,6 @@ props:
   - name: heatpumpManagement
     label: Wärmepumpe Automatik
     description: Group item
-    type: TEXT
-    required: true
-    context: item
-  - name: heatpumpSmartGrid
-    label: ESPAltherma Smart Grid
-    description: String item
-    type: TEXT
-    required: true
-    context: item
-  - name: heatpumpDhwTempHeating
-    label: Pyaltherma Warmwasser Solltemperatur
-    description: Number:Temperature item
-    type: TEXT
-    required: true
-    context: item
-  - name: heatpumpDhwManagement
-    label: Wärmepumpe Warmwasser-Automatik
-    description: Switch item
-    type: TEXT
-    required: true
-    context: item
-  - name: heatpumpLeavingWaterTempOffsetHeating
-    label: Pyaltherma Vorlauf-Offset Heizen
-    description: Number:Temperature item
-    type: TEXT
-    required: true
-    context: item
-  - name: heatpumpLeavingWaterSetpoint
-    label: ESPAltherma Vorlauf Sollwert
-    description: Number:Temperature item
     type: TEXT
     required: true
     context: item
@@ -96,18 +66,6 @@ props:
   - name: acTimer
     label: Klimaanlage Timer
     description: Number:Time item
-    type: TEXT
-    required: true
-    context: item
-  - name: acFan
-    label: Faikout Perfera Lüfter
-    description: String item
-    type: TEXT
-    required: true
-    context: item
-  - name: acPowerful
-    label: Faikout Perfera Powerful
-    description: Switch item
     type: TEXT
     required: true
     context: item
@@ -202,7 +160,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Sep 27, 2026, 11:33:43 PM
+timestamp: Oct 2, 2026, 2:13:02 PM
 component: oh-card
 config:
   title: Steuerung
@@ -218,17 +176,12 @@ slots:
       default:
       - component: widget:heatpump-controls
         config:
-          heatpumpPower: =props.heatpumpPower
           heatpumpDhwBoost: =props.heatpumpDhwBoost
           heatpumpDhwTankTemp: =props.heatpumpDhwTankTemp
+          heatpumpPower: =props.heatpumpPower
           heatpumpClimateControlPower: =props.heatpumpClimateControlPower
           heatpumpDhwPower: =props.heatpumpDhwPower
           heatpumpManagement: =props.heatpumpManagement
-          heatpumpSmartGrid: =props.heatpumpSmartGrid
-          heatpumpDhwTempHeating: =props.heatpumpDhwTempHeating
-          heatpumpDhwManagement: =props.heatpumpDhwManagement
-          heatpumpLeavingWaterTempOffsetHeating: =props.heatpumpLeavingWaterTempOffsetHeating
-          heatpumpLeavingWaterSetpoint: =props.heatpumpLeavingWaterSetpoint
       - component: widget:air-conditioner-controls
         config:
           acSwitch: =props.acSwitch
@@ -236,8 +189,6 @@ slots:
           acTemperatureSetpoint: =props.acTemperatureSetpoint
           acTemperature: =props.acTemperature
           acTimer: =props.acTimer
-          acFan: =props.acFan
-          acPowerful: =props.acPowerful
       - component: widget:ventilation-controls
         config:
           ventilationLevel: =props.ventilationLevel

@@ -31,15 +31,14 @@ props:
     default: '#78909c'
   - name: active
     label: Active
-    description: Whether the device runs, which tints its icon; usually an expression
+    description: Whether the device runs, which tints its panel and icon; usually an expression
     type: BOOLEAN
     required: false
-  - name: var
-    label: Variable
-    description: The variable that folds the device's details in and out; declare it in an oh-context around the head and
-      the details
+  - name: popup
+    label: Popup
+    description: 'The uid of the page a tap opens as a popup, e.g. the device''s page; empty: no tap'
     type: TEXT
-    required: true
+    required: false
   - name: action
     label: Main action
     description: switch (a switch pill), button (a boost button), bar (a segmented bar) or empty
@@ -62,7 +61,7 @@ props:
     type: TEXT
     required: false
   parameterGroups: []
-timestamp: Sep 27, 2026, 9:44:33 PM
+timestamp: Oct 2, 2026, 2:13:02 PM
 component: div
 config:
   style:
@@ -71,6 +70,9 @@ config:
     display: flex
     align-items: center
     gap: 10px
+    padding: 10px 12px
+    border-radius: 14px
+    background: '=props.active ? ''color-mix(in srgb, var(--head-color) 12%, transparent)'' : ''rgba(127, 127, 127, 0.08)'''
 slots:
   default:
   - component: div
@@ -120,16 +122,6 @@ slots:
                 white-space: nowrap
                 overflow: hidden
                 text-overflow: ellipsis
-          - component: oh-icon
-            config:
-              icon: f7:chevron_down
-              width: 16
-              height: 16
-              style:
-                flex: 0 0 auto
-                transition: transform 0.25s ease
-                transform: '=(!!vars[props.var]) ? ''rotate(180deg)'' : ''none'''
-                opacity: '0.6'
           - component: div
             config:
               style:
@@ -179,12 +171,12 @@ slots:
             text-overflow: ellipsis
   - component: oh-link
     config:
-      action: variable
-      actionVariable: =props.var
-      actionVariableValue: =!(!!vars[props.var])
+      visible: =!!props.popup
+      action: popup
+      actionModal: ='page:' + props.popup
       style:
         position: absolute
         inset: '0'
         display: block
-        border-radius: 10px
+        border-radius: 14px
         z-index: '1'
