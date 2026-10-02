@@ -1,5 +1,5 @@
 (async () => {
-  // demo warnings for the forecast popup's and the weather bar's screenshots, in this browser only: the state
+  // demo warnings for the weather page's and the weather bar's screenshots, in this browser only: the state
   // tracking stops, so no update from openHAB overwrites them; nothing is sent to openHAB. Run it once the page has
   // its states
   const st = document.querySelector("#app").__vue_app__.config.globalProperties.$pinia._s.get("states");

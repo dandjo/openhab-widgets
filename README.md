@@ -35,14 +35,14 @@ number formats come from the items.
 
 | Widget | Needs |
 |---|---|
-| `air-conditioner-controls` | `boost-button`, `boost-pill`, `device-head`, `pill-slider`, `pill-switch`, `state-bar` |
+| `air-conditioner-controls` | `boost-button`, `device-head`, `pill-switch`, `state-bar` |
 | `appliance-icon` | – |
 | `appliance-tile` | `appliance-icon` |
 | `appliances-card` | `appliance-icon`, `appliance-tile` |
 | `boost-button` | – |
 | `boost-pill` | – |
 | `consumption-card` | – |
-| `controls-card` | `air-conditioner-controls`, `boost-button`, `boost-pill`, `device-head`, `heatpump-controls`, `pill-slider`, `pill-switch`, `state-bar`, `switch-tile`, `ventilation-controls` |
+| `controls-card` | `air-conditioner-controls`, `boost-button`, `device-head`, `heatpump-controls`, `pill-switch`, `state-bar`, `switch-tile`, `ventilation-controls` |
 | `device-head` | `boost-button`, `pill-switch`, `state-bar` |
 | `electricity-price-card` | – |
 | `energy-days-card` | – |
@@ -51,7 +51,7 @@ number formats come from the items.
 | `flow-node` | – |
 | `flow-share-ring` | – |
 | `heatpump-card` | `flow-node`, `item-popup`, `value-tile` |
-| `heatpump-controls` | `boost-button`, `device-head`, `pill-slider`, `pill-switch`, `state-bar` |
+| `heatpump-controls` | `boost-button`, `device-head`, `pill-switch`, `state-bar` |
 | `item-popup` | – |
 | `pill-slider` | – |
 | `pill-switch` | – |
@@ -66,15 +66,16 @@ number formats come from the items.
 | `switch-tile` | – |
 | `temperatures-card` | – |
 | `value-tile` | `item-popup` |
-| `ventilation-controls` | `boost-button`, `device-head`, `pill-slider`, `pill-switch`, `state-bar` |
+| `ventilation-controls` | `boost-button`, `device-head`, `pill-switch`, `state-bar` |
 | `weather-card` | `weather-icon` |
 | `weather-icon` | – |
 
 ## Dashboard cards
 
-The cards of my overview page. Each takes the items it shows as props; the prop names say what an item is. Some
-elements open popup pages of my installation when tapped (`page:flow_*`, `page:hp_*`, `page:appliance_*`,
-`page:forecast`); they are not part of this repository.
+The cards of my overview page. Each takes the items it shows as props; the prop names say what an item is. Most
+elements open a page of my installation as a popup when tapped: the page of their device (`page:heatpump`,
+`page:weather` …), or for the energy flow's house and appliances a popup of its own (`page:flow_home`,
+`page:flow_appliances`). The pages are not part of this repository.
 
 ### Weather: `weather-card`
 
@@ -84,8 +85,8 @@ gently animated), the outdoor temperature from a local sensor, and today and the
 drawn beside its maximum over its minimum. While an official warning of GeoSphere Austria is in effect or begins within
 24 hours, it is teased beside the temperature: a disc in its level's colour (yellow, orange, red) with an exclamation
 mark and a ring pulsing out of it, on a wider screen in a pill with the warning's short text (*Gewitter bis 20:00*). On
-a phone the gaps narrow, and below 380 px the chevron goes, so the bar keeps its fit. A tap opens the forecast popup of
-my installation (see [Weather](#weather)). Its items come from two rules,
+a phone the gaps narrow, and below 380 px the chevron goes, so the bar keeps its fit. A tap opens the weather page of my
+installation as a popup (see [Weather](#weather)). Its items come from two rules,
 `scripts/openhab-ui/applied/weather_forecast_rule.js`, which reads Open-Meteo's GeoSphere AROME Austria model, and
 `weather_warnings_rule.js`, which reads GeoSphere Austria's warnings and sends a broadcast notification when their level
 rises to orange or red.
@@ -118,47 +119,36 @@ Needs `weather-icon`.
 
 ### Controls: `controls-card`
 
-Heat pump, air conditioner and ventilation, each folded to a head of three lines with its main action on the right: a
-Boost button for the heat pump's hot water, the air conditioner's on/off pill, the ventilation levels 1 to 3; the heat
-pump's second line names which of its switches are on and which off. A tap on a head folds out its details, each group
-under its icon and title: Smart Grid, Betrieb (the switch pills Heizung, Warmwasser and Automatik, each with the icon of
-what it switches, three abreast where there is room and two and one on a phone) and sliders for the DHW setpoint and the
-leaving water offset; mode, fan, setpoint, boost and timer (usable while the unit is off); the ventilation timer. Below
-them tiles that toggle plugs and show their power. The three devices are the widgets `heatpump-controls`,
-`air-conditioner-controls` and `ventilation-controls`, the tiles `switch-tile`.
+Heat pump, air conditioner and ventilation, each a panel of three lines with its main action on the right: a Boost
+button for the heat pump's hot water, the air conditioner's on/off pill, the ventilation levels 1 to 3; the heat pump's
+second line names which of its switches are on and which off. A tap on a panel, anywhere but on the action, opens the
+device's page of my installation as a popup, with all its controls. Below them tiles that toggle plugs and show their
+power. The three devices are the widgets `heatpump-controls`, `air-conditioner-controls` and `ventilation-controls`, the
+tiles `switch-tile`.
 
-Needs `air-conditioner-controls`, `boost-button`, `boost-pill`, `device-head`, `heatpump-controls`, `pill-slider`,
-`pill-switch`, `state-bar`, `switch-tile`, `ventilation-controls`.
+Needs `air-conditioner-controls`, `boost-button`, `device-head`, `heatpump-controls`, `pill-switch`, `state-bar`,
+`switch-tile`, `ventilation-controls`.
 
 ![Controls](screenshots/controls-card.png)
-
-![Controls, folded out](screenshots/controls-card-open.png)
 
 ![Controls in dark mode](screenshots/controls-card-dark.png)
 
 <details>
-<summary>33 props</summary>
+<summary>26 props</summary>
 
 | Prop | Item | Item type |
 |---|---|---|
-| `heatpumpPower` | ESPAltherma Elektrische Leistung | Number:Power |
 | `heatpumpDhwBoost` | Pyaltherma Warmwasser-Boost | Switch |
 | `heatpumpDhwTankTemp` | ESPAltherma Warmwasserspeicher Temperatur | Number:Temperature |
+| `heatpumpPower` | ESPAltherma Elektrische Leistung | Number:Power |
 | `heatpumpClimateControlPower` | Pyaltherma Heizung Ein/Aus | Switch |
 | `heatpumpDhwPower` | Pyaltherma Warmwasser Ein/Aus | Switch |
 | `heatpumpManagement` | Wärmepumpe Automatik | Group |
-| `heatpumpSmartGrid` | ESPAltherma Smart Grid | String |
-| `heatpumpDhwTempHeating` | Pyaltherma Warmwasser Solltemperatur | Number:Temperature |
-| `heatpumpDhwManagement` | Wärmepumpe Warmwasser-Automatik | Switch |
-| `heatpumpLeavingWaterTempOffsetHeating` | Pyaltherma Vorlauf-Offset Heizen | Number:Temperature |
-| `heatpumpLeavingWaterSetpoint` | ESPAltherma Vorlauf Sollwert | Number:Temperature |
 | `acSwitch` | Faikout Perfera Schalter | Switch |
 | `acMode` | Faikout Perfera Modus | String |
 | `acTemperatureSetpoint` | Faikout Perfera Solltemperatur | Number:Temperature |
 | `acTemperature` | Faikout Perfera Temperatur | Number:Temperature |
 | `acTimer` | Klimaanlage Timer | Number:Time |
-| `acFan` | Faikout Perfera Lüfter | String |
-| `acPowerful` | Faikout Perfera Powerful | Switch |
 | `ventilationLevel` | ESPLyfterl Stufe | String |
 | `ventilationPower` | Lüftung Leistung | Number:Power |
 | `netatmoWeatherstationCo2` | Netatmo Wetterstation CO2 | Number:Dimensionless |
@@ -435,59 +425,48 @@ Indoor and outdoor temperature now, the day's minimum and maximum, and the last 
 
 ## Device controls
 
-The parts of the controls card. A device panel is a `device-head` over its details, which fold out on a tap on the
-head. Folding sends no command: the head sets a variable, which the panel declares in an `oh-context` around head and
-details. It has to be a context variable: MainUI gives every widget instance its own copy of the page's variables, so
-a page variable the head widget set would never reach the details, while a context's variables reach through the
-widgets placed inside it.
+The parts of the controls card and of my device pages' controls. A device panel is a `device-head`: a tap on it opens
+the device's page as a popup, where the pills, bars and sliders below make up the controls.
 
 ### Device panels: `heatpump-controls`, `air-conditioner-controls`, `ventilation-controls`
 
 The three devices of the controls card, each a widget of its own that takes its items as props:
 
 - `heatpump-controls`, the heat pump: storage temperature and power in its head, and which of its three switches are on
-  (Warmwasser, Automatik an · Heizung aus), Boost as its main action; folded out Smart Grid (`state-bar`), Betrieb
-  (`pill-switch`: Heizung, Warmwasser, and Automatik, which switches a group of the heat pump's automations) and the
-  sliders for DHW setpoint and leaving water offset (`pill-slider`).
+  (Warmwasser, Automatik an · Heizung aus), Boost as its main action; a tap opens the page `heatpump`.
 - `air-conditioner-controls`, the air conditioner: state, mode, setpoint, room temperature and timer in its head, on/off
-  as its main action; folded out mode and fan (`state-bar`), setpoint, boost (`boost-pill`) and timer, in the order of
-  its popup, faded while the unit is off but usable.
+  as its main action; a tap opens the page `air_conditioning`.
 - `ventilation-controls`, the ventilation: level, power, CO₂ and what the automation does in its head, the levels 1 to 3
-  as its main action; folded out the timer slider. It always runs, so its panel is always tinted.
+  as its main action; a tap opens the page `ventilation`. It always runs, so its panel is always tinted.
 
 Each panel is tinted in its device's colour while the device runs; place them one under the other.
 
 | Heat pump | Air conditioner | Ventilation |
 |---|---|---|
-| ![Heat pump, folded out](screenshots/heatpump-controls.png) | ![Air conditioner, folded out](screenshots/air-conditioner-controls.png) | ![Ventilation, folded out](screenshots/ventilation-controls.png) |
+| ![Heat pump](screenshots/heatpump-controls.png) | ![Air conditioner](screenshots/air-conditioner-controls.png) | ![Ventilation](screenshots/ventilation-controls.png) |
 
-`heatpump-controls` needs `boost-button`, `device-head`, `pill-slider`, `pill-switch`, `state-bar`.
+`heatpump-controls` needs `boost-button`, `device-head`, `pill-switch`, `state-bar`.
 
-`air-conditioner-controls` needs `boost-button`, `boost-pill`, `device-head`, `pill-slider`, `pill-switch`, `state-bar`.
+`air-conditioner-controls` needs `boost-button`, `device-head`, `pill-switch`, `state-bar`.
 
-`ventilation-controls` needs `boost-button`, `device-head`, `pill-slider`, `pill-switch`, `state-bar`.
+`ventilation-controls` needs `boost-button`, `device-head`, `pill-switch`, `state-bar`.
 
 <details>
-<summary><code>heatpump-controls</code>: 11 props</summary>
+<summary><code>heatpump-controls</code>: 6 props</summary>
 
 | Prop | Item | Item type |
 |---|---|---|
-| `heatpumpPower` | ESPAltherma Elektrische Leistung | Number:Power |
 | `heatpumpDhwBoost` | Pyaltherma Warmwasser-Boost | Switch |
 | `heatpumpDhwTankTemp` | ESPAltherma Warmwasserspeicher Temperatur | Number:Temperature |
+| `heatpumpPower` | ESPAltherma Elektrische Leistung | Number:Power |
 | `heatpumpClimateControlPower` | Pyaltherma Heizung Ein/Aus | Switch |
 | `heatpumpDhwPower` | Pyaltherma Warmwasser Ein/Aus | Switch |
 | `heatpumpManagement` | Wärmepumpe Automatik | Group |
-| `heatpumpSmartGrid` | ESPAltherma Smart Grid | String |
-| `heatpumpDhwTempHeating` | Pyaltherma Warmwasser Solltemperatur | Number:Temperature |
-| `heatpumpDhwManagement` | Wärmepumpe Warmwasser-Automatik | Switch |
-| `heatpumpLeavingWaterTempOffsetHeating` | Pyaltherma Vorlauf-Offset Heizen | Number:Temperature |
-| `heatpumpLeavingWaterSetpoint` | ESPAltherma Vorlauf Sollwert | Number:Temperature |
 
 </details>
 
 <details>
-<summary><code>air-conditioner-controls</code>: 7 props</summary>
+<summary><code>air-conditioner-controls</code>: 5 props</summary>
 
 | Prop | Item | Item type |
 |---|---|---|
@@ -496,8 +475,6 @@ Each panel is tinted in its device's colour while the device runs; place them on
 | `acTemperatureSetpoint` | Faikout Perfera Solltemperatur | Number:Temperature |
 | `acTemperature` | Faikout Perfera Temperatur | Number:Temperature |
 | `acTimer` | Klimaanlage Timer | Number:Time |
-| `acFan` | Faikout Perfera Lüfter | String |
-| `acPowerful` | Faikout Perfera Powerful | Switch |
 
 </details>
 
@@ -517,48 +494,27 @@ Each panel is tinted in its device's colour while the device runs; place them on
 
 ### Device head: `device-head`
 
-A device in three lines: its icon in a circle, tinted in the device's colour while `active` holds; beside it the name
-with a chevron and the main action, and under them two lines of state that run the whole width, under the action too, so
-they stay readable on a phone. A tap anywhere but on the action folds the details in or out through the variable `var`.
-The main action is a switch pill (`action: switch`, `pill-switch`), a boost button (`button`, `boost-button`) or a
-segmented bar (`bar`, `state-bar` with `actionOptions`) on `actionItem`. Declare `var` in an `oh-context` around the
-head and the details, and show the details while `vars.<var>` holds:
+A device in a panel of three lines, tinted in the device's colour while `active` holds: its icon in a circle; beside it
+the name and the main action, and under them two lines of state that run the whole width, under the action too, so they
+stay readable on a phone. A tap anywhere but on the action opens the page `popup` as a popup, e.g. the device's page;
+without `popup` the panel takes no tap. The main action is a switch pill (`action: switch`, `pill-switch`), a boost
+button (`button`, `boost-button`) or a segmented bar (`bar`, `state-bar` with `actionOptions`) on `actionItem`:
 
-![Device heads, folded](screenshots/device-heads.png)
+![Device heads](screenshots/device-heads.png)
 
 ```yaml
-component: oh-context
+component: widget:device-head
 config:
-  variables:
-    acOpen: false
-slots:
-  default:
-    - component: div
-      slots:
-        default:
-          - component: widget:device-head
-            config:
-              icon: material:ac_unit
-              title: Klimaanlage
-              line1: "=(items.faikout_perfera_switch.state === 'ON' ? 'An · ' : 'Aus · ') + items.faikout_perfera_mode.displayState"
-              line2: ="Raum " + items.faikout_perfera_temperature.displayState
-              color: "#29b6f6"
-              active: =items.faikout_perfera_switch.state === 'ON'
-              var: acOpen
-              action: switch
-              actionItem: faikout_perfera_switch
-              actionTitle: An/Aus
-          - component: div
-            config:
-              visible: =!!vars.acOpen
-            slots:
-              default:
-                - component: widget:state-bar
-                  config:
-                    item: faikout_perfera_mode
-                    options: A=Auto;H=Heizen;C=Kühlen;D=Entfeuchten;F=Lüften
-                    color: "#29b6f6"
-                    byText: true
+  icon: material:ac_unit
+  title: Klimaanlage
+  line1: "=(items.faikout_perfera_switch.state === 'ON' ? 'An · ' : 'Aus · ') + items.faikout_perfera_mode.displayState"
+  line2: ="Raum " + items.faikout_perfera_temperature.displayState
+  color: "#29b6f6"
+  active: =items.faikout_perfera_switch.state === 'ON'
+  popup: air_conditioning
+  action: switch
+  actionItem: faikout_perfera_switch
+  actionTitle: An/Aus
 ```
 
 Needs `boost-button`, `pill-switch`, `state-bar`.
@@ -570,8 +526,8 @@ Needs `boost-button`, `pill-switch`, `state-bar`.
 | `line1` | First line of state; usually an expression | TEXT |  |
 | `line2` | Second line of state; usually an expression | TEXT |  |
 | `color` | Device colour as #rrggbb | TEXT | `#78909c` |
-| `active` | Whether the device runs, which tints its icon; usually an expression | BOOLEAN |  |
-| `var` | The variable that folds the device's details in and out; declare it in an oh-context around the head and the details | TEXT |  |
+| `active` | Whether the device runs, which tints its panel and icon; usually an expression | BOOLEAN |  |
+| `popup` | The uid of the page a tap opens as a popup, e.g. the device's page; empty: no tap | TEXT |  |
 | `action` | switch (a switch pill), button (a boost button), bar (a segmented bar) or empty | TEXT |  |
 | `actionItem` | The item of the main action | Item |  |
 | `actionTitle` | The switch pill's or button's text | TEXT |  |
@@ -935,7 +891,7 @@ and its ring pulses. Put the tiles in a grid, e.g. two columns.
   config:
     kind: washer
     title: Waschmaschine 1
-    popup: appliance_washing_machine_1
+    popup: washing_machine_1
     progress: miele_washing_machine_wwg360_program_progress
     state: miele_washing_machine_wwg360_operation_state
     program: miele_washing_machine_wwg360_active_program
@@ -946,7 +902,7 @@ and its ring pulses. Put the tiles in a grid, e.g. two columns.
   config:
     kind: washer
     title: Waschmaschine 2
-    popup: appliance_washing_machine_2
+    popup: washing_machine_2
     power: washing_machine_2_power
     done: washing_machine_2_finished
 ```
@@ -978,18 +934,18 @@ three thin streaks; a raised cloud over `fog`, falling `rain`, drifting white `s
 with the sun peeking out at its top left for showers (`rain_sun`, `snow_sun`, `thunder_sun`). Nothing for any other
 value, as an item is `NULL` after a restart. My rule works the symbol out from Open-Meteo: a day's sky from the share of
 its daylight the sun shines, an hour's from the cloud layers, the high ones counted half. My weather bar shows the
-present weather with it, and my forecast popup each day's, beside its hours of sunshine with their share of the daylight
+present weather with it, and my weather page each day's, beside its hours of sunshine with their share of the daylight
 and the strongest wind with an arrow of its dominant direction and its compass point, above a chart of the next 60
 hours: temperature with the weather drawn above it and over the precipitation of each hour, the wind below with arrows
 of its direction, both every three hours; ECharts takes no widget, so the drawings there are this widget's layers as
-still SVG images. That popup is a page of my installation, not a widget of this repository; its rule writes the forecast
-as JSON into String items, and the chart reads them through an `oh-data-series` whose `data` is an expression such as
+still SVG images. That page is part of my installation, not a widget of this repository; its rule writes the forecast as
+JSON into String items, and the chart reads them through an `oh-data-series` whose `data` is an expression such as
 `=JSON.parse(items.weather_hourly.state).map((r) => [r[0] * 1000, r[1]])`, with no persistence involved. The warnings in
 the screenshots are demo values.
 
 | Light | Dark |
 |---|---|
-| ![Forecast popup: warnings, days and chart](screenshots/forecast-popup.png) | ![Forecast popup in dark mode](screenshots/forecast-popup-dark.png) |
+| ![Weather page: warnings, days and chart](screenshots/weather-forecast.png) | ![Weather page in dark mode](screenshots/weather-forecast-dark.png) |
 
 ```yaml
 component: widget:weather-icon

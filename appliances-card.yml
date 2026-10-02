@@ -124,7 +124,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Sep 27, 2026, 9:44:33 PM
+timestamp: Oct 2, 2026, 2:13:02 PM
 component: oh-card
 config:
   title: Haushaltsgeräte
@@ -153,7 +153,7 @@ slots:
         config:
           kind: washer
           title: Waschmaschine 1
-          popup: appliance_washing_machine_1
+          popup: washing_machine_1
           progress: =props.washer1ProgramProgress
           state: =props.washer1OperationState
           program: =props.washer1ActiveProgram
@@ -164,14 +164,14 @@ slots:
         config:
           kind: washer
           title: Waschmaschine 2
-          popup: appliance_washing_machine_2
+          popup: washing_machine_2
           power: =props.washingMachine2Power
           done: =props.washingMachine2Finished
       - component: widget:appliance-tile
         config:
           kind: dryer
           title: Wäschetrockner
-          popup: appliance_tumble_dryer
+          popup: tumble_dryer
           progress: =props.dryerProgramProgress
           state: =props.dryerOperationState
           program: =props.dryerActiveProgram
@@ -182,7 +182,7 @@ slots:
         config:
           kind: dish-washer
           title: Geschirrspüler
-          popup: appliance_dishwasher
+          popup: dishwasher
           progress: =props.dishwasherProgramProgress
           state: =props.dishwasherOperationState
           program: =props.dishwasherActiveProgram
