@@ -75,6 +75,12 @@ props:
     type: TEXT
     required: true
     context: item
+  - name: batterySoc
+    label: Batteriespeicher Ladestand
+    description: Number:Dimensionless item
+    type: TEXT
+    required: true
+    context: item
   - name: homePower
     label: Haus Leistung
     description: Number:Power item
@@ -102,12 +108,6 @@ props:
   - name: ventilationTimerSet
     label: Lüftung Timer eingestellt
     description: Number:Time item
-    type: TEXT
-    required: true
-    context: item
-  - name: batterySoc
-    label: Batteriespeicher Ladestand
-    description: Number:Dimensionless item
     type: TEXT
     required: true
     context: item
@@ -328,7 +328,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 3, 2026, 11:36:34 PM
+timestamp: Oct 4, 2026, 12:18:52 AM
 component: oh-card
 config:
   title: Energiefluss
@@ -350,7 +350,6 @@ slots:
         display: flex
         flex-direction: column
         justify-content: center
-      stylesheet: '@keyframes flowOrbit { to { transform: rotate(360deg); } }'
     slots:
       default:
       - component: div
@@ -625,178 +624,394 @@ slots:
                       fill: none
                       stroke: rgba(127, 127, 127, 0.28)
                       stroke-width: 4.5
-              - component: circle
-                config:
-                  cx: 139.6
-                  cy: 74.4
-                  r: 30
-                  fill: none
-                  stroke: '#ffb300'
-                  stroke-width: 4.5
-                  stroke-linecap: round
-                  stroke-dasharray: 0 9.43
-                  style:
-                    transform-box: fill-box
-                    transform-origin: center
-                    animation: '=''flowOrbit '' + (Math.abs((Number(items[props.pvPower].numericState) || 0)) < 300 ? 9 :
-                      Math.abs((Number(items[props.pvPower].numericState) || 0)) < 1000 ? 7 : Math.abs((Number(items[props.pvPower].numericState)
-                      || 0)) < 2500 ? 5.5 : 4) + ''s linear infinite'' + (((Number(items[props.pvPower].numericState) || 0)
-                      < 0) ? '''' : '' reverse'')'
-                  visible: =Math.abs((Number(items[props.pvPower].numericState) || 0)) > 10
-              - component: circle
-                config:
-                  cx: 73.6
-                  cy: 186.5
-                  r: 30
-                  fill: none
-                  stroke: '=(Number(items[props.gridPower].numericState) || 0) < 0 ? ''#43a047'' : ''#e53935'''
-                  stroke-width: 4.5
-                  stroke-linecap: round
-                  stroke-dasharray: 0 9.43
-                  style:
-                    transform-box: fill-box
-                    transform-origin: center
-                    animation: '=''flowOrbit '' + (Math.abs((Number(items[props.gridPower].numericState) || 0)) < 300 ? 9
-                      : Math.abs((Number(items[props.gridPower].numericState) || 0)) < 1000 ? 7 : Math.abs((Number(items[props.gridPower].numericState)
-                      || 0)) < 2500 ? 5.5 : 4) + ''s linear infinite'' + (((Number(items[props.gridPower].numericState) ||
-                      0) > 0) ? '''' : '' reverse'')'
-                  visible: =Math.abs((Number(items[props.gridPower].numericState) || 0)) > 10
-              - component: circle
-                config:
-                  cx: 106.1
-                  cy: 312.5
-                  r: 30
-                  fill: none
-                  stroke: '#7cb342'
-                  stroke-width: 4.5
-                  stroke-linecap: round
-                  stroke-dasharray: 0 9.43
-                  style:
-                    transform-box: fill-box
-                    transform-origin: center
-                    animation: '=''flowOrbit '' + (Math.abs((Number(items[props.batteryPower].numericState) || 0)) < 300 ?
-                      9 : Math.abs((Number(items[props.batteryPower].numericState) || 0)) < 1000 ? 7 : Math.abs((Number(items[props.batteryPower].numericState)
-                      || 0)) < 2500 ? 5.5 : 4) + ''s linear infinite'' + (((Number(items[props.batteryPower].numericState)
-                      || 0) < 0) ? '''' : '' reverse'')'
-                  visible: =Math.abs((Number(items[props.batteryPower].numericState) || 0)) > 10
-              - component: circle
-                config:
-                  cx: 377.7
-                  cy: 107.9
-                  r: 30
-                  fill: none
-                  stroke: '#fb8c00'
-                  stroke-width: 4.5
-                  stroke-linecap: round
-                  stroke-dasharray: 0 9.43
-                  style:
-                    transform-box: fill-box
-                    transform-origin: center
-                    animation: '=''flowOrbit '' + (Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) < 300
-                      ? 9 : Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) < 1000 ? 7 : Math.abs((Number(items[props.heatpumpPower].numericState)
-                      || 0)) < 2500 ? 5.5 : 4) + ''s linear infinite'' + (((Number(items[props.heatpumpPower].numericState)
-                      || 0) > 0) ? '''' : '' reverse'')'
-                  visible: =Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) > 50
-              - component: circle
-                config:
-                  cx: 344.2
-                  cy: 346.0
-                  r: 30
-                  fill: none
-                  stroke: '#26a69a'
-                  stroke-width: 4.5
-                  stroke-linecap: round
-                  stroke-dasharray: 0 9.43
-                  style:
-                    transform-box: fill-box
-                    transform-origin: center
-                    animation: '=''flowOrbit '' + (Math.abs((Number(items[props.ecarPower].numericState) || 0)) < 300 ? 9
-                      : Math.abs((Number(items[props.ecarPower].numericState) || 0)) < 1000 ? 7 : Math.abs((Number(items[props.ecarPower].numericState)
-                      || 0)) < 2500 ? 5.5 : 4) + ''s linear infinite'' + (((Number(items[props.ecarPower].numericState) ||
-                      0) > 0) ? '''' : '' reverse'')'
-                  visible: =Math.abs((Number(items[props.ecarPower].numericState) || 0)) > 100
-              - component: circle
-                config:
-                  cx: 218.2
-                  cy: 378.5
-                  r: 30
-                  fill: none
-                  stroke: '#5c6bc0'
-                  stroke-width: 4.5
-                  stroke-linecap: round
-                  stroke-dasharray: 0 9.43
-                  style:
-                    transform-box: fill-box
-                    transform-origin: center
-                    animation: '=''flowOrbit '' + (Math.abs(((Number(items[props.washingMachine1Power].numericState) || 0)
-                      + (Number(items[props.washingMachine2Power].numericState) || 0) + (Number(items[props.tumbleDryerPower].numericState)
-                      || 0) + (Number(items[props.dishwasherPower].numericState) || 0))) < 300 ? 9 : Math.abs(((Number(items[props.washingMachine1Power].numericState)
-                      || 0) + (Number(items[props.washingMachine2Power].numericState) || 0) + (Number(items[props.tumbleDryerPower].numericState)
-                      || 0) + (Number(items[props.dishwasherPower].numericState) || 0))) < 1000 ? 7 : Math.abs(((Number(items[props.washingMachine1Power].numericState)
-                      || 0) + (Number(items[props.washingMachine2Power].numericState) || 0) + (Number(items[props.tumbleDryerPower].numericState)
-                      || 0) + (Number(items[props.dishwasherPower].numericState) || 0))) < 2500 ? 5.5 : 4) + ''s linear infinite''
-                      + ((((Number(items[props.washingMachine1Power].numericState) || 0) + (Number(items[props.washingMachine2Power].numericState)
-                      || 0) + (Number(items[props.tumbleDryerPower].numericState) || 0) + (Number(items[props.dishwasherPower].numericState)
-                      || 0)) > 0) ? '''' : '' reverse'')'
-                  visible: =Math.abs(((Number(items[props.washingMachine1Power].numericState) || 0) + (Number(items[props.washingMachine2Power].numericState)
-                    || 0) + (Number(items[props.tumbleDryerPower].numericState) || 0) + (Number(items[props.dishwasherPower].numericState)
-                    || 0))) > 10
-              - component: circle
-                config:
-                  cx: 241.9
-                  cy: 210.2
-                  r: 30
-                  fill: none
-                  stroke: '#1e88e5'
-                  stroke-width: 4.5
-                  stroke-linecap: round
-                  stroke-dasharray: 0 9.43
-                  style:
-                    transform-box: fill-box
-                    transform-origin: center
-                    animation: '=''flowOrbit '' + (Math.abs((Number(items[props.homePower].numericState) || 0)) < 300 ? 9
-                      : Math.abs((Number(items[props.homePower].numericState) || 0)) < 1000 ? 7 : Math.abs((Number(items[props.homePower].numericState)
-                      || 0)) < 2500 ? 5.5 : 4) + ''s linear infinite'' + (((Number(items[props.batteryPower].numericState)
-                      || 0) + (Number(items[props.gridPower].numericState) || 0) >= 0) ? '''' : '' reverse'')'
-                  visible: =Math.abs((Number(items[props.homePower].numericState) || 0)) > 10
-              - component: circle
-                config:
-                  cx: 410.2
-                  cy: 233.9
-                  r: 30
-                  fill: none
-                  stroke: '#29b6f6'
-                  stroke-width: 4.5
-                  stroke-linecap: round
-                  stroke-dasharray: 0 9.43
-                  style:
-                    transform-box: fill-box
-                    transform-origin: center
-                    animation: '=''flowOrbit '' + (Math.abs((items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
-                      || 0) : 0)) < 300 ? 9 : Math.abs((items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
-                      || 0) : 0)) < 1000 ? 7 : Math.abs((items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
-                      || 0) : 0)) < 2500 ? 5.5 : 4) + ''s linear infinite'' + (((items[props.acSwitch].state === ''ON'' ?
-                      (Number(items[props.acUnitPower].numericState) || 0) : 0) > 0) ? '''' : '' reverse'')'
-                  visible: '=Math.abs((items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
-                    || 0) : 0)) > 5'
-              - component: circle
-                config:
-                  cx: 265.6
-                  cy: 41.9
-                  r: 30
-                  fill: none
-                  stroke: '#26a69a'
-                  stroke-width: 4.5
-                  stroke-linecap: round
-                  stroke-dasharray: 0 9.43
-                  style:
-                    transform-box: fill-box
-                    transform-origin: center
-                    animation: '=''flowOrbit '' + (Math.abs((Number(items[props.ventilationPower].numericState) || 0)) < 300
-                      ? 9 : Math.abs((Number(items[props.ventilationPower].numericState) || 0)) < 1000 ? 7 : Math.abs((Number(items[props.ventilationPower].numericState)
-                      || 0)) < 2500 ? 5.5 : 4) + ''s linear infinite'' + (((Number(items[props.ventilationPower].numericState)
-                      || 0) > 0) ? '''' : '' reverse'')'
-                  visible: =Math.abs((Number(items[props.ventilationPower].numericState) || 0)) > 5
+              - component: g
+                config: {}
+                slots:
+                  default:
+                  - component: circle
+                    config:
+                      cx: 139.6
+                      cy: 74.4
+                      r: 30
+                      fill: none
+                      stroke: '#ffb300'
+                      stroke-width: 4.5
+                      visible: =(Math.abs((Number(items[props.pvPower].numericState) || 0)) > 10) && !(false)
+                    slots:
+                      default:
+                      - component: animate
+                        config:
+                          attributeName: opacity
+                          values: 1;0.3;1
+                          dur: 2s
+                          repeatCount: indefinite
+                          visible: =(Math.abs((Number(items[props.pvPower].numericState) || 0)) > 10) && !(false)
+                  - component: circle
+                    config:
+                      cx: 139.6
+                      cy: 74.4
+                      r: 30
+                      fill: none
+                      stroke: '#ffb300'
+                      stroke-width: 4.5
+                      visible: =(Math.abs((Number(items[props.pvPower].numericState) || 0)) > 10) && (false)
+                    slots:
+                      default:
+                      - component: animate
+                        config:
+                          attributeName: opacity
+                          values: 0.5;0.12;0.5
+                          dur: 2s
+                          repeatCount: indefinite
+                          visible: =(Math.abs((Number(items[props.pvPower].numericState) || 0)) > 10) && (false)
+              - component: g
+                config: {}
+                slots:
+                  default:
+                  - component: circle
+                    config:
+                      cx: 73.6
+                      cy: 186.5
+                      r: 30
+                      fill: none
+                      stroke: '=(Number(items[props.gridPower].numericState) || 0) < 0 ? ''#43a047'' : ''#e53935'''
+                      stroke-width: 4.5
+                      visible: =(Math.abs((Number(items[props.gridPower].numericState) || 0)) > 10) && !(false)
+                    slots:
+                      default:
+                      - component: animate
+                        config:
+                          attributeName: opacity
+                          values: 1;0.3;1
+                          dur: 2s
+                          repeatCount: indefinite
+                          visible: =(Math.abs((Number(items[props.gridPower].numericState) || 0)) > 10) && !(false)
+                  - component: circle
+                    config:
+                      cx: 73.6
+                      cy: 186.5
+                      r: 30
+                      fill: none
+                      stroke: '=(Number(items[props.gridPower].numericState) || 0) < 0 ? ''#43a047'' : ''#e53935'''
+                      stroke-width: 4.5
+                      visible: =(Math.abs((Number(items[props.gridPower].numericState) || 0)) > 10) && (false)
+                    slots:
+                      default:
+                      - component: animate
+                        config:
+                          attributeName: opacity
+                          values: 0.5;0.12;0.5
+                          dur: 2s
+                          repeatCount: indefinite
+                          visible: =(Math.abs((Number(items[props.gridPower].numericState) || 0)) > 10) && (false)
+              - component: g
+                config: {}
+                slots:
+                  default:
+                  - component: circle
+                    config:
+                      cx: 106.1
+                      cy: 312.5
+                      r: 30
+                      fill: none
+                      stroke: '#7cb342'
+                      stroke-width: 4.5
+                      visible: =(Math.abs((Number(items[props.batteryPower].numericState) || 0)) > 10) && !(((Number(items[props.batterySoc].numericState)
+                        || 0) / 100) > 0)
+                    slots:
+                      default:
+                      - component: animate
+                        config:
+                          attributeName: opacity
+                          values: 1;0.3;1
+                          dur: 2s
+                          repeatCount: indefinite
+                          visible: =(Math.abs((Number(items[props.batteryPower].numericState) || 0)) > 10) && !(((Number(items[props.batterySoc].numericState)
+                            || 0) / 100) > 0)
+                  - component: circle
+                    config:
+                      cx: 106.1
+                      cy: 312.5
+                      r: 30
+                      fill: none
+                      stroke: '#7cb342'
+                      stroke-width: 4.5
+                      visible: =(Math.abs((Number(items[props.batteryPower].numericState) || 0)) > 10) && (((Number(items[props.batterySoc].numericState)
+                        || 0) / 100) > 0)
+                    slots:
+                      default:
+                      - component: animate
+                        config:
+                          attributeName: opacity
+                          values: 0.5;0.12;0.5
+                          dur: 2s
+                          repeatCount: indefinite
+                          visible: =(Math.abs((Number(items[props.batteryPower].numericState) || 0)) > 10) && (((Number(items[props.batterySoc].numericState)
+                            || 0) / 100) > 0)
+              - component: g
+                config: {}
+                slots:
+                  default:
+                  - component: circle
+                    config:
+                      cx: 377.7
+                      cy: 107.9
+                      r: 30
+                      fill: none
+                      stroke: '#fb8c00'
+                      stroke-width: 4.5
+                      visible: =(Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) > 50) && !(false)
+                    slots:
+                      default:
+                      - component: animate
+                        config:
+                          attributeName: opacity
+                          values: 1;0.3;1
+                          dur: 2s
+                          repeatCount: indefinite
+                          visible: =(Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) > 50) && !(false)
+                  - component: circle
+                    config:
+                      cx: 377.7
+                      cy: 107.9
+                      r: 30
+                      fill: none
+                      stroke: '#fb8c00'
+                      stroke-width: 4.5
+                      visible: =(Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) > 50) && (false)
+                    slots:
+                      default:
+                      - component: animate
+                        config:
+                          attributeName: opacity
+                          values: 0.5;0.12;0.5
+                          dur: 2s
+                          repeatCount: indefinite
+                          visible: =(Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) > 50) && (false)
+              - component: g
+                config: {}
+                slots:
+                  default:
+                  - component: circle
+                    config:
+                      cx: 344.2
+                      cy: 346.0
+                      r: 30
+                      fill: none
+                      stroke: '#26a69a'
+                      stroke-width: 4.5
+                      visible: =(Math.abs((Number(items[props.ecarPower].numericState) || 0)) > 100) && !(false)
+                    slots:
+                      default:
+                      - component: animate
+                        config:
+                          attributeName: opacity
+                          values: 1;0.3;1
+                          dur: 2s
+                          repeatCount: indefinite
+                          visible: =(Math.abs((Number(items[props.ecarPower].numericState) || 0)) > 100) && !(false)
+                  - component: circle
+                    config:
+                      cx: 344.2
+                      cy: 346.0
+                      r: 30
+                      fill: none
+                      stroke: '#26a69a'
+                      stroke-width: 4.5
+                      visible: =(Math.abs((Number(items[props.ecarPower].numericState) || 0)) > 100) && (false)
+                    slots:
+                      default:
+                      - component: animate
+                        config:
+                          attributeName: opacity
+                          values: 0.5;0.12;0.5
+                          dur: 2s
+                          repeatCount: indefinite
+                          visible: =(Math.abs((Number(items[props.ecarPower].numericState) || 0)) > 100) && (false)
+              - component: g
+                config: {}
+                slots:
+                  default:
+                  - component: circle
+                    config:
+                      cx: 218.2
+                      cy: 378.5
+                      r: 30
+                      fill: none
+                      stroke: '#5c6bc0'
+                      stroke-width: 4.5
+                      visible: =(Math.abs(((Number(items[props.washingMachine1Power].numericState) || 0) + (Number(items[props.washingMachine2Power].numericState)
+                        || 0) + (Number(items[props.tumbleDryerPower].numericState) || 0) + (Number(items[props.dishwasherPower].numericState)
+                        || 0))) > 10) && !(false)
+                    slots:
+                      default:
+                      - component: animate
+                        config:
+                          attributeName: opacity
+                          values: 1;0.3;1
+                          dur: 2s
+                          repeatCount: indefinite
+                          visible: =(Math.abs(((Number(items[props.washingMachine1Power].numericState) || 0) + (Number(items[props.washingMachine2Power].numericState)
+                            || 0) + (Number(items[props.tumbleDryerPower].numericState) || 0) + (Number(items[props.dishwasherPower].numericState)
+                            || 0))) > 10) && !(false)
+                  - component: circle
+                    config:
+                      cx: 218.2
+                      cy: 378.5
+                      r: 30
+                      fill: none
+                      stroke: '#5c6bc0'
+                      stroke-width: 4.5
+                      visible: =(Math.abs(((Number(items[props.washingMachine1Power].numericState) || 0) + (Number(items[props.washingMachine2Power].numericState)
+                        || 0) + (Number(items[props.tumbleDryerPower].numericState) || 0) + (Number(items[props.dishwasherPower].numericState)
+                        || 0))) > 10) && (false)
+                    slots:
+                      default:
+                      - component: animate
+                        config:
+                          attributeName: opacity
+                          values: 0.5;0.12;0.5
+                          dur: 2s
+                          repeatCount: indefinite
+                          visible: =(Math.abs(((Number(items[props.washingMachine1Power].numericState) || 0) + (Number(items[props.washingMachine2Power].numericState)
+                            || 0) + (Number(items[props.tumbleDryerPower].numericState) || 0) + (Number(items[props.dishwasherPower].numericState)
+                            || 0))) > 10) && (false)
+              - component: g
+                config: {}
+                slots:
+                  default:
+                  - component: circle
+                    config:
+                      cx: 241.9
+                      cy: 210.2
+                      r: 30
+                      fill: none
+                      stroke: '#1e88e5'
+                      stroke-width: 4.5
+                      visible: =(Math.abs((Number(items[props.homePower].numericState) || 0)) > 10) && !(false)
+                    slots:
+                      default:
+                      - component: animate
+                        config:
+                          attributeName: opacity
+                          values: 1;0.3;1
+                          dur: 2s
+                          repeatCount: indefinite
+                          visible: =(Math.abs((Number(items[props.homePower].numericState) || 0)) > 10) && !(false)
+                  - component: circle
+                    config:
+                      cx: 241.9
+                      cy: 210.2
+                      r: 30
+                      fill: none
+                      stroke: '#1e88e5'
+                      stroke-width: 4.5
+                      visible: =(Math.abs((Number(items[props.homePower].numericState) || 0)) > 10) && (false)
+                    slots:
+                      default:
+                      - component: animate
+                        config:
+                          attributeName: opacity
+                          values: 0.5;0.12;0.5
+                          dur: 2s
+                          repeatCount: indefinite
+                          visible: =(Math.abs((Number(items[props.homePower].numericState) || 0)) > 10) && (false)
+              - component: g
+                config: {}
+                slots:
+                  default:
+                  - component: circle
+                    config:
+                      cx: 410.2
+                      cy: 233.9
+                      r: 30
+                      fill: none
+                      stroke: '#29b6f6'
+                      stroke-width: 4.5
+                      visible: '=(Math.abs((items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
+                        || 0) : 0)) > 5) && !(((Number(items[props.acTimer].numericState) || 0) / Math.max((Number(items[props.acTimer].numericState)
+                        || 0), (Number(items[props.acTimerSet].numericState) || 0) || 720)) > 0)'
+                    slots:
+                      default:
+                      - component: animate
+                        config:
+                          attributeName: opacity
+                          values: 1;0.3;1
+                          dur: 2s
+                          repeatCount: indefinite
+                          visible: '=(Math.abs((items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
+                            || 0) : 0)) > 5) && !(((Number(items[props.acTimer].numericState) || 0) / Math.max((Number(items[props.acTimer].numericState)
+                            || 0), (Number(items[props.acTimerSet].numericState) || 0) || 720)) > 0)'
+                  - component: circle
+                    config:
+                      cx: 410.2
+                      cy: 233.9
+                      r: 30
+                      fill: none
+                      stroke: '#29b6f6'
+                      stroke-width: 4.5
+                      visible: '=(Math.abs((items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
+                        || 0) : 0)) > 5) && (((Number(items[props.acTimer].numericState) || 0) / Math.max((Number(items[props.acTimer].numericState)
+                        || 0), (Number(items[props.acTimerSet].numericState) || 0) || 720)) > 0)'
+                    slots:
+                      default:
+                      - component: animate
+                        config:
+                          attributeName: opacity
+                          values: 0.5;0.12;0.5
+                          dur: 2s
+                          repeatCount: indefinite
+                          visible: '=(Math.abs((items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
+                            || 0) : 0)) > 5) && (((Number(items[props.acTimer].numericState) || 0) / Math.max((Number(items[props.acTimer].numericState)
+                            || 0), (Number(items[props.acTimerSet].numericState) || 0) || 720)) > 0)'
+              - component: g
+                config: {}
+                slots:
+                  default:
+                  - component: circle
+                    config:
+                      cx: 265.6
+                      cy: 41.9
+                      r: 30
+                      fill: none
+                      stroke: '#26a69a'
+                      stroke-width: 4.5
+                      visible: =(Math.abs((Number(items[props.ventilationPower].numericState) || 0)) > 5) && !(((Number(items[props.ventilationTimer].numericState)
+                        || 0) / Math.max((Number(items[props.ventilationTimer].numericState) || 0), (Number(items[props.ventilationTimerSet].numericState)
+                        || 0) || 360)) > 0)
+                    slots:
+                      default:
+                      - component: animate
+                        config:
+                          attributeName: opacity
+                          values: 1;0.3;1
+                          dur: 2s
+                          repeatCount: indefinite
+                          visible: =(Math.abs((Number(items[props.ventilationPower].numericState) || 0)) > 5) && !(((Number(items[props.ventilationTimer].numericState)
+                            || 0) / Math.max((Number(items[props.ventilationTimer].numericState) || 0), (Number(items[props.ventilationTimerSet].numericState)
+                            || 0) || 360)) > 0)
+                  - component: circle
+                    config:
+                      cx: 265.6
+                      cy: 41.9
+                      r: 30
+                      fill: none
+                      stroke: '#26a69a'
+                      stroke-width: 4.5
+                      visible: =(Math.abs((Number(items[props.ventilationPower].numericState) || 0)) > 5) && (((Number(items[props.ventilationTimer].numericState)
+                        || 0) / Math.max((Number(items[props.ventilationTimer].numericState) || 0), (Number(items[props.ventilationTimerSet].numericState)
+                        || 0) || 360)) > 0)
+                    slots:
+                      default:
+                      - component: animate
+                        config:
+                          attributeName: opacity
+                          values: 0.5;0.12;0.5
+                          dur: 2s
+                          repeatCount: indefinite
+                          visible: =(Math.abs((Number(items[props.ventilationPower].numericState) || 0)) > 5) && (((Number(items[props.ventilationTimer].numericState)
+                            || 0) / Math.max((Number(items[props.ventilationTimer].numericState) || 0), (Number(items[props.ventilationTimerSet].numericState)
+                            || 0) || 360)) > 0)
               - component: g
                 config:
                   visible: =(Number(items[props.acTimer].numericState) || 0) / Math.max((Number(items[props.acTimer].numericState)
