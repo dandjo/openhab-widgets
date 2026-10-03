@@ -39,7 +39,7 @@ props:
     required: false
     default: '72'
   parameterGroups: []
-timestamp: Sep 27, 2026, 9:44:33 PM
+timestamp: Oct 4, 2026, 12:18:52 AM
 component: svg
 config:
   viewBox: 0 0 64 64
@@ -62,6 +62,26 @@ slots:
       cx: 32
       cy: 32
       r: 28
+      stroke: =props.color || '#1e88e5'
+      stroke-width: 4
+      stroke-linecap: round
+      fill: none
+      visible: =!!props.running
+    slots:
+      default:
+      - component: animate
+        config:
+          attributeName: opacity
+          dur: 2s
+          repeatCount: indefinite
+          values: '=(props.progress !== undefined && props.progress !== null && props.progress !== '''') ? ''0.5;0.12;0.5''
+            : ''1;0.3;1'''
+          visible: =!!props.running
+  - component: circle
+    config:
+      cx: 32
+      cy: 32
+      r: 28
       transform: rotate(-90 32 32)
       stroke: =props.color || '#1e88e5'
       stroke-width: 4
@@ -69,25 +89,6 @@ slots:
       fill: none
       stroke-dasharray: =(175.93 * Number(props.progress) / 100).toFixed(1) + ' 175.93'
       visible: =!!props.running && (props.progress !== undefined && props.progress !== null && props.progress !== '')
-  - component: circle
-    config:
-      cx: 32
-      cy: 32
-      r: 28
-      stroke: =props.color || '#1e88e5'
-      stroke-width: 4
-      stroke-linecap: round
-      fill: none
-      visible: =!!props.running && !(props.progress !== undefined && props.progress !== null && props.progress !== '')
-    slots:
-      default:
-      - component: animate
-        config:
-          attributeName: opacity
-          values: 1;0.3;1
-          dur: 2s
-          repeatCount: indefinite
-          visible: =!!props.running
   - component: rect
     config:
       x: 20

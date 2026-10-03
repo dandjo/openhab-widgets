@@ -624,7 +624,13 @@ FLOW_W, FLOW_H = 461, 461
 STEP, TURN = 45, 8  # degrees between two nodes, and the star's turn clockwise from straight up
 ORBIT = 30  # every node's one ring, around its drawing; its dots, arcs and badges say what the node does
 RING_W = 4.5  # its stroke, the dots and arcs on it: as thick as the appliance icons' rings (4 of 64 units at 72 px)
-DOTS = 20  # running dots on a ring, about 5 units apart
+# a working node's ring pulses beside an arc that shows a value (user, 2026-10-03: running dots, then dashes, were
+# tried and replaced by this pulse), never stronger than half the arc's opacity, so the arc reads at the pulse's
+# peak too; a fixed duration, as a SMIL animation restarts whenever an expression in it changes
+PULSE = {"attributeName": "opacity", "values": "0.5;0.12;0.5", "dur": "2s", "repeatCount": "indefinite"}
+# a working ring without an arc pulses as a whole and strongly, as the appliance icon of a machine without progress
+# does (user, 2026-10-04)
+PULSE_FULL = {**PULSE, "values": "1;0.3;1"}
 
 
 def at(angle):
@@ -812,18 +818,24 @@ def ring_badge(x, y, name, color, on, r=12, text=False):
                      mark])
 
 
-def flow_orbit(xy, color, power, clockwise, threshold):
-    """A node's grey ring while power flows through it: dots in its colour run round, clockwise while `clockwise` holds,
-    the other way otherwise, a little faster the more it is. A CSS animation, as a SMIL one restarts whenever its
-    expression-driven duration changes. A share on the ring (share_orbit) covers them."""
-    p = f"Math.abs({power})"
-    dur = f"({p} < 300 ? 9 : {p} < 1000 ? 7 : {p} < 2500 ? 5.5 : 4)"
-    c = round(2 * math.pi * ORBIT, 1)
-    return svg("circle", visible=f"={p} > {threshold}", cx=xy[0], cy=xy[1],
-               r=ORBIT, fill="none", stroke=color, **{
-                   "stroke-width": RING_W, "stroke-linecap": "round", "stroke-dasharray": f"0 {round(c / DOTS, 2)}",
-                   "style": {"transform-box": "fill-box", "transform-origin": "center",
-                             "animation": f"='flowOrbit ' + {dur} + 's linear infinite' + (({clockwise}) ? '' : ' reverse')"}})
+def active_ring(xy, color, active, arc):
+    """What a working node shows on its ring: the whole ring pulsing strongly in its colour (PULSE_FULL); where an arc
+    on the ring shows a value (arc, an expression: a timer, the battery's charge, a frequency, power or temperature),
+    a soft pulse (PULSE) instead, the arc standing still over it, so the value reads and the rest of the ring shows
+    that the node works. Nothing while it rests."""
+    ring_ = svg("circle", [svg("animate", visible=f"=({active}) && !({arc})", **PULSE_FULL)],
+                visible=f"=({active}) && !({arc})", cx=xy[0], cy=xy[1], r=ORBIT, fill="none", stroke=color,
+                **{"stroke-width": RING_W})
+    pulse = svg("circle", [svg("animate", visible=f"=({active}) && ({arc})", **PULSE)],
+                visible=f"=({active}) && ({arc})", cx=xy[0], cy=xy[1], r=ORBIT, fill="none", stroke=color,
+                **{"stroke-width": RING_W})
+    return svg("g", [ring_, pulse])
+
+
+def flow_orbit(xy, color, power, threshold, share=None, least=0):
+    """A node's ring while power flows through it (above threshold): pulsing in its colour, softly where a share
+    stands on it (share, an expression, above least)."""
+    return active_ring(xy, color, f"Math.abs({power}) > {threshold}", f"({share}) > {least}" if share else "false")
 
 
 def share_orbit(xy, share, color, least=0):
@@ -899,21 +911,21 @@ def energy_flow():
         *spoke(APPL_XY, APPL_COLOR, APPL_POWER, "false", threshold=APPL_ON),
         *spoke(BATT_XY, "#7cb342", num(BATT), f"{num(BATT)} > 0"),
         *spoke(VENT_XY, VENT_TEAL, VENT_POWER, "false", threshold=5),
-        # every circle's grey ring; while power flows, dots in the node's colour run round it: clockwise while a device
-        # draws power, against it while it produces (PV); the grid clockwise on import, the battery while charging;
-        # the house clockwise unless discharge plus import is negative (more exported than discharged, or more charged
-        # than imported); a running timer fills the air conditioner's and the ventilation's ring with its time left,
-        # the battery's charge its ring, the dots running on in the rest
+        # every circle's grey ring; while power flows it pulses in the node's colour, softly where an arc stands on
+        # it: a running timer's time left on the air conditioner's and the ventilation's ring, the battery's charge
+        # on its own
         *[track(x, y) for x, y in nodes],
-        flow_orbit(PV_XY, "#ffb300", num(PV), f"{num(PV)} < 0", 10),
-        flow_orbit(GRID_XY, GRID_COLOR, num(GRID), f"{num(GRID)} > 0", 10),
-        flow_orbit(BATT_XY, "#7cb342", num(BATT), f"{num(BATT)} < 0", 10),
-        flow_orbit(HP_XY, HP_ORANGE, num(HP), f"{num(HP)} > 0", HP_ON),
-        flow_orbit(ECAR_XY, ECAR_COLOR, num(ECAR), f"{num(ECAR)} > 0", ECAR_ON),
-        flow_orbit(APPL_XY, APPL_COLOR, APPL_POWER, f"{APPL_POWER} > 0", APPL_ON),
-        flow_orbit(HOME_XY, "#1e88e5", num(HOME), f"{num(BATT)} + {num(GRID)} >= 0", 10),
-        flow_orbit(AC_XY, AC_BLUE, AC_FLOW, f"{AC_FLOW} > 0", AC_ON),
-        flow_orbit(VENT_XY, VENT_TEAL, VENT_POWER, f"{VENT_POWER} > 0", 5),
+        flow_orbit(PV_XY, "#ffb300", num(PV), 10),
+        flow_orbit(GRID_XY, GRID_COLOR, num(GRID), 10),
+        flow_orbit(BATT_XY, "#7cb342", num(BATT), 10, share=f"{num(SOC)} / 100"),
+        flow_orbit(HP_XY, HP_ORANGE, num(HP), HP_ON),
+        flow_orbit(ECAR_XY, ECAR_COLOR, num(ECAR), ECAR_ON),
+        flow_orbit(APPL_XY, APPL_COLOR, APPL_POWER, APPL_ON),
+        flow_orbit(HOME_XY, "#1e88e5", num(HOME), 10),
+        flow_orbit(AC_XY, AC_BLUE, AC_FLOW, AC_ON,
+                   share=f"{M_AC} / {timer_full('air_conditioning_timer', 720)}"),
+        flow_orbit(VENT_XY, VENT_TEAL, VENT_POWER, 5,
+                   share=f"{M_VENT} / {timer_full('ventilation_timer', 360)}"),
         share_orbit(AC_XY, f"{M_AC} / {timer_full('air_conditioning_timer', 720)}", AC_BLUE),
         share_orbit(VENT_XY, f"{M_VENT} / {timer_full('ventilation_timer', 360)}", VENT_TEAL),
         share_orbit(BATT_XY, f"{num(SOC)} / 100", "#7cb342"),
@@ -955,7 +967,6 @@ def energy_flow():
                # it centres itself in the height the row leaves, the cards below stay at the card's bottom
                **{"padding": f"={NARROW} ? '4px' : '12px'", "flex": "1 1 auto", "display": "flex",
                   "flex-direction": "column", "justify-content": "center"})
-    star["config"]["stylesheet"] = "@keyframes flowOrbit { to { transform: rotate(360deg); } }"
     strip = div([house_tiles()], **{"padding": "8px 12px 14px"})
     return [star, strip]
 
@@ -1788,24 +1799,14 @@ def hp_tile(cx, y, w, title, icon, color, on, rows, state=None):
 
 
 WATER_PACE = (num(HPX["flow"]), FLOW_STEPS)
-COMPRESSOR_PACE = (num(HPX["hz"]), FREQUENCY_STEPS)
 
 
-def hp_orbit(xy, color, active, pace, share=None, share_color=None):
-    """A node's grey ring as in the energy flow, and while `active` dots in the node's colour running round it,
-    clockwise while the heat goes its usual way, the other way during a defrost, faster with the water's flow or the
-    compressor's frequency (`pace`). A CSS animation, as a SMIL one restarts whenever its duration changes. A share
-    fills the ring as in the energy flow, from 1 % on, the dots running on in the rest, in share_color (an expression)
-    or the node's colour."""
-    value, bins = pace
-    c = round(2 * math.pi * HP_ORBIT, 1)
-    dur = steps(value, bins, ["9", "7.5", "6", "4.5", "3.5"])[1:]
-    ring_ = track(*xy)
-    dots = svg("circle", visible=f"={active}", cx=xy[0], cy=xy[1], r=HP_ORBIT, fill="none", stroke=color, **{
-        "stroke-width": RING_W, "stroke-linecap": "round", "stroke-dasharray": f"0 {round(c / DOTS, 2)}",
-        "style": {"transform-box": "fill-box", "transform-origin": "center",
-                  "animation": f"='flowOrbit ' + ({dur}) + 's linear infinite' + ({DEFROSTING} ? ' reverse' : '')"}})
-    return [ring_, dots] + ([share_orbit(xy, share, share_color or color, 0.01)] if share else [])
+def hp_orbit(xy, color, active, share=None, share_color=None):
+    """A node's ring as in the energy flow; while `active` pulsing in the node's colour, softly where a share fills
+    part of it (from 1 % on, in share_color, an expression, or the node's colour)."""
+    arc = f"({share}) > 0.01" if share else "false"
+    return [track(*xy), active_ring(xy, color, active, arc)] + \
+        ([share_orbit(xy, share, share_color or color, 0.01)] if share else [])
 
 
 hp_svg = svg("svg", [
@@ -1834,14 +1835,14 @@ hp_svg = svg("svg", [
     # the outdoor unit's ring filled by the compressor's frequency; the wall unit's by the heat pump's own draw (its
     # measured circuit, as POWER_FULL; the tank's booster heater sits in the tank, not here), full and red while its
     # backup heater runs; the tank's by its temperature; the heating circuits' by the leaving water while they carry it
-    *hp_orbit(OUT, "#fb8c00", COMPRESSOR, COMPRESSOR_PACE, f"{num(HPX['hz'])} / {HZ_FULL}"),
-    *hp_orbit(WALL, "#64b5f6", PUMP_ON, WATER_PACE, f"({BUH_ON} ? 1 : {num(HPX['circuit'])} / {POWER_FULL})",
+    *hp_orbit(OUT, "#fb8c00", COMPRESSOR, f"{num(HPX['hz'])} / {HZ_FULL}"),
+    *hp_orbit(WALL, "#64b5f6", PUMP_ON, f"({BUH_ON} ? 1 : {num(HPX['circuit'])} / {POWER_FULL})",
               f"={BUH_ON} ? '#e53935' : '#64b5f6'"),
-    *hp_orbit(VALVE, "#ffb74d", PUMP_ON, WATER_PACE),
-    *hp_orbit(TANK, "#e57373", f"({TANK_FLOW} || {BSH_ON})", WATER_PACE, f"{num(HPX['tank'])} / {TANK_FULL}"),
-    *hp_orbit(RADIATORS, "#ffab91", HEATING_FLOW, WATER_PACE, CIRCUIT_SHARE),
-    *hp_orbit(GROUND_FH, "#f48fb1", HEATING_FLOW, WATER_PACE, CIRCUIT_SHARE),
-    *hp_orbit(UPPER_FH, "#f48fb1", HEATING_FLOW, WATER_PACE, CIRCUIT_SHARE),
+    *hp_orbit(VALVE, "#ffb74d", PUMP_ON),
+    *hp_orbit(TANK, "#e57373", f"({TANK_FLOW} || {BSH_ON})", f"{num(HPX['tank'])} / {TANK_FULL}"),
+    *hp_orbit(RADIATORS, "#ffab91", HEATING_FLOW, CIRCUIT_SHARE),
+    *hp_orbit(GROUND_FH, "#f48fb1", HEATING_FLOW, CIRCUIT_SHARE),
+    *hp_orbit(UPPER_FH, "#f48fb1", HEATING_FLOW, CIRCUIT_SHARE),
     flow_node("heat-pump", OUT, num(HPX["circuit"]), frequency=num(HPX["hz"])),
     *wall_unit_node(*WALL), *valve_node(*VALVE), *tank_node(*TANK),
     *radiator_node(*RADIATORS), *floor_node(*GROUND_FH), *floor_node(*UPPER_FH),
@@ -2024,7 +2025,6 @@ def heatpump_content():
              *[hp_popup_link(hp_box(cx - HP_ORBIT, cy - HP_ORBIT, 2 * HP_ORBIT, 2 * HP_ORBIT, "50%"), uid)
                for (cx, cy), uid in HP_NODE_POPUPS]]
     drawing = div([hp_svg, *links], **{"position": "relative"})
-    drawing["config"]["stylesheet"] = "@keyframes flowOrbit { to { transform: rotate(360deg); } }"
     return [div([hp_stats(), drawing],
                 **{"display": "flex", "flex-direction": "column", "gap": "12px", "width": "100%",
                    "max-width": f"{HP_VB[2]}px", "margin": "auto",
@@ -3211,7 +3211,9 @@ def dishwasher_front(running):
 def appliance_icon_widget():
     """The widget every appliance icon is an instance of: a washer, dryer or dishwasher (kind: washer, dryer,
     dish-washer) drawn inside a ring, its drum, paddles or spray arm turning while running holds; the ring fills with
-    progress (0 to 100) while it runs, or pulses when there is no progress."""
+    progress (0 to 100) while it runs and pulses in the rest of it, as the energy flow's rings beside an arc do (the
+    arc, as wide and in the same colour, covers the pulsing ring under it), or pulses as a whole when there is no
+    progress."""
     running = "!!props.running"
     has_progress = "(props.progress !== undefined && props.progress !== null && props.progress !== '')"
     ring_ = round(2 * math.pi * 28, 2)
@@ -3219,11 +3221,13 @@ def appliance_icon_widget():
     arc = svg("circle", cx=32, cy=32, r=28, transform="rotate(-90 32 32)", visible=f"={running} && {has_progress}",
               **stroke(4, "=props.color || '#1e88e5'",
                        **{"stroke-dasharray": f"=({ring_} * Number(props.progress) / 100).toFixed(1) + ' {ring_}'"}))
-    pulse = svg("circle", [svg("animate", attributeName="opacity", values="1;0.3;1", dur="2s", repeatCount="indefinite",
+    # beside the progress arc as weak as the energy flow's pulse, alone as strong as before
+    pulse = svg("circle", [svg("animate", attributeName="opacity", dur="2s", repeatCount="indefinite",
+                               values=f"={has_progress} ? '{PULSE['values']}' : '{PULSE_FULL['values']}'",
                                visible=f"={running}")],
-                cx=32, cy=32, r=28, visible=f"={running} && !{has_progress}", **stroke(4, "=props.color || '#1e88e5'"))
+                cx=32, cy=32, r=28, visible=f"={running}", **stroke(4, "=props.color || '#1e88e5'"))
     fronts = [svg("g", front(running), visible=f"=props.kind === '{kind}'") for kind, front in APPLIANCE_FRONTS]
-    return svg("svg", [track, arc, pulse, *machine_body(fronts)], viewBox="0 0 64 64", width="=props.size || 72",
+    return svg("svg", [track, pulse, arc, *machine_body(fronts)], viewBox="0 0 64 64", width="=props.size || 72",
                height="=props.size || 72")
 
 
@@ -3411,12 +3415,12 @@ def heat_specs():
     the heat pump as its node in the energy flow with the same badge, its grey ring filled by the compressor's
     frequency, and the leaving water; on is the switch for hot water and for heating."""
     tank = heat_icon([*tank_node(0, 0, "heatTank"), *tank_source_badge(0, 0)],
-                     hp_orbit((0, 0), "#e57373", f"({TANK_FLOW} || {BSH_ON})", WATER_PACE,
+                     hp_orbit((0, 0), "#e57373", f"({TANK_FLOW} || {BSH_ON})",
                               f"{num(HPX['tank'])} / {TANK_FULL}"),
                      [tank_layers("heatTank")])
     pump = heat_icon([flow_node("heat-pump", (0, 0), num(HPX["power"]), frequency=num(HPX["hz"])),
                       *hp_mode_badges(0, 0)],
-                     hp_orbit((0, 0), HP_ORANGE, COMPRESSOR, COMPRESSOR_PACE, f"{num(HPX['hz'])} / {HZ_FULL}"))
+                     hp_orbit((0, 0), HP_ORANGE, COMPRESSOR, f"{num(HPX['hz'])} / {HZ_FULL}"))
     return [dict(icon=tank, title="Warmwasserspeicher", on="items.pyaltherma_dhw_power.state === 'ON'", color=DHW_C,
                  value=f"={disp(HPX['tank'])}"),
             dict(icon=pump, title="Heizung", on="items.pyaltherma_climate_control_power.state === 'ON'",
@@ -3443,7 +3447,6 @@ def heating(tile=heat_tile):
                 cop_tile("COP Warmwasser", "espaltherma_dcop_dhw", DHW_C, "shower", half, pop), total],
                **{"display": "grid", "gap": "8px", "grid-template-columns": "repeat(2, minmax(0, 1fr))"})
     content = div([tiles, *hp_day_split(), cops], **{"padding": "12px 16px 16px", "font-size": "14px"})
-    content["config"]["stylesheet"] = "@keyframes flowOrbit { to { transform: rotate(360deg); } }"
     return [content]
 
 # ---------------------------------------------------------------- 8b. appliance pages
