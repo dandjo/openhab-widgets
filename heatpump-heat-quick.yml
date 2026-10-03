@@ -40,14 +40,14 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 3, 2026, 2:28:59 AM
+timestamp: Oct 3, 2026, 11:36:34 PM
 component: div
 config:
   style:
     --quick-popup: panel
   label: Wärme
   stylesheet: ':root .popup:has(> .oh-popup[style*="--quick-popup"]) { --f7-popup-tablet-width: 420px; --f7-popup-tablet-height:
-    min(640px, calc(100vh - 64px)); }
+    min(660px, calc(100vh - 64px)); }
 
     .menu-item-dropdown:not(.menu-item-dropdown-opened) .menu-dropdown { display: none; }
 

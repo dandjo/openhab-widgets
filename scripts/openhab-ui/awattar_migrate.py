@@ -4,9 +4,11 @@
 Usage: awattar_migrate.py check|apply   (run as root with openHAB stopped for apply)
 """
 import json
+import os
 import sys
 
-DB = "/var/lib/openhab/jsondb/"
+# the JSONDB to work on; OPENHAB_JSONDB points a run at a copy of it
+DB = os.path.join(os.environ.get("OPENHAB_JSONDB", "/var/lib/openhab/jsondb"), "")
 ADDONS = "/var/lib/openhab/config/org/openhab/addons.config"
 
 BRIDGE = "awattar:bridge:epex_spot_awattar"

@@ -43,11 +43,12 @@ number formats come from the items.
 | `consumption-card` | – |
 | `electricity-price-card` | – |
 | `energy-days-card` | – |
-| `energy-flow-card` | `air-conditioner-quick`, `boost-pill`, `flow-link`, `flow-node`, `flow-share-ring`, `heatpump-quick`, `pill-slider`, `pill-switch`, `power-pill`, `state-bar`, `switch-row`, `switch-tile`, `ventilation-quick` |
+| `energy-flow-card` | `air-conditioner-quick`, `boost-pill`, `flow-link`, `flow-node`, `flow-share-ring`, `heatpump-quick`, `pill-slider`, `pill-switch`, `power-pill`, `state-bar`, `switch-row`, `ventilation-quick` |
 | `flow-link` | – |
 | `flow-node` | – |
 | `flow-share-ring` | – |
 | `ground-floor-quick` | – |
+| `heating-card` | `boost-pill`, `flow-node`, `heatpump-cop-quick`, `heatpump-quick`, `pill-slider`, `pill-switch`, `state-bar` |
 | `heatpump-card` | `boost-pill`, `flow-node`, `ground-floor-quick`, `heatpump-circuit-quick`, `heatpump-control-quick`, `heatpump-cop-quick`, `heatpump-electric-quick`, `heatpump-heat-quick`, `heatpump-indoor-quick`, `heatpump-outdoor-quick`, `heatpump-refrigerant-quick`, `item-popup`, `pill-slider`, `pill-switch`, `state-bar`, `upper-floor-quick`, `value-tile` |
 | `heatpump-circuit-quick` | `pill-slider` |
 | `heatpump-control-quick` | `boost-pill`, `pill-switch`, `state-bar` |
@@ -56,7 +57,7 @@ number formats come from the items.
 | `heatpump-heat-quick` | – |
 | `heatpump-indoor-quick` | `boost-pill`, `pill-slider`, `pill-switch`, `state-bar` |
 | `heatpump-outdoor-quick` | – |
-| `heatpump-quick` | `boost-pill`, `pill-slider`, `pill-switch` |
+| `heatpump-quick` | `boost-pill`, `pill-slider`, `pill-switch`, `state-bar` |
 | `heatpump-refrigerant-quick` | – |
 | `item-popup` | – |
 | `pill-slider` | – |
@@ -70,6 +71,7 @@ number formats come from the items.
 | `state-bar` | – |
 | `switch-row` | – |
 | `switch-tile` | – |
+| `switches-card` | `switch-tile` |
 | `temperatures-card` | – |
 | `upper-floor-quick` | – |
 | `value-tile` | `item-popup` |
@@ -128,29 +130,32 @@ Needs `weather-icon`.
 ### Energy flow: `energy-flow-card`
 
 A regular star around the house: PV, heat pump, air conditioner, E-Car, the household appliances together, ventilation,
-battery and grid, each with its power and today's energy. Dots run along the lines in the direction of the flow at four
-speeds and slide under the node rims; while power flows through a node, dots in its colour run round its grey ring,
-clockwise towards the house and the other way out of it. The icons move with the power (sun rays, air streams, pylon
-dashes, a pulsing bolt over the charging car, sparkles twinkling while the appliances run, the battery filled to its
-state of charge, the ventilation's duct fan turning), the heat pump's fan with its compressor: while only its electric
-heaters run it stands and the energy only flows. Badges on the rings tell what the heat pump does (space heating, hot
-water, defrost, a red bolt while only its electric heaters run), whether the air conditioner is on and the ventilation's
-level. A running timer covers its device's ring with an arc, full at what it was last set to, and the battery's ring is
-filled with its state of charge; the dots run on in the rest of the ring. A tap on the heat pump, the air conditioner or
-the ventilation opens its quick popup (see [Quick popups](#quick-popups)). Under the star three tiles with large pale
-icons, the house's power and today's self-consumption and self-sufficiency as rings, and below them switch tiles for
-plugs. The card places its lines, nodes and rings as `flow-link`, `flow-node` and `flow-share-ring`, the plugs as
-`switch-tile`. The recording and the dark screenshot show it with demo values.
+battery and grid, each with its power and today's energy. Every node is one grey ring around its drawing, the ring
+carrying what the node shows beyond it. Dots run along the lines in the direction of the flow at four speeds and slide
+under the node rims; while power flows through a node, dots in its colour run round its ring: clockwise while a device
+draws power and the other way while it produces, the grid clockwise on import, the battery while charging, the house
+unless discharge plus import is negative. The icons move with the power (sun rays, air streams, pylon dashes, a pulsing
+bolt over the charging car, sparkles twinkling while the appliances run, the battery filled to its state of charge, the
+ventilation unit's fan turning and its air arrows flowing, fresh air in and used air out), the heat pump's fan with its
+compressor: while only its electric heaters run it stands and the energy only flows. Badges just outside the rings tell
+what the heat pump does (space heating, hot water, defrost, a red bolt while only its electric heaters run), whether the
+air conditioner is on and the ventilation's level; a badge is filled in its colour while its device works and grey
+otherwise. A running timer covers its device's ring with an arc, full at what it was last set to, and the battery's ring
+is filled with its state of charge; the dots run on in the rest of the ring. A tap on the heat pump, the air conditioner
+or the ventilation opens its quick popup (see [Quick popups](#quick-popups)). Under the star three tiles with large pale
+icons, the house's power and today's self-consumption and self-sufficiency as rings. The card places its lines, nodes
+and rings as `flow-link`, `flow-node` and `flow-share-ring`. The recording and the dark screenshot show it with demo
+values.
 
 Needs `air-conditioner-quick`, `boost-pill`, `flow-link`, `flow-node`, `flow-share-ring`, `heatpump-quick`,
-`pill-slider`, `pill-switch`, `power-pill`, `state-bar`, `switch-row`, `switch-tile`, `ventilation-quick`.
+`pill-slider`, `pill-switch`, `power-pill`, `state-bar`, `switch-row`, `ventilation-quick`.
 
 ![Energy flow](screenshots/energy-flow-card.gif)
 
 ![Energy flow in dark mode](screenshots/energy-flow-card-dark.png)
 
 <details>
-<summary>67 props</summary>
+<summary>54 props</summary>
 
 | Prop | Item | Item type |
 |---|---|---|
@@ -193,6 +198,7 @@ Needs `air-conditioner-quick`, `boost-pill`, `flow-link`, `flow-node`, `flow-sha
 | `batteryChargeToday` | Batteriespeicher Ladung heute | Number:Energy |
 | `heatpumpDhwTankTemp` | ESPAltherma Warmwasserspeicher Temperatur | Number:Temperature |
 | `heatpumpDhwBoost` | Pyaltherma Warmwasser-Boost | Switch |
+| `heatpumpSmartGrid` | ESPAltherma Smart Grid | String |
 | `heatpumpClimateControlPower` | Pyaltherma Heizung Ein/Aus | Switch |
 | `heatpumpDhwPower` | Pyaltherma Warmwasser Ein/Aus | Switch |
 | `heatpumpManagement` | Wärmepumpe Automatik | Group |
@@ -200,12 +206,30 @@ Needs `air-conditioner-quick`, `boost-pill`, `flow-link`, `flow-node`, `flow-sha
 | `heatpumpDhwManagement` | Wärmepumpe Warmwasser-Automatik | Switch |
 | `acMode` | Faikout Perfera Modus | String |
 | `acTemperature` | Faikout Perfera Temperatur | Number:Temperature |
+| `acFan` | Faikout Perfera Lüfter | String |
 | `acTemperatureSetpoint` | Faikout Perfera Solltemperatur | Number:Temperature |
 | `acPowerful` | Faikout Perfera Powerful | Switch |
 | `netatmoWeatherstationCo2` | Netatmo Wetterstation CO2 | Number:Dimensionless |
 | `ventilationManagement` | Lüftung Automatik | Group |
 | `homeEnergyToday` | Haus Energie heute | Number:Energy |
 | `pvSelfUseToday` | Photovoltaik Eigenverbrauch heute | Number:Energy |
+
+</details>
+
+### Switches: `switches-card`
+
+The switchable plugs under the energy flow as `switch-tile`s, five abreast, three on a phone: icon, *An* or *Aus*, name,
+power and today's energy; a tap anywhere switches, and while on a tile is tinted and outlined in its colour.
+
+Needs `switch-tile`.
+
+![Switches](screenshots/switches-card.png)
+
+<details>
+<summary>15 props</summary>
+
+| Prop | Item | Item type |
+|---|---|---|
 | `coffeeMachineSwitch` | Kaffeemaschine Schalter | Switch |
 | `coffeeMachinePower` | Kaffeemaschine Leistung | Number:Power |
 | `coffeeMachineEnergyToday` | Kaffeemaschine Energie heute | Number:Energy |
@@ -261,6 +285,62 @@ Needs `appliance-icon`, `appliance-tile`.
 
 </details>
 
+### Heating and hot water: `heating-card`
+
+Two tiles in the appliances' style, the DHW tank and the heat pump: the tank drawn as in the heat pump card, its water
+in three layers (the top in its temperature's colour) with the Effect Heater beside it, lit while it heats, its ring
+filled by its temperature and a badge for where its heat comes from (the booster heater's red bolt, else the heat pump
+while the compressor charges the tank); the heat pump as the energy flow's node with the same mode badge, its ring
+filled by the compressor's frequency. Each tile's pill holds the temperature, the tank's and the leaving water's, filled
+in the tile's colour while hot water or heating is switched on, outlined while off; a tap opens the heat pump's quick
+popup. Below them today's electricity and heat of the heat pump split into space heating, DHW and standby as bars
+(hovering a part lifts it everywhere), and today's COPs of space heating, DHW and in total as rings like the energy
+flow's self-consumption. The screenshots show it with the heat pump card's demo values.
+
+Needs `boost-pill`, `flow-node`, `heatpump-cop-quick`, `heatpump-quick`, `pill-slider`, `pill-switch`, `state-bar`.
+
+![Heating and hot water](screenshots/heating-card.png)
+
+![Heating and hot water in dark mode](screenshots/heating-card-dark.png)
+
+<details>
+<summary>30 props</summary>
+
+| Prop | Item | Item type |
+|---|---|---|
+| `heatpumpDhwTankTemp` | ESPAltherma Warmwasserspeicher Temperatur | Number:Temperature |
+| `heatpumpFlowSensor` | ESPAltherma Durchfluss | Number:VolumetricFlowRate |
+| `heatpumpDefrostOperaton` | ESPAltherma Abtauen | Switch |
+| `heatpumpWaterPumpOperation` | ESPAltherma Umwälzpumpe | Switch |
+| `heatpumpValve` | ESPAltherma 3-Wege-Ventil | String |
+| `heatpumpBshMode` | ESPAltherma Zusatzheizung Speicher | Switch |
+| `heatpumpInvFrequency` | ESPAltherma Verdichterfrequenz | Number:Frequency |
+| `heatpumpDhwPower` | Pyaltherma Warmwasser Ein/Aus | Switch |
+| `heatpumpPower` | ESPAltherma Elektrische Leistung | Number:Power |
+| `heatpumpDhwBoost` | Pyaltherma Warmwasser-Boost | Switch |
+| `heatpumpSmartGrid` | ESPAltherma Smart Grid | String |
+| `heatpumpClimateControlPower` | Pyaltherma Heizung Ein/Aus | Switch |
+| `heatpumpManagement` | Wärmepumpe Automatik | Group |
+| `heatpumpDhwTempHeating` | Pyaltherma Warmwasser Solltemperatur | Number:Temperature |
+| `heatpumpDhwManagement` | Wärmepumpe Warmwasser-Automatik | Switch |
+| `heatpumpBuhStep1Mode` | ESPAltherma Heizstab Stufe 1 | Switch |
+| `heatpumpBuhStep2Mode` | ESPAltherma Heizstab Stufe 2 | Switch |
+| `heatpumpLeavingWaterTempAfterBuh` | ESPAltherma Vorlauftemperatur nach Heizstab | Number:Temperature |
+| `heatpumpEnergyToday` | ESPAltherma Energie heute | Number:Energy |
+| `heatpumpEnergySpaceToday` | ESPAltherma Energie Heizung heute | Number:Energy |
+| `heatpumpEnergyDhwToday` | ESPAltherma Energie Warmwasser heute | Number:Energy |
+| `heatpumpEnergyStandbyToday` | ESPAltherma Energie Standby heute | Number:Energy |
+| `heatpumpHeatingEnergyToday` | ESPAltherma Heizenergie heute | Number:Energy |
+| `heatpumpHeatingEnergySpaceToday` | ESPAltherma Heizenergie Heizung heute | Number:Energy |
+| `heatpumpHeatingEnergyDhwToday` | ESPAltherma Heizenergie Warmwasser heute | Number:Energy |
+| `heatpumpDcopSpace` | ESPAltherma Tages-COP Heizung | Number |
+| `heatpumpCop` | ESPAltherma COP | Number |
+| `heatpumpDcop` | ESPAltherma Tages-COP | Number |
+| `heatpumpExtAmbientTemp` | ESPAltherma Außentemperatur | Number:Temperature |
+| `heatpumpDcopDhw` | ESPAltherma Tages-COP Warmwasser | Number |
+
+</details>
+
 ### Electricity price: `electricity-price-card`
 
 The all-in price, the cheapest and priciest hour, and the prices 12 hours back and 36 hours ahead, coloured green,
@@ -285,21 +365,23 @@ orange and red by price.
 ### Heat pump: `heatpump-card`
 
 A section through the house: the outdoor unit on the roof (the energy flow's `flow-node`), wall unit, three-way valve,
-DHW tank and radiators in the basement, floor heating on the two levels above. Every device sits in a grey ring like the
-energy flow's nodes, dots running round it while it works; the outdoor unit's fan turns while the compressor runs and
-its ring is filled by the compressor's frequency, the wall unit's by its own draw, the measured circuit (full and red
-while the backup heater runs; the tank's booster heater does not count), the tank's by its temperature, radiators and
-floor loops by the leaving water while they carry it. Dots run along the pipes, as many as a pipe is long, faster with
-the water's flow or the compressor's frequency, and all of them backwards during a defrost. The valve shows its position
-in its icon. Tiles in the style of the switch tiles hold the figures: the outdoor unit, the control (heating, hot water,
-Smart Grid, automation), the refrigerant, the heating circuit, the climate of the two floors, the tank with its booster
-heater and the indoor unit with its own power (the measured circuit plus the backup heater), each tinted in its colour
-while what it shows is at work. A tap on a tile, the wall unit or the outdoor unit opens its quick popup with charts or
-controls. Beside the drawing the electrical power, the heat and the COP as value tiles that open popups with their
-charts of the day and the month, today's energies split into space heating, DHW and standby as bars, and today's COPs as
-rings. On a phone the drawing takes the card's width; on a wider screen it stands at most at its own size, as the energy
-flow does, so their texts keep the UI's sizes and their circles come out the same. The recording and the dark screenshot
-show it with demo values (a space heating run).
+DHW tank (in layers, the Effect Heater beside it) and radiators in the basement, floor heating on the two levels above.
+Every device is one grey ring like the energy flow's nodes, dots running round it while it works; the outdoor unit's fan
+turns while the compressor runs and its ring is filled by the compressor's frequency, the wall unit's by its own draw,
+the measured circuit (full and red while the backup heater runs; the tank's booster heater does not count), the tank's
+by its temperature, radiators and floor loops by the leaving water while they carry it. Dots run along the pipes, as
+many as a pipe is long, faster with the water's flow or the compressor's frequency, and all of them backwards during a
+defrost. The valve shows its position in its icon. Badges just outside three rings say what the outdoor unit's ring
+shows (*Hz*) and the wall unit's (a bolt, red while the backup heater runs) and where the tank's heat comes from; grey
+while their device rests. Tiles in the style of the switch tiles hold the figures: the outdoor unit, the control
+(heating, hot water, Smart Grid, automation), the refrigerant, the heating circuit, the climate of the two floors, the
+tank with its booster heater and the indoor unit with its own power (the measured circuit plus the backup heater), each
+tinted in its colour while what it shows is at work. A tap on a tile, the wall unit or the outdoor unit opens its quick
+popup with charts or controls. Above the drawing the electrical power, the heat and the COP as a row of value tiles that
+open popups with their charts of the day and the month (today's split and COPs are in the heating card). On a phone the
+drawing takes the card's width; on a wider screen it stands at most at its own size, as the energy flow does, so their
+texts keep the UI's sizes and their rings come out the same, and in the middle of the height its row gives the card. The
+recording and the dark screenshot show it with demo values (a space heating run).
 
 Needs `boost-pill`, `flow-node`, `ground-floor-quick`, `heatpump-circuit-quick`, `heatpump-control-quick`,
 `heatpump-cop-quick`, `heatpump-electric-quick`, `heatpump-heat-quick`, `heatpump-indoor-quick`,
@@ -315,6 +397,25 @@ Needs `boost-pill`, `flow-node`, `ground-floor-quick`, `heatpump-circuit-quick`,
 
 | Prop | Item | Item type |
 |---|---|---|
+| `heatpumpPower` | ESPAltherma Elektrische Leistung | Number:Power |
+| `heatpumpEnergyToday` | ESPAltherma Energie heute | Number:Energy |
+| `heatpumpElectricalPowerSpace` | ESPAltherma Elektrische Leistung Heizung | Number:Power |
+| `heatpumpElectricalPowerDhw` | ESPAltherma Elektrische Leistung Warmwasser | Number:Power |
+| `heatpumpElectricalPowerStandby` | ESPAltherma Elektrische Leistung Standby | Number:Power |
+| `heatpumpEnergySpaceToday` | ESPAltherma Energie Heizung heute | Number:Energy |
+| `heatpumpEnergyDhwToday` | ESPAltherma Energie Warmwasser heute | Number:Energy |
+| `heatpumpEnergyStandbyToday` | ESPAltherma Energie Standby heute | Number:Energy |
+| `heatpumpHeatPower` | ESPAltherma Heizleistung | Number:Power |
+| `heatpumpHeatingEnergyToday` | ESPAltherma Heizenergie heute | Number:Energy |
+| `heatpumpHeatingPowerSpace` | ESPAltherma Heizleistung Heizung | Number:Power |
+| `heatpumpHeatingPowerDhw` | ESPAltherma Heizleistung Warmwasser | Number:Power |
+| `heatpumpHeatingEnergySpaceToday` | ESPAltherma Heizenergie Heizung heute | Number:Energy |
+| `heatpumpHeatingEnergyDhwToday` | ESPAltherma Heizenergie Warmwasser heute | Number:Energy |
+| `heatpumpCop` | ESPAltherma COP | Number |
+| `heatpumpDcop` | ESPAltherma Tages-COP | Number |
+| `heatpumpExtAmbientTemp` | ESPAltherma Außentemperatur | Number:Temperature |
+| `heatpumpDcopSpace` | ESPAltherma Tages-COP Heizung | Number |
+| `heatpumpDcopDhw` | ESPAltherma Tages-COP Warmwasser | Number |
 | `heatpumpDhwTankTemp` | ESPAltherma Warmwasserspeicher Temperatur | Number:Temperature |
 | `heatpumpInvFrequency` | ESPAltherma Verdichterfrequenz | Number:Frequency |
 | `heatpumpDefrostOperaton` | ESPAltherma Abtauen | Switch |
@@ -326,7 +427,6 @@ Needs `boost-pill`, `flow-node`, `ground-floor-quick`, `heatpump-circuit-quick`,
 | `heatpumpCircuitPower` | Wärmepumpe Leistung | Number:Power |
 | `heatpumpBshMode` | ESPAltherma Zusatzheizung Speicher | Switch |
 | `heatpumpLeavingWaterTempAfterBuh` | ESPAltherma Vorlauftemperatur nach Heizstab | Number:Temperature |
-| `heatpumpExtAmbientTemp` | ESPAltherma Außentemperatur | Number:Temperature |
 | `heatpumpHeatExchangerMidTemp` | ESPAltherma Wärmetauscher Mitte | Number:Temperature |
 | `heatpumpSmartGrid` | ESPAltherma Smart Grid | String |
 | `heatpumpClimateControlPower` | Pyaltherma Heizung Ein/Aus | Switch |
@@ -353,24 +453,6 @@ Needs `boost-pill`, `flow-node`, `ground-floor-quick`, `heatpump-circuit-quick`,
 | `heatpumpLeavingWaterSetpoint` | ESPAltherma Vorlauf Sollwert | Number:Temperature |
 | `heatpumpDhwTempHeating` | Pyaltherma Warmwasser Solltemperatur | Number:Temperature |
 | `heatpumpDhwManagement` | Wärmepumpe Warmwasser-Automatik | Switch |
-| `heatpumpPower` | ESPAltherma Elektrische Leistung | Number:Power |
-| `heatpumpEnergyToday` | ESPAltherma Energie heute | Number:Energy |
-| `heatpumpElectricalPowerSpace` | ESPAltherma Elektrische Leistung Heizung | Number:Power |
-| `heatpumpElectricalPowerDhw` | ESPAltherma Elektrische Leistung Warmwasser | Number:Power |
-| `heatpumpElectricalPowerStandby` | ESPAltherma Elektrische Leistung Standby | Number:Power |
-| `heatpumpEnergySpaceToday` | ESPAltherma Energie Heizung heute | Number:Energy |
-| `heatpumpEnergyDhwToday` | ESPAltherma Energie Warmwasser heute | Number:Energy |
-| `heatpumpEnergyStandbyToday` | ESPAltherma Energie Standby heute | Number:Energy |
-| `heatpumpHeatPower` | ESPAltherma Heizleistung | Number:Power |
-| `heatpumpHeatingEnergyToday` | ESPAltherma Heizenergie heute | Number:Energy |
-| `heatpumpHeatingPowerSpace` | ESPAltherma Heizleistung Heizung | Number:Power |
-| `heatpumpHeatingPowerDhw` | ESPAltherma Heizleistung Warmwasser | Number:Power |
-| `heatpumpHeatingEnergySpaceToday` | ESPAltherma Heizenergie Heizung heute | Number:Energy |
-| `heatpumpHeatingEnergyDhwToday` | ESPAltherma Heizenergie Warmwasser heute | Number:Energy |
-| `heatpumpCop` | ESPAltherma COP | Number |
-| `heatpumpDcop` | ESPAltherma Tages-COP | Number |
-| `heatpumpDcopSpace` | ESPAltherma Tages-COP Heizung | Number |
-| `heatpumpDcopDhw` | ESPAltherma Tages-COP Warmwasser | Number |
 
 </details>
 
@@ -478,12 +560,12 @@ actionModalConfig:
   ventilationManagement: ventilation_management
 ```
 
-It opens 420 px wide and up to 640 px high, on a phone full screen; its charts start below their period buttons, a
-closed period menu takes no room. The energy flow's heat pump, air conditioner and ventilation open the first three,
-the heat pump card's tiles, wall unit and outdoor unit the others:
+It opens 420 px wide and up to 660 px high, on a phone full screen; its charts start below their period buttons, a
+closed period menu takes no room. The energy flow's heat pump, air conditioner and ventilation open the first three
+(the heating card's tiles open the heat pump's too), the heat pump card's tiles, wall unit and outdoor unit the others:
 
-- `heatpump-quick`, heat pump: the hot-water boost, heating, hot water and automation, the DHW setpoint.
-- `air-conditioner-quick`, air conditioner: on/off, mode, setpoint, timer and boost.
+- `heatpump-quick`, heat pump: the hot-water boost, the Smart Grid, heating, hot water and automation, the DHW setpoint.
+- `air-conditioner-quick`, air conditioner: on/off, mode, fan, setpoint, timer and boost.
 - `ventilation-quick`, ventilation: the level, the timer and the automation.
 - `heatpump-control-quick`, control: heating, hot water and automation, the hot-water boost and the Smart Grid.
 - `heatpump-indoor-quick`, indoor unit: all the heat pump's controls.
@@ -507,16 +589,17 @@ the heat pump card's tiles, wall unit and outdoor unit the others:
 | ![Ground floor](screenshots/ground-floor-quick.png) | ![Electricity](screenshots/heatpump-electric-quick.png) | ![Heat](screenshots/heatpump-heat-quick.png) |
 | ![COP](screenshots/heatpump-cop-quick.png) |  |  |
 
-`heatpump-quick` needs `boost-pill`, `pill-slider`, `pill-switch`.
+`heatpump-quick` needs `boost-pill`, `pill-slider`, `pill-switch`, `state-bar`.
 
 <details>
-<summary><code>heatpump-quick</code>: 8 props</summary>
+<summary><code>heatpump-quick</code>: 9 props</summary>
 
 | Prop | Item | Item type |
 |---|---|---|
 | `heatpumpDhwTankTemp` | ESPAltherma Warmwasserspeicher Temperatur | Number:Temperature |
 | `heatpumpPower` | ESPAltherma Elektrische Leistung | Number:Power |
 | `heatpumpDhwBoost` | Pyaltherma Warmwasser-Boost | Switch |
+| `heatpumpSmartGrid` | ESPAltherma Smart Grid | String |
 | `heatpumpClimateControlPower` | Pyaltherma Heizung Ein/Aus | Switch |
 | `heatpumpDhwPower` | Pyaltherma Warmwasser Ein/Aus | Switch |
 | `heatpumpManagement` | Wärmepumpe Automatik | Group |
@@ -528,13 +611,14 @@ the heat pump card's tiles, wall unit and outdoor unit the others:
 `air-conditioner-quick` needs `boost-pill`, `pill-slider`, `power-pill`, `state-bar`.
 
 <details>
-<summary><code>air-conditioner-quick</code>: 7 props</summary>
+<summary><code>air-conditioner-quick</code>: 8 props</summary>
 
 | Prop | Item | Item type |
 |---|---|---|
 | `acSwitch` | Faikout Perfera Schalter | Switch |
 | `acMode` | Faikout Perfera Modus | String |
 | `acTemperature` | Faikout Perfera Temperatur | Number:Temperature |
+| `acFan` | Faikout Perfera Lüfter | String |
 | `acTemperatureSetpoint` | Faikout Perfera Solltemperatur | Number:Temperature |
 | `acTimer` | Klimaanlage Timer | Number:Time |
 | `acTimerSet` | Klimaanlage Timer eingestellt | Number:Time |
@@ -946,8 +1030,10 @@ house whose windows glow and pulse with the consumption), `heat-pump` (an outdoo
 `frequency`, the compressor's, is above 0 Hz, faster from 30 and 55 Hz), `air-conditioner` (an indoor unit whose air
 streams flow), `e-car` (a car with a bolt fading in and out while it charges), `battery` (filled to `soc`, red, orange
 or green), `appliances` (an appliance's housing with sparkles for a front, the big one breathing and the small ones
-twinkling while they run) and `ventilation` (a duct fan whose five blades turn above 5 W, faster with the power). The
-ring has an opaque disc in the card colour under its tint, so dots running under it disappear.
+twinkling while they run) and `ventilation` (a ventilation unit whose fan turns above 5 W, faster with the power, and
+whose two arrows, fresh air in and used air out, flow while it runs). A node is its drawing on a disc tinted in its
+colour over an opaque one in the card colour, so dots running under it disappear; the card that places it draws the grey
+ring around it, as the energy flow does (`track()` in the generator), and its badges.
 
 ![Flow nodes](screenshots/flow-node.gif)
 
