@@ -22,7 +22,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Sep 27, 2026, 8:52:40 PM
+timestamp: Oct 3, 2026, 2:28:59 AM
 component: oh-card
 config:
   title: Energie pro Tag
@@ -60,7 +60,7 @@ slots:
               grid:
               - component: oh-chart-grid
                 config:
-                  top: '40'
+                  top: '62'
                   bottom: '70'
                   left: '45'
                   right: '45'

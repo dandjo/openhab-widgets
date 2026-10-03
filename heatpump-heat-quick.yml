@@ -1,0 +1,324 @@
+uid: heatpump-heat-quick
+tags:
+- controls
+props:
+  parameters:
+  - name: heatpumpHeatPower
+    label: ESPAltherma Heizleistung
+    description: Number:Power item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpHeatingEnergyToday
+    label: ESPAltherma Heizenergie heute
+    description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpHeatingPowerSpace
+    label: ESPAltherma Heizleistung Heizung
+    description: Number:Power item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpHeatingPowerDhw
+    label: ESPAltherma Heizleistung Warmwasser
+    description: Number:Power item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpHeatingEnergySpaceToday
+    label: ESPAltherma Heizenergie Heizung heute
+    description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpHeatingEnergyDhwToday
+    label: ESPAltherma Heizenergie Warmwasser heute
+    description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  parameterGroups: []
+timestamp: Oct 3, 2026, 2:28:59 AM
+component: div
+config:
+  style:
+    --quick-popup: panel
+  label: Wärme
+  stylesheet: ':root .popup:has(> .oh-popup[style*="--quick-popup"]) { --f7-popup-tablet-width: 420px; --f7-popup-tablet-height:
+    min(640px, calc(100vh - 64px)); }
+
+    .menu-item-dropdown:not(.menu-item-dropdown-opened) .menu-dropdown { display: none; }
+
+    .oh-chart-container > .menu.padding { padding-top: 6px !important; }'
+slots:
+  default:
+  - component: div
+    config:
+      style:
+        display: flex
+        flex-direction: column
+        gap: 6px
+        padding: 12px 14px
+    slots:
+      default:
+      - component: div
+        config:
+          style:
+            display: flex
+            align-items: center
+            gap: 10px
+            padding-bottom: 4px
+        slots:
+          default:
+          - component: div
+            config:
+              style:
+                width: 34px
+                height: 34px
+                flex: 0 0 auto
+                border-radius: 50%
+                display: flex
+                align-items: center
+                justify-content: center
+                background: 'color-mix(in srgb, #e57373 22%, transparent)'
+            slots:
+              default:
+              - component: oh-icon
+                config:
+                  icon: material:local_fire_department
+                  width: 20
+                  height: 20
+          - component: div
+            config:
+              style:
+                display: flex
+                flex-direction: column
+                min-width: '0'
+            slots:
+              default:
+              - component: Label
+                config:
+                  text: Wärme
+                  style:
+                    font-size: 15px
+                    font-weight: '600'
+              - component: Label
+                config:
+                  text: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpHeatPower].state) ? ''–'' : ((Number(items[props.heatpumpHeatPower].numericState)
+                    || 0) / 1000).toFixed(2).replace(''.'', '','') + '' kW'') + '' · heute '' + ((Number(items[props.heatpumpHeatingEnergyToday].numericState)
+                    || 0)).toFixed(1).replace(''.'', '','') + '' kWh'''
+                  style:
+                    font-size: 12px
+                    opacity: '0.7'
+                    white-space: nowrap
+                    overflow: hidden
+                    text-overflow: ellipsis
+      - component: oh-chart
+        config:
+          chartType: ''
+          periodVisible: true
+          period: D
+          height: 260px
+        slots:
+          grid:
+          - component: oh-chart-grid
+            config:
+              top: '62'
+              bottom: '60'
+              left: '50'
+              right: '20'
+          xAxis:
+          - component: oh-time-axis
+            config:
+              gridIndex: 0
+          yAxis:
+          - component: oh-value-axis
+            config:
+              gridIndex: 0
+              name: W
+              nameGap: 14
+              nameTextStyle:
+                align: right
+                padding:
+                - 0
+                - 8
+                - 0
+                - 0
+              splitLine:
+                lineStyle:
+                  type: dashed
+                  opacity: 0.4
+          series:
+          - component: oh-time-series
+            config:
+              name: Heizung
+              gridIndex: 0
+              xAxisIndex: 0
+              yAxisIndex: 0
+              type: line
+              item: =props.heatpumpHeatingPowerSpace
+              symbol: none
+              sampling: lttb
+              lineStyle:
+                width: 1.5
+                color: '#ffb74d'
+              itemStyle:
+                color: '#ffb74d'
+              areaStyle:
+                color:
+                  type: linear
+                  x: 0
+                  y: 0
+                  x2: 0
+                  y2: 1
+                  colorStops:
+                  - offset: 0
+                    color: rgba(255, 183, 77, 0.45)
+                  - offset: 1
+                    color: rgba(255, 183, 77, 0.02)
+          - component: oh-time-series
+            config:
+              name: Warmwasser
+              gridIndex: 0
+              xAxisIndex: 0
+              yAxisIndex: 0
+              type: line
+              item: =props.heatpumpHeatingPowerDhw
+              symbol: none
+              sampling: lttb
+              lineStyle:
+                width: 1.5
+                color: '#e57373'
+              itemStyle:
+                color: '#e57373'
+              areaStyle:
+                color:
+                  type: linear
+                  x: 0
+                  y: 0
+                  x2: 0
+                  y2: 1
+                  colorStops:
+                  - offset: 0
+                    color: rgba(229, 115, 115, 0.45)
+                  - offset: 1
+                    color: rgba(229, 115, 115, 0.02)
+          tooltip:
+          - component: oh-chart-tooltip
+            config:
+              show: true
+              confine: true
+              trigger: axis
+              smartFormatter: true
+          legend:
+          - component: oh-chart-legend
+            config:
+              show: true
+              bottom: '0'
+              type: scroll
+      - component: oh-chart
+        config:
+          chartType: month
+          periodVisible: true
+          height: 270px
+        slots:
+          grid:
+          - component: oh-chart-grid
+            config:
+              top: '62'
+              bottom: '60'
+              left: '45'
+              right: '45'
+          xAxis:
+          - component: oh-category-axis
+            config:
+              gridIndex: 0
+              categoryType: month
+              name: Tag
+              nameGap: 12
+              axisTick:
+                show: false
+          yAxis:
+          - component: oh-value-axis
+            config:
+              gridIndex: 0
+              name: kWh
+              nameGap: 14
+              nameTextStyle:
+                align: right
+                padding:
+                - 0
+                - 8
+                - 0
+                - 0
+              splitLine:
+                lineStyle:
+                  type: dashed
+                  opacity: 0.4
+          series:
+          - component: oh-aggregate-series
+            config:
+              name: Heizung
+              gridIndex: 0
+              xAxisIndex: 0
+              yAxisIndex: 0
+              type: bar
+              item: =props.heatpumpHeatingEnergySpaceToday
+              aggregationFunction: last
+              dimension1: date
+              itemStyle:
+                color: '#ffb74d'
+              stack: day
+          - component: oh-aggregate-series
+            config:
+              name: Warmwasser
+              gridIndex: 0
+              xAxisIndex: 0
+              yAxisIndex: 0
+              type: bar
+              item: =props.heatpumpHeatingEnergyDhwToday
+              aggregationFunction: last
+              dimension1: date
+              itemStyle:
+                color: '#e57373'
+                borderRadius:
+                - 4
+                - 4
+                - 0
+                - 0
+              stack: day
+          legend:
+          - component: oh-chart-legend
+            config:
+              show: true
+              bottom: '0'
+              type: scroll
+          tooltip:
+          - component: oh-chart-tooltip
+            config:
+              show: true
+              confine: true
+              trigger: axis
+              smartFormatter: true
+      - component: div
+        config:
+          style:
+            display: flex
+            justify-content: flex-end
+            padding-top: 4px
+        slots:
+          default:
+          - component: oh-button
+            config:
+              text: Alle Details
+              action: popup
+              actionModal: page:heatpump
+              outline: true
+              small: true
+              style:
+                color: '#e57373'
+                border-color: '#e57373'
+                width: auto
+                padding: 0 12px

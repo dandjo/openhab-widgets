@@ -1,0 +1,297 @@
+uid: heatpump-refrigerant-quick
+tags:
+- controls
+props:
+  parameters:
+  - name: heatpumpDischargePipeTemp
+    label: ESPAltherma Heißgastemperatur
+    description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpRefrigerantPressure
+    label: ESPAltherma Kältemitteldruck
+    description: Number:Pressure item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpTargetDischargeTemp
+    label: ESPAltherma Soll-Heißgastemperatur
+    description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpRefrigerantTemp
+    label: ESPAltherma Kältemittel flüssig
+    description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpHeatExchangerMidTemp
+    label: ESPAltherma Wärmetauscher Mitte
+    description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
+  parameterGroups: []
+timestamp: Oct 3, 2026, 2:28:59 AM
+component: div
+config:
+  style:
+    --quick-popup: panel
+  label: Kältemittel
+  stylesheet: ':root .popup:has(> .oh-popup[style*="--quick-popup"]) { --f7-popup-tablet-width: 420px; --f7-popup-tablet-height:
+    min(640px, calc(100vh - 64px)); }
+
+    .menu-item-dropdown:not(.menu-item-dropdown-opened) .menu-dropdown { display: none; }
+
+    .oh-chart-container > .menu.padding { padding-top: 6px !important; }'
+slots:
+  default:
+  - component: div
+    config:
+      style:
+        display: flex
+        flex-direction: column
+        gap: 6px
+        padding: 12px 14px
+    slots:
+      default:
+      - component: div
+        config:
+          style:
+            display: flex
+            align-items: center
+            gap: 10px
+            padding-bottom: 4px
+        slots:
+          default:
+          - component: div
+            config:
+              style:
+                width: 34px
+                height: 34px
+                flex: 0 0 auto
+                border-radius: 50%
+                display: flex
+                align-items: center
+                justify-content: center
+                background: 'color-mix(in srgb, #ba68c8 22%, transparent)'
+            slots:
+              default:
+              - component: oh-icon
+                config:
+                  icon: material:severe_cold
+                  width: 20
+                  height: 20
+          - component: div
+            config:
+              style:
+                display: flex
+                flex-direction: column
+                min-width: '0'
+            slots:
+              default:
+              - component: Label
+                config:
+                  text: Kältemittel
+                  style:
+                    font-size: 15px
+                    font-weight: '600'
+              - component: Label
+                config:
+                  text: '=''Heißgas '' + ([''NULL'', ''UNDEF''].includes(items[props.heatpumpDischargePipeTemp].state) ? ''–''
+                    : (items[props.heatpumpDischargePipeTemp].displayState || items[props.heatpumpDischargePipeTemp].state))
+                    + '' · '' + ([''NULL'', ''UNDEF''].includes(items[props.heatpumpRefrigerantPressure].state) ? ''–'' :
+                    (items[props.heatpumpRefrigerantPressure].displayState || items[props.heatpumpRefrigerantPressure].state))'
+                  style:
+                    font-size: 12px
+                    opacity: '0.7'
+                    white-space: nowrap
+                    overflow: hidden
+                    text-overflow: ellipsis
+      - component: oh-chart
+        config:
+          chartType: ''
+          periodVisible: true
+          period: D
+          height: 270px
+        slots:
+          grid:
+          - component: oh-chart-grid
+            config:
+              top: '62'
+              bottom: '60'
+              left: '50'
+              right: '20'
+          xAxis:
+          - component: oh-time-axis
+            config:
+              gridIndex: 0
+          yAxis:
+          - component: oh-value-axis
+            config:
+              gridIndex: 0
+              name: °C
+              nameGap: 14
+              nameTextStyle:
+                align: right
+                padding:
+                - 0
+                - 8
+                - 0
+                - 0
+              splitLine:
+                lineStyle:
+                  type: dashed
+                  opacity: 0.4
+              scale: true
+          series:
+          - component: oh-time-series
+            config:
+              name: Heißgas
+              gridIndex: 0
+              xAxisIndex: 0
+              yAxisIndex: 0
+              type: line
+              item: =props.heatpumpDischargePipeTemp
+              symbol: none
+              lineStyle:
+                width: 2
+                color: '#ba68c8'
+              itemStyle:
+                color: '#ba68c8'
+          - component: oh-time-series
+            config:
+              name: Heißgas Soll
+              gridIndex: 0
+              xAxisIndex: 0
+              yAxisIndex: 0
+              type: line
+              item: =props.heatpumpTargetDischargeTemp
+              symbol: none
+              lineStyle:
+                width: 1.5
+                type: dashed
+                color: '#ba68c8'
+              itemStyle:
+                color: '#ba68c8'
+          - component: oh-time-series
+            config:
+              name: Flüssig
+              gridIndex: 0
+              xAxisIndex: 0
+              yAxisIndex: 0
+              type: line
+              item: =props.heatpumpRefrigerantTemp
+              symbol: none
+              lineStyle:
+                width: 2
+                color: '#4fc3f7'
+              itemStyle:
+                color: '#4fc3f7'
+          - component: oh-time-series
+            config:
+              name: Wärmetauscher
+              gridIndex: 0
+              xAxisIndex: 0
+              yAxisIndex: 0
+              type: line
+              item: =props.heatpumpHeatExchangerMidTemp
+              symbol: none
+              lineStyle:
+                width: 2
+                color: '#26a69a'
+              itemStyle:
+                color: '#26a69a'
+          tooltip:
+          - component: oh-chart-tooltip
+            config:
+              show: true
+              confine: true
+              trigger: axis
+              smartFormatter: true
+          legend:
+          - component: oh-chart-legend
+            config:
+              show: true
+              bottom: '0'
+              type: scroll
+      - component: oh-chart
+        config:
+          chartType: ''
+          periodVisible: true
+          period: D
+          height: 200px
+        slots:
+          grid:
+          - component: oh-chart-grid
+            config:
+              top: '62'
+              bottom: '35'
+              left: '50'
+              right: '20'
+          xAxis:
+          - component: oh-time-axis
+            config:
+              gridIndex: 0
+          yAxis:
+          - component: oh-value-axis
+            config:
+              gridIndex: 0
+              name: bar
+              nameGap: 14
+              nameTextStyle:
+                align: right
+                padding:
+                - 0
+                - 8
+                - 0
+                - 0
+              splitLine:
+                lineStyle:
+                  type: dashed
+                  opacity: 0.4
+              scale: true
+          series:
+          - component: oh-time-series
+            config:
+              name: Druck
+              gridIndex: 0
+              xAxisIndex: 0
+              yAxisIndex: 0
+              type: line
+              item: =props.heatpumpRefrigerantPressure
+              symbol: none
+              lineStyle:
+                width: 2
+                color: '#ba68c8'
+              itemStyle:
+                color: '#ba68c8'
+          tooltip:
+          - component: oh-chart-tooltip
+            config:
+              show: true
+              confine: true
+              trigger: axis
+              smartFormatter: true
+      - component: div
+        config:
+          style:
+            display: flex
+            justify-content: flex-end
+            padding-top: 4px
+        slots:
+          default:
+          - component: oh-button
+            config:
+              text: Alle Details
+              action: popup
+              actionModal: page:heatpump
+              outline: true
+              small: true
+              style:
+                color: '#ba68c8'
+                border-color: '#ba68c8'
+                width: auto
+                padding: 0 12px
