@@ -78,10 +78,11 @@ insertion in their sorted order.
     after running a script in the page first), `cdp_elems.py` of any elements a script finds, and `cdp_tap.py`
     taps the tile whose text contains a text and saves the popup it opens. `cdp_gif.py` records a card as an animated GIF,
     stepping its SVG animations frame by frame; `demo_flow.js` gives the energy flow demo values in that browser
-    only, by stopping MainUI's state tracking. `widget_gallery.py OUTDIR` writes the page `widget_gallery` with
+    only, by stopping MainUI's state tracking, `demo_heatpump.js` the heat pump card (a space heating run). `widget_gallery.py OUTDIR` writes the page `widget_gallery` with
     the energy flow's and the appliances' widgets on demo values and the controls' small widgets, for the
     screenshots, as the body to POST to `/rest/ui/components/ui:page`; delete it afterwards, the generator's next run
     removes it too. `shoot_all.sh` takes every screenshot of the GitHub repository with
-    these tools and the element scripts in `screenshot-js/`, the energy flow, the consumption card and the weather
-    page's warnings on demo values (`demo_flow.js`, `demo_consumption.js`, `demo_weather.js`), and the quick popups
+    these tools and the element scripts in `screenshot-js/`, the energy flow, the heat pump card, the consumption
+    card and the weather page's warnings on demo values (`demo_flow.js`, `demo_heatpump.js`, `demo_consumption.js`,
+    `demo_weather.js`), and the quick popups
     each as tall as its content (`screenshot-js/quick.js`), while the gallery is up.

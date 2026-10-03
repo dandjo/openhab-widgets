@@ -20,6 +20,10 @@
     washing_machine_2_energy_today: q(1.511, "kWh", 3), tumble_dryer_energy_today: q(1.057, "kWh", 3),
     dishwasher_energy_today: q(0.007, "kWh", 3),
     faikout_perfera_switch: { state: "ON", type: "OnOff" },
+    // the heat pump heating with its compressor, no heater: its fan turns and its badge shows the flame
+    espaltherma_inv_frequency: q(42, "Hz", 0), espaltherma_3way_valve_mode: { state: "Space", type: "String" },
+    espaltherma_defrost_operaton: { state: "OFF", type: "OnOff" }, espaltherma_bsh_mode: { state: "OFF", type: "OnOff" },
+    espaltherma_buh_step1_mode: { state: "OFF", type: "OnOff" }, espaltherma_buh_step2_mode: { state: "OFF", type: "OnOff" },
     // running timers, each set to more than is left, so their arcs cover part of the ring
     air_conditioning_timer: q(135, "min", 0), air_conditioning_timer_set: q(240, "min", 0),
     ventilation_timer: q(20, "min", 0), ventilation_timer_set: q(30, "min", 0), ventilation_power: q(38, "W", 1),

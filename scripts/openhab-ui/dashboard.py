@@ -66,9 +66,10 @@ def kw(item):
     return f"{fixed(f'Math.abs({num(item)}) / 1000', 3)} + ' kW'"
 
 
-def kw2(item):
-    """A power item's state in kW to two decimals, a dash while it has none."""
-    return f"(['NULL', 'UNDEF'].includes(items.{item}.state) ? '–' : {fixed(f'{num(item)} / 1000', 2)} + ' kW')"
+def kw2(item, *plus):
+    """A power item's state in kW to two decimals, a dash while it has none; plus: further power items added to it."""
+    watts = num(item) if not plus else "(" + " + ".join(num(i) for i in (item, *plus)) + ")"
+    return f"(['NULL', 'UNDEF'].includes(items.{item}.state) ? '–' : {fixed(f'{watts} / 1000', 2)} + ' kW')"
 
 
 def comp(component, config=None, **slots):
@@ -387,13 +388,14 @@ def pv_node(cx, cy, power):
             *[svg("line", x1=round(a, 2), y1=b, x2=round(c, 2), y2=e, **stroke(0.8, "#e3f2fd")) for a, b, c, e in grid]]
 
 
-def heatpump_node(cx, cy, power):
-    """Outdoor unit whose fan turns while the heat pump draws more than 100 W."""
+def heatpump_node(cx, cy, hz):
+    """Outdoor unit whose fan turns while its compressor runs (frequency above 0 Hz), faster the higher it runs; the
+    heaters alone leave it still, their energy only flows."""
     fx, fy = cx - 5, cy
-    active = f"Math.abs({power}) > 100"
+    active = f"{hz} > 0"
     blades = [svg("path", d=f"M{fx},{fy} q3.5,-3 0,-7.5 q-3.5,3 0,7.5", fill="#fb8c00",
                   transform=f"rotate({angle} {fx} {fy})") for angle in (0, 120, 240)]
-    blades.append(spin(fx, fy, steps(power, [800, 2000], ["1.4s", "0.9s", "0.5s"]), active))
+    blades.append(spin(fx, fy, steps(hz, [30, 55], ["1.4s", "0.9s", "0.5s"]), active))
     grille = [svg("line", x1=cx + 7, y1=cy + dy, x2=cx + 14, y2=cy + dy, **stroke(1, opacity="0.7"))
               for dy in (-7, -3.5, 0, 3.5, 7)]
     return [ring(cx, cy, "#fb8c00"),
@@ -561,6 +563,7 @@ VENT_TEAL = "#26a69a"
 ECAR_CALC = ("Berechnet aus der Messung der Klimaanlage (Shelly EM) abzüglich der Leistung laut Faikin und der "
              "Grundlast der Klimaanlage (Standby, Innengerät); unter 300 W lädt das Auto nicht.")
 HP_ON = 50  # watts; the heat pump idles at about 20 W
+HEATER_RED = "#e53935"  # the heat pump's electric heaters at work, as the wall unit's ring in the heat pump card
 HOME = "home_active_power"
 # the household appliances with a plug of their own, as on the appliance tiles; the fridge, running most of the day,
 # and the coffee machine, a switch among the controls, stay out
@@ -699,7 +702,8 @@ FLOW_KINDS = {  # kind: (builder of the drawing around (0, 0) from the power exp
     "grid": (lambda p: pylon_node(0, 0, f"={p} < 0 ? '#43a047' : '#e53935'", p),
              "grid: a pylon, red on import, green on export, dashes along its wires"),
     "home": (lambda p: home_node(0, 0, p), "home: a house whose windows glow and pulse with the consumption"),
-    "heat-pump": (lambda p: heatpump_node(0, 0, p), "heat pump: an outdoor unit whose fan turns above 100 W"),
+    "heat-pump": (lambda p: heatpump_node(0, 0, "Number(props.frequency)"),
+                  "heat pump: an outdoor unit whose fan turns while its compressor runs (frequency)"),
     "air-conditioner": (lambda p: ac_node(0, 0, p), "air conditioner: an indoor unit whose air streams flow"),
     "e-car": (lambda p: ecar_node(0, 0, p), "E-Car: a car whose bolt fades in and out while it charges"),
     "battery": (lambda p: battery_node(0, 0, "Number(props.soc)"), "battery: filled to its state of charge"),
@@ -711,7 +715,8 @@ FLOW_KINDS = {  # kind: (builder of the drawing around (0, 0) from the power exp
 
 def flow_node_widget():
     """The widget every node of the energy flow is an instance of: a device drawn in a ring of 30 around (x, y), its
-    animations driven by power (the battery by soc). kind: pv, grid, home, heat-pump, air-conditioner, e-car, battery,
+    animations driven by power (the battery by soc, the heat pump's fan by frequency). kind: pv, grid, home, heat-pump,
+    air-conditioner, e-car, battery,
     appliances or ventilation.
     The ring has an opaque disc in the card colour under its tint, so link dots slide under it."""
     power = "Number(props.power)"
@@ -719,12 +724,14 @@ def flow_node_widget():
     return svg("g", drawings, transform="='translate(' + props.x + ' ' + props.y + ')'")
 
 
-def flow_node(kind, xy, power=None, soc=None):
+def flow_node(kind, xy, power=None, soc=None, frequency=None):
     cfg = {"kind": kind, "x": xy[0], "y": xy[1]}
     if power is not None:
         cfg["power"] = f"={power}"
     if soc is not None:
         cfg["soc"] = f"={soc}"
+    if frequency is not None:
+        cfg["frequency"] = f"={frequency}"
     return comp("widget:flow-node", cfg)
 
 
@@ -811,8 +818,15 @@ def energy_flow():
     """The energy flow's card content: the star of eight nodes with their rings, timers, badges and links, and under
     it the house's figures and the switches."""
     hp_defrost = f"items.{HPX['defrost']}.state === 'ON'"
-    # the heat pump's badge: defrosting, else what its valve serves; filled while it draws more than HP_ON watts
+    # the heat pump's badge: defrosting, else what its valve serves; filled while it draws more than HP_ON watts; while
+    # only its heaters run, the compressor standing, a bolt in the backup heater's red instead
     operation = f"={hp_defrost} ? 'ac_unit' : {DHW_MODE} ? 'shower' : 'local_fire_department'"
+    heaters_only = f"(({BUH_ON} || {BSH_ON}) && !({COMPRESSOR}))"
+    hp_badge_xy = round(HP_XY[0] + ON_RING, 1), round(HP_XY[1] - ON_RING, 1)
+    hp_badge = ring_badge(*hp_badge_xy, operation, HP_ORANGE, HP_RUNNING)
+    hp_badge["config"]["visible"] = f"=!{heaters_only}"
+    heater_badge = ring_badge(*hp_badge_xy, "electric_bolt", HEATER_RED, "true")
+    heater_badge["config"]["visible"] = f"={heaters_only}"
     ac_texts = below(AC_XY, f"={fixed(f'{AC_NET} / 1000', 3)} + ' kW'", kwh(num("air_conditioning_unit_energy_today")))
     ac_texts[1]["config"].update(timer_line(M_AC, AC_BLUE, ac_texts[1]["config"]["content"]))
     vent_texts = beside(VENT_XY, f"={fixed(f'{VENT_POWER} / 1000', 3)} + ' kW'",
@@ -855,7 +869,7 @@ def energy_flow():
         flow_node("pv", PV_XY, num(PV)),
         flow_node("grid", GRID_XY, num(GRID)),
         flow_node("home", HOME_XY, num(HOME)),
-        flow_node("heat-pump", HP_XY, num(HP)),
+        flow_node("heat-pump", HP_XY, num(HP), frequency=num(HPX["hz"])),
         flow_node("air-conditioner", AC_XY, AC_FLOW),
         flow_node("e-car", ECAR_XY, num(ECAR)),
         flow_node("appliances", APPL_XY, APPL_POWER),
@@ -863,7 +877,7 @@ def energy_flow():
         flow_node("ventilation", VENT_XY, VENT_POWER),
         # badges on the rings: the heat pump's operation upper right; on/off and the level upper left, where a timer's
         # arc ends
-        ring_badge(round(HP_XY[0] + ON_RING, 1), round(HP_XY[1] - ON_RING, 1), operation, HP_ORANGE, HP_RUNNING),
+        hp_badge, heater_badge,
         ring_badge(round(AC_XY[0] - ON_RING, 1), round(AC_XY[1] - ON_RING, 1), "power_settings_new", AC_BLUE, AC_ON_STATE),
         level,
         *beside(PV_XY, f"={kw(PV)}", f"={disp('huawei_inverter_e_day')} + ' heute'", -1),
@@ -1743,18 +1757,18 @@ hp_svg = svg("svg", [
               reverse=DEFROSTING, pace=WATER_PACE),
     # devices where they are, drawn like the energy flow nodes
     # every device's grey ring, its dots running while it works
-    # the outdoor unit's ring filled by the compressor's frequency; the wall unit's by the heat pump's draw, full and
-    # red while its backup heater runs; the tank's by its temperature; the heating circuits' by the leaving water
-    # while they carry it
+    # the outdoor unit's ring filled by the compressor's frequency; the wall unit's by the heat pump's own draw (its
+    # measured circuit, as POWER_FULL; the tank's booster heater sits in the tank, not here), full and red while its
+    # backup heater runs; the tank's by its temperature; the heating circuits' by the leaving water while they carry it
     *hp_orbit(OUT, "#fb8c00", COMPRESSOR, COMPRESSOR_PACE, f"{num(HPX['hz'])} / {HZ_FULL}"),
-    *hp_orbit(WALL, "#64b5f6", PUMP_ON, WATER_PACE, f"({BUH_ON} ? 1 : {num(HPX['power'])} / {POWER_FULL})",
+    *hp_orbit(WALL, "#64b5f6", PUMP_ON, WATER_PACE, f"({BUH_ON} ? 1 : {num(HPX['circuit'])} / {POWER_FULL})",
               f"={BUH_ON} ? '#e53935' : '#64b5f6'"),
     *hp_orbit(VALVE, "#ffb74d", PUMP_ON, WATER_PACE),
     *hp_orbit(TANK, "#e57373", f"({TANK_FLOW} || {BSH_ON})", WATER_PACE, f"{num(HPX['tank'])} / {TANK_FULL}"),
     *hp_orbit(RADIATORS, "#ffab91", HEATING_FLOW, WATER_PACE, CIRCUIT_SHARE),
     *hp_orbit(GROUND_FH, "#f48fb1", HEATING_FLOW, WATER_PACE, CIRCUIT_SHARE),
     *hp_orbit(UPPER_FH, "#f48fb1", HEATING_FLOW, WATER_PACE, CIRCUIT_SHARE),
-    flow_node("heat-pump", OUT, num(HPX["circuit"])),
+    flow_node("heat-pump", OUT, num(HPX["circuit"]), frequency=num(HPX["hz"])),
     *wall_unit_node(*WALL), *valve_node(*VALVE), *tank_node(*TANK),
     *radiator_node(*RADIATORS), *floor_node(*GROUND_FH), *floor_node(*UPPER_FH),
     # the outdoor unit's tile in the sky left of it, clear of the roof: the power of its own circuit, the compressor's
@@ -1801,13 +1815,13 @@ hp_svg = svg("svg", [
         ("CO₂", f"={disp('netatmo_weatherstation_co2')}", "currentColor")]),
     # below the house, flush with its walls, the tank's and the indoor unit's tiles: the tank's temperature,
     # its setpoint and its booster heater, at work while it charges or heats; the indoor unit's flow, the circuit's
-    # pressure (red outside its range) and the backup heater, at work while the pump runs; over them the draw of all
-    # electrical consumers (outdoor unit, backup heater and booster heater)
+    # pressure (red outside its range) and the backup heater, at work while the pump runs; over them its own draw:
+    # the measured circuit (Shelly EM) and the backup heater's steps, without the tank's booster heater
     *hp_tile(*TANK_TILE, "Warmwasserspeicher", "propane_tank", DHW_C, f"({TANK_FLOW} || {BSH_ON})", [
         ("Temperatur", f"={disp(HPX['tank'])}", tank_text), ("Soll", f"={disp(HPX['tank_set'])}", "currentColor"),
         ("Zusatzheizung", f"={BSH_ON} ? {kw2(HPX['bsh_power'])} : 'Aus'", "currentColor")]),
     *hp_tile(*INDOOR_TILE, "Innengerät", "hvac", "#64b5f6", PUMP_ON, [
-        ("Leistung", f"={kw2(HPX['power'])}", "#fb8c00"),
+        ("Leistung", f"={kw2(HPX['circuit'], HPX['buh_power'])}", "#fb8c00"),
         ("Durchfluss", f"={disp(HPX['flow'])}", "currentColor"),
         ("Druck", f"={disp(HPX['water_pressure'])}", f"={WATER_PRESSURE_BAD} ? '#e57373' : 'currentColor'"),
         ("Heizstab", f"={BUH_ON} ? {kw2(HPX['buh_power'])} : 'Aus'", "currentColor")]),
@@ -4840,7 +4854,9 @@ FLOW_NODE_PARAMS = [
     param("x", "x", "Centre's x in the flow's viewBox", "DECIMAL", required=True),
     param("y", "y", "Centre's y in the flow's viewBox", "DECIMAL", required=True),
     dict(FLOW_POWER, required=False),
-    param("soc", "State of charge", "The battery's state of charge in %; usually an expression", "DECIMAL")]
+    param("soc", "State of charge", "The battery's state of charge in %; usually an expression", "DECIMAL"),
+    param("frequency", "Compressor frequency", "The heat pump's compressor frequency in Hz, which turns its fan; "
+          "usually an expression", "DECIMAL")]
 FLOW_SHARE_RING_PARAMS = [
     param("x", "x", "Centre's x in the flow's viewBox", "DECIMAL", required=True),
     param("y", "y", "Centre's y in the flow's viewBox", "DECIMAL", required=True),

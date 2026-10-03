@@ -1,8 +1,8 @@
 #!/bin/bash
 # every screenshot of the widget repository, into shots/v4/repo under the repository's names; needs the page
-# widget_gallery (widget_gallery.py writes it, to be POSTed to ui:page) and the SSH tunnel on 18080. The energy flow, the consumption card and the
-# weather page's warnings are shot with demo values (demo_flow.js, demo_consumption.js, demo_weather.js), set in the
-# browser only
+# widget_gallery (widget_gallery.py writes it, to be POSTed to ui:page) and the SSH tunnel on 18080. The energy flow, the
+# heat pump card, the consumption card and the weather page's warnings are shot with demo values (demo_flow.js,
+# demo_heatpump.js, demo_consumption.js, demo_weather.js), set in the browser only
 set -u
 B=http://127.0.0.1:18080/page
 O=shots/v4; R=$O/repo; mkdir -p $O $R
@@ -14,7 +14,6 @@ python3 cdp_shot.py $B/overview $R/overview-phone.png 16 390 1400 >/dev/null
 step cards; python3 cdp_cards.py $B/overview $O/ov 1400 >/dev/null
 python3 cdp_cards.py $B/overview $O/ovd 1400 dark >/dev/null
 cp $(shot ov haushaltsgeraete) $R/appliances-card.png; cp $(shot ov strompreis) $R/electricity-price-card.png
-cp $(shot ov waermepumpe) $R/heatpump-card.png; cp $(shot ovd waermepumpe) $R/heatpump-card-dark.png
 cp $(shot ov verbrauch-heute*) $R/consumption-card.png; cp $(shot ov energie-pro-tag) $R/energy-days-card.png
 cp $(shot ov pv-ertrag*) $R/pv-days-card.png; cp $(shot ov temperaturen) $R/temperatures-card.png
 cp $O/ov-0-card.png $R/weather-card.png; cp $O/ovd-0-card.png $R/weather-card-dark.png
@@ -23,6 +22,9 @@ cp $(shot ovcons verbrauch-heute*) $R/consumption-card.png
 step flow; PRE_JS=demo_flow.js FPS=20 python3 cdp_gif.py $B/overview 1 1400 $R/energy-flow-card.gif 6 light 1.5
 python3 cdp_cards_js.py $B/overview $O/ovdemo-dark 1400 dark "$(cat demo_flow.js)" >/dev/null
 cp $(shot ovdemo-dark energiefluss) $R/energy-flow-card-dark.png
+step heatpump; PRE_JS=demo_heatpump.js FPS=20 python3 cdp_gif.py $B/overview 4 1400 $R/heatpump-card.gif 4 light 1
+python3 cdp_cards_js.py $B/overview $O/ovhp-dark 1400 dark "$(cat demo_heatpump.js)" >/dev/null
+cp $(shot ovhp-dark waermepumpe) $R/heatpump-card-dark.png
 # the quick popups as the energy flow's nodes and the heat pump card's tiles open them, each as tall as its content
 step popups
 for spec in "Energiefluss|Wärmepumpe|true|heatpump-quick" "Energiefluss|Klimaanlage|true|air-conditioner-quick" \

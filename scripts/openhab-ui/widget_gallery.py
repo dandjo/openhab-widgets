@@ -39,7 +39,8 @@ def nodes_card():
     items = []
     for i, (kind, power, soc) in enumerate(NODES):
         x = 45 + 85 * i
-        items += [g.flow_node(kind, (x, 45), None if power is None else str(power), None if soc is None else str(soc)),
+        items += [g.flow_node(kind, (x, 45), None if power is None else str(power), None if soc is None else str(soc),
+                              "45" if kind == "heat-pump" else None),  # a compressor at 45 Hz turns the fan
                   caption(x, 100, kind)]
     width = 90 + 85 * (len(NODES) - 1)
     return g.card("flow-node", [drawing(items, width, 110, round(width * 1.2))])
