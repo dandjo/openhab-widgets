@@ -8,7 +8,7 @@ generates is replaced on each run, and so is every widget tagged `generated`; wi
 Changes made in the UI to a generated page or widget are overwritten by the next run, so this script is the
 source of the UI.
 
-The widgets are the overview's nine cards (`weather-card`, `energy-flow-card`, `appliances-card`, `heatpump-card`,
+The widgets are the overview's eleven cards (`weather-card`, `energy-flow-card`, `switches-card`, `appliances-card`, `heating-card`, `heatpump-card`,
 `electricity-price-card`, `consumption-card`, `energy-days-card`, `pv-days-card`, `temperatures-card`) and the parts they are built from, wherever a part stands in more than one place or makes sense
 on its own:
 
@@ -50,14 +50,33 @@ To apply, with openHAB stopped:
     sudo chown openhab:openhab /var/lib/openhab/jsondb/uicomponents_ui_page.json /var/lib/openhab/jsondb/uicomponents_ui_widget.json
     sudo systemctl start openhab
 
+Without a restart, through the REST API: run it against a copy of the JSONDB, let `ui_diff.py` compare the result
+with the live files uid by uid and `ui_put.py` write what changed, with the API token in `~/.openhab_token`:
+
+    rm -rf /tmp/ui-run && mkdir -p /tmp/ui-run/jsondb
+    cd /var/lib/openhab/jsondb
+    cp uicomponents_ui_page.json uicomponents_ui_widget.json \
+       org.openhab.core.items.Item.json org.openhab.core.items.Metadata.json /tmp/ui-run/jsondb/
+    cd ~/scripts/openhab-ui
+    OPENHAB_JSONDB=/tmp/ui-run/jsondb python3 dashboard.py update-apply
+    python3 ui_diff.py /var/lib/openhab/jsondb /tmp/ui-run/jsondb /tmp/ui-run/body.json
+    python3 ui_put.py check /tmp/ui-run/body.json
+    python3 ui_put.py apply /tmp/ui-run/body.json
+    rm -rf /tmp/ui-run
+
+MainUI shows the change on the next page load. `~/docs/openhab-changes.md` describes this route and the token.
+
 `awattar_migrate.py` holds the JSONDB helpers the script uses: byte-exact re-encoding of openHAB's files and
-insertion in their sorted order.
+insertion in their sorted order. `OPENHAB_JSONDB` points them at another directory than `/var/lib/openhab/jsondb`.
 
 ## The rest of this directory
 
 - `i18n/`: German labels and Material icons for items, things, channels, rules, transformations and the
   `default` sitemap. `german_apply.py check|apply` applies them (openHAB stopped); `de_labels.py` and `icons_de.py`
   hold the data, `coverage.py` checks the exports in the same directory for untranslated labels.
+- `ui_diff.py LIVE_DIR NEW_DIR [BODY]` lists the pages and widgets that differ between two JSONDB directories,
+  ignoring what openHAB's REST writes change by themselves (timestamp, `editable`, tag order, `26.0` for 26), and
+  writes them as a REST body; `ui_put.py check|apply BODY` PUTs, POSTs or DELETEs them in the running openHAB.
 - `applied/`: one-off JSONDB and InfluxDB changes that have been applied, kept as a record of what was done.
   They read `awattar_migrate.py` from `/tmp`, where they were run.
 - Tools for a workstation with headless Chrome and an SSH tunnel to port 8080; they do not run on homepi:

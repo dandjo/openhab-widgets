@@ -54,7 +54,7 @@ props:
     type: DECIMAL
     required: false
   parameterGroups: []
-timestamp: Oct 3, 2026, 2:00:31 PM
+timestamp: Oct 3, 2026, 11:36:34 PM
 component: g
 config:
   transform: ='translate(' + props.x + ' ' + props.y + ')'
@@ -73,18 +73,16 @@ slots:
             config:
               cx: 0
               cy: 0
-              r: 30
+              r: 27.75
               style:
                 fill: 'var(--f7-card-bg-color, #fff)'
           - component: circle
             config:
               cx: 0
               cy: 0
-              r: 30
+              r: 27.75
               fill: '#ffb300'
-              stroke: '#ffb300'
               fill-opacity: '0.12'
-              stroke-width: 3
       - component: g
         config:
           opacity: =(0.25 + 0.75 * Math.min(1, Math.abs(Number(props.power)) / 8000)).toFixed(2)
@@ -247,18 +245,16 @@ slots:
             config:
               cx: 0
               cy: 0
-              r: 30
+              r: 27.75
               style:
                 fill: 'var(--f7-card-bg-color, #fff)'
           - component: circle
             config:
               cx: 0
               cy: 0
-              r: 30
+              r: 27.75
               fill: '=Number(props.power) < 0 ? ''#43a047'' : ''#e53935'''
-              stroke: '=Number(props.power) < 0 ? ''#43a047'' : ''#e53935'''
               fill-opacity: '0.12'
-              stroke-width: 3
       - component: line
         config:
           x1: -10.0
@@ -428,18 +424,16 @@ slots:
             config:
               cx: 0
               cy: 0
-              r: 30
+              r: 27.75
               style:
                 fill: 'var(--f7-card-bg-color, #fff)'
           - component: circle
             config:
               cx: 0
               cy: 0
-              r: 30
+              r: 27.75
               fill: '#1e88e5'
-              stroke: '#1e88e5'
               fill-opacity: '0.12'
-              stroke-width: 3
       - component: rect
         config:
           x: 6
@@ -527,18 +521,16 @@ slots:
             config:
               cx: 0
               cy: 0
-              r: 30
+              r: 27.75
               style:
                 fill: 'var(--f7-card-bg-color, #fff)'
           - component: circle
             config:
               cx: 0
               cy: 0
-              r: 30
+              r: 27.75
               fill: '#fb8c00'
-              stroke: '#fb8c00'
               fill-opacity: '0.12'
-              stroke-width: 3
       - component: rect
         config:
           x: -17
@@ -682,18 +674,16 @@ slots:
             config:
               cx: 0
               cy: 0
-              r: 30
+              r: 27.75
               style:
                 fill: 'var(--f7-card-bg-color, #fff)'
           - component: circle
             config:
               cx: 0
               cy: 0
-              r: 30
+              r: 27.75
               fill: '#29b6f6'
-              stroke: '#29b6f6'
               fill-opacity: '0.12'
-              stroke-width: 3
       - component: rect
         config:
           x: -18
@@ -791,18 +781,16 @@ slots:
             config:
               cx: 0
               cy: 0
-              r: 30
+              r: 27.75
               style:
                 fill: 'var(--f7-card-bg-color, #fff)'
           - component: circle
             config:
               cx: 0
               cy: 0
-              r: 30
+              r: 27.75
               fill: '#26a69a'
-              stroke: '#26a69a'
               fill-opacity: '0.12'
-              stroke-width: 3
       - component: path
         config:
           d: M22.38,8.0 L22.5,5.0 Q22.5,2.0 21.5,1.62 Q17.25,0.62 11.12,-0.5 L3.75,-4.5 Q-5.62,-5.62 -16.75,-4.75 L-20.62,-4.12
@@ -946,18 +934,16 @@ slots:
             config:
               cx: 0
               cy: 0
-              r: 30
+              r: 27.75
               style:
                 fill: 'var(--f7-card-bg-color, #fff)'
           - component: circle
             config:
               cx: 0
               cy: 0
-              r: 30
+              r: 27.75
               fill: '#7cb342'
-              stroke: '#7cb342'
               fill-opacity: '0.12'
-              stroke-width: 3
       - component: rect
         config:
           x: -21
@@ -1011,18 +997,16 @@ slots:
             config:
               cx: 0
               cy: 0
-              r: 30
+              r: 27.75
               style:
                 fill: 'var(--f7-card-bg-color, #fff)'
           - component: circle
             config:
               cx: 0
               cy: 0
-              r: 30
+              r: 27.75
               fill: '#5c6bc0'
-              stroke: '#5c6bc0'
               fill-opacity: '0.12'
-              stroke-width: 3
       - component: g
         config:
           transform: translate(-32 -32)
@@ -1131,23 +1115,23 @@ slots:
             config:
               cx: 0
               cy: 0
-              r: 30
+              r: 27.75
               style:
                 fill: 'var(--f7-card-bg-color, #fff)'
           - component: circle
             config:
               cx: 0
               cy: 0
-              r: 30
+              r: 27.75
               fill: '#26a69a'
-              stroke: '#26a69a'
               fill-opacity: '0.12'
-              stroke-width: 3
-      - component: circle
+      - component: rect
         config:
-          cx: 0
-          cy: 0
-          r: 19.5
+          x: -16
+          y: -6
+          width: 32
+          height: 21
+          rx: 3
           stroke: currentColor
           stroke-width: 1.6
           stroke-linecap: round
@@ -1158,49 +1142,95 @@ slots:
           default:
           - component: path
             config:
-              d: M0,0 C5,-3 9,-11 3,-17 C-1,-12 -4,-6 0,0 Z
+              d: M0,4.5 C2.5,3.0 4.5,-1.0 1.5,-4.0 C-0.5,-1.5 -2,1.5 0,4.5 Z
               fill: '#26a69a'
-              transform: rotate(0 0 0)
+              transform: rotate(0 0 4.5)
               fill-opacity: '0.85'
           - component: path
             config:
-              d: M0,0 C5,-3 9,-11 3,-17 C-1,-12 -4,-6 0,0 Z
+              d: M0,4.5 C2.5,3.0 4.5,-1.0 1.5,-4.0 C-0.5,-1.5 -2,1.5 0,4.5 Z
               fill: '#26a69a'
-              transform: rotate(72 0 0)
+              transform: rotate(72 0 4.5)
               fill-opacity: '0.85'
           - component: path
             config:
-              d: M0,0 C5,-3 9,-11 3,-17 C-1,-12 -4,-6 0,0 Z
+              d: M0,4.5 C2.5,3.0 4.5,-1.0 1.5,-4.0 C-0.5,-1.5 -2,1.5 0,4.5 Z
               fill: '#26a69a'
-              transform: rotate(144 0 0)
+              transform: rotate(144 0 4.5)
               fill-opacity: '0.85'
           - component: path
             config:
-              d: M0,0 C5,-3 9,-11 3,-17 C-1,-12 -4,-6 0,0 Z
+              d: M0,4.5 C2.5,3.0 4.5,-1.0 1.5,-4.0 C-0.5,-1.5 -2,1.5 0,4.5 Z
               fill: '#26a69a'
-              transform: rotate(216 0 0)
+              transform: rotate(216 0 4.5)
               fill-opacity: '0.85'
           - component: path
             config:
-              d: M0,0 C5,-3 9,-11 3,-17 C-1,-12 -4,-6 0,0 Z
+              d: M0,4.5 C2.5,3.0 4.5,-1.0 1.5,-4.0 C-0.5,-1.5 -2,1.5 0,4.5 Z
               fill: '#26a69a'
-              transform: rotate(288 0 0)
+              transform: rotate(288 0 4.5)
               fill-opacity: '0.85'
           - component: animateTransform
             config:
               attributeName: transform
               type: rotate
-              from: 0 0 0
-              to: 360 0 0
+              from: 0 0 4.5
+              to: 360 0 4.5
               dur: '=Math.abs(Number(props.power)) < 30 ? ''2.4s'' : (Math.abs(Number(props.power)) < 60 ? ''1.5s'' : (''0.9s''))'
               repeatCount: indefinite
               visible: =Math.abs(Number(props.power)) > 5
       - component: circle
         config:
           cx: 0
-          cy: 0
-          r: 3.4
+          cy: 4.5
+          r: 2
           style:
             fill: 'var(--f7-card-bg-color, #fff)'
           stroke: '#26a69a'
-          stroke-width: 1.6
+          stroke-width: 1.4
+      - component: path
+        config:
+          d: M-7,-21 V-10
+          opacity: '=Math.abs(Number(props.power)) > 5 ? ''1'' : ''0.4'''
+          stroke: '#26a69a'
+          stroke-width: 1.8
+          stroke-linecap: round
+          fill: none
+          stroke-dasharray: 3 3
+        slots:
+          default:
+          - component: animate
+            config:
+              attributeName: stroke-dashoffset
+              from: '0'
+              to: '-12'
+              dur: '=Math.abs(Number(props.power)) < 30 ? ''1.6s'' : (Math.abs(Number(props.power)) < 60 ? ''1s'' : (''0.6s''))'
+              repeatCount: indefinite
+              visible: =Math.abs(Number(props.power)) > 5
+      - component: path
+        config:
+          d: M-10.5,-11.5 L-7,-8 L-3.5,-11.5 Z
+          fill: '#26a69a'
+      - component: path
+        config:
+          d: M7,-7 V-18
+          opacity: '=Math.abs(Number(props.power)) > 5 ? ''1'' : ''0.4'''
+          stroke: '#90a4ae'
+          stroke-width: 1.8
+          stroke-linecap: round
+          fill: none
+          stroke-dasharray: 3 3
+        slots:
+          default:
+          - component: animate
+            config:
+              attributeName: stroke-dashoffset
+              from: '0'
+              to: '-12'
+              dur: '=Math.abs(Number(props.power)) < 30 ? ''1.6s'' : (Math.abs(Number(props.power)) < 60 ? ''1s'' : (''0.6s''))'
+              repeatCount: indefinite
+              visible: =Math.abs(Number(props.power)) > 5
+      - component: path
+        config:
+          d: M3.5,-17.5 L7,-21 L10.5,-17.5 Z
+          fill: '#90a4ae'
