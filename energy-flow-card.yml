@@ -111,6 +111,30 @@ props:
     type: TEXT
     required: true
     context: item
+  - name: heatpumpInvFrequency
+    label: ESPAltherma Verdichterfrequenz
+    description: Number:Frequency item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpBuhStep1Mode
+    label: ESPAltherma Heizstab Stufe 1
+    description: Switch item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpBuhStep2Mode
+    label: ESPAltherma Heizstab Stufe 2
+    description: Switch item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpBshMode
+    label: ESPAltherma Zusatzheizung Speicher
+    description: Switch item
+    type: TEXT
+    required: true
+    context: item
   - name: heatpumpDefrostOperaton
     label: ESPAltherma Abtauen
     description: Switch item
@@ -382,7 +406,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 3, 2026, 2:28:59 AM
+timestamp: Oct 3, 2026, 2:00:31 PM
 component: oh-card
 config:
   title: Energiefluss
@@ -865,6 +889,7 @@ slots:
                   x: 422.0
                   y: 118.0
                   power: =(Number(items[props.heatpumpPower].numericState) || 0)
+                  frequency: =(Number(items[props.heatpumpInvFrequency].numericState) || 0)
               - component: widget:flow-node
                 config:
                   kind: air-conditioner
@@ -899,7 +924,10 @@ slots:
                   y: 41.9
                   power: =(Number(items[props.ventilationPower].numericState) || 0)
               - component: g
-                config: {}
+                config:
+                  visible: =!(((items[props.heatpumpBuhStep1Mode].state === 'ON' || items[props.heatpumpBuhStep2Mode].state
+                    === 'ON') || items[props.heatpumpBshMode].state === 'ON') && !((Number(items[props.heatpumpInvFrequency].numericState)
+                    || 0) > 0))
                 slots:
                   default:
                   - component: circle
@@ -925,6 +953,40 @@ slots:
                       content: '=items[props.heatpumpDefrostOperaton].state === ''ON'' ? ''ac_unit'' : items[props.heatpumpValve].state
                         === ''DHW'' ? ''shower'' : ''local_fire_department'''
                       fill: '=(Number(items[props.heatpumpPower].numericState) || 0) > 50 ? ''#ffffff'' : ''#fb8c00'''
+                      font-size: 15
+                      text-anchor: middle
+                      dominant-baseline: central
+                      style:
+                        font-family: '''Material Icons'''
+                        font-feature-settings: '''liga'''
+              - component: g
+                config:
+                  visible: =(((items[props.heatpumpBuhStep1Mode].state === 'ON' || items[props.heatpumpBuhStep2Mode].state
+                    === 'ON') || items[props.heatpumpBshMode].state === 'ON') && !((Number(items[props.heatpumpInvFrequency].numericState)
+                    || 0) > 0))
+                slots:
+                  default:
+                  - component: circle
+                    config:
+                      cx: 448.9
+                      cy: 91.1
+                      r: 12
+                      style:
+                        fill: 'var(--f7-card-bg-color, #fff)'
+                  - component: circle
+                    config:
+                      cx: 448.9
+                      cy: 91.1
+                      r: 12
+                      fill: '=true ? ''#e53935'' : ''rgba(229, 57, 53, 0.14)'''
+                      stroke: '#e53935'
+                      stroke-width: 2
+                  - component: text
+                    config:
+                      x: 448.9
+                      y: 91.6
+                      content: electric_bolt
+                      fill: '=true ? ''#ffffff'' : ''#e53935'''
                       font-size: 15
                       text-anchor: middle
                       dominant-baseline: central

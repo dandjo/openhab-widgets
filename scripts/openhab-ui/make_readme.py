@@ -20,9 +20,11 @@ OVERVIEW = [
      "household appliances together, ventilation, battery and grid, each with its power and today's energy. Dots run "
      "along the lines in the direction of the flow at four speeds and slide under the node rims; while power flows "
      "through a node, dots in its colour run round its grey ring, clockwise towards the house and the other way out of "
-     "it. The icons move with the power (sun rays, fan, air streams, pylon dashes, a pulsing bolt over the charging "
+     "it. The icons move with the power (sun rays, air streams, pylon dashes, a pulsing bolt over the charging "
      "car, sparkles twinkling while the appliances run, the battery filled to its state of charge, the ventilation's "
-     "duct fan turning). Badges on the rings tell what the heat pump does (space heating, hot water, defrost), whether "
+     "duct fan turning), the heat pump's fan with its compressor: while only its electric heaters run it stands and "
+     "the energy only flows. Badges on the rings tell what the heat pump does (space heating, hot water, defrost, a "
+     "red bolt while only its electric heaters run), whether "
      "the air conditioner is on and the ventilation's level. A running timer covers its device's ring with an arc, "
      "full at what it was last set to, and the battery's ring is filled with its state of charge; the dots run on in "
      "the rest of the ring. A tap on "
@@ -39,18 +41,21 @@ OVERVIEW = [
     ("heatpump-card", "Heat pump", "A section through the house: the outdoor unit on the roof (the energy flow's "
      "`flow-node`), wall unit, three-way valve, DHW tank and radiators in the basement, floor heating on the two "
      "levels above. Every device sits in a grey ring like the energy flow's nodes, dots running round it while it "
-     "works; the outdoor unit's ring is filled by the compressor's frequency, the wall unit's by the electrical draw "
-     "(full and red while the backup heater runs), the tank's by its temperature, radiators and floor loops by the "
+     "works; the outdoor unit's fan turns while the compressor runs and its ring is filled by the compressor's "
+     "frequency, the wall unit's by its own draw, the measured circuit (full and red while the backup heater runs; "
+     "the tank's booster heater does not count), the tank's by its temperature, radiators and floor loops by the "
      "leaving water while they carry it. Dots run along the pipes, as many as a pipe is long, faster with the water's flow or the compressor's "
      "frequency, and all of them backwards during a defrost. The valve shows its position in its icon. Tiles in the "
      "style of the switch tiles hold the figures: the outdoor unit, the control (heating, hot water, Smart Grid, "
-     "automation), the refrigerant, the heating circuit, the climate of the two floors, the tank and the indoor unit, "
-     "each tinted in its colour while what it shows is at work. A tap on a tile, the wall unit or the outdoor unit "
+     "automation), the refrigerant, the heating circuit, the climate of the two floors, the tank with its booster "
+     "heater and the indoor unit with its own power (the measured circuit plus the backup heater), each tinted in its "
+     "colour while what it shows is at work. A tap on a tile, the wall unit or the outdoor unit "
      "opens its quick popup with charts or controls. Beside the drawing the electrical power, the heat and the COP as "
      "value tiles that open popups with their charts of the day and the month, today's energies split into space "
      "heating, DHW and standby as bars, and today's COPs as rings. On a phone the drawing takes the card's width; on "
      "a wider screen it stands at most at its own size, as the energy flow does, so their texts keep the UI's sizes "
-     "and their circles come out the same."),
+     "and their circles come out the same. The recording and the dark screenshot show it with demo values (a space "
+     "heating run)."),
     ("consumption-card", "Consumption today", "Today's consumption as one bar split by source (PV, grid) and by "
      "consumer, with a legend in two columns; hovering a part lifts it everywhere. The screenshot shows it with demo "
      "values."),
@@ -395,7 +400,8 @@ The recordings show the widgets with fixed demo values.
 md.append(section("Node", "flow-node", """A device in a ring, its animation driven by `power`: `pv` (a tilted module
 under a sun, both brighter with the power, rays turning faster), `grid` (a pylon, red on import and green on export,
 dashes running along its wires), `home` (a house whose windows glow and pulse with the consumption), `heat-pump` (an
-outdoor unit whose fan turns above 100 W), `air-conditioner` (an indoor unit whose air streams flow), `e-car` (a car
+outdoor unit whose fan turns while `frequency`, the compressor's, is above 0 Hz, faster from 30 and 55 Hz),
+`air-conditioner` (an indoor unit whose air streams flow), `e-car` (a car
 with a bolt fading in and out while it charges), `battery` (filled to `soc`, red, orange or green), `appliances`
 (an appliance's housing with sparkles for a front, the big one breathing and the small ones twinkling while
 they run) and `ventilation` (a duct fan whose five blades turn above 5 W, faster with the power). The ring has an opaque disc in the card colour under its tint, so dots running under it disappear.""", shot=img("flow-node.gif", "Flow nodes")))
