@@ -1,0 +1,334 @@
+uid: heatpump-outdoor-quick
+tags:
+- controls
+props:
+  parameters:
+  - name: heatpumpCircuitPower
+    label: Wärmepumpe Leistung
+    description: Number:Power item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpInvFrequency
+    label: ESPAltherma Verdichterfrequenz
+    description: Number:Frequency item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpExtAmbientTemp
+    label: ESPAltherma Außentemperatur
+    description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpHeatExchangerMidTemp
+    label: ESPAltherma Wärmetauscher Mitte
+    description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpOutdoorAirTemp
+    label: ESPAltherma Außenluft Temperatur
+    description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
+  parameterGroups: []
+timestamp: Oct 3, 2026, 2:28:59 AM
+component: div
+config:
+  style:
+    --quick-popup: panel
+  label: Außengerät
+  stylesheet: ':root .popup:has(> .oh-popup[style*="--quick-popup"]) { --f7-popup-tablet-width: 420px; --f7-popup-tablet-height:
+    min(640px, calc(100vh - 64px)); }
+
+    .menu-item-dropdown:not(.menu-item-dropdown-opened) .menu-dropdown { display: none; }
+
+    .oh-chart-container > .menu.padding { padding-top: 6px !important; }'
+slots:
+  default:
+  - component: div
+    config:
+      style:
+        display: flex
+        flex-direction: column
+        gap: 6px
+        padding: 12px 14px
+    slots:
+      default:
+      - component: div
+        config:
+          style:
+            display: flex
+            align-items: center
+            gap: 10px
+            padding-bottom: 4px
+        slots:
+          default:
+          - component: div
+            config:
+              style:
+                width: 34px
+                height: 34px
+                flex: 0 0 auto
+                border-radius: 50%
+                display: flex
+                align-items: center
+                justify-content: center
+                background: 'color-mix(in srgb, #fb8c00 22%, transparent)'
+            slots:
+              default:
+              - component: oh-icon
+                config:
+                  icon: material:heat_pump
+                  width: 20
+                  height: 20
+          - component: div
+            config:
+              style:
+                display: flex
+                flex-direction: column
+                min-width: '0'
+            slots:
+              default:
+              - component: Label
+                config:
+                  text: Außengerät
+                  style:
+                    font-size: 15px
+                    font-weight: '600'
+              - component: Label
+                config:
+                  text: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpCircuitPower].state) ? ''–'' : ((Number(items[props.heatpumpCircuitPower].numericState)
+                    || 0) / 1000).toFixed(2).replace(''.'', '','') + '' kW'') + '' · '' + ([''NULL'', ''UNDEF''].includes(items[props.heatpumpInvFrequency].state)
+                    ? ''–'' : (items[props.heatpumpInvFrequency].displayState || items[props.heatpumpInvFrequency].state))
+                    + '' · außen '' + ([''NULL'', ''UNDEF''].includes(items[props.heatpumpExtAmbientTemp].state) ? ''–'' :
+                    (items[props.heatpumpExtAmbientTemp].displayState || items[props.heatpumpExtAmbientTemp].state))'
+                  style:
+                    font-size: 12px
+                    opacity: '0.7'
+                    white-space: nowrap
+                    overflow: hidden
+                    text-overflow: ellipsis
+      - component: oh-chart
+        config:
+          chartType: ''
+          periodVisible: true
+          period: D
+          height: 280px
+        slots:
+          grid:
+          - component: oh-chart-grid
+            config:
+              top: '80'
+              bottom: '60'
+              left: '50'
+              right: '50'
+          xAxis:
+          - component: oh-time-axis
+            config:
+              gridIndex: 0
+          yAxis:
+          - component: oh-value-axis
+            config:
+              gridIndex: 0
+              name: W
+              nameGap: 14
+              nameTextStyle:
+                align: right
+                padding:
+                - 0
+                - 8
+                - 0
+                - 0
+              splitLine:
+                lineStyle:
+                  type: dashed
+                  opacity: 0.4
+              min: 0
+          - component: oh-value-axis
+            config:
+              gridIndex: 0
+              name: Hz
+              nameGap: 14
+              nameTextStyle:
+                align: left
+                padding:
+                - 0
+                - 0
+                - 0
+                - 8
+              splitLine:
+                lineStyle:
+                  type: dashed
+                  opacity: 0.4
+              min: 0
+          series:
+          - component: oh-time-series
+            config:
+              name: Leistung
+              gridIndex: 0
+              xAxisIndex: 0
+              yAxisIndex: 0
+              type: line
+              item: =props.heatpumpCircuitPower
+              symbol: none
+              sampling: lttb
+              lineStyle:
+                width: 1.5
+                color: '#fb8c00'
+              itemStyle:
+                color: '#fb8c00'
+              areaStyle:
+                color:
+                  type: linear
+                  x: 0
+                  y: 0
+                  x2: 0
+                  y2: 1
+                  colorStops:
+                  - offset: 0
+                    color: rgba(251, 140, 0, 0.45)
+                  - offset: 1
+                    color: rgba(251, 140, 0, 0.02)
+          - component: oh-time-series
+            config:
+              name: Verdichter
+              gridIndex: 0
+              xAxisIndex: 0
+              yAxisIndex: 1
+              type: line
+              item: =props.heatpumpInvFrequency
+              symbol: none
+              lineStyle:
+                width: 2
+                color: '#78909c'
+              itemStyle:
+                color: '#78909c'
+          tooltip:
+          - component: oh-chart-tooltip
+            config:
+              show: true
+              confine: true
+              trigger: axis
+              smartFormatter: true
+          legend:
+          - component: oh-chart-legend
+            config:
+              show: true
+              bottom: '0'
+              type: scroll
+      - component: oh-chart
+        config:
+          chartType: ''
+          periodVisible: true
+          period: D
+          height: 250px
+        slots:
+          grid:
+          - component: oh-chart-grid
+            config:
+              top: '62'
+              bottom: '60'
+              left: '50'
+              right: '20'
+          xAxis:
+          - component: oh-time-axis
+            config:
+              gridIndex: 0
+          yAxis:
+          - component: oh-value-axis
+            config:
+              gridIndex: 0
+              name: °C
+              nameGap: 14
+              nameTextStyle:
+                align: right
+                padding:
+                - 0
+                - 8
+                - 0
+                - 0
+              splitLine:
+                lineStyle:
+                  type: dashed
+                  opacity: 0.4
+              scale: true
+          series:
+          - component: oh-time-series
+            config:
+              name: Außen
+              gridIndex: 0
+              xAxisIndex: 0
+              yAxisIndex: 0
+              type: line
+              item: =props.heatpumpExtAmbientTemp
+              symbol: none
+              lineStyle:
+                width: 2
+                color: '#26a69a'
+              itemStyle:
+                color: '#26a69a'
+          - component: oh-time-series
+            config:
+              name: Wärmetauscher
+              gridIndex: 0
+              xAxisIndex: 0
+              yAxisIndex: 0
+              type: line
+              item: =props.heatpumpHeatExchangerMidTemp
+              symbol: none
+              lineStyle:
+                width: 2
+                color: '#4fc3f7'
+              itemStyle:
+                color: '#4fc3f7'
+          - component: oh-time-series
+            config:
+              name: Außenluft
+              gridIndex: 0
+              xAxisIndex: 0
+              yAxisIndex: 0
+              type: line
+              item: =props.heatpumpOutdoorAirTemp
+              symbol: none
+              lineStyle:
+                width: 1.5
+                type: dashed
+                color: '#9e9e9e'
+              itemStyle:
+                color: '#9e9e9e'
+          tooltip:
+          - component: oh-chart-tooltip
+            config:
+              show: true
+              confine: true
+              trigger: axis
+              smartFormatter: true
+          legend:
+          - component: oh-chart-legend
+            config:
+              show: true
+              bottom: '0'
+              type: scroll
+      - component: div
+        config:
+          style:
+            display: flex
+            justify-content: flex-end
+            padding-top: 4px
+        slots:
+          default:
+          - component: oh-button
+            config:
+              text: Alle Details
+              action: popup
+              actionModal: page:heatpump
+              outline: true
+              small: true
+              style:
+                color: '#fb8c00'
+                border-color: '#fb8c00'
+                width: auto
+                padding: 0 12px

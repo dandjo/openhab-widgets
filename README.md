@@ -1,7 +1,7 @@
 # openHAB Widgets
 
 MainUI widgets from my openHAB 5 installation: the cards of an energy and home dashboard and the parts they are built
-from, which work on their own too: device panels with their heads, pills, bars and sliders, the nodes and lines of the
+from, which work on their own too: the quick popups they open, pills, bars and sliders, the nodes and lines of the
 energy flow, appliance icons and tiles, a weather drawing; besides them a set of cards for every metered plug, a popup
 for any item and the tile their values stand in. The UI texts are German, numbers use a decimal comma. No widget names
 an item: every item comes in as a prop, so the widgets work with any item names.
@@ -35,23 +35,29 @@ number formats come from the items.
 
 | Widget | Needs |
 |---|---|
-| `air-conditioner-controls` | `boost-button`, `device-head`, `pill-switch`, `state-bar` |
+| `air-conditioner-quick` | `boost-pill`, `pill-slider`, `power-pill`, `state-bar` |
 | `appliance-icon` | – |
 | `appliance-tile` | `appliance-icon` |
 | `appliances-card` | `appliance-icon`, `appliance-tile` |
-| `boost-button` | – |
 | `boost-pill` | – |
 | `consumption-card` | – |
-| `controls-card` | `air-conditioner-controls`, `boost-button`, `device-head`, `heatpump-controls`, `pill-switch`, `state-bar`, `switch-tile`, `ventilation-controls` |
-| `device-head` | `boost-button`, `pill-switch`, `state-bar` |
 | `electricity-price-card` | – |
 | `energy-days-card` | – |
-| `energy-flow-card` | `flow-link`, `flow-node`, `flow-share-ring` |
+| `energy-flow-card` | `air-conditioner-quick`, `boost-pill`, `flow-link`, `flow-node`, `flow-share-ring`, `heatpump-quick`, `pill-slider`, `pill-switch`, `power-pill`, `state-bar`, `switch-row`, `switch-tile`, `ventilation-quick` |
 | `flow-link` | – |
 | `flow-node` | – |
 | `flow-share-ring` | – |
-| `heatpump-card` | `flow-node`, `item-popup`, `value-tile` |
-| `heatpump-controls` | `boost-button`, `device-head`, `pill-switch`, `state-bar` |
+| `ground-floor-quick` | – |
+| `heatpump-card` | `boost-pill`, `flow-node`, `ground-floor-quick`, `heatpump-circuit-quick`, `heatpump-control-quick`, `heatpump-cop-quick`, `heatpump-electric-quick`, `heatpump-heat-quick`, `heatpump-indoor-quick`, `heatpump-outdoor-quick`, `heatpump-refrigerant-quick`, `item-popup`, `pill-slider`, `pill-switch`, `state-bar`, `upper-floor-quick`, `value-tile` |
+| `heatpump-circuit-quick` | `pill-slider` |
+| `heatpump-control-quick` | `boost-pill`, `pill-switch`, `state-bar` |
+| `heatpump-cop-quick` | – |
+| `heatpump-electric-quick` | – |
+| `heatpump-heat-quick` | – |
+| `heatpump-indoor-quick` | `boost-pill`, `pill-slider`, `pill-switch`, `state-bar` |
+| `heatpump-outdoor-quick` | – |
+| `heatpump-quick` | `boost-pill`, `pill-slider`, `pill-switch` |
+| `heatpump-refrigerant-quick` | – |
 | `item-popup` | – |
 | `pill-slider` | – |
 | `pill-switch` | – |
@@ -65,8 +71,9 @@ number formats come from the items.
 | `switch-row` | – |
 | `switch-tile` | – |
 | `temperatures-card` | – |
+| `upper-floor-quick` | – |
 | `value-tile` | `item-popup` |
-| `ventilation-controls` | `boost-button`, `device-head`, `pill-switch`, `state-bar` |
+| `ventilation-quick` | `pill-slider`, `state-bar`, `switch-row` |
 | `weather-card` | `weather-icon` |
 | `weather-icon` | – |
 
@@ -75,7 +82,8 @@ number formats come from the items.
 The cards of my overview page. Each takes the items it shows as props; the prop names say what an item is. Most
 elements open a page of my installation as a popup when tapped: the page of their device (`page:heatpump`,
 `page:weather` …), or for the energy flow's house and appliances a popup of its own (`page:flow_home`,
-`page:flow_appliances`). The pages are not part of this repository.
+`page:flow_appliances`). The pages are not part of this repository; the quick popups the energy flow's heat pump, air
+conditioner and ventilation and the heat pump card's tiles open are (see [Quick popups](#quick-popups)).
 
 ### Weather: `weather-card`
 
@@ -117,73 +125,31 @@ Needs `weather-icon`.
 
 </details>
 
-### Controls: `controls-card`
-
-Heat pump, air conditioner and ventilation, each a panel of three lines with its main action on the right: a Boost
-button for the heat pump's hot water, the air conditioner's on/off pill, the ventilation levels 1 to 3; the heat pump's
-second line names which of its switches are on and which off. A tap on a panel, anywhere but on the action, opens the
-device's page of my installation as a popup, with all its controls. Below them tiles that toggle plugs and show their
-power. The three devices are the widgets `heatpump-controls`, `air-conditioner-controls` and `ventilation-controls`, the
-tiles `switch-tile`.
-
-Needs `air-conditioner-controls`, `boost-button`, `device-head`, `heatpump-controls`, `pill-switch`, `state-bar`,
-`switch-tile`, `ventilation-controls`.
-
-![Controls](screenshots/controls-card.png)
-
-![Controls in dark mode](screenshots/controls-card-dark.png)
-
-<details>
-<summary>26 props</summary>
-
-| Prop | Item | Item type |
-|---|---|---|
-| `heatpumpDhwBoost` | Pyaltherma Warmwasser-Boost | Switch |
-| `heatpumpDhwTankTemp` | ESPAltherma Warmwasserspeicher Temperatur | Number:Temperature |
-| `heatpumpPower` | ESPAltherma Elektrische Leistung | Number:Power |
-| `heatpumpClimateControlPower` | Pyaltherma Heizung Ein/Aus | Switch |
-| `heatpumpDhwPower` | Pyaltherma Warmwasser Ein/Aus | Switch |
-| `heatpumpManagement` | Wärmepumpe Automatik | Group |
-| `acSwitch` | Faikout Perfera Schalter | Switch |
-| `acMode` | Faikout Perfera Modus | String |
-| `acTemperatureSetpoint` | Faikout Perfera Solltemperatur | Number:Temperature |
-| `acTemperature` | Faikout Perfera Temperatur | Number:Temperature |
-| `acTimer` | Klimaanlage Timer | Number:Time |
-| `ventilationLevel` | ESPLyfterl Stufe | String |
-| `ventilationPower` | Lüftung Leistung | Number:Power |
-| `netatmoWeatherstationCo2` | Netatmo Wetterstation CO2 | Number:Dimensionless |
-| `ventilationTimer` | Lüftung Timer | Number:Time |
-| `ventilationManagement` | Lüftung Automatik | Group |
-| `coffeeMachineSwitch` | Kaffeemaschine Schalter | Switch |
-| `coffeeMachinePower` | Kaffeemaschine Leistung | Number:Power |
-| `bicycleBatteriesSwitch` | Fahrradakkus Schalter | Switch |
-| `bicycleBatteriesPower` | Fahrradakkus Leistung | Number:Power |
-| `office1Switch` | Büro 1 Schalter | Switch |
-| `office1Power` | Büro 1 Leistung | Number:Power |
-| `office2Switch` | Büro 2 Schalter | Switch |
-| `office2Power` | Büro 2 Leistung | Number:Power |
-| `terraceLightSwitch` | Terrassenlicht Schalter | Switch |
-| `terraceLightPower` | Terrassenlicht Leistung | Number:Power |
-
-</details>
-
 ### Energy flow: `energy-flow-card`
 
-A regular star around the house: PV, heat pump, air conditioner, E-Car, the household appliances together, battery and
-grid, each with its power and today's energy. Dots run along the lines in the direction of the flow at four speeds and
-slide under the node rims; the icons move with the power (sun rays, fan, air streams, pylon dashes, a pulsing bolt over
-the charging car, sparkles twinkling while the appliances run, the battery filled to its state of charge). Rings for
-today's self-consumption and self-sufficiency sit in the free corner. The card places its lines, nodes and rings as
-`flow-link`, `flow-node` and `flow-share-ring`. The recording and the dark screenshot show it with demo values.
+A regular star around the house: PV, heat pump, air conditioner, E-Car, the household appliances together, ventilation,
+battery and grid, each with its power and today's energy. Dots run along the lines in the direction of the flow at four
+speeds and slide under the node rims; while power flows through a node, dots in its colour run round its grey ring,
+clockwise towards the house and the other way out of it. The icons move with the power (sun rays, fan, air streams,
+pylon dashes, a pulsing bolt over the charging car, sparkles twinkling while the appliances run, the battery filled to
+its state of charge, the ventilation's duct fan turning). Badges on the rings tell what the heat pump does (space
+heating, hot water, defrost), whether the air conditioner is on and the ventilation's level. A running timer covers its
+device's ring with an arc, full at what it was last set to, and the battery's ring is filled with its state of charge;
+the dots run on in the rest of the ring. A tap on the heat pump, the air conditioner or the ventilation opens its quick
+popup (see [Quick popups](#quick-popups)). Under the star three tiles with large pale icons, the house's power and
+today's self-consumption and self-sufficiency as rings, and below them switch tiles for plugs. The card places its
+lines, nodes and rings as `flow-link`, `flow-node` and `flow-share-ring`, the plugs as `switch-tile`. The recording and
+the dark screenshot show it with demo values.
 
-Needs `flow-link`, `flow-node`, `flow-share-ring`.
+Needs `air-conditioner-quick`, `boost-pill`, `flow-link`, `flow-node`, `flow-share-ring`, `heatpump-quick`,
+`pill-slider`, `pill-switch`, `power-pill`, `state-bar`, `switch-row`, `switch-tile`, `ventilation-quick`.
 
 ![Energy flow](screenshots/energy-flow-card.gif)
 
 ![Energy flow in dark mode](screenshots/energy-flow-card-dark.png)
 
 <details>
-<summary>27 props</summary>
+<summary>63 props</summary>
 
 | Prop | Item | Item type |
 |---|---|---|
@@ -198,11 +164,17 @@ Needs `flow-link`, `flow-node`, `flow-share-ring`.
 | `tumbleDryerPower` | Wäschetrockner Leistung | Number:Power |
 | `dishwasherPower` | Geschirrspüler Leistung | Number:Power |
 | `batteryPower` | Batteriespeicher Leistung | Number:Power |
+| `ventilationPower` | Lüftung Leistung | Number:Power |
 | `homePower` | Haus Leistung | Number:Power |
+| `acTimer` | Klimaanlage Timer | Number:Time |
+| `acTimerSet` | Klimaanlage Timer eingestellt | Number:Time |
+| `ventilationTimer` | Lüftung Timer | Number:Time |
+| `ventilationTimerSet` | Lüftung Timer eingestellt | Number:Time |
 | `batterySoc` | Batteriespeicher Ladestand | Number:Dimensionless |
+| `heatpumpDefrostOperaton` | ESPAltherma Abtauen | Switch |
+| `heatpumpValve` | ESPAltherma 3-Wege-Ventil | String |
+| `ventilationLevel` | ESPLyfterl Stufe | String |
 | `pvEnergyToday` | Wechselrichter Ertrag heute | Number:Energy |
-| `pvSelfUseToday` | Photovoltaik Eigenverbrauch heute | Number:Energy |
-| `homeEnergyToday` | Haus Energie heute | Number:Energy |
 | `gridImportToday` | Stromzähler Bezug heute | Number:Energy |
 | `gridExportToday` | Stromzähler Einspeisung heute | Number:Energy |
 | `heatpumpEnergyToday` | ESPAltherma Energie heute | Number:Energy |
@@ -212,8 +184,38 @@ Needs `flow-link`, `flow-node`, `flow-share-ring`.
 | `washingMachine2EnergyToday` | Waschmaschine 2 Energie heute | Number:Energy |
 | `tumbleDryerEnergyToday` | Wäschetrockner Energie heute | Number:Energy |
 | `dishwasherEnergyToday` | Geschirrspüler Energie heute | Number:Energy |
-| `batteryChargeToday` | Batteriespeicher Ladung heute | Number:Energy |
 | `batteryDischargeToday` | Batteriespeicher Entladung heute | Number:Energy |
+| `batteryChargeToday` | Batteriespeicher Ladung heute | Number:Energy |
+| `heatpumpDhwTankTemp` | ESPAltherma Warmwasserspeicher Temperatur | Number:Temperature |
+| `heatpumpDhwBoost` | Pyaltherma Warmwasser-Boost | Switch |
+| `heatpumpClimateControlPower` | Pyaltherma Heizung Ein/Aus | Switch |
+| `heatpumpDhwPower` | Pyaltherma Warmwasser Ein/Aus | Switch |
+| `heatpumpManagement` | Wärmepumpe Automatik | Group |
+| `heatpumpDhwTempHeating` | Pyaltherma Warmwasser Solltemperatur | Number:Temperature |
+| `heatpumpDhwManagement` | Wärmepumpe Warmwasser-Automatik | Switch |
+| `acMode` | Faikout Perfera Modus | String |
+| `acTemperature` | Faikout Perfera Temperatur | Number:Temperature |
+| `acTemperatureSetpoint` | Faikout Perfera Solltemperatur | Number:Temperature |
+| `acPowerful` | Faikout Perfera Powerful | Switch |
+| `netatmoWeatherstationCo2` | Netatmo Wetterstation CO2 | Number:Dimensionless |
+| `ventilationManagement` | Lüftung Automatik | Group |
+| `homeEnergyToday` | Haus Energie heute | Number:Energy |
+| `pvSelfUseToday` | Photovoltaik Eigenverbrauch heute | Number:Energy |
+| `coffeeMachineSwitch` | Kaffeemaschine Schalter | Switch |
+| `coffeeMachinePower` | Kaffeemaschine Leistung | Number:Power |
+| `coffeeMachineEnergyToday` | Kaffeemaschine Energie heute | Number:Energy |
+| `bicycleBatteriesSwitch` | Fahrradakkus Schalter | Switch |
+| `bicycleBatteriesPower` | Fahrradakkus Leistung | Number:Power |
+| `bicycleBatteriesEnergyToday` | Fahrradakkus Energie heute | Number:Energy |
+| `office1Switch` | Büro 1 Schalter | Switch |
+| `office1Power` | Büro 1 Leistung | Number:Power |
+| `office1EnergyToday` | Büro 1 Energie heute | Number:Energy |
+| `office2Switch` | Büro 2 Schalter | Switch |
+| `office2Power` | Büro 2 Leistung | Number:Power |
+| `office2EnergyToday` | Büro 2 Energie heute | Number:Energy |
+| `terraceLightSwitch` | Terrassenlicht Schalter | Switch |
+| `terraceLightPower` | Terrassenlicht Leistung | Number:Power |
+| `terraceLightEnergyToday` | Terrassenlicht Energie heute | Number:Energy |
 
 </details>
 
@@ -277,62 +279,91 @@ orange and red by price.
 
 ### Heat pump: `heatpump-card`
 
-A section through the house: outdoor unit on the roof (the energy flow's `flow-node`), wall unit, three-way valve and
-DHW tank in the basement, floor heating and radiators on their levels, with the flow animated along the pipes as the
-valve decides. Two framed badges, each joined to its pipe by a dotted line, hold the refrigerant's hot gas, liquid and
-pressure (violet while the compressor runs) and the water's heat with its leaving and inlet temperatures (coloured by
-that heat); the tank's temperature stands below it in a colour from blue to red, the sum of all electrical consumers
-below the wall unit, powers in kW. Beside it the power, today's energies split into space heating, DHW and standby, and
-daily COPs. On a phone the drawing takes the card's width; on a wider screen it stands at most at its own size, as the
-energy flow does, so their texts keep the UI's sizes and their circles come out the same.
+A section through the house: the outdoor unit on the roof (the energy flow's `flow-node`), wall unit, three-way valve,
+DHW tank and radiators in the basement, floor heating on the two levels above. Every device sits in a grey ring like the
+energy flow's nodes, dots running round it while it works; the outdoor unit's ring is filled by the compressor's
+frequency, the wall unit's by the electrical draw (full and red while the backup heater runs), the tank's by its
+temperature, radiators and floor loops by the leaving water while they carry it. Dots run along the pipes, as many as a
+pipe is long, faster with the water's flow or the compressor's frequency, and all of them backwards during a defrost.
+The valve shows its position in its icon. Tiles in the style of the switch tiles hold the figures: the outdoor unit, the
+control (heating, hot water, Smart Grid, automation), the refrigerant, the heating circuit, the climate of the two
+floors, the tank and the indoor unit, each tinted in its colour while what it shows is at work. A tap on a tile, the
+wall unit or the outdoor unit opens its quick popup with charts or controls. Beside the drawing the electrical power,
+the heat and the COP as value tiles that open popups with their charts of the day and the month, today's energies split
+into space heating, DHW and standby as bars, and today's COPs as rings. On a phone the drawing takes the card's width;
+on a wider screen it stands at most at its own size, as the energy flow does, so their texts keep the UI's sizes and
+their circles come out the same.
 
-Needs `flow-node`, `item-popup`, `value-tile`.
+Needs `boost-pill`, `flow-node`, `ground-floor-quick`, `heatpump-circuit-quick`, `heatpump-control-quick`,
+`heatpump-cop-quick`, `heatpump-electric-quick`, `heatpump-heat-quick`, `heatpump-indoor-quick`,
+`heatpump-outdoor-quick`, `heatpump-refrigerant-quick`, `item-popup`, `pill-slider`, `pill-switch`, `state-bar`,
+`upper-floor-quick`, `value-tile`.
 
 ![Heat pump](screenshots/heatpump-card.png)
 
 ![Heat pump in dark mode](screenshots/heatpump-card-dark.png)
 
 <details>
-<summary>36 props</summary>
+<summary>56 props</summary>
 
 | Prop | Item | Item type |
 |---|---|---|
 | `heatpumpDhwTankTemp` | ESPAltherma Warmwasserspeicher Temperatur | Number:Temperature |
 | `heatpumpInvFrequency` | ESPAltherma Verdichterfrequenz | Number:Frequency |
+| `heatpumpDefrostOperaton` | ESPAltherma Abtauen | Switch |
 | `heatpumpWaterPumpOperation` | ESPAltherma Umwälzpumpe | Switch |
 | `heatpumpFlowSensor` | ESPAltherma Durchfluss | Number:VolumetricFlowRate |
 | `heatpumpValve` | ESPAltherma 3-Wege-Ventil | String |
-| `heatpumpCircuitPower` | Wärmepumpe Leistung | Number:Power |
 | `heatpumpBuhStep1Mode` | ESPAltherma Heizstab Stufe 1 | Switch |
 | `heatpumpBuhStep2Mode` | ESPAltherma Heizstab Stufe 2 | Switch |
+| `heatpumpPower` | ESPAltherma Elektrische Leistung | Number:Power |
 | `heatpumpBshMode` | ESPAltherma Zusatzheizung Speicher | Switch |
+| `heatpumpLeavingWaterTempAfterBuh` | ESPAltherma Vorlauftemperatur nach Heizstab | Number:Temperature |
+| `heatpumpCircuitPower` | Wärmepumpe Leistung | Number:Power |
 | `heatpumpExtAmbientTemp` | ESPAltherma Außentemperatur | Number:Temperature |
-| `heatpumpDefrostOperaton` | ESPAltherma Abtauen | Switch |
+| `heatpumpHeatExchangerMidTemp` | ESPAltherma Wärmetauscher Mitte | Number:Temperature |
+| `heatpumpSmartGrid` | ESPAltherma Smart Grid | String |
+| `heatpumpClimateControlPower` | Pyaltherma Heizung Ein/Aus | Switch |
+| `heatpumpDhwBoost` | Pyaltherma Warmwasser-Boost | Switch |
+| `heatpumpDhwPower` | Pyaltherma Warmwasser Ein/Aus | Switch |
+| `heatpumpManagement` | Wärmepumpe Automatik | Group |
 | `heatpumpDischargePipeTemp` | ESPAltherma Heißgastemperatur | Number:Temperature |
 | `heatpumpRefrigerantTemp` | ESPAltherma Kältemittel flüssig | Number:Temperature |
 | `heatpumpRefrigerantPressure` | ESPAltherma Kältemitteldruck | Number:Pressure |
-| `acTemperature` | Faikout Perfera Temperatur | Number:Temperature |
-| `heatpumpIndoorAmbientTemp` | ESPAltherma Raumtemperatur | Number:Temperature |
-| `heatpumpPower` | ESPAltherma Elektrische Leistung | Number:Power |
 | `heatpumpHeatingPowerAfterBuh` | ESPAltherma Heizleistung nach Heizstab | Number:Power |
-| `heatpumpLeavingWaterTempAfterBuh` | ESPAltherma Vorlauftemperatur nach Heizstab | Number:Temperature |
 | `heatpumpInletWaterTemp` | ESPAltherma Rücklauftemperatur | Number:Temperature |
+| `acTemperature` | Faikout Perfera Temperatur | Number:Temperature |
+| `tadoHumidity` | Tado Luftfeuchtigkeit | Number:Dimensionless |
+| `heatpumpIndoorAmbientTemp` | ESPAltherma Raumtemperatur | Number:Temperature |
+| `netatmoWeatherstationAtmosphericHumidity` | Netatmo Wetterstation Luftfeuchtigkeit | Number:Dimensionless |
+| `netatmoWeatherstationCo2` | Netatmo Wetterstation CO2 | Number:Dimensionless |
 | `heatpumpDhwSetpoint` | ESPAltherma Warmwasser Sollwert | Number:Temperature |
 | `heatpumpBshPower` | ESPAltherma Elektrische Leistung Zusatzheizung | Number:Power |
 | `heatpumpWaterPressure` | ESPAltherma Wasserdruck | Number:Pressure |
 | `heatpumpBuhPower` | ESPAltherma Elektrische Leistung Heizstab | Number:Power |
-| `heatpumpHeatPower` | ESPAltherma Heizleistung | Number:Power |
-| `heatpumpCop` | ESPAltherma COP | Number |
+| `heatpumpOutdoorAirTemp` | ESPAltherma Außenluft Temperatur | Number:Temperature |
+| `heatpumpTargetDischargeTemp` | ESPAltherma Soll-Heißgastemperatur | Number:Temperature |
+| `heatpumpLeavingWaterTempOffsetHeating` | Pyaltherma Vorlauf-Offset Heizen | Number:Temperature |
+| `heatpumpLeavingWaterSetpoint` | ESPAltherma Vorlauf Sollwert | Number:Temperature |
+| `heatpumpDhwTempHeating` | Pyaltherma Warmwasser Solltemperatur | Number:Temperature |
+| `heatpumpDhwManagement` | Wärmepumpe Warmwasser-Automatik | Switch |
 | `heatpumpEnergyToday` | ESPAltherma Energie heute | Number:Energy |
+| `heatpumpElectricalPowerSpace` | ESPAltherma Elektrische Leistung Heizung | Number:Power |
+| `heatpumpElectricalPowerDhw` | ESPAltherma Elektrische Leistung Warmwasser | Number:Power |
+| `heatpumpElectricalPowerStandby` | ESPAltherma Elektrische Leistung Standby | Number:Power |
 | `heatpumpEnergySpaceToday` | ESPAltherma Energie Heizung heute | Number:Energy |
 | `heatpumpEnergyDhwToday` | ESPAltherma Energie Warmwasser heute | Number:Energy |
 | `heatpumpEnergyStandbyToday` | ESPAltherma Energie Standby heute | Number:Energy |
+| `heatpumpHeatPower` | ESPAltherma Heizleistung | Number:Power |
 | `heatpumpHeatingEnergyToday` | ESPAltherma Heizenergie heute | Number:Energy |
+| `heatpumpHeatingPowerSpace` | ESPAltherma Heizleistung Heizung | Number:Power |
+| `heatpumpHeatingPowerDhw` | ESPAltherma Heizleistung Warmwasser | Number:Power |
 | `heatpumpHeatingEnergySpaceToday` | ESPAltherma Heizenergie Heizung heute | Number:Energy |
 | `heatpumpHeatingEnergyDhwToday` | ESPAltherma Heizenergie Warmwasser heute | Number:Energy |
+| `heatpumpCop` | ESPAltherma COP | Number |
+| `heatpumpDcop` | ESPAltherma Tages-COP | Number |
 | `heatpumpDcopSpace` | ESPAltherma Tages-COP Heizung | Number |
 | `heatpumpDcopDhw` | ESPAltherma Tages-COP Warmwasser | Number |
-| `heatpumpDcop` | ESPAltherma Tages-COP | Number |
 
 </details>
 
@@ -423,115 +454,251 @@ Indoor and outdoor temperature now, the day's minimum and maximum, and the last 
 
 </details>
 
-## Device controls
+## Quick popups
 
-The parts of the controls card and of my device pages' controls. A device panel is a `device-head`: a tap on it opens
-the device's page as a popup, where the pills, bars and sliders below make up the controls.
+Compact popups the cards open: a device's main controls or the charts of one of its parts, under a small head with
+its state and above *Alle Details*, which opens the device's page of my installation. Each is a widget that takes its
+items as props; open it from a link with `action: popup`, `actionModal: widget:<uid>` and its items in
+`actionModalConfig`, as the cards do:
 
-### Device panels: `heatpump-controls`, `air-conditioner-controls`, `ventilation-controls`
+```yaml
+action: popup
+actionModal: widget:ventilation-quick
+actionModalConfig:
+  ventilationLevel: esplyfterl_level
+  netatmoWeatherstationCo2: netatmo_weatherstation_co2
+  ventilationTimer: ventilation_timer
+  ventilationManagement: ventilation_management
+```
 
-The three devices of the controls card, each a widget of its own that takes its items as props:
+It opens 420 px wide and up to 640 px high, on a phone full screen; its charts start below their period buttons, a
+closed period menu takes no room. The energy flow's heat pump, air conditioner and ventilation open the first three,
+the heat pump card's tiles, wall unit and outdoor unit the others:
 
-- `heatpump-controls`, the heat pump: storage temperature and power in its head, and which of its three switches are on
-  (Warmwasser, Automatik an · Heizung aus), Boost as its main action; a tap opens the page `heatpump`.
-- `air-conditioner-controls`, the air conditioner: state, mode, setpoint, room temperature and timer in its head, on/off
-  as its main action; a tap opens the page `air_conditioning`.
-- `ventilation-controls`, the ventilation: level, power, CO₂ and what the automation does in its head, the levels 1 to 3
-  as its main action; a tap opens the page `ventilation`. It always runs, so its panel is always tinted.
+- `heatpump-quick`, heat pump: the hot-water boost, heating, hot water and automation, the DHW setpoint.
+- `air-conditioner-quick`, air conditioner: on/off, mode, setpoint, timer and boost.
+- `ventilation-quick`, ventilation: the level, the timer and the automation.
+- `heatpump-control-quick`, control: heating, hot water and automation, the hot-water boost and the Smart Grid.
+- `heatpump-indoor-quick`, indoor unit: all the heat pump's controls.
+- `heatpump-outdoor-quick`, outdoor unit: its power with the compressor frequency and the outdoor temperature against
+  its heat exchanger's over the day.
+- `heatpump-refrigerant-quick`, refrigerant: hot gas with its target, liquid, heat exchanger and pressure over the day.
+- `heatpump-circuit-quick`, heating circuit: the leaving water offset, leaving and inlet water with the heat over the
+  day.
+- `upper-floor-quick`, upper floor: temperature and humidity over the day.
+- `ground-floor-quick`, ground floor: temperature, humidity and CO₂ over the day.
+- `heatpump-electric-quick`, electricity: the power of space heating, DHW and standby over the day, their energy per day
+  of the month.
+- `heatpump-heat-quick`, heat: the heat of space heating and DHW over the day, per day of the month.
+- `heatpump-cop-quick`, COP: the COP against the outdoor temperature over the day, the daily COPs of the month.
 
-Each panel is tinted in its device's colour while the device runs; place them one under the other.
-
-| Heat pump | Air conditioner | Ventilation |
+| | | |
 |---|---|---|
-| ![Heat pump](screenshots/heatpump-controls.png) | ![Air conditioner](screenshots/air-conditioner-controls.png) | ![Ventilation](screenshots/ventilation-controls.png) |
+| ![Heat pump](screenshots/heatpump-quick.png) | ![Air conditioner](screenshots/air-conditioner-quick.png) | ![Ventilation](screenshots/ventilation-quick.png) |
+| ![Control](screenshots/heatpump-control-quick.png) | ![Indoor unit](screenshots/heatpump-indoor-quick.png) | ![Outdoor unit](screenshots/heatpump-outdoor-quick.png) |
+| ![Refrigerant](screenshots/heatpump-refrigerant-quick.png) | ![Heating circuit](screenshots/heatpump-circuit-quick.png) | ![Upper floor](screenshots/upper-floor-quick.png) |
+| ![Ground floor](screenshots/ground-floor-quick.png) | ![Electricity](screenshots/heatpump-electric-quick.png) | ![Heat](screenshots/heatpump-heat-quick.png) |
+| ![COP](screenshots/heatpump-cop-quick.png) |  |  |
 
-`heatpump-controls` needs `boost-button`, `device-head`, `pill-switch`, `state-bar`.
-
-`air-conditioner-controls` needs `boost-button`, `device-head`, `pill-switch`, `state-bar`.
-
-`ventilation-controls` needs `boost-button`, `device-head`, `pill-switch`, `state-bar`.
+`heatpump-quick` needs `boost-pill`, `pill-slider`, `pill-switch`.
 
 <details>
-<summary><code>heatpump-controls</code>: 6 props</summary>
+<summary><code>heatpump-quick</code>: 8 props</summary>
 
 | Prop | Item | Item type |
 |---|---|---|
-| `heatpumpDhwBoost` | Pyaltherma Warmwasser-Boost | Switch |
 | `heatpumpDhwTankTemp` | ESPAltherma Warmwasserspeicher Temperatur | Number:Temperature |
 | `heatpumpPower` | ESPAltherma Elektrische Leistung | Number:Power |
+| `heatpumpDhwBoost` | Pyaltherma Warmwasser-Boost | Switch |
 | `heatpumpClimateControlPower` | Pyaltherma Heizung Ein/Aus | Switch |
 | `heatpumpDhwPower` | Pyaltherma Warmwasser Ein/Aus | Switch |
 | `heatpumpManagement` | Wärmepumpe Automatik | Group |
+| `heatpumpDhwTempHeating` | Pyaltherma Warmwasser Solltemperatur | Number:Temperature |
+| `heatpumpDhwManagement` | Wärmepumpe Warmwasser-Automatik | Switch |
 
 </details>
 
+`air-conditioner-quick` needs `boost-pill`, `pill-slider`, `power-pill`, `state-bar`.
+
 <details>
-<summary><code>air-conditioner-controls</code>: 5 props</summary>
+<summary><code>air-conditioner-quick</code>: 7 props</summary>
 
 | Prop | Item | Item type |
 |---|---|---|
 | `acSwitch` | Faikout Perfera Schalter | Switch |
 | `acMode` | Faikout Perfera Modus | String |
-| `acTemperatureSetpoint` | Faikout Perfera Solltemperatur | Number:Temperature |
 | `acTemperature` | Faikout Perfera Temperatur | Number:Temperature |
+| `acTemperatureSetpoint` | Faikout Perfera Solltemperatur | Number:Temperature |
 | `acTimer` | Klimaanlage Timer | Number:Time |
+| `acTimerSet` | Klimaanlage Timer eingestellt | Number:Time |
+| `acPowerful` | Faikout Perfera Powerful | Switch |
 
 </details>
 
+`ventilation-quick` needs `pill-slider`, `state-bar`, `switch-row`.
+
 <details>
-<summary><code>ventilation-controls</code>: 5 props</summary>
+<summary><code>ventilation-quick</code>: 5 props</summary>
 
 | Prop | Item | Item type |
 |---|---|---|
 | `ventilationLevel` | ESPLyfterl Stufe | String |
-| `ventilationPower` | Lüftung Leistung | Number:Power |
 | `netatmoWeatherstationCo2` | Netatmo Wetterstation CO2 | Number:Dimensionless |
 | `ventilationTimer` | Lüftung Timer | Number:Time |
 | `ventilationManagement` | Lüftung Automatik | Group |
+| `ventilationTimerSet` | Lüftung Timer eingestellt | Number:Time |
+
+</details>
+
+`heatpump-control-quick` needs `boost-pill`, `pill-switch`, `state-bar`.
+
+<details>
+<summary><code>heatpump-control-quick</code>: 6 props</summary>
+
+| Prop | Item | Item type |
+|---|---|---|
+| `heatpumpClimateControlPower` | Pyaltherma Heizung Ein/Aus | Switch |
+| `heatpumpDhwPower` | Pyaltherma Warmwasser Ein/Aus | Switch |
+| `heatpumpManagement` | Wärmepumpe Automatik | Group |
+| `heatpumpDhwBoost` | Pyaltherma Warmwasser-Boost | Switch |
+| `heatpumpDhwTankTemp` | ESPAltherma Warmwasserspeicher Temperatur | Number:Temperature |
+| `heatpumpSmartGrid` | ESPAltherma Smart Grid | String |
+
+</details>
+
+`heatpump-indoor-quick` needs `boost-pill`, `pill-slider`, `pill-switch`, `state-bar`.
+
+<details>
+<summary><code>heatpump-indoor-quick</code>: 12 props</summary>
+
+| Prop | Item | Item type |
+|---|---|---|
+| `heatpumpLeavingWaterTempAfterBuh` | ESPAltherma Vorlauftemperatur nach Heizstab | Number:Temperature |
+| `heatpumpFlowSensor` | ESPAltherma Durchfluss | Number:VolumetricFlowRate |
+| `heatpumpSmartGrid` | ESPAltherma Smart Grid | String |
+| `heatpumpClimateControlPower` | Pyaltherma Heizung Ein/Aus | Switch |
+| `heatpumpDhwPower` | Pyaltherma Warmwasser Ein/Aus | Switch |
+| `heatpumpManagement` | Wärmepumpe Automatik | Group |
+| `heatpumpDhwTempHeating` | Pyaltherma Warmwasser Solltemperatur | Number:Temperature |
+| `heatpumpDhwTankTemp` | ESPAltherma Warmwasserspeicher Temperatur | Number:Temperature |
+| `heatpumpDhwManagement` | Wärmepumpe Warmwasser-Automatik | Switch |
+| `heatpumpDhwBoost` | Pyaltherma Warmwasser-Boost | Switch |
+| `heatpumpLeavingWaterTempOffsetHeating` | Pyaltherma Vorlauf-Offset Heizen | Number:Temperature |
+| `heatpumpLeavingWaterSetpoint` | ESPAltherma Vorlauf Sollwert | Number:Temperature |
+
+</details>
+
+<details>
+<summary><code>heatpump-outdoor-quick</code>: 5 props</summary>
+
+| Prop | Item | Item type |
+|---|---|---|
+| `heatpumpCircuitPower` | Wärmepumpe Leistung | Number:Power |
+| `heatpumpInvFrequency` | ESPAltherma Verdichterfrequenz | Number:Frequency |
+| `heatpumpExtAmbientTemp` | ESPAltherma Außentemperatur | Number:Temperature |
+| `heatpumpHeatExchangerMidTemp` | ESPAltherma Wärmetauscher Mitte | Number:Temperature |
+| `heatpumpOutdoorAirTemp` | ESPAltherma Außenluft Temperatur | Number:Temperature |
+
+</details>
+
+<details>
+<summary><code>heatpump-refrigerant-quick</code>: 5 props</summary>
+
+| Prop | Item | Item type |
+|---|---|---|
+| `heatpumpDischargePipeTemp` | ESPAltherma Heißgastemperatur | Number:Temperature |
+| `heatpumpRefrigerantPressure` | ESPAltherma Kältemitteldruck | Number:Pressure |
+| `heatpumpTargetDischargeTemp` | ESPAltherma Soll-Heißgastemperatur | Number:Temperature |
+| `heatpumpRefrigerantTemp` | ESPAltherma Kältemittel flüssig | Number:Temperature |
+| `heatpumpHeatExchangerMidTemp` | ESPAltherma Wärmetauscher Mitte | Number:Temperature |
+
+</details>
+
+`heatpump-circuit-quick` needs `pill-slider`.
+
+<details>
+<summary><code>heatpump-circuit-quick</code>: 6 props</summary>
+
+| Prop | Item | Item type |
+|---|---|---|
+| `heatpumpLeavingWaterTempAfterBuh` | ESPAltherma Vorlauftemperatur nach Heizstab | Number:Temperature |
+| `heatpumpInletWaterTemp` | ESPAltherma Rücklauftemperatur | Number:Temperature |
+| `heatpumpLeavingWaterTempOffsetHeating` | Pyaltherma Vorlauf-Offset Heizen | Number:Temperature |
+| `heatpumpLeavingWaterSetpoint` | ESPAltherma Vorlauf Sollwert | Number:Temperature |
+| `heatpumpClimateControlPower` | Pyaltherma Heizung Ein/Aus | Switch |
+| `heatpumpHeatingPowerAfterBuh` | ESPAltherma Heizleistung nach Heizstab | Number:Power |
+
+</details>
+
+<details>
+<summary><code>upper-floor-quick</code>: 2 props</summary>
+
+| Prop | Item | Item type |
+|---|---|---|
+| `acTemperature` | Faikout Perfera Temperatur | Number:Temperature |
+| `tadoHumidity` | Tado Luftfeuchtigkeit | Number:Dimensionless |
+
+</details>
+
+<details>
+<summary><code>ground-floor-quick</code>: 3 props</summary>
+
+| Prop | Item | Item type |
+|---|---|---|
+| `heatpumpIndoorAmbientTemp` | ESPAltherma Raumtemperatur | Number:Temperature |
+| `netatmoWeatherstationAtmosphericHumidity` | Netatmo Wetterstation Luftfeuchtigkeit | Number:Dimensionless |
+| `netatmoWeatherstationCo2` | Netatmo Wetterstation CO2 | Number:Dimensionless |
+
+</details>
+
+<details>
+<summary><code>heatpump-electric-quick</code>: 8 props</summary>
+
+| Prop | Item | Item type |
+|---|---|---|
+| `heatpumpPower` | ESPAltherma Elektrische Leistung | Number:Power |
+| `heatpumpEnergyToday` | ESPAltherma Energie heute | Number:Energy |
+| `heatpumpElectricalPowerSpace` | ESPAltherma Elektrische Leistung Heizung | Number:Power |
+| `heatpumpElectricalPowerDhw` | ESPAltherma Elektrische Leistung Warmwasser | Number:Power |
+| `heatpumpElectricalPowerStandby` | ESPAltherma Elektrische Leistung Standby | Number:Power |
+| `heatpumpEnergySpaceToday` | ESPAltherma Energie Heizung heute | Number:Energy |
+| `heatpumpEnergyDhwToday` | ESPAltherma Energie Warmwasser heute | Number:Energy |
+| `heatpumpEnergyStandbyToday` | ESPAltherma Energie Standby heute | Number:Energy |
+
+</details>
+
+<details>
+<summary><code>heatpump-heat-quick</code>: 6 props</summary>
+
+| Prop | Item | Item type |
+|---|---|---|
+| `heatpumpHeatPower` | ESPAltherma Heizleistung | Number:Power |
+| `heatpumpHeatingEnergyToday` | ESPAltherma Heizenergie heute | Number:Energy |
+| `heatpumpHeatingPowerSpace` | ESPAltherma Heizleistung Heizung | Number:Power |
+| `heatpumpHeatingPowerDhw` | ESPAltherma Heizleistung Warmwasser | Number:Power |
+| `heatpumpHeatingEnergySpaceToday` | ESPAltherma Heizenergie Heizung heute | Number:Energy |
+| `heatpumpHeatingEnergyDhwToday` | ESPAltherma Heizenergie Warmwasser heute | Number:Energy |
+
+</details>
+
+<details>
+<summary><code>heatpump-cop-quick</code>: 5 props</summary>
+
+| Prop | Item | Item type |
+|---|---|---|
+| `heatpumpCop` | ESPAltherma COP | Number |
+| `heatpumpDcop` | ESPAltherma Tages-COP | Number |
+| `heatpumpExtAmbientTemp` | ESPAltherma Außentemperatur | Number:Temperature |
+| `heatpumpDcopSpace` | ESPAltherma Tages-COP Heizung | Number |
+| `heatpumpDcopDhw` | ESPAltherma Tages-COP Warmwasser | Number |
 
 </details>
 
 
-### Device head: `device-head`
+## Controls
 
-A device in a panel of three lines, tinted in the device's colour while `active` holds: its icon in a circle; beside it
-the name and the main action, and under them two lines of state that run the whole width, under the action too, so they
-stay readable on a phone. A tap anywhere but on the action opens the page `popup` as a popup, e.g. the device's page;
-without `popup` the panel takes no tap. The main action is a switch pill (`action: switch`, `pill-switch`), a boost
-button (`button`, `boost-button`) or a segmented bar (`bar`, `state-bar` with `actionOptions`) on `actionItem`:
+The parts of the quick popups and of my device pages' controls.
 
-![Device heads](screenshots/device-heads.png)
-
-```yaml
-component: widget:device-head
-config:
-  icon: material:ac_unit
-  title: Klimaanlage
-  line1: "=(items.faikout_perfera_switch.state === 'ON' ? 'An · ' : 'Aus · ') + items.faikout_perfera_mode.displayState"
-  line2: ="Raum " + items.faikout_perfera_temperature.displayState
-  color: "#29b6f6"
-  active: =items.faikout_perfera_switch.state === 'ON'
-  popup: air_conditioning
-  action: switch
-  actionItem: faikout_perfera_switch
-  actionTitle: An/Aus
-```
-
-Needs `boost-button`, `pill-switch`, `state-bar`.
-
-| Prop | Description | Type | Default |
-|---|---|---|---|
-| `icon` | The device's icon | TEXT |  |
-| `title` | The device's name | TEXT |  |
-| `line1` | First line of state; usually an expression | TEXT |  |
-| `line2` | Second line of state; usually an expression | TEXT |  |
-| `color` | Device colour as #rrggbb | TEXT | `#78909c` |
-| `active` | Whether the device runs, which tints its panel and icon; usually an expression | BOOLEAN |  |
-| `popup` | The uid of the page a tap opens as a popup, e.g. the device's page; empty: no tap | TEXT |  |
-| `action` | switch (a switch pill), button (a boost button), bar (a segmented bar) or empty | TEXT |  |
-| `actionItem` | The item of the main action | Item |  |
-| `actionTitle` | The switch pill's or button's text | TEXT |  |
-| `actionOptions` | The bar's value=label pairs separated by semicolons | TEXT |  |
 
 ### Segmented bar: `state-bar`
 
@@ -584,6 +751,7 @@ config:
 | `icon` | Icon, e.g. material:coffee (its state follows the item) | TEXT |  |
 | `color` | Colour of the tile while on as #rrggbb | TEXT | `#78909c` |
 | `value` | A line under the name, e.g. the power; usually an expression | TEXT |  |
+| `energy` | A line under the value, e.g. today's energy; usually an expression; empty: none | TEXT |  |
 
 ### On/off pill: `power-pill`
 
@@ -634,32 +802,13 @@ config:
 | `color` | Device colour as #rrggbb | TEXT | `#fb8c00` |
 | `running` | The line under the title while the boost runs; usually an expression | TEXT | `läuft` |
 
-### Boost button: `boost-button`
-
-A boost as one small pill, for a place without room for the boost pill such as a device head: its name in the device
-colour, outlined, filled with the colour while it runs. A tap switches the item.
-
-```yaml
-component: widget:boost-button
-config:
-  item: pyaltherma_dhw_powerful
-  title: Boost
-  color: "#fb8c00"
-```
-
-| Prop | Description | Type | Default |
-|---|---|---|---|
-| `item` | The switch item | Item |  |
-| `title` | The button's text | TEXT | `Boost` |
-| `color` | Device colour as #rrggbb | TEXT | `#fb8c00` |
-
 ### Slider: `pill-slider`
 
 A setting as a wide pill slider in the device colour, for setpoints, offsets, powers and timers: a gradient fills the
 bar up to the value, the white knob stays inside the bar at both ends, and the value is sent once on release. Only the
 knob can be dragged, so scrolling across a slider on a phone leaves it alone. Above the
 bar an icon in a tinted circle (for a timer, `ring: true`, a ring around a timer icon that empties as the item runs
-down to 0), the title with a line of context and the value large on the right; `marks` puts labels below the bar.
+down to 0, full at `ringFull`, e.g. the minutes it was last set to, or at `max`), the title with a line of context and the value large on the right; `marks` puts labels below the bar.
 `value` and `context` are expressions, evaluated where the slider is placed. The slider is only built once the item
 has a numeric state, because MainUI's slider starts at its minimum and a touch ending on it sends its value.
 
@@ -669,14 +818,14 @@ config:
   item: faikout_perfera_temperature_setpoint
   color: "#29b6f6"
   min: 18
-  max: 32
+  max: 30
   step: 0.5
   unit: °C
   title: Soll
   icon: material:device_thermostat
   value: =items.faikout_perfera_temperature_setpoint.displayState
   context: ="Raum " + items.faikout_perfera_temperature.displayState
-  marks: 18=18 °C;22=22;26=26;32=32 °C
+  marks: 18=18 °C;22=22;26=26;30=30 °C
 ```
 
 ![Sliders](screenshots/pill-sliders.png)
@@ -692,6 +841,7 @@ config:
 | `title` | Title above the slider | TEXT |  |
 | `icon` | The badge's icon, e.g. material:thermostat | TEXT | `material:tune` |
 | `ring` | A ring around a timer icon instead of the icon, emptying as the item runs down to 0 | BOOLEAN |  |
+| `ringFull` | What a full timer ring stands for, e.g. an expression on the minutes the timer was last set to; empty: the maximum | TEXT |  |
 | `value` | The value to show, usually an expression on the item | TEXT |  |
 | `valueColor` | Colour of the value where it is not the device colour; empty: the text colour | TEXT |  |
 | `context` | A line under the title saying what the setting does, usually an expression | TEXT |  |
@@ -787,9 +937,10 @@ A device in a ring, its animation driven by `power`: `pv` (a tilted module under
 rays turning faster), `grid` (a pylon, red on import and green on export, dashes running along its wires), `home` (a
 house whose windows glow and pulse with the consumption), `heat-pump` (an outdoor unit whose fan turns above 100 W),
 `air-conditioner` (an indoor unit whose air streams flow), `e-car` (a car with a bolt fading in and out while it
-charges), `battery` (filled to `soc`, red, orange or green) and `appliances` (an appliance's housing with sparkles for a
-front, the big one breathing and the small ones twinkling while they run). The ring has an opaque disc in the card
-colour under its tint, so dots running under it disappear.
+charges), `battery` (filled to `soc`, red, orange or green), `appliances` (an appliance's housing with sparkles for a
+front, the big one breathing and the small ones twinkling while they run) and `ventilation` (a duct fan whose five
+blades turn above 5 W, faster with the power). The ring has an opaque disc in the card colour under its tint, so dots
+running under it disappear.
 
 ![Flow nodes](screenshots/flow-node.gif)
 

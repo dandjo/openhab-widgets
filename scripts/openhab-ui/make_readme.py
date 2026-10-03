@@ -16,34 +16,41 @@ OVERVIEW = [
      "`scripts/openhab-ui/applied/weather_forecast_rule.js`, which reads Open-Meteo's GeoSphere AROME Austria model, "
      "and `weather_warnings_rule.js`, which reads GeoSphere Austria's warnings and sends a broadcast notification "
      "when their level rises to orange or red."),
-    ("controls-card", "Controls", "Heat pump, air conditioner and ventilation, each a panel of three lines with its "
-     "main action on the right: a Boost button for the heat pump's hot water, the air conditioner's on/off pill, the "
-     "ventilation levels 1 to 3; the heat pump's second line names which of its switches are on and which off. A tap "
-     "on a panel, anywhere but on the action, opens the device's page of my installation as a popup, with all its "
-     "controls. Below them tiles that toggle plugs and show their power. The three devices are the widgets `heatpump-controls`, "
-     "`air-conditioner-controls` and `ventilation-controls`, the tiles `switch-tile`."),
     ("energy-flow-card", "Energy flow", "A regular star around the house: PV, heat pump, air conditioner, E-Car, the "
-     "household appliances together, battery and grid, each with its power and today's energy. Dots run along the "
-     "lines in the direction of the flow at four speeds and slide under the node rims; the icons move with the power "
-     "(sun rays, fan, air streams, pylon dashes, a pulsing bolt over the charging car, sparkles twinkling while the "
-     "appliances run, the battery filled to its state of charge). Rings for today's self-consumption and "
-     "self-sufficiency sit in the free corner. The card places its lines, nodes and rings as `flow-link`, `flow-node` "
-     "and `flow-share-ring`. The recording and the dark screenshot show it with demo values."),
+     "household appliances together, ventilation, battery and grid, each with its power and today's energy. Dots run "
+     "along the lines in the direction of the flow at four speeds and slide under the node rims; while power flows "
+     "through a node, dots in its colour run round its grey ring, clockwise towards the house and the other way out of "
+     "it. The icons move with the power (sun rays, fan, air streams, pylon dashes, a pulsing bolt over the charging "
+     "car, sparkles twinkling while the appliances run, the battery filled to its state of charge, the ventilation's "
+     "duct fan turning). Badges on the rings tell what the heat pump does (space heating, hot water, defrost), whether "
+     "the air conditioner is on and the ventilation's level. A running timer covers its device's ring with an arc, "
+     "full at what it was last set to, and the battery's ring is filled with its state of charge; the dots run on in "
+     "the rest of the ring. A tap on "
+     "the heat pump, the air conditioner or the ventilation opens its quick popup (see [Quick popups](#quick-popups)). "
+     "Under the star three tiles with large pale icons, the house's power and today's self-consumption and "
+     "self-sufficiency as rings, and below them switch tiles for plugs. The card places its lines, nodes and rings as "
+     "`flow-link`, `flow-node` and `flow-share-ring`, the plugs as `switch-tile`. The recording and the dark "
+     "screenshot show it with demo values."),
     ("appliances-card", "Appliances", "Washing machines, dryer and dishwasher as `appliance-tile`s, each drawn inside a "
      "ring filled with the program progress; drums and paddles turn and the spray arm sprays while they run, with a "
      "pill for the remaining time."),
     ("electricity-price-card", "Electricity price", "The all-in price, the cheapest and priciest hour, and the prices "
      "12 hours back and 36 hours ahead, coloured green, orange and red by price."),
-    ("heatpump-card", "Heat pump", "A section through the house: outdoor unit on the roof (the energy flow's "
-     "`flow-node`), wall unit, three-way valve and DHW tank in the basement, floor heating and radiators on their "
-     "levels, with the flow animated along the pipes as the valve decides. Two framed badges, each joined to its pipe "
-     "by a dotted line, hold the refrigerant's hot gas, liquid and pressure (violet while the compressor runs) and the "
-     "water's heat with its leaving and inlet temperatures (coloured by that heat); the tank's temperature stands "
-     "below it in a colour from blue to red, the sum of all electrical consumers below the wall unit, powers in kW. "
-     "Beside it the power, today's energies split "
-     "into space heating, DHW and standby, and daily COPs. On a phone the drawing takes the card's width; on a wider "
-     "screen it stands at most at its own size, as the energy flow does, so their texts keep the UI's sizes and "
-     "their circles come out the same."),
+    ("heatpump-card", "Heat pump", "A section through the house: the outdoor unit on the roof (the energy flow's "
+     "`flow-node`), wall unit, three-way valve, DHW tank and radiators in the basement, floor heating on the two "
+     "levels above. Every device sits in a grey ring like the energy flow's nodes, dots running round it while it "
+     "works; the outdoor unit's ring is filled by the compressor's frequency, the wall unit's by the electrical draw "
+     "(full and red while the backup heater runs), the tank's by its temperature, radiators and floor loops by the "
+     "leaving water while they carry it. Dots run along the pipes, as many as a pipe is long, faster with the water's flow or the compressor's "
+     "frequency, and all of them backwards during a defrost. The valve shows its position in its icon. Tiles in the "
+     "style of the switch tiles hold the figures: the outdoor unit, the control (heating, hot water, Smart Grid, "
+     "automation), the refrigerant, the heating circuit, the climate of the two floors, the tank and the indoor unit, "
+     "each tinted in its colour while what it shows is at work. A tap on a tile, the wall unit or the outdoor unit "
+     "opens its quick popup with charts or controls. Beside the drawing the electrical power, the heat and the COP as "
+     "value tiles that open popups with their charts of the day and the month, today's energies split into space "
+     "heating, DHW and standby as bars, and today's COPs as rings. On a phone the drawing takes the card's width; on "
+     "a wider screen it stands at most at its own size, as the energy flow does, so their texts keep the UI's sizes "
+     "and their circles come out the same."),
     ("consumption-card", "Consumption today", "Today's consumption as one bar split by source (PV, grid) and by "
      "consumer, with a legend in two columns; hovering a part lifts it everywhere. The screenshot shows it with demo "
      "values."),
@@ -58,15 +65,24 @@ OVERVIEW = [
 PLUG = [("plug-card", "Now: power, on/off pill, energy today and total"), ("plug-power-card", "Power over the day"),
         ("plug-energy-days-card", "Energy per day of the month"), ("plug-electric-card", "Voltage, current, power factor, "
                                                                                       "apparent and reactive power")]
-DEVICES = [("heatpump-controls", "Heat pump", "storage temperature and power in its head, and which of its three "
-            "switches are on (Warmwasser, Automatik an · Heizung aus), Boost as its main action; a tap opens the page "
-            "`heatpump`"),
-           ("air-conditioner-controls", "Air conditioner", "state, mode, setpoint, room temperature and timer in its "
-            "head, on/off as its main action; a tap opens the page `air_conditioning`"),
-           ("ventilation-controls", "Ventilation", "level, power, CO₂ and what the automation does in its head, the "
-            "levels 1 to 3 as its main action; a tap opens the page `ventilation`. It always runs, so its panel is "
-            "always tinted")]
-
+QUICK = [  # uid, title, what it holds; the first three open from the energy flow, the rest from the heat pump card
+    ("heatpump-quick", "Heat pump", "the hot-water boost, heating, hot water and automation, the DHW setpoint"),
+    ("air-conditioner-quick", "Air conditioner", "on/off, mode, setpoint, timer and boost"),
+    ("ventilation-quick", "Ventilation", "the level, the timer and the automation"),
+    ("heatpump-control-quick", "Control", "heating, hot water and automation, the hot-water boost and the Smart Grid"),
+    ("heatpump-indoor-quick", "Indoor unit", "all the heat pump's controls"),
+    ("heatpump-outdoor-quick", "Outdoor unit", "its power with the compressor frequency and the outdoor temperature "
+     "against its heat exchanger's over the day"),
+    ("heatpump-refrigerant-quick", "Refrigerant", "hot gas with its target, liquid, heat exchanger and pressure over "
+     "the day"),
+    ("heatpump-circuit-quick", "Heating circuit", "the leaving water offset, leaving and inlet water with the heat over "
+     "the day"),
+    ("upper-floor-quick", "Upper floor", "temperature and humidity over the day"),
+    ("ground-floor-quick", "Ground floor", "temperature, humidity and CO₂ over the day"),
+    ("heatpump-electric-quick", "Electricity", "the power of space heating, DHW and standby over the day, their energy "
+     "per day of the month"),
+    ("heatpump-heat-quick", "Heat", "the heat of space heating and DHW over the day, per day of the month"),
+    ("heatpump-cop-quick", "COP", "the COP against the outdoor temperature over the day, the daily COPs of the month")]
 
 def fill(text, indent=""):
     """A paragraph wrapped at 120 characters."""
@@ -132,17 +148,39 @@ def img(name, alt):
     return f"![{alt}](screenshots/{name})"
 
 
-def panels():
-    """The three device panels: what each shows, side by side, and what each needs."""
-    rows = ["### Device panels: " + ", ".join(f"`{u}`" for u, _, _ in DEVICES), "",
-            "The three devices of the controls card, each a widget of its own that takes its items as props:", ""]
-    rows += [fill(f"- `{u}`, the {t.lower()}: {w}.", "  ") for u, t, w in DEVICES]
-    rows += ["", "Each panel is tinted in its device's colour while the device runs; place them one under the other.",
-             "", "| " + " | ".join(t for _, t, _ in DEVICES) + " |", "|---|---|---|",
-             "| " + " | ".join(img(f"{u}.png", t) for u, t, _ in DEVICES) + " |", ""]
-    for u, t, _ in DEVICES:
-        rows += [f"`{u}` needs " + ", ".join(f"`{d}`" for d in sorted(needs(u))) + ".", ""]
-    for u, _, _ in DEVICES:
+def quick_popups():
+    """The quick popups: what each holds, their screenshots three abreast and their props."""
+    rows = ["""## Quick popups
+
+Compact popups the cards open: a device's main controls or the charts of one of its parts, under a small head with
+its state and above *Alle Details*, which opens the device's page of my installation. Each is a widget that takes its
+items as props; open it from a link with `action: popup`, `actionModal: widget:<uid>` and its items in
+`actionModalConfig`, as the cards do:
+
+```yaml
+action: popup
+actionModal: widget:ventilation-quick
+actionModalConfig:
+  ventilationLevel: esplyfterl_level
+  netatmoWeatherstationCo2: netatmo_weatherstation_co2
+  ventilationTimer: ventilation_timer
+  ventilationManagement: ventilation_management
+```
+
+It opens 420 px wide and up to 640 px high, on a phone full screen; its charts start below their period buttons, a
+closed period menu takes no room. The energy flow's heat pump, air conditioner and ventilation open the first three,
+the heat pump card's tiles, wall unit and outdoor unit the others:
+"""]
+    rows += [fill(f"- `{u}`, {t.lower() if t != 'COP' else t}: {w}.", "  ") for u, t, w in QUICK]
+    rows += ["", "| | | |", "|---|---|---|"]
+    for i in range(0, len(QUICK), 3):
+        group = QUICK[i:i + 3] + [None] * (3 - len(QUICK[i:i + 3]))
+        rows.append("| " + " | ".join(img(f"{q[0]}.png", q[1]) if q else "" for q in group) + " |")
+    rows.append("")
+    for u, _, _ in QUICK:
+        deps = needs(u)
+        if deps:
+            rows += [f"`{u}` needs " + ", ".join(f"`{d}`" for d in sorted(deps)) + ".", ""]
         rows += [details(u).replace("<summary>", f"<summary><code>{u}</code>: "), ""]
     return "\n".join(rows)
 
@@ -150,7 +188,7 @@ def panels():
 md = ["""# openHAB Widgets
 
 MainUI widgets from my openHAB 5 installation: the cards of an energy and home dashboard and the parts they are built
-from, which work on their own too: device panels with their heads, pills, bars and sliders, the nodes and lines of the
+from, which work on their own too: the quick popups they open, pills, bars and sliders, the nodes and lines of the
 energy flow, appliance icons and tiles, a weather drawing; besides them a set of cards for every metered plug, a popup
 for any item and the tile their values stand in. The UI texts are German, numbers use a decimal comma. No widget names
 an item: every item comes in as a prop, so the widgets work with any item names.
@@ -194,7 +232,8 @@ md.append("""## Dashboard cards
 The cards of my overview page. Each takes the items it shows as props; the prop names say what an item is. Most
 elements open a page of my installation as a popup when tapped: the page of their device (`page:heatpump`,
 `page:weather` …), or for the energy flow's house and appliances a popup of its own (`page:flow_home`,
-`page:flow_appliances`). The pages are not part of this repository.
+`page:flow_appliances`). The pages are not part of this repository; the quick popups the energy flow's heat pump, air
+conditioner and ventilation and the heat pump card's tiles open are (see [Quick popups](#quick-popups)).
 """)
 for uid, title, what in OVERVIEW:
     shots = []
@@ -205,31 +244,12 @@ for uid, title, what in OVERVIEW:
     need = ("\n\n" + fill("Needs " + ", ".join(f"`{d}`" for d in sorted(deps)) + ".")) if deps else ""
     md.append(f"### {title}: `{uid}`\n\n{fill(what)}{need}\n\n" + "\n\n".join(shots) + f"\n\n{details(uid)}\n")
 
-md.append("""## Device controls
+md.append(quick_popups() + "\n")
+md.append("""## Controls
 
-The parts of the controls card and of my device pages' controls. A device panel is a `device-head`: a tap on it opens
-the device's page as a popup, where the pills, bars and sliders below make up the controls.
+The parts of the quick popups and of my device pages' controls.
 
-""" + panels() + "\n")
-md.append(section("Device head", "device-head", """A device in a panel of three lines, tinted in the device's colour
-while `active` holds: its icon in a circle; beside it the name and the main action, and under them two lines of state
-that run the whole width, under the action too, so they stay readable on a phone. A tap anywhere but on the action
-opens the page `popup` as a popup, e.g. the device's page; without `popup` the panel takes no tap. The main action is a
-switch pill (`action: switch`, `pill-switch`), a boost button (`button`, `boost-button`) or a segmented bar (`bar`,
-`state-bar` with `actionOptions`) on `actionItem`:""", """
-component: widget:device-head
-config:
-  icon: material:ac_unit
-  title: Klimaanlage
-  line1: "=(items.faikout_perfera_switch.state === 'ON' ? 'An · ' : 'Aus · ') + items.faikout_perfera_mode.displayState"
-  line2: ="Raum " + items.faikout_perfera_temperature.displayState
-  color: "#29b6f6"
-  active: =items.faikout_perfera_switch.state === 'ON'
-  popup: air_conditioning
-  action: switch
-  actionItem: faikout_perfera_switch
-  actionTitle: An/Aus
-""", img("device-heads.png", "Device heads")))
+""")
 md.append(section("Segmented bar", "state-bar", """The states of one item as the segments of a bar, the current one
 filled in the colour; a tap sends a segment's state. `options` holds `value=label` pairs separated by semicolons.
 With `byText` the segments are as wide as their labels, so a long one such as *Entfeuchten* fits on a phone;
@@ -273,22 +293,13 @@ config:
   color: "#fb8c00"
   running: ="läuft · Speicher " + items.espaltherma_dhw_tank_temp.displayState
 """, img("boost-pills.png", "Boost pills")))
-md.append(section("Boost button", "boost-button", """A boost as one small pill, for a place without room for the boost
-pill such as a device head: its name in the device colour, outlined, filled with the colour while it runs. A tap
-switches the item.""", """
-component: widget:boost-button
-config:
-  item: pyaltherma_dhw_powerful
-  title: Boost
-  color: "#fb8c00"
-"""))
 md.append("""### Slider: `pill-slider`
 
 A setting as a wide pill slider in the device colour, for setpoints, offsets, powers and timers: a gradient fills the
 bar up to the value, the white knob stays inside the bar at both ends, and the value is sent once on release. Only the
 knob can be dragged, so scrolling across a slider on a phone leaves it alone. Above the
 bar an icon in a tinted circle (for a timer, `ring: true`, a ring around a timer icon that empties as the item runs
-down to 0), the title with a line of context and the value large on the right; `marks` puts labels below the bar.
+down to 0, full at `ringFull`, e.g. the minutes it was last set to, or at `max`), the title with a line of context and the value large on the right; `marks` puts labels below the bar.
 `value` and `context` are expressions, evaluated where the slider is placed. The slider is only built once the item
 has a numeric state, because MainUI's slider starts at its minimum and a touch ending on it sends its value.
 
@@ -298,14 +309,14 @@ config:
   item: faikout_perfera_temperature_setpoint
   color: "#29b6f6"
   min: 18
-  max: 32
+  max: 30
   step: 0.5
   unit: °C
   title: Soll
   icon: material:device_thermostat
   value: =items.faikout_perfera_temperature_setpoint.displayState
   context: ="Raum " + items.faikout_perfera_temperature.displayState
-  marks: 18=18 °C;22=22;26=26;32=32 °C
+  marks: 18=18 °C;22=22;26=26;30=30 °C
 ```
 
 ![Sliders](screenshots/pill-sliders.png)
@@ -385,9 +396,9 @@ md.append(section("Node", "flow-node", """A device in a ring, its animation driv
 under a sun, both brighter with the power, rays turning faster), `grid` (a pylon, red on import and green on export,
 dashes running along its wires), `home` (a house whose windows glow and pulse with the consumption), `heat-pump` (an
 outdoor unit whose fan turns above 100 W), `air-conditioner` (an indoor unit whose air streams flow), `e-car` (a car
-with a bolt fading in and out while it charges), `battery` (filled to `soc`, red, orange or green) and `appliances`
+with a bolt fading in and out while it charges), `battery` (filled to `soc`, red, orange or green), `appliances`
 (an appliance's housing with sparkles for a front, the big one breathing and the small ones twinkling while
-they run). The ring has an opaque disc in the card colour under its tint, so dots running under it disappear.""", shot=img("flow-node.gif", "Flow nodes")))
+they run) and `ventilation` (a duct fan whose five blades turn above 5 W, faster with the power). The ring has an opaque disc in the card colour under its tint, so dots running under it disappear.""", shot=img("flow-node.gif", "Flow nodes")))
 md.append(section("Line", "flow-link", """A line from (`x1`, `y1`) to (`x2`, `y2`) in `color`. While
 |`power`| exceeds `threshold` three dots run along it, towards (`x2`, `y2`) while `forward` holds and back otherwise, at
 four speeds by the power; below the threshold the line fades. The dots run a dot radius past both ends, so they slide

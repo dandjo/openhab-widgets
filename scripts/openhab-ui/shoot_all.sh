@@ -1,6 +1,6 @@
 #!/bin/bash
 # every screenshot of the widget repository, into shots/v4/repo under the repository's names; needs the page
-# widget_gallery (widget_gallery.py apply) and the SSH tunnel on 18080. The energy flow, the consumption card and the
+# widget_gallery (widget_gallery.py writes it, to be POSTed to ui:page) and the SSH tunnel on 18080. The energy flow, the consumption card and the
 # weather page's warnings are shot with demo values (demo_flow.js, demo_consumption.js, demo_weather.js), set in the
 # browser only
 set -u
@@ -13,7 +13,6 @@ python3 cdp_shot.py $B/overview $R/overview-dark.png 16 1400 1621 dark >/dev/nul
 python3 cdp_shot.py $B/overview $R/overview-phone.png 16 390 1400 >/dev/null
 step cards; python3 cdp_cards.py $B/overview $O/ov 1400 >/dev/null
 python3 cdp_cards.py $B/overview $O/ovd 1400 dark >/dev/null
-cp $(shot ov steuerung) $R/controls-card.png; cp $(shot ovd steuerung) $R/controls-card-dark.png
 cp $(shot ov haushaltsgeraete) $R/appliances-card.png; cp $(shot ov strompreis) $R/electricity-price-card.png
 cp $(shot ov waermepumpe) $R/heatpump-card.png; cp $(shot ovd waermepumpe) $R/heatpump-card-dark.png
 cp $(shot ov verbrauch-heute*) $R/consumption-card.png; cp $(shot ov energie-pro-tag) $R/energy-days-card.png
@@ -21,11 +20,23 @@ cp $(shot ov pv-ertrag*) $R/pv-days-card.png; cp $(shot ov temperaturen) $R/temp
 cp $O/ov-0-card.png $R/weather-card.png; cp $O/ovd-0-card.png $R/weather-card-dark.png
 python3 cdp_cards_js.py $B/overview $O/ovcons 1400 light "$(cat demo_consumption.js)" >/dev/null
 cp $(shot ovcons verbrauch-heute*) $R/consumption-card.png
-step flow; PRE_JS=demo_flow.js FPS=20 python3 cdp_gif.py $B/overview 2 1400 $R/energy-flow-card.gif 6 light 1.5
+step flow; PRE_JS=demo_flow.js FPS=20 python3 cdp_gif.py $B/overview 1 1400 $R/energy-flow-card.gif 6 light 1.5
 python3 cdp_cards_js.py $B/overview $O/ovdemo-dark 1400 dark "$(cat demo_flow.js)" >/dev/null
 cp $(shot ovdemo-dark energiefluss) $R/energy-flow-card-dark.png
-step panels; python3 cdp_elems.py $B/overview 1400 $O/panels "$(cat screenshot-js/panels.js)" >/dev/null
-for p in device-heads heatpump-controls air-conditioner-controls ventilation-controls; do cp $O/panels/$p.png $R/; done
+# the quick popups as the energy flow's nodes and the heat pump card's tiles open them, each as tall as its content
+step popups
+for spec in "Energiefluss|Wärmepumpe|true|heatpump-quick" "Energiefluss|Klimaanlage|true|air-conditioner-quick" \
+            "Energiefluss|Lüftung|true|ventilation-quick" "Wärmepumpe|Regelung|false|heatpump-control-quick" \
+            "Wärmepumpe|Innengerät|false|heatpump-indoor-quick" "Wärmepumpe|Außengerät|false|heatpump-outdoor-quick" \
+            "Wärmepumpe|Kältemittel|false|heatpump-refrigerant-quick" "Wärmepumpe|Heizkreis|false|heatpump-circuit-quick" \
+            "Wärmepumpe|Obergeschoss|false|upper-floor-quick" "Wärmepumpe|Erdgeschoss|false|ground-floor-quick" \
+            "Wärmepumpe|Elektrisch|false|heatpump-electric-quick" "Wärmepumpe|Wärme|false|heatpump-heat-quick" \
+            "Wärmepumpe|COP|false|heatpump-cop-quick"; do
+  IFS='|' read -r card title round name <<< "$spec"
+  python3 cdp_elems.py $B/overview 1400 $O/quick "$(cat screenshot-js/quick_rect.js)('$name')" \
+    "$(cat screenshot-js/quick.js)('$card', '$title', $round)" >/dev/null
+  cp $O/quick/$name.png $R/
+done
 step crops; python3 cdp_elems.py $B/heatpump 1400 $O/crops "$(cat screenshot-js/crops_hp.js)" >/dev/null
 python3 cdp_elems.py $B/air_conditioning 1400 $O/crops "$(cat screenshot-js/crops_ac.js)" >/dev/null
 python3 cdp_elems.py $B/heatpump 1400 $O/crops "$(cat screenshot-js/sliders.js)" >/dev/null

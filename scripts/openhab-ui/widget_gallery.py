@@ -1,15 +1,17 @@
 #!/usr/bin/env python3
 """A temporary page `widget_gallery` for the screenshots of the widget repository: the energy flow's and the
 appliances' widgets with fixed demo values, every one of them running, and the controls' small widgets with their
-real items. Built from the generator's own parts; the generator removes the page on its next run (OBSOLETE_PAGES).
-Usage: widget_gallery.py check|apply   (as root, with openHAB stopped for apply)"""
+real items. Built from the generator's own parts. POST it to /rest/ui/components/ui:page while the screenshots are
+taken and DELETE it afterwards; the generator's next run removes it too (OBSOLETE_PAGES).
+Usage: widget_gallery.py OUTDIR   writes OUTDIR/page.json, the REST body"""
 import datetime
+import json
 import os
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 GEN = os.path.join(HERE, "dashboard.py")
-MODE = sys.argv[1]
+OUT = sys.argv[1]
 sys.argv = [GEN, "check"]  # the generator's module code reads its mode; its main() is not run
 ns = {"__file__": GEN, "__name__": "dashboard"}
 exec(compile(open(GEN).read().replace("\nmain()\n", "\n"), GEN, "exec"), ns)
@@ -29,7 +31,8 @@ def caption(x, y, text):
 
 
 NODES = [("pv", 5200, None), ("grid", -800, None), ("home", 2400, None), ("heat-pump", 1500, None),
-         ("air-conditioner", 600, None), ("e-car", 2000, None), ("battery", None, 72), ("appliances", 1950, None)]
+         ("air-conditioner", 600, None), ("e-car", 2000, None), ("battery", None, 72), ("appliances", 1950, None),
+         ("ventilation", 40, None)]
 
 
 def nodes_card():
@@ -78,9 +81,7 @@ def column(children):
 
 
 def pills_card():
-    return g.card("power-pill · boost-pill · boost-button", [column([
-        g.ac_power(), g.dhw_boost(), g.ac_boost(),
-        g.div([g.boost_button("Boost", "pyaltherma_dhw_powerful", g.HP_ORANGE)], **{"width": "104px"})])])
+    return g.card("power-pill · boost-pill", [column([g.ac_power(), g.dhw_boost(), g.ac_boost()])])
 
 
 def bars_card():
@@ -92,8 +93,7 @@ def bars_card():
 
 
 def tiles_card():
-    tiles = g.control_tiles()[0]["slots"]["default"][3]
-    return g.card("switch-tile", [g.div([tiles], **{"padding": "4px 16px 14px"})])
+    return g.card("switch-tile", [g.div([g.switch_tiles()], **{"padding": "4px 16px 14px"})])
 
 
 def gallery_page(now):
@@ -102,13 +102,6 @@ def gallery_page(now):
     return g.layout_page(UID, {"label": "Widget-Galerie", "sidebar": False}, blocks, now)
 
 
-name = "uicomponents_ui_page.json"
-data, enc = g.m.detect(g.m.DB + name)
-data.pop(UID, None)
-data = g.m.insert(data, UID, gallery_page(datetime.datetime.now()))
-text = g.m.encode(data, *enc)
-print(f"{name}: encoder html={enc[0]} newline={enc[1]} ok; page {UID}")
-if MODE == "apply":
-    with open(g.m.DB + name, "w", encoding="utf-8") as f:
-        f.write(text)
-    print("written")
+os.makedirs(OUT, exist_ok=True)
+json.dump(gallery_page(datetime.datetime.now())["value"], open(os.path.join(OUT, "page.json"), "w"), ensure_ascii=False)
+print("written", os.path.join(OUT, "page.json"))

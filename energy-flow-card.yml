@@ -69,9 +69,39 @@ props:
     type: TEXT
     required: true
     context: item
+  - name: ventilationPower
+    label: Lüftung Leistung
+    description: Number:Power item
+    type: TEXT
+    required: true
+    context: item
   - name: homePower
     label: Haus Leistung
     description: Number:Power item
+    type: TEXT
+    required: true
+    context: item
+  - name: acTimer
+    label: Klimaanlage Timer
+    description: Number:Time item
+    type: TEXT
+    required: true
+    context: item
+  - name: acTimerSet
+    label: Klimaanlage Timer eingestellt
+    description: Number:Time item
+    type: TEXT
+    required: true
+    context: item
+  - name: ventilationTimer
+    label: Lüftung Timer
+    description: Number:Time item
+    type: TEXT
+    required: true
+    context: item
+  - name: ventilationTimerSet
+    label: Lüftung Timer eingestellt
+    description: Number:Time item
     type: TEXT
     required: true
     context: item
@@ -81,20 +111,26 @@ props:
     type: TEXT
     required: true
     context: item
+  - name: heatpumpDefrostOperaton
+    label: ESPAltherma Abtauen
+    description: Switch item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpValve
+    label: ESPAltherma 3-Wege-Ventil
+    description: String item
+    type: TEXT
+    required: true
+    context: item
+  - name: ventilationLevel
+    label: ESPLyfterl Stufe
+    description: String item
+    type: TEXT
+    required: true
+    context: item
   - name: pvEnergyToday
     label: Wechselrichter Ertrag heute
-    description: Number:Energy item
-    type: TEXT
-    required: true
-    context: item
-  - name: pvSelfUseToday
-    label: Photovoltaik Eigenverbrauch heute
-    description: Number:Energy item
-    type: TEXT
-    required: true
-    context: item
-  - name: homeEnergyToday
-    label: Haus Energie heute
     description: Number:Energy item
     type: TEXT
     required: true
@@ -153,20 +189,200 @@ props:
     type: TEXT
     required: true
     context: item
-  - name: batteryChargeToday
-    label: Batteriespeicher Ladung heute
-    description: Number:Energy item
-    type: TEXT
-    required: true
-    context: item
   - name: batteryDischargeToday
     label: Batteriespeicher Entladung heute
     description: Number:Energy item
     type: TEXT
     required: true
     context: item
+  - name: batteryChargeToday
+    label: Batteriespeicher Ladung heute
+    description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpDhwTankTemp
+    label: ESPAltherma Warmwasserspeicher Temperatur
+    description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpDhwBoost
+    label: Pyaltherma Warmwasser-Boost
+    description: Switch item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpClimateControlPower
+    label: Pyaltherma Heizung Ein/Aus
+    description: Switch item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpDhwPower
+    label: Pyaltherma Warmwasser Ein/Aus
+    description: Switch item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpManagement
+    label: Wärmepumpe Automatik
+    description: Group item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpDhwTempHeating
+    label: Pyaltherma Warmwasser Solltemperatur
+    description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpDhwManagement
+    label: Wärmepumpe Warmwasser-Automatik
+    description: Switch item
+    type: TEXT
+    required: true
+    context: item
+  - name: acMode
+    label: Faikout Perfera Modus
+    description: String item
+    type: TEXT
+    required: true
+    context: item
+  - name: acTemperature
+    label: Faikout Perfera Temperatur
+    description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
+  - name: acTemperatureSetpoint
+    label: Faikout Perfera Solltemperatur
+    description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
+  - name: acPowerful
+    label: Faikout Perfera Powerful
+    description: Switch item
+    type: TEXT
+    required: true
+    context: item
+  - name: netatmoWeatherstationCo2
+    label: Netatmo Wetterstation CO2
+    description: Number:Dimensionless item
+    type: TEXT
+    required: true
+    context: item
+  - name: ventilationManagement
+    label: Lüftung Automatik
+    description: Group item
+    type: TEXT
+    required: true
+    context: item
+  - name: homeEnergyToday
+    label: Haus Energie heute
+    description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  - name: pvSelfUseToday
+    label: Photovoltaik Eigenverbrauch heute
+    description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  - name: coffeeMachineSwitch
+    label: Kaffeemaschine Schalter
+    description: Switch item
+    type: TEXT
+    required: true
+    context: item
+  - name: coffeeMachinePower
+    label: Kaffeemaschine Leistung
+    description: Number:Power item
+    type: TEXT
+    required: true
+    context: item
+  - name: coffeeMachineEnergyToday
+    label: Kaffeemaschine Energie heute
+    description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  - name: bicycleBatteriesSwitch
+    label: Fahrradakkus Schalter
+    description: Switch item
+    type: TEXT
+    required: true
+    context: item
+  - name: bicycleBatteriesPower
+    label: Fahrradakkus Leistung
+    description: Number:Power item
+    type: TEXT
+    required: true
+    context: item
+  - name: bicycleBatteriesEnergyToday
+    label: Fahrradakkus Energie heute
+    description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  - name: office1Switch
+    label: Büro 1 Schalter
+    description: Switch item
+    type: TEXT
+    required: true
+    context: item
+  - name: office1Power
+    label: Büro 1 Leistung
+    description: Number:Power item
+    type: TEXT
+    required: true
+    context: item
+  - name: office1EnergyToday
+    label: Büro 1 Energie heute
+    description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  - name: office2Switch
+    label: Büro 2 Schalter
+    description: Switch item
+    type: TEXT
+    required: true
+    context: item
+  - name: office2Power
+    label: Büro 2 Leistung
+    description: Number:Power item
+    type: TEXT
+    required: true
+    context: item
+  - name: office2EnergyToday
+    label: Büro 2 Energie heute
+    description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  - name: terraceLightSwitch
+    label: Terrassenlicht Schalter
+    description: Switch item
+    type: TEXT
+    required: true
+    context: item
+  - name: terraceLightPower
+    label: Terrassenlicht Leistung
+    description: Number:Power item
+    type: TEXT
+    required: true
+    context: item
+  - name: terraceLightEnergyToday
+    label: Terrassenlicht Energie heute
+    description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
   parameterGroups: []
-timestamp: Oct 2, 2026, 2:13:02 PM
+timestamp: Oct 3, 2026, 2:28:59 AM
 component: oh-card
 config:
   title: Energiefluss
@@ -188,20 +404,21 @@ slots:
         display: flex
         flex-direction: column
         justify-content: center
+      stylesheet: '@keyframes flowOrbit { to { transform: rotate(360deg); } }'
     slots:
       default:
       - component: div
         config:
           style:
             position: relative
-            max-width: 470px
+            max-width: 510px
             width: 100%
             margin: 0 auto
         slots:
           default:
           - component: svg
             config:
-              viewBox: 0 0 470 460
+              viewBox: 0 0 510 516
               width: 100%
               style:
                 display: block
@@ -210,40 +427,40 @@ slots:
               default:
               - component: widget:flow-link
                 config:
-                  x1: 265.8
-                  y1: 63.7
-                  x2: 249.7
-                  y2: 178.6
+                  x1: 165.6
+                  y1: 103.5
+                  x2: 247.4
+                  y2: 212.0
                   color: '#ffb300'
                   power: =(Number(items[props.pvPower].numericState) || 0)
                   forward: =true
                   threshold: 10
               - component: widget:flow-link
                 config:
-                  x1: 100.9
-                  y1: 188.0
-                  x2: 215.8
-                  y2: 204.1
+                  x1: 101.1
+                  y1: 212.9
+                  x2: 235.8
+                  y2: 231.8
                   color: '=(Number(items[props.gridPower].numericState) || 0) < 0 ? ''#43a047'' : ''#e53935'''
                   power: =(Number(items[props.gridPower].numericState) || 0)
                   forward: =(Number(items[props.gridPower].numericState) || 0) > 0
                   threshold: 10
               - component: widget:flow-link
                 config:
-                  x1: 362.1
-                  y1: 120.4
-                  x2: 269.5
-                  y2: 190.3
+                  x1: 398.0
+                  y1: 136.1
+                  x2: 289.5
+                  y2: 217.9
                   color: '#fb8c00'
                   power: =(Number(items[props.heatpumpPower].numericState) || 0)
                   forward: =false
                   threshold: 50
               - component: widget:flow-link
                 config:
-                  x1: 390.1
-                  y1: 228.6
-                  x2: 275.2
-                  y2: 212.5
+                  x1: 429.9
+                  y1: 259.1
+                  x2: 295.2
+                  y2: 240.2
                   color: '#29b6f6'
                   power: '=(items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState) || 0)
                     : 0)'
@@ -251,20 +468,20 @@ slots:
                   threshold: 5
               - component: widget:flow-link
                 config:
-                  x1: 333.4
-                  y1: 324.9
-                  x2: 263.5
-                  y2: 232.3
+                  x1: 365.4
+                  y1: 368.5
+                  x2: 283.6
+                  y2: 260.0
                   color: '#26a69a'
                   power: =(Number(items[props.ecarPower].numericState) || 0)
                   forward: =false
                   threshold: 100
               - component: widget:flow-link
                 config:
-                  x1: 225.2
-                  y1: 352.9
-                  x2: 241.3
-                  y2: 238.0
+                  x1: 242.4
+                  y1: 400.4
+                  x2: 261.3
+                  y2: 265.7
                   color: '#5c6bc0'
                   power: =((Number(items[props.washingMachine1Power].numericState) || 0) + (Number(items[props.washingMachine2Power].numericState)
                     || 0) + (Number(items[props.tumbleDryerPower].numericState) || 0) + (Number(items[props.dishwasherPower].numericState)
@@ -273,70 +490,525 @@ slots:
                   threshold: 10
               - component: widget:flow-link
                 config:
-                  x1: 128.9
-                  y1: 296.2
-                  x2: 221.5
-                  y2: 226.3
+                  x1: 133.0
+                  y1: 335.9
+                  x2: 241.5
+                  y2: 254.1
                   color: '#7cb342'
                   power: =(Number(items[props.batteryPower].numericState) || 0)
                   forward: =(Number(items[props.batteryPower].numericState) || 0) > 0
                   threshold: 10
+              - component: widget:flow-link
+                config:
+                  x1: 288.6
+                  y1: 71.6
+                  x2: 269.7
+                  y2: 206.3
+                  color: '#26a69a'
+                  power: =(Number(items[props.ventilationPower].numericState) || 0)
+                  forward: =false
+                  threshold: 5
+              - component: circle
+                config:
+                  cx: 292.8
+                  cy: 41.9
+                  r: 38
+                  fill: none
+                  stroke: rgba(127, 127, 127, 0.28)
+                  stroke-width: 3
+              - component: circle
+                config:
+                  cx: 422.0
+                  cy: 118.0
+                  r: 38
+                  fill: none
+                  stroke: rgba(127, 127, 127, 0.28)
+                  stroke-width: 3
+              - component: circle
+                config:
+                  cx: 459.6
+                  cy: 263.3
+                  r: 38
+                  fill: none
+                  stroke: rgba(127, 127, 127, 0.28)
+                  stroke-width: 3
+              - component: circle
+                config:
+                  cx: 383.5
+                  cy: 392.5
+                  r: 38
+                  fill: none
+                  stroke: rgba(127, 127, 127, 0.28)
+                  stroke-width: 3
+              - component: circle
+                config:
+                  cx: 238.2
+                  cy: 430.1
+                  r: 38
+                  fill: none
+                  stroke: rgba(127, 127, 127, 0.28)
+                  stroke-width: 3
+              - component: circle
+                config:
+                  cx: 109.0
+                  cy: 354.0
+                  r: 38
+                  fill: none
+                  stroke: rgba(127, 127, 127, 0.28)
+                  stroke-width: 3
+              - component: circle
+                config:
+                  cx: 71.4
+                  cy: 208.7
+                  r: 38
+                  fill: none
+                  stroke: rgba(127, 127, 127, 0.28)
+                  stroke-width: 3
+              - component: circle
+                config:
+                  cx: 147.5
+                  cy: 79.5
+                  r: 38
+                  fill: none
+                  stroke: rgba(127, 127, 127, 0.28)
+                  stroke-width: 3
+              - component: circle
+                config:
+                  cx: 265.5
+                  cy: 236
+                  r: 38
+                  fill: none
+                  stroke: rgba(127, 127, 127, 0.28)
+                  stroke-width: 3
+              - component: circle
+                config:
+                  cx: 147.5
+                  cy: 79.5
+                  r: 38
+                  fill: none
+                  stroke: '#ffb300'
+                  stroke-width: 3
+                  stroke-linecap: round
+                  stroke-dasharray: 0 9.95
+                  style:
+                    transform-box: fill-box
+                    transform-origin: center
+                    animation: '=''flowOrbit '' + (Math.abs((Number(items[props.pvPower].numericState) || 0)) < 300 ? 9 :
+                      Math.abs((Number(items[props.pvPower].numericState) || 0)) < 1000 ? 7 : Math.abs((Number(items[props.pvPower].numericState)
+                      || 0)) < 2500 ? 5.5 : 4) + ''s linear infinite'' + ((true) ? '''' : '' reverse'')'
+                  visible: =Math.abs((Number(items[props.pvPower].numericState) || 0)) > 10
+              - component: circle
+                config:
+                  cx: 71.4
+                  cy: 208.7
+                  r: 38
+                  fill: none
+                  stroke: '=(Number(items[props.gridPower].numericState) || 0) < 0 ? ''#43a047'' : ''#e53935'''
+                  stroke-width: 3
+                  stroke-linecap: round
+                  stroke-dasharray: 0 9.95
+                  style:
+                    transform-box: fill-box
+                    transform-origin: center
+                    animation: '=''flowOrbit '' + (Math.abs((Number(items[props.gridPower].numericState) || 0)) < 300 ? 9
+                      : Math.abs((Number(items[props.gridPower].numericState) || 0)) < 1000 ? 7 : Math.abs((Number(items[props.gridPower].numericState)
+                      || 0)) < 2500 ? 5.5 : 4) + ''s linear infinite'' + (((Number(items[props.gridPower].numericState) ||
+                      0) > 0) ? '''' : '' reverse'')'
+                  visible: =Math.abs((Number(items[props.gridPower].numericState) || 0)) > 10
+              - component: circle
+                config:
+                  cx: 109.0
+                  cy: 354.0
+                  r: 38
+                  fill: none
+                  stroke: '#7cb342'
+                  stroke-width: 3
+                  stroke-linecap: round
+                  stroke-dasharray: 0 9.95
+                  style:
+                    transform-box: fill-box
+                    transform-origin: center
+                    animation: '=''flowOrbit '' + (Math.abs((Number(items[props.batteryPower].numericState) || 0)) < 300 ?
+                      9 : Math.abs((Number(items[props.batteryPower].numericState) || 0)) < 1000 ? 7 : Math.abs((Number(items[props.batteryPower].numericState)
+                      || 0)) < 2500 ? 5.5 : 4) + ''s linear infinite'' + (((Number(items[props.batteryPower].numericState)
+                      || 0) > 0) ? '''' : '' reverse'')'
+                  visible: =Math.abs((Number(items[props.batteryPower].numericState) || 0)) > 10
+              - component: circle
+                config:
+                  cx: 422.0
+                  cy: 118.0
+                  r: 38
+                  fill: none
+                  stroke: '#fb8c00'
+                  stroke-width: 3
+                  stroke-linecap: round
+                  stroke-dasharray: 0 9.95
+                  style:
+                    transform-box: fill-box
+                    transform-origin: center
+                    animation: '=''flowOrbit '' + (Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) < 300
+                      ? 9 : Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) < 1000 ? 7 : Math.abs((Number(items[props.heatpumpPower].numericState)
+                      || 0)) < 2500 ? 5.5 : 4) + ''s linear infinite'' + ((false) ? '''' : '' reverse'')'
+                  visible: =Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) > 50
+              - component: circle
+                config:
+                  cx: 383.5
+                  cy: 392.5
+                  r: 38
+                  fill: none
+                  stroke: '#26a69a'
+                  stroke-width: 3
+                  stroke-linecap: round
+                  stroke-dasharray: 0 9.95
+                  style:
+                    transform-box: fill-box
+                    transform-origin: center
+                    animation: '=''flowOrbit '' + (Math.abs((Number(items[props.ecarPower].numericState) || 0)) < 300 ? 9
+                      : Math.abs((Number(items[props.ecarPower].numericState) || 0)) < 1000 ? 7 : Math.abs((Number(items[props.ecarPower].numericState)
+                      || 0)) < 2500 ? 5.5 : 4) + ''s linear infinite'' + ((false) ? '''' : '' reverse'')'
+                  visible: =Math.abs((Number(items[props.ecarPower].numericState) || 0)) > 100
+              - component: circle
+                config:
+                  cx: 238.2
+                  cy: 430.1
+                  r: 38
+                  fill: none
+                  stroke: '#5c6bc0'
+                  stroke-width: 3
+                  stroke-linecap: round
+                  stroke-dasharray: 0 9.95
+                  style:
+                    transform-box: fill-box
+                    transform-origin: center
+                    animation: '=''flowOrbit '' + (Math.abs(((Number(items[props.washingMachine1Power].numericState) || 0)
+                      + (Number(items[props.washingMachine2Power].numericState) || 0) + (Number(items[props.tumbleDryerPower].numericState)
+                      || 0) + (Number(items[props.dishwasherPower].numericState) || 0))) < 300 ? 9 : Math.abs(((Number(items[props.washingMachine1Power].numericState)
+                      || 0) + (Number(items[props.washingMachine2Power].numericState) || 0) + (Number(items[props.tumbleDryerPower].numericState)
+                      || 0) + (Number(items[props.dishwasherPower].numericState) || 0))) < 1000 ? 7 : Math.abs(((Number(items[props.washingMachine1Power].numericState)
+                      || 0) + (Number(items[props.washingMachine2Power].numericState) || 0) + (Number(items[props.tumbleDryerPower].numericState)
+                      || 0) + (Number(items[props.dishwasherPower].numericState) || 0))) < 2500 ? 5.5 : 4) + ''s linear infinite''
+                      + ((false) ? '''' : '' reverse'')'
+                  visible: =Math.abs(((Number(items[props.washingMachine1Power].numericState) || 0) + (Number(items[props.washingMachine2Power].numericState)
+                    || 0) + (Number(items[props.tumbleDryerPower].numericState) || 0) + (Number(items[props.dishwasherPower].numericState)
+                    || 0))) > 10
+              - component: circle
+                config:
+                  cx: 265.5
+                  cy: 236
+                  r: 38
+                  fill: none
+                  stroke: '#1e88e5'
+                  stroke-width: 3
+                  stroke-linecap: round
+                  stroke-dasharray: 0 9.95
+                  style:
+                    transform-box: fill-box
+                    transform-origin: center
+                    animation: '=''flowOrbit '' + (Math.abs((Number(items[props.homePower].numericState) || 0)) < 300 ? 9
+                      : Math.abs((Number(items[props.homePower].numericState) || 0)) < 1000 ? 7 : Math.abs((Number(items[props.homePower].numericState)
+                      || 0)) < 2500 ? 5.5 : 4) + ''s linear infinite'' + ((true) ? '''' : '' reverse'')'
+                  visible: =Math.abs((Number(items[props.homePower].numericState) || 0)) > 10
+              - component: circle
+                config:
+                  cx: 459.6
+                  cy: 263.3
+                  r: 38
+                  fill: none
+                  stroke: '#29b6f6'
+                  stroke-width: 3
+                  stroke-linecap: round
+                  stroke-dasharray: 0 9.95
+                  style:
+                    transform-box: fill-box
+                    transform-origin: center
+                    animation: '=''flowOrbit '' + (Math.abs((items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
+                      || 0) : 0)) < 300 ? 9 : Math.abs((items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
+                      || 0) : 0)) < 1000 ? 7 : Math.abs((items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
+                      || 0) : 0)) < 2500 ? 5.5 : 4) + ''s linear infinite'' + ((false) ? '''' : '' reverse'')'
+                  visible: '=Math.abs((items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
+                    || 0) : 0)) > 5'
+              - component: circle
+                config:
+                  cx: 292.8
+                  cy: 41.9
+                  r: 38
+                  fill: none
+                  stroke: '#26a69a'
+                  stroke-width: 3
+                  stroke-linecap: round
+                  stroke-dasharray: 0 9.95
+                  style:
+                    transform-box: fill-box
+                    transform-origin: center
+                    animation: '=''flowOrbit '' + (Math.abs((Number(items[props.ventilationPower].numericState) || 0)) < 300
+                      ? 9 : Math.abs((Number(items[props.ventilationPower].numericState) || 0)) < 1000 ? 7 : Math.abs((Number(items[props.ventilationPower].numericState)
+                      || 0)) < 2500 ? 5.5 : 4) + ''s linear infinite'' + ((false) ? '''' : '' reverse'')'
+                  visible: =Math.abs((Number(items[props.ventilationPower].numericState) || 0)) > 5
+              - component: g
+                config:
+                  visible: =(Number(items[props.acTimer].numericState) || 0) / Math.max((Number(items[props.acTimer].numericState)
+                    || 0), (Number(items[props.acTimerSet].numericState) || 0) || 720) > 0
+                slots:
+                  default:
+                  - component: circle
+                    config:
+                      style:
+                        stroke: 'var(--f7-card-bg-color, #fff)'
+                      cx: 459.6
+                      cy: 263.3
+                      r: 38
+                      fill: none
+                      transform: rotate(-90 459.6 263.3)
+                      stroke-linecap: round
+                      stroke-dasharray: =(Math.min(1, (Number(items[props.acTimer].numericState) || 0) / Math.max((Number(items[props.acTimer].numericState)
+                        || 0), (Number(items[props.acTimerSet].numericState) || 0) || 720)) * 238.8).toFixed(1) + ' 238.8'
+                      stroke-width: 5
+                  - component: circle
+                    config:
+                      stroke: '#29b6f6'
+                      cx: 459.6
+                      cy: 263.3
+                      r: 38
+                      fill: none
+                      transform: rotate(-90 459.6 263.3)
+                      stroke-linecap: round
+                      stroke-dasharray: =(Math.min(1, (Number(items[props.acTimer].numericState) || 0) / Math.max((Number(items[props.acTimer].numericState)
+                        || 0), (Number(items[props.acTimerSet].numericState) || 0) || 720)) * 238.8).toFixed(1) + ' 238.8'
+                      stroke-width: 3.5
+                      opacity: '0.9'
+              - component: g
+                config:
+                  visible: =(Number(items[props.ventilationTimer].numericState) || 0) / Math.max((Number(items[props.ventilationTimer].numericState)
+                    || 0), (Number(items[props.ventilationTimerSet].numericState) || 0) || 360) > 0
+                slots:
+                  default:
+                  - component: circle
+                    config:
+                      style:
+                        stroke: 'var(--f7-card-bg-color, #fff)'
+                      cx: 292.8
+                      cy: 41.9
+                      r: 38
+                      fill: none
+                      transform: rotate(-90 292.8 41.9)
+                      stroke-linecap: round
+                      stroke-dasharray: =(Math.min(1, (Number(items[props.ventilationTimer].numericState) || 0) / Math.max((Number(items[props.ventilationTimer].numericState)
+                        || 0), (Number(items[props.ventilationTimerSet].numericState) || 0) || 360)) * 238.8).toFixed(1) +
+                        ' 238.8'
+                      stroke-width: 5
+                  - component: circle
+                    config:
+                      stroke: '#26a69a'
+                      cx: 292.8
+                      cy: 41.9
+                      r: 38
+                      fill: none
+                      transform: rotate(-90 292.8 41.9)
+                      stroke-linecap: round
+                      stroke-dasharray: =(Math.min(1, (Number(items[props.ventilationTimer].numericState) || 0) / Math.max((Number(items[props.ventilationTimer].numericState)
+                        || 0), (Number(items[props.ventilationTimerSet].numericState) || 0) || 360)) * 238.8).toFixed(1) +
+                        ' 238.8'
+                      stroke-width: 3.5
+                      opacity: '0.9'
+              - component: g
+                config:
+                  visible: =(Number(items[props.batterySoc].numericState) || 0) / 100 > 0
+                slots:
+                  default:
+                  - component: circle
+                    config:
+                      style:
+                        stroke: 'var(--f7-card-bg-color, #fff)'
+                      cx: 109.0
+                      cy: 354.0
+                      r: 38
+                      fill: none
+                      transform: rotate(-90 109.0 354.0)
+                      stroke-linecap: round
+                      stroke-dasharray: =(Math.min(1, (Number(items[props.batterySoc].numericState) || 0) / 100) * 238.8).toFixed(1)
+                        + ' 238.8'
+                      stroke-width: 5
+                  - component: circle
+                    config:
+                      stroke: '#7cb342'
+                      cx: 109.0
+                      cy: 354.0
+                      r: 38
+                      fill: none
+                      transform: rotate(-90 109.0 354.0)
+                      stroke-linecap: round
+                      stroke-dasharray: =(Math.min(1, (Number(items[props.batterySoc].numericState) || 0) / 100) * 238.8).toFixed(1)
+                        + ' 238.8'
+                      stroke-width: 3.5
+                      opacity: '0.9'
               - component: widget:flow-node
                 config:
                   kind: pv
-                  x: 270.0
-                  y: 34.0
+                  x: 147.5
+                  y: 79.5
                   power: =(Number(items[props.pvPower].numericState) || 0)
               - component: widget:flow-node
                 config:
                   kind: grid
-                  x: 71.2
-                  y: 183.8
+                  x: 71.4
+                  y: 208.7
                   power: =(Number(items[props.gridPower].numericState) || 0)
               - component: widget:flow-node
                 config:
                   kind: home
-                  x: 245.5
-                  y: 208.3
+                  x: 265.5
+                  y: 236
                   power: =(Number(items[props.homePower].numericState) || 0)
               - component: widget:flow-node
                 config:
                   kind: heat-pump
-                  x: 386.1
-                  y: 102.4
+                  x: 422.0
+                  y: 118.0
                   power: =(Number(items[props.heatpumpPower].numericState) || 0)
               - component: widget:flow-node
                 config:
                   kind: air-conditioner
-                  x: 419.8
-                  y: 232.8
+                  x: 459.6
+                  y: 263.3
                   power: '=(items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState) || 0)
                     : 0)'
               - component: widget:flow-node
                 config:
                   kind: e-car
-                  x: 351.4
-                  y: 348.9
+                  x: 383.5
+                  y: 392.5
                   power: =(Number(items[props.ecarPower].numericState) || 0)
               - component: widget:flow-node
                 config:
                   kind: appliances
-                  x: 221.0
-                  y: 382.6
+                  x: 238.2
+                  y: 430.1
                   power: =((Number(items[props.washingMachine1Power].numericState) || 0) + (Number(items[props.washingMachine2Power].numericState)
                     || 0) + (Number(items[props.tumbleDryerPower].numericState) || 0) + (Number(items[props.dishwasherPower].numericState)
                     || 0))
               - component: widget:flow-node
                 config:
                   kind: battery
-                  x: 104.9
-                  y: 314.2
+                  x: 109.0
+                  y: 354.0
                   soc: =(Number(items[props.batterySoc].numericState) || 0)
+              - component: widget:flow-node
+                config:
+                  kind: ventilation
+                  x: 292.8
+                  y: 41.9
+                  power: =(Number(items[props.ventilationPower].numericState) || 0)
+              - component: g
+                config: {}
+                slots:
+                  default:
+                  - component: circle
+                    config:
+                      cx: 448.9
+                      cy: 91.1
+                      r: 12
+                      style:
+                        fill: 'var(--f7-card-bg-color, #fff)'
+                  - component: circle
+                    config:
+                      cx: 448.9
+                      cy: 91.1
+                      r: 12
+                      fill: '=(Number(items[props.heatpumpPower].numericState) || 0) > 50 ? ''#fb8c00'' : ''rgba(251, 140,
+                        0, 0.14)'''
+                      stroke: '#fb8c00'
+                      stroke-width: 2
+                  - component: text
+                    config:
+                      x: 448.9
+                      y: 91.6
+                      content: '=items[props.heatpumpDefrostOperaton].state === ''ON'' ? ''ac_unit'' : items[props.heatpumpValve].state
+                        === ''DHW'' ? ''shower'' : ''local_fire_department'''
+                      fill: '=(Number(items[props.heatpumpPower].numericState) || 0) > 50 ? ''#ffffff'' : ''#fb8c00'''
+                      font-size: 15
+                      text-anchor: middle
+                      dominant-baseline: central
+                      style:
+                        font-family: '''Material Icons'''
+                        font-feature-settings: '''liga'''
+              - component: g
+                config: {}
+                slots:
+                  default:
+                  - component: circle
+                    config:
+                      cx: 432.7
+                      cy: 236.4
+                      r: 12
+                      style:
+                        fill: 'var(--f7-card-bg-color, #fff)'
+                  - component: circle
+                    config:
+                      cx: 432.7
+                      cy: 236.4
+                      r: 12
+                      fill: '=items[props.acSwitch].state === ''ON'' ? ''#29b6f6'' : ''rgba(41, 182, 246, 0.14)'''
+                      stroke: '#29b6f6'
+                      stroke-width: 2
+                  - component: text
+                    config:
+                      x: 432.7
+                      y: 236.9
+                      content: power_settings_new
+                      fill: '=items[props.acSwitch].state === ''ON'' ? ''#ffffff'' : ''#29b6f6'''
+                      font-size: 15
+                      text-anchor: middle
+                      dominant-baseline: central
+                      style:
+                        font-family: '''Material Icons'''
+                        font-feature-settings: '''liga'''
+              - component: g
+                config: {}
+                slots:
+                  default:
+                  - component: circle
+                    config:
+                      cx: 265.9
+                      cy: 15.0
+                      r: 12
+                      fill: '#26a69a'
+                  - component: text
+                    config:
+                      x: 265.9
+                      y: 15.0
+                      content: =items[props.ventilationLevel].state
+                      fill: '#ffffff'
+                      font-size: 13
+                      font-weight: '700'
+                      text-anchor: middle
+                      dominant-baseline: central
               - component: text
                 config:
-                  x: 312.0
-                  y: 35.0
+                  x: 97.5
+                  y: 80.5
                   content: =(Math.abs((Number(items[props.pvPower].numericState) || 0)) / 1000).toFixed(3).replace('.', ',')
+                    + ' kW'
+                  fill: currentColor
+                  font-size: 18
+                  font-weight: '700'
+                  text-anchor: end
+                  opacity: '1'
+              - component: text
+                config:
+                  x: 97.5
+                  y: 97.5
+                  content: '=([''NULL'', ''UNDEF''].includes(items[props.pvEnergyToday].state) ? ''–'' : (items[props.pvEnergyToday].displayState
+                    || items[props.pvEnergyToday].state)) + '' heute'''
+                  fill: currentColor
+                  font-size: 12
+                  font-weight: normal
+                  text-anchor: end
+                  opacity: '0.7'
+              - component: text
+                config:
+                  x: 342.8
+                  y: 42.9
+                  content: =((Number(items[props.ventilationPower].numericState) || 0) / 1000).toFixed(3).replace('.', ',')
                     + ' kW'
                   fill: currentColor
                   font-size: 18
@@ -345,55 +1017,23 @@ slots:
                   opacity: '1'
               - component: text
                 config:
-                  x: 312.0
-                  y: 52.0
-                  content: '=([''NULL'', ''UNDEF''].includes(items[props.pvEnergyToday].state) ? ''–'' : (items[props.pvEnergyToday].displayState
-                    || items[props.pvEnergyToday].state)) + '' heute'''
-                  fill: currentColor
+                  x: 342.8
+                  y: 59.9
+                  content: '=(Number(items[props.ventilationTimer].numericState) || 0) > 0 ? ''Timer '' + ((Number(items[props.ventilationTimer].numericState)
+                    || 0) >= 60 ? Math.floor((Number(items[props.ventilationTimer].numericState) || 0) / 60) + '':'' + (Math.floor((Number(items[props.ventilationTimer].numericState)
+                    || 0) % 60) < 10 ? ''0'' : '''') + Math.floor((Number(items[props.ventilationTimer].numericState) || 0)
+                    % 60) + '' h'' : Math.round((Number(items[props.ventilationTimer].numericState) || 0)) + '' min'') : (''Stufe
+                    '' + ([''NULL'', ''UNDEF''].includes(items[props.ventilationLevel].state) ? ''–'' : (items[props.ventilationLevel].displayState
+                    || items[props.ventilationLevel].state)))'
+                  fill: '=(Number(items[props.ventilationTimer].numericState) || 0) > 0 ? ''#26a69a'' : ''currentColor'''
                   font-size: 12
                   font-weight: normal
                   text-anchor: start
-                  opacity: '0.7'
-              - component: widget:flow-share-ring
-                config:
-                  x: 32.2
-                  y: 32
-                  title: Eigenverbrauch
-                  part: =(Number(items[props.pvSelfUseToday].numericState) || 0)
-                  whole: =(Number(items[props.pvEnergyToday].numericState) || 0)
-              - component: widget:flow-share-ring
-                config:
-                  x: 32.2
-                  y: 93
-                  title: Autarkie
-                  part: =(Number(items[props.pvSelfUseToday].numericState) || 0)
-                  whole: =(Number(items[props.homeEnergyToday].numericState) || 0)
+                  opacity: '=(Number(items[props.ventilationTimer].numericState) || 0) > 0 ? ''1'' : ''0.7'''
               - component: text
                 config:
-                  x: 230.7
-                  y: 154.3
-                  content: =(Math.abs((Number(items[props.homePower].numericState) || 0)) / 1000).toFixed(3).replace('.',
-                    ',') + ' kW'
-                  fill: currentColor
-                  font-size: 18
-                  font-weight: '700'
-                  text-anchor: end
-                  opacity: '1'
-              - component: text
-                config:
-                  x: 230.7
-                  y: 169.3
-                  content: ='' + ((Number(items[props.homeEnergyToday].numericState) || 0)).toFixed(2).replace('.', ',') +
-                    ' kWh heute'
-                  fill: currentColor
-                  font-size: 12
-                  font-weight: normal
-                  text-anchor: end
-                  opacity: '0.7'
-              - component: text
-                config:
-                  x: 71.2
-                  y: 235.8
+                  x: 71.4
+                  y: 270.7
                   content: =((Number(items[props.gridPower].numericState) || 0) / 1000).toFixed(3).replace('.', ',') + ' kW'
                   fill: currentColor
                   font-size: 18
@@ -402,10 +1042,11 @@ slots:
                   opacity: '1'
               - component: text
                 config:
-                  x: 71.2
-                  y: 251.8
+                  x: 71.4
+                  y: 286.7
                   content: ='Bezug ' + ((Number(items[props.gridImportToday].numericState) || 0)).toFixed(2).replace('.',
-                    ',') + ' kWh'
+                    ',') + ' · Einsp. ' + ((Number(items[props.gridExportToday].numericState) || 0)).toFixed(2).replace('.',
+                    ',')
                   fill: currentColor
                   font-size: 12
                   font-weight: normal
@@ -413,19 +1054,8 @@ slots:
                   opacity: '0.7'
               - component: text
                 config:
-                  x: 71.2
-                  y: 266.8
-                  content: ='Einspeisung ' + ((Number(items[props.gridExportToday].numericState) || 0)).toFixed(2).replace('.',
-                    ',') + ' kWh'
-                  fill: currentColor
-                  font-size: 12
-                  font-weight: normal
-                  text-anchor: middle
-                  opacity: '0.7'
-              - component: text
-                config:
-                  x: 386.1
-                  y: 154.4
+                  x: 422.0
+                  y: 180.0
                   content: =(Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) / 1000).toFixed(3).replace('.',
                     ',') + ' kW'
                   fill: currentColor
@@ -435,8 +1065,8 @@ slots:
                   opacity: '1'
               - component: text
                 config:
-                  x: 386.1
-                  y: 170.4
+                  x: 422.0
+                  y: 196.0
                   content: ='' + ((Number(items[props.heatpumpEnergyToday].numericState) || 0)).toFixed(2).replace('.', ',')
                     + ' kWh heute'
                   fill: currentColor
@@ -446,8 +1076,8 @@ slots:
                   opacity: '0.7'
               - component: text
                 config:
-                  x: 419.8
-                  y: 284.8
+                  x: 459.6
+                  y: 325.3
                   content: =((Number(items[props.acUnitPower].numericState) || 0) / 1000).toFixed(3).replace('.', ',') + '
                     kW'
                   fill: currentColor
@@ -457,19 +1087,22 @@ slots:
                   opacity: '1'
               - component: text
                 config:
-                  x: 419.8
-                  y: 300.8
-                  content: ='' + ((Number(items[props.acUnitEnergyToday].numericState) || 0)).toFixed(2).replace('.', ',')
-                    + ' kWh heute'
-                  fill: currentColor
+                  x: 459.6
+                  y: 341.3
+                  content: '=(Number(items[props.acTimer].numericState) || 0) > 0 ? ''Timer '' + ((Number(items[props.acTimer].numericState)
+                    || 0) >= 60 ? Math.floor((Number(items[props.acTimer].numericState) || 0) / 60) + '':'' + (Math.floor((Number(items[props.acTimer].numericState)
+                    || 0) % 60) < 10 ? ''0'' : '''') + Math.floor((Number(items[props.acTimer].numericState) || 0) % 60) +
+                    '' h'' : Math.round((Number(items[props.acTimer].numericState) || 0)) + '' min'') : ('''' + ((Number(items[props.acUnitEnergyToday].numericState)
+                    || 0)).toFixed(2).replace(''.'', '','') + '' kWh heute'')'
+                  fill: '=(Number(items[props.acTimer].numericState) || 0) > 0 ? ''#29b6f6'' : ''currentColor'''
                   font-size: 12
                   font-weight: normal
                   text-anchor: middle
-                  opacity: '0.7'
+                  opacity: '=(Number(items[props.acTimer].numericState) || 0) > 0 ? ''1'' : ''0.7'''
               - component: text
                 config:
-                  x: 351.4
-                  y: 400.9
+                  x: 383.5
+                  y: 454.5
                   content: =(Math.abs((Number(items[props.ecarPower].numericState) || 0)) / 1000).toFixed(3).replace('.',
                     ',') + ' kW'
                   fill: currentColor
@@ -479,8 +1112,8 @@ slots:
                   opacity: '1'
               - component: text
                 config:
-                  x: 351.4
-                  y: 416.9
+                  x: 383.5
+                  y: 470.5
                   content: ='' + ((Number(items[props.ecarEnergyToday].numericState) || 0)).toFixed(2).replace('.', ',') +
                     ' kWh heute'
                   fill: currentColor
@@ -490,8 +1123,8 @@ slots:
                   opacity: '0.7'
               - component: text
                 config:
-                  x: 221.0
-                  y: 434.6
+                  x: 238.2
+                  y: 492.1
                   content: =(((Number(items[props.washingMachine1Power].numericState) || 0) + (Number(items[props.washingMachine2Power].numericState)
                     || 0) + (Number(items[props.tumbleDryerPower].numericState) || 0) + (Number(items[props.dishwasherPower].numericState)
                     || 0)) / 1000).toFixed(3).replace('.', ',') + ' kW'
@@ -502,8 +1135,8 @@ slots:
                   opacity: '1'
               - component: text
                 config:
-                  x: 221.0
-                  y: 450.6
+                  x: 238.2
+                  y: 508.1
                   content: ='' + (((Number(items[props.washingMachine1EnergyToday].numericState) || 0) + (Number(items[props.washingMachine2EnergyToday].numericState)
                     || 0) + (Number(items[props.tumbleDryerEnergyToday].numericState) || 0) + (Number(items[props.dishwasherEnergyToday].numericState)
                     || 0))).toFixed(2).replace('.', ',') + ' kWh heute'
@@ -514,8 +1147,8 @@ slots:
                   opacity: '0.7'
               - component: text
                 config:
-                  x: 104.9
-                  y: 366.2
+                  x: 109.0
+                  y: 416.0
                   content: =((Number(items[props.batteryPower].numericState) || 0) / 1000).toFixed(3).replace('.', ',') +
                     ' kW'
                   fill: currentColor
@@ -525,21 +1158,11 @@ slots:
                   opacity: '1'
               - component: text
                 config:
-                  x: 104.9
-                  y: 382.2
-                  content: ='Geladen ' + ((Number(items[props.batteryChargeToday].numericState) || 0)).toFixed(2).replace('.',
-                    ',') + ' kWh'
-                  fill: currentColor
-                  font-size: 12
-                  font-weight: normal
-                  text-anchor: middle
-                  opacity: '0.7'
-              - component: text
-                config:
-                  x: 104.9
-                  y: 397.2
-                  content: ='Entladen ' + ((Number(items[props.batteryDischargeToday].numericState) || 0)).toFixed(2).replace('.',
-                    ',') + ' kWh'
+                  x: 109.0
+                  y: 432.0
+                  content: ='Entl. ' + ((Number(items[props.batteryDischargeToday].numericState) || 0)).toFixed(2).replace('.',
+                    ',') + ' · Gel. ' + ((Number(items[props.batteryChargeToday].numericState) || 0)).toFixed(2).replace('.',
+                    ',')
                   fill: currentColor
                   font-size: 12
                   font-weight: normal
@@ -553,10 +1176,10 @@ slots:
                 position: absolute
                 display: block
                 border-radius: 50%
-                left: 50.21%
-                top: 0.00%
-                width: 14.47%
-                height: 14.78%
+                left: 20.69%
+                top: 7.27%
+                width: 16.47%
+                height: 16.28%
           - component: oh-link
             config:
               action: popup
@@ -565,10 +1188,10 @@ slots:
                 position: absolute
                 display: block
                 border-radius: 50%
-                left: 7.91%
-                top: 32.57%
-                width: 14.47%
-                height: 14.78%
+                left: 5.76%
+                top: 32.31%
+                width: 16.47%
+                height: 16.28%
           - component: oh-link
             config:
               action: popup
@@ -577,34 +1200,10 @@ slots:
                 position: absolute
                 display: block
                 border-radius: 50%
-                left: 45.00%
-                top: 37.89%
-                width: 14.47%
-                height: 14.78%
-          - component: oh-link
-            config:
-              action: popup
-              actionModal: page:heatpump
-              style:
-                position: absolute
-                display: block
-                border-radius: 50%
-                left: 74.91%
-                top: 14.87%
-                width: 14.47%
-                height: 14.78%
-          - component: oh-link
-            config:
-              action: popup
-              actionModal: page:air_conditioning
-              style:
-                position: absolute
-                display: block
-                border-radius: 50%
-                left: 82.09%
-                top: 43.22%
-                width: 14.47%
-                height: 14.78%
+                left: 43.82%
+                top: 37.60%
+                width: 16.47%
+                height: 16.28%
           - component: oh-link
             config:
               action: popup
@@ -613,10 +1212,10 @@ slots:
                 position: absolute
                 display: block
                 border-radius: 50%
-                left: 15.09%
-                top: 60.91%
-                width: 14.47%
-                height: 14.78%
+                left: 13.14%
+                top: 60.47%
+                width: 16.47%
+                height: 16.28%
           - component: oh-link
             config:
               action: popup
@@ -625,10 +1224,10 @@ slots:
                 position: absolute
                 display: block
                 border-radius: 50%
-                left: 67.53%
-                top: 68.46%
-                width: 14.47%
-                height: 14.78%
+                left: 66.96%
+                top: 67.93%
+                width: 16.47%
+                height: 16.28%
           - component: oh-link
             config:
               action: popup
@@ -637,7 +1236,333 @@ slots:
                 position: absolute
                 display: block
                 border-radius: 50%
-                left: 39.79%
-                top: 75.78%
-                width: 14.47%
-                height: 14.78%
+                left: 38.47%
+                top: 75.21%
+                width: 16.47%
+                height: 16.28%
+          - component: oh-link
+            config:
+              action: popup
+              actionModal: widget:heatpump-quick
+              actionModalConfig:
+                heatpumpDhwTankTemp: =props.heatpumpDhwTankTemp
+                heatpumpPower: =props.heatpumpPower
+                heatpumpDhwBoost: =props.heatpumpDhwBoost
+                heatpumpClimateControlPower: =props.heatpumpClimateControlPower
+                heatpumpDhwPower: =props.heatpumpDhwPower
+                heatpumpManagement: =props.heatpumpManagement
+                heatpumpDhwTempHeating: =props.heatpumpDhwTempHeating
+                heatpumpDhwManagement: =props.heatpumpDhwManagement
+              style:
+                position: absolute
+                display: block
+                border-radius: 50%
+                left: 74.51%
+                top: 14.73%
+                width: 16.47%
+                height: 16.28%
+          - component: oh-link
+            config:
+              action: popup
+              actionModal: widget:air-conditioner-quick
+              actionModalConfig:
+                acSwitch: =props.acSwitch
+                acMode: =props.acMode
+                acTemperature: =props.acTemperature
+                acTemperatureSetpoint: =props.acTemperatureSetpoint
+                acTimer: =props.acTimer
+                acTimerSet: =props.acTimerSet
+                acPowerful: =props.acPowerful
+              style:
+                position: absolute
+                display: block
+                border-radius: 50%
+                left: 81.88%
+                top: 42.89%
+                width: 16.47%
+                height: 16.28%
+          - component: oh-link
+            config:
+              action: popup
+              actionModal: widget:ventilation-quick
+              actionModalConfig:
+                ventilationLevel: =props.ventilationLevel
+                netatmoWeatherstationCo2: =props.netatmoWeatherstationCo2
+                ventilationTimer: =props.ventilationTimer
+                ventilationManagement: =props.ventilationManagement
+                ventilationTimerSet: =props.ventilationTimerSet
+              style:
+                position: absolute
+                display: block
+                border-radius: 50%
+                left: 49.18%
+                top: -0.02%
+                width: 16.47%
+                height: 16.28%
+  - component: div
+    config:
+      style:
+        display: flex
+        flex-direction: column
+        gap: 10px
+        padding: 8px 12px 14px
+    slots:
+      default:
+      - component: div
+        config:
+          style:
+            display: grid
+            gap: 8px
+            grid-template-columns: '=screen.width < 600 ? ''repeat(2, minmax(0, 1fr))'' : ''repeat(3, minmax(0, 1fr))'''
+        slots:
+          default:
+          - component: div
+            config:
+              style:
+                position: relative
+                overflow: hidden
+                padding: 8px 10px
+                border-radius: 12px
+                background: rgba(127, 127, 127, 0.08)
+                min-width: '0'
+                display: flex
+                align-items: center
+                grid-column: '=screen.width < 600 ? ''1 / -1'' : ''auto'''
+            slots:
+              default:
+              - component: oh-icon
+                config:
+                  icon: material:home
+                  width: 58
+                  height: 58
+                  style:
+                    position: absolute
+                    right: -6px
+                    bottom: -10px
+                    opacity: '0.16'
+                    color: '#1e88e5'
+              - component: div
+                config:
+                  style:
+                    position: relative
+                    min-width: '0'
+                    flex: 1 1 auto
+                slots:
+                  default:
+                  - component: div
+                    config:
+                      style:
+                        display: flex
+                        align-items: center
+                        gap: 8px
+                    slots:
+                      default:
+                      - component: oh-icon
+                        config:
+                          icon: material:home
+                          width: 24
+                          height: 24
+                          style:
+                            color: '#1e88e5'
+                            flex: 0 0 auto
+                      - component: div
+                        config:
+                          style:
+                            display: flex
+                            flex-direction: column
+                            min-width: '0'
+                        slots:
+                          default:
+                          - component: Label
+                            config:
+                              text: =(Math.abs((Number(items[props.homePower].numericState) || 0)) / 1000).toFixed(3).replace('.',
+                                ',') + ' kW'
+                              style:
+                                font-size: 16px
+                                font-weight: '700'
+                                line-height: 20px
+                                white-space: nowrap
+                          - component: Label
+                            config:
+                              text: ='' + ((Number(items[props.homeEnergyToday].numericState) || 0)).toFixed(2).replace('.',
+                                ',') + ' kWh heute'
+                              style:
+                                font-size: 11px
+                                opacity: '0.7'
+                                white-space: nowrap
+              - component: oh-link
+                config:
+                  action: popup
+                  actionModal: page:flow_home
+                  style:
+                    position: absolute
+                    inset: '0'
+                    display: block
+                    border-radius: 12px
+          - component: div
+            config:
+              style:
+                position: relative
+                overflow: hidden
+                padding: 8px 10px
+                border-radius: 12px
+                background: rgba(127, 127, 127, 0.08)
+                min-width: '0'
+                display: flex
+                align-items: center
+            slots:
+              default:
+              - component: oh-icon
+                config:
+                  icon: material:solar_power
+                  width: 58
+                  height: 58
+                  style:
+                    position: absolute
+                    right: -6px
+                    bottom: -10px
+                    opacity: '0.16'
+                    color: '#43a047'
+              - component: div
+                config:
+                  style:
+                    position: relative
+                    min-width: '0'
+                    flex: 1 1 auto
+                slots:
+                  default:
+                  - component: svg
+                    config:
+                      viewBox: 0 0 150 50
+                      width: 100%
+                      style:
+                        display: block
+                        overflow: visible
+                        max-width: 170px
+                    slots:
+                      default:
+                      - component: widget:flow-share-ring
+                        config:
+                          x: 24
+                          y: 25
+                          title: Eigenverbrauch
+                          part: =(Number(items[props.pvSelfUseToday].numericState) || 0)
+                          whole: =(Number(items[props.pvEnergyToday].numericState) || 0)
+              - component: oh-link
+                config:
+                  action: popup
+                  actionModal: page:flow_self_consumption
+                  style:
+                    position: absolute
+                    inset: '0'
+                    display: block
+                    border-radius: 12px
+          - component: div
+            config:
+              style:
+                position: relative
+                overflow: hidden
+                padding: 8px 10px
+                border-radius: 12px
+                background: rgba(127, 127, 127, 0.08)
+                min-width: '0'
+                display: flex
+                align-items: center
+            slots:
+              default:
+              - component: oh-icon
+                config:
+                  icon: material:energy_savings_leaf
+                  width: 58
+                  height: 58
+                  style:
+                    position: absolute
+                    right: -6px
+                    bottom: -10px
+                    opacity: '0.16'
+                    color: '#43a047'
+              - component: div
+                config:
+                  style:
+                    position: relative
+                    min-width: '0'
+                    flex: 1 1 auto
+                slots:
+                  default:
+                  - component: svg
+                    config:
+                      viewBox: 0 0 150 50
+                      width: 100%
+                      style:
+                        display: block
+                        overflow: visible
+                        max-width: 170px
+                    slots:
+                      default:
+                      - component: widget:flow-share-ring
+                        config:
+                          x: 24
+                          y: 25
+                          title: Autarkie
+                          part: =(Number(items[props.pvSelfUseToday].numericState) || 0)
+                          whole: =(Number(items[props.homeEnergyToday].numericState) || 0)
+              - component: oh-link
+                config:
+                  action: popup
+                  actionModal: page:flow_self_sufficiency
+                  style:
+                    position: absolute
+                    inset: '0'
+                    display: block
+                    border-radius: 12px
+      - component: div
+        config:
+          style:
+            display: grid
+            gap: 6px
+            grid-template-columns: '=screen.width < 600 ? ''repeat(3, minmax(0, 1fr))'' : ''repeat(5, minmax(0, 1fr))'''
+        slots:
+          default:
+          - component: widget:switch-tile
+            config:
+              item: =props.coffeeMachineSwitch
+              title: Kaffee
+              icon: material:coffee
+              color: '#8d6e63'
+              value: =Math.round((Number(items[props.coffeeMachinePower].numericState) || 0)) + ' W'
+              energy: =((Number(items[props.coffeeMachineEnergyToday].numericState) || 0)).toFixed(2).replace('.', ',') +
+                ' kWh'
+          - component: widget:switch-tile
+            config:
+              item: =props.bicycleBatteriesSwitch
+              title: E-Bikes
+              icon: material:electric_bike
+              color: '#7cb342'
+              value: =Math.round((Number(items[props.bicycleBatteriesPower].numericState) || 0)) + ' W'
+              energy: =((Number(items[props.bicycleBatteriesEnergyToday].numericState) || 0)).toFixed(2).replace('.', ',')
+                + ' kWh'
+          - component: widget:switch-tile
+            config:
+              item: =props.office1Switch
+              title: Büro 1
+              icon: material:computer
+              color: '#ab47bc'
+              value: =Math.round((Number(items[props.office1Power].numericState) || 0)) + ' W'
+              energy: =((Number(items[props.office1EnergyToday].numericState) || 0)).toFixed(2).replace('.', ',') + ' kWh'
+          - component: widget:switch-tile
+            config:
+              item: =props.office2Switch
+              title: Büro 2
+              icon: material:computer
+              color: '#ab47bc'
+              value: =Math.round((Number(items[props.office2Power].numericState) || 0)) + ' W'
+              energy: =((Number(items[props.office2EnergyToday].numericState) || 0)).toFixed(2).replace('.', ',') + ' kWh'
+          - component: widget:switch-tile
+            config:
+              item: =props.terraceLightSwitch
+              title: Terrasse
+              icon: material:light
+              color: '#fbc02d'
+              value: =Math.round((Number(items[props.terraceLightPower].numericState) || 0)) + ' W'
+              energy: =((Number(items[props.terraceLightEnergyToday].numericState) || 0)).toFixed(2).replace('.', ',') + '
+                kWh'

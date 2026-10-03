@@ -8,15 +8,17 @@ generates is replaced on each run, and so is every widget tagged `generated`; wi
 Changes made in the UI to a generated page or widget are overwritten by the next run, so this script is the
 source of the UI.
 
-The widgets are the overview's ten cards (`weather-card`, `controls-card`, `energy-flow-card`, `appliances-card`,
-`electricity-price-card`, `heatpump-card`, `consumption-card`, `energy-days-card`, `pv-days-card`,
-`temperatures-card`) and the parts they are built from, wherever a part stands in more than one place or makes sense
+The widgets are the overview's nine cards (`weather-card`, `energy-flow-card`, `appliances-card`, `heatpump-card`,
+`electricity-price-card`, `consumption-card`, `energy-days-card`, `pv-days-card`, `temperatures-card`) and the parts they are built from, wherever a part stands in more than one place or makes sense
 on its own:
 
-- the controls: the device panels `heatpump-controls`, `air-conditioner-controls` and `ventilation-controls`, each a
-  `device-head` that opens the device's page; `state-bar`, every segmented bar; `pill-switch`, `power-pill`, `boost-pill` and
-  `boost-button`, the switches as pills; `pill-slider`, the slider of every setpoint, offset, power and timer;
-  `switch-row`, every row with a switch outside the overview's tiles; and `switch-tile`, the overview's plug tiles;
+- the quick popups: `heatpump-quick`, `air-conditioner-quick` and `ventilation-quick`, which the energy flow opens,
+  and the heat pump card's `heatpump-control-quick`, `heatpump-indoor-quick`, `heatpump-outdoor-quick`,
+  `heatpump-refrigerant-quick`, `heatpump-circuit-quick`, `upper-floor-quick`, `ground-floor-quick`,
+  `heatpump-electric-quick`, `heatpump-heat-quick` and `heatpump-cop-quick`, which its tiles open;
+- the controls: `state-bar`, every segmented bar; `pill-switch`, `power-pill` and `boost-pill`, the switches as pills; `pill-slider`, the slider of every setpoint, offset, power and timer;
+  `switch-row`, every row with a switch outside the overview's tiles; and `switch-tile`, the switch cards under the
+  energy flow;
 - the energy flow: `flow-link`, `flow-node` and `flow-share-ring`, its lines, nodes and rings; the heat pump card's
   outdoor unit is a `flow-node` too;
 - the appliances: `appliance-tile` and `appliance-icon`, which the Miele machines' pages show too;
@@ -25,9 +27,10 @@ on its own:
   `plug-energy-days-card`, `plug-electric-card`), `item-popup`, the popup every tile of the device pages opens, and
   `value-tile`, the tile itself: title and value over a large pale icon.
 
-A widget that places another takes the other's items from its own props: `role_widget()` builds a device panel with
+A widget that places another takes the other's items from its own props: `role_widget()` builds a quick panel with
 its items and turns them into role props (`item_prop()`), `ITEM_PARAMS` names the props of a widget that take an
-item, and `items_in()` and `itemized()` follow them into the widgets a card places. The plug cards are built by the
+item, and `items_in()` and `itemized()` follow them into the widgets a card places and into the `actionModalConfig`
+of a link that opens a widget as a popup. The plug cards are built by the
 same card builders from placeholders; `templated()` turns each placeholder into an expression on the widget's props,
 so a widget renders exactly like the card built for one device. All widgets are also published, as YAML, in the
 GitHub repository `dandjo/openhab-widgets`.
@@ -75,9 +78,10 @@ insertion in their sorted order.
     after running a script in the page first), `cdp_elems.py` of any elements a script finds, and `cdp_tap.py`
     taps the tile whose text contains a text and saves the popup it opens. `cdp_gif.py` records a card as an animated GIF,
     stepping its SVG animations frame by frame; `demo_flow.js` gives the energy flow demo values in that browser
-    only, by stopping MainUI's state tracking. `widget_gallery.py check|apply` puts up the page `widget_gallery`
-    with the energy flow's and the appliances' widgets on demo values and the controls' small widgets, for the
-    screenshots (openHAB stopped); the generator's next run removes it. `shoot_all.sh` takes every screenshot of the GitHub repository with
+    only, by stopping MainUI's state tracking. `widget_gallery.py OUTDIR` writes the page `widget_gallery` with
+    the energy flow's and the appliances' widgets on demo values and the controls' small widgets, for the
+    screenshots, as the body to POST to `/rest/ui/components/ui:page`; delete it afterwards, the generator's next run
+    removes it too. `shoot_all.sh` takes every screenshot of the GitHub repository with
     these tools and the element scripts in `screenshot-js/`, the energy flow, the consumption card and the weather
-    page's warnings on demo values (`demo_flow.js`, `demo_consumption.js`, `demo_weather.js`), while the gallery is
-    up.
+    page's warnings on demo values (`demo_flow.js`, `demo_consumption.js`, `demo_weather.js`), and the quick popups
+    each as tall as its content (`screenshot-js/quick.js`), while the gallery is up.

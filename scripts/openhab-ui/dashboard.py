@@ -142,6 +142,7 @@ def fill_chart(chart_, min_height):
 
 # a value axis name right-aligned with the axis labels below it
 AXIS_NAME = {"align": "right", "padding": [0, 8, 0, 0]}
+RIGHT_AXIS_NAME = {"align": "left", "padding": [0, 0, 0, 8]}  # over the labels of an axis on the right, mirrored
 
 
 def chart(config, **slots):
@@ -205,7 +206,8 @@ ITEM_PROP_NAMES = {
     "heatpump_power": "heatpumpCircuitPower", "espaltherma_electrical_power_buh": "heatpumpBuhPower",
     "espaltherma_electrical_power_bsh": "heatpumpBshPower",
     "espaltherma_3way_valve_mode": "heatpumpValve", "pyaltherma_dhw_powerful": "heatpumpDhwBoost",
-    "air_conditioning_timer": "acTimer", "espaltherma_refrig_temp_liquid_side": "heatpumpRefrigerantTemp",
+    "air_conditioning_timer": "acTimer", "air_conditioning_timer_set": "acTimerSet",
+    "espaltherma_refrig_temp_liquid_side": "heatpumpRefrigerantTemp",
     "espaltherma_refrigerant_pressure_sensor": "heatpumpRefrigerantPressure",
 }
 ITEM_REF = re.compile(r"items\.([a-z][a-z0-9_]*)")
@@ -234,6 +236,10 @@ def items_in(tree):
                 for k, x in v["config"].items():
                     if k in keys and isinstance(x, str) and not x.startswith("=") and x not in found:
                         found.append(x)
+                modal = v["config"].get("actionModalConfig")
+                if isinstance(modal, dict):  # the items a popup widget is opened with
+                    found.extend(x for k, x in modal.items() if k in modal_item_keys(v["config"])
+                                 and isinstance(x, str) and not x.startswith("=") and x not in found)
             for k, x in v.items():
                 walk(x, k)
         elif isinstance(v, list):
@@ -244,6 +250,13 @@ def items_in(tree):
             found.extend(n for n in names if n not in found)
     walk(tree)
     return found
+
+
+def modal_item_keys(cfg):
+    """The keys of a config's actionModalConfig that take an item: the item params of the widget it opens."""
+    modal = cfg.get("actionModal", "")
+    return ITEM_PARAMS.get(modal[len("widget:"):], set()) if isinstance(modal, str) and modal.startswith("widget:") \
+        else set()
 
 
 def item_keys_of(node):
@@ -257,6 +270,10 @@ def itemized(tree, props, keys=ITEM_KEYS):
     """The tree with every item read from the widget's props; props maps item name to prop name."""
     if isinstance(tree, dict):
         inner = item_keys_of(tree) if isinstance(tree.get("config"), dict) else set(ITEM_KEYS)
+        if isinstance(tree.get("actionModalConfig"), dict):  # a config opening a popup widget with items
+            tree = {**tree, "actionModalConfig": {k: ("=props." + props[x]) if k in modal_item_keys(tree) and
+                                                  isinstance(x, str) and x in props else x
+                                                  for k, x in tree["actionModalConfig"].items()}}
         return {k: (("=props." + props[x]) if k in keys and isinstance(x, str) and x in props
                     else itemized(x, props, inner) if k == "config" else itemized(x, props))
                 for k, x in tree.items()}
@@ -420,9 +437,14 @@ def home_node(cx, cy, power):
             *windows]
 
 
+def soc_color(soc):
+    """The battery's colour by its state of charge: red below 20 %, orange below 50 %, green above."""
+    return f"={soc} < 20 ? '#e53935' : {soc} < 50 ? '#fb8c00' : '#43a047'"
+
+
 def battery_node(cx, cy, soc=None):
     soc = f"Math.max(0, Math.min(100, {soc or num(SOC)}))"
-    fill = f"={soc} < 20 ? '#e53935' : {soc} < 50 ? '#fb8c00' : '#43a047'"
+    fill = soc_color(soc)
     return [ring(cx, cy, "#7cb342"),
             svg("rect", x=cx - 21, y=cy - 10, width=40, height=20, rx=3, fill="none", stroke="currentColor",
                 **{"stroke-width": 2}),
@@ -505,6 +527,22 @@ def appliances_node(cx, cy, power):
                 transform=f"translate({cx - 32} {cy - 32})")]
 
 
+def ventilation_node(cx, cy, power):
+    """The ventilation: a duct fan from the front, five curved blades in a round housing; they turn while it draws
+    more than 5 W, faster the more it draws."""
+    blade = (f"M{cx},{cy} C{cx + 5},{cy - 3} {cx + 9},{cy - 11} {cx + 3},{cy - 17} "
+             f"C{cx - 1},{cy - 12} {cx - 4},{cy - 6} {cx},{cy} Z")
+    blades = [svg("path", d=blade, fill=VENT_TEAL, transform=f"rotate({72 * k} {cx} {cy})", **{"fill-opacity": "0.85"})
+              for k in range(5)]
+    blades.append(spin(cx, cy, steps(power, [30, 60], ["2.4s", "1.5s", "0.9s"]), f"Math.abs({power}) > 5"))
+    return [ring(cx, cy, VENT_TEAL),
+            svg("circle", cx=cx, cy=cy, r=19.5, **stroke(1.6)),
+            svg("g", blades),
+            # the hub over the blades' roots, in the card colour
+            svg("circle", cx=cx, cy=cy, r=3.4, style={"fill": "var(--f7-card-bg-color, #fff)"}, stroke=VENT_TEAL,
+                **{"stroke-width": 1.6})]
+
+
 PV = "huawei_inverter_input_power"
 HP = "espaltherma_electrical_power"
 ECAR = "e_car_power"
@@ -518,6 +556,7 @@ AC_ON = 5  # watts
 ECAR_ON = 100  # watts; standby and an LED light behind the same plug draw a few watts
 ECAR_CHARGING = 500  # it charges with 1.4 to 2.2 kW
 ECAR_COLOR = "#26a69a"
+VENT_TEAL = "#26a69a"
 # how the car's figures come about, under them on its page
 ECAR_CALC = ("Berechnet aus der Messung der Klimaanlage (Shelly EM) abzüglich der Leistung laut Faikin und der "
              "Grundlast der Klimaanlage (Standby, Innengerät); unter 300 W lädt das Auto nicht.")
@@ -552,10 +591,11 @@ def share_ring(cx, cy, title, part, whole, r=22, visible=None):
 
 SELF_CONSUMPTION = ("Self-consumption", num("photovoltaics_own_ec_day"), num("huawei_inverter_e_day"))
 SELF_SUFFICIENCY = ("Self-sufficiency", num("photovoltaics_own_ec_day"), num("home_ec_day"))
-HOME_XY = (245.5, 208.3)
-SPOKE = 176  # distance of every node from the house
-FLOW_W, FLOW_H = 470, 460
-STEP, TURN = 45, 8  # degrees between two nodes, and the star's turn clockwise from PV straight up
+HOME_XY = (265.5, 236)
+SPOKE = 196  # distance of every node from the house
+FLOW_W, FLOW_H = 510, 516
+STEP, TURN = 45, 8  # degrees between two nodes, and the star's turn clockwise from straight up
+ORBIT = 38  # the grey ring around every circle, clear of the circle's own ring (30) and of the texts below
 
 
 def at(angle):
@@ -564,31 +604,28 @@ def at(angle):
     return round(HOME_XY[0] + SPOKE * math.cos(a), 1), round(HOME_XY[1] + SPOKE * math.sin(a), 1)
 
 
-# A regular star: the top-left quarter stays free for the two rings, the seven nodes share the other 270° at
-# 45° each, turned by 8° so that the heat pump's texts keep clear of PV's at today's size. Radius and viewBox
-# come from the boxes of each node's icon and of each of its text lines as the browser measures them (no titles,
-# the icons say what a node is; the PV texts to the right, all others below, the house's above it to the left):
-# at this size every box keeps at least 12 units from every other box, the rings and the house label, and no line
-# crosses a box.
-PV_XY, HP_XY, AC_XY, ECAR_XY, APPL_XY, BATT_XY, GRID_XY = (at(-90 + TURN + k * STEP) for k in range(7))
-TEXT_GAP = 8  # between a circle and the texts beside it
-# the bottom-right corner of the house's values sits off its circle as far as the texts under the other nodes
-# stand off theirs, in the direction that keeps the values as far from the PV line as from the grid line
-HOUSE_LABEL_ANGLE = 247
-HOUSE_LABEL_X, HOUSE_LABEL_Y = (round(HOME_XY[0] + (30 + TEXT_GAP) * math.cos(math.radians(HOUSE_LABEL_ANGLE)), 1),
-                                round(HOME_XY[1] + (30 + TEXT_GAP) * math.sin(math.radians(HOUSE_LABEL_ANGLE)), 1))
-RINGS_XY = [(32.2, 32), (32.2, 93)]  # self-consumption over self-sufficiency, in the free quarter
-# the page each node opens as a popup: the device's page; house and appliances, which have none, a popup of their own
-NODE_POPUPS = [(*PV_XY, "photovoltaics"), (*GRID_XY, "power_meter"), (*HOME_XY, "flow_home"), (*HP_XY, "heatpump"),
-               (*AC_XY, "air_conditioning"), (*BATT_XY, "energy_storage"), (*ECAR_XY, "e_car"),
-               (*APPL_XY, "flow_appliances")]
-def node_link(cx, cy, popup, size=68):
-    """Transparent link over a node that opens the page named by popup in a popup, positioned in percent of the
-    FLOW_W × FLOW_H viewBox."""
-    return comp("oh-link", {"action": "popup", "actionModal": f"page:{popup}", "style": {
-        "position": "absolute", "display": "block", "border-radius": "50%",
-        "left": f"{(cx - size / 2) / FLOW_W * 100:.2f}%", "top": f"{(cy - size / 2) / FLOW_H * 100:.2f}%",
-        "width": f"{size / FLOW_W * 100:.2f}%", "height": f"{size / FLOW_H * 100:.2f}%"}})
+# A regular star of eight nodes, 45° apart and turned by 8°: the ventilation at the top, then clockwise heat pump, air
+# conditioner, E-Car, appliances, battery, grid, and PV at the top left. Every circle has a grey ring around it, so
+# the radius is 20 units more than a ring-less star needs; the texts stand below the rings, the ventilation's and
+# PV's beside them, where the line to the house leaves them free. Checked by screenshots at desktop and phone width.
+VENT_XY, HP_XY, AC_XY, ECAR_XY, APPL_XY, BATT_XY, GRID_XY, PV_XY = (at(-90 + TURN + k * STEP) for k in range(8))
+TEXT_GAP = 12  # between a ring and the texts beside it
+# the page each node opens as a popup: the device's page; house and appliances, which have none, a popup of their own;
+# heat pump, air conditioner and ventilation open their quick controls instead (QUICK_NODES)
+NODE_POPUPS = [(*PV_XY, "photovoltaics"), (*GRID_XY, "power_meter"), (*HOME_XY, "flow_home"),
+               (*BATT_XY, "energy_storage"), (*ECAR_XY, "e_car"), (*APPL_XY, "flow_appliances")]
+
+
+def node_box(cx, cy, size=2 * ORBIT + 8):
+    """A node's box over the drawing, in percent of the FLOW_W × FLOW_H viewBox, ring included."""
+    return {"position": "absolute", "display": "block", "border-radius": "50%",
+            "left": f"{(cx - size / 2) / FLOW_W * 100:.2f}%", "top": f"{(cy - size / 2) / FLOW_H * 100:.2f}%",
+            "width": f"{size / FLOW_W * 100:.2f}%", "height": f"{size / FLOW_H * 100:.2f}%"}
+
+
+def node_link(cx, cy, popup):
+    """Transparent link over a node that opens the page named by popup in a popup."""
+    return comp("oh-link", {"action": "popup", "actionModal": f"page:{popup}", "style": node_box(cx, cy)})
 
 
 def spoke(node, color, power, inward, threshold=10):
@@ -602,12 +639,25 @@ def spoke(node, color, power, inward, threshold=10):
 
 def below(node, value, *lines):
     """Value and today's energy in one or two small lines under a node."""
-    return [svg_text(node[0], node[1] + 52, value, 18, "700"),
-            *[svg_text(node[0], node[1] + 68 + 15 * i, text, 12, opacity="0.7") for i, text in enumerate(lines)]]
+    return [svg_text(node[0], node[1] + 62, value, 18, "700"),
+            *[svg_text(node[0], node[1] + 78 + 15 * i, text, 12, opacity="0.7") for i, text in enumerate(lines)]]
+
+
+def beside(node, value, line, side):
+    """Value and one small line beside a node's ring, to its right (side 1) or left (side -1)."""
+    x, anchor = node[0] + side * (ORBIT + TEXT_GAP), "start" if side > 0 else "end"
+    return [svg_text(x, node[1] + 1, value, 18, "700", anchor=anchor),
+            svg_text(x, node[1] + 18, line, 12, anchor=anchor, opacity="0.7")]
 
 
 def kwh(expr, suffix=" kWh heute", prefix=""):
     return f"='{prefix}' + {fixed(expr, 2)} + '{suffix}'"
+
+
+def into_out_of(into, out_of):
+    """Today's energy into the house and out of it as one line, each amount after its short name, what came in first;
+    into and out_of are (name, expression). Without a unit, as with it the grid's line would leave the drawing."""
+    return f"='{into[0]} ' + {fixed(into[1], 2)} + ' · {out_of[0]} ' + {fixed(out_of[1], 2)}"
 
 
 def flow_link_widget():
@@ -655,13 +705,14 @@ FLOW_KINDS = {  # kind: (builder of the drawing around (0, 0) from the power exp
     "battery": (lambda p: battery_node(0, 0, "Number(props.soc)"), "battery: filled to its state of charge"),
     "appliances": (lambda p: appliances_node(0, 0, p),
                    "appliances: an appliance with sparkles that breathe and twinkle while they run"),
+    "ventilation": (lambda p: ventilation_node(0, 0, p), "ventilation: a duct fan whose five blades turn while it runs"),
 }
 
 
 def flow_node_widget():
     """The widget every node of the energy flow is an instance of: a device drawn in a ring of 30 around (x, y), its
-    animations driven by power (the battery by soc). kind: pv, grid, home, heat-pump, air-conditioner, e-car, battery
-    or appliances.
+    animations driven by power (the battery by soc). kind: pv, grid, home, heat-pump, air-conditioner, e-car, battery,
+    appliances or ventilation.
     The ring has an opaque disc in the card colour under its tint, so link dots slide under it."""
     power = "Number(props.power)"
     drawings = [svg("g", build(power), visible=f"=props.kind === '{kind}'") for kind, (build, _) in FLOW_KINDS.items()]
@@ -689,48 +740,194 @@ def flow_share_ring(xy, title, part, whole):
                                            "whole": f"={whole}"})
 
 
-flow = div([div([svg("svg", [
-    # connections first, so the nodes sit on top of the line ends
-    *spoke(PV_XY, "#ffb300", num(PV), "true"),
-    *spoke(GRID_XY, GRID_COLOR, num(GRID), f"{num(GRID)} > 0"),
-    *spoke(HP_XY, "#fb8c00", num(HP), "false", threshold=HP_ON),
-    *spoke(AC_XY, "#29b6f6", AC_FLOW, "false", threshold=AC_ON),
-    *spoke(ECAR_XY, ECAR_COLOR, num(ECAR), "false", threshold=ECAR_ON),
-    *spoke(APPL_XY, APPL_COLOR, APPL_POWER, "false", threshold=APPL_ON),
-    *spoke(BATT_XY, "#7cb342", num(BATT), f"{num(BATT)} > 0"),
-    flow_node("pv", PV_XY, num(PV)),
-    flow_node("grid", GRID_XY, num(GRID)),
-    flow_node("home", HOME_XY, num(HOME)),
-    flow_node("heat-pump", HP_XY, num(HP)),
-    flow_node("air-conditioner", AC_XY, AC_FLOW),
-    flow_node("e-car", ECAR_XY, num(ECAR)),
-    flow_node("appliances", APPL_XY, APPL_POWER),
-    flow_node("battery", BATT_XY, soc=num(SOC)),
-    svg_text(PV_XY[0] + 42, PV_XY[1] + 1, f"={kw(PV)}", 18, "700", anchor="start"),
-    svg_text(PV_XY[0] + 42, PV_XY[1] + 18, f"={disp('huawei_inverter_e_day')} + ' heute'", 12, anchor="start",
-             opacity="0.7"),
-    flow_share_ring(RINGS_XY[0], *SELF_CONSUMPTION),
-    flow_share_ring(RINGS_XY[1], *SELF_SUFFICIENCY),
-    svg_text(HOUSE_LABEL_X, HOUSE_LABEL_Y - 19, f"={kw(HOME)}", 18, "700", anchor="end"),
-    svg_text(HOUSE_LABEL_X, HOUSE_LABEL_Y - 4, kwh(num("home_ec_day")), 12, anchor="end", opacity="0.7"),
-    *below(GRID_XY, f"={signed_kw}",
-           kwh(num("huawei_inverter_power_meter_ec_day"), " kWh", "Bezug "),
-           kwh(num("huawei_inverter_power_meter_ep_day"), " kWh", "Einspeisung ")),
-    *below(HP_XY, f"={kw(HP)}", kwh(num("espaltherma_energy_today"))),
-    *below(AC_XY, f"={fixed(f'{AC_NET} / 1000', 3)} + ' kW'",
-           kwh(num("air_conditioning_unit_energy_today"))),
-    *below(ECAR_XY, f"={kw(ECAR)}",
-           kwh(num("e_car_energy_today"))),
-    *below(APPL_XY, f"={fixed(f'{APPL_POWER} / 1000', 3)} + ' kW'", kwh(APPL_DAY)),
-    *below(BATT_XY, f"={fixed(f'{num(BATT)} / 1000', 3)} + ' kW'",  # negative while charging
-           kwh(num("huawei_inverter_energy_storage_day_charge"), " kWh", "Geladen "),
-           kwh(num("huawei_inverter_energy_storage_day_discharge"), " kWh", "Entladen ")),
-], viewBox=f"0 0 {FLOW_W} {FLOW_H}", width="100%", style={"display": "block", "overflow": "visible"}),
-    *[node_link(cx, cy, popup) for cx, cy, popup in NODE_POPUPS]],
-    # at most at its own size, one unit a pixel, so its texts keep the sizes of the rest of the UI on a wide screen
-    **{"position": "relative", "max-width": f"{FLOW_W}px", "width": "100%", "margin": "0 auto"})],
-    **{"padding": f"={NARROW} ? '4px' : '12px'", "flex": "1 1 auto", "display": "flex", "flex-direction": "column",
-       "justify-content": "center"})
+def hm(m):
+    """Minutes as 1:30 h, or 45 min below an hour; MainUI's expressions know no String()."""
+    return (f"({m} >= 60 ? Math.floor({m} / 60) + ':' + (Math.floor({m} % 60) < 10 ? '0' : '') + "
+            f"Math.floor({m} % 60) + ' h' : Math.round({m}) + ' min')")
+
+
+def glyph(x, y, name, size, fill):
+    """A Material Icons glyph in an svg, by its ligature; name may be an expression."""
+    return svg("text", x=x, y=y, content=name, fill=fill, **{
+        "font-size": size, "text-anchor": "middle", "dominant-baseline": "central",
+        "style": {"font-family": "'Material Icons'", "font-feature-settings": "'liga'"}})
+
+
+def ring_badge(x, y, name, color, on, r=12):
+    """A small round badge on a node's ring, with a glyph: filled in the colour while on, only tinted with it while off; an opaque disc
+    below keeps the ring it sits on from showing through."""
+    return svg("g", [svg("circle", cx=x, cy=y, r=r, style={"fill": "var(--f7-card-bg-color, #fff)"}),
+                     svg("circle", cx=x, cy=y, r=r, fill=f"={on} ? '{color}' : '{rgba(color, 0.14)}'", stroke=color,
+                         **{"stroke-width": 2}),
+                     glyph(x, y + 0.5, name, round(r * 1.25), f"={on} ? '#ffffff' : '{color}'")])
+
+
+def flow_orbit(xy, color, power, toward, threshold):
+    """A node's grey ring while power flows through it: dots in its colour run round, clockwise while the power flows
+    towards the house, the other way while it flows away, a little faster the more it is. A CSS animation, as a SMIL
+    one restarts whenever its expression-driven duration changes. A share on the ring (share_orbit) covers them."""
+    p = f"Math.abs({power})"
+    dur = f"({p} < 300 ? 9 : {p} < 1000 ? 7 : {p} < 2500 ? 5.5 : 4)"
+    c = round(2 * math.pi * ORBIT, 1)
+    return svg("circle", visible=f"={p} > {threshold}", cx=xy[0], cy=xy[1],
+               r=ORBIT, fill="none", stroke=color, **{
+                   "stroke-width": 3, "stroke-linecap": "round", "stroke-dasharray": f"0 {round(c / 24, 2)}",
+                   "style": {"transform-box": "fill-box", "transform-origin": "center",
+                             "animation": f"='flowOrbit ' + {dur} + 's linear infinite' + (({toward}) ? '' : ' reverse')"}})
+
+
+def share_orbit(xy, share, color, least=0):
+    """A share as an arc on a node's ring, from the top clockwise, full at 1 (share an expression; shown above least):
+    a timer's time left, the battery's charge, the heat pump's frequency, power or tank temperature. An underlay in
+    the card colour hides the grey ring and the running dots under the arc, so they run on only where it leaves the
+    ring free; it is a little wider and longer than the arc, so no dot peeps out at its edges."""
+    c = round(2 * math.pi * ORBIT, 1)
+    dash = f"=(Math.min(1, {share}) * {c}).toFixed(1) + ' {c}'"
+    arc = {"cx": xy[0], "cy": xy[1], "r": ORBIT, "fill": "none", "transform": f"rotate(-90 {xy[0]} {xy[1]})",
+           "stroke-linecap": "round", "stroke-dasharray": dash}
+    return svg("g", [svg("circle", style={"stroke": "var(--f7-card-bg-color, #fff)"}, **arc, **{"stroke-width": 5}),
+                     svg("circle", stroke=color, **arc, **{"stroke-width": 3.5, "opacity": "0.9"})],
+               visible=f"={share} > {least}")
+
+
+M_AC, M_VENT = num("air_conditioning_timer"), num("ventilation_timer")
+
+
+def timer_full(item, high):
+    """The minutes a full timer ring stands for: what the timer was last set to, by hand or by its automatic start
+    (<item>_set, kept by the rule timer_set_value), high until it has been set once; never less than the time left."""
+    return f"Math.max({num(item)}, {num(item + '_set')} || {high})"
+VENT_POWER = num("ventilation_power")
+ON_RING = round(ORBIT / math.sqrt(2), 1)  # a badge's offset on the ring, at 45°
+
+
+def timer_line(m, color, otherwise):
+    """A node's second line: the time left while its timer runs, in the device's colour, otherwise as it was."""
+    return {"content": f"={m} > 0 ? 'Timer ' + {hm(m)} : ({otherwise[1:]})", "fill": f"={m} > 0 ? '{color}' : 'currentColor'",
+            "opacity": f"={m} > 0 ? '1' : '0.7'"}
+
+
+def energy_flow():
+    """The energy flow's card content: the star of eight nodes with their rings, timers, badges and links, and under
+    it the house's figures and the switches."""
+    hp_defrost = f"items.{HPX['defrost']}.state === 'ON'"
+    # the heat pump's badge: defrosting, else what its valve serves; filled while it draws more than HP_ON watts
+    operation = f"={hp_defrost} ? 'ac_unit' : {DHW_MODE} ? 'shower' : 'local_fire_department'"
+    ac_texts = below(AC_XY, f"={fixed(f'{AC_NET} / 1000', 3)} + ' kW'", kwh(num("air_conditioning_unit_energy_today")))
+    ac_texts[1]["config"].update(timer_line(M_AC, AC_BLUE, ac_texts[1]["config"]["content"]))
+    vent_texts = beside(VENT_XY, f"={fixed(f'{VENT_POWER} / 1000', 3)} + ' kW'",
+                        f"='Stufe ' + {disp('esplyfterl_level')}", 1)
+    vent_texts[1]["config"].update(timer_line(M_VENT, VENT_TEAL, vent_texts[1]["config"]["content"]))
+    nodes = [VENT_XY, HP_XY, AC_XY, ECAR_XY, APPL_XY, BATT_XY, GRID_XY, PV_XY, HOME_XY]
+    level = svg("g", [svg("circle", cx=round(VENT_XY[0] - ON_RING, 1), cy=round(VENT_XY[1] - ON_RING, 1), r=12,
+                          fill=VENT_TEAL),
+                      svg("text", x=round(VENT_XY[0] - ON_RING, 1), y=round(VENT_XY[1] - ON_RING, 1),
+                          content="=items.esplyfterl_level.state", fill="#ffffff",
+                          **{"font-size": 13, "font-weight": "700", "text-anchor": "middle",
+                             "dominant-baseline": "central"})])
+    drawing = svg("svg", [
+        # connections first, so the nodes sit on top of the line ends
+        *spoke(PV_XY, "#ffb300", num(PV), "true"),
+        *spoke(GRID_XY, GRID_COLOR, num(GRID), f"{num(GRID)} > 0"),
+        *spoke(HP_XY, "#fb8c00", num(HP), "false", threshold=HP_ON),
+        *spoke(AC_XY, "#29b6f6", AC_FLOW, "false", threshold=AC_ON),
+        *spoke(ECAR_XY, ECAR_COLOR, num(ECAR), "false", threshold=ECAR_ON),
+        *spoke(APPL_XY, APPL_COLOR, APPL_POWER, "false", threshold=APPL_ON),
+        *spoke(BATT_XY, "#7cb342", num(BATT), f"{num(BATT)} > 0"),
+        *spoke(VENT_XY, VENT_TEAL, VENT_POWER, "false", threshold=5),
+        # every circle's grey ring; while power flows, dots in the node's colour run round it; a running timer fills
+        # the air conditioner's and the ventilation's ring with its time left, the battery's charge its ring, the dots
+        # running on in the rest
+        *[svg("circle", cx=x, cy=y, r=ORBIT, fill="none", stroke="rgba(127, 127, 127, 0.28)", **{"stroke-width": 3})
+          for x, y in nodes],
+        flow_orbit(PV_XY, "#ffb300", num(PV), "true", 10),
+        flow_orbit(GRID_XY, GRID_COLOR, num(GRID), f"{num(GRID)} > 0", 10),
+        flow_orbit(BATT_XY, "#7cb342", num(BATT), f"{num(BATT)} > 0", 10),
+        flow_orbit(HP_XY, HP_ORANGE, num(HP), "false", HP_ON),
+        flow_orbit(ECAR_XY, ECAR_COLOR, num(ECAR), "false", ECAR_ON),
+        flow_orbit(APPL_XY, APPL_COLOR, APPL_POWER, "false", APPL_ON),
+        flow_orbit(HOME_XY, "#1e88e5", num(HOME), "true", 10),
+        flow_orbit(AC_XY, AC_BLUE, AC_FLOW, "false", AC_ON),
+        flow_orbit(VENT_XY, VENT_TEAL, VENT_POWER, "false", 5),
+        share_orbit(AC_XY, f"{M_AC} / {timer_full('air_conditioning_timer', 720)}", AC_BLUE),
+        share_orbit(VENT_XY, f"{M_VENT} / {timer_full('ventilation_timer', 360)}", VENT_TEAL),
+        share_orbit(BATT_XY, f"{num(SOC)} / 100", "#7cb342"),
+        flow_node("pv", PV_XY, num(PV)),
+        flow_node("grid", GRID_XY, num(GRID)),
+        flow_node("home", HOME_XY, num(HOME)),
+        flow_node("heat-pump", HP_XY, num(HP)),
+        flow_node("air-conditioner", AC_XY, AC_FLOW),
+        flow_node("e-car", ECAR_XY, num(ECAR)),
+        flow_node("appliances", APPL_XY, APPL_POWER),
+        flow_node("battery", BATT_XY, soc=num(SOC)),
+        flow_node("ventilation", VENT_XY, VENT_POWER),
+        # badges on the rings: the heat pump's operation upper right; on/off and the level upper left, where a timer's
+        # arc ends
+        ring_badge(round(HP_XY[0] + ON_RING, 1), round(HP_XY[1] - ON_RING, 1), operation, HP_ORANGE, HP_RUNNING),
+        ring_badge(round(AC_XY[0] - ON_RING, 1), round(AC_XY[1] - ON_RING, 1), "power_settings_new", AC_BLUE, AC_ON_STATE),
+        level,
+        *beside(PV_XY, f"={kw(PV)}", f"={disp('huawei_inverter_e_day')} + ' heute'", -1),
+        *vent_texts,
+        *below(GRID_XY, f"={signed_kw}", into_out_of(("Bezug", num("huawei_inverter_power_meter_ec_day")),
+                                                   ("Einsp.", num("huawei_inverter_power_meter_ep_day")))),
+        *below(HP_XY, f"={kw(HP)}", kwh(num("espaltherma_energy_today"))),
+        *ac_texts,
+        *below(ECAR_XY, f"={kw(ECAR)}", kwh(num("e_car_energy_today"))),
+        *below(APPL_XY, f"={fixed(f'{APPL_POWER} / 1000', 3)} + ' kW'", kwh(APPL_DAY)),
+        *below(BATT_XY, f"={fixed(f'{num(BATT)} / 1000', 3)} + ' kW'",  # negative while charging
+               into_out_of(("Entl.", num("huawei_inverter_energy_storage_day_discharge")),
+                           ("Gel.", num("huawei_inverter_energy_storage_day_charge")))),
+    ], viewBox=f"0 0 {FLOW_W} {FLOW_H}", width="100%", style={"display": "block", "overflow": "visible"})
+    quick = [(HP_XY, "heatpump-quick"), (AC_XY, "air-conditioner-quick"), (VENT_XY, "ventilation-quick")]
+    links = [*[node_link(cx, cy, popup) for cx, cy, popup in NODE_POPUPS],
+             *[comp("oh-link", {"action": "popup", "actionModal": quick_panel(uid)["component"],
+                                "actionModalConfig": dict(quick_panel(uid)["config"]), "style": node_box(*xy)})
+               for xy, uid in quick]]
+    star = div([div([drawing, *links],
+                    # at most at its own size, one unit a pixel, so its texts keep the UI's sizes on a wide screen
+                    **{"position": "relative", "max-width": f"{FLOW_W}px", "width": "100%", "margin": "0 auto"})],
+               # it centres itself in the height the row leaves, the cards below stay at the card's bottom
+               **{"padding": f"={NARROW} ? '4px' : '12px'", "flex": "1 1 auto", "display": "flex",
+                  "flex-direction": "column", "justify-content": "center"})
+    star["config"]["stylesheet"] = "@keyframes flowOrbit { to { transform: rotate(360deg); } }"
+    strip = div([house_tiles(), switch_tiles()], **{"display": "flex", "flex-direction": "column", "gap": "10px",
+                                                    "padding": "8px 12px 14px"})
+    return [star, strip]
+
+
+TILE_BG = "rgba(127, 127, 127, 0.08)"
+
+
+def house_tiles():
+    """The house's power and energy today, today's self-consumption and self-sufficiency, as three small cards under
+    the star, each opening its popup with a tap anywhere on it: three abreast, on a phone the house above the two
+    rings. Each has a large pale icon at its lower right, as the value tiles have."""
+    home = div([comp("oh-icon", {"icon": "material:home", "width": 24, "height": 24,
+                                 "style": {"color": "#1e88e5", "flex": "0 0 auto"}}),
+                div([label(f"={kw(HOME)}", **{"font-size": "16px", "font-weight": "700", "line-height": "20px",
+                                              "white-space": "nowrap"}),
+                     label(kwh(num("home_ec_day")), **{"font-size": "11px", "opacity": "0.7", "white-space": "nowrap"})],
+                    **{"display": "flex", "flex-direction": "column", "min-width": "0"})],
+               **{"display": "flex", "align-items": "center", "gap": "8px"})
+    ring_svg = lambda ring: svg("svg", [flow_share_ring((24, 25), *ring)], viewBox="0 0 150 50", width="100%",
+                                style={"display": "block", "overflow": "visible", "max-width": "170px"})
+
+    def tile(child, popup, icon, color, **extra):
+        # the value tiles' watermark: 58 px, 6 px past the right edge and 10 past the bottom, at 16 %
+        mark = comp("oh-icon", {"icon": f"material:{icon}", "width": 58, "height": 58, "style": {
+            "position": "absolute", "right": "-6px", "bottom": "-10px", "opacity": "0.16", "color": color}})
+        link = comp("oh-link", {"action": "popup", "actionModal": f"page:{popup}",
+                                "style": {"position": "absolute", "inset": "0", "display": "block",
+                                          "border-radius": "12px"}})
+        return div([mark, div([child], **{"position": "relative", "min-width": "0", "flex": "1 1 auto"}), link],
+                   **{"position": "relative", "overflow": "hidden", "padding": "8px 10px", "border-radius": "12px",
+                      "background": TILE_BG, "min-width": "0", "display": "flex", "align-items": "center", **extra})
+    return div([tile(home, "flow_home", "home", "#1e88e5", **{"grid-column": f"={NARROW} ? '1 / -1' : 'auto'"}),
+                tile(ring_svg(SELF_CONSUMPTION), "flow_self_consumption", "solar_power", "#43a047"),
+                tile(ring_svg(SELF_SUFFICIENCY), "flow_self_sufficiency", "energy_savings_leaf", "#43a047")],
+               **{"display": "grid", "gap": "8px",
+                  "grid-template-columns": f"={NARROW} ? 'repeat(2, minmax(0, 1fr))' : 'repeat(3, minmax(0, 1fr))'"})
+
 
 # ---------------------------------------------------------------- 2a. weather, a slim bar at the top
 
@@ -1252,6 +1449,8 @@ HPX = {  # heat pump items
     "heat": "espaltherma_heating_power", "cop": "espaltherma_cop", "defrost": "espaltherma_defrost_operaton",
     "refrigerant": "espaltherma_refrig_temp_liquid_side", "pressure": "espaltherma_refrigerant_pressure_sensor",
     "hot_gas": "espaltherma_discharge_pipe_temp",
+    # the middle of the outdoor unit's heat exchanger, which the refrigerant evaporates in
+    "exchanger": "espaltherma_heat_exchanger_mid_temp",
     # each device's own draw: the measured circuit of the outdoor unit, the nominal powers of the backup heater in the
     # wall unit and of the booster heater in the tank; "power" is their sum
     "circuit": "heatpump_power", "buh_power": "espaltherma_electrical_power_buh",
@@ -1260,14 +1459,24 @@ HPX = {  # heat pump items
     "water_heat": "espaltherma_heating_power_after_buh",
 }
 PUMP_ON = f"(items.{HPX['pump']}.state === 'ON' || {num(HPX['flow'])} > 0)"
+# what fills a ring of the heat pump card: the compressor's top frequency, the highest draw persisted without the
+# heaters (heatpump_power, 3578 W on 2026-03-26 13:50; its single 4670 W at 0 Hz on 2026-05-15 is a glitch of the
+# meter), a hot tank, the highest leaving water the one heating circuit, floor heating, is set to ([9-00] 40 °C; its
+# heating curve reaches 35 °C at the coldest, [1-02]). The rings stay in the nodes' colours, graded nowhere.
+HZ_FULL, POWER_FULL, TANK_FULL, SUPPLY_FULL = 74, 3578, 60, 40
 DHW_MODE = f"items.{HPX['valve']}.state === 'DHW'"
 HEATING_FLOW = f"({PUMP_ON} && !({DHW_MODE}))"
+# the heating circuits' rings: the leaving water against its highest setting, while they carry it
+CIRCUIT_SHARE = f"({HEATING_FLOW} ? {num(HPX['supply'])} / {SUPPLY_FULL} : 0)"
 TANK_FLOW = f"({PUMP_ON} && ({DHW_MODE}))"
 COMPRESSOR = f"{num(HPX['hz'])} > 0"
+# a defrost turns the refrigerant cycle round: heat goes from the water back to the outdoor unit
+DEFROSTING = f"items.{HPX['defrost']}.state === 'ON'"
 BUH_ON = f"(items.{HPX['buh1']}.state === 'ON' || items.{HPX['buh2']}.state === 'ON')"
 BSH_ON = f"items.{HPX['bsh']}.state === 'ON'"
 SUPPLY, RETURN, REFRIGERANT = "#e57373", "#64b5f6", "#ba68c8"
 SPACE_C, DHW_C, STANDBY_C = "#ffb74d", "#e57373", "#b0bec5"
+ELECTRIC_C, COP_C = "#ffa726", "#66bb6a"  # the heat pump card's electricity and COP
 
 
 def grad(id_, stops, vertical=True):
@@ -1286,11 +1495,18 @@ def wall_unit_node(cx, cy):
 
 
 def valve_node(cx, cy):
+    """The three-way valve: the inlet from the wall unit at the right, the port to the tank at the left, the port to
+    the heating riser at the top. The open outlet is filled orange, the closed one hollow and faint, so its position
+    shows: up to the heating circuits, or left to the tank for hot water."""
+    to_tank, to_heating = f"={DHW_MODE} ? '#fb8c00' : 'none'", f"={DHW_MODE} ? 'none' : '#fb8c00'"
+    faint = lambda tank: f"={DHW_MODE} ? '{1 if tank else 0.4}' : '{0.4 if tank else 1}'"
     return [ring(cx, cy, "#ffb74d"),
-            svg("polygon", points=f"{cx - 12},{cy - 6} {cx},{cy} {cx - 12},{cy + 6}", **stroke(1.4, fill="#ffe0b2")),
+            svg("polygon", points=f"{cx - 12},{cy - 6} {cx},{cy} {cx - 12},{cy + 6}",
+                **stroke(1.4, fill=to_tank, **{"stroke-opacity": faint(True)})),
             svg("polygon", points=f"{cx + 12},{cy - 6} {cx},{cy} {cx + 12},{cy + 6}", **stroke(1.4, fill="#ffe0b2")),
             # the third port points up to the heating riser, the actuator hangs below
-            svg("polygon", points=f"{cx - 6},{cy - 12} {cx},{cy} {cx + 6},{cy - 12}", **stroke(1.4, fill="#ffe0b2")),
+            svg("polygon", points=f"{cx - 6},{cy - 12} {cx},{cy} {cx + 6},{cy - 12}",
+                **stroke(1.4, fill=to_heating, **{"stroke-opacity": faint(False)})),
             svg("line", x1=cx, y1=cy, x2=cx, y2=cy + 11, **stroke(1.6)),
             svg("rect", x=cx - 5, y=cy + 11, width=10, height=5, rx=1, **stroke(1.4))]
 
@@ -1332,14 +1548,52 @@ def hp_text(x, y, content, size, weight="normal", anchor="middle", opacity="1", 
                **{"font-size": size, "font-weight": weight, "text-anchor": anchor, "opacity": opacity})
 
 
-def hp_route(d, color, active, dur="2s"):
-    """Pipe along a polyline with three dots running in its drawing direction while `active`."""
+def path_points(d):
+    """The corners of a polyline of absolute M, L, H and V commands."""
+    points, x, y = [], 0, 0
+    for cmd, args in re.findall(r"([MLHV])\s*([-\d.,\s]+)", d):
+        nums = [float(v) for v in re.split(r"[\s,]+", args.strip()) if v]
+        if cmd in "ML":
+            x, y = nums[0], nums[1]
+        elif cmd == "H":
+            x = nums[0]
+        else:
+            y = nums[0]
+        points.append((x, y))
+    return points
+
+
+def reversed_path(d):
+    """A polyline of absolute M, L, H and V commands, drawn from its other end."""
+    return "M" + " L".join(f"{px:g},{py:g}" for px, py in reversed(path_points(d)))
+
+
+# every pipe's dots keep the same spacing, so a long pipe has more of them, not further apart ones; they all run at
+# the same speed, which follows the water's flow on the water pipes and the compressor's frequency on the
+# refrigerant's, in steps, as a changed duration restarts the animation
+DOT_SPACING = 40  # units between two dots
+HP_ORBIT = 38  # the grey ring round every device, as in the energy flow
+DOT_SPEEDS = [20, 35, 50, 65, 80]  # units per second, one per step
+FLOW_STEPS = [6, 12, 18, 24]  # l/min
+FREQUENCY_STEPS = [30, 45, 60, 75]  # Hz
+
+
+def hp_route(d, color, active, reverse=None, pace=None):
+    """Pipe along a polyline with dots running in its drawing direction while `active`, the other way while `reverse`
+    holds; one dot per DOT_SPACING of its length, at a speed from DOT_SPEEDS by `pace`, a (value, steps) pair. The
+    dots are spaced by their keyPoints, as on the energy flow's links."""
+    points = path_points(d)
+    length = sum(math.hypot(bx - ax, by - ay) for (ax, ay), (bx, by) in zip(points, points[1:]))
+    count = max(1, round(length / DOT_SPACING))
+    value, bins = pace
+    dur = steps(value, bins, [f"{round(length / speed, 2)}s" for speed in DOT_SPEEDS])
+    path = f"={reverse} ? '{reversed_path(d)}' : '{d}'" if reverse else d
     dots = []
-    for i in range(3):
-        o = round(i / 3, 4)
+    for i in range(count):
+        o = round(i / count, 4)
         timing = ({"keyPoints": "0;1", "keyTimes": "0;1"} if i == 0 else
                   {"keyPoints": f"{o};1;0;{o}", "keyTimes": f"0;{round(1 - o, 4)};{round(1 - o, 4)};1"})
-        dots.append(svg("circle", [svg("animateMotion", path=d, dur=dur, repeatCount="indefinite",
+        dots.append(svg("circle", [svg("animateMotion", path=path, dur=dur, repeatCount="indefinite",
                                        calcMode="linear", **timing)],
                         visible=f"={active}", r=4.5, fill=color, cx=0, cy=0))
     return [svg("path", d=d, **stroke(3, color, opacity=f"={active} ? '0.55' : '0.18'",
@@ -1361,70 +1615,109 @@ def rounded_polygon(points, r):
     return " ".join(parts) + " Z"
 
 
-# vertical layout: eaves 162 (ridge 112), upper/ground floor at 270, ground level at 386, basement floor at 510;
+# vertical layout: eaves 162 (ridge 137, a flat pitch), upper/ground floor at 270, ground level at 386, basement
+# floor at 502, the basement only as high as its devices with their grey rings and the radiators' branch above them
+# need;
 # the nodes sit in the middle of their level.
 # The house runs from 100 to 610 and bounds the drawing: the outdoor unit sits on the right slope of the roof
 # with its values to its left, the refrigerant runs down inside the right wall to the wall unit.
-EAVE, RIDGE, FLOOR_1, GROUND_LEVEL, BOTTOM = 162, 112, 270, 386, 510
+EAVE, RIDGE, FLOOR_1, GROUND_LEVEL, BOTTOM = 162, 137, 270, 386, 502
 UPPER_Y, GROUND_Y, BASEMENT_Y = (EAVE + FLOOR_1) // 2, (FLOOR_1 + GROUND_LEVEL) // 2, (GROUND_LEVEL + BOTTOM) // 2
 LEFT, RIGHT = 100, 610
-OUT, WALL, VALVE, TANK = (575, 110), (540, BASEMENT_Y), (434, BASEMENT_Y), (328, BASEMENT_Y)
-RADIATORS, GROUND_FH, UPPER_FH = (222, BASEMENT_Y), (320, GROUND_Y), (320, UPPER_Y)  # floor loops right of the radiators
+# the basement's four devices evenly spaced from the radiators to the wall unit beside the refrigerant line, the
+# radiators' ring as far from the left wall as the wall unit's from the right one; the floor loops above, left of the
+# riser
+WALL_X = 532
+RADIATORS_X = LEFT + RIGHT - WALL_X
+RADIATORS, TANK, VALVE, WALL = ((round(RADIATORS_X + (WALL_X - RADIATORS_X) * k / 3), BASEMENT_Y) for k in range(4))
+# the outdoor unit on the right slope of the roof, the refrigerant down inside the right wall from it
+OUT, GROUND_FH, UPPER_FH = (575, 102), (337, GROUND_Y), (337, UPPER_Y)
 REFRIGERANT_X = 588
 HOUSE = 0.4  # outline opacity
-HP_VB = (92, 72, 526, BOTTOM + 60 - 72)  # viewBox: x, y, width, height; 7 units beside the house on both sides
+HP_VB = (92, 15, 526, BOTTOM + 121 - 15)  # viewBox: x, y, width, height; 7 units beside the house on both sides
 
-# the water's heat, measured after the backup heater: the pipe from the wall unit carries it to the valve, the tank's
-# booster heater adds its own behind that. Its badge is framed in a colour from its size: grey while idle, yellow up to
-# 2 kW, orange up to 5 kW, red above, blue while it is negative (a defrost draws heat from the water)
-WATER_HEAT = num(HPX["water_heat"])
-water_heat_color = (f"=['NULL', 'UNDEF'].includes(items.{HPX['water_heat']}.state) ? '#9e9e9e' : "
-                    f"{WATER_HEAT} < -50 ? '#64b5f6' : {WATER_HEAT} < 50 ? '#9e9e9e' : {WATER_HEAT} < 2000 ? '#fbc02d' : "
-                    f"{WATER_HEAT} < 5000 ? '#fb8c00' : '#e57373'")
-# the refrigerant's badge in its colour while the compressor runs, grey while it stands
-refrigerant_color = f"={COMPRESSOR} ? '{REFRIGERANT}' : '#9e9e9e'"
 # the heating water's pressure outside the range of 1 to 2,5 bar (no value is not out of range)
 WATER_PRESSURE_BAD = (f"(!['NULL', 'UNDEF'].includes(items.{HPX['water_pressure']}.state) && "
                       f"({num(HPX['water_pressure'])} < 1 || {num(HPX['water_pressure'])} > 2.5))")
-ROOM_X = (VALVE[0] + REFRIGERANT_X) / 2  # the middle of the room right of the riser, where the badges sit
-BADGE_W = 130  # both badges, wide enough for a label and its value side by side
+ROOM_X = (VALVE[0] + REFRIGERANT_X) / 2  # the middle of the room right of the riser, where its tiles sit
 # the ground floor's free middle, between the lower edge of its floor line (1.4 wide) and the upper edge of the
 # green ground level (3 wide)
 GROUND_MID = (FLOOR_1 + 0.7 + GROUND_LEVEL - 1.5) / 2
-# a badge's caption stands above it, its baseline CAPTION_GAP above the frame; its capitals are CAPTION_CAP high at 12 px
-CAPTION_GAP, CAPTION_CAP = 7, 8.6
-# the water badge sits low enough that caption and badge together are centred on GROUND_MID; the refrigerant badge
-# keeps its place, the roof leaves room above it
-WATER_MID = round(GROUND_MID + (CAPTION_CAP + CAPTION_GAP) / 2, 1)  # rounded, so no float noise reaches the JSON
+TILE_ROW = 17  # from one row of a tile to the next
+# the floors' tiles, 170 wide, stand as far from the outer wall as the ground floor's (three rows) from its floor
+# and ceiling lines, about 14; their floor loops 14 right of them
+FLOOR_TILE_W = 170
+FLOOR_TILE_X = round(LEFT + 1 + ((GROUND_LEVEL - 1.5) - (FLOOR_1 + 0.7) - (35 + 3 * TILE_ROW)) / 2)
 
 
-def badge_row(y, label, value, color):
-    """A row of a badge centred on ROOM_X: a small label at its left, raised so the middle of its capitals meets the
-    middle of the value's digits, the value bold at its right on the baseline y. The raise is half the difference of
-    their heights, (11.5 - 7.75) / 2 at 16 and 11 px in the system font, measured on the live page; 2.5 left the
-    labels 0.6 px high."""
-    return [hp_text(ROOM_X - BADGE_W / 2 + 9, y - 1.85, label, 11, anchor="start", opacity="0.7"),
-            hp_text(ROOM_X + BADGE_W / 2 - 9, y, value, 16, "700", anchor="end", color=color)]
+def percent(item):
+    """A humidity in whole per cent, as the Netatmo reports it; Tado's has two decimals."""
+    return f"(['NULL', 'UNDEF'].includes(items.{item}.state) ? '–' : {fixed(num(item), 0)} + ' %')"
 
 
-def triangle(x, y, up, color, size=1):
-    """The leaving water's triangle pointing up, the inlet water's pointing down, its left corner at x, its base at y."""
-    w, h = 9 * size, 7.5 * size
-    tip = y - h if up else y + h
-    return svg("polygon", points=f"{x},{y} {x + w / 2},{tip} {x + w},{y}", fill=color)
+# the tiles' places (centre x, top, width): the outdoor unit's tile beside the unit, as far above the roof as the
+# indoor unit's below the basement floor, the control's level with it, flush with the left wall; the refrigerant's and the heating circuit's between riser and refrigerant line; the
+# floors' left of their loops; the tank's and the indoor unit's below the house, flush with its walls
+TILE_GAP = 12  # between a tile and the house's outline next to it, as below the basement floor
+OUTDOOR_RIGHT = OUT[0] - HP_ORBIT - TILE_GAP  # the outdoor unit's tile ends that far from the unit's grey ring
 
 
-def hp_badge(cx, y, w, h, color, leader, caption, rows):
-    """A framed badge centred on cx from y, sized w×h, faintly filled in `color`, with a dotted line in that colour
-    between `leader`'s two points (x1, y1, x2, y2), from its pipe to the badge; `caption` above it, `rows` its
-    contents."""
-    x1, y1, x2, y2 = leader
-    return [svg("line", x1=x1, y1=y1, x2=x2, y2=y2, stroke=color,
-                **{"stroke-width": 1.4, "stroke-dasharray": "2 3", "opacity": "0.8"}),
-            hp_text(cx, y - CAPTION_GAP, caption, 12, opacity="0.7"),
-            svg("rect", x=cx - w / 2, y=y, width=w, height=h, rx=10, stroke=color, fill=color,
-                **{"stroke-width": 1.5, "fill-opacity": "0.08"}),
-            *rows]
+def roof_y(x):
+    """The roof's outline at x."""
+    return RIDGE + abs(x - (LEFT + RIGHT) / 2) / ((RIGHT - LEFT) / 2) * (EAVE - RIDGE)
+
+
+OUTDOOR_TILE = (OUTDOOR_RIGHT - 176 / 2,
+                round(roof_y(OUTDOOR_RIGHT - 176) - TILE_GAP - (35 + 4 * TILE_ROW)), 176)
+CONTROL_TILE = (LEFT + 176 / 2, OUTDOOR_TILE[1], 176)
+REFRIGERANT_TILE = (ROOM_X, 170, 136)
+CIRCUIT_TILE = (ROOM_X, round(GROUND_MID - (35 + 3 * TILE_ROW) / 2), 136)
+UPPER_TILE = (FLOOR_TILE_X + FLOOR_TILE_W / 2, round(UPPER_Y - (35 + 2 * TILE_ROW) / 2), FLOOR_TILE_W)
+GROUND_TILE = (FLOOR_TILE_X + FLOOR_TILE_W / 2, round(GROUND_MID - (35 + 3 * TILE_ROW) / 2), FLOOR_TILE_W)
+TANK_TILE = (LEFT + 214 / 2, BOTTOM + 12, 214)
+INDOOR_TILE = (RIGHT - 156 / 2, BOTTOM + 12, 156)
+
+
+def hp_tile(cx, y, w, title, icon, color, on, rows, state=None):
+    """A tile of the drawing, built like the switch tiles under the energy flow: a rounded card, faintly grey, tinted
+    and outlined in its colour while `on`; its icon and title at the top left, then a row
+    per (name, value, colour), the name small at the left, raised so the middle of its capitals meets the middle of
+    the value's digits, the value bold at the right. Centred on cx from y, w wide, 35 + 17 per row high; state, an
+    expression, stands at the top right where given."""
+    x = cx - w / 2
+    out = [svg("rect", x=x, y=y, width=w, height=35 + TILE_ROW * len(rows), rx=12,
+               fill=f"={on} ? '{rgba(color, 0.2)}' : 'rgba(127, 127, 127, 0.08)'",
+               stroke=f"={on} ? '{rgba(color, 0.6)}' : 'none'", **{"stroke-width": 1.5}),
+           glyph(x + 19, y + 16, icon, 18, f"={on} ? '{color}' : 'currentColor'"),
+           hp_text(x + 34, y + 21, title, 13, "600", anchor="start"),
+           *([hp_text(x + w - 10, y + 21, state, 11, "700", anchor="end", opacity="0.7")] if state else [])]
+    for k, (name, value, value_color) in enumerate(rows):
+        base = y + 42 + TILE_ROW * k
+        out += [hp_text(x + 10, base - 1.85, name, 11, anchor="start", opacity="0.7"),
+                hp_text(x + w - 10, base, value, 15, "700", anchor="end", color=value_color)]
+    return out
+
+
+WATER_PACE = (num(HPX["flow"]), FLOW_STEPS)
+COMPRESSOR_PACE = (num(HPX["hz"]), FREQUENCY_STEPS)
+
+
+def hp_orbit(xy, color, active, pace, share=None, share_color=None):
+    """A node's grey ring as in the energy flow, and while `active` dots in the node's colour running round it,
+    clockwise while the heat goes its usual way, the other way during a defrost, faster with the water's flow or the
+    compressor's frequency (`pace`). A CSS animation, as a SMIL one restarts whenever its duration changes. A share
+    fills the ring as in the energy flow, from 1 % on, the dots running on in the rest, in share_color (an expression)
+    or the node's colour."""
+    value, bins = pace
+    c = round(2 * math.pi * HP_ORBIT, 1)
+    dur = steps(value, bins, ["9", "7.5", "6", "4.5", "3.5"])[1:]
+    ring_ = svg("circle", cx=xy[0], cy=xy[1], r=HP_ORBIT, fill="none", stroke="rgba(127, 127, 127, 0.28)",
+                **{"stroke-width": 3})
+    dots = svg("circle", visible=f"={active}", cx=xy[0], cy=xy[1], r=HP_ORBIT, fill="none", stroke=color, **{
+        "stroke-width": 3, "stroke-linecap": "round", "stroke-dasharray": f"0 {round(c / 24, 2)}",
+        "style": {"transform-box": "fill-box", "transform-origin": "center",
+                  "animation": f"='flowOrbit ' + ({dur}) + 's linear infinite' + ({DEFROSTING} ? ' reverse' : '')"}})
+    return [ring_, dots] + ([share_orbit(xy, share, share_color or color, 0.01)] if share else [])
 
 
 hp_svg = svg("svg", [
@@ -1437,72 +1730,97 @@ hp_svg = svg("svg", [
     svg("line", x1=LEFT + 1, y1=FLOOR_1, x2=RIGHT - 1, y2=FLOOR_1, **stroke(1.4, opacity="0.25")),
     svg("line", x1=LEFT + 2, y1=GROUND_LEVEL, x2=RIGHT - 2, y2=GROUND_LEVEL, **stroke(3, "#a5d6a7")),
     # pipes, drawn in flow direction: refrigerant from the roof down inside the wall, supply riser with one
-    # branch per level
-    *hp_route(f"M{REFRIGERANT_X},{OUT[1] + 27} V{WALL[1]} H{WALL[0] + 30}", REFRIGERANT, COMPRESSOR),
-    *hp_route(f"M{WALL[0] - 30},{WALL[1]} H{VALVE[0] + 30}", SUPPLY, PUMP_ON, "1.2s"),
-    *hp_route(f"M{VALVE[0] - 30},{VALVE[1]} H{TANK[0] + 30}", SUPPLY, TANK_FLOW, "1.2s"),
-    *hp_route(f"M{VALVE[0]},{VALVE[1] - 30} V{UPPER_FH[1]} H{UPPER_FH[0] + 30}", SUPPLY, HEATING_FLOW, "2.4s"),
-    *hp_route(f"M{VALVE[0]},{GROUND_FH[1]} H{GROUND_FH[0] + 30}", SUPPLY, HEATING_FLOW, "1.6s"),
-    *hp_route(f"M{VALVE[0]},{GROUND_LEVEL + 18} H{RADIATORS[0]} V{RADIATORS[1] - 30}", SUPPLY, HEATING_FLOW, "2s"),
+    # branch per level; during a defrost the dots run back, as the heat goes from the water to the outdoor unit
+    *hp_route(f"M{REFRIGERANT_X},{OUT[1] + 27} V{WALL[1]} H{WALL[0] + 30}", REFRIGERANT, COMPRESSOR, reverse=DEFROSTING,
+              pace=(num(HPX["hz"]), FREQUENCY_STEPS)),
+    *hp_route(f"M{WALL[0] - 30},{WALL[1]} H{VALVE[0] + 30}", SUPPLY, PUMP_ON, reverse=DEFROSTING, pace=WATER_PACE),
+    *hp_route(f"M{VALVE[0] - 30},{VALVE[1]} H{TANK[0] + 30}", SUPPLY, TANK_FLOW, reverse=DEFROSTING, pace=WATER_PACE),
+    *hp_route(f"M{VALVE[0]},{VALVE[1] - 30} V{UPPER_FH[1]} H{UPPER_FH[0] + 30}", SUPPLY, HEATING_FLOW,
+              reverse=DEFROSTING, pace=WATER_PACE),
+    *hp_route(f"M{VALVE[0]},{GROUND_FH[1]} H{GROUND_FH[0] + 30}", SUPPLY, HEATING_FLOW, reverse=DEFROSTING,
+              pace=WATER_PACE),
+    *hp_route(f"M{VALVE[0]},{GROUND_LEVEL + 12} H{RADIATORS[0]} V{RADIATORS[1] - 30}", SUPPLY, HEATING_FLOW,
+              reverse=DEFROSTING, pace=WATER_PACE),
     # devices where they are, drawn like the energy flow nodes
+    # every device's grey ring, its dots running while it works
+    # the outdoor unit's ring filled by the compressor's frequency; the wall unit's by the heat pump's draw, full and
+    # red while its backup heater runs; the tank's by its temperature; the heating circuits' by the leaving water
+    # while they carry it
+    *hp_orbit(OUT, "#fb8c00", COMPRESSOR, COMPRESSOR_PACE, f"{num(HPX['hz'])} / {HZ_FULL}"),
+    *hp_orbit(WALL, "#64b5f6", PUMP_ON, WATER_PACE, f"({BUH_ON} ? 1 : {num(HPX['power'])} / {POWER_FULL})",
+              f"={BUH_ON} ? '#e53935' : '#64b5f6'"),
+    *hp_orbit(VALVE, "#ffb74d", PUMP_ON, WATER_PACE),
+    *hp_orbit(TANK, "#e57373", f"({TANK_FLOW} || {BSH_ON})", WATER_PACE, f"{num(HPX['tank'])} / {TANK_FULL}"),
+    *hp_orbit(RADIATORS, "#ffab91", HEATING_FLOW, WATER_PACE, CIRCUIT_SHARE),
+    *hp_orbit(GROUND_FH, "#f48fb1", HEATING_FLOW, WATER_PACE, CIRCUIT_SHARE),
+    *hp_orbit(UPPER_FH, "#f48fb1", HEATING_FLOW, WATER_PACE, CIRCUIT_SHARE),
     flow_node("heat-pump", OUT, num(HPX["circuit"])),
     *wall_unit_node(*WALL), *valve_node(*VALVE), *tank_node(*TANK),
     *radiator_node(*RADIATORS), *floor_node(*GROUND_FH), *floor_node(*UPPER_FH),
-    # values beside their devices
-    hp_text(OUT[0] - 38, OUT[1] - 22, f"='Außengerät · ' + {disp(HPX['outdoor'])}", 13, anchor="end", opacity="0.7"),
-    hp_text(OUT[0] - 38, OUT[1] - 2, f"={kw2(HPX['circuit'])} + ' · ' + {disp(HPX['hz'])}", 17, "700", anchor="end"),
-    svg("text", x=OUT[0] - 38, y=OUT[1] + 16, content="Defrosting", fill="#4fc3f7",
-        visible=f"=items.{HPX['defrost']}.state === 'ON'", **{"font-size": 13, "text-anchor": "end"}),
-    # the refrigerant's hot gas over its liquid temperature and its pressure in a badge in the upper floor, each row
-    # labelled, a dotted line across to its line
-    *hp_badge(ROOM_X, UPPER_Y - 36.5, BADGE_W, 73, refrigerant_color,
-              (ROOM_X + BADGE_W / 2, UPPER_Y, REFRIGERANT_X - 1.5, UPPER_Y), "Kältemittel", [
-        *badge_row(UPPER_Y - 13.5, "Heißgas", f"={disp(HPX['hot_gas'])}", REFRIGERANT),
-        *badge_row(UPPER_Y + 5.5, "Flüssig", f"={disp(HPX['refrigerant'])}", REFRIGERANT),
-        *badge_row(UPPER_Y + 24.5, "Druck", f"={disp(HPX['pressure'])}", REFRIGERANT)]),
-    hp_text(UPPER_FH[0] - 40, UPPER_Y - 6, "Upper Floor", 16, "700", anchor="end"),
-    hp_text(UPPER_FH[0] - 40, UPPER_Y + 13, f"='Fußbodenheizung · ' + {disp('faikout_perfera_temperature')}", 12, anchor="end",
-            opacity="0.7"),
-    hp_text(GROUND_FH[0] - 40, GROUND_Y - 6, "Ground Floor", 16, "700", anchor="end"),
-    hp_text(GROUND_FH[0] - 40, GROUND_Y + 13, f"='Fußbodenheizung · ' + {disp(HPX['indoor'])}", 12, anchor="end",
-            opacity="0.7"),
-    hp_text(VALVE[0], VALVE[1] + 47, f"={DHW_MODE} ? 'Warmwasser' : 'Heizung'", 14, "700", color="#ffa726"),
-    # the tank's temperature below it, on the valve's line
-    hp_text(TANK[0], TANK[1] + 47, f"={disp(HPX['tank'])}", 14, "700", color=tank_text),
-    # the sum of all electrical consumers below the wall unit
-    hp_text(WALL[0], WALL[1] + 47, f"={kw2(HPX['power'])}", 14, "700", color="#fb8c00"),
-    # the water's heat over its leaving and inlet temperatures in a badge in the ground floor, a dotted line from the
-    # middle of the pipe between wall unit and valve up to it
-    *hp_badge(ROOM_X, WATER_MID - 38.5, BADGE_W, 77, water_heat_color,
-              ((VALVE[0] + WALL[0]) / 2, WALL[1] - 3, ROOM_X, WATER_MID + 38.5), "Wärmeleistung", [
-        hp_text(ROOM_X, WATER_MID - 13.5, f"={kw2(HPX['water_heat'])}", 18, "700"),
-        triangle(ROOM_X - 35, WATER_MID + 7.5, True, SUPPLY, 1.1),
-        hp_text(ROOM_X - 21, WATER_MID + 7.5, f"={disp(HPX['supply'])}", 16, "700", anchor="start", color=SUPPLY),
-        triangle(ROOM_X - 35, WATER_MID + 15.5, False, RETURN, 1.1),
-        hp_text(ROOM_X - 21, WATER_MID + 26.5, f"={disp(HPX['return'])}", 16, "700", anchor="start", color=RETURN)]),
-    hp_text(RADIATORS[0] - 40, BASEMENT_Y - 6, "Basement", 16, "700", anchor="end"),
-    hp_text(RADIATORS[0] - 40, BASEMENT_Y + 13, "Radiators", 12, anchor="end", opacity="0.7"),
-    # the tank's and the indoor unit's names, centred below them, each with its water below (the tank's setpoint, the
-    # wall unit's flow and the circuit's pressure, red outside its range) and its own heater below that
-    hp_text(TANK[0], BOTTOM + 26, "Warmwasserspeicher", 15, "700"),
-    hp_text(TANK[0], BOTTOM + 42, f"='Soll ' + {disp(HPX['tank_set'])}", 12, opacity="0.7"),
-    hp_text(TANK[0], BOTTOM + 57, f"='Zusatzheizung ' + ({BSH_ON} ? {kw2(HPX['bsh_power'])} : 'Aus')", 12, opacity="0.7"),
-    hp_text(WALL[0], BOTTOM + 26, "Innengerät", 15, "700"),
-    svg("text", [svg("tspan", content=f"={disp(HPX['flow'])} + ' · '", **{"fill-opacity": "0.7"}),
-                 svg("tspan", content=f"={disp(HPX['water_pressure'])}",
-                     fill=f"={WATER_PRESSURE_BAD} ? '#e57373' : 'currentColor'",
-                     **{"fill-opacity": f"={WATER_PRESSURE_BAD} ? '1' : '0.7'",
-                        "font-weight": f"={WATER_PRESSURE_BAD} ? '700' : 'normal'"})],
-        x=WALL[0], y=BOTTOM + 42, fill="currentColor", **{"font-size": 12, "text-anchor": "middle"}),
-    hp_text(WALL[0], BOTTOM + 57, f"='Heizstab ' + ({BUH_ON} ? {kw2(HPX['buh_power'])} : 'Aus')", 12, opacity="0.7"),
+    # the outdoor unit's tile in the sky left of it, clear of the roof: the power of its own circuit, the compressor's
+    # frequency, the outdoor temperature and the middle of its heat exchanger; Abtauen during a defrost. 176 wide, so
+    # Abtauen at its top right clears the title
+    *hp_tile(*OUTDOOR_TILE, "Außengerät", "heat_pump", "#fb8c00", COMPRESSOR, [
+        ("Leistung", f"={kw2(HPX['circuit'])}", "#fb8c00"),
+        ("Verdichter", f"={disp(HPX['hz'])}", "currentColor"),
+        ("Außen", f"={disp(HPX['outdoor'])}", "currentColor"),
+        ("Wärmetauscher", f"={disp(HPX['exchanger'])}", "currentColor")],
+             state=f"=items.{HPX['defrost']}.state === 'ON' ? 'Abtauen' : ''"),
+    # the control's tile flush with the left wall: whether heating and hot water are on (Boost while the powerful
+    # mode runs), the Smart Grid state and the automation; tinted while the grid asks for something
+    *hp_tile(*CONTROL_TILE, "Regelung", "tune", "#fb8c00", "items.espaltherma_smart_grid.state !== '0'", [
+        ("Heizung", "=items.pyaltherma_climate_control_power.state === 'ON' ? 'An' : 'Aus'", "currentColor"),
+        ("Warmwasser", "=items.pyaltherma_dhw_powerful.state === 'ON' ? 'Boost' : "
+                       "items.pyaltherma_dhw_power.state === 'ON' ? 'An' : 'Aus'", "currentColor"),
+        ("Smart Grid", "=(" + " : ".join(f"items.espaltherma_smart_grid.state === '{v}' ? '{t}'" for v, t in
+                                          [("1", "Sperre"), ("2", "Empfehlung"), ("3", "Befehl")]) + " : 'Normal')",
+         "currentColor"),
+        ("Automatik", "=items.heatpump_management.state === 'ON' ? 'An' : 'Aus'", "currentColor")]),
+    # right of the riser, centred between it and the refrigerant line: the refrigerant in the upper floor, between
+    # its sloping ceiling and its floor, the heating circuit in the ground floor
+    *hp_tile(*REFRIGERANT_TILE, "Kältemittel", "severe_cold", REFRIGERANT, COMPRESSOR, [
+        ("Heißgas", f"={disp(HPX['hot_gas'])}", "currentColor"),
+        ("Flüssig", f"={disp(HPX['refrigerant'])}", "currentColor"),
+        ("Druck", f"={disp(HPX['pressure'])}", "currentColor")]),
+    # the heating circuit's tile: the water's heat after the backup heater (what the pipe from the wall unit carries,
+    # without the booster heater in the tank) over its leaving and inlet temperatures
+    *hp_tile(*CIRCUIT_TILE, "Heizkreis", "waves", SUPPLY, HEATING_FLOW, [
+        ("Wärme", f"={kw2(HPX['water_heat'])}", "currentColor"),
+        ("Vorlauf", f"={disp(HPX['supply'])}", SUPPLY), ("Rücklauf", f"={disp(HPX['return'])}", RETURN)]),
+    # the floors' climate left of their floor loops, tinted while those carry water:
+    # the upper floor's from the air conditioner (temperature) and its Tado zone (humidity), the ground floor's from
+    # the heat pump's room sensor (temperature) and the Netatmo station beside it (humidity, CO₂)
+    *hp_tile(*UPPER_TILE, "Obergeschoss", "bed",
+             "#f48fb1", HEATING_FLOW, [
+        ("Temperatur", f"={disp('faikout_perfera_temperature')}", "currentColor"),
+        ("Luftfeuchtigkeit", f"={percent('tado_humidity')}", "currentColor")]),
+    *hp_tile(*GROUND_TILE, "Erdgeschoss", "weekend",
+             "#f48fb1", HEATING_FLOW, [
+        ("Temperatur", f"={disp(HPX['indoor'])}", "currentColor"),
+        ("Luftfeuchtigkeit", f"={percent('netatmo_weatherstation_atmospheric_humidity')}", "currentColor"),
+        ("CO₂", f"={disp('netatmo_weatherstation_co2')}", "currentColor")]),
+    # below the house, flush with its walls, the tank's and the indoor unit's tiles: the tank's temperature,
+    # its setpoint and its booster heater, at work while it charges or heats; the indoor unit's flow, the circuit's
+    # pressure (red outside its range) and the backup heater, at work while the pump runs; over them the draw of all
+    # electrical consumers (outdoor unit, backup heater and booster heater)
+    *hp_tile(*TANK_TILE, "Warmwasserspeicher", "propane_tank", DHW_C, f"({TANK_FLOW} || {BSH_ON})", [
+        ("Temperatur", f"={disp(HPX['tank'])}", tank_text), ("Soll", f"={disp(HPX['tank_set'])}", "currentColor"),
+        ("Zusatzheizung", f"={BSH_ON} ? {kw2(HPX['bsh_power'])} : 'Aus'", "currentColor")]),
+    *hp_tile(*INDOOR_TILE, "Innengerät", "hvac", "#64b5f6", PUMP_ON, [
+        ("Leistung", f"={kw2(HPX['power'])}", "#fb8c00"),
+        ("Durchfluss", f"={disp(HPX['flow'])}", "currentColor"),
+        ("Druck", f"={disp(HPX['water_pressure'])}", f"={WATER_PRESSURE_BAD} ? '#e57373' : 'currentColor'"),
+        ("Heizstab", f"={BUH_ON} ? {kw2(HPX['buh_power'])} : 'Aus'", "currentColor")]),
 ], viewBox=" ".join(map(str, HP_VB)), width="100%", style={"display": "block", "overflow": "visible"})
 
 
-def stat_tile(title, value, color, icon):
+def stat_tile(title, value, color, icon, popup):
     """A figure of the heat pump card: a value tile a tenth larger than elsewhere; on a phone, where three share
-    the width, smaller, so a power in kW to two decimals fits."""
-    return comp("widget:value-tile", {"title": title, "value": value, "icon": f"material:{icon}", "color": color,
+    the width, smaller, so a power in kW to two decimals fits. A tap opens its quick popup."""
+    tile = comp("widget:value-tile", {"title": title, "value": value, "icon": f"material:{icon}", "color": color,
                                       "fontSize": f"={NARROW} ? '0.85em' : '1.1em'"})
+    link = hp_popup_link({"position": "absolute", "inset": "0", "display": "block", "border-radius": "12px"}, popup)
+    return div([tile, link], **{"position": "relative", "min-width": "0"})
 
 
 def stacked_bar(title, total, parts):
@@ -1518,68 +1836,103 @@ def stacked_bar(title, total, parts):
                **{"margin-bottom": "12px"})
 
 
-def cop_ring(title, item, color):
+def cop_tile(title, item, color, icon):
+    """A day's COP as Eigenverbrauch and Autarkie stand under the energy flow: a small card with a ring filled up to 6,
+    the value inside, the title and heute beside it, a large pale icon at its lower right."""
     value = num(item)
-    length = round(2 * math.pi * 28, 2)
-    return div([svg("svg", [svg("circle", cx=38, cy=38, r=28, **stroke(8, "#9e9e9e", **{"stroke-opacity": "0.25"})),
-                             svg("circle", cx=38, cy=38, r=28, transform="rotate(-90 38 38)",
-                                 **stroke(8, color, **{"stroke-dasharray":
-                                                        f"=({length} * Math.min(1, {value} / 6)).toFixed(1) + ' {length}'"})),
-                             svg("text", x=38, y=44, content=f"={value} > 0 ? {fixed(value, 1)} : '–'", fill="currentColor",
-                                 **{"font-size": 18, "font-weight": 700, "text-anchor": "middle"})],
-                         viewBox="0 0 76 76", width=76, height=76),
-                label(title, **{"font-size": "14px", "opacity": "0.75"})],
-               **{"display": "flex", "flex-direction": "column", "align-items": "center", "gap": "4px"})
+    length = round(2 * math.pi * 22, 2)
+    ring = svg("svg", [svg("circle", cx=24, cy=25, r=22, **stroke(5, "#9e9e9e", **{"stroke-opacity": "0.25"})),
+                       svg("circle", cx=24, cy=25, r=22, transform="rotate(-90 24 25)",
+                           **stroke(5, color, **{"stroke-dasharray":
+                                                  f"=({length} * Math.min(1, {value} / 6)).toFixed(1) + ' {length}'"})),
+                       svg_text(24, 30, f"={value} > 0 ? {fixed(value, 1)} : '–'", 13, "700"),
+                       svg_text(56, 23, title, 12, anchor="start", opacity="0.7"),
+                       svg_text(56, 39, "heute", 11, anchor="start", opacity="0.5")],
+               viewBox="0 0 150 50", width="100%", style={"display": "block", "overflow": "visible", "max-width": "170px"})
+    mark = comp("oh-icon", {"icon": f"material:{icon}", "width": 58, "height": 58, "style": {
+        "position": "absolute", "right": "-6px", "bottom": "-10px", "opacity": "0.16", "color": color}})
+    return div([mark, div([ring], **{"position": "relative", "min-width": "0", "flex": "1 1 auto"})],
+               **{"position": "relative", "overflow": "hidden", "padding": "8px 10px", "border-radius": "12px",
+                  "background": TILE_BG, "min-width": "0", "display": "flex", "align-items": "center"})
 
 
 legend_dot = lambda name, c: keyed(f"item k k-{name.lower()}", [
     div([], **{"width": "10px", "height": "10px", "border-radius": "3px", "background": c}),
     label(name, **{"font-size": "12px", "opacity": "0.75"})], style={"display": "flex", "align-items": "center", "gap": "5px"})
-hp_stats = div([
-    div([stat_tile("Electrical", f"={kw2(HPX['power'])}", "#ffa726", "bolt"),
-         stat_tile("Heat", f"={kw2(HPX['heat'])}", SUPPLY, "local_fire_department"),
-         stat_tile("COP", f"={num(HPX['cop'])} > 0 ? {fixed(num(HPX['cop']), 2)} : '–'", "#66bb6a", "eco")],
-        **{"display": "grid", "grid-template-columns": "repeat(3, 1fr)", "gap": "8px", "margin-bottom": "16px"}),
-    label("Today", **{"font-weight": "700", "margin-bottom": "8px"}),
-    # hovering a part lifts it, the same part in the other bar and its legend entry, as in Consumption Today
-    hover_group([
-        stacked_bar("Electricity", num("espaltherma_energy_today"),
-                    [("Heizung", "espaltherma_energy_space_today", SPACE_C), ("Warmwasser", "espaltherma_energy_dhw_today", DHW_C),
-                     ("Standby", "espaltherma_energy_standby_today", STANDBY_C)]),
-        stacked_bar("Heat", num("espaltherma_heating_energy_today"),
-                    [("Heizung", "espaltherma_heating_energy_space_today", SPACE_C),
-                     ("Warmwasser", "espaltherma_heating_energy_dhw_today", DHW_C)]),
-        div([legend_dot("Heizung", SPACE_C), legend_dot("Warmwasser", DHW_C), legend_dot("Standby", STANDBY_C)],
-            **{"display": "flex", "gap": "14px", "margin": "-4px 0 14px"})],
-        [("heizung", SPACE_C), ("warmwasser", DHW_C), ("standby", STANDBY_C)]),
-    div([cop_ring("COP Space", "espaltherma_dcop_space", SPACE_C), cop_ring("COP DHW", "espaltherma_dcop_dhw", DHW_C),
-         cop_ring("COP Total", "espaltherma_dcop", "#66bb6a")],
-        **{"display": "flex", "justify-content": "space-around"}),
-], **{"padding": "4px 4px 8px", "font-size": "14px"})
-
-def hp_link(node, size=60):
-    """Transparent link over a node of the heat pump drawing that opens the heat pump's page as a popup, in percent of
-    its viewBox."""
-    (cx, cy), (x0, y0, w, h) = node, HP_VB
-    return comp("oh-link", {"action": "popup", "actionModal": "page:heatpump", "style": {
-        "position": "absolute", "display": "block", "border-radius": "50%",
-        "left": f"{(cx - size / 2 - x0) / w * 100:.2f}%", "top": f"{(cy - size / 2 - y0) / h * 100:.2f}%",
-        "width": f"{size / w * 100:.2f}%", "height": f"{size / h * 100:.2f}%"}})
+def hp_stats():
+    """The figures beside the drawing, built with it, as their tiles link to quick popups."""
+    return div([
+        div([stat_tile("Electrical", f"={kw2(HPX['power'])}", ELECTRIC_C, "bolt", "heatpump-electric-quick"),
+             stat_tile("Heat", f"={kw2(HPX['heat'])}", SUPPLY, "local_fire_department", "heatpump-heat-quick"),
+             stat_tile("COP", f"={num(HPX['cop'])} > 0 ? {fixed(num(HPX['cop']), 2)} : '–'", COP_C, "eco",
+                       "heatpump-cop-quick")],
+            **{"display": "grid", "grid-template-columns": "repeat(3, 1fr)", "gap": "8px", "margin-bottom": "16px"}),
+        label("Today", **{"font-weight": "700", "margin-bottom": "8px"}),
+        # hovering a part lifts it, the same part in the other bar and its legend entry, as in Consumption Today
+        hover_group([
+            stacked_bar("Electricity", num("espaltherma_energy_today"),
+                        [("Heizung", "espaltherma_energy_space_today", SPACE_C), ("Warmwasser", "espaltherma_energy_dhw_today", DHW_C),
+                         ("Standby", "espaltherma_energy_standby_today", STANDBY_C)]),
+            stacked_bar("Heat", num("espaltherma_heating_energy_today"),
+                        [("Heizung", "espaltherma_heating_energy_space_today", SPACE_C),
+                         ("Warmwasser", "espaltherma_heating_energy_dhw_today", DHW_C)]),
+            div([legend_dot("Heizung", SPACE_C), legend_dot("Warmwasser", DHW_C), legend_dot("Standby", STANDBY_C)],
+                **{"display": "flex", "gap": "14px", "margin": "-4px 0 14px"})],
+            [("heizung", SPACE_C), ("warmwasser", DHW_C), ("standby", STANDBY_C)]),
+        # the day's COPs: space heating and hot water side by side, the total below them across the row; three abreast
+        # their rings would shrink to two thirds in the figures' column
+        div([cop_tile("COP Heizung", "espaltherma_dcop_space", SPACE_C, "local_fire_department"),
+             cop_tile("COP Warmwasser", "espaltherma_dcop_dhw", DHW_C, "shower"),
+             div([cop_tile("COP gesamt", "espaltherma_dcop", COP_C, "eco")],
+                 **{"grid-column": "1 / -1", "display": "grid", "min-width": "0"})],
+            **{"display": "grid", "gap": "8px", "grid-template-columns": "repeat(2, minmax(0, 1fr))"}),
+    ], **{"padding": "4px 4px 8px", "font-size": "14px"})
 
 
-HP_LINKS = [OUT, WALL, VALVE, TANK, RADIATORS, GROUND_FH, UPPER_FH]
-# On a phone the drawing takes the whole card width. On a wider screen it stands at its own size at most, one
-# unit a pixel, so its texts keep the sizes of the rest of the UI instead of growing with the card, and the
-# figures keep the font size they have on a phone. In one row, drawing and figures stand with even room: the free
-# width goes in equal parts to the left, the middle and the right, the column gap matching the card's own padding
-# at the sides; the figures take the width the drawing leaves, up to 460 px.
-heatpump_schema = [div([div([div([hp_svg, *[hp_link(n) for n in HP_LINKS]], **{"position": "relative"})],
-                            **{"flex": "0 1 auto", "min-width": "0", "max-width": "100%",
-                               "width": f"={NARROW} ? '100%' : '{HP_VB[2]}px'"}),
-                        div([hp_stats], **{"flex": "1 1 300px", "min-width": "260px", "max-width": "460px"})],
-                       **{"display": "flex", "flex-wrap": "wrap", "justify-content": "space-evenly",
-                          "align-items": "center", "gap": "20px 16px",
-                          "padding": f"={NARROW} ? '8px 4px 12px' : '8px 0 16px'"})]
+def hp_box(x, y, w, h, radius):
+    """A link's place over the heat pump drawing, in percent of its viewBox."""
+    x0, y0, vw, vh = HP_VB
+    return {"position": "absolute", "display": "block", "border-radius": radius,
+            "left": f"{(x - x0) / vw * 100:.2f}%", "top": f"{(y - y0) / vh * 100:.2f}%",
+            "width": f"{w / vw * 100:.2f}%", "height": f"{h / vh * 100:.2f}%"}
+
+
+def hp_popup_link(style, uid):
+    """Transparent link that opens a quick popup with the items it reads."""
+    panel = quick_panel(uid)
+    return comp("oh-link", {"action": "popup", "actionModal": panel["component"],
+                            "actionModalConfig": dict(panel["config"]), "style": style})
+
+
+# what a tap opens: a tile its popup, the wall unit and the outdoor unit theirs; valve, tank, radiators and floor loops
+# open nothing
+HP_TILE_POPUPS = [(CONTROL_TILE, 4, "heatpump-control-quick"), (OUTDOOR_TILE, 4, "heatpump-outdoor-quick"),
+                  (REFRIGERANT_TILE, 3, "heatpump-refrigerant-quick"),
+                  (CIRCUIT_TILE, 3, "heatpump-circuit-quick"), (UPPER_TILE, 2, "upper-floor-quick"),
+                  (GROUND_TILE, 3, "ground-floor-quick"), (INDOOR_TILE, 4, "heatpump-indoor-quick")]
+HP_NODE_POPUPS = [(WALL, "heatpump-indoor-quick"), (OUT, "heatpump-outdoor-quick")]
+
+
+def heatpump_content():
+    """The heat pump card's content, built when the card is, as its links need the quick popups. On a phone the
+    drawing takes the whole card width. On a wider screen it stands at its own size at most, one unit a pixel, so its
+    texts keep the sizes of the rest of the UI instead of growing with the card, and the figures keep the font size
+    they have on a phone. In one row, drawing and figures stand with even room: the free width goes in equal parts
+    to the left, the middle and the right, the column gap matching the card's own padding at the sides; the figures
+    take the width the drawing leaves, up to 460 px."""
+    links = [*[hp_popup_link(hp_box(cx - w / 2, y, w, 35 + TILE_ROW * rows, "12px"), uid)
+               for (cx, y, w), rows, uid in HP_TILE_POPUPS],
+             *[hp_popup_link(hp_box(cx - HP_ORBIT, cy - HP_ORBIT, 2 * HP_ORBIT, 2 * HP_ORBIT, "50%"), uid)
+               for (cx, cy), uid in HP_NODE_POPUPS]]
+    drawing = div([hp_svg, *links], **{"position": "relative"})
+    drawing["config"]["stylesheet"] = "@keyframes flowOrbit { to { transform: rotate(360deg); } }"
+    return [div([div([drawing],
+                     **{"flex": "0 1 auto", "min-width": "0", "max-width": "100%",
+                        "width": f"={NARROW} ? '100%' : '{HP_VB[2]}px'"}),
+                 div([hp_stats()], **{"flex": "1 1 300px", "min-width": "260px", "max-width": "460px"})],
+                **{"display": "flex", "flex-wrap": "wrap", "justify-content": "space-evenly",
+                   "align-items": "center", "gap": "20px 16px",
+                   "padding": f"={NARROW} ? '8px 4px 12px' : '8px 0 16px'"})]
 
 # ---------------------------------------------------------------- 3. price
 
@@ -1653,12 +2006,12 @@ def watts(item):
 
 
 SWITCHES = [
-    # title, icon, item, colour, live value; left column first, then right
-    ("Kaffeemaschine", "material:coffee", "coffee_machine_switch", "#8d6e63", watts("coffee_machine_power")),
-    ("Fahrradakkus", "material:electric_bike", "bicycle_batteries_switch", "#7cb342", watts("bicycle_batteries_power")),
+    # title, icon, item, colour, live value; in this order under the energy flow
+    ("Kaffee", "material:coffee", "coffee_machine_switch", "#8d6e63", watts("coffee_machine_power")),
+    ("E-Bikes", "material:electric_bike", "bicycle_batteries_switch", "#7cb342", watts("bicycle_batteries_power")),
     ("Büro 1", "material:computer", "office_1_switch", "#ab47bc", watts("office_1_power")),
     ("Büro 2", "material:computer", "office_2_switch", "#ab47bc", watts("office_2_power")),
-    ("Terrassenlicht", "material:light", "terrace_light_switch", "#fbc02d", watts("terrace_light_power")),
+    ("Terrasse", "material:light", "terrace_light_switch", "#fbc02d", watts("terrace_light_power")),
 ]
 def is_on(item):
     return f"items.{item}.state === 'ON'"
@@ -1855,27 +2208,6 @@ def boost_pill(item, icon, color, title, running):
                                       "running": f"={running}"})
 
 
-def boost_button_widget():
-    """The widget every boost button is an instance of: a boost as one pill, for a head that has no room for the
-    boost pill: its name in the device colour, outlined, filled with the colour while the boost runs. A tap anywhere
-    switches."""
-    on = "items[props.item].state === 'ON'"
-    text = label("=props.title || 'Boost'", **{"font-size": "13px", "font-weight": "700", "white-space": "nowrap",
-                                               "color": f"={on} ? '#ffffff' : 'var(--boost-color)'"})
-    return div([text, toggle_link("=props.item", "17px")],
-               **{"--boost-color": "=props.color || '#fb8c00'", "position": "relative", "display": "flex",
-                  "align-items": "center", "justify-content": "center", "height": "34px", "box-sizing": "border-box",
-                  "border-radius": "17px",
-                  "border": f"={on} ? '1.5px solid transparent' : '1.5px solid var(--boost-color)'",
-                  "background": f"={on} ? 'linear-gradient(135deg, var(--boost-color), "
-                                "color-mix(in srgb, var(--boost-color) 75%, transparent))' : 'transparent'",
-                  "transition": "background 0.3s ease"})
-
-
-def boost_button(title, item, color):
-    return comp("widget:boost-button", {"item": item, "title": title, "color": color})
-
-
 def ac_mode_bar():
     """The mode can be chosen while the unit is off: the chosen one is marked grey then, blue while it runs."""
     # by text: Entfeuchten fits on phones
@@ -1959,7 +2291,8 @@ def pill_slider_widget():
         svg("circle", cx=13, cy=13, r=10, fill="none", stroke="=props.color", **{"stroke-width": 3, "stroke-opacity": 0.25}),
         svg("circle", cx=13, cy=13, r=10, fill="none", stroke="=props.color", transform="rotate(-90 13 13)",
             **{"stroke-width": 3, "stroke-linecap": "round",
-               "stroke-dasharray": f"=Math.min(1, Math.max(0, {n}) / Number(props.max)) * {circ} + ' {circ}'",
+               "stroke-dasharray": f"=Math.min(1, Math.max(0, {n}) / (Number(props.ringFull) || Number(props.max))) * "
+                                   f"{circ} + ' {circ}'",
                "opacity": f"={n} > 0 ? 1 : 0"})],
         viewBox="0 0 26 26", width=26, height=26, style={"position": "absolute", "inset": "0"}),
         comp("oh-icon", {"icon": "material:timer", "width": 14, "height": 14})],
@@ -2002,7 +2335,16 @@ def pill_slider_widget():
         "  --f7-range-knob-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35); --f7-range-label-bg-color: var(--pill-color);",
         "  --f7-range-label-text-color: #ffffff; margin: 0; }",
         ".range-bar-active { background: linear-gradient(90deg, color-mix(in srgb, var(--pill-color) 55%, transparent),",
-        "  var(--pill-color)) !important; }"])
+        "  var(--pill-color)) !important; }",
+        # the value while dragging: Framework7's md pin is 26 px with 10 px type and sits right above the knob, under
+        # the finger on a phone; instead a label as wide as its text, well above the knob
+        ".range-knob-label { width: auto !important; min-width: 0 !important; height: auto !important;",
+        "  line-height: 20px !important; margin: 0 0 34px 0 !important; padding: 6px 12px !important; font-size: 16px !important;",
+        "  font-weight: 700 !important; border-radius: 12px !important; white-space: nowrap;",
+        "  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35); transform: translate(-50%, 100%) scale(0) !important;",
+        "  transform-origin: 50% 100%; }",
+        ".range-knob-label:before { display: none !important; }",
+        ".range-knob-active-state .range-knob-label { transform: translate(-50%, 0) scale(1) !important; }"])
     return comp("div", {"stylesheet": css, "style": {
         "--pill-color": "=props.color || '#78909c'", "display": "flex", "flex-direction": "column", "gap": "6px",
         "padding": "=props.row ? '8px 2px 10px' : '4px 0 0'",
@@ -2011,14 +2353,16 @@ def pill_slider_widget():
 
 
 def pill_slider(item, color, low, high, step, title, value, context, marks, unit, icon=None, ring=False,
-                value_color=None, dim=None, row=False):
-    """An instance of the slider widget; value and context are expressions, evaluated where it stands."""
+                value_color=None, dim=None, row=False, ring_full=None):
+    """An instance of the slider widget; value, context and ring_full are expressions, evaluated where it stands."""
     cfg = {"item": item, "color": color, "min": low, "max": high, "step": step, "unit": unit, "title": title,
            "value": f"={value}", "context": f"={context}", "marks": ";".join(f"{v}={t}" for v, t in marks)}
     if icon:
         cfg["icon"] = icon
     if ring:
         cfg["ring"] = True
+    if ring_full:
+        cfg["ringFull"] = f"={ring_full}"
     if value_color is not None:
         cfg["valueColor"] = value_color
     if dim:
@@ -2029,11 +2373,13 @@ def pill_slider(item, color, low, high, step, title, value, context, marks, unit
 
 
 def timer_slider(item, color, high, hours_per_tick, context, dim=None, row=False):
-    """A timer on its slider: the minutes left, Aus at 0; the countdown is the item's rule's."""
+    """A timer on its slider: the minutes left, Aus at 0, its ring full at what it was last set to; the countdown is
+    the item's rule's."""
     m = num(item)
     ticks = [(h * 60, f"{h} h" if h else "0") for h in range(0, high // 60 + 1, hours_per_tick)]
     return pill_slider(item, color, 0, high, 15, "Timer", f"{m} > 0 ? {minutes_text(m)} : 'Aus'", context, ticks,
-                       "min", ring=True, value_color=f"={m} > 0 ? '{color}' : ''", dim=dim, row=row)
+                       "min", ring=True, value_color=f"={m} > 0 ? '{color}' : ''", dim=dim, row=row,
+                       ring_full=timer_full(item, high))
 
 
 def ac_timer(dim=None, row=False):
@@ -2056,8 +2402,8 @@ def degrees(item):
 
 
 def ac_setpoint(dim=None, row=False):
-    ticks = [(t, f"{t} °C" if t in (18, 32) else str(t)) for t in range(18, 33, 2)]
-    return pill_slider("faikout_perfera_temperature_setpoint", AC_BLUE, 18, 32, 0.5, "Soll",
+    ticks = [(t, f"{t} °C" if t in (18, 30) else str(t)) for t in range(18, 31, 2)]
+    return pill_slider("faikout_perfera_temperature_setpoint", AC_BLUE, 18, 30, 0.5, "Soll",  # the unit's range
                        degrees("faikout_perfera_temperature_setpoint"), f"'Raum ' + {disp('faikout_perfera_temperature')}",
                        ticks, "°C", icon="material:device_thermostat", dim=dim, row=row)
 
@@ -2116,110 +2462,186 @@ def operation_section(*titles, row=False):
                    row=row)
 
 
-def device_panel(head, first=False):
-    """A device of the controls: its head, which draws the panel and opens the device's page."""
-    return div([head], **{"margin-top": "4px" if first else "8px"})
+# ---- quick controls: the panels the energy flow's heat pump, air conditioner and ventilation open
+
+# a quick panel opens as a compact popup instead of Framework7's 630 × 630 px: MainUI puts a popup widget's style on
+# the popup's page, where the mark tells it from other popups; ":root" keeps the rule unscoped while it is shown
+QUICK_POPUP = (':root .popup:has(> .oh-popup[style*="--quick-popup"]) { --f7-popup-tablet-width: 420px; '
+               '--f7-popup-tablet-height: min(640px, calc(100vh - 64px)); }')
 
 
-def device_head_widget():
-    """The widget every device head is an instance of: a device in a panel of three lines, tinted in its colour while
-    it runs: its icon (26 px, as on the switch tiles) in a circle, beside it the name and the main action, and under
-    them two lines of state that run the whole width, under the action too, so they stay readable on a phone. A tap
-    anywhere but on the action opens the page named by popup in a popup; the action lies above that and takes its own
-    taps. action: switch (a switch pill), button (a boost button) or bar (a segmented bar of actionOptions), on
-    actionItem."""
-    badge = div([comp("oh-icon", {"icon": "=props.icon", "width": 26, "height": 26})],
-                **{"width": "44px", "height": "44px", "flex": "0 0 auto", "border-radius": "50%", "display": "flex",
-                   "align-items": "center", "justify-content": "center",
-                   "background": "=props.active ? 'color-mix(in srgb, var(--head-color) 25%, transparent)' : "
-                                 "'rgba(127, 127, 127, 0.12)'"})
-    actions = [comp(f"widget:{uid}", {"item": "=props.actionItem", key: f"=props.{prop}", "color": "=props.color",
-                                      "visible": f"=props.action === '{kind}'"})
-               for kind, uid, key, prop in (("switch", "pill-switch", "title", "actionTitle"),
-                                            ("button", "boost-button", "title", "actionTitle"),
-                                            ("bar", "state-bar", "options", "actionOptions"))]
-    top = div([label("=props.title", **{"flex": "1", "min-width": "0", "font-size": "15px", "font-weight": "600",
-                                        "white-space": "nowrap", "overflow": "hidden", "text-overflow": "ellipsis"}),
-               div(actions, visible="=!!props.action",
-                   **{"flex": "0 0 104px", "position": "relative", "z-index": "2"})],
-              **{"display": "flex", "align-items": "center", "gap": "8px"})
-    info = [label(f"=props.{line} || ''",
-                  **{"font-size": "12px", "opacity": "0.7", "line-height": "16px", "white-space": "nowrap",
-                     "overflow": "hidden", "text-overflow": "ellipsis"})
-            for line in ("line1", "line2")]
-    body = div([top, *info], **{"flex": "1", "min-width": "0", "display": "flex", "flex-direction": "column",
-                                "gap": "2px"})
-    link = comp("oh-link", {"visible": "=!!props.popup", "action": "popup", "actionModal": "='page:' + props.popup",
-                            "style": {"position": "absolute", "inset": "0", "display": "block", "border-radius": "14px",
-                                      "z-index": "1"}})
-    return div([badge, body, link], **{"--head-color": "=props.color || '#78909c'", "position": "relative",
-                                       "display": "flex", "align-items": "center", "gap": "10px",
-                                       "padding": "10px 12px", "border-radius": "14px",
-                                       "background": "=props.active ? 'color-mix(in srgb, var(--head-color) 12%, "
-                                                     "transparent)' : 'rgba(127, 127, 127, 0.08)'"})
+def details_button(page, color):
+    return div([comp("oh-button", {"text": "Alle Details", "action": "popup", "actionModal": f"page:{page}",
+                                   "outline": True, "small": True,
+                                   "style": {"color": color, "border-color": color, "width": "auto",
+                                             "padding": "0 12px"}})],
+               **{"display": "flex", "justify-content": "flex-end", "padding-top": "4px"})
 
 
-def device_head(icon, title, lines, color, active, popup, action=None, action_item=None, action_title=None,
-                action_options=None):
-    """An instance of the device head widget; lines and active are expressions, evaluated where the head stands."""
-    cfg = {"icon": icon, "title": title, "line1": f"={lines[0]}", "line2": f"={lines[1]}", "color": color,
-           "active": f"={active}", "popup": popup}
-    if action:
-        cfg.update({"action": action, "actionItem": action_item})
-    if action_title:
-        cfg["actionTitle"] = action_title
-    if action_options:
-        cfg["actionOptions"] = ";".join(f"{v}={t}" for v, t in action_options)
-    return comp("widget:device-head", cfg)
+def quick(icon, title, color, state, children, page):
+    """A device's main controls under a small head with its state, and the way to its page; opened as a compact
+    popup, the bar names the device (config.label)."""
+    head = div([div([comp("oh-icon", {"icon": icon, "width": 20, "height": 20})],
+                    **{"width": "34px", "height": "34px", "flex": "0 0 auto", "border-radius": "50%",
+                       "display": "flex", "align-items": "center", "justify-content": "center",
+                       "background": f"color-mix(in srgb, {color} 22%, transparent)"}),
+                div([label(title, **{"font-size": "15px", "font-weight": "600"}),
+                     label(f"={state}", **{"font-size": "12px", "opacity": "0.7", "white-space": "nowrap",
+                                           "overflow": "hidden", "text-overflow": "ellipsis"})],
+                    **{"display": "flex", "flex-direction": "column", "min-width": "0"})],
+               **{"display": "flex", "align-items": "center", "gap": "10px", "padding-bottom": "4px"})
+    root = div([div([head, *children, details_button(page, color)],
+                    **{"display": "flex", "flex-direction": "column", "gap": "6px", "padding": "12px 14px"})])
+    # a chart's closed period menu would stretch the popup by its full length, as on the pages (PERIOD_MENU)
+    root["config"].update({"label": title, "style": {"--quick-popup": "panel"},
+                           "stylesheet": "\n".join([QUICK_POPUP, PERIOD_MENU])})
+    return root
 
 
-def grouped_states(switches):
-    """The switches that are on, then those that are off, each by name: Warmwasser, Automatik an · Heizung aus."""
-    states = "[" + ", ".join(f"['{t}', items.{item}.state]" for t, item in switches) + "]"
-    names = lambda state: f"{states}.filter(s => s[1] === '{state}').map(s => s[0])"
-    return (f"[[{names('ON')}, ' an'], [{names('OFF')}, ' aus']].filter(g => g[0].length)"
-            f".map(g => g[0].join(', ') + g[1]).join(' · ')")
+def hp_quick():
+    """The heat pump: Warmwasser-Boost, Betrieb and the DHW setpoint."""
+    state = f"'Speicher ' + {disp(HPX['tank'])} + ' · ' + {kw(HPX['power'])}"
+    return quick("material:heat_pump", "Wärmepumpe", HP_ORANGE, state,
+                 [dhw_boost(), operation_section(row=True), dhw_setpoint(row=True)], "heatpump")
 
 
-def on_off_text(item):
-    return f"(items.{item}.state === 'ON' ? 'an' : items.{item}.state === 'OFF' ? 'aus' : '–')"
+def ac_quick():
+    """The air conditioner: on/off, mode, setpoint, timer and boost."""
+    state = (f"({AC_ON_STATE} ? 'An · ' : 'Aus · ') + {disp('faikout_perfera_mode')} + ' · Raum ' + "
+             f"{disp('faikout_perfera_temperature')}")
+    return quick("material:ac_unit", "Klimaanlage", AC_BLUE, state,
+                 [ac_power(), ac_mode_section(row=True), ac_setpoint(row=True), ac_timer(row=True), ac_boost()],
+                 "air_conditioning")
 
 
-def hp_controls():
-    """The heat pump: storage temperature, power and the three switches in its head, Boost as its main action; a tap
-    opens its page."""
-    lines = [f"'Speicher ' + {disp(HPX['tank'])} + ' · ' + {kw(HPX['power'])}",
-             grouped_states([(t, item) for t, item, _ in HP_SWITCH_BAR])]
-    return device_panel(device_head("material:heat_pump", "Wärmepumpe", lines, HP_ORANGE, HP_RUNNING, "heatpump",
-                                    "button", "pyaltherma_dhw_powerful", "Boost"), first=True)
+def vent_quick():
+    """The ventilation: its level, the timer and the automation."""
+    state = f"'Stufe ' + {disp('esplyfterl_level')} + ' · CO₂ ' + {disp('netatmo_weatherstation_co2')}"
+    level = section("material:air", "Stufe", VENT_TEAL, [state_bar("esplyfterl_level", VENT_LEVELS, VENT_TEAL)],
+                    row=True)
+    return quick("material:air", "Lüftung", VENT_TEAL, state,
+                 [level, vent_timer(row=True), switch_row("Automatik", "material:tune", "ventilation_management",
+                                                          VENT_TEAL)], "ventilation")
 
 
-def ac_controls():
-    """The air conditioner: state, mode, setpoint, room and timer in its head, An/Aus as its main action; a tap opens
-    its page."""
-    m = num("air_conditioning_timer")
-    lines = [f"({AC_ON_STATE} ? 'An · ' : 'Aus · ') + {disp('faikout_perfera_mode')} + ' · Soll ' + "
-             f"{degrees('faikout_perfera_temperature_setpoint')}",
-             f"'Raum ' + {disp('faikout_perfera_temperature')} + ({m} > 0 ? ' · Timer noch ' + {minutes_text(m)} : "
-             f"' · kein Timer')"]
-    return device_panel(device_head("material:ac_unit", "Klimaanlage", lines, AC_BLUE, AC_ON_STATE, "air_conditioning",
-                                    "switch", "faikout_perfera_switch", "An/Aus"))
+# ---- the popups of the heat pump card's tiles
+
+def hp_control_quick():
+    """The heat pump's control: heating, hot water and the automation, the hot-water boost and the Smart Grid."""
+    on = lambda item: f"(items.{item}.state === 'ON' ? 'an' : 'aus')"
+    state = f"'Heizung ' + {on('pyaltherma_climate_control_power')} + ' · Warmwasser ' + {on('pyaltherma_dhw_power')}"
+    return quick("material:tune", "Regelung", HP_ORANGE, state,
+                 [operation_section(row=True), dhw_boost(), smart_grid_section(row=True)], "heatpump")
 
 
-VENT_TEAL = "#26a69a"
+def hp_indoor_quick():
+    """The indoor unit: all the heat pump's controls, as on its page."""
+    state = f"'Vorlauf ' + {disp(HPX['supply'])} + ' · ' + {disp(HPX['flow'])}"
+    return quick("material:hvac", "Innengerät", "#64b5f6", state,
+                 [smart_grid_section(row=True), operation_section(row=True), dhw_setpoint(row=True), dhw_boost(),
+                  lw_offset(row=True)], "heatpump")
 
 
-def vent_controls():
-    """The ventilation: level, power, CO2 and what the automation does in its head, the levels 1 to 3 as its main
-    action; a tap opens its page. It always runs, so the panel is always tinted."""
-    m = num("ventilation_timer")
-    auto = is_on("ventilation_management")
-    lines = [f"'Stufe ' + {disp('esplyfterl_level')} + ' · ' + Math.round({num('ventilation_power')}) + ' W · CO₂ ' + "
-             f"{disp('netatmo_weatherstation_co2')}",
-             f"{m} > 0 ? ({auto} ? 'Automatik pausiert bis ' : 'Timer bis ') + {ends_at(m)} : "
-             f"({auto} ? 'Automatik regelt die Stufe' : 'Automatik aus')"]
-    return device_panel(device_head("material:air", "Lüftung", lines, VENT_TEAL, "true", "ventilation", "bar",
-                                    "esplyfterl_level", action_options=[("1", "1"), ("2", "2"), ("3", "3")]))
+def hp_outdoor_quick():
+    """The outdoor unit over the day: its circuit's power with the compressor's frequency, the outdoor temperature
+    against its heat exchanger's, whose gap tells how hard it pulls heat from the air."""
+    state = f"{kw2(HPX['circuit'])} + ' · ' + {disp(HPX['hz'])} + ' · außen ' + {disp(HPX['outdoor'])}"
+    work = day_chart([area("Leistung", HPX["circuit"], HP_ORANGE), line("Verdichter", HPX["hz"], "#78909c", y=1)],
+                     [value_axis("W", min=0), value_axis("Hz", min=0)], height="280px")
+    temps = day_chart([line("Außen", HPX["outdoor"], "#26a69a"), line("Wärmetauscher", HPX["exchanger"], "#4fc3f7"),
+                       line("Außenluft", "espaltherma_outdoor_air_temp", "#9e9e9e", dashed=True)],
+                      [value_axis("°C", scale=True)], height="250px")
+    return quick("material:heat_pump", "Außengerät", HP_ORANGE, state, [work, temps], "heatpump")
+
+
+def hp_refrigerant_quick():
+    """The refrigerant over the day: hot gas with its target, liquid and the outdoor heat exchanger, the pressure."""
+    state = f"'Heißgas ' + {disp(HPX['hot_gas'])} + ' · ' + {disp(HPX['pressure'])}"
+    temps = day_chart([line("Heißgas", HPX["hot_gas"], REFRIGERANT),
+                       line("Heißgas Soll", "espaltherma_target_discharge_temp", REFRIGERANT, dashed=True),
+                       line("Flüssig", HPX["refrigerant"], "#4fc3f7"),
+                       line("Wärmetauscher", HPX["exchanger"], "#26a69a")], [value_axis("°C", scale=True)],
+                      height="270px")
+    pressure = day_chart([line("Druck", HPX["pressure"], REFRIGERANT)], [value_axis("bar", scale=True)], height="200px")
+    return quick("material:severe_cold", "Kältemittel", REFRIGERANT, state, [temps, pressure], "heatpump")
+
+
+def hp_circuit_quick():
+    """The heating circuit: its leaving water offset, leaving and inlet water over the day with the water's heat."""
+    state = f"'Vorlauf ' + {disp(HPX['supply'])} + ' · Rücklauf ' + {disp(HPX['return'])}"
+    temps = day_chart([line("Vorlauf", HPX["supply"], SUPPLY), line("Rücklauf", HPX["return"], RETURN),
+                       area("Wärme", HPX["water_heat"], HP_ORANGE, y=1)],
+                      [value_axis("°C", scale=True), value_axis("W")], height="300px")
+    return quick("material:waves", "Heizkreis", SUPPLY, state, [lw_offset(row=True), temps], "heatpump")
+
+
+def floor_quick(title, icon, temperature, humidity, co2, page):
+    """A floor's climate over the day: temperature and humidity, the CO₂ where it is measured."""
+    state = f"{disp(temperature)} + ' · ' + {percent(humidity)}" + (f" + ' · ' + {disp(co2)}" if co2 else "")
+    charts = [day_chart([line("Temperatur", temperature, "#f48fb1"), line("Luftfeuchtigkeit", humidity, "#4fc3f7", y=1)],
+                        [value_axis("°C", scale=True), value_axis("%", scale=True)], height="290px")]
+    if co2:
+        charts.append(day_chart([area("CO₂", co2, "#78909c")], [value_axis("ppm", scale=True)], height="200px"))
+    return quick(f"material:{icon}", title, "#f48fb1", state, charts, page)
+
+
+# the parts heatpump_metering splits the heat pump's power and energy into, in the colours of the card's day bars
+HP_PARTS = [("Heizung", "space", SPACE_C), ("Warmwasser", "dhw", DHW_C), ("Standby", "standby", STANDBY_C)]
+
+
+def hp_split_quick(title, icon, color, power, today, part_power, part_energy, parts):
+    """Electricity or heat by part: the parts' power over the day, their energy per day of the month stacked;
+    part_power and part_energy name a part's items by its key."""
+    state = f"{kw2(power)} + ' · heute ' + {fixed(num(today), 1)} + ' kWh'"
+    day = day_chart([area(name, part_power.format(key), c) for name, key, c in parts], height="260px")
+    month = month_chart([daily(name, part_energy.format(key), c, stack="day",
+                               **({"itemStyle": {"color": c, "borderRadius": [4, 4, 0, 0]}} if i == len(parts) - 1
+                                  else {}))
+                         for i, (name, key, c) in enumerate(parts)], "kWh")
+    return quick(f"material:{icon}", title, color, state, [day, month], "heatpump")
+
+
+def hp_cop_quick():
+    """The COP over the day against the outdoor temperature it follows, and the day's COPs per day of the month:
+    space heating and hot water as columns, the total as a line."""
+    cop = num(HPX["cop"])
+    day_cop = num("espaltherma_dcop")
+    state = f"'jetzt ' + ({cop} > 0 ? {fixed(cop, 2)} : '–') + ' · heute ' + ({day_cop} > 0 ? {fixed(day_cop, 2)} : '–')"
+    day = day_chart([area("COP", HPX["cop"], COP_C), line("Außen", HPX["outdoor"], "#26a69a", y=1, dashed=True)],
+                    [value_axis("COP", min=0), value_axis("°C", scale=True)], height="280px")
+    month = month_chart([daily("Heizung", "espaltherma_dcop_space", SPACE_C,
+                               itemStyle={"color": SPACE_C, "borderRadius": [3, 3, 0, 0]}),
+                         daily("Warmwasser", "espaltherma_dcop_dhw", DHW_C,
+                               itemStyle={"color": DHW_C, "borderRadius": [3, 3, 0, 0]}),
+                         daily("Gesamt", "espaltherma_dcop", COP_C, type="line", symbol="circle", symbolSize=5,
+                               lineStyle={"width": 2, "color": COP_C})], "COP")
+    return quick("material:eco", "COP", COP_C, state, [day, month], "heatpump")
+
+
+QUICK_PANELS = {"heatpump-quick": hp_quick, "air-conditioner-quick": ac_quick, "ventilation-quick": vent_quick,
+                "heatpump-control-quick": hp_control_quick, "heatpump-indoor-quick": hp_indoor_quick,
+                "heatpump-outdoor-quick": hp_outdoor_quick,
+                "heatpump-refrigerant-quick": hp_refrigerant_quick, "heatpump-circuit-quick": hp_circuit_quick,
+                "heatpump-electric-quick": lambda: hp_split_quick(
+                    "Elektrisch", "bolt", ELECTRIC_C, HPX["power"], "espaltherma_energy_today",
+                    "espaltherma_electrical_power_{}", "espaltherma_energy_{}_today", HP_PARTS),
+                "heatpump-heat-quick": lambda: hp_split_quick(
+                    "Wärme", "local_fire_department", SUPPLY, HPX["heat"], "espaltherma_heating_energy_today",
+                    "espaltherma_heating_power_{}", "espaltherma_heating_energy_{}_today", HP_PARTS[:2]),
+                "heatpump-cop-quick": hp_cop_quick,
+                "upper-floor-quick": lambda: floor_quick("Obergeschoss", "bed", "faikout_perfera_temperature",
+                                                         "tado_humidity", None, "air_conditioning"),
+                "ground-floor-quick": lambda: floor_quick("Erdgeschoss", "weekend", HPX["indoor"],
+                                                          "netatmo_weatherstation_atmospheric_humidity",
+                                                          "netatmo_weatherstation_co2", "netatmo")}
+_QUICK = {}
+
+
+def quick_panel(uid):
+    """An instance of a quick panel widget with its items (built once)."""
+    if uid not in _QUICK:
+        _QUICK[uid] = role_widget(uid, QUICK_PANELS[uid])
+    return _QUICK[uid]
 
 
 # widgets whose props are items named by their role, built with the items and turned into props (see widgets()):
@@ -2229,8 +2651,9 @@ ITEM_PARAMS = {}  # uid: the props of a widget that take an item, for the widget
 
 
 def role_widget(uid, builder):
-    """An instance of a widget built from builder with its items as role props."""
-    tree = builder()
+    """An instance of a widget built from builder with its items as role props; its charts start below their period
+    buttons, as on the pages."""
+    tree = plots_below_controls(builder())
     props = {i: item_prop(i) for i in items_in(tree)}
     ROLE_WIDGETS[uid] = (tree, props)
     ITEM_PARAMS[uid] = set(props.values())
@@ -2238,43 +2661,44 @@ def role_widget(uid, builder):
 
 
 def switch_tile_widget():
-    """The widget every switch tile is an instance of: a plug or device with its icon, An or Aus, name and a value; a
-    tap anywhere switches it; while on it is tinted and outlined in its colour."""
+    """The widget every switch tile is an instance of: a plug or device as a small card, its icon and An or Aus, name,
+    a value and an optional second one (e.g. power and today's energy); a tap anywhere switches it; while on it is
+    tinted and outlined in its colour."""
     on = "items[props.item].state === 'ON'"
-    return div([div([comp("oh-icon", {"icon": "=props.icon", "state": "=items[props.item].state", "width": 26,
-                                      "height": 26}),
+    line = {"white-space": "nowrap", "overflow": "hidden", "text-overflow": "ellipsis"}
+    return div([div([comp("oh-icon", {"icon": "=props.icon", "state": "=items[props.item].state", "width": 22,
+                                      "height": 22}),
                      label(f"={on} ? 'An' : 'Aus'", **{"font-size": "11px", "font-weight": "700", "opacity": "0.7"})],
                     **{"display": "flex", "justify-content": "space-between", "align-items": "flex-start"}),
-                label("=props.title", **{"font-size": "13px", "font-weight": "600", "margin-top": "6px",
-                                         "white-space": "nowrap", "overflow": "hidden", "text-overflow": "ellipsis"}),
-                label("=props.value || ''", **{"font-size": "12px", "opacity": "0.7"}),
-                toggle_link("=props.item", "14px")],
-               **{"--tile-color": "=props.color || '#78909c'", "position": "relative", "padding": "10px 12px",
-                  "border-radius": "14px", "min-width": "0",
+                label("=props.title", **{**line, "font-size": "13px", "font-weight": "600", "margin-top": "5px",
+                                         "line-height": "16px"}),
+                label("=props.value || ''", **{**line, "font-size": "12px", "opacity": "0.7", "line-height": "15px"}),
+                label("=props.energy || ''", visible="=!!props.energy",
+                      **{**line, "font-size": "11px", "opacity": "0.55", "line-height": "14px"}),
+                toggle_link("=props.item", "12px")],
+               **{"--tile-color": "=props.color || '#78909c'", "position": "relative", "padding": "8px 9px",
+                  "border-radius": "12px", "min-width": "0", "display": "flex", "flex-direction": "column",
                   "background": f"={on} ? 'color-mix(in srgb, var(--tile-color) 20%, transparent)' : "
                                 "'rgba(127, 127, 127, 0.08)'",
                   "box-shadow": f"={on} ? 'inset 0 0 0 1.5px color-mix(in srgb, var(--tile-color) 60%, transparent)' : "
                                 "'none'"})
 
 
-def switch_tile(title, icon, item, color, value):
-    return comp("widget:switch-tile", {"item": item, "title": title, "icon": icon, "color": color, "value": value})
+def switch_tile(title, icon, item, color, value, energy=None):
+    cfg = {"item": item, "title": title, "icon": icon, "color": color, "value": value}
+    if energy:
+        cfg["energy"] = energy
+    return comp("widget:switch-tile", cfg)
 
 
-def control_tiles():
-    tiles = [switch_tile(title, icon, item, color, value) for title, icon, item, color, value in SWITCHES]
-    return [div([role_widget("heatpump-controls", hp_controls),
-                 role_widget("air-conditioner-controls", ac_controls),
-                 role_widget("ventilation-controls", vent_controls),
-                 div(tiles, **{"display": "grid", "grid-template-columns": "repeat(auto-fill, minmax(120px, 1fr))",
-                               "gap": "8px", "margin-top": "8px"})],
-                **{"padding": "4px 16px 14px"})]
-
-
-# heat pump, air conditioner and ventilation in panels of their own, each a head of three lines with its main action
-# that opens the device's page in a popup when tapped; the switches as tiles: tap one to switch it, ON is tinted in
-# its colour
-controls = control_tiles()
+def switch_tiles():
+    """The switches under the energy flow, five abreast, three on a phone, with power and today's energy."""
+    tiles = [switch_tile(title, icon, item, color, value,
+                         f"={fixed(num(item.replace('_switch', '_energy_today')), 2)} + ' kWh'")
+             for title, icon, item, color, value in SWITCHES]
+    return div(tiles, **{"display": "grid", "gap": "6px",
+                         "grid-template-columns": f"={NARROW} ? 'repeat(3, minmax(0, 1fr))' : "
+                                                  f"'repeat({len(SWITCHES)}, minmax(0, 1fr))'"})
 
 
 # ---------------------------------------------------------------- 5. consumption today
@@ -3153,8 +3577,10 @@ def value_axis(name, **extra):
 
 
 def day_chart(series, axes=None, height="260px", **slots):
-    """The last day with arrows for earlier days; a legend once there is more than one series."""
+    """The last day with arrows for earlier days; a legend once there is more than one series. A second axis stands
+    on the right, its name over its labels."""
     axes = axes or [value_axis("W")]
+    axes = axes[:1] + [{**a, "config": {**a["config"], "nameTextStyle": RIGHT_AXIS_NAME}} for a in axes[1:]]
     extra = {"legend": legend()} if len(series) > 1 else {}
     return chart({"period": "D", "periodVisible": True, "height": height},
                  grid=[comp("oh-chart-grid", {"top": "35", "bottom": "60" if extra else "35", "left": "50",
@@ -3184,14 +3610,27 @@ def month_bars(name, item, color, unit="kWh", factor=None):
                  tooltip=tip)
 
 
+def month_chart(series, unit, height="270px"):
+    """Several day series over the current month with a legend; the arrows page through months."""
+    return chart({"chartType": "month", "periodVisible": True, "height": height},
+                 grid=[comp("oh-chart-grid", {"top": "40", "bottom": "60", "left": "45", "right": "45"})],
+                 xAxis=[comp("oh-category-axis", {"gridIndex": 0, "categoryType": "month", "name": "Tag", "nameGap": 12,
+                                                  "axisTick": {"show": False}})],
+                 yAxis=[value_axis(unit)], series=series, legend=legend(),
+                 tooltip=tooltip(trigger="axis", smartFormatter=True))
+
+
 def plots_below_controls(tree):
-    """The period buttons sit in the top right corner of a chart; with the plot starting below them they hide no
-    data. Returns a copy, as parts of a tree may be shared with the overview."""
+    """The period buttons sit in the top right corner of a chart, 6 to 42 px from its top (PERIOD_MENU); with the
+    plot starting below them they hide no data. A second axis names its unit at the plot's top right corner, 14 px
+    above it, so with one the plot starts lower still. Returns a copy, as parts of a tree may be shared with the
+    overview."""
     def lower(v):
         if isinstance(v, dict):
             if v.get("component") == "oh-chart" and v.get("config", {}).get("periodVisible"):
+                named = [a for a in v.get("slots", {}).get("yAxis", []) if a["config"].get("name")]
                 for g in v.get("slots", {}).get("grid", []):
-                    g["config"]["top"] = "62"
+                    g["config"]["top"] = "80" if len(named) > 1 else "62"
             for x in v.values():
                 lower(x)
         elif isinstance(v, list):
@@ -3228,27 +3667,62 @@ def controls_box(*rows):
 HOME_BLUE = "#1e88e5"
 
 
-def home_sources():
-    """Where the house's power comes from now: from PV directly, from the battery and from the grid, each with its
-    share, as a split bar over three tiles. The grid counts only while it imports, the battery only while it
-    discharges; PV covers the rest, at most its own power."""
-    grid_in, batt_out = f"Math.max(0, {num(GRID)})", f"Math.max(0, {num(BATT)})"
-    pv = f"Math.max(0, Math.min({num(PV)}, {num(HOME)} - {grid_in} - {batt_out}))"
-    whole = f"Math.max(1, {pv} + {batt_out} + {grid_in})"
-    sources = [("aus PV", pv, "#ffb300", "solar_power"), ("aus der Batterie", batt_out, BATTERY_GREEN, "battery_full"),
-               ("aus dem Netz", grid_in, "#e53935", "electric_meter")]
+def split_now(title, parts):
+    """Power split by where it comes from or goes to now, each part with its share, as a split bar over tiles; parts:
+    (title, watts, colour, icon)."""
+    whole = "Math.max(1, " + " + ".join(v for _, v, _, _ in parts) + ")"
     share_ = lambda v: f"Math.round(100 * {v} / {whole})"
     bar = div([div([], visible=f"={v} > 5", **{"width": f"=(100 * {v} / {whole}).toFixed(2) + '%'", "height": "100%",
                                                "background": c, "border-radius": "4px"})
-               for _, v, c, _ in sources], **{"display": "flex", "gap": "2px", "height": "10px", "margin": "0 16px 10px"})
+               for _, v, c, _ in parts], **{"display": "flex", "gap": "2px", "height": "10px", "margin": "0 16px 10px"})
     tiles = []
-    for t, v, c, icon in sources:
+    for t, v, c, icon in parts:
         tile = value_tile(f"='{t} · ' + {share_(v)} + ' %'", f"={fixed(f'{v} / 1000', 3)} + ' kW'", color=c)
         tile["config"]["icon"] = f"material:{icon}"  # the title's share names other items, which would mislead the rules
         tiles.append(tile)
-    tiles = wide_grid(tiles)
-    return [label("Woher der Strom jetzt kommt", **{"font-size": "13px", "opacity": "0.7", "padding": "4px 16px 6px"}),
-            bar, tiles]
+    return [label(title, **{"font-size": "13px", "opacity": "0.7", "padding": "4px 16px 6px"}), bar, wide_grid(tiles)]
+
+
+GRID_IN, GRID_OUT = f"Math.max(0, {num(GRID)})", f"Math.max(0, -{num(GRID)})"
+BATT_OUT, BATT_IN = f"Math.max(0, {num(BATT)})", f"Math.max(0, -{num(BATT)})"
+# PV's part of the house's power: what the grid's import and the battery's discharge leave, at most PV's power
+PV_HOUSE = f"Math.max(0, Math.min({num(PV)}, {num(HOME)} - {GRID_IN} - {BATT_OUT}))"
+
+
+def home_sources():
+    """Where the house's power comes from now: from PV directly, from the battery and from the grid. The grid counts
+    only while it imports, the battery only while it discharges; PV covers the rest, at most its own power."""
+    return split_now("Woher der Strom jetzt kommt", [
+        ("aus PV", PV_HOUSE, "#ffb300", "solar_power"), ("aus der Batterie", BATT_OUT, BATTERY_GREEN, "battery_full"),
+        ("aus dem Netz", GRID_IN, "#e53935", "electric_meter")])
+
+
+# where PV's power goes, in this order and never more than it is: into the house, into the battery while it charges,
+# into the grid while it exports (an export beyond it comes from the battery)
+PV_BATT = f"Math.max(0, Math.min({BATT_IN}, {num(PV)} - {PV_HOUSE}))"
+PV_GRID = f"Math.max(0, Math.min({GRID_OUT}, {num(PV)} - {PV_HOUSE} - {PV_BATT}))"
+
+
+def pv_destinations():
+    """Where PV's power goes now: into the house, into the battery, into the grid."""
+    return split_now("Wohin der PV-Strom jetzt geht", [
+        ("ins Haus", PV_HOUSE, "#1e88e5", "home"), ("in den Akku", PV_BATT, BATTERY_GREEN, "battery_charging_full"),
+        ("ins Netz", PV_GRID, "#78909c", "upload")])
+
+
+def day_sums(series, stack):
+    """The daily totals of the current month as stacked bars, the arrows paging through months; series: (name,
+    item, colour)."""
+    return chart({"chartType": "month", "periodVisible": True, "height": "260px"},
+                 grid=[comp("oh-chart-grid", {"top": "40", "bottom": "60", "left": "45", "right": "20"})],
+                 xAxis=[comp("oh-category-axis", {"gridIndex": 0, "categoryType": "month", "name": "Tag", "nameGap": 12,
+                                                  "axisTick": {"show": False}})],
+                 yAxis=[value_axis("kWh")],
+                 series=[daily(name, item, color, stack=stack,
+                               **({"itemStyle": {"color": color, "borderRadius": [4, 4, 0, 0]}} if i == len(series) - 1
+                                  else {}))
+                         for i, (name, item, color) in enumerate(series)],
+                 tooltip=tooltip(trigger="axis", smartFormatter=True), legend=legend())
 
 
 def month_sums(series):
@@ -3344,7 +3818,48 @@ def appliances_blocks():
 
 # the energy flow's own popups, for the two nodes without a device page, laid out like the device pages and opened as
 # wide as they are: uid: (label, builder of the blocks)
-FLOW_POPUPS = {"flow_home": ("Home", home_blocks), "flow_appliances": ("Appliances", appliances_blocks)}
+def self_consumption_blocks():
+    """Self-consumption, the share of PV's yield the house uses itself, in the battery included: where PV's power goes
+    now, today's yield and its parts, and per day and per month what was used and what was fed in."""
+    now = [hero("material:solar_power", "#ffb300", "PV-Leistung", f"={kw(PV)}",
+                [chip(f"={num(PV)} > 10 ? 'jetzt ' + Math.round(100 * ({PV_HOUSE} + {PV_BATT}) / {num(PV)}) + "
+                      f"' % selbst genutzt' : 'PV ruht'", f"={num(PV)} > 10 ? '#43a047' : '#9e9e9e'")]),
+           *pv_destinations()]
+    today = wide_grid([value_tile("Self-consumption", pct("photovoltaics_own_ec_day", "huawei_inverter_e_day"),
+                                  color="#43a047"),
+                       vtile("PV-Ertrag", "huawei_inverter_e_day", color="#ffb300"),
+                       vtile("Selbst genutzt", "photovoltaics_own_ec_day", color="#43a047"),
+                       vtile("Eingespeist", "huawei_inverter_power_meter_ep_day"),
+                       vtile("Akku geladen", "huawei_inverter_energy_storage_day_charge")])
+    split = [("Selbst genutzt", "energy_daily_self_use", SELF_C), ("Eingespeist", "energy_daily_grid_export", "#90a4ae")]
+    months = month_sums([(n, i, c, {"stack": "pv"}) for n, i, c in split])
+    return [two(card("Jetzt", now), card("Heute", [today])),
+            two(card("Pro Tag", [day_sums(split, "pv")]), card("Pro Monat", [months]))]
+
+
+def self_sufficiency_blocks():
+    """Self-sufficiency, the share of the house's consumption that PV covers, by way of the battery too: where the
+    house's power comes from now, today's consumption and its sources, and per day and per month from PV and from the
+    grid."""
+    own = f"({PV_HOUSE} + {BATT_OUT})"
+    now = [hero("material:home", HOME_BLUE, "Hausverbrauch", f"={kw(HOME)}",
+                [chip(f"='jetzt ' + Math.round(100 * Math.min(1, {own} / Math.max(1, {num(HOME)}))) + "
+                      f"' % aus eigenen Quellen'", "#43a047")]),
+           *home_sources()]
+    today = wide_grid([value_tile("Self-sufficiency", pct("photovoltaics_own_ec_day", "home_ec_day"), color="#43a047"),
+                       vtile("Verbrauch heute", "home_ec_day", color=HOME_BLUE),
+                       vtile("aus PV", "photovoltaics_own_ec_day", color="#43a047"),
+                       vtile("aus dem Netz", "huawei_inverter_power_meter_ec_day", color="#e53935"),
+                       vtile("Akku entladen", "huawei_inverter_energy_storage_day_discharge")])
+    split = [("From PV", "energy_daily_self_use", SELF_C), ("From Grid", "energy_daily_grid_import", IMPORT_C)]
+    months = month_sums([(n, i, c, {"stack": "home"}) for n, i, c in split])
+    return [two(card("Jetzt", now), card("Heute", [today])),
+            two(card("Pro Tag", [day_sums(split, "home")]), card("Pro Monat", [months]))]
+
+
+FLOW_POPUPS = {"flow_home": ("Home", home_blocks), "flow_appliances": ("Appliances", appliances_blocks),
+               "flow_self_consumption": ("Self-consumption", self_consumption_blocks),
+               "flow_self_sufficiency": ("Self-sufficiency", self_sufficiency_blocks)}
 
 
 # ---------------------------------------------------------------- 10. device pages
@@ -3994,8 +4509,11 @@ def timestamp(now):
 
 
 # A chart's period menu is hidden by opacity alone and stays in the layout: under a chart low on a page it
-# stretches the page, or a popup, by its full length. Out of the layout while closed, it opens as before.
-PERIOD_MENU = ".menu-item-dropdown:not(.menu-item-dropdown-opened) .menu-dropdown { display: none; }"
+# stretches the page, or a popup, by its full length. Out of the layout while closed, it opens as before. Its buttons
+# stand 6 to 42 px from the chart's top instead of Framework7's 16 to 52 px, clear of the axis names below them;
+# Framework7 sets the padding class's padding as important.
+PERIOD_MENU = "\n".join([".menu-item-dropdown:not(.menu-item-dropdown-opened) .menu-dropdown { display: none; }",
+                         ".oh-chart-container > .menu.padding { padding-top: 6px !important; }"])
 
 
 def one_block(blocks):
@@ -4053,11 +4571,10 @@ def overview_cards():
     """The overview's cards; each is a widget of its own."""
     return {
         "weather-card": weather_card(),
-        "controls-card": card("Controls", controls),
-        "energy-flow-card": card("Energy Flow", [flow], fill=True),
+        "energy-flow-card": card("Energy Flow", energy_flow(), fill=True),
         "appliances-card": card("Appliances", appliances, fill=True),
         "electricity-price-card": card("Electricity Price", price, fill=True),
-        "heatpump-card": card("Heatpump", heatpump_schema),
+        "heatpump-card": card("Heatpump", heatpump_content()),
         "consumption-card": card("='Verbrauch heute · ' + " + disp("home_ec_day"), consumption),
         "energy-days-card": card("Energy per Day", [fill_chart(energy_days, "340px")], fill=True),
         "pv-days-card": card("PV Production per Day", [pv_days()]),
@@ -4065,15 +4582,23 @@ def overview_cards():
     }
 
 
+def widget_stack(*cards):
+    """Card widgets one above the other in a column, as stack() does with cards: MainUI renders a widget without a
+    wrapper, so the column's stylesheet sets the heights: all at their own, the last one taking what the row leaves."""
+    column = div(list(cards), **{"display": "flex", "flex-direction": "column", "height": "100%"})
+    column["config"]["stylesheet"] = (":host > .card { height: auto !important; flex: 0 0 auto; }\n"
+                                      ":host > .card:last-child { flex: 1 1 auto; }")
+    return column
+
+
 def page(now):
     props = overview_widget_props()
     w = lambda uid: widget_ref(uid, **props[uid])  # every item a widget reads comes in as a prop
     return layout_page(PAGE_UID, {"label": "Overview", "stylesheet": SCROLLBAR}, [
-        # the weather as a slim bar across the top; each card fills the height of its row: the flow centres itself,
-        # the appliance tiles and the price chart stretch
+        # the weather as a slim bar across the top; the energy flow with its controls beside the appliances over the
+        # price, which fills the column down to the flow's height; then the heat pump
         block(row(full(w("weather-card"))),
-              row(col([w("controls-card")]), col([w("energy-flow-card")])),
-              row(col([w("appliances-card")]), col([w("electricity-price-card")])),
+              row(col([w("energy-flow-card")]), col([widget_stack(w("appliances-card"), w("electricity-price-card"))])),
               row(full(w("heatpump-card"))),
               row(col([w("consumption-card")]), col([w("energy-days-card")])),
               row(full(w("pv-days-card"))),
@@ -4254,6 +4779,8 @@ PILL_SLIDER_PARAMS = [
     param("icon", "Icon", "The badge's icon, e.g. material:thermostat", default="material:tune"),
     param("ring", "Timer ring", "A ring around a timer icon instead of the icon, emptying as the item runs down to 0",
           "BOOLEAN"),
+    param("ringFull", "Full ring", "What a full timer ring stands for, e.g. an expression on the minutes the timer was "
+          "last set to; empty: the maximum"),
     param("value", "Value", "The value to show, usually an expression on the item", required=True),
     param("valueColor", "Value colour", "Colour of the value where it is not the device colour; empty: the text colour"),
     param("context", "Context", "A line under the title saying what the setting does, usually an expression"),
@@ -4272,8 +4799,6 @@ BOOST_PILL_PARAMS = [SWITCH_ITEM, param("title", "Title", "Name of the boost", d
                      param("color", "Colour", "Device colour as #rrggbb", default="#fb8c00"),
                      param("running", "Text while on", "The line under the title while the boost runs; usually an "
                            "expression", default="läuft")]
-BOOST_BUTTON_PARAMS = [SWITCH_ITEM, param("title", "Title", "The button's text", default="Boost"),
-                       param("color", "Colour", "Device colour as #rrggbb", default="#fb8c00")]
 STATE_BAR_PARAMS = [
     dict(param("item", "Item", "The item whose states the segments send", required=True), context="item"),
     param("options", "Options", "value=label pairs separated by semicolons, e.g. 1=Niedrig;2=Mittel;3=Hoch",
@@ -4285,20 +4810,9 @@ STATE_BAR_PARAMS = [
 SWITCH_TILE_PARAMS = [SWITCH_ITEM, param("title", "Title", "Name of the plug or device", required=True),
                       param("icon", "Icon", "Icon, e.g. material:coffee (its state follows the item)"),
                       param("color", "Colour", "Colour of the tile while on as #rrggbb", default="#78909c"),
-                      param("value", "Value", "A line under the name, e.g. the power; usually an expression")]
-DEVICE_HEAD_PARAMS = [
-    param("icon", "Icon", "The device's icon", required=True),
-    param("title", "Title", "The device's name", required=True),
-    param("line1", "Line 1", "First line of state; usually an expression"),
-    param("line2", "Line 2", "Second line of state; usually an expression"),
-    param("color", "Colour", "Device colour as #rrggbb", default="#78909c"),
-    param("active", "Active", "Whether the device runs, which tints its panel and icon; usually an expression",
-          "BOOLEAN"),
-    param("popup", "Popup", "The uid of the page a tap opens as a popup, e.g. the device's page; empty: no tap"),
-    param("action", "Main action", "switch (a switch pill), button (a boost button), bar (a segmented bar) or empty"),
-    dict(param("actionItem", "Action item", "The item of the main action"), context="item"),
-    param("actionTitle", "Action title", "The switch pill's or button's text"),
-    param("actionOptions", "Action options", "The bar's value=label pairs separated by semicolons")]
+                      param("value", "Value", "A line under the name, e.g. the power; usually an expression"),
+                      param("energy", "Second value", "A line under the value, e.g. today's energy; usually an "
+                            "expression; empty: none")]
 SWITCH_ROW_PARAMS = [
     dict(param("item", "Item", "The switch item", required=True), context="item"),
     param("title", "Title", "Name of the switch", required=True),
@@ -4370,6 +4884,8 @@ def widgets():
     out = {}
     names = known_items()
     for uid, card_ in overview_cards().items():
+        # the overview's charts start below their period buttons too, as the pages' do
+        card_ = plots_below_controls(card_)
         props = {i: item_prop(i) for i in items_in(card_)}
         assert len(set(props.values())) == len(props), f"{uid}: two items share a prop name"
         params = [dict(param(p, names.get(i, (p, ""))[0], f"{names.get(i, ('', 'Item'))[1]} item", required=True),
@@ -4384,10 +4900,8 @@ def widgets():
     out["switch-row"] = (switch_row_widget(), SWITCH_ROW_PARAMS, ["switch"])
     out["power-pill"] = (power_pill_widget(), POWER_PILL_PARAMS, ["switch"])
     out["boost-pill"] = (boost_pill_widget(), BOOST_PILL_PARAMS, ["switch"])
-    out["boost-button"] = (boost_button_widget(), BOOST_BUTTON_PARAMS, ["switch"])
     out["state-bar"] = (state_bar_widget(), STATE_BAR_PARAMS, ["controls"])
     out["switch-tile"] = (switch_tile_widget(), SWITCH_TILE_PARAMS, ["switch"])
-    out["device-head"] = (device_head_widget(), DEVICE_HEAD_PARAMS, ["controls"])
     out["flow-link"] = (flow_link_widget(), FLOW_LINK_PARAMS, ["flow"])
     out["flow-node"] = (flow_node_widget(), FLOW_NODE_PARAMS, ["flow"])
     out["flow-share-ring"] = (share_ring_widget(), FLOW_SHARE_RING_PARAMS, ["flow"])
@@ -4401,10 +4915,12 @@ def widgets():
     out["pill-switch"] = (pill_switch_widget(), PILL_SWITCH_PARAMS, ["switch"])
     for uid, (card_, _, _) in out.items():
         assert not has_placeholder(str(card_)) and "1, 2, 3" not in str(card_), uid
-        # references to other widgets carry names such as heatpump-controls, which a group item may share, and the
-        # pages a tap opens are named after their device, as its group item is (weather, heatpump)
+        # references to other widgets carry names such as heatpump-quick, which a group item may share, and the pages
+        # a tap opens and the energy flow's node kinds are named after their device, as its group item is (weather,
+        # heatpump, ventilation)
         text = re.sub(r'"(widget:[a-z0-9-]+|page:[a-z0-9_]+)"', '""', m.json.dumps(card_))
-        text = re.sub(r'"popup": "[a-z0-9_]+"', '""', text)
+        text = re.sub(r'"(popup|kind)": "[a-z0-9_-]+"', '""', text)  # a node's kind is an option, not an item
+        text = re.sub(r"props\.kind === '[a-z-]+'|\{\"value\": \"[a-z-]+\", \"label\": \"[a-z-]+\"\}", "", text)
         left = [n for n in names if re.search(r"(?<![A-Za-z0-9_])" + re.escape(n) + r"(?![A-Za-z0-9_])", text)]
         assert not left, f"{uid} still names items: {left[:5]}"
     return out
