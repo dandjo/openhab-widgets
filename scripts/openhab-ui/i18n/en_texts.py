@@ -92,7 +92,9 @@ EN = {
         "Heating=Heating,Heating + DHW=Heating + Hot water,DHW=Hot water,Stop=Stop",
     "Heating=Heizen,Fan Only=Nur Lüfter,Cooling=Kühlen,Defrost=Abtauen,Stop=Stopp":
         "Heating=Heating,Fan Only=Fan only,Cooling=Cooling,Defrost=Defrost,Stop=Stop",
-    "ON=An,OFF=Aus": "ON=On,OFF=Off", "an": "on", "aus": "off", "bis": "until",
+    "ON=An,OFF=Aus": "ON=On,OFF=Off", "an": "on", "aus": "off", "bis": "until", "jetzt": "now", "morgen": "tomorrow", "teuerste": "priciest",
+    "Woher der Strom jetzt kommt": "Where the power comes from now",
+    "Wohin der PV-Strom jetzt geht": "Where the PV power goes now",
     "0=Normal;1=Sperre;2=Empfehlung;3=Befehl": "0=Normal;1=Blocked;2=Recommended;3=Forced",
     "1=Niedrig;2=Mittel;3=Hoch": "1=Low;2=Medium;3=High",
     "A=Auto;H=Heizen;C=Kühlen;D=Entfeuchten;F=Lüften": "A=Auto;H=Heating;C=Cooling;D=Drying;F=Fan",
