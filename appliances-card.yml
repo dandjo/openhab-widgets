@@ -51,6 +51,12 @@ props:
     type: TEXT
     required: true
     context: item
+  - name: washingMachine2Since
+    label: Waschmaschine 2 läuft seit
+    description: DateTime item
+    type: TEXT
+    required: true
+    context: item
   - name: dryerProgramProgress
     label: Miele Wäschetrockner TWC560WP Fortschritt
     description: Number:Dimensionless item
@@ -124,7 +130,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 2, 2026, 2:13:02 PM
+timestamp: Oct 4, 2026, 9:05:35 PM
 component: oh-card
 config:
   title: Haushaltsgeräte
@@ -167,6 +173,7 @@ slots:
           popup: washing_machine_2
           power: =props.washingMachine2Power
           done: =props.washingMachine2Finished
+          since: =props.washingMachine2Since
       - component: widget:appliance-tile
         config:
           kind: dryer
