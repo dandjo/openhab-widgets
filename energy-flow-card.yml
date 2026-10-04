@@ -328,7 +328,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 4, 2026, 12:18:52 AM
+timestamp: Oct 4, 2026, 5:20:43 PM
 component: oh-card
 config:
   title: Energiefluss
@@ -468,10 +468,10 @@ slots:
                     config:
                       cx: 265.6
                       cy: 41.9
-                      r: 30
+                      r: 29.2
                       fill: none
                       stroke: rgba(127, 127, 127, 0.28)
-                      stroke-width: 4.5
+                      stroke-width: 2.9
               - component: g
                 config: {}
                 slots:
@@ -487,10 +487,10 @@ slots:
                     config:
                       cx: 377.7
                       cy: 107.9
-                      r: 30
+                      r: 29.2
                       fill: none
                       stroke: rgba(127, 127, 127, 0.28)
-                      stroke-width: 4.5
+                      stroke-width: 2.9
               - component: g
                 config: {}
                 slots:
@@ -506,10 +506,10 @@ slots:
                     config:
                       cx: 410.2
                       cy: 233.9
-                      r: 30
+                      r: 29.2
                       fill: none
                       stroke: rgba(127, 127, 127, 0.28)
-                      stroke-width: 4.5
+                      stroke-width: 2.9
               - component: g
                 config: {}
                 slots:
@@ -525,10 +525,10 @@ slots:
                     config:
                       cx: 344.2
                       cy: 346.0
-                      r: 30
+                      r: 29.2
                       fill: none
                       stroke: rgba(127, 127, 127, 0.28)
-                      stroke-width: 4.5
+                      stroke-width: 2.9
               - component: g
                 config: {}
                 slots:
@@ -544,10 +544,10 @@ slots:
                     config:
                       cx: 218.2
                       cy: 378.5
-                      r: 30
+                      r: 29.2
                       fill: none
                       stroke: rgba(127, 127, 127, 0.28)
-                      stroke-width: 4.5
+                      stroke-width: 2.9
               - component: g
                 config: {}
                 slots:
@@ -563,10 +563,10 @@ slots:
                     config:
                       cx: 106.1
                       cy: 312.5
-                      r: 30
+                      r: 29.2
                       fill: none
                       stroke: rgba(127, 127, 127, 0.28)
-                      stroke-width: 4.5
+                      stroke-width: 2.9
               - component: g
                 config: {}
                 slots:
@@ -582,10 +582,10 @@ slots:
                     config:
                       cx: 73.6
                       cy: 186.5
-                      r: 30
+                      r: 29.2
                       fill: none
                       stroke: rgba(127, 127, 127, 0.28)
-                      stroke-width: 4.5
+                      stroke-width: 2.9
               - component: g
                 config: {}
                 slots:
@@ -601,10 +601,10 @@ slots:
                     config:
                       cx: 139.6
                       cy: 74.4
-                      r: 30
+                      r: 29.2
                       fill: none
                       stroke: rgba(127, 127, 127, 0.28)
-                      stroke-width: 4.5
+                      stroke-width: 2.9
               - component: g
                 config: {}
                 slots:
@@ -620,10 +620,10 @@ slots:
                     config:
                       cx: 241.9
                       cy: 210.2
-                      r: 30
+                      r: 29.2
                       fill: none
                       stroke: rgba(127, 127, 127, 0.28)
-                      stroke-width: 4.5
+                      stroke-width: 2.9
               - component: g
                 config: {}
                 slots:
@@ -632,17 +632,31 @@ slots:
                     config:
                       cx: 139.6
                       cy: 74.4
-                      r: 30
+                      r: 29.2
                       fill: none
                       stroke: '#ffb300'
-                      stroke-width: 4.5
+                      stroke-width: 2.9
                       visible: =(Math.abs((Number(items[props.pvPower].numericState) || 0)) > 10) && !(false)
                     slots:
                       default:
                       - component: animate
                         config:
                           attributeName: opacity
-                          values: 1;0.3;1
+                          values: 0.3;1;0.3
+                          dur: 2s
+                          repeatCount: indefinite
+                          visible: =(Math.abs((Number(items[props.pvPower].numericState) || 0)) > 10) && !(false)
+                      - component: animate
+                        config:
+                          attributeName: stroke-width
+                          values: 2.9;4.5;2.9
+                          dur: 2s
+                          repeatCount: indefinite
+                          visible: =(Math.abs((Number(items[props.pvPower].numericState) || 0)) > 10) && !(false)
+                      - component: animate
+                        config:
+                          attributeName: r
+                          values: 29.2;30;29.2
                           dur: 2s
                           repeatCount: indefinite
                           visible: =(Math.abs((Number(items[props.pvPower].numericState) || 0)) > 10) && !(false)
@@ -650,17 +664,17 @@ slots:
                     config:
                       cx: 139.6
                       cy: 74.4
-                      r: 30
+                      r: 29.2
                       fill: none
                       stroke: '#ffb300'
-                      stroke-width: 4.5
+                      stroke-width: 2.9
                       visible: =(Math.abs((Number(items[props.pvPower].numericState) || 0)) > 10) && (false)
                     slots:
                       default:
                       - component: animate
                         config:
                           attributeName: opacity
-                          values: 0.5;0.12;0.5
+                          values: 0.3;0.06;0.3
                           dur: 2s
                           repeatCount: indefinite
                           visible: =(Math.abs((Number(items[props.pvPower].numericState) || 0)) > 10) && (false)
@@ -672,17 +686,31 @@ slots:
                     config:
                       cx: 73.6
                       cy: 186.5
-                      r: 30
+                      r: 29.2
                       fill: none
                       stroke: '=(Number(items[props.gridPower].numericState) || 0) < 0 ? ''#43a047'' : ''#e53935'''
-                      stroke-width: 4.5
+                      stroke-width: 2.9
                       visible: =(Math.abs((Number(items[props.gridPower].numericState) || 0)) > 10) && !(false)
                     slots:
                       default:
                       - component: animate
                         config:
                           attributeName: opacity
-                          values: 1;0.3;1
+                          values: 0.3;1;0.3
+                          dur: 2s
+                          repeatCount: indefinite
+                          visible: =(Math.abs((Number(items[props.gridPower].numericState) || 0)) > 10) && !(false)
+                      - component: animate
+                        config:
+                          attributeName: stroke-width
+                          values: 2.9;4.5;2.9
+                          dur: 2s
+                          repeatCount: indefinite
+                          visible: =(Math.abs((Number(items[props.gridPower].numericState) || 0)) > 10) && !(false)
+                      - component: animate
+                        config:
+                          attributeName: r
+                          values: 29.2;30;29.2
                           dur: 2s
                           repeatCount: indefinite
                           visible: =(Math.abs((Number(items[props.gridPower].numericState) || 0)) > 10) && !(false)
@@ -690,17 +718,17 @@ slots:
                     config:
                       cx: 73.6
                       cy: 186.5
-                      r: 30
+                      r: 29.2
                       fill: none
                       stroke: '=(Number(items[props.gridPower].numericState) || 0) < 0 ? ''#43a047'' : ''#e53935'''
-                      stroke-width: 4.5
+                      stroke-width: 2.9
                       visible: =(Math.abs((Number(items[props.gridPower].numericState) || 0)) > 10) && (false)
                     slots:
                       default:
                       - component: animate
                         config:
                           attributeName: opacity
-                          values: 0.5;0.12;0.5
+                          values: 0.3;0.06;0.3
                           dur: 2s
                           repeatCount: indefinite
                           visible: =(Math.abs((Number(items[props.gridPower].numericState) || 0)) > 10) && (false)
@@ -712,10 +740,10 @@ slots:
                     config:
                       cx: 106.1
                       cy: 312.5
-                      r: 30
+                      r: 29.2
                       fill: none
                       stroke: '#7cb342'
-                      stroke-width: 4.5
+                      stroke-width: 2.9
                       visible: =(Math.abs((Number(items[props.batteryPower].numericState) || 0)) > 10) && !(((Number(items[props.batterySoc].numericState)
                         || 0) / 100) > 0)
                     slots:
@@ -723,7 +751,23 @@ slots:
                       - component: animate
                         config:
                           attributeName: opacity
-                          values: 1;0.3;1
+                          values: 0.3;1;0.3
+                          dur: 2s
+                          repeatCount: indefinite
+                          visible: =(Math.abs((Number(items[props.batteryPower].numericState) || 0)) > 10) && !(((Number(items[props.batterySoc].numericState)
+                            || 0) / 100) > 0)
+                      - component: animate
+                        config:
+                          attributeName: stroke-width
+                          values: 2.9;4.5;2.9
+                          dur: 2s
+                          repeatCount: indefinite
+                          visible: =(Math.abs((Number(items[props.batteryPower].numericState) || 0)) > 10) && !(((Number(items[props.batterySoc].numericState)
+                            || 0) / 100) > 0)
+                      - component: animate
+                        config:
+                          attributeName: r
+                          values: 29.2;30;29.2
                           dur: 2s
                           repeatCount: indefinite
                           visible: =(Math.abs((Number(items[props.batteryPower].numericState) || 0)) > 10) && !(((Number(items[props.batterySoc].numericState)
@@ -732,10 +776,10 @@ slots:
                     config:
                       cx: 106.1
                       cy: 312.5
-                      r: 30
+                      r: 29.2
                       fill: none
                       stroke: '#7cb342'
-                      stroke-width: 4.5
+                      stroke-width: 2.9
                       visible: =(Math.abs((Number(items[props.batteryPower].numericState) || 0)) > 10) && (((Number(items[props.batterySoc].numericState)
                         || 0) / 100) > 0)
                     slots:
@@ -743,7 +787,7 @@ slots:
                       - component: animate
                         config:
                           attributeName: opacity
-                          values: 0.5;0.12;0.5
+                          values: 0.3;0.06;0.3
                           dur: 2s
                           repeatCount: indefinite
                           visible: =(Math.abs((Number(items[props.batteryPower].numericState) || 0)) > 10) && (((Number(items[props.batterySoc].numericState)
@@ -756,17 +800,31 @@ slots:
                     config:
                       cx: 377.7
                       cy: 107.9
-                      r: 30
+                      r: 29.2
                       fill: none
                       stroke: '#fb8c00'
-                      stroke-width: 4.5
+                      stroke-width: 2.9
                       visible: =(Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) > 50) && !(false)
                     slots:
                       default:
                       - component: animate
                         config:
                           attributeName: opacity
-                          values: 1;0.3;1
+                          values: 0.3;1;0.3
+                          dur: 2s
+                          repeatCount: indefinite
+                          visible: =(Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) > 50) && !(false)
+                      - component: animate
+                        config:
+                          attributeName: stroke-width
+                          values: 2.9;4.5;2.9
+                          dur: 2s
+                          repeatCount: indefinite
+                          visible: =(Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) > 50) && !(false)
+                      - component: animate
+                        config:
+                          attributeName: r
+                          values: 29.2;30;29.2
                           dur: 2s
                           repeatCount: indefinite
                           visible: =(Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) > 50) && !(false)
@@ -774,17 +832,17 @@ slots:
                     config:
                       cx: 377.7
                       cy: 107.9
-                      r: 30
+                      r: 29.2
                       fill: none
                       stroke: '#fb8c00'
-                      stroke-width: 4.5
+                      stroke-width: 2.9
                       visible: =(Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) > 50) && (false)
                     slots:
                       default:
                       - component: animate
                         config:
                           attributeName: opacity
-                          values: 0.5;0.12;0.5
+                          values: 0.3;0.06;0.3
                           dur: 2s
                           repeatCount: indefinite
                           visible: =(Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) > 50) && (false)
@@ -796,17 +854,31 @@ slots:
                     config:
                       cx: 344.2
                       cy: 346.0
-                      r: 30
+                      r: 29.2
                       fill: none
                       stroke: '#26a69a'
-                      stroke-width: 4.5
+                      stroke-width: 2.9
                       visible: =(Math.abs((Number(items[props.ecarPower].numericState) || 0)) > 100) && !(false)
                     slots:
                       default:
                       - component: animate
                         config:
                           attributeName: opacity
-                          values: 1;0.3;1
+                          values: 0.3;1;0.3
+                          dur: 2s
+                          repeatCount: indefinite
+                          visible: =(Math.abs((Number(items[props.ecarPower].numericState) || 0)) > 100) && !(false)
+                      - component: animate
+                        config:
+                          attributeName: stroke-width
+                          values: 2.9;4.5;2.9
+                          dur: 2s
+                          repeatCount: indefinite
+                          visible: =(Math.abs((Number(items[props.ecarPower].numericState) || 0)) > 100) && !(false)
+                      - component: animate
+                        config:
+                          attributeName: r
+                          values: 29.2;30;29.2
                           dur: 2s
                           repeatCount: indefinite
                           visible: =(Math.abs((Number(items[props.ecarPower].numericState) || 0)) > 100) && !(false)
@@ -814,17 +886,17 @@ slots:
                     config:
                       cx: 344.2
                       cy: 346.0
-                      r: 30
+                      r: 29.2
                       fill: none
                       stroke: '#26a69a'
-                      stroke-width: 4.5
+                      stroke-width: 2.9
                       visible: =(Math.abs((Number(items[props.ecarPower].numericState) || 0)) > 100) && (false)
                     slots:
                       default:
                       - component: animate
                         config:
                           attributeName: opacity
-                          values: 0.5;0.12;0.5
+                          values: 0.3;0.06;0.3
                           dur: 2s
                           repeatCount: indefinite
                           visible: =(Math.abs((Number(items[props.ecarPower].numericState) || 0)) > 100) && (false)
@@ -836,10 +908,10 @@ slots:
                     config:
                       cx: 218.2
                       cy: 378.5
-                      r: 30
+                      r: 29.2
                       fill: none
                       stroke: '#5c6bc0'
-                      stroke-width: 4.5
+                      stroke-width: 2.9
                       visible: =(Math.abs(((Number(items[props.washingMachine1Power].numericState) || 0) + (Number(items[props.washingMachine2Power].numericState)
                         || 0) + (Number(items[props.tumbleDryerPower].numericState) || 0) + (Number(items[props.dishwasherPower].numericState)
                         || 0))) > 10) && !(false)
@@ -848,7 +920,25 @@ slots:
                       - component: animate
                         config:
                           attributeName: opacity
-                          values: 1;0.3;1
+                          values: 0.3;1;0.3
+                          dur: 2s
+                          repeatCount: indefinite
+                          visible: =(Math.abs(((Number(items[props.washingMachine1Power].numericState) || 0) + (Number(items[props.washingMachine2Power].numericState)
+                            || 0) + (Number(items[props.tumbleDryerPower].numericState) || 0) + (Number(items[props.dishwasherPower].numericState)
+                            || 0))) > 10) && !(false)
+                      - component: animate
+                        config:
+                          attributeName: stroke-width
+                          values: 2.9;4.5;2.9
+                          dur: 2s
+                          repeatCount: indefinite
+                          visible: =(Math.abs(((Number(items[props.washingMachine1Power].numericState) || 0) + (Number(items[props.washingMachine2Power].numericState)
+                            || 0) + (Number(items[props.tumbleDryerPower].numericState) || 0) + (Number(items[props.dishwasherPower].numericState)
+                            || 0))) > 10) && !(false)
+                      - component: animate
+                        config:
+                          attributeName: r
+                          values: 29.2;30;29.2
                           dur: 2s
                           repeatCount: indefinite
                           visible: =(Math.abs(((Number(items[props.washingMachine1Power].numericState) || 0) + (Number(items[props.washingMachine2Power].numericState)
@@ -858,10 +948,10 @@ slots:
                     config:
                       cx: 218.2
                       cy: 378.5
-                      r: 30
+                      r: 29.2
                       fill: none
                       stroke: '#5c6bc0'
-                      stroke-width: 4.5
+                      stroke-width: 2.9
                       visible: =(Math.abs(((Number(items[props.washingMachine1Power].numericState) || 0) + (Number(items[props.washingMachine2Power].numericState)
                         || 0) + (Number(items[props.tumbleDryerPower].numericState) || 0) + (Number(items[props.dishwasherPower].numericState)
                         || 0))) > 10) && (false)
@@ -870,7 +960,7 @@ slots:
                       - component: animate
                         config:
                           attributeName: opacity
-                          values: 0.5;0.12;0.5
+                          values: 0.3;0.06;0.3
                           dur: 2s
                           repeatCount: indefinite
                           visible: =(Math.abs(((Number(items[props.washingMachine1Power].numericState) || 0) + (Number(items[props.washingMachine2Power].numericState)
@@ -884,17 +974,31 @@ slots:
                     config:
                       cx: 241.9
                       cy: 210.2
-                      r: 30
+                      r: 29.2
                       fill: none
                       stroke: '#1e88e5'
-                      stroke-width: 4.5
+                      stroke-width: 2.9
                       visible: =(Math.abs((Number(items[props.homePower].numericState) || 0)) > 10) && !(false)
                     slots:
                       default:
                       - component: animate
                         config:
                           attributeName: opacity
-                          values: 1;0.3;1
+                          values: 0.3;1;0.3
+                          dur: 2s
+                          repeatCount: indefinite
+                          visible: =(Math.abs((Number(items[props.homePower].numericState) || 0)) > 10) && !(false)
+                      - component: animate
+                        config:
+                          attributeName: stroke-width
+                          values: 2.9;4.5;2.9
+                          dur: 2s
+                          repeatCount: indefinite
+                          visible: =(Math.abs((Number(items[props.homePower].numericState) || 0)) > 10) && !(false)
+                      - component: animate
+                        config:
+                          attributeName: r
+                          values: 29.2;30;29.2
                           dur: 2s
                           repeatCount: indefinite
                           visible: =(Math.abs((Number(items[props.homePower].numericState) || 0)) > 10) && !(false)
@@ -902,17 +1006,17 @@ slots:
                     config:
                       cx: 241.9
                       cy: 210.2
-                      r: 30
+                      r: 29.2
                       fill: none
                       stroke: '#1e88e5'
-                      stroke-width: 4.5
+                      stroke-width: 2.9
                       visible: =(Math.abs((Number(items[props.homePower].numericState) || 0)) > 10) && (false)
                     slots:
                       default:
                       - component: animate
                         config:
                           attributeName: opacity
-                          values: 0.5;0.12;0.5
+                          values: 0.3;0.06;0.3
                           dur: 2s
                           repeatCount: indefinite
                           visible: =(Math.abs((Number(items[props.homePower].numericState) || 0)) > 10) && (false)
@@ -924,10 +1028,10 @@ slots:
                     config:
                       cx: 410.2
                       cy: 233.9
-                      r: 30
+                      r: 29.2
                       fill: none
                       stroke: '#29b6f6'
-                      stroke-width: 4.5
+                      stroke-width: 2.9
                       visible: '=(Math.abs((items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
                         || 0) : 0)) > 5) && !(((Number(items[props.acTimer].numericState) || 0) / Math.max((Number(items[props.acTimer].numericState)
                         || 0), (Number(items[props.acTimerSet].numericState) || 0) || 720)) > 0)'
@@ -936,7 +1040,25 @@ slots:
                       - component: animate
                         config:
                           attributeName: opacity
-                          values: 1;0.3;1
+                          values: 0.3;1;0.3
+                          dur: 2s
+                          repeatCount: indefinite
+                          visible: '=(Math.abs((items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
+                            || 0) : 0)) > 5) && !(((Number(items[props.acTimer].numericState) || 0) / Math.max((Number(items[props.acTimer].numericState)
+                            || 0), (Number(items[props.acTimerSet].numericState) || 0) || 720)) > 0)'
+                      - component: animate
+                        config:
+                          attributeName: stroke-width
+                          values: 2.9;4.5;2.9
+                          dur: 2s
+                          repeatCount: indefinite
+                          visible: '=(Math.abs((items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
+                            || 0) : 0)) > 5) && !(((Number(items[props.acTimer].numericState) || 0) / Math.max((Number(items[props.acTimer].numericState)
+                            || 0), (Number(items[props.acTimerSet].numericState) || 0) || 720)) > 0)'
+                      - component: animate
+                        config:
+                          attributeName: r
+                          values: 29.2;30;29.2
                           dur: 2s
                           repeatCount: indefinite
                           visible: '=(Math.abs((items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
@@ -946,10 +1068,10 @@ slots:
                     config:
                       cx: 410.2
                       cy: 233.9
-                      r: 30
+                      r: 29.2
                       fill: none
                       stroke: '#29b6f6'
-                      stroke-width: 4.5
+                      stroke-width: 2.9
                       visible: '=(Math.abs((items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
                         || 0) : 0)) > 5) && (((Number(items[props.acTimer].numericState) || 0) / Math.max((Number(items[props.acTimer].numericState)
                         || 0), (Number(items[props.acTimerSet].numericState) || 0) || 720)) > 0)'
@@ -958,7 +1080,7 @@ slots:
                       - component: animate
                         config:
                           attributeName: opacity
-                          values: 0.5;0.12;0.5
+                          values: 0.3;0.06;0.3
                           dur: 2s
                           repeatCount: indefinite
                           visible: '=(Math.abs((items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
@@ -972,10 +1094,10 @@ slots:
                     config:
                       cx: 265.6
                       cy: 41.9
-                      r: 30
+                      r: 29.2
                       fill: none
                       stroke: '#26a69a'
-                      stroke-width: 4.5
+                      stroke-width: 2.9
                       visible: =(Math.abs((Number(items[props.ventilationPower].numericState) || 0)) > 5) && !(((Number(items[props.ventilationTimer].numericState)
                         || 0) / Math.max((Number(items[props.ventilationTimer].numericState) || 0), (Number(items[props.ventilationTimerSet].numericState)
                         || 0) || 360)) > 0)
@@ -984,7 +1106,25 @@ slots:
                       - component: animate
                         config:
                           attributeName: opacity
-                          values: 1;0.3;1
+                          values: 0.3;1;0.3
+                          dur: 2s
+                          repeatCount: indefinite
+                          visible: =(Math.abs((Number(items[props.ventilationPower].numericState) || 0)) > 5) && !(((Number(items[props.ventilationTimer].numericState)
+                            || 0) / Math.max((Number(items[props.ventilationTimer].numericState) || 0), (Number(items[props.ventilationTimerSet].numericState)
+                            || 0) || 360)) > 0)
+                      - component: animate
+                        config:
+                          attributeName: stroke-width
+                          values: 2.9;4.5;2.9
+                          dur: 2s
+                          repeatCount: indefinite
+                          visible: =(Math.abs((Number(items[props.ventilationPower].numericState) || 0)) > 5) && !(((Number(items[props.ventilationTimer].numericState)
+                            || 0) / Math.max((Number(items[props.ventilationTimer].numericState) || 0), (Number(items[props.ventilationTimerSet].numericState)
+                            || 0) || 360)) > 0)
+                      - component: animate
+                        config:
+                          attributeName: r
+                          values: 29.2;30;29.2
                           dur: 2s
                           repeatCount: indefinite
                           visible: =(Math.abs((Number(items[props.ventilationPower].numericState) || 0)) > 5) && !(((Number(items[props.ventilationTimer].numericState)
@@ -994,10 +1134,10 @@ slots:
                     config:
                       cx: 265.6
                       cy: 41.9
-                      r: 30
+                      r: 29.2
                       fill: none
                       stroke: '#26a69a'
-                      stroke-width: 4.5
+                      stroke-width: 2.9
                       visible: =(Math.abs((Number(items[props.ventilationPower].numericState) || 0)) > 5) && (((Number(items[props.ventilationTimer].numericState)
                         || 0) / Math.max((Number(items[props.ventilationTimer].numericState) || 0), (Number(items[props.ventilationTimerSet].numericState)
                         || 0) || 360)) > 0)
@@ -1006,7 +1146,7 @@ slots:
                       - component: animate
                         config:
                           attributeName: opacity
-                          values: 0.5;0.12;0.5
+                          values: 0.3;0.06;0.3
                           dur: 2s
                           repeatCount: indefinite
                           visible: =(Math.abs((Number(items[props.ventilationPower].numericState) || 0)) > 5) && (((Number(items[props.ventilationTimer].numericState)
@@ -1024,26 +1164,54 @@ slots:
                         stroke: 'var(--f7-card-bg-color, #fff)'
                       cx: 410.2
                       cy: 233.9
-                      r: 30
+                      r: 29.2
                       fill: none
                       transform: rotate(-90 410.2 233.9)
                       stroke-linecap: round
                       stroke-dasharray: =(Math.min(1, (Number(items[props.acTimer].numericState) || 0) / Math.max((Number(items[props.acTimer].numericState)
-                        || 0), (Number(items[props.acTimerSet].numericState) || 0) || 720)) * 188.5).toFixed(1) + ' 188.5'
-                      stroke-width: 6.5
+                        || 0), (Number(items[props.acTimerSet].numericState) || 0) || 720)) * 100).toFixed(2) + ' 100'
+                      pathLength: 100
+                      stroke-width: 4.9
                   - component: circle
                     config:
                       stroke: '#29b6f6'
                       cx: 410.2
                       cy: 233.9
-                      r: 30
+                      r: 29.2
                       fill: none
                       transform: rotate(-90 410.2 233.9)
                       stroke-linecap: round
                       stroke-dasharray: =(Math.min(1, (Number(items[props.acTimer].numericState) || 0) / Math.max((Number(items[props.acTimer].numericState)
-                        || 0), (Number(items[props.acTimerSet].numericState) || 0) || 720)) * 188.5).toFixed(1) + ' 188.5'
-                      stroke-width: 4.5
+                        || 0), (Number(items[props.acTimerSet].numericState) || 0) || 720)) * 100).toFixed(2) + ' 100'
+                      pathLength: 100
+                      stroke-width: 2.9
                       opacity: '0.9'
+                    slots:
+                      default:
+                      - component: animate
+                        config:
+                          attributeName: opacity
+                          values: 1;0.55;1
+                          dur: 2s
+                          repeatCount: indefinite
+                          visible: '=Math.abs((items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
+                            || 0) : 0)) > 5'
+                      - component: animate
+                        config:
+                          attributeName: stroke-width
+                          values: 4.5;2.9;4.5
+                          dur: 2s
+                          repeatCount: indefinite
+                          visible: '=Math.abs((items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
+                            || 0) : 0)) > 5'
+                      - component: animate
+                        config:
+                          attributeName: r
+                          values: 30;29.2;30
+                          dur: 2s
+                          repeatCount: indefinite
+                          visible: '=Math.abs((items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
+                            || 0) : 0)) > 5'
               - component: g
                 config:
                   visible: =(Number(items[props.ventilationTimer].numericState) || 0) / Math.max((Number(items[props.ventilationTimer].numericState)
@@ -1056,28 +1224,53 @@ slots:
                         stroke: 'var(--f7-card-bg-color, #fff)'
                       cx: 265.6
                       cy: 41.9
-                      r: 30
+                      r: 29.2
                       fill: none
                       transform: rotate(-90 265.6 41.9)
                       stroke-linecap: round
                       stroke-dasharray: =(Math.min(1, (Number(items[props.ventilationTimer].numericState) || 0) / Math.max((Number(items[props.ventilationTimer].numericState)
-                        || 0), (Number(items[props.ventilationTimerSet].numericState) || 0) || 360)) * 188.5).toFixed(1) +
-                        ' 188.5'
-                      stroke-width: 6.5
+                        || 0), (Number(items[props.ventilationTimerSet].numericState) || 0) || 360)) * 100).toFixed(2) + '
+                        100'
+                      pathLength: 100
+                      stroke-width: 4.9
                   - component: circle
                     config:
                       stroke: '#26a69a'
                       cx: 265.6
                       cy: 41.9
-                      r: 30
+                      r: 29.2
                       fill: none
                       transform: rotate(-90 265.6 41.9)
                       stroke-linecap: round
                       stroke-dasharray: =(Math.min(1, (Number(items[props.ventilationTimer].numericState) || 0) / Math.max((Number(items[props.ventilationTimer].numericState)
-                        || 0), (Number(items[props.ventilationTimerSet].numericState) || 0) || 360)) * 188.5).toFixed(1) +
-                        ' 188.5'
-                      stroke-width: 4.5
+                        || 0), (Number(items[props.ventilationTimerSet].numericState) || 0) || 360)) * 100).toFixed(2) + '
+                        100'
+                      pathLength: 100
+                      stroke-width: 2.9
                       opacity: '0.9'
+                    slots:
+                      default:
+                      - component: animate
+                        config:
+                          attributeName: opacity
+                          values: 1;0.55;1
+                          dur: 2s
+                          repeatCount: indefinite
+                          visible: =Math.abs((Number(items[props.ventilationPower].numericState) || 0)) > 5
+                      - component: animate
+                        config:
+                          attributeName: stroke-width
+                          values: 4.5;2.9;4.5
+                          dur: 2s
+                          repeatCount: indefinite
+                          visible: =Math.abs((Number(items[props.ventilationPower].numericState) || 0)) > 5
+                      - component: animate
+                        config:
+                          attributeName: r
+                          values: 30;29.2;30
+                          dur: 2s
+                          repeatCount: indefinite
+                          visible: =Math.abs((Number(items[props.ventilationPower].numericState) || 0)) > 5
               - component: g
                 config:
                   visible: =(Number(items[props.batterySoc].numericState) || 0) / 100 > 0
@@ -1089,26 +1282,51 @@ slots:
                         stroke: 'var(--f7-card-bg-color, #fff)'
                       cx: 106.1
                       cy: 312.5
-                      r: 30
+                      r: 29.2
                       fill: none
                       transform: rotate(-90 106.1 312.5)
                       stroke-linecap: round
-                      stroke-dasharray: =(Math.min(1, (Number(items[props.batterySoc].numericState) || 0) / 100) * 188.5).toFixed(1)
-                        + ' 188.5'
-                      stroke-width: 6.5
+                      stroke-dasharray: =(Math.min(1, (Number(items[props.batterySoc].numericState) || 0) / 100) * 100).toFixed(2)
+                        + ' 100'
+                      pathLength: 100
+                      stroke-width: 4.9
                   - component: circle
                     config:
                       stroke: '#7cb342'
                       cx: 106.1
                       cy: 312.5
-                      r: 30
+                      r: 29.2
                       fill: none
                       transform: rotate(-90 106.1 312.5)
                       stroke-linecap: round
-                      stroke-dasharray: =(Math.min(1, (Number(items[props.batterySoc].numericState) || 0) / 100) * 188.5).toFixed(1)
-                        + ' 188.5'
-                      stroke-width: 4.5
+                      stroke-dasharray: =(Math.min(1, (Number(items[props.batterySoc].numericState) || 0) / 100) * 100).toFixed(2)
+                        + ' 100'
+                      pathLength: 100
+                      stroke-width: 2.9
                       opacity: '0.9'
+                    slots:
+                      default:
+                      - component: animate
+                        config:
+                          attributeName: opacity
+                          values: 1;0.55;1
+                          dur: 2s
+                          repeatCount: indefinite
+                          visible: =Math.abs((Number(items[props.batteryPower].numericState) || 0)) > 10
+                      - component: animate
+                        config:
+                          attributeName: stroke-width
+                          values: 4.5;2.9;4.5
+                          dur: 2s
+                          repeatCount: indefinite
+                          visible: =Math.abs((Number(items[props.batteryPower].numericState) || 0)) > 10
+                      - component: animate
+                        config:
+                          attributeName: r
+                          values: 30;29.2;30
+                          dur: 2s
+                          repeatCount: indefinite
+                          visible: =Math.abs((Number(items[props.batteryPower].numericState) || 0)) > 10
               - component: widget:flow-node
                 config:
                   kind: pv
@@ -1129,7 +1347,7 @@ slots:
                   power: =(Number(items[props.homePower].numericState) || 0)
               - component: widget:flow-node
                 config:
-                  kind: heat-pump
+                  kind: heat-pump-split
                   x: 377.7
                   y: 107.9
                   power: =(Number(items[props.heatpumpPower].numericState) || 0)

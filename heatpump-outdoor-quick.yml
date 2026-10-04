@@ -34,7 +34,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 4, 2026, 1:23:32 PM
+timestamp: Oct 4, 2026, 5:20:43 PM
 component: div
 config:
   style:
@@ -116,19 +116,80 @@ slots:
           chartType: ''
           periodVisible: true
           period: D
-          height: 220px
+          height: 752px
+          options:
+            axisPointer:
+              link:
+              - xAxisIndex: all
         slots:
           grid:
           - component: oh-chart-grid
             config:
-              top: '62'
-              bottom: '35'
+              top: 62
+              height: 120
+              left: '50'
+              right: '20'
+          - component: oh-chart-grid
+            config:
+              top: 242
+              height: 120
+              left: '50'
+              right: '20'
+          - component: oh-chart-grid
+            config:
+              top: 422
+              height: 120
+              left: '50'
+              right: '20'
+          - component: oh-chart-grid
+            config:
+              top: 602
+              height: 120
               left: '50'
               right: '20'
           xAxis:
           - component: oh-time-axis
             config:
               gridIndex: 0
+              axisPointer:
+                snap: false
+                label:
+                  show: false
+              axisLabel:
+                show: false
+          - component: oh-time-axis
+            config:
+              gridIndex: 1
+              axisPointer:
+                snap: false
+                label:
+                  show: false
+              axisLabel:
+                show: false
+          - component: oh-time-axis
+            config:
+              gridIndex: 2
+              axisPointer:
+                snap: false
+                label:
+                  show: false
+              axisLabel:
+                show: false
+          - component: oh-time-axis
+            config:
+              gridIndex: 2
+              axisPointer:
+                snap: false
+                label:
+                  show: false
+              show: false
+          - component: oh-time-axis
+            config:
+              gridIndex: 3
+              axisPointer:
+                snap: false
+                label:
+                  show: false
           yAxis:
           - component: oh-value-axis
             config:
@@ -147,6 +208,61 @@ slots:
                   type: dashed
                   opacity: 0.4
               min: 0
+          - component: oh-value-axis
+            config:
+              gridIndex: 1
+              name: Hz
+              nameGap: 14
+              nameTextStyle:
+                align: right
+                padding:
+                - 0
+                - 8
+                - 0
+                - 0
+              splitLine:
+                lineStyle:
+                  type: dashed
+                  opacity: 0.4
+              min: 0
+          - component: oh-value-axis
+            config:
+              gridIndex: 2
+              name: °C
+              nameGap: 14
+              nameTextStyle:
+                align: right
+                padding:
+                - 0
+                - 8
+                - 0
+                - 0
+              splitLine:
+                lineStyle:
+                  type: dashed
+                  opacity: 0.4
+              scale: true
+              min: =(v) => Math.floor(Math.min(v.min, (v.min + v.max - 4) / 2))
+              max: =(v) => Math.ceil(Math.max(v.max, (v.min + v.max + 4) / 2))
+          - component: oh-value-axis
+            config:
+              gridIndex: 3
+              name: °C
+              nameGap: 14
+              nameTextStyle:
+                align: right
+                padding:
+                - 0
+                - 8
+                - 0
+                - 0
+              splitLine:
+                lineStyle:
+                  type: dashed
+                  opacity: 0.4
+              scale: true
+              min: =(v) => Math.floor(Math.min(v.min, (v.min + v.max - 4) / 2))
+              max: =(v) => Math.ceil(Math.max(v.max, (v.min + v.max + 4) / 2))
           series:
           - component: oh-time-series
             config:
@@ -175,66 +291,12 @@ slots:
                     color: rgba(251, 140, 0, 0.45)
                   - offset: 1
                     color: rgba(251, 140, 0, 0.02)
-          tooltip:
-          - component: oh-chart-tooltip
-            config:
-              show: true
-              confine: true
-              trigger: axis
-              smartFormatter: true
-          title:
-          - component: oh-chart-title
-            config:
-              show: true
-              text: Leistung
-              left: 10
-              top: 15
-              textStyle:
-                fontSize: 13
-                fontWeight: 600
-      - component: oh-chart
-        config:
-          chartType: ''
-          periodVisible: true
-          period: D
-          height: 220px
-        slots:
-          grid:
-          - component: oh-chart-grid
-            config:
-              top: '62'
-              bottom: '35'
-              left: '50'
-              right: '20'
-          xAxis:
-          - component: oh-time-axis
-            config:
-              gridIndex: 0
-          yAxis:
-          - component: oh-value-axis
-            config:
-              gridIndex: 0
-              name: Hz
-              nameGap: 14
-              nameTextStyle:
-                align: right
-                padding:
-                - 0
-                - 8
-                - 0
-                - 0
-              splitLine:
-                lineStyle:
-                  type: dashed
-                  opacity: 0.4
-              min: 0
-          series:
           - component: oh-time-series
             config:
               name: Verdichter
-              gridIndex: 0
-              xAxisIndex: 0
-              yAxisIndex: 0
+              gridIndex: 1
+              xAxisIndex: 1
+              yAxisIndex: 1
               type: line
               item: =props.heatpumpInvFrequency
               symbol: none
@@ -243,68 +305,12 @@ slots:
                 color: '#78909c'
               itemStyle:
                 color: '#78909c'
-          tooltip:
-          - component: oh-chart-tooltip
-            config:
-              show: true
-              confine: true
-              trigger: axis
-              smartFormatter: true
-          title:
-          - component: oh-chart-title
-            config:
-              show: true
-              text: Verdichter
-              left: 10
-              top: 15
-              textStyle:
-                fontSize: 13
-                fontWeight: 600
-      - component: oh-chart
-        config:
-          chartType: ''
-          periodVisible: true
-          period: D
-          height: 270px
-        slots:
-          grid:
-          - component: oh-chart-grid
-            config:
-              top: '62'
-              bottom: '60'
-              left: '50'
-              right: '20'
-          xAxis:
-          - component: oh-time-axis
-            config:
-              gridIndex: 0
-          yAxis:
-          - component: oh-value-axis
-            config:
-              gridIndex: 0
-              name: °C
-              nameGap: 14
-              nameTextStyle:
-                align: right
-                padding:
-                - 0
-                - 8
-                - 0
-                - 0
-              splitLine:
-                lineStyle:
-                  type: dashed
-                  opacity: 0.4
-              scale: true
-              min: =(v) => Math.floor(Math.min(v.min, (v.min + v.max - 4) / 2))
-              max: =(v) => Math.ceil(Math.max(v.max, (v.min + v.max + 4) / 2))
-          series:
           - component: oh-time-series
             config:
               name: Außen
-              gridIndex: 0
-              xAxisIndex: 0
-              yAxisIndex: 0
+              gridIndex: 2
+              xAxisIndex: 2
+              yAxisIndex: 2
               type: line
               item: =props.heatpumpExtAmbientTemp
               symbol: none
@@ -316,9 +322,9 @@ slots:
           - component: oh-time-series
             config:
               name: Wärmetauscher
-              gridIndex: 0
-              xAxisIndex: 0
-              yAxisIndex: 0
+              gridIndex: 2
+              xAxisIndex: 3
+              yAxisIndex: 2
               type: line
               item: =props.heatpumpHeatExchangerMidTemp
               symbol: none
@@ -327,74 +333,12 @@ slots:
                 color: '#4fc3f7'
               itemStyle:
                 color: '#4fc3f7'
-          tooltip:
-          - component: oh-chart-tooltip
-            config:
-              show: true
-              confine: true
-              trigger: axis
-              smartFormatter: true
-          legend:
-          - component: oh-chart-legend
-            config:
-              show: true
-              bottom: '0'
-              type: scroll
-          title:
-          - component: oh-chart-title
-            config:
-              show: true
-              text: Außen und Wärmetauscher
-              left: 10
-              top: 15
-              textStyle:
-                fontSize: 13
-                fontWeight: 600
-      - component: oh-chart
-        config:
-          chartType: ''
-          periodVisible: true
-          period: D
-          height: 220px
-        slots:
-          grid:
-          - component: oh-chart-grid
-            config:
-              top: '62'
-              bottom: '35'
-              left: '50'
-              right: '20'
-          xAxis:
-          - component: oh-time-axis
-            config:
-              gridIndex: 0
-          yAxis:
-          - component: oh-value-axis
-            config:
-              gridIndex: 0
-              name: °C
-              nameGap: 14
-              nameTextStyle:
-                align: right
-                padding:
-                - 0
-                - 8
-                - 0
-                - 0
-              splitLine:
-                lineStyle:
-                  type: dashed
-                  opacity: 0.4
-              scale: true
-              min: =(v) => Math.floor(Math.min(v.min, (v.min + v.max - 4) / 2))
-              max: =(v) => Math.ceil(Math.max(v.max, (v.min + v.max + 4) / 2))
-          series:
           - component: oh-time-series
             config:
               name: Außenluft
-              gridIndex: 0
-              xAxisIndex: 0
-              yAxisIndex: 0
+              gridIndex: 3
+              xAxisIndex: 4
+              yAxisIndex: 3
               type: line
               item: =props.heatpumpOutdoorAirTemp
               symbol: none
@@ -403,6 +347,52 @@ slots:
                 color: '#9e9e9e'
               itemStyle:
                 color: '#9e9e9e'
+          title:
+          - component: oh-chart-title
+            config:
+              show: true
+              text: Leistung
+              left: 10
+              top: 15
+              textStyle:
+                fontSize: 13
+                fontWeight: 600
+          - component: oh-chart-title
+            config:
+              show: true
+              text: Verdichter
+              left: 10
+              top: 190
+              textStyle:
+                fontSize: 13
+                fontWeight: 600
+          - component: oh-chart-title
+            config:
+              show: true
+              text: '{s0|Außen} · {s1|Wärmetauscher}'
+              left: 10
+              top: 370
+              textStyle:
+                fontSize: 13
+                fontWeight: 600
+                rich:
+                  s0:
+                    fontSize: 13
+                    fontWeight: 600
+                    color: '#26a69a'
+                  s1:
+                    fontSize: 13
+                    fontWeight: 600
+                    color: '#4fc3f7'
+          - component: oh-chart-title
+            config:
+              show: true
+              text: Außenluft
+              left: 10
+              top: 550
+              textStyle:
+                fontSize: 13
+                fontWeight: 600
           tooltip:
           - component: oh-chart-tooltip
             config:
@@ -410,16 +400,6 @@ slots:
               confine: true
               trigger: axis
               smartFormatter: true
-          title:
-          - component: oh-chart-title
-            config:
-              show: true
-              text: Außenluft
-              left: 10
-              top: 15
-              textStyle:
-                fontSize: 13
-                fontWeight: 600
       - component: div
         config:
           style:

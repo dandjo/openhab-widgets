@@ -40,7 +40,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 4, 2026, 1:23:32 PM
+timestamp: Oct 4, 2026, 5:20:43 PM
 component: div
 config:
   style:
@@ -138,19 +138,50 @@ slots:
           chartType: ''
           periodVisible: true
           period: D
-          height: 270px
+          height: 392px
+          options:
+            axisPointer:
+              link:
+              - xAxisIndex: all
         slots:
           grid:
           - component: oh-chart-grid
             config:
-              top: '62'
-              bottom: '60'
+              top: 62
+              height: 120
+              left: '50'
+              right: '20'
+          - component: oh-chart-grid
+            config:
+              top: 242
+              height: 120
               left: '50'
               right: '20'
           xAxis:
           - component: oh-time-axis
             config:
               gridIndex: 0
+              axisPointer:
+                snap: false
+                label:
+                  show: false
+              axisLabel:
+                show: false
+          - component: oh-time-axis
+            config:
+              gridIndex: 0
+              axisPointer:
+                snap: false
+                label:
+                  show: false
+              show: false
+          - component: oh-time-axis
+            config:
+              gridIndex: 1
+              axisPointer:
+                snap: false
+                label:
+                  show: false
           yAxis:
           - component: oh-value-axis
             config:
@@ -171,6 +202,22 @@ slots:
               scale: true
               min: =(v) => Math.floor(Math.min(v.min, (v.min + v.max - 4) / 2))
               max: =(v) => Math.ceil(Math.max(v.max, (v.min + v.max + 4) / 2))
+          - component: oh-value-axis
+            config:
+              gridIndex: 1
+              name: W
+              nameGap: 14
+              nameTextStyle:
+                align: right
+                padding:
+                - 0
+                - 8
+                - 0
+                - 0
+              splitLine:
+                lineStyle:
+                  type: dashed
+                  opacity: 0.4
           series:
           - component: oh-time-series
             config:
@@ -190,7 +237,7 @@ slots:
             config:
               name: Rücklauf
               gridIndex: 0
-              xAxisIndex: 0
+              xAxisIndex: 1
               yAxisIndex: 0
               type: line
               item: =props.heatpumpInletWaterTemp
@@ -200,71 +247,12 @@ slots:
                 color: '#64b5f6'
               itemStyle:
                 color: '#64b5f6'
-          tooltip:
-          - component: oh-chart-tooltip
-            config:
-              show: true
-              confine: true
-              trigger: axis
-              smartFormatter: true
-          legend:
-          - component: oh-chart-legend
-            config:
-              show: true
-              bottom: '0'
-              type: scroll
-          title:
-          - component: oh-chart-title
-            config:
-              show: true
-              text: Vorlauf und Rücklauf
-              left: 10
-              top: 15
-              textStyle:
-                fontSize: 13
-                fontWeight: 600
-      - component: oh-chart
-        config:
-          chartType: ''
-          periodVisible: true
-          period: D
-          height: 220px
-        slots:
-          grid:
-          - component: oh-chart-grid
-            config:
-              top: '62'
-              bottom: '35'
-              left: '50'
-              right: '20'
-          xAxis:
-          - component: oh-time-axis
-            config:
-              gridIndex: 0
-          yAxis:
-          - component: oh-value-axis
-            config:
-              gridIndex: 0
-              name: W
-              nameGap: 14
-              nameTextStyle:
-                align: right
-                padding:
-                - 0
-                - 8
-                - 0
-                - 0
-              splitLine:
-                lineStyle:
-                  type: dashed
-                  opacity: 0.4
-          series:
           - component: oh-time-series
             config:
               name: Wärme
-              gridIndex: 0
-              xAxisIndex: 0
-              yAxisIndex: 0
+              gridIndex: 1
+              xAxisIndex: 2
+              yAxisIndex: 1
               type: line
               item: =props.heatpumpHeatingPowerAfterBuh
               symbol: none
@@ -286,6 +274,34 @@ slots:
                     color: rgba(251, 140, 0, 0.45)
                   - offset: 1
                     color: rgba(251, 140, 0, 0.02)
+          title:
+          - component: oh-chart-title
+            config:
+              show: true
+              text: '{s0|Vorlauf} · {s1|Rücklauf}'
+              left: 10
+              top: 15
+              textStyle:
+                fontSize: 13
+                fontWeight: 600
+                rich:
+                  s0:
+                    fontSize: 13
+                    fontWeight: 600
+                    color: '#e57373'
+                  s1:
+                    fontSize: 13
+                    fontWeight: 600
+                    color: '#64b5f6'
+          - component: oh-chart-title
+            config:
+              show: true
+              text: Wärme
+              left: 10
+              top: 190
+              textStyle:
+                fontSize: 13
+                fontWeight: 600
           tooltip:
           - component: oh-chart-tooltip
             config:
@@ -293,16 +309,6 @@ slots:
               confine: true
               trigger: axis
               smartFormatter: true
-          title:
-          - component: oh-chart-title
-            config:
-              show: true
-              text: Wärme
-              left: 10
-              top: 15
-              textStyle:
-                fontSize: 13
-                fontWeight: 600
       - component: div
         config:
           style:

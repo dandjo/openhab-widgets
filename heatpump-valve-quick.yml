@@ -10,7 +10,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 4, 2026, 1:23:32 PM
+timestamp: Oct 4, 2026, 5:20:43 PM
 component: div
 config:
   style:
@@ -88,45 +88,49 @@ slots:
           chartType: ''
           periodVisible: true
           period: D
-          height: 160px
+          height: 150px
+          options:
+            axisPointer:
+              link:
+              - xAxisIndex: all
         slots:
           grid:
           - component: oh-chart-grid
             config:
               top: '62'
-              bottom: '35'
-              left: '20'
+              height: 58
+              left: '50'
               right: '20'
           xAxis:
           - component: oh-time-axis
             config:
               gridIndex: 0
+              axisPointer:
+                snap: false
+                label:
+                  show: false
           yAxis:
           - component: oh-category-axis
             config:
-              gridIndex: 0
               categoryType: values
               data:
               - Stellung
               show: false
+              gridIndex: 0
           series:
           - component: oh-state-series
             config:
               name: Stellung
               item: =props.heatpumpValve
-              xAxisIndex: 0
-              yAxisIndex: 0
               yValue: 0
               yHeight: 0.7
               mapState: '=(s) => s === ''Space'' ? ''Heizung'' : s === ''DHW'' ? ''Warmwasser'' : s'
               stateColor:
                 Heizung: '#ffb74d'
                 Warmwasser: '#e57373'
-          tooltip:
-          - component: oh-chart-tooltip
-            config:
-              show: true
-              confine: true
+              xAxisIndex: 0
+              yAxisIndex: 0
+              gridIndex: 0
           title:
           - component: oh-chart-title
             config:
@@ -137,6 +141,11 @@ slots:
               textStyle:
                 fontSize: 13
                 fontWeight: 600
+          tooltip:
+          - component: oh-chart-tooltip
+            config:
+              show: true
+              confine: true
       - component: div
         config:
           style:

@@ -28,7 +28,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Sep 27, 2026, 8:52:40 PM
+timestamp: Oct 4, 2026, 5:20:43 PM
 component: oh-card
 config:
   title: Temperaturen
@@ -105,6 +105,10 @@ slots:
       periodVisible: false
       period: D
       height: 320px
+      options:
+        axisPointer:
+          link:
+          - xAxisIndex: all
     slots:
       grid:
       - component: oh-chart-grid
@@ -117,6 +121,18 @@ slots:
       - component: oh-time-axis
         config:
           gridIndex: 0
+          axisPointer:
+            snap: false
+            label:
+              show: false
+      - component: oh-time-axis
+        config:
+          gridIndex: 0
+          show: false
+          axisPointer:
+            snap: false
+            label:
+              show: false
       yAxis:
       - component: oh-value-axis
         config:
@@ -181,7 +197,7 @@ slots:
         config:
           name: Außen
           gridIndex: 0
-          xAxisIndex: 0
+          xAxisIndex: 1
           yAxisIndex: 0
           type: line
           item: =props.temperatureOutdoor15min

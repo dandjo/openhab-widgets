@@ -18,6 +18,8 @@ props:
       label: home
     - value: heat-pump
       label: heat-pump
+    - value: heat-pump-split
+      label: heat-pump-split
     - value: air-conditioner
       label: air-conditioner
     - value: e-car
@@ -54,7 +56,7 @@ props:
     type: DECIMAL
     required: false
   parameterGroups: []
-timestamp: Oct 3, 2026, 11:36:34 PM
+timestamp: Oct 4, 2026, 5:20:43 PM
 component: g
 config:
   transform: ='translate(' + props.x + ' ' + props.y + ')'
@@ -83,110 +85,13 @@ slots:
               r: 27.75
               fill: '#ffb300'
               fill-opacity: '0.12'
-      - component: g
+      - component: rect
         config:
-          opacity: =(0.25 + 0.75 * Math.min(1, Math.abs(Number(props.power)) / 8000)).toFixed(2)
-        slots:
-          default:
-          - component: line
-            config:
-              x1: 12.5
-              y1: -13.0
-              x2: 15.0
-              y2: -13.0
-              stroke: '#ffb300'
-              stroke-width: 1.6
-              stroke-linecap: round
-              fill: none
-          - component: line
-            config:
-              x1: 10.6
-              y1: -8.4
-              x2: 12.36
-              y2: -6.64
-              stroke: '#ffb300'
-              stroke-width: 1.6
-              stroke-linecap: round
-              fill: none
-          - component: line
-            config:
-              x1: 6.0
-              y1: -6.5
-              x2: 6.0
-              y2: -4.0
-              stroke: '#ffb300'
-              stroke-width: 1.6
-              stroke-linecap: round
-              fill: none
-          - component: line
-            config:
-              x1: 1.4
-              y1: -8.4
-              x2: -0.36
-              y2: -6.64
-              stroke: '#ffb300'
-              stroke-width: 1.6
-              stroke-linecap: round
-              fill: none
-          - component: line
-            config:
-              x1: -0.5
-              y1: -13.0
-              x2: -3.0
-              y2: -13.0
-              stroke: '#ffb300'
-              stroke-width: 1.6
-              stroke-linecap: round
-              fill: none
-          - component: line
-            config:
-              x1: 1.4
-              y1: -17.6
-              x2: -0.36
-              y2: -19.36
-              stroke: '#ffb300'
-              stroke-width: 1.6
-              stroke-linecap: round
-              fill: none
-          - component: line
-            config:
-              x1: 6.0
-              y1: -19.5
-              x2: 6.0
-              y2: -22.0
-              stroke: '#ffb300'
-              stroke-width: 1.6
-              stroke-linecap: round
-              fill: none
-          - component: line
-            config:
-              x1: 10.6
-              y1: -17.6
-              x2: 12.36
-              y2: -19.36
-              stroke: '#ffb300'
-              stroke-width: 1.6
-              stroke-linecap: round
-              fill: none
-          - component: animateTransform
-            config:
-              attributeName: transform
-              type: rotate
-              from: 0 6 -13
-              to: 360 6 -13
-              dur: '=Math.abs(Number(props.power)) < 1000 ? ''12s'' : (Math.abs(Number(props.power)) < 4000 ? ''7s'' : (''4s''))'
-              repeatCount: indefinite
-              visible: =Math.abs(Number(props.power)) > 10
-      - component: circle
-        config:
-          cx: 6
-          cy: -13
-          r: 5
-          fill: '#ffb300'
-          opacity: =(0.25 + 0.75 * Math.min(1, Math.abs(Number(props.power)) / 8000)).toFixed(2)
-      - component: polygon
-        config:
-          points: -18,15 12,15 18,-1 -12,-1
+          x: -17.84
+          y: -3.76
+          width: 33.8
+          height: 18.79
+          rx: 1.5
           fill-opacity: =(0.25 + 0.75 * Math.min(1, Math.abs(Number(props.power)) / 8000)).toFixed(2)
           stroke: currentColor
           stroke-width: 1.2
@@ -194,44 +99,226 @@ slots:
           fill: '#1e88e5'
       - component: line
         config:
-          x1: -10.5
-          y1: 15
-          x2: -4.5
-          y2: -1
+          x1: -6.57
+          y1: -3.76
+          x2: -6.57
+          y2: 15.03
           stroke: '#e3f2fd'
-          stroke-width: 0.8
+          stroke-width: 0.9
           stroke-linecap: round
           fill: none
       - component: line
         config:
-          x1: -3.0
-          y1: 15
-          x2: 3.0
-          y2: -1
+          x1: 4.69
+          y1: -3.76
+          x2: 4.69
+          y2: 15.03
           stroke: '#e3f2fd'
-          stroke-width: 0.8
+          stroke-width: 0.9
           stroke-linecap: round
           fill: none
       - component: line
         config:
-          x1: 4.5
-          y1: 15
-          x2: 10.5
-          y2: -1
+          x1: -17.84
+          y1: 5.635
+          x2: 15.96
+          y2: 5.635
           stroke: '#e3f2fd'
-          stroke-width: 0.8
+          stroke-width: 0.9
           stroke-linecap: round
           fill: none
-      - component: line
+      - component: g
+        config: {}
+        slots:
+          default:
+          - component: line
+            config:
+              x1: 16.61
+              y1: -5.85
+              x2: 18.92
+              y2: -4.89
+              style:
+                stroke: 'color-mix(in srgb, #ffb300 12%, var(--f7-card-bg-color, #fff))'
+              stroke-width: 4
+              stroke-linecap: round
+          - component: line
+            config:
+              x1: 12.93
+              y1: -2.17
+              x2: 13.89
+              y2: 0.14
+              style:
+                stroke: 'color-mix(in srgb, #ffb300 12%, var(--f7-card-bg-color, #fff))'
+              stroke-width: 4
+              stroke-linecap: round
+          - component: line
+            config:
+              x1: 7.73
+              y1: -2.17
+              x2: 6.77
+              y2: 0.14
+              style:
+                stroke: 'color-mix(in srgb, #ffb300 12%, var(--f7-card-bg-color, #fff))'
+              stroke-width: 4
+              stroke-linecap: round
+          - component: line
+            config:
+              x1: 4.05
+              y1: -5.85
+              x2: 1.74
+              y2: -4.89
+              style:
+                stroke: 'color-mix(in srgb, #ffb300 12%, var(--f7-card-bg-color, #fff))'
+              stroke-width: 4
+              stroke-linecap: round
+          - component: line
+            config:
+              x1: 4.05
+              y1: -11.05
+              x2: 1.74
+              y2: -12.01
+              style:
+                stroke: 'color-mix(in srgb, #ffb300 12%, var(--f7-card-bg-color, #fff))'
+              stroke-width: 4
+              stroke-linecap: round
+          - component: line
+            config:
+              x1: 7.73
+              y1: -14.73
+              x2: 6.77
+              y2: -17.04
+              style:
+                stroke: 'color-mix(in srgb, #ffb300 12%, var(--f7-card-bg-color, #fff))'
+              stroke-width: 4
+              stroke-linecap: round
+          - component: line
+            config:
+              x1: 12.93
+              y1: -14.73
+              x2: 13.89
+              y2: -17.04
+              style:
+                stroke: 'color-mix(in srgb, #ffb300 12%, var(--f7-card-bg-color, #fff))'
+              stroke-width: 4
+              stroke-linecap: round
+          - component: line
+            config:
+              x1: 16.61
+              y1: -11.05
+              x2: 18.92
+              y2: -12.01
+              style:
+                stroke: 'color-mix(in srgb, #ffb300 12%, var(--f7-card-bg-color, #fff))'
+              stroke-width: 4
+              stroke-linecap: round
+          - component: g
+            config:
+              opacity: =(0.9 + 0.1 * Math.min(1, Math.abs(Number(props.power)) / 8000)).toFixed(2)
+            slots:
+              default:
+              - component: line
+                config:
+                  x1: 16.61
+                  y1: -5.85
+                  x2: 18.92
+                  y2: -4.89
+                  stroke: '#ffb300'
+                  stroke-width: 1.8
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 12.93
+                  y1: -2.17
+                  x2: 13.89
+                  y2: 0.14
+                  stroke: '#ffb300'
+                  stroke-width: 1.8
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 7.73
+                  y1: -2.17
+                  x2: 6.77
+                  y2: 0.14
+                  stroke: '#ffb300'
+                  stroke-width: 1.8
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 4.05
+                  y1: -5.85
+                  x2: 1.74
+                  y2: -4.89
+                  stroke: '#ffb300'
+                  stroke-width: 1.8
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 4.05
+                  y1: -11.05
+                  x2: 1.74
+                  y2: -12.01
+                  stroke: '#ffb300'
+                  stroke-width: 1.8
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 7.73
+                  y1: -14.73
+                  x2: 6.77
+                  y2: -17.04
+                  stroke: '#ffb300'
+                  stroke-width: 1.8
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 12.93
+                  y1: -14.73
+                  x2: 13.89
+                  y2: -17.04
+                  stroke: '#ffb300'
+                  stroke-width: 1.8
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 16.61
+                  y1: -11.05
+                  x2: 18.92
+                  y2: -12.01
+                  stroke: '#ffb300'
+                  stroke-width: 1.8
+                  stroke-linecap: round
+                  fill: none
+          - component: animateTransform
+            config:
+              attributeName: transform
+              type: rotate
+              from: 0 10.33 -8.45
+              to: 360 10.33 -8.45
+              dur: '=Math.abs(Number(props.power)) < 1000 ? ''12s'' : (Math.abs(Number(props.power)) < 4000 ? ''7s'' : (''4s''))'
+              repeatCount: indefinite
+              visible: =Math.abs(Number(props.power)) > 10
+      - component: circle
         config:
-          x1: -15
-          y1: 7
-          x2: 15
-          y2: 7
-          stroke: '#e3f2fd'
-          stroke-width: 0.8
-          stroke-linecap: round
-          fill: none
+          cx: 10.33
+          cy: -8.45
+          r: 6.6
+          style:
+            fill: 'color-mix(in srgb, #ffb300 12%, var(--f7-card-bg-color, #fff))'
+      - component: circle
+        config:
+          cx: 10.33
+          cy: -8.45
+          r: 5
+          fill: '#ffb300'
+          opacity: =(0.9 + 0.1 * Math.min(1, Math.abs(Number(props.power)) / 8000)).toFixed(2)
   - component: g
     config:
       visible: =props.kind === 'grid'
@@ -434,19 +521,17 @@ slots:
               r: 27.75
               fill: '#1e88e5'
               fill-opacity: '0.12'
-      - component: rect
+      - component: path
         config:
-          x: 6
-          y: -15
-          width: 4
-          height: 7
+          d: M6.5,-12.65 V-16 H10.5 V-9.35
           stroke: currentColor
-          stroke-width: 1.4
+          stroke-width: 1.8
           stroke-linecap: round
           fill: none
+          stroke-linejoin: round
       - component: polygon
         config:
-          points: -17,-2 0,-16 17,-2
+          points: -17,-4 0,-18 17,-4
           stroke: currentColor
           stroke-width: 1.8
           stroke-linecap: round
@@ -455,7 +540,7 @@ slots:
       - component: rect
         config:
           x: -13
-          y: -2
+          y: -4
           width: 26
           height: 19
           stroke: currentColor
@@ -465,7 +550,7 @@ slots:
       - component: rect
         config:
           x: -3
-          y: 7
+          y: 5
           width: 6
           height: 10
           stroke: currentColor
@@ -475,7 +560,7 @@ slots:
       - component: rect
         config:
           x: -10
-          y: 1
+          y: -1
           width: 6
           height: 6
           rx: 1
@@ -493,7 +578,7 @@ slots:
       - component: rect
         config:
           x: 4
-          y: 1
+          y: -1
           width: 6
           height: 6
           rx: 1
@@ -663,6 +748,202 @@ slots:
           fill: none
   - component: g
     config:
+      visible: =props.kind === 'heat-pump-split'
+    slots:
+      default:
+      - component: g
+        config: {}
+        slots:
+          default:
+          - component: circle
+            config:
+              cx: 0
+              cy: 0
+              r: 27.75
+              style:
+                fill: 'var(--f7-card-bg-color, #fff)'
+          - component: circle
+            config:
+              cx: 0
+              cy: 0
+              r: 27.75
+              fill: '#fb8c00'
+              fill-opacity: '0.12'
+      - component: rect
+        config:
+          x: -21
+          y: -14
+          width: 32
+          height: 22
+          rx: 3
+          stroke: currentColor
+          stroke-width: 1.6
+          stroke-linecap: round
+          fill: none
+      - component: circle
+        config:
+          cx: -11
+          cy: -3
+          r: 8.5
+          stroke: currentColor
+          stroke-width: 1.2
+          stroke-linecap: round
+          fill: none
+      - component: g
+        config: {}
+        slots:
+          default:
+          - component: path
+            config:
+              d: M-11,-3 q3.5,-3 0,-7.5 q-3.5,3 0,7.5
+              fill: '#fb8c00'
+              transform: rotate(0 -11 -3)
+          - component: path
+            config:
+              d: M-11,-3 q3.5,-3 0,-7.5 q-3.5,3 0,7.5
+              fill: '#fb8c00'
+              transform: rotate(120 -11 -3)
+          - component: path
+            config:
+              d: M-11,-3 q3.5,-3 0,-7.5 q-3.5,3 0,7.5
+              fill: '#fb8c00'
+              transform: rotate(240 -11 -3)
+          - component: animateTransform
+            config:
+              attributeName: transform
+              type: rotate
+              from: 0 -11 -3
+              to: 360 -11 -3
+              dur: '=Math.abs(Number(props.frequency)) < 30 ? ''1.4s'' : (Math.abs(Number(props.frequency)) < 55 ? ''0.9s''
+                : (''0.5s''))'
+              repeatCount: indefinite
+              visible: =Number(props.frequency) > 0
+      - component: circle
+        config:
+          cx: -11
+          cy: -3
+          r: 1.5
+          fill: currentColor
+      - component: line
+        config:
+          x1: 1
+          y1: -10
+          x2: 8
+          y2: -10
+          stroke: currentColor
+          stroke-width: 1
+          stroke-linecap: round
+          fill: none
+          opacity: '0.7'
+      - component: line
+        config:
+          x1: 1
+          y1: -6.5
+          x2: 8
+          y2: -6.5
+          stroke: currentColor
+          stroke-width: 1
+          stroke-linecap: round
+          fill: none
+          opacity: '0.7'
+      - component: line
+        config:
+          x1: 1
+          y1: -3
+          x2: 8
+          y2: -3
+          stroke: currentColor
+          stroke-width: 1
+          stroke-linecap: round
+          fill: none
+          opacity: '0.7'
+      - component: line
+        config:
+          x1: 1
+          y1: 0.5
+          x2: 8
+          y2: 0.5
+          stroke: currentColor
+          stroke-width: 1
+          stroke-linecap: round
+          fill: none
+          opacity: '0.7'
+      - component: line
+        config:
+          x1: 1
+          y1: 4
+          x2: 8
+          y2: 4
+          stroke: currentColor
+          stroke-width: 1
+          stroke-linecap: round
+          fill: none
+          opacity: '0.7'
+      - component: line
+        config:
+          x1: -16
+          y1: 8
+          x2: -16
+          y2: 11
+          stroke: currentColor
+          stroke-width: 1.6
+          stroke-linecap: round
+          fill: none
+      - component: rect
+        config:
+          x: 3
+          y: -8
+          width: 16
+          height: 24
+          rx: 2.5
+          style:
+            fill: 'var(--f7-card-bg-color, #fff)'
+      - component: rect
+        config:
+          x: 3
+          y: -8
+          width: 16
+          height: 24
+          rx: 2.5
+          fill: '#64b5f6'
+          fill-opacity: '0.12'
+      - component: rect
+        config:
+          x: 3
+          y: -8
+          width: 16
+          height: 24
+          rx: 2.5
+          stroke: currentColor
+          stroke-width: 1.6
+          stroke-linecap: round
+          fill: none
+      - component: rect
+        config:
+          x: 6
+          y: -5
+          width: 10
+          height: 4
+          rx: 1
+          fill: '#37474f'
+      - component: path
+        config:
+          d: M5.5,4 l1.8,-2 l1.8,4 l1.8,-4 l1.8,4 l1.8,-4 l1.8,2
+          stroke: '#9e9e9e'
+          stroke-width: 1.2
+          stroke-linecap: round
+          fill: none
+      - component: circle
+        config:
+          cx: 11
+          cy: 11
+          r: 2.3
+          stroke: '#9e9e9e'
+          stroke-width: 1.2
+          stroke-linecap: round
+          fill: none
+  - component: g
+    config:
       visible: =props.kind === 'air-conditioner'
     slots:
       default:
@@ -793,8 +1074,8 @@ slots:
               fill-opacity: '0.12'
       - component: path
         config:
-          d: M22.38,8.0 L22.5,5.0 Q22.5,2.0 21.5,1.62 Q17.25,0.62 11.12,-0.5 L3.75,-4.5 Q-5.62,-5.62 -16.75,-4.75 L-20.62,-4.12
-            L-22.0,-0.5 L-22.62,5.25 Q-22.62,7.5 -21.0,8.0 Z
+          d: M22.38,4.6 L22.5,1.6 Q22.5,-1.4 21.5,-1.77 Q17.25,-2.77 11.12,-3.9 L3.75,-7.9 Q-5.62,-9.03 -16.75,-8.15 L-20.62,-7.53
+            L-22.0,-3.9 L-22.62,1.85 Q-22.62,4.1 -21.0,4.6 Z
           stroke: currentColor
           stroke-width: 1.6
           stroke-linecap: round
@@ -803,7 +1084,7 @@ slots:
           stroke-linejoin: round
       - component: path
         config:
-          d: M9.5,-0.5 L4.12,-3.75 Q-5.62,-4.75 -15.5,-3.75 L-17.0,-2.0 Q-16.25,-1.12 -12.5,-1.0 Z
+          d: M9.5,-3.9 L4.12,-7.15 Q-5.62,-8.15 -15.5,-7.15 L-17.0,-5.4 Q-16.25,-4.53 -12.5,-4.4 Z
           stroke: currentColor
           stroke-width: 1.2
           stroke-linecap: round
@@ -812,9 +1093,9 @@ slots:
       - component: line
         config:
           x1: -2.62
-          y1: -4.62
+          y1: -8.03
           x2: -2.62
-          y2: -0.88
+          y2: -4.28
           stroke: currentColor
           stroke-width: 1.2
           stroke-linecap: round
@@ -822,9 +1103,9 @@ slots:
       - component: line
         config:
           x1: -9.88
-          y1: -4.38
+          y1: -7.78
           x2: -9.88
-          y2: -1.0
+          y2: -4.4
           stroke: currentColor
           stroke-width: 1.2
           stroke-linecap: round
@@ -832,9 +1113,9 @@ slots:
       - component: line
         config:
           x1: 10.25
-          y1: 6.5
+          y1: 3.1
           x2: -9.25
-          y2: 6.5
+          y2: 3.1
           stroke: currentColor
           stroke-width: 1
           stroke-linecap: round
@@ -843,9 +1124,9 @@ slots:
       - component: line
         config:
           x1: 22.0
-          y1: 2.5
+          y1: -0.9
           x2: 19.0
-          y2: 2.0
+          y2: -1.4
           stroke: '#ffd54f'
           stroke-width: 1.2
           stroke-linecap: round
@@ -853,9 +1134,9 @@ slots:
       - component: line
         config:
           x1: -22.38
-          y1: 1.0
+          y1: -2.4
           x2: -20.38
-          y2: 1.38
+          y2: -2.02
           stroke: '#ef5350'
           stroke-width: 1.2
           stroke-linecap: round
@@ -863,14 +1144,14 @@ slots:
       - component: circle
         config:
           cx: 14.88
-          cy: 7.12
+          cy: 3.73
           r: 5.38
           style:
             fill: 'var(--f7-card-bg-color, #fff)'
       - component: circle
         config:
           cx: 14.88
-          cy: 7.12
+          cy: 3.73
           r: 3.88
           stroke: currentColor
           stroke-width: 1.6
@@ -879,20 +1160,20 @@ slots:
       - component: circle
         config:
           cx: 14.88
-          cy: 7.12
+          cy: 3.73
           r: 1
           fill: currentColor
       - component: circle
         config:
           cx: -14.0
-          cy: 7.12
+          cy: 3.73
           r: 5.38
           style:
             fill: 'var(--f7-card-bg-color, #fff)'
       - component: circle
         config:
           cx: -14.0
-          cy: 7.12
+          cy: 3.73
           r: 3.88
           stroke: currentColor
           stroke-width: 1.6
@@ -901,20 +1182,30 @@ slots:
       - component: circle
         config:
           cx: -14.0
-          cy: 7.12
+          cy: 3.73
           r: 1
           fill: currentColor
-      - component: polygon
+      - component: g
         config:
-          points: 2.5,-24 -3.5,-14.8 0.4,-14.8 -0.8,-8 5.5,-17.2 1.6,-17.2
-          fill: '#26a69a'
           opacity: '0'
-          stroke: '#26a69a'
-          stroke-width: 0.8
-          stroke-linejoin: round
           visible: =Math.abs(Number(props.power)) > 500
         slots:
           default:
+          - component: polygon
+            config:
+              points: 2.25,-12.0 -6.75,1.8 -0.9,1.8 -2.7,12.0 6.75,-1.8 0.9,-1.8
+              style:
+                fill: 'var(--f7-card-bg-color, #fff)'
+                stroke: 'var(--f7-card-bg-color, #fff)'
+              stroke-width: 3.5
+              stroke-linejoin: round
+          - component: polygon
+            config:
+              points: 2.25,-12.0 -6.75,1.8 -0.9,1.8 -2.7,12.0 6.75,-1.8 0.9,-1.8
+              fill: '#26a69a'
+              stroke: '#26a69a'
+              stroke-width: 0.8
+              stroke-linejoin: round
           - component: animate
             config:
               attributeName: opacity

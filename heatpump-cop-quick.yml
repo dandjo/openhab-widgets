@@ -34,7 +34,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 4, 2026, 1:23:32 PM
+timestamp: Oct 4, 2026, 5:20:43 PM
 component: div
 config:
   style:
@@ -115,19 +115,42 @@ slots:
           chartType: ''
           periodVisible: true
           period: D
-          height: 220px
+          height: 392px
+          options:
+            axisPointer:
+              link:
+              - xAxisIndex: all
         slots:
           grid:
           - component: oh-chart-grid
             config:
-              top: '62'
-              bottom: '35'
+              top: 62
+              height: 120
+              left: '50'
+              right: '20'
+          - component: oh-chart-grid
+            config:
+              top: 242
+              height: 120
               left: '50'
               right: '20'
           xAxis:
           - component: oh-time-axis
             config:
               gridIndex: 0
+              axisPointer:
+                snap: false
+                label:
+                  show: false
+              axisLabel:
+                show: false
+          - component: oh-time-axis
+            config:
+              gridIndex: 1
+              axisPointer:
+                snap: false
+                label:
+                  show: false
           yAxis:
           - component: oh-value-axis
             config:
@@ -146,6 +169,25 @@ slots:
                   type: dashed
                   opacity: 0.4
               min: 0
+          - component: oh-value-axis
+            config:
+              gridIndex: 1
+              name: °C
+              nameGap: 14
+              nameTextStyle:
+                align: right
+                padding:
+                - 0
+                - 8
+                - 0
+                - 0
+              splitLine:
+                lineStyle:
+                  type: dashed
+                  opacity: 0.4
+              scale: true
+              min: =(v) => Math.floor(Math.min(v.min, (v.min + v.max - 4) / 2))
+              max: =(v) => Math.ceil(Math.max(v.max, (v.min + v.max + 4) / 2))
           series:
           - component: oh-time-series
             config:
@@ -174,13 +216,20 @@ slots:
                     color: rgba(102, 187, 106, 0.45)
                   - offset: 1
                     color: rgba(102, 187, 106, 0.02)
-          tooltip:
-          - component: oh-chart-tooltip
+          - component: oh-time-series
             config:
-              show: true
-              confine: true
-              trigger: axis
-              smartFormatter: true
+              name: Außen
+              gridIndex: 1
+              xAxisIndex: 1
+              yAxisIndex: 1
+              type: line
+              item: =props.heatpumpExtAmbientTemp
+              symbol: none
+              lineStyle:
+                width: 2
+                color: '#26a69a'
+              itemStyle:
+                color: '#26a69a'
           title:
           - component: oh-chart-title
             config:
@@ -191,59 +240,15 @@ slots:
               textStyle:
                 fontSize: 13
                 fontWeight: 600
-      - component: oh-chart
-        config:
-          chartType: ''
-          periodVisible: true
-          period: D
-          height: 220px
-        slots:
-          grid:
-          - component: oh-chart-grid
+          - component: oh-chart-title
             config:
-              top: '62'
-              bottom: '35'
-              left: '50'
-              right: '20'
-          xAxis:
-          - component: oh-time-axis
-            config:
-              gridIndex: 0
-          yAxis:
-          - component: oh-value-axis
-            config:
-              gridIndex: 0
-              name: °C
-              nameGap: 14
-              nameTextStyle:
-                align: right
-                padding:
-                - 0
-                - 8
-                - 0
-                - 0
-              splitLine:
-                lineStyle:
-                  type: dashed
-                  opacity: 0.4
-              scale: true
-              min: =(v) => Math.floor(Math.min(v.min, (v.min + v.max - 4) / 2))
-              max: =(v) => Math.ceil(Math.max(v.max, (v.min + v.max + 4) / 2))
-          series:
-          - component: oh-time-series
-            config:
-              name: Außen
-              gridIndex: 0
-              xAxisIndex: 0
-              yAxisIndex: 0
-              type: line
-              item: =props.heatpumpExtAmbientTemp
-              symbol: none
-              lineStyle:
-                width: 2
-                color: '#26a69a'
-              itemStyle:
-                color: '#26a69a'
+              show: true
+              text: Außentemperatur
+              left: 10
+              top: 190
+              textStyle:
+                fontSize: 13
+                fontWeight: 600
           tooltip:
           - component: oh-chart-tooltip
             config:
@@ -251,16 +256,6 @@ slots:
               confine: true
               trigger: axis
               smartFormatter: true
-          title:
-          - component: oh-chart-title
-            config:
-              show: true
-              text: Außentemperatur
-              left: 10
-              top: 15
-              textStyle:
-                fontSize: 13
-                fontWeight: 600
       - component: oh-chart
         config:
           chartType: month

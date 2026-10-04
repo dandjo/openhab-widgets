@@ -40,7 +40,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Sep 27, 2026, 8:52:40 PM
+timestamp: Oct 4, 2026, 5:20:43 PM
 component: oh-card
 config:
   title: Strompreis
@@ -108,6 +108,10 @@ slots:
               period: 2D
               future: '0.75'
               height: 100%
+              options:
+                axisPointer:
+                  link:
+                  - xAxisIndex: all
             slots:
               grid:
               - component: oh-chart-grid
@@ -120,6 +124,34 @@ slots:
               - component: oh-time-axis
                 config:
                   gridIndex: 0
+                  axisPointer:
+                    snap: false
+                    label:
+                      show: false
+              - component: oh-time-axis
+                config:
+                  gridIndex: 0
+                  show: false
+                  axisPointer:
+                    snap: false
+                    label:
+                      show: false
+              - component: oh-time-axis
+                config:
+                  gridIndex: 0
+                  show: false
+                  axisPointer:
+                    snap: false
+                    label:
+                      show: false
+              - component: oh-time-axis
+                config:
+                  gridIndex: 0
+                  show: false
+                  axisPointer:
+                    snap: false
+                    label:
+                      show: false
               yAxis:
               - component: oh-value-axis
                 config:
@@ -161,7 +193,7 @@ slots:
                 config:
                   name: Gesamt netto
                   gridIndex: 0
-                  xAxisIndex: 0
+                  xAxisIndex: 1
                   yAxisIndex: 0
                   type: line
                   item: =props.priceTotalNet
@@ -174,7 +206,7 @@ slots:
                 config:
                   name: Markt brutto
                   gridIndex: 0
-                  xAxisIndex: 0
+                  xAxisIndex: 2
                   yAxisIndex: 0
                   type: line
                   item: =props.priceMarketGross
@@ -187,7 +219,7 @@ slots:
                 config:
                   name: Markt netto
                   gridIndex: 0
-                  xAxisIndex: 0
+                  xAxisIndex: 3
                   yAxisIndex: 0
                   type: line
                   item: =props.priceMarketNet

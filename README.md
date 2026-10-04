@@ -133,19 +133,21 @@ Needs `weather-icon`.
 
 A regular star around the house: PV, heat pump, air conditioner, E-Car, the household appliances together, ventilation,
 battery and grid, each with its power and today's energy. Every node is one grey ring around its drawing, the ring
-carrying what the node shows beyond it. Dots run along the lines in the direction of the flow at four speeds and slide
-under the node rims; while power flows through a node, its ring pulses in its colour. The icons move with the power (sun
-rays, air streams, pylon dashes, a pulsing bolt over the charging car, sparkles twinkling while the appliances run, the
+carrying what the node shows beyond it; a working ring and its arc swell outwards at their brightest, about half again
+as wide as at rest. Dots run along the lines in the direction of the flow at four speeds and slide under the node rims;
+while power flows through a node, its ring pulses in its colour. The icons move with the power (sun rays, air streams,
+pylon dashes, a pulsing bolt over the middle of the charging car, sparkles twinkling while the appliances run, the
 battery filled to its state of charge, the ventilation unit's fan turning and its air arrows flowing, fresh air in and
-used air out), the heat pump's fan with its compressor: while only its electric heaters run it stands and the energy
-only flows. Badges just outside the rings tell what the heat pump does (space heating, hot water, defrost, a red bolt
-while only its electric heaters run), whether the air conditioner is on and the ventilation's level; a badge is filled
-in its colour while its device works and grey otherwise. A running timer covers its device's ring with an arc, full at
-what it was last set to, and the battery's ring is filled with its state of charge; beside such an arc the rest of the
-ring pulses softly, never as strong as the arc. A tap on the heat pump, the air conditioner or the ventilation opens its
-quick popup (see [Quick popups](#quick-popups)). Under the star three tiles with large pale icons, the house's power and
-today's self-consumption and self-sufficiency as rings. The card places its lines, nodes and rings as `flow-link`,
-`flow-node` and `flow-share-ring`. The recording and the dark screenshot show it with demo values.
+used air out), the heat pump, outdoor and indoor unit, its fan with its compressor: while only its electric heaters run
+it stands and the energy only flows. Badges just outside the rings tell what the heat pump does (space heating, hot
+water, defrost, a red bolt while only its electric heaters run), whether the air conditioner is on and the ventilation's
+level; a badge is filled in its colour while its device works and grey otherwise. A running timer covers its device's
+ring with an arc, full at what it was last set to, and the battery's ring is filled with its state of charge; beside
+such an arc the rest of the ring pulses softly and, while the node works, the arc pulses in step with it, brightest and
+widest with it. A tap on the heat pump, the air conditioner or the ventilation opens its quick popup (see [Quick
+popups](#quick-popups)). Under the star three tiles with large pale icons, the house's power and today's
+self-consumption and self-sufficiency as rings. The card places its lines, nodes and rings as `flow-link`, `flow-node`
+and `flow-share-ring`. The recording and the dark screenshot show it with demo values.
 
 Needs `air-conditioner-quick`, `boost-pill`, `flow-link`, `flow-node`, `flow-share-ring`, `heatpump-quick`,
 `pill-slider`, `pill-switch`, `power-pill`, `state-bar`, `switch-row`, `ventilation-quick`.
@@ -251,8 +253,8 @@ Needs `switch-tile`.
 ### Appliances: `appliances-card`
 
 Washing machines, dryer and dishwasher as `appliance-tile`s, each drawn inside a ring filled with the program progress,
-the rest of it pulsing; drums and paddles turn and the spray arm sprays while they run, with a pill for the remaining
-time; a machine without progress pulses its whole ring.
+the rest of it pulsing and the arc in step with it; drums and paddles turn and the spray arm sprays while they run, with
+a pill for the remaining time; a machine without progress pulses its whole ring.
 
 Needs `appliance-icon`, `appliance-tile`.
 
@@ -370,23 +372,24 @@ orange and red by price.
 A section through the house: the outdoor unit on the roof (the energy flow's `flow-node`), wall unit, three-way valve,
 DHW tank (in layers, the Effect Heater beside it) and radiators in the basement, floor heating on the two levels above.
 Every device is one grey ring like the energy flow's nodes, pulsing while it works, softly beside the arc that shows its
-value; the outdoor unit's fan turns while the compressor runs and its ring is filled by the compressor's frequency, the
-wall unit's by its own draw, the measured circuit (full and red while the backup heater runs; the tank's booster heater
-does not count), the tank's by its temperature, radiators and floor loops by the leaving water while they carry it. Dots
-run along the pipes, as many as a pipe is long, two at least on the short ones between wall unit, valve and tank, faster
-with the water's flow or the compressor's frequency, and all of them backwards during a defrost. The valve shows its
-position in its icon. Badges just outside three rings say what the outdoor unit's ring shows (*Hz*) and the wall unit's
-(a bolt, red while the backup heater runs) and where the tank's heat comes from; grey while their device rests. Tiles in
-the style of the switch tiles hold the figures: the outdoor unit, the control (heating, hot water, Smart Grid,
-automation), the refrigerant, the heating circuit, the climate of the two floors, the tank with its booster heater and
-the indoor unit with its own power (the measured circuit plus the backup heater), each tinted in its colour while what
-it shows is at work. A tap on a tile, the wall unit, the outdoor unit, the tank or the valve opens its quick popup: the
-control all the heat pump's controls, the others their values over the day, one chart each. Above the drawing the
-electrical power, the heat and the COP as a row of value tiles that open popups with their charts of the day and the
-month (today's split and COPs are in the heating card). On a phone the drawing takes the card's width; on a wider screen
-it stands at most at its own size, as the energy flow does, so their texts keep the UI's sizes and their rings come out
-the same, and in the middle of the height its row gives the card. The recording and the dark screenshot show it with
-demo values (a space heating run).
+value, which pulses in step with it; the outdoor unit's fan turns while the compressor runs and its ring is filled by
+the compressor's frequency, the wall unit's by its own draw, the measured circuit (full and red while the backup heater
+runs; the tank's booster heater does not count), the tank's by its temperature, radiators and floor loops by the leaving
+water while they carry it. Dots run along the pipes, as many as a pipe is long, two at least on the short ones between
+wall unit, valve and tank, faster with the water's flow or the compressor's frequency, and all of them backwards during
+a defrost. The valve shows its position in its icon. Badges just outside three rings say what the outdoor unit's ring
+shows (*Hz*) and the wall unit's (a bolt, red while the backup heater runs) and where the tank's heat comes from; grey
+while their device rests. Tiles in the style of the switch tiles hold the figures: the outdoor unit, the control
+(heating, hot water, Smart Grid, automation), the refrigerant, the heating circuit, the climate of the two floors, the
+tank with its booster heater and the indoor unit with its own power (the measured circuit plus the backup heater), each
+tinted in its colour while what it shows is at work. A tap on a tile, the wall unit, the outdoor unit, the tank or the
+valve opens its quick popup: the control all the heat pump's controls, the others their values over the day, one grid
+each in one chart whose tooltip lists them all at the time pointed at. Above the drawing the electrical power, the heat
+and the COP as a row of value tiles that open popups with their charts of the day and the month (today's split and COPs
+are in the heating card). On a phone the drawing takes the card's width; on a wider screen it stands at most at its own
+size, as the energy flow does, so their texts keep the UI's sizes and their rings come out the same, and in the middle
+of the height its row gives the card. The recording and the dark screenshot show it with demo values (a space heating
+run).
 
 Needs `boost-pill`, `flow-node`, `ground-floor-quick`, `heatpump-circuit-quick`, `heatpump-control-quick`,
 `heatpump-cop-quick`, `heatpump-electric-quick`, `heatpump-heat-quick`, `heatpump-indoor-quick`,
@@ -726,13 +729,14 @@ closed period menu takes no room. The energy flow's heat pump, air conditioner a
 </details>
 
 <details>
-<summary><code>heatpump-tank-quick</code>: 3 props</summary>
+<summary><code>heatpump-tank-quick</code>: 4 props</summary>
 
 | Prop | Item | Item type |
 |---|---|---|
 | `heatpumpDhwTankTemp` | ESPAltherma Warmwasserspeicher Temperatur | Number:Temperature |
 | `heatpumpDhwSetpoint` | ESPAltherma Warmwasser Sollwert | Number:Temperature |
 | `heatpumpBshMode` | ESPAltherma Zusatzheizung Speicher | Switch |
+| `heatpumpBshPower` | ESPAltherma Elektrische Leistung Zusatzheizung | Number:Power |
 
 </details>
 
@@ -1048,16 +1052,18 @@ The recordings show the widgets with fixed demo values.
 
 ### Node: `flow-node`
 
-A device in a ring, its animation driven by `power`: `pv` (a tilted module under a sun, both brighter with the power,
-rays turning faster), `grid` (a pylon, red on import and green on export, dashes running along its wires), `home` (a
-house whose windows glow and pulse with the consumption), `heat-pump` (an outdoor unit whose fan turns while
-`frequency`, the compressor's, is above 0 Hz, faster from 30 and 55 Hz), `air-conditioner` (an indoor unit whose air
-streams flow), `e-car` (a car with a bolt fading in and out while it charges), `battery` (filled to `soc`, red, orange
-or green), `appliances` (an appliance's housing with sparkles for a front, the big one breathing and the small ones
-twinkling while they run) and `ventilation` (a ventilation unit whose fan turns above 5 W, faster with the power, and
-whose two arrows, fresh air in and used air out, flow while it runs). A node is its drawing on a disc tinted in its
-colour over an opaque one in the card colour, so dots running under it disappear; the card that places it draws the grey
-ring around it, as the energy flow does (`track()` in the generator), and its badges.
+A device in a ring, its animation driven by `power`: `pv` (a straight module of six cells with the sun in front of its
+corner, both brighter with the power, rays turning faster), `grid` (a pylon, red on import and green on export, dashes
+running along its wires), `home` (a house whose windows glow and pulse with the consumption), `heat-pump` (an outdoor
+unit whose fan turns while `frequency`, the compressor's, is above 0 Hz, faster from 30 and 55 Hz), `heat-pump-split`
+(the whole split heat pump: that outdoor unit with the indoor unit standing in front of its right side),
+`air-conditioner` (an indoor unit whose air streams flow), `e-car` (a car with a bolt fading in and out while it
+charges), `battery` (filled to `soc`, red, orange or green), `appliances` (an appliance's housing with sparkles for a
+front, the big one breathing and the small ones twinkling while they run) and `ventilation` (a ventilation unit whose
+fan turns above 5 W, faster with the power, and whose two arrows, fresh air in and used air out, flow while it runs). A
+node is its drawing on a disc tinted in its colour over an opaque one in the card colour, so dots running under it
+disappear; the card that places it draws the grey ring around it, as the energy flow does (`track()` in the generator),
+and its badges.
 
 ![Flow nodes](screenshots/flow-node.gif)
 
