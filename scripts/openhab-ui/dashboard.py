@@ -5404,13 +5404,15 @@ def page(now):
     w = lambda uid: widget_ref(uid, **props[uid])  # every item a widget reads comes in as a prop
     return layout_page(PAGE_UID, {"label": "Overview", "stylesheet": SCROLLBAR}, [
         # the weather bar over the energy flow over the switches beside the appliances over heating and hot water (on
-        # a phone the weather stays on top), the flow taking the height the row leaves; the heat pump beside today's
-        # consumption over the energy per day, which fills the column down to the heat pump's height; the price beside
-        # the temperatures; the PV calendar across the bottom
+        # a phone the weather stays on top), the flow taking the height the row leaves; then two columns of their own,
+        # the heat pump over the price beside today's consumption over the energy per day over the temperatures, each
+        # with a chart that takes what its column lacks (the price's, the energy per day's): today's consumption lists
+        # its consumers in one column below about 1500 px and then stands taller than the heat pump, which a shared
+        # row stretched with up to 255 px of empty card (user, 2026-10-05); the PV calendar across the bottom
         block(row(col([widget_stack(w("weather-card"), w("energy-flow-card"), w("switches-card"), grow=2)]),
                   col([widget_stack(w("appliances-card"), w("heating-card"))])),
-              row(col([w("heatpump-card")]), col([widget_stack(w("consumption-card"), w("energy-days-card"))])),
-              row(col([w("electricity-price-card")]), col([w("temperatures-card")])),
+              row(col([widget_stack(w("heatpump-card"), w("electricity-price-card"), grow=2)]),
+                  col([widget_stack(w("consumption-card"), w("energy-days-card"), w("temperatures-card"), grow=2)])),
               row(full(w("pv-days-card")))),
     ], now)
 
