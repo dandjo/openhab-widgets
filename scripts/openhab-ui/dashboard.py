@@ -5207,7 +5207,14 @@ def epex_spot_blocks():
                              [*price("Gesamt", PRICE, "epex_spot_awattar_total_net", "#e53935", now=True),
                               *price("Markt", "epex_spot_awattar_market_gross", "epex_spot_awattar", "#fb8c00")],
                              value_axis("EUR/kWh"))], 400, period="2D", future="0.75")
-    return [two(card("Jetzt", now), card("Preise 12 h zurück, 36 h voraus", [prices]))]
+    # as high as Jetzt beside it, at least 300 px (user, 2026-10-05: 400 px left Jetzt with 100 px of empty card): the
+    # one grid reaches down to the chart's bottom instead of standing at a fixed height
+    prices["config"]["height"] = "100%"
+    grid_cfg = prices["slots"]["grid"][0]["config"]
+    del grid_cfg["height"]
+    grid_cfg["bottom"] = STACK_BOTTOM
+    return [two(card("Jetzt", now),
+                card("Preise 12 h zurück, 36 h voraus", [fill_chart(prices, "300px")], fill=True))]
 
 
 GRID_SIGN = f"={num(GRID)} < 0 ? '#43a047' : '#e53935'"
