@@ -2276,12 +2276,15 @@ def heatpump_content():
              *[hp_popup_link(hp_box(cx - HP_ORBIT, cy - HP_ORBIT, 2 * HP_ORBIT, 2 * HP_ORBIT, "50%"), uid)
                for (cx, cy), uid in HP_NODE_POPUPS]]
     drawing = div([hp_svg, *links], **{"position": "relative"})
-    return [div([hp_stats()], **{"padding": f"={NARROW} ? '8px 4px 0' : '12px 16px 0'"}),  # as the other cards' tiles
+    # its tiles as far in from the card's edge as the other cards' tiles, on a phone too (user, 2026-10-05)
+    return [div([hp_stats()], **{"padding": f"={NARROW} ? '8px 16px 0' : '12px 16px 0'"}),
             div([drawing],
                 # at its own size outside a phone, so its circles never shrink there (user, 2026-10-05: below 1500 px
                 # the card is narrower than the drawing); centred, reaching into the card's padding, whose edge the
                 # house stays 7 units clear of
-                **{"display": "flex", "flex-direction": "column", "gap": "12px",
+                # its padding inside its width, so on a phone the drawing keeps 8 px to both edges of the card, as
+                # the energy flow's (user, 2026-10-05: it reached the right edge)
+                **{"display": "flex", "flex-direction": "column", "gap": "12px", "box-sizing": "border-box",
                    "width": f"={NARROW} ? '100%' : '{HP_VB[2]}px'", "max-width": f"={NARROW} ? '{HP_VB[2]}px' : 'none'",
                    "margin": f"={NARROW} ? 'auto' : 'auto calc((100% - {HP_VB[2]}px) / 2)'",
                    "padding": f"={NARROW} ? '8px 4px 12px' : '8px 0 16px'"})]

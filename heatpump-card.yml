@@ -340,7 +340,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 5, 2026, 1:29:38 AM
+timestamp: Oct 5, 2026, 1:37:44 AM
 component: oh-card
 config:
   title: Heat Pump
@@ -357,7 +357,7 @@ slots:
   - component: div
     config:
       style:
-        padding: '=screen.width < 600 ? ''8px 4px 0'' : ''12px 16px 0'''
+        padding: '=screen.width < 600 ? ''8px 16px 0'' : ''12px 16px 0'''
     slots:
       default:
       - component: div
@@ -470,6 +470,7 @@ slots:
         display: flex
         flex-direction: column
         gap: 12px
+        box-sizing: border-box
         width: '=screen.width < 600 ? ''100%'' : ''526px'''
         max-width: '=screen.width < 600 ? ''526px'' : ''none'''
         margin: '=screen.width < 600 ? ''auto'' : ''auto calc((100% - 526px) / 2)'''
