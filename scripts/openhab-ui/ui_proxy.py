@@ -64,6 +64,15 @@ def english_item(item):
 GERMAN_NUMBER = re.compile(r"^(-?\d{1,3}(?:\.\d{3})+|-?\d+)(,\d+)?(\s.*)?$")
 
 
+WEEKDAYS = {"Mo": "Mon", "Di": "Tue", "Mi": "Wed", "Do": "Thu", "Fr": "Fri", "Sa": "Sat", "So": "Sun"}
+
+
+def english_date(text):
+    """A date as openHAB formats it for de_AT with a weekday, Mo. 12:00, as Mon 12:00."""
+    m = re.match(r"^(Mo|Di|Mi|Do|Fr|Sa|So)\.(\s)", text)
+    return WEEKDAYS[m.group(1)] + text[3:] if m else text
+
+
 def english_number(text):
     """A number as openHAB formats it for de_AT, 1.234,5 kWh, as en_GB writes it, 1,234.5 kWh; other texts as they are."""
     m = GERMAN_NUMBER.match(text)
@@ -81,7 +90,7 @@ def english_states(payload):
             if s.get("state") in opts:
                 s["displayState"] = opts[s["state"]]
             elif isinstance(s.get("displayState"), str):
-                s["displayState"] = english_number(en.tr_core(s["displayState"]))
+                s["displayState"] = english_date(english_number(en.tr_core(s["displayState"])))
             elif isinstance(s.get("state"), str) and en.tr_core(s["state"]) != s["state"]:
                 s["displayState"] = en.tr_core(s["state"])
             # a Miele machine's program and phase are shown as their state and compared nowhere
