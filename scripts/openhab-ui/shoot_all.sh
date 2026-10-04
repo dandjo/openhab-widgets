@@ -22,7 +22,8 @@ cp $(shot ov switches) $R/switches-card.png
 cp $(shot ov consumption-today*) $R/consumption-card.png; cp $(shot ov energy-per-day) $R/energy-days-card.png
 cp $(shot ov pv-yield*) $R/pv-days-card.png; cp $(shot ov temperatures) $R/temperatures-card.png
 cp $O/ov-0-card.png $R/weather-card.png; cp $O/ovd-0-card.png $R/weather-card-dark.png
-python3 cdp_cards_js.py $B/overview $O/ovcons 1400 light "$(cat demo_consumption.js)" >/dev/null
+# 1600 px, where the consumers list shows each consumer's share beside its energy
+python3 cdp_cards_js.py $B/overview $O/ovcons 1600 light "$(cat demo_consumption.js)" >/dev/null
 cp $(shot ovcons consumption-today*) $R/consumption-card.png
 # every animated GIF also in dark mode, animated as well (user, 2026-10-04)
 step flow; PRE_JS=demo_flow.js FPS=20 python3 cdp_gif.py $B/overview 1 1400 $R/energy-flow-card.gif 6 light 1.5
