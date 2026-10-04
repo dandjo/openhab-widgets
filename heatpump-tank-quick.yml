@@ -4,36 +4,36 @@ tags:
 props:
   parameters:
   - name: heatpumpDhwTankTemp
-    label: ESPAltherma Warmwasserspeicher Temperatur
+    label: ESPAltherma DHW Tank Temperature
     description: Number:Temperature item
     type: TEXT
     required: true
     context: item
   - name: heatpumpDhwSetpoint
-    label: ESPAltherma Warmwasser Sollwert
+    label: ESPAltherma DHW Setpoint
     description: Number:Temperature item
     type: TEXT
     required: true
     context: item
   - name: heatpumpBshMode
-    label: ESPAltherma Zusatzheizung Speicher
+    label: ESPAltherma Booster Heater (BSH) Mode
     description: Switch item
     type: TEXT
     required: true
     context: item
   - name: heatpumpBshPower
-    label: ESPAltherma Elektrische Leistung Zusatzheizung
+    label: ESPAltherma Electrical Power Booster Heater
     description: Number:Power item
     type: TEXT
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 4, 2026, 5:20:43 PM
+timestamp: Oct 4, 2026, 11:05:34 PM
 component: div
 config:
   style:
     --quick-popup: panel
-  label: Warmwasserspeicher
+  label: Hot Water Tank
   stylesheet: ':root .popup:has(> .oh-popup[style*="--quick-popup"]) { --f7-popup-tablet-width: 420px; --f7-popup-tablet-height:
     min(660px, calc(100vh - 64px)); }
 
@@ -88,16 +88,16 @@ slots:
               default:
               - component: Label
                 config:
-                  text: Warmwasserspeicher
+                  text: Hot Water Tank
                   style:
                     font-size: 15px
                     font-weight: '600'
               - component: Label
                 config:
                   text: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpDhwTankTemp].state) ? ''–'' : (items[props.heatpumpDhwTankTemp].displayState
-                    || items[props.heatpumpDhwTankTemp].state)) + '' · Soll '' + ([''NULL'', ''UNDEF''].includes(items[props.heatpumpDhwSetpoint].state)
+                    || items[props.heatpumpDhwTankTemp].state)) + '' · Target '' + ([''NULL'', ''UNDEF''].includes(items[props.heatpumpDhwSetpoint].state)
                     ? ''–'' : (items[props.heatpumpDhwSetpoint].displayState || items[props.heatpumpDhwSetpoint].state)) +
-                    '' · Zusatzheizung '' + (items[props.heatpumpBshMode].state === ''ON'' ? ''an'' : ''aus'')'
+                    '' · Booster heater '' + (items[props.heatpumpBshMode].state === ''ON'' ? ''on'' : ''off'')'
                   style:
                     font-size: 12px
                     opacity: '0.7'
@@ -185,7 +185,7 @@ slots:
             config:
               categoryType: values
               data:
-              - Zusatzheizung
+              - Booster heater
               show: false
               gridIndex: 1
           - component: oh-value-axis
@@ -195,7 +195,7 @@ slots:
           series:
           - component: oh-time-series
             config:
-              name: Temperatur
+              name: Temperature
               gridIndex: 0
               xAxisIndex: 0
               yAxisIndex: 0
@@ -209,7 +209,7 @@ slots:
                 color: '#e57373'
           - component: oh-time-series
             config:
-              name: Soll
+              name: Target
               gridIndex: 0
               xAxisIndex: 1
               yAxisIndex: 0
@@ -224,11 +224,11 @@ slots:
                 color: '#e57373'
           - component: oh-state-series
             config:
-              name: Zusatzheizung
+              name: Booster heater
               item: =props.heatpumpBshMode
               yValue: 0
               yHeight: 0.7
-              mapState: '=(s) => s === ''ON'' ? ''An'' : s === ''OFF'' ? ''Aus'' : s'
+              mapState: '=(s) => s === ''ON'' ? ''On'' : s === ''OFF'' ? ''Off'' : s'
               stateColor:
                 An: '#fb8c00'
                 Aus: '=themeOptions.dark === ''dark'' ? ''#3c3c3c'' : ''#e0e0e0'''
@@ -239,7 +239,7 @@ slots:
               gridIndex: 1
           - component: oh-time-series
             config:
-              name: Zusatzheizung
+              name: Booster heater
               gridIndex: 1
               xAxisIndex: 3
               yAxisIndex: 2
@@ -254,7 +254,7 @@ slots:
           - component: oh-chart-title
             config:
               show: true
-              text: '{s0|Temperatur} · {s1|Soll gestrichelt}'
+              text: '{s0|Temperature} · {s1|Target dashed}'
               left: 10
               top: 15
               textStyle:
@@ -272,7 +272,7 @@ slots:
           - component: oh-chart-title
             config:
               show: true
-              text: Zusatzheizung
+              text: Booster heater
               left: 10
               top: 190
               textStyle:
@@ -286,9 +286,9 @@ slots:
               trigger: axis
               smartFormatter: false
               formatter: '=(ps) => ''<div>'' + dayjs(ps[0].axisValue).format(''llll'') + ''</div>'' + ps.filter((p) => p.seriesId
-                && (p.seriesId.indexOf(''oh-time-series'') === 0) && (!(p.seriesName === ''Zusatzheizung'') || Math.abs(p.value[0]
+                && (p.seriesId.indexOf(''oh-time-series'') === 0) && (!(p.seriesName === ''Booster heater'') || Math.abs(p.value[0]
                 - ps[0].axisValue) <= 960000)).map((p) => p.marker + '' '' + p.seriesName + ''<span style="float: right; margin-left:
-                20px"><b>'' + ((v) => p.seriesName === ''Zusatzheizung'' ? (v > 0 ? ''An'' : ''Aus'') : v.toLocaleString(''de-AT'')
+                20px"><b>'' + ((v) => p.seriesName === ''Booster heater'' ? (v > 0 ? ''On'' : ''Off'') : v.toLocaleString(''en-GB'')
                 + '' '' + p.seriesId.split(''#'')[2])(Number(p.value[1])) + ''</b></span><br/>'').join('''')'
       - component: div
         config:
@@ -300,7 +300,7 @@ slots:
           default:
           - component: oh-button
             config:
-              text: Alle Details
+              text: All details
               action: popup
               actionModal: page:heatpump
               outline: true

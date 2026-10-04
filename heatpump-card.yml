@@ -4,85 +4,85 @@ tags:
 props:
   parameters:
   - name: heatpumpPower
-    label: ESPAltherma Elektrische Leistung
+    label: ESPAltherma Electrical Power
     description: Number:Power item
     type: TEXT
     required: true
     context: item
   - name: heatpumpEnergyToday
-    label: ESPAltherma Energie heute
+    label: ESPAltherma Energy Today
     description: Number:Energy item
     type: TEXT
     required: true
     context: item
   - name: heatpumpElectricalPowerSpace
-    label: ESPAltherma Elektrische Leistung Heizung
+    label: ESPAltherma Electrical Power Space
     description: Number:Power item
     type: TEXT
     required: true
     context: item
   - name: heatpumpElectricalPowerDhw
-    label: ESPAltherma Elektrische Leistung Warmwasser
+    label: ESPAltherma Electrical Power DHW
     description: Number:Power item
     type: TEXT
     required: true
     context: item
   - name: heatpumpElectricalPowerStandby
-    label: ESPAltherma Elektrische Leistung Standby
+    label: ESPAltherma Electrical Power Standby
     description: Number:Power item
     type: TEXT
     required: true
     context: item
   - name: heatpumpEnergySpaceToday
-    label: ESPAltherma Energie Heizung heute
+    label: ESPAltherma Energy Space Today
     description: Number:Energy item
     type: TEXT
     required: true
     context: item
   - name: heatpumpEnergyDhwToday
-    label: ESPAltherma Energie Warmwasser heute
+    label: ESPAltherma Energy DHW Today
     description: Number:Energy item
     type: TEXT
     required: true
     context: item
   - name: heatpumpEnergyStandbyToday
-    label: ESPAltherma Energie Standby heute
+    label: ESPAltherma Energy Standby Today
     description: Number:Energy item
     type: TEXT
     required: true
     context: item
   - name: heatpumpHeatPower
-    label: ESPAltherma Heizleistung
+    label: ESPAltherma Heating Power
     description: Number:Power item
     type: TEXT
     required: true
     context: item
   - name: heatpumpHeatingEnergyToday
-    label: ESPAltherma Heizenergie heute
+    label: ESPAltherma Heating Energy Today
     description: Number:Energy item
     type: TEXT
     required: true
     context: item
   - name: heatpumpHeatingPowerSpace
-    label: ESPAltherma Heizleistung Heizung
+    label: ESPAltherma Heating Power Space
     description: Number:Power item
     type: TEXT
     required: true
     context: item
   - name: heatpumpHeatingPowerDhw
-    label: ESPAltherma Heizleistung Warmwasser
+    label: ESPAltherma Heating Power DHW
     description: Number:Power item
     type: TEXT
     required: true
     context: item
   - name: heatpumpHeatingEnergySpaceToday
-    label: ESPAltherma Heizenergie Heizung heute
+    label: ESPAltherma Heating Energy Space Today
     description: Number:Energy item
     type: TEXT
     required: true
     context: item
   - name: heatpumpHeatingEnergyDhwToday
-    label: ESPAltherma Heizenergie Warmwasser heute
+    label: ESPAltherma Heating Energy DHW Today
     description: Number:Energy item
     type: TEXT
     required: true
@@ -94,97 +94,97 @@ props:
     required: true
     context: item
   - name: heatpumpDcop
-    label: ESPAltherma Tages-COP
+    label: ESPAltherma DCOP
     description: Number item
     type: TEXT
     required: true
     context: item
   - name: heatpumpExtAmbientTemp
-    label: ESPAltherma Außentemperatur
+    label: ESPAltherma External Ambient Temperature
     description: Number:Temperature item
     type: TEXT
     required: true
     context: item
   - name: heatpumpDcopSpace
-    label: ESPAltherma Tages-COP Heizung
+    label: ESPAltherma DCOP Space
     description: Number item
     type: TEXT
     required: true
     context: item
   - name: heatpumpDcopDhw
-    label: ESPAltherma Tages-COP Warmwasser
+    label: ESPAltherma DCOP DHW
     description: Number item
     type: TEXT
     required: true
     context: item
   - name: heatpumpDhwTankTemp
-    label: ESPAltherma Warmwasserspeicher Temperatur
+    label: ESPAltherma DHW Tank Temperature
     description: Number:Temperature item
     type: TEXT
     required: true
     context: item
   - name: heatpumpInvFrequency
-    label: ESPAltherma Verdichterfrequenz
+    label: ESPAltherma Inverter Frequency
     description: Number:Frequency item
     type: TEXT
     required: true
     context: item
   - name: heatpumpDefrostOperaton
-    label: ESPAltherma Abtauen
+    label: ESPAltherma Defrost Operation
     description: Switch item
     type: TEXT
     required: true
     context: item
   - name: heatpumpWaterPumpOperation
-    label: ESPAltherma Umwälzpumpe
+    label: ESPAltherma Water Pump Operation
     description: Switch item
     type: TEXT
     required: true
     context: item
   - name: heatpumpFlowSensor
-    label: ESPAltherma Durchfluss
+    label: ESPAltherma Flow Sensor (l/min)
     description: Number:VolumetricFlowRate item
     type: TEXT
     required: true
     context: item
   - name: heatpumpValve
-    label: ESPAltherma 3-Wege-Ventil
+    label: ESPAltherma 3-Way Valve Mode
     description: String item
     type: TEXT
     required: true
     context: item
   - name: heatpumpBuhStep1Mode
-    label: ESPAltherma Heizstab Stufe 1
+    label: ESPAltherma Backup Heater (BUH) Step 1 Mode
     description: Switch item
     type: TEXT
     required: true
     context: item
   - name: heatpumpBuhStep2Mode
-    label: ESPAltherma Heizstab Stufe 2
+    label: ESPAltherma Backup Heater (BUH) Step 2 Mode
     description: Switch item
     type: TEXT
     required: true
     context: item
   - name: heatpumpBshMode
-    label: ESPAltherma Zusatzheizung Speicher
+    label: ESPAltherma Booster Heater (BSH) Mode
     description: Switch item
     type: TEXT
     required: true
     context: item
   - name: heatpumpLeavingWaterTempAfterBuh
-    label: ESPAltherma Vorlauftemperatur nach Heizstab
+    label: ESPAltherma Leaving Water Temperature After BUH
     description: Number:Temperature item
     type: TEXT
     required: true
     context: item
   - name: heatpumpCircuitPower
-    label: Wärmepumpe Leistung
+    label: Heatpump Power
     description: Number:Power item
     type: TEXT
     required: true
     context: item
   - name: heatpumpHeatExchangerMidTemp
-    label: ESPAltherma Wärmetauscher Mitte
+    label: ESPAltherma Heat Exchanger Mid Temperature
     description: Number:Temperature item
     type: TEXT
     required: true
@@ -196,154 +196,154 @@ props:
     required: true
     context: item
   - name: heatpumpClimateControlPower
-    label: Pyaltherma Heizung Ein/Aus
+    label: Pyaltherma Climate Control Power
     description: Switch item
     type: TEXT
     required: true
     context: item
   - name: heatpumpDhwBoost
-    label: Pyaltherma Warmwasser-Boost
+    label: Pyaltherma DHW Powerful
     description: Switch item
     type: TEXT
     required: true
     context: item
   - name: heatpumpDhwPower
-    label: Pyaltherma Warmwasser Ein/Aus
+    label: Pyaltherma DHW Power
     description: Switch item
     type: TEXT
     required: true
     context: item
   - name: heatpumpManagement
-    label: Wärmepumpe Automatik
+    label: Heatpump Management
     description: Group item
     type: TEXT
     required: true
     context: item
   - name: heatpumpDischargePipeTemp
-    label: ESPAltherma Heißgastemperatur
+    label: ESPAltherma Discharge Pipe Temperature
     description: Number:Temperature item
     type: TEXT
     required: true
     context: item
   - name: heatpumpRefrigerantTemp
-    label: ESPAltherma Kältemittel flüssig
+    label: ESPAltherma Refrigerant Temperature Liquid Side
     description: Number:Temperature item
     type: TEXT
     required: true
     context: item
   - name: heatpumpRefrigerantPressure
-    label: ESPAltherma Kältemitteldruck
+    label: ESPAltherma Refrigerant Pressure Sensor
     description: Number:Pressure item
     type: TEXT
     required: true
     context: item
   - name: heatpumpHeatingPowerAfterBuh
-    label: ESPAltherma Heizleistung nach Heizstab
+    label: ESPAltherma Heating Power After BUH
     description: Number:Power item
     type: TEXT
     required: true
     context: item
   - name: heatpumpInletWaterTemp
-    label: ESPAltherma Rücklauftemperatur
+    label: ESPAltherma Inlet Water Temperature
     description: Number:Temperature item
     type: TEXT
     required: true
     context: item
   - name: acTemperature
-    label: Faikout Perfera Temperatur
+    label: Faikout Perfera Temperature
     description: Number:Temperature item
     type: TEXT
     required: true
     context: item
   - name: tadoHumidity
-    label: Tado Luftfeuchtigkeit
+    label: Tado Humidity
     description: Number:Dimensionless item
     type: TEXT
     required: true
     context: item
   - name: heatpumpIndoorAmbientTemp
-    label: ESPAltherma Raumtemperatur
+    label: ESPAltherma Indoor Ambient Temperature
     description: Number:Temperature item
     type: TEXT
     required: true
     context: item
   - name: netatmoWeatherstationAtmosphericHumidity
-    label: Netatmo Wetterstation Luftfeuchtigkeit
+    label: Netatmo Weatherstation Atmospheric Humidity
     description: Number:Dimensionless item
     type: TEXT
     required: true
     context: item
   - name: netatmoWeatherstationCo2
-    label: Netatmo Wetterstation CO2
+    label: Netatmo Weatherstation CO2
     description: Number:Dimensionless item
     type: TEXT
     required: true
     context: item
   - name: heatpumpDhwSetpoint
-    label: ESPAltherma Warmwasser Sollwert
+    label: ESPAltherma DHW Setpoint
     description: Number:Temperature item
     type: TEXT
     required: true
     context: item
   - name: heatpumpBshPower
-    label: ESPAltherma Elektrische Leistung Zusatzheizung
+    label: ESPAltherma Electrical Power Booster Heater
     description: Number:Power item
     type: TEXT
     required: true
     context: item
   - name: heatpumpBuhPower
-    label: ESPAltherma Elektrische Leistung Heizstab
+    label: ESPAltherma Electrical Power Backup Heater
     description: Number:Power item
     type: TEXT
     required: true
     context: item
   - name: heatpumpWaterPressure
-    label: ESPAltherma Wasserdruck
+    label: ESPAltherma Water Pressure
     description: Number:Pressure item
     type: TEXT
     required: true
     context: item
   - name: heatpumpDhwTempHeating
-    label: Pyaltherma Warmwasser Solltemperatur
+    label: Pyaltherma DHW Temp Heating
     description: Number:Temperature item
     type: TEXT
     required: true
     context: item
   - name: heatpumpDhwManagement
-    label: Wärmepumpe Warmwasser-Automatik
+    label: Heatpump DHW Management
     description: Switch item
     type: TEXT
     required: true
     context: item
   - name: heatpumpLeavingWaterTempOffsetHeating
-    label: Pyaltherma Vorlauf-Offset Heizen
+    label: Pyaltherma Leaving Water Temp Offset Heating
     description: Number:Temperature item
     type: TEXT
     required: true
     context: item
   - name: heatpumpLeavingWaterSetpoint
-    label: ESPAltherma Vorlauf Sollwert
+    label: ESPAltherma Leaving Water Setpoint
     description: Number:Temperature item
     type: TEXT
     required: true
     context: item
   - name: heatpumpOutdoorAirTemp
-    label: ESPAltherma Außenluft Temperatur
+    label: ESPAltherma Outdoor Air Temperature
     description: Number:Temperature item
     type: TEXT
     required: true
     context: item
   - name: heatpumpTargetDischargeTemp
-    label: ESPAltherma Soll-Heißgastemperatur
+    label: ESPAltherma Target Discharge Temperature
     description: Number:Temperature item
     type: TEXT
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 4, 2026, 9:05:35 PM
+timestamp: Oct 4, 2026, 11:05:34 PM
 component: oh-card
 config:
-  title: Wärmepumpe
+  title: Heat Pump
   style:
     height: calc(100% - 2 * var(--f7-card-margin-vertical))
     display: flex
@@ -386,9 +386,9 @@ slots:
               default:
               - component: widget:value-tile
                 config:
-                  title: Elektrisch
+                  title: Electrical
                   value: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpPower].state) ? ''–'' : ((Number(items[props.heatpumpPower].numericState)
-                    || 0) / 1000).toFixed(2).replace(''.'', '','') + '' kW'')'
+                    || 0) / 1000).toFixed(2) + '' kW'')'
                   icon: material:bolt
                   color: '#ffa726'
                   fontSize: clamp(11.9px, 2.93cqw, 15.4px)
@@ -419,9 +419,9 @@ slots:
               default:
               - component: widget:value-tile
                 config:
-                  title: Wärme
+                  title: Heat
                   value: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpHeatPower].state) ? ''–'' : ((Number(items[props.heatpumpHeatPower].numericState)
-                    || 0) / 1000).toFixed(2).replace(''.'', '','') + '' kW'')'
+                    || 0) / 1000).toFixed(2) + '' kW'')'
                   icon: material:local_fire_department
                   color: '#e57373'
                   fontSize: clamp(11.9px, 2.93cqw, 15.4px)
@@ -452,7 +452,7 @@ slots:
                 config:
                   title: COP
                   value: '=(Number(items[props.heatpumpCop].numericState) || 0) > 0 ? ((Number(items[props.heatpumpCop].numericState)
-                    || 0)).toFixed(2).replace(''.'', '','') : ''–'''
+                    || 0)).toFixed(2) : ''–'''
                   icon: material:eco
                   color: '#66bb6a'
                   fontSize: clamp(11.9px, 2.93cqw, 15.4px)
@@ -2697,7 +2697,7 @@ slots:
                 config:
                   x: 391.0
                   y: 43
-                  content: Außengerät
+                  content: Outdoor Unit
                   fill: currentColor
                   font-size: 13
                   font-weight: '600'
@@ -2707,7 +2707,7 @@ slots:
                 config:
                   x: 523.0
                   y: 43
-                  content: '=items[props.heatpumpDefrostOperaton].state === ''ON'' ? ''Abtauen'' : '''''
+                  content: '=items[props.heatpumpDefrostOperaton].state === ''ON'' ? ''Defrost'' : '''''
                   fill: currentColor
                   font-size: 11
                   font-weight: '700'
@@ -2717,7 +2717,7 @@ slots:
                 config:
                   x: 367.0
                   y: 62.15
-                  content: Leistung
+                  content: Power
                   fill: currentColor
                   font-size: 11
                   font-weight: normal
@@ -2728,7 +2728,7 @@ slots:
                   x: 523.0
                   y: 64
                   content: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpCircuitPower].state) ? ''–'' : ((Number(items[props.heatpumpCircuitPower].numericState)
-                    || 0) / 1000).toFixed(2).replace(''.'', '','') + '' kW'')'
+                    || 0) / 1000).toFixed(2) + '' kW'')'
                   fill: '#fb8c00'
                   font-size: 15
                   font-weight: '700'
@@ -2738,7 +2738,7 @@ slots:
                 config:
                   x: 367.0
                   y: 79.15
-                  content: Verdichter
+                  content: Compressor
                   fill: currentColor
                   font-size: 11
                   font-weight: normal
@@ -2759,7 +2759,7 @@ slots:
                 config:
                   x: 367.0
                   y: 96.15
-                  content: Außen
+                  content: Outdoor
                   fill: currentColor
                   font-size: 11
                   font-weight: normal
@@ -2780,7 +2780,7 @@ slots:
                 config:
                   x: 367.0
                   y: 113.15
-                  content: Wärmetauscher
+                  content: Heat exchanger
                   fill: currentColor
                   font-size: 11
                   font-weight: normal
@@ -2824,7 +2824,7 @@ slots:
                 config:
                   x: 134.0
                   y: 43
-                  content: Regelung
+                  content: Control
                   fill: currentColor
                   font-size: 13
                   font-weight: '600'
@@ -2834,7 +2834,7 @@ slots:
                 config:
                   x: 110.0
                   y: 62.15
-                  content: Heizung
+                  content: Heating
                   fill: currentColor
                   font-size: 11
                   font-weight: normal
@@ -2844,7 +2844,7 @@ slots:
                 config:
                   x: 266.0
                   y: 64
-                  content: '=items[props.heatpumpClimateControlPower].state === ''ON'' ? ''An'' : ''Aus'''
+                  content: '=items[props.heatpumpClimateControlPower].state === ''ON'' ? ''On'' : ''Off'''
                   fill: currentColor
                   font-size: 15
                   font-weight: '700'
@@ -2854,7 +2854,7 @@ slots:
                 config:
                   x: 110.0
                   y: 79.15
-                  content: Warmwasser
+                  content: Hot water
                   fill: currentColor
                   font-size: 11
                   font-weight: normal
@@ -2865,7 +2865,7 @@ slots:
                   x: 266.0
                   y: 81
                   content: '=items[props.heatpumpDhwBoost].state === ''ON'' ? ''Boost'' : items[props.heatpumpDhwPower].state
-                    === ''ON'' ? ''An'' : ''Aus'''
+                    === ''ON'' ? ''On'' : ''Off'''
                   fill: currentColor
                   font-size: 15
                   font-weight: '700'
@@ -2885,8 +2885,8 @@ slots:
                 config:
                   x: 266.0
                   y: 98
-                  content: '=(items[props.heatpumpSmartGrid].state === ''1'' ? ''Sperre'' : items[props.heatpumpSmartGrid].state
-                    === ''2'' ? ''Empfehlung'' : items[props.heatpumpSmartGrid].state === ''3'' ? ''Befehl'' : ''Normal'')'
+                  content: '=(items[props.heatpumpSmartGrid].state === ''1'' ? ''Blocked'' : items[props.heatpumpSmartGrid].state
+                    === ''2'' ? ''Recommended'' : items[props.heatpumpSmartGrid].state === ''3'' ? ''Command'' : ''Normal'')'
                   fill: currentColor
                   font-size: 15
                   font-weight: '700'
@@ -2896,7 +2896,7 @@ slots:
                 config:
                   x: 110.0
                   y: 113.15
-                  content: Automatik
+                  content: Automatic
                   fill: currentColor
                   font-size: 11
                   font-weight: normal
@@ -2906,7 +2906,7 @@ slots:
                 config:
                   x: 266.0
                   y: 115
-                  content: '=items[props.heatpumpManagement].state === ''ON'' ? ''An'' : ''Aus'''
+                  content: '=items[props.heatpumpManagement].state === ''ON'' ? ''On'' : ''Off'''
                   fill: currentColor
                   font-size: 15
                   font-weight: '700'
@@ -2940,7 +2940,7 @@ slots:
                 config:
                   x: 467.0
                   y: 191
-                  content: Kältemittel
+                  content: Refrigerant
                   fill: currentColor
                   font-size: 13
                   font-weight: '600'
@@ -2950,7 +2950,7 @@ slots:
                 config:
                   x: 443.0
                   y: 210.15
-                  content: Heißgas
+                  content: Hot gas
                   fill: currentColor
                   font-size: 11
                   font-weight: normal
@@ -2971,7 +2971,7 @@ slots:
                 config:
                   x: 443.0
                   y: 227.15
-                  content: Flüssig
+                  content: Liquid
                   fill: currentColor
                   font-size: 11
                   font-weight: normal
@@ -2992,7 +2992,7 @@ slots:
                 config:
                   x: 443.0
                   y: 244.15
-                  content: Druck
+                  content: Pressure
                   fill: currentColor
                   font-size: 11
                   font-weight: normal
@@ -3039,7 +3039,7 @@ slots:
                 config:
                   x: 467.0
                   y: 306
-                  content: Heizkreis
+                  content: Heating Circuit
                   fill: currentColor
                   font-size: 13
                   font-weight: '600'
@@ -3049,7 +3049,7 @@ slots:
                 config:
                   x: 443.0
                   y: 325.15
-                  content: Wärme
+                  content: Heat
                   fill: currentColor
                   font-size: 11
                   font-weight: normal
@@ -3060,7 +3060,7 @@ slots:
                   x: 559.0
                   y: 327
                   content: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpHeatingPowerAfterBuh].state) ? ''–'' : ((Number(items[props.heatpumpHeatingPowerAfterBuh].numericState)
-                    || 0) / 1000).toFixed(2).replace(''.'', '','') + '' kW'')'
+                    || 0) / 1000).toFixed(2) + '' kW'')'
                   fill: currentColor
                   font-size: 15
                   font-weight: '700'
@@ -3070,7 +3070,7 @@ slots:
                 config:
                   x: 443.0
                   y: 342.15
-                  content: Vorlauf
+                  content: Flow
                   fill: currentColor
                   font-size: 11
                   font-weight: normal
@@ -3091,7 +3091,7 @@ slots:
                 config:
                   x: 443.0
                   y: 359.15
-                  content: Rücklauf
+                  content: Return
                   fill: currentColor
                   font-size: 11
                   font-weight: normal
@@ -3138,7 +3138,7 @@ slots:
                 config:
                   x: 149.0
                   y: 203
-                  content: Obergeschoss
+                  content: Upper Floor
                   fill: currentColor
                   font-size: 13
                   font-weight: '600'
@@ -3148,7 +3148,7 @@ slots:
                 config:
                   x: 125.0
                   y: 222.15
-                  content: Temperatur
+                  content: Temperature
                   fill: currentColor
                   font-size: 11
                   font-weight: normal
@@ -3169,7 +3169,7 @@ slots:
                 config:
                   x: 125.0
                   y: 239.15
-                  content: Luftfeuchtigkeit
+                  content: Humidity
                   fill: currentColor
                   font-size: 11
                   font-weight: normal
@@ -3180,7 +3180,7 @@ slots:
                   x: 275.0
                   y: 241
                   content: '=([''NULL'', ''UNDEF''].includes(items[props.tadoHumidity].state) ? ''–'' : ((Number(items[props.tadoHumidity].numericState)
-                    || 0)).toFixed(0).replace(''.'', '','') + '' %'')'
+                    || 0)).toFixed(0) + '' %'')'
                   fill: currentColor
                   font-size: 15
                   font-weight: '700'
@@ -3216,7 +3216,7 @@ slots:
                 config:
                   x: 149.0
                   y: 306
-                  content: Erdgeschoss
+                  content: Ground Floor
                   fill: currentColor
                   font-size: 13
                   font-weight: '600'
@@ -3226,7 +3226,7 @@ slots:
                 config:
                   x: 125.0
                   y: 325.15
-                  content: Temperatur
+                  content: Temperature
                   fill: currentColor
                   font-size: 11
                   font-weight: normal
@@ -3247,7 +3247,7 @@ slots:
                 config:
                   x: 125.0
                   y: 342.15
-                  content: Luftfeuchtigkeit
+                  content: Humidity
                   fill: currentColor
                   font-size: 11
                   font-weight: normal
@@ -3258,8 +3258,8 @@ slots:
                   x: 275.0
                   y: 344
                   content: '=([''NULL'', ''UNDEF''].includes(items[props.netatmoWeatherstationAtmosphericHumidity].state)
-                    ? ''–'' : ((Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState) || 0)).toFixed(0).replace(''.'',
-                    '','') + '' %'')'
+                    ? ''–'' : ((Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState) || 0)).toFixed(0)
+                    + '' %'')'
                   fill: currentColor
                   font-size: 15
                   font-weight: '700'
@@ -3318,7 +3318,7 @@ slots:
                 config:
                   x: 134.0
                   y: 539
-                  content: Warmwasserspeicher
+                  content: Hot Water Tank
                   fill: currentColor
                   font-size: 13
                   font-weight: '600'
@@ -3328,7 +3328,7 @@ slots:
                 config:
                   x: 110.0
                   y: 558.15
-                  content: Temperatur
+                  content: Temperature
                   fill: currentColor
                   font-size: 11
                   font-weight: normal
@@ -3351,7 +3351,7 @@ slots:
                 config:
                   x: 110.0
                   y: 575.15
-                  content: Soll
+                  content: Target
                   fill: currentColor
                   font-size: 11
                   font-weight: normal
@@ -3372,7 +3372,7 @@ slots:
                 config:
                   x: 110.0
                   y: 592.15
-                  content: Zusatzheizung
+                  content: Booster heater
                   fill: currentColor
                   font-size: 11
                   font-weight: normal
@@ -3383,8 +3383,7 @@ slots:
                   x: 304.0
                   y: 594
                   content: '=items[props.heatpumpBshMode].state === ''ON'' ? ([''NULL'', ''UNDEF''].includes(items[props.heatpumpBshPower].state)
-                    ? ''–'' : ((Number(items[props.heatpumpBshPower].numericState) || 0) / 1000).toFixed(2).replace(''.'',
-                    '','') + '' kW'') : ''Aus'''
+                    ? ''–'' : ((Number(items[props.heatpumpBshPower].numericState) || 0) / 1000).toFixed(2) + '' kW'') : ''Off'''
                   fill: currentColor
                   font-size: 15
                   font-weight: '700'
@@ -3419,7 +3418,7 @@ slots:
                 config:
                   x: 488.0
                   y: 539
-                  content: Innengerät
+                  content: Indoor Unit
                   fill: currentColor
                   font-size: 13
                   font-weight: '600'
@@ -3429,7 +3428,7 @@ slots:
                 config:
                   x: 464.0
                   y: 558.15
-                  content: Leistung
+                  content: Power
                   fill: currentColor
                   font-size: 11
                   font-weight: normal
@@ -3440,8 +3439,7 @@ slots:
                   x: 600.0
                   y: 560
                   content: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpCircuitPower].state) ? ''–'' : (((Number(items[props.heatpumpCircuitPower].numericState)
-                    || 0) + (Number(items[props.heatpumpBuhPower].numericState) || 0)) / 1000).toFixed(2).replace(''.'', '','')
-                    + '' kW'')'
+                    || 0) + (Number(items[props.heatpumpBuhPower].numericState) || 0)) / 1000).toFixed(2) + '' kW'')'
                   fill: '#fb8c00'
                   font-size: 15
                   font-weight: '700'
@@ -3451,7 +3449,7 @@ slots:
                 config:
                   x: 464.0
                   y: 575.15
-                  content: Durchfluss
+                  content: Flow rate
                   fill: currentColor
                   font-size: 11
                   font-weight: normal
@@ -3472,7 +3470,7 @@ slots:
                 config:
                   x: 464.0
                   y: 592.15
-                  content: Druck
+                  content: Pressure
                   fill: currentColor
                   font-size: 11
                   font-weight: normal
@@ -3494,7 +3492,7 @@ slots:
                 config:
                   x: 464.0
                   y: 609.15
-                  content: Heizstab
+                  content: Backup heater
                   fill: currentColor
                   font-size: 11
                   font-weight: normal
@@ -3506,7 +3504,7 @@ slots:
                   y: 611
                   content: '=(items[props.heatpumpBuhStep1Mode].state === ''ON'' || items[props.heatpumpBuhStep2Mode].state
                     === ''ON'') ? ([''NULL'', ''UNDEF''].includes(items[props.heatpumpBuhPower].state) ? ''–'' : ((Number(items[props.heatpumpBuhPower].numericState)
-                    || 0) / 1000).toFixed(2).replace(''.'', '','') + '' kW'') : ''Aus'''
+                    || 0) / 1000).toFixed(2) + '' kW'') : ''Off'''
                   fill: currentColor
                   font-size: 15
                   font-weight: '700'

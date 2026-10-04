@@ -16,10 +16,10 @@ props:
     required: false
     default: '#8d6e63'
   parameterGroups: []
-timestamp: Sep 27, 2026, 8:52:40 PM
+timestamp: Oct 4, 2026, 11:05:34 PM
 component: oh-card
 config:
-  title: Energie pro Tag
+  title: Energy per Day
   style:
     height: calc(100% - 2 * var(--f7-card-margin-vertical))
 slots:
@@ -42,7 +42,7 @@ slots:
         config:
           gridIndex: 0
           categoryType: month
-          name: Tag
+          name: Day
           nameGap: 12
           axisTick:
             show: false
@@ -66,7 +66,7 @@ slots:
       series:
       - component: oh-aggregate-series
         config:
-          name: Energie
+          name: Energy
           gridIndex: 0
           xAxisIndex: 0
           yAxisIndex: 0

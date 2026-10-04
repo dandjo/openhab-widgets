@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Screenshot a URL after a fixed wait via Chrome DevTools. Usage: cdp_shot.py URL OUT.png [WAIT_S] [WIDTH] [HEIGHT]"""
+"""Screenshot a URL after a fixed wait via Chrome DevTools. Usage: cdp_shot.py URL OUT.png [WAIT_S] [WIDTH] [HEIGHT]
+[dark]; HEIGHT full: the page's whole length (the viewport grows to its scrolling content, so nothing is cut off)"""
 import asyncio
 import base64
 import json
@@ -13,7 +14,8 @@ import websockets
 URL, OUT = sys.argv[1], sys.argv[2]
 WAIT = float(sys.argv[3]) if len(sys.argv) > 3 else 15
 W = int(sys.argv[4]) if len(sys.argv) > 4 else 1200
-H = int(sys.argv[5]) if len(sys.argv) > 5 else 800
+FULL = len(sys.argv) > 5 and sys.argv[5] == "full"
+H = 1000 if FULL else int(sys.argv[5]) if len(sys.argv) > 5 else 800
 DARK = len(sys.argv) > 6 and sys.argv[6] == "dark"
 PORT = 9223
 
@@ -49,6 +51,19 @@ async def main():
                 await call("Emulation.setEmulatedMedia", features=[{"name": "prefers-color-scheme", "value": "dark"}])
             await call("Page.navigate", url=URL)
             await asyncio.sleep(WAIT)
+            height = H
+            for _ in range(4) if FULL else ():
+                # MainUI scrolls inside .page-content: grow the viewport to its content until it stops growing
+                r = await call("Runtime.evaluate", returnByValue=True, expression=(
+                    "Math.ceil(Math.max(document.documentElement.scrollHeight, ...[...document.querySelectorAll("
+                    "'.page-content')].map((e) => e.scrollHeight)))"))
+                need = int(r["result"]["value"])
+                if need <= height:
+                    break
+                height = need
+                await call("Emulation.setDeviceMetricsOverride", width=W, height=height, deviceScaleFactor=1,
+                           mobile=W < 600, screenWidth=W, screenHeight=height)
+                await asyncio.sleep(3)
             shot = await call("Page.captureScreenshot", format="png")
             open(OUT, "wb").write(base64.b64decode(shot["data"]))
             print("saved", OUT)

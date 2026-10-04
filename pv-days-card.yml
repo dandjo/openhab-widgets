@@ -4,16 +4,16 @@ tags:
 props:
   parameters:
   - name: dailyPv
-    label: Energie täglich PV
+    label: Energy Daily PV
     description: Number:Energy item
     type: TEXT
     required: true
     context: item
   parameterGroups: []
-timestamp: Sep 30, 2026, 1:06:31 AM
+timestamp: Oct 4, 2026, 11:05:34 PM
 component: oh-card
 config:
-  title: PV-Ertrag pro Tag
+  title: PV Yield per Day
   style:
     height: calc(100% - 2 * var(--f7-card-margin-vertical))
 slots:
@@ -41,7 +41,7 @@ slots:
               default:
               - component: oh-button
                 config:
-                  text: Jahr
+                  text: Year
                   action: variable
                   actionVariable: pvView
                   actionVariableValue: year
@@ -59,7 +59,7 @@ slots:
                       '''''
               - component: oh-button
                 config:
-                  text: Halbjahre
+                  text: Half-years
                   action: variable
                   actionVariable: pvView
                   actionVariableValue: halves
@@ -77,7 +77,7 @@ slots:
                       : '''''
               - component: oh-button
                 config:
-                  text: Monate
+                  text: Months
                   action: variable
                   actionVariable: pvView
                   actionVariableValue: months
@@ -94,7 +94,7 @@ slots:
                       : '''''
               - component: oh-button
                 config:
-                  text: Balken
+                  text: Bars
                   action: variable
                   actionVariable: pvView
                   actionVariableValue: bars
@@ -136,7 +136,7 @@ slots:
           series:
           - component: oh-calendar-series
             config:
-              name: PV-Ertrag
+              name: PV yield
               type: heatmap
               calendarIndex: 0
               item: =props.dailyPv
@@ -318,14 +318,14 @@ slots:
           series:
           - component: oh-calendar-series
             config:
-              name: PV-Ertrag
+              name: PV yield
               type: heatmap
               calendarIndex: 0
               item: =props.dailyPv
               aggregationFunction: last
           - component: oh-calendar-series
             config:
-              name: PV-Ertrag
+              name: PV yield
               type: heatmap
               calendarIndex: 1
               item: =props.dailyPv
@@ -386,19 +386,19 @@ slots:
           series:
           - component: oh-calendar-series
             config:
-              name: PV-Ertrag
+              name: PV yield
               calendarIndex: 0
               type: custom
               renderItem: '=(params, api) => ((W, H, y) => ((c6, c4) => ((n) => ((c) => ((x0) => ((bx, by, off) => params.dataIndex
                 === 0 ? ({type: ''group'', children: [({type: ''group'', silent: true, children: [0,1,2,3,4,5,6,7,8,9,10,11].map((m)
                 => ({type: ''group'', silent: true, children: [{type: ''text'', silent: true, style: {x: bx(m), y: by(m),
-                text: [''Jänner'', ''Februar'', ''März'', ''April'', ''Mai'', ''Juni'', ''Juli'', ''August'', ''September'',
-                ''Oktober'', ''November'', ''Dezember''][m], fontSize: 11, fontWeight: 600, fill: (themeOptions.dark === ''dark''
+                text: [''January'', ''February'', ''March'', ''April'', ''May'', ''June'', ''July'', ''August'', ''September'',
+                ''October'', ''November'', ''December''][m], fontSize: 11, fontWeight: 600, fill: (themeOptions.dark === ''dark''
                 ? ''#bdbdbd'' : ''#616161'')}}].concat([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30].slice(0,
                 dayjs().date(1).year(y).month(m).daysInMonth()).map((i) => ({type: ''rect'', silent: true, shape: {x: bx(m)
                 + (off(m) + i) % 7 * c + 1, y: by(m) + 16 + Math.floor((off(m) + i) / 7) * c + 1, width: c - 2, height: c
                 - 2, r: 2}, style: {fill: (themeOptions.dark === ''dark'' ? ''#2b2b2b'' : ''#eeeeee'')}})))})).concat([0,1,2,3,4,5].slice(0,
-                n).map((m) => [''M'', ''D'', ''M'', ''D'', ''F'', ''S'', ''S''].map((w, k) => ({type: ''text'', silent: true,
+                n).map((m) => [''M'', ''T'', ''W'', ''T'', ''F'', ''S'', ''S''].map((w, k) => ({type: ''text'', silent: true,
                 style: {x: bx(m) + k * c + c / 2, y: 64, text: w, fontSize: 9, fill: (themeOptions.dark === ''dark'' ? ''#bdbdbd''
                 : ''#616161''), align: ''center''}}))).reduce((a, b) => a.concat(b), []))}), ({type: ''rect'', silent: false,
                 shape: {x: bx(dayjs(api.value(0)).month()) + (off(dayjs(api.value(0)).month()) + dayjs(api.value(0)).date()
@@ -460,25 +460,25 @@ slots:
               gridIndex: 0
               categoryType: values
               data:
-              - Jänner
-              - Februar
-              - März
+              - January
+              - February
+              - March
               - April
-              - Mai
-              - Juni
-              - Juli
+              - May
+              - June
+              - July
               - August
               - September
-              - Oktober
+              - October
               - November
-              - Dezember
+              - December
               name: ' '
               axisTick:
                 show: false
               axisLabel:
                 interval: 0
                 fontSize: '=screen.width < 600 ? 10 : 12'
-                formatter: =(v, i) => ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'][i]
+                formatter: =(v, i) => ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][i]
           yAxis:
           - component: oh-value-axis
             config:
@@ -493,7 +493,7 @@ slots:
                 - 0
                 - 0
               axisLabel:
-                formatter: =(v) => v.toLocaleString('de-AT')
+                formatter: =(v) => v.toLocaleString('en-GB')
               splitLine:
                 lineStyle:
                   type: dashed
@@ -505,7 +505,7 @@ slots:
           series:
           - component: oh-aggregate-series
             config:
-              name: PV-Ertrag
+              name: PV yield
               gridIndex: 0
               xAxisIndex: 0
               yAxisIndex: 0
@@ -522,7 +522,7 @@ slots:
                 - 0
           - component: oh-aggregate-series
             config:
-              name: Ø pro Tag
+              name: Ø per day
               gridIndex: 0
               xAxisIndex: 0
               yAxisIndex: 1
@@ -542,5 +542,5 @@ slots:
               confine: true
               trigger: axis
               smartFormatter: false
-              valueFormatter: '=(v) => v == null ? ''–'' : Number(v).toLocaleString(''de-AT'', {minimumFractionDigits: Number(v)
+              valueFormatter: '=(v) => v == null ? ''–'' : Number(v).toLocaleString(''en-GB'', {minimumFractionDigits: Number(v)
                 >= 100 ? 0 : 1, maximumFractionDigits: Number(v) >= 100 ? 0 : 1}) + '' kWh'''

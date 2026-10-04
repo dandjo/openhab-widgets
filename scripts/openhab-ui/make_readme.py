@@ -10,7 +10,7 @@ OVERVIEW = [
      "animated), the outdoor temperature from a local sensor, and today and the next two days, each with its weather "
      "drawn beside its maximum over its minimum. While an official warning of GeoSphere Austria is in effect or begins within 24 hours, it is teased "
      "beside the temperature: a disc in its level's colour (yellow, orange, red) with an exclamation mark and a ring "
-     "pulsing out of it, on a wider screen in a pill with the warning's short text (*Gewitter bis 20:00*). On a "
+     "pulsing out of it, on a wider screen in a pill with the warning's short text (*Thunderstorm until 20:00*). On a "
      "phone the gaps narrow, and below 380 px the chevron goes, so the bar keeps its fit. A tap opens the weather page of "
      "my installation as a popup (see [Weather](#weather)). Its items come from two rules, "
      "`scripts/openhab-ui/applied/weather_forecast_rule.js`, which reads Open-Meteo's GeoSphere AROME Austria model, "
@@ -39,7 +39,7 @@ OVERVIEW = [
      "self-sufficiency as rings. The card places its lines, nodes and rings as `flow-link`, `flow-node` and "
      "`flow-share-ring`. The recording and the dark screenshot show it with demo values."),
     ("switches-card", "Switches", "The switchable plugs under the energy flow as `switch-tile`s, five abreast, three "
-     "on a phone: icon, *An* or *Aus*, name, power and today's energy; a tap anywhere switches, and while on a tile is "
+     "on a phone: icon, *On* or *Off*, name, power and today's energy; a tap anywhere switches, and while on a tile is "
      "tinted and outlined in its colour."),
     ("appliances-card", "Appliances", "Washing machines, dryer and dishwasher as `appliance-tile`s, each drawn inside a "
      "ring filled with the program progress, the rest of it pulsing and the arc in step with it; drums and paddles turn and the spray arm sprays "
@@ -52,7 +52,7 @@ OVERVIEW = [
      "heat pump as the energy flow's node with its mode badge, filled while the heat pump's own measured circuit "
      "draws, its red bolt only for the backup heater in the wall unit (the tank's booster heater shows on the tank), "
      "its ring as in the energy flow, whole while it draws and filling towards the expected end of a hot-water charge, "
-     "which a line under the tile names. "
+     "while the setpoint pill gives way to the time left, as a Miele machine's, and a line names the end. "
      "Each tile's pill holds the temperature, the tank's and the leaving water's, filled in the tile's colour while "
      "hot water or heating is switched on, outlined while off, beside a tinted pill with the setpoint and a small "
      "target icon; a tap opens the heat pump's quick popup. Below them "
@@ -189,12 +189,17 @@ def img(name, alt):
     return f"![{alt}](screenshots/{name})"
 
 
+def gifs(name, alt):
+    """An animated screenshot and its dark twin."""
+    return img(f"{name}.gif", alt) + "\n\n" + img(f"{name}-dark.gif", f"{alt} in dark mode")
+
+
 def quick_popups():
     """The quick popups: what each holds, their screenshots three abreast and their props."""
     rows = ["""## Quick popups
 
 Compact popups the cards open: a device's main controls or the charts of one of its parts, under a small head with
-its state and above *Alle Details*, which opens the device's page of my installation. Each is a widget that takes its
+its state and above *All details*, which opens the device's page of my installation. Each is a widget that takes its
 items as props; open it from a link with `action: popup`, `actionModal: widget:<uid>` and its items in
 `actionModalConfig`, as the cards do:
 
@@ -231,8 +236,10 @@ md = ["""# openHAB Widgets
 MainUI widgets from my openHAB 5 installation: the cards of an energy and home dashboard and the parts they are built
 from, which work on their own too: the quick popups they open, pills, bars and sliders, the nodes and lines of the
 energy flow, appliance icons and tiles, a weather drawing; besides them a set of cards for every metered plug, a popup
-for any item and the tile their values stand in. The UI texts are German, numbers use a decimal comma. No widget names
-an item: every item comes in as a prop, so the widgets work with any item names.
+for any item and the tile their values stand in. The UI texts are English, numbers use a decimal point; my own
+installation runs the same widgets in German, as the generator builds them, and
+[`scripts/openhab-ui/i18n/en.py`](scripts/openhab-ui/i18n/en.py) translates them for this repository. No widget
+names an item: every item comes in as a prop, so the widgets work with any item names.
 
 ![Overview](screenshots/overview-light.png)
 
@@ -249,7 +256,7 @@ this repository. Use it on a layout page as a component `widget:<uid>` with its 
 - component: widget:plug-card
   config:
     prefix: coffee_machine
-    title: Kaffeemaschine
+    title: Coffee Machine
     icon: material:coffee
     color: "#8d6e63"
 ```
@@ -278,7 +285,8 @@ conditioner and ventilation and the heat pump card's tiles open are (see [Quick 
 """)
 for uid, title, what in OVERVIEW:
     shots = []
-    for name, alt in ((f"{uid}.gif", title), (f"{uid}.png", title), (f"{uid}-dark.png", f"{title} in dark mode")):
+    for name, alt in ((f"{uid}.gif", title), (f"{uid}.png", title), (f"{uid}-dark.gif", f"{title} in dark mode"),
+                      (f"{uid}-dark.png", f"{title} in dark mode")):
         if os.path.exists(os.path.join(EXPORT, "screenshots", name)):
             shots.append(img(name, alt))
     deps = needs(uid)
@@ -293,7 +301,7 @@ The parts of the quick popups and of my device pages' controls.
 """)
 md.append(section("Segmented bar", "state-bar", """The states of one item as the segments of a bar, the current one
 filled in the colour; a tap sends a segment's state. `options` holds `value=label` pairs separated by semicolons.
-With `byText` the segments are as wide as their labels, so a long one such as *Entfeuchten* fits on a phone;
+With `byText` the segments are as wide as their labels, so a long one such as *Recommended* fits on a phone;
 Framework7's sliding highlight is sized for equal segments and is hidden then. `color` may be an expression, e.g. grey
 while the device is off.""", """
 component: widget:state-bar
@@ -302,13 +310,13 @@ config:
   options: 1=1;2=2;3=3
   color: "#26a69a"
 """, img("state-bars.png", "Segmented bars")))
-md.append(section("Switch tile", "switch-tile", """A plug or device as a small tile: its icon, *An* or *Aus*, the name
+md.append(section("Switch tile", "switch-tile", """A plug or device as a small tile: its icon, *On* or *Off*, the name
 and a value such as its power; a tap anywhere switches it. While on it is tinted and outlined in its colour. Put
 several in a grid, e.g. `grid-template-columns: repeat(auto-fill, minmax(120px, 1fr))`.""", """
 component: widget:switch-tile
 config:
   item: coffee_machine_switch
-  title: Kaffeemaschine
+  title: Coffee Machine
   icon: material:coffee
   color: "#8d6e63"
   value: =Math.round(Number(items.coffee_machine_power.numericState) || 0) + ' W'
@@ -320,19 +328,19 @@ component: widget:power-pill
 config:
   item: faikout_perfera_switch
   color: "#29b6f6"
-  onText: ="An · " + items.faikout_perfera_mode.displayState
+  onText: ="On · " + items.faikout_perfera_mode.displayState
 """, img("power-pill.png", "On/off pill")))
 md.append(section("Boost pill", "boost-pill", """A boost that runs for a while, as a pill: its icon in a tinted circle,
-the name, what it does while it runs (`running`, an expression) or *Aus*, and *Starten* or *Stoppen*; while it runs
+the name, what it does while it runs (`running`, an expression) or *Off*, and *Start* or *Stop*; while it runs
 the pill fills with a gradient of the device colour and rings pulse from the icon. A tap anywhere switches the item.
 My heat pump's hot-water boost and my air conditioner's boost both carry a rocket.""", """
 component: widget:boost-pill
 config:
   item: pyaltherma_dhw_powerful
-  title: Warmwasser-Boost
+  title: Hot water boost
   icon: material:rocket_launch
   color: "#fb8c00"
-  running: ="läuft · Speicher " + items.espaltherma_dhw_tank_temp.displayState
+  running: ="running · tank " + items.espaltherma_dhw_tank_temp.displayState
 """, img("boost-pills.png", "Boost pills")))
 md.append("""### Slider: `pill-slider`
 
@@ -353,10 +361,10 @@ config:
   max: 30
   step: 0.5
   unit: °C
-  title: Soll
+  title: Target
   icon: material:device_thermostat
   value: =items.faikout_perfera_temperature_setpoint.displayState
-  context: ="Raum " + items.faikout_perfera_temperature.displayState
+  context: ="Room " + items.faikout_perfera_temperature.displayState
   marks: 18=18 °C;22=22;26=26;30=30 °C
 ```
 
@@ -369,14 +377,14 @@ A switch for switches that stand side by side: a pill 34 px high in which a whit
 switches (`icon`; the power symbol without one) slides to the right while the pill fills with the card's colour, the
 name in the part the knob leaves free. Every pill has the same sizes and 12 px text. Put several in a grid that places
 as many as fit, e.g. `grid-template-columns: repeat(auto-fit, minmax(120px, 1fr))`, which holds a name such as
-*Warmwasser* and lets three pills stand abreast where there is room and two and one on a phone. A tap anywhere on the
+*Hot water* and lets three pills stand abreast where there is room and two and one on a phone. A tap anywhere on the
 pill switches the item.
 
 ```yaml
 component: widget:pill-switch
 config:
   item: pyaltherma_climate_control_power
-  title: Heizung
+  title: Heating
   icon: material:local_fire_department
   color: "#fb8c00"
 ```
@@ -386,7 +394,7 @@ config:
 """ + table("pill-switch") + "\n")
 md.append("""### Switch row: `switch-row`
 
-A switch in a list of switches: its icon in a circle tinted in the card's colour while on, the name, *An* or *Aus*, and
+A switch in a list of switches: its icon in a circle tinted in the card's colour while on, the name, *On* or *Off*, and
 a switch drawn in the card's colour, a track that fills while on and a white knob that slides over. A tap anywhere
 on the row switches the item.
 
@@ -445,20 +453,20 @@ with a bolt fading in and out while it charges), `battery` (filled to `soc`, red
 they run) and `ventilation` (a ventilation unit whose fan turns above 5 W, faster with the power, and whose two
 arrows, fresh air in and used air out, flow while it runs). A node is its drawing on a disc tinted in its colour over
 an opaque one in the card colour, so dots running under it disappear; the card that places it draws the grey ring
-around it, as the energy flow does (`track()` in the generator), and its badges.""", shot=img("flow-node.gif", "Flow nodes")))
+around it, as the energy flow does (`track()` in the generator), and its badges.""", shot=gifs("flow-node", "Flow nodes")))
 md.append(section("Line", "flow-link", """A line from (`x1`, `y1`) to (`x2`, `y2`) in `color`. While
 |`power`| exceeds `threshold` three dots run along it, towards (`x2`, `y2`) while `forward` holds and back otherwise, at
 four speeds by the power; below the threshold the line fades. The dots run a dot radius past both ends, so they slide
 out from under one node's rim and back under the other's. `color` and `forward` may be expressions, e.g. the grid's
-line green and outward while it exports.""", shot=img("flow-link.gif", "Flow lines between three nodes")))
+line green and outward while it exports.""", shot=gifs("flow-link", "Flow lines between three nodes")))
 md.append(section("Share ring", "flow-share-ring", """A ring around (`x`, `y`) filled to `part` / `whole`, the
-percentage inside and `title` with *heute* beside it; the energy flow shows today's self-consumption and
+percentage inside and `title` with *today* beside it; the energy flow shows today's self-consumption and
 self-sufficiency with it.""", """
 component: widget:flow-share-ring
 config:
   x: 40
   y: 40
-  title: Eigenverbrauch
+  title: Self-consumption
   part: =Number(items.photovoltaics_own_ec_day.numericState) || 0
   whole: =Number(items.huawei_inverter_e_day.numericState) || 0
 """, img("flow-share-rings.png", "Share rings")))
@@ -476,7 +484,7 @@ config:
   running: =items.miele_tumble_dryer_twc560wp_program_progress.state !== 'UNDEF'
   progress: =Number(items.miele_tumble_dryer_twc560wp_program_progress.numericState) || 0
   size: 72
-""", img("appliance-icon.gif", "Appliance icons")))
+""", gifs("appliance-icon", "Appliance icons")))
 md.append(section("Appliance tile", "appliance-tile", """An appliance as a tile of the appliances card: its icon, name
 and state; a tap opens the page `popup` as a popup. A Miele machine comes with the items of its program (`progress`,
 `state`, `program`, `phase`, `finished`, `remaining`, as the Miele binding provides them): the ring shows the
@@ -487,7 +495,7 @@ e.g. two columns.""", """
 - component: widget:appliance-tile
   config:
     kind: washer
-    title: Waschmaschine 1
+    title: Washing Machine 1
     popup: washing_machine_1
     progress: miele_washing_machine_wwg360_program_progress
     state: miele_washing_machine_wwg360_operation_state
@@ -498,7 +506,7 @@ e.g. two columns.""", """
 - component: widget:appliance-tile
   config:
     kind: washer
-    title: Waschmaschine 2
+    title: Washing Machine 2
     popup: washing_machine_2
     power: washing_machine_2_power
     done: washing_machine_2_finished
@@ -554,7 +562,7 @@ action: popup
 actionModal: widget:item-popup
 actionModalConfig:
   item: coffee_machine_energy_today
-  title: Energie heute
+  title: Energy today
   kind: number
 ```
 
@@ -572,7 +580,7 @@ font. `wrap` lets a long text wrap across the whole row of a grid.
 ```yaml
 component: widget:value-tile
 config:
-  title: Vorlauf
+  title: Flow
   value: =items.espaltherma_leaving_water_temp_after_buh.displayState
   icon: material:thermostat
   color: "#e57373"

@@ -16,10 +16,10 @@ props:
     required: false
     default: '#8d6e63'
   parameterGroups: []
-timestamp: Sep 27, 2026, 8:52:40 PM
+timestamp: Oct 4, 2026, 11:05:34 PM
 component: oh-card
 config:
-  title: Leistung heute
+  title: Power today
   style:
     height: calc(100% - 2 * var(--f7-card-margin-vertical))
     display: flex
@@ -83,7 +83,7 @@ slots:
               series:
               - component: oh-time-series
                 config:
-                  name: Leistung
+                  name: Power
                   gridIndex: 0
                   xAxisIndex: 0
                   yAxisIndex: 0

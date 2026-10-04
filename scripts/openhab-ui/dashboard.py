@@ -3521,7 +3521,10 @@ def marks(color):
     return {"data": [{"type": "max", "name": "max"}, {"type": "min", "name": "min", "label": {"position": "bottom"}}],
             "symbol": "circle", "symbolSize": 12, "itemStyle": {"color": color, "borderColor": "#ffffff",
                                                                  "borderWidth": 2.5},
-            "label": {"show": True, "position": "top", "distance": 10, "formatter": "{c} °C",
+            # a function, as an ECharts template cannot write the decimal comma (MainUI's number formatter leaves
+            # labels alone)
+            "label": {"show": True, "position": "top", "distance": 10,
+                      "formatter": f"=(p) => {fixed('Number(p.value)', 1)} + ' °C'",
                       "fontSize": 14, "fontWeight": 700, "color": "#ffffff", "backgroundColor": color,
                       "padding": [3, 7], "borderRadius": 6}}
 temps = [
@@ -3661,6 +3664,10 @@ def chips(*children):
 TILE_LINK = {"position": "absolute", "inset": "0", "display": "block", "border-radius": "12px"}
 
 
+# a tile's title, 2 px closer to the icon's ring than the tile's gap (user, 2026-10-04), the lines below moving along
+TILE_TITLE = {"font-weight": "600", "margin-top": "-2px"}
+
+
 def tile(children, popup, link=None):
     """Appliance tile; a transparent link over it opens the appliance's page as a popup (popup may be an
     expression), or link is laid over it instead."""
@@ -3687,7 +3694,7 @@ def miele_state(p):
     """Running flag, chip colour, chip text and the program · phase · ready line of a Miele machine."""
     running = ok(f"{p}_program_progress")
     state = f"items.{p}_operation_state.state"
-    finished = f"(('' + {state}).toLowerCase().indexOf('beendet') >= 0)"
+    finished = f"(['beendet', 'finish', 'end'].some((w) => ('' + {state}).toLowerCase().indexOf(w) >= 0))"
     color = f"={running} ? '#1e88e5' : {finished} ? '#43a047' : '#9e9e9e'"
     status = f"={running} ? {disp(p + '_program_progress')} : {disp(p + '_operation_state')}"
     prog, phase = f"items.{p}_active_program.state", f"items.{p}_program_phase.state"
@@ -3718,7 +3725,7 @@ def appliance_tile_widget():
     miele = "!!props.progress"
     watts = f"(Number({it('power')}.numericState) || 0)"
     running = f"({miele} ? {ok_('progress')} : {watts} > 10)"
-    finished = (f"({miele} ? (('' + {it('state')}.state).toLowerCase().indexOf('beendet') >= 0) : "
+    finished = (f"({miele} ? (['beendet', 'finish', 'end'].some((w) => ('' + {it('state')}.state).toLowerCase().indexOf(w) >= 0)) : "
                 f"(!!props.done && {it('done')}.state === 'ON'))")
     color = f"={running} ? '#1e88e5' : {finished} ? '#43a047' : '#9e9e9e'"
     status = (f"={miele} ? ({running} ? {shown('progress')} : {shown('state')}) : "
@@ -3740,7 +3747,7 @@ def appliance_tile_widget():
     since = comp("Label", {"text": f"='Läuft seit ' + dayjs({it('since')}.state).format('HH:mm') + ' · ' + {hm(minutes)}",
                            "visible": f"=!{miele} && {running} && {ok_('since')}",
                            "style": {"font-size": "12px", "opacity": "0.75"}})
-    return tile([icon, label("=props.title", **{"font-weight": "600"}), state_chips, plug_chip,
+    return tile([icon, label("=props.title", **TILE_TITLE), state_chips, plug_chip,
                  comp("Label", {"text": details, "visible": f"={miele} && {running}",
                                 "style": {"font-size": "12px", "opacity": "0.75"}}), since], "=props.popup")
 
@@ -3790,23 +3797,31 @@ def heat_icon(drawing, orbit, defs=None):
                width=HEAT_ICON, height=HEAT_ICON, style={"display": "block", "overflow": "visible"})
 
 
-def heat_tile(icon, title, on, color, value, setpoint, dark, light, runtime=None, notes=()):
+def heat_tile(icon, title, on, color, value, setpoint, dark, light, runtime=None, notes=(), countdown=None):
     """A tile like the appliances': the icon, the title, the temperature as a pill (user's variant E, 2026-10-03),
     filled in the tile's colour while switched on, only outlined in it while off, and beside it the setpoint as a
     tinted pill with a small target icon, as the dishwasher's remaining time; both pills the size of the appliances'
     (user, 2026-10-04: 12 px, the outline inside the chip's size). dark and light: the setpoint's text colour in each
     theme. runtime: (since item, what) for a line under them while a run lasts, 'Laden seit 18:05 · 35 min', in the
-    style of a Miele machine's program line; notes: (text, visible) expressions for further lines in its style. A tap
-    opens the heat pump's quick panel, as in the energy flow."""
+    style of a Miele machine's program line; notes: (text, visible) expressions for further lines in its style;
+    countdown: (seconds, visible) expressions for a pill with a timer that stands in the setpoint's place while
+    visible, as a Miele machine's remaining time (the heating tile during a hot-water charge). A tap opens the heat
+    pump's quick panel, as in the energy flow."""
     temperature = label(value, **{"background": f"={on} ? '{color}' : 'transparent'",
                                   "color": f"={on} ? '#ffffff' : '{color}'", "border": f"1.5px solid {color}",
                                   "border-radius": "10px", "padding": "0.5px 8.5px", "font-size": "12px",
                                   "font-weight": "600", "white-space": "nowrap"})
-    target = div([comp("f7-icon", {"f7": "scope", "size": 13}), label(setpoint)],
-                 **{"display": "inline-flex", "align-items": "center", "gap": "4px",
-                    "color": f"=themeOptions.dark === 'dark' ? '{dark}' : '{light}'", "background": rgba(color, 0.16),
-                    "border-radius": "10px", "padding": "2px 8px", "font-size": "12px", "font-weight": "600",
-                    "white-space": "nowrap"})
+    pill = {"display": "inline-flex", "align-items": "center", "gap": "4px",
+            "color": f"=themeOptions.dark === 'dark' ? '{dark}' : '{light}'", "background": rgba(color, 0.16),
+            "border-radius": "10px", "padding": "2px 8px", "font-size": "12px", "font-weight": "600",
+            "white-space": "nowrap"}
+    target = div([comp("f7-icon", {"f7": "scope", "size": 13}), label(setpoint)], **pill)
+    pills = [temperature, target]
+    if countdown:
+        secs, shown_ = countdown
+        target["config"]["visible"] = f"=!({shown_})"
+        pills.append(div([comp("f7-icon", {"f7": "timer", "size": 13}), label(f"={duration(None, secs)}")],
+                         visible=f"={shown_}", **pill))
     lines = []
     if runtime:
         since, what = runtime
@@ -3816,7 +3831,7 @@ def heat_tile(icon, title, on, color, value, setpoint, dark, light, runtime=None
                                 "style": {"font-size": "12px", "opacity": "0.75"}})]
     lines += [comp("Label", {"text": f"={text}", "visible": f"={visible}", "style": {"font-size": "12px", "opacity": "0.75"}})
               for text, visible in notes]
-    return tile([icon, label(title, **{"font-weight": "600"}), chips(temperature, target), *lines], None,
+    return tile([icon, label(title, **TILE_TITLE), chips(*pills), *lines], None,
                 hp_popup_link(TILE_LINK, "heatpump-quick"))
 
 
@@ -3843,7 +3858,10 @@ def heat_specs():
                  color=SPACE_C, value=f"={disp(HPX['supply'])}",
                  setpoint=f"={disp('espaltherma_leaving_water_setpoint')}", dark=SPACE_C, light="#e65100",
                  runtime=("heatpump_heating_since", "'Heizen'"),
-                 notes=[(f"'WW fertig um ' + {DHW_DONE} + ' · noch ' + {hm(DHW_LEFT)}", DHW_ETA_OK)])]
+                 # during a hot-water charge the time left in the setpoint's place, as a Miele machine's, and the end
+                 # under it (user, 2026-10-04)
+                 countdown=(f"({DHW_LEFT}) * 60", DHW_ETA_OK),
+                 notes=[(f"'Warmwasserladung · fertig ' + {DHW_DONE}", DHW_ETA_OK)])]
 
 
 def heating(tile=heat_tile):

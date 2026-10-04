@@ -1,44 +1,48 @@
 #!/bin/bash
-# every screenshot of the widget repository, into shots/v4/repo under the repository's names; needs the page
-# widget_gallery (widget_gallery.py writes it, to be POSTed to ui:page) and the SSH tunnel on 18080. The energy flow, the
+# every screenshot of the widget repository, into shots/v4/repo under the repository's names, in English as the
+# repository publishes the widgets: through ui_proxy.py on 18081 (in front of the SSH tunnel on 18080), which hands the
+# browser the English widgets and pages; needs the page widget_gallery (widget_gallery.py writes it, to be POSTed to
+# ui:page). The energy flow, the
 # heat pump card, the heating card, the consumption card and the weather page's warnings are shot with demo values (demo_flow.js,
 # demo_heatpump.js, demo_consumption.js, demo_weather.js), set in the browser only
 set -u
-B=http://127.0.0.1:18080/page
+B=${BASE:-http://127.0.0.1:18081}/page
 O=shots/v4; R=$O/repo; mkdir -p $O $R
 step() { echo "$(date +%T) $*"; }
 shot() { ls $O/$1-*-$2.png | head -1; }  # a card's screenshot by its title, whatever its place on the page
-step overview; python3 cdp_shot.py $B/overview $R/overview-light.png 16 1400 1621 >/dev/null
-python3 cdp_shot.py $B/overview $R/overview-dark.png 16 1400 1621 dark >/dev/null
-python3 cdp_shot.py $B/overview $R/overview-phone.png 16 390 1400 >/dev/null
+# the overview in its whole length, nothing cut off at the bottom (user, 2026-10-04)
+# 1600 px wide, where Consumption Today lists its consumers in two columns (user, 2026-10-04)
+step overview; python3 cdp_shot.py $B/overview $R/overview-light.png 16 1600 full >/dev/null
+python3 cdp_shot.py $B/overview $R/overview-dark.png 16 1600 full dark >/dev/null
+python3 cdp_shot.py $B/overview $R/overview-phone.png 16 390 full >/dev/null
 step cards; python3 cdp_cards.py $B/overview $O/ov 1400 >/dev/null
 python3 cdp_cards.py $B/overview $O/ovd 1400 dark >/dev/null
-cp $(shot ov haushaltsgeraete) $R/appliances-card.png; cp $(shot ov strompreis) $R/electricity-price-card.png
-cp $(shot ov schalter) $R/switches-card.png
-cp $(shot ov verbrauch-heute*) $R/consumption-card.png; cp $(shot ov energie-pro-tag) $R/energy-days-card.png
-cp $(shot ov pv-ertrag*) $R/pv-days-card.png; cp $(shot ov temperaturen) $R/temperatures-card.png
+cp $(shot ov appliances) $R/appliances-card.png; cp $(shot ov electricity-price) $R/electricity-price-card.png
+cp $(shot ov switches) $R/switches-card.png
+cp $(shot ov consumption-today*) $R/consumption-card.png; cp $(shot ov energy-per-day) $R/energy-days-card.png
+cp $(shot ov pv-yield*) $R/pv-days-card.png; cp $(shot ov temperatures) $R/temperatures-card.png
 cp $O/ov-0-card.png $R/weather-card.png; cp $O/ovd-0-card.png $R/weather-card-dark.png
 python3 cdp_cards_js.py $B/overview $O/ovcons 1400 light "$(cat demo_consumption.js)" >/dev/null
-cp $(shot ovcons verbrauch-heute*) $R/consumption-card.png
+cp $(shot ovcons consumption-today*) $R/consumption-card.png
+# every animated GIF also in dark mode, animated as well (user, 2026-10-04)
 step flow; PRE_JS=demo_flow.js FPS=20 python3 cdp_gif.py $B/overview 1 1400 $R/energy-flow-card.gif 6 light 1.5
-python3 cdp_cards_js.py $B/overview $O/ovdemo-dark 1400 dark "$(cat demo_flow.js)" >/dev/null
-cp $(shot ovdemo-dark energiefluss) $R/energy-flow-card-dark.png
+PRE_JS=demo_flow.js FPS=20 python3 cdp_gif.py $B/overview 1 1400 $R/energy-flow-card-dark.gif 6 dark 1.5
 step heatpump; PRE_JS=demo_heatpump.js FPS=20 python3 cdp_gif.py $B/overview 5 1400 $R/heatpump-card.gif 4 light 1
+PRE_JS=demo_heatpump.js FPS=20 python3 cdp_gif.py $B/overview 5 1400 $R/heatpump-card-dark.gif 4 dark 1
 python3 cdp_cards_js.py $B/overview $O/ovhp-dark 1400 dark "$(cat demo_heatpump.js)" >/dev/null
-cp $(shot ovhp-dark waermepumpe) $R/heatpump-card-dark.png
 # the heating card on the heat pump card's demo values: a space heating run, the tank not charging
 python3 cdp_cards_js.py $B/overview $O/ovhp 1400 light "$(cat demo_heatpump.js)" >/dev/null
-cp $(shot ovhp heizung-warmwasser) $R/heating-card.png; cp $(shot ovhp-dark heizung-warmwasser) $R/heating-card-dark.png
+cp $(shot ovhp heating-hot-water) $R/heating-card.png; cp $(shot ovhp-dark heating-hot-water) $R/heating-card-dark.png
 # the quick popups as the energy flow's nodes and the heat pump card's tiles open them, each as tall as its content
 step popups
-for spec in "Energiefluss|Wärmepumpe|true|heatpump-quick" "Energiefluss|Klimaanlage|true|air-conditioner-quick" \
-            "Energiefluss|Lüftung|true|ventilation-quick" "Wärmepumpe|Regelung|false|heatpump-control-quick" \
-            "Wärmepumpe|Innengerät|false|heatpump-indoor-quick" "Wärmepumpe|Außengerät|false|heatpump-outdoor-quick" \
-            "Wärmepumpe|Kältemittel|false|heatpump-refrigerant-quick" "Wärmepumpe|Heizkreis|false|heatpump-circuit-quick" \
-            "Wärmepumpe|Warmwasserspeicher|false|heatpump-tank-quick" "Wärmepumpe|3-Wege-Ventil|false|heatpump-valve-quick" \
-            "Wärmepumpe|Obergeschoss|false|upper-floor-quick" "Wärmepumpe|Erdgeschoss|false|ground-floor-quick" \
-            "Wärmepumpe|Elektrisch|false|heatpump-electric-quick" "Wärmepumpe|Wärme|false|heatpump-heat-quick" \
-            "Wärmepumpe|COP|false|heatpump-cop-quick"; do
+for spec in "Energy Flow|Heat Pump|true|heatpump-quick" "Energy Flow|Air Conditioner|true|air-conditioner-quick" \
+            "Energy Flow|Ventilation|true|ventilation-quick" "Heat Pump|Control|false|heatpump-control-quick" \
+            "Heat Pump|Indoor Unit|false|heatpump-indoor-quick" "Heat Pump|Outdoor Unit|false|heatpump-outdoor-quick" \
+            "Heat Pump|Refrigerant|false|heatpump-refrigerant-quick" "Heat Pump|Heating Circuit|false|heatpump-circuit-quick" \
+            "Heat Pump|Hot Water Tank|false|heatpump-tank-quick" "Heat Pump|3-Way Valve|false|heatpump-valve-quick" \
+            "Heat Pump|Upper Floor|false|upper-floor-quick" "Heat Pump|Ground Floor|false|ground-floor-quick" \
+            "Heat Pump|Electrical|false|heatpump-electric-quick" "Heat Pump|Heat|false|heatpump-heat-quick" \
+            "Heat Pump|COP|false|heatpump-cop-quick"; do
   IFS='|' read -r card title round name <<< "$spec"
   python3 cdp_elems.py $B/overview 1400 $O/quick "$(cat screenshot-js/quick_rect.js)('$name')" \
     "$(cat screenshot-js/quick.js)('$card', '$title', $round)" >/dev/null
@@ -58,7 +62,7 @@ for parts, out in ((('boost-dhw', 'boost-ac'), 'boost-pills'), (('slider-dhw', '
     a, b = (Image.open('$O/crops/' + p + '.png') for p in parts)
     s = Image.new('RGB', (max(a.size[0], b.size[0]), a.size[1] + b.size[1]), 'white'); s.paste(a, (0, 0)); s.paste(b, (0, a.size[1]))
     s.save('$R/' + out + '.png')"
-step popup; python3 cdp_tap.py $B/coffee_machine $R/item-popup.png "Energie heute"
+step popup; python3 cdp_tap.py $B/coffee_machine $R/item-popup.png "Energy today"
 # the weather page's warnings and forecast at phone width, one card under the other, the warnings on demo values
 step weather; python3 cdp_elems.py $B/weather 390 $O/weather "$(cat screenshot-js/forecast.js)" "$(cat demo_weather.js)" >/dev/null
 python3 cdp_elems.py $B/weather 390 $O/weather-dark "$(cat screenshot-js/forecast.js)" "$(cat demo_weather.js)" dark >/dev/null
@@ -70,5 +74,8 @@ cp $O/g900-6-switch-tile.png $R/switch-tiles.png
 FPS=20 python3 cdp_gif.py $B/widget_gallery 0 900 $R/flow-node.gif 6 light 1.5
 FPS=20 python3 cdp_gif.py $B/widget_gallery 1 900 $R/flow-link.gif 6 light 1.5
 FPS=20 python3 cdp_gif.py $B/widget_gallery 3 900 $R/appliance-icon.gif 4 light 1.5
+FPS=20 python3 cdp_gif.py $B/widget_gallery 0 900 $R/flow-node-dark.gif 6 dark 1.5
+FPS=20 python3 cdp_gif.py $B/widget_gallery 1 900 $R/flow-link-dark.gif 6 dark 1.5
+FPS=20 python3 cdp_gif.py $B/widget_gallery 3 900 $R/appliance-icon-dark.gif 4 dark 1.5
 fi
 step done; ls $R | wc -l

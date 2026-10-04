@@ -17,12 +17,12 @@ props:
     default: '#78909c'
   - name: onText
     label: Text while on
-    description: What the pill says while on, e.g. An · Lüften; usually an expression
+    description: What the pill says while on, e.g. On · Fan; usually an expression
     type: TEXT
     required: false
-    default: An
+    default: 'On'
   parameterGroups: []
-timestamp: Sep 27, 2026, 9:44:33 PM
+timestamp: Oct 4, 2026, 11:05:34 PM
 component: div
 config:
   style:
@@ -39,7 +39,7 @@ slots:
   default:
   - component: Label
     config:
-      text: '=items[props.item].state === ''ON'' ? (props.onText || ''An'') : ''Aus'''
+      text: '=items[props.item].state === ''ON'' ? (props.onText || ''On'') : ''Off'''
       style:
         width: 100%
         text-align: center

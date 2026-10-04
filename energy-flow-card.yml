@@ -4,295 +4,295 @@ tags:
 props:
   parameters:
   - name: pvPower
-    label: Wechselrichter Eingangsleistung
+    label: Huawei Inverter Input Power
     description: Number:Power item
     type: TEXT
     required: true
     context: item
   - name: gridPower
-    label: Stromzähler Wirkleistung
+    label: Huawei Inverter Power Meter Active Power
     description: Number:Power item
     type: TEXT
     required: true
     context: item
   - name: heatpumpPower
-    label: ESPAltherma Elektrische Leistung
+    label: ESPAltherma Electrical Power
     description: Number:Power item
     type: TEXT
     required: true
     context: item
   - name: acSwitch
-    label: Faikout Perfera Schalter
+    label: Faikout Perfera Switch
     description: Switch item
     type: TEXT
     required: true
     context: item
   - name: acUnitPower
-    label: Klimaanlage Geräteleistung
+    label: Air Conditioning Unit Power
     description: Number:Power item
     type: TEXT
     required: true
     context: item
   - name: ecarPower
-    label: E-Auto Leistung
+    label: E-Car Power
     description: Number:Power item
     type: TEXT
     required: true
     context: item
   - name: washingMachine1Power
-    label: Waschmaschine 1 Leistung
+    label: Washing Machine 1 Power
     description: Number:Power item
     type: TEXT
     required: true
     context: item
   - name: washingMachine2Power
-    label: Waschmaschine 2 Leistung
+    label: Washing Machine 2 Power
     description: Number:Power item
     type: TEXT
     required: true
     context: item
   - name: tumbleDryerPower
-    label: Wäschetrockner Leistung
+    label: Tumble Dryer Power
     description: Number:Power item
     type: TEXT
     required: true
     context: item
   - name: dishwasherPower
-    label: Geschirrspüler Leistung
+    label: Dishwasher Power
     description: Number:Power item
     type: TEXT
     required: true
     context: item
   - name: batteryPower
-    label: Batteriespeicher Leistung
+    label: Huawei Inverter Energy Storage Power
     description: Number:Power item
     type: TEXT
     required: true
     context: item
   - name: ventilationPower
-    label: Lüftung Leistung
+    label: Ventilation Power
     description: Number:Power item
     type: TEXT
     required: true
     context: item
   - name: batterySoc
-    label: Batteriespeicher Ladestand
+    label: Huawei Inverter Energy Storage SOC
     description: Number:Dimensionless item
     type: TEXT
     required: true
     context: item
   - name: heatpumpDhwEta
-    label: Wärmepumpe Warmwasser fertig um
+    label: Heatpump DHW Done At
     description: DateTime item
     type: TEXT
     required: true
     context: item
   - name: heatpumpDhwSince
-    label: Wärmepumpe Warmwasser lädt seit
+    label: Heatpump DHW Charging Since
     description: DateTime item
     type: TEXT
     required: true
     context: item
   - name: homePower
-    label: Haus Leistung
+    label: Home Active Power
     description: Number:Power item
     type: TEXT
     required: true
     context: item
   - name: acTimer
-    label: Klimaanlage Timer
+    label: Air Conditioning Timer
     description: Number:Time item
     type: TEXT
     required: true
     context: item
   - name: acTimerSet
-    label: Klimaanlage Timer eingestellt
+    label: Air Conditioning Timer Set
     description: Number:Time item
     type: TEXT
     required: true
     context: item
   - name: ventilationTimer
-    label: Lüftung Timer
+    label: Ventilation Timer
     description: Number:Time item
     type: TEXT
     required: true
     context: item
   - name: ventilationTimerSet
-    label: Lüftung Timer eingestellt
+    label: Ventilation Timer Set
     description: Number:Time item
     type: TEXT
     required: true
     context: item
   - name: heatpumpInvFrequency
-    label: ESPAltherma Verdichterfrequenz
+    label: ESPAltherma Inverter Frequency
     description: Number:Frequency item
     type: TEXT
     required: true
     context: item
   - name: heatpumpBuhStep1Mode
-    label: ESPAltherma Heizstab Stufe 1
+    label: ESPAltherma Backup Heater (BUH) Step 1 Mode
     description: Switch item
     type: TEXT
     required: true
     context: item
   - name: heatpumpBuhStep2Mode
-    label: ESPAltherma Heizstab Stufe 2
+    label: ESPAltherma Backup Heater (BUH) Step 2 Mode
     description: Switch item
     type: TEXT
     required: true
     context: item
   - name: heatpumpBshMode
-    label: ESPAltherma Zusatzheizung Speicher
+    label: ESPAltherma Booster Heater (BSH) Mode
     description: Switch item
     type: TEXT
     required: true
     context: item
   - name: heatpumpDefrostOperaton
-    label: ESPAltherma Abtauen
+    label: ESPAltherma Defrost Operation
     description: Switch item
     type: TEXT
     required: true
     context: item
   - name: heatpumpValve
-    label: ESPAltherma 3-Wege-Ventil
+    label: ESPAltherma 3-Way Valve Mode
     description: String item
     type: TEXT
     required: true
     context: item
   - name: acMode
-    label: Faikout Perfera Modus
+    label: Faikout Perfera Mode
     description: String item
     type: TEXT
     required: true
     context: item
   - name: ventilationLevel
-    label: ESPLyfterl Stufe
+    label: ESPLyfterl Level
     description: String item
     type: TEXT
     required: true
     context: item
   - name: pvEnergyToday
-    label: Wechselrichter Ertrag heute
+    label: Huawei Inverter E-Day
     description: Number:Energy item
     type: TEXT
     required: true
     context: item
   - name: gridImportToday
-    label: Stromzähler Bezug heute
+    label: Huawei Inverter Power Meter Ec-Day
     description: Number:Energy item
     type: TEXT
     required: true
     context: item
   - name: gridExportToday
-    label: Stromzähler Einspeisung heute
+    label: Huawei Inverter Power Meter Ep-Day
     description: Number:Energy item
     type: TEXT
     required: true
     context: item
   - name: heatpumpEnergyToday
-    label: ESPAltherma Energie heute
+    label: ESPAltherma Energy Today
     description: Number:Energy item
     type: TEXT
     required: true
     context: item
   - name: acUnitEnergyToday
-    label: Klimaanlage Geräteenergie heute
+    label: Air Conditioning Unit Energy Today
     description: Number:Energy item
     type: TEXT
     required: true
     context: item
   - name: ecarEnergyToday
-    label: E-Auto Energie heute
+    label: E-Car Energy Today
     description: Number:Energy item
     type: TEXT
     required: true
     context: item
   - name: washingMachine1EnergyToday
-    label: Waschmaschine 1 Energie heute
+    label: Washing Machine 1 Energy Today
     description: Number:Energy item
     type: TEXT
     required: true
     context: item
   - name: washingMachine2EnergyToday
-    label: Waschmaschine 2 Energie heute
+    label: Washing Machine 2 Energy Today
     description: Number:Energy item
     type: TEXT
     required: true
     context: item
   - name: tumbleDryerEnergyToday
-    label: Wäschetrockner Energie heute
+    label: Tumble Dryer Energy Today
     description: Number:Energy item
     type: TEXT
     required: true
     context: item
   - name: dishwasherEnergyToday
-    label: Geschirrspüler Energie heute
+    label: Dishwasher Energy Today
     description: Number:Energy item
     type: TEXT
     required: true
     context: item
   - name: batteryDischargeToday
-    label: Batteriespeicher Entladung heute
+    label: Huawei Inverter Energy Storage Day Discharge
     description: Number:Energy item
     type: TEXT
     required: true
     context: item
   - name: batteryChargeToday
-    label: Batteriespeicher Ladung heute
+    label: Huawei Inverter Energy Storage Day Charge
     description: Number:Energy item
     type: TEXT
     required: true
     context: item
   - name: pvSelfUseToday
-    label: Photovoltaik Eigenverbrauch heute
+    label: Photovoltaics Own Ec-Day
     description: Number:Energy item
     type: TEXT
     required: true
     context: item
   - name: pvPv1Power
-    label: Wechselrichter PV1 Leistung
+    label: Huawei Inverter PV1 Power
     description: Number:Power item
     type: TEXT
     required: true
     context: item
   - name: pvPv2Power
-    label: Wechselrichter PV2 Leistung
+    label: Huawei Inverter PV2 Power
     description: Number:Power item
     type: TEXT
     required: true
     context: item
   - name: priceTotalGross
-    label: Strompreis gesamt brutto
+    label: EPEX Spot aWATTar Total Gross
     description: Number:EnergyPrice item
     type: TEXT
     required: true
     context: item
   - name: batteryPower5min
-    label: Batteriespeicher Leistung 5 min
+    label: Energy Storage Power 5 min
     description: Number:Power item
     type: TEXT
     required: true
     context: item
   - name: homeEnergyToday
-    label: Haus Energie heute
+    label: Home Energy Day
     description: Number:Energy item
     type: TEXT
     required: true
     context: item
   - name: heatpumpWaterPumpOperation
-    label: ESPAltherma Umwälzpumpe
+    label: ESPAltherma Water Pump Operation
     description: Switch item
     type: TEXT
     required: true
     context: item
   - name: heatpumpFlowSensor
-    label: ESPAltherma Durchfluss
+    label: ESPAltherma Flow Sensor (l/min)
     description: Number:VolumetricFlowRate item
     type: TEXT
     required: true
     context: item
   - name: heatpumpHeatPower
-    label: ESPAltherma Heizleistung
+    label: ESPAltherma Heating Power
     description: Number:Power item
     type: TEXT
     required: true
@@ -304,37 +304,37 @@ props:
     required: true
     context: item
   - name: acTemperature
-    label: Faikout Perfera Temperatur
+    label: Faikout Perfera Temperature
     description: Number:Temperature item
     type: TEXT
     required: true
     context: item
   - name: acTemperatureSetpoint
-    label: Faikout Perfera Solltemperatur
+    label: Faikout Perfera Temperature Setpoint
     description: Number:Temperature item
     type: TEXT
     required: true
     context: item
   - name: netatmoWeatherstationCo2
-    label: Netatmo Wetterstation CO2
+    label: Netatmo Weatherstation CO2
     description: Number:Dimensionless item
     type: TEXT
     required: true
     context: item
   - name: netatmoWeatherstationAtmosphericHumidity
-    label: Netatmo Wetterstation Luftfeuchtigkeit
+    label: Netatmo Weatherstation Atmospheric Humidity
     description: Number:Dimensionless item
     type: TEXT
     required: true
     context: item
   - name: heatpumpDhwTankTemp
-    label: ESPAltherma Warmwasserspeicher Temperatur
+    label: ESPAltherma DHW Tank Temperature
     description: Number:Temperature item
     type: TEXT
     required: true
     context: item
   - name: heatpumpDhwBoost
-    label: Pyaltherma Warmwasser-Boost
+    label: Pyaltherma DHW Powerful
     description: Switch item
     type: TEXT
     required: true
@@ -346,37 +346,37 @@ props:
     required: true
     context: item
   - name: heatpumpClimateControlPower
-    label: Pyaltherma Heizung Ein/Aus
+    label: Pyaltherma Climate Control Power
     description: Switch item
     type: TEXT
     required: true
     context: item
   - name: heatpumpDhwPower
-    label: Pyaltherma Warmwasser Ein/Aus
+    label: Pyaltherma DHW Power
     description: Switch item
     type: TEXT
     required: true
     context: item
   - name: heatpumpManagement
-    label: Wärmepumpe Automatik
+    label: Heatpump Management
     description: Group item
     type: TEXT
     required: true
     context: item
   - name: heatpumpDhwTempHeating
-    label: Pyaltherma Warmwasser Solltemperatur
+    label: Pyaltherma DHW Temp Heating
     description: Number:Temperature item
     type: TEXT
     required: true
     context: item
   - name: heatpumpDhwManagement
-    label: Wärmepumpe Warmwasser-Automatik
+    label: Heatpump DHW Management
     description: Switch item
     type: TEXT
     required: true
     context: item
   - name: acFan
-    label: Faikout Perfera Lüfter
+    label: Faikout Perfera Fan
     description: String item
     type: TEXT
     required: true
@@ -388,16 +388,16 @@ props:
     required: true
     context: item
   - name: ventilationManagement
-    label: Lüftung Automatik
+    label: Ventilation Management
     description: Group item
     type: TEXT
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 4, 2026, 9:05:35 PM
+timestamp: Oct 4, 2026, 11:05:34 PM
 component: oh-card
 config:
-  title: Energiefluss
+  title: Energy Flow
   style:
     height: calc(100% - 2 * var(--f7-card-margin-vertical))
     display: flex
@@ -1688,8 +1688,7 @@ slots:
                 config:
                   x: 99.6
                   y: 73.4
-                  content: =(Math.abs((Number(items[props.pvPower].numericState) || 0)) / 1000).toFixed(3).replace('.', ',')
-                    + ' kW'
+                  content: =(Math.abs((Number(items[props.pvPower].numericState) || 0)) / 1000).toFixed(3) + ' kW'
                   fill: currentColor
                   font-size: 18
                   font-weight: '700'
@@ -1700,7 +1699,7 @@ slots:
                   x: 99.6
                   y: 90.4
                   content: '=([''NULL'', ''UNDEF''].includes(items[props.pvEnergyToday].state) ? ''–'' : (items[props.pvEnergyToday].displayState
-                    || items[props.pvEnergyToday].state)) + '' heute'''
+                    || items[props.pvEnergyToday].state)) + '' today'''
                   fill: currentColor
                   font-size: 12
                   font-weight: normal
@@ -1710,8 +1709,7 @@ slots:
                 config:
                   x: 305.6
                   y: 40.9
-                  content: =((Number(items[props.ventilationPower].numericState) || 0) / 1000).toFixed(3).replace('.', ',')
-                    + ' kW'
+                  content: =((Number(items[props.ventilationPower].numericState) || 0) / 1000).toFixed(3) + ' kW'
                   fill: currentColor
                   font-size: 18
                   font-weight: '700'
@@ -1724,7 +1722,7 @@ slots:
                   content: '=(Number(items[props.ventilationTimer].numericState) || 0) > 0 ? ''Timer '' + ((Number(items[props.ventilationTimer].numericState)
                     || 0) >= 60 ? Math.floor((Number(items[props.ventilationTimer].numericState) || 0) / 60) + '':'' + (Math.floor((Number(items[props.ventilationTimer].numericState)
                     || 0) % 60) < 10 ? ''0'' : '''') + Math.floor((Number(items[props.ventilationTimer].numericState) || 0)
-                    % 60) + '' h'' : Math.round((Number(items[props.ventilationTimer].numericState) || 0)) + '' min'') : (''Stufe
+                    % 60) + '' h'' : Math.round((Number(items[props.ventilationTimer].numericState) || 0)) + '' min'') : (''Level
                     '' + ([''NULL'', ''UNDEF''].includes(items[props.ventilationLevel].state) ? ''–'' : (items[props.ventilationLevel].displayState
                     || items[props.ventilationLevel].state)))'
                   fill: '=(Number(items[props.ventilationTimer].numericState) || 0) > 0 ? ''#26a69a'' : ''currentColor'''
@@ -1736,7 +1734,7 @@ slots:
                 config:
                   x: 73.6
                   y: 240.5
-                  content: =((Number(items[props.gridPower].numericState) || 0) / 1000).toFixed(3).replace('.', ',') + ' kW'
+                  content: =((Number(items[props.gridPower].numericState) || 0) / 1000).toFixed(3) + ' kW'
                   fill: currentColor
                   font-size: 18
                   font-weight: '700'
@@ -1746,9 +1744,8 @@ slots:
                 config:
                   x: 73.6
                   y: 256.5
-                  content: ='Bezug ' + ((Number(items[props.gridImportToday].numericState) || 0)).toFixed(2).replace('.',
-                    ',') + ' · Einsp. ' + ((Number(items[props.gridExportToday].numericState) || 0)).toFixed(2).replace('.',
-                    ',')
+                  content: ='Import ' + ((Number(items[props.gridImportToday].numericState) || 0)).toFixed(2) + ' · Export
+                    ' + ((Number(items[props.gridExportToday].numericState) || 0)).toFixed(2)
                   fill: currentColor
                   font-size: 12
                   font-weight: normal
@@ -1758,8 +1755,7 @@ slots:
                 config:
                   x: 382.7
                   y: 161.9
-                  content: =(Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) / 1000).toFixed(3).replace('.',
-                    ',') + ' kW'
+                  content: =(Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) / 1000).toFixed(3) + ' kW'
                   fill: currentColor
                   font-size: 18
                   font-weight: '700'
@@ -1769,8 +1765,7 @@ slots:
                 config:
                   x: 382.7
                   y: 177.9
-                  content: ='' + ((Number(items[props.heatpumpEnergyToday].numericState) || 0)).toFixed(2).replace('.', ',')
-                    + ' kWh heute'
+                  content: ='' + ((Number(items[props.heatpumpEnergyToday].numericState) || 0)).toFixed(2) + ' kWh today'
                   fill: currentColor
                   font-size: 12
                   font-weight: normal
@@ -1780,8 +1775,7 @@ slots:
                 config:
                   x: 410.2
                   y: 287.9
-                  content: =((Number(items[props.acUnitPower].numericState) || 0) / 1000).toFixed(3).replace('.', ',') + '
-                    kW'
+                  content: =((Number(items[props.acUnitPower].numericState) || 0) / 1000).toFixed(3) + ' kW'
                   fill: currentColor
                   font-size: 18
                   font-weight: '700'
@@ -1795,7 +1789,7 @@ slots:
                     || 0) >= 60 ? Math.floor((Number(items[props.acTimer].numericState) || 0) / 60) + '':'' + (Math.floor((Number(items[props.acTimer].numericState)
                     || 0) % 60) < 10 ? ''0'' : '''') + Math.floor((Number(items[props.acTimer].numericState) || 0) % 60) +
                     '' h'' : Math.round((Number(items[props.acTimer].numericState) || 0)) + '' min'') : ('''' + ((Number(items[props.acUnitEnergyToday].numericState)
-                    || 0)).toFixed(2).replace(''.'', '','') + '' kWh heute'')'
+                    || 0)).toFixed(2) + '' kWh today'')'
                   fill: '=(Number(items[props.acTimer].numericState) || 0) > 0 ? ''#29b6f6'' : ''currentColor'''
                   font-size: 12
                   font-weight: normal
@@ -1805,8 +1799,7 @@ slots:
                 config:
                   x: 344.2
                   y: 400.0
-                  content: =(Math.abs((Number(items[props.ecarPower].numericState) || 0)) / 1000).toFixed(3).replace('.',
-                    ',') + ' kW'
+                  content: =(Math.abs((Number(items[props.ecarPower].numericState) || 0)) / 1000).toFixed(3) + ' kW'
                   fill: currentColor
                   font-size: 18
                   font-weight: '700'
@@ -1816,8 +1809,7 @@ slots:
                 config:
                   x: 344.2
                   y: 416.0
-                  content: ='' + ((Number(items[props.ecarEnergyToday].numericState) || 0)).toFixed(2).replace('.', ',') +
-                    ' kWh heute'
+                  content: ='' + ((Number(items[props.ecarEnergyToday].numericState) || 0)).toFixed(2) + ' kWh today'
                   fill: currentColor
                   font-size: 12
                   font-weight: normal
@@ -1829,7 +1821,7 @@ slots:
                   y: 432.5
                   content: =(((Number(items[props.washingMachine1Power].numericState) || 0) + (Number(items[props.washingMachine2Power].numericState)
                     || 0) + (Number(items[props.tumbleDryerPower].numericState) || 0) + (Number(items[props.dishwasherPower].numericState)
-                    || 0)) / 1000).toFixed(3).replace('.', ',') + ' kW'
+                    || 0)) / 1000).toFixed(3) + ' kW'
                   fill: currentColor
                   font-size: 18
                   font-weight: '700'
@@ -1841,7 +1833,7 @@ slots:
                   y: 448.5
                   content: ='' + (((Number(items[props.washingMachine1EnergyToday].numericState) || 0) + (Number(items[props.washingMachine2EnergyToday].numericState)
                     || 0) + (Number(items[props.tumbleDryerEnergyToday].numericState) || 0) + (Number(items[props.dishwasherEnergyToday].numericState)
-                    || 0))).toFixed(2).replace('.', ',') + ' kWh heute'
+                    || 0))).toFixed(2) + ' kWh today'
                   fill: currentColor
                   font-size: 12
                   font-weight: normal
@@ -1851,8 +1843,7 @@ slots:
                 config:
                   x: 106.1
                   y: 366.5
-                  content: =((Number(items[props.batteryPower].numericState) || 0) / 1000).toFixed(3).replace('.', ',') +
-                    ' kW'
+                  content: =((Number(items[props.batteryPower].numericState) || 0) / 1000).toFixed(3) + ' kW'
                   fill: currentColor
                   font-size: 18
                   font-weight: '700'
@@ -1862,9 +1853,8 @@ slots:
                 config:
                   x: 106.1
                   y: 382.5
-                  content: ='Entl. ' + ((Number(items[props.batteryDischargeToday].numericState) || 0)).toFixed(2).replace('.',
-                    ',') + ' · Gel. ' + ((Number(items[props.batteryChargeToday].numericState) || 0)).toFixed(2).replace('.',
-                    ',')
+                  content: ='Disch. ' + ((Number(items[props.batteryDischargeToday].numericState) || 0)).toFixed(2) + ' ·
+                    Chg. ' + ((Number(items[props.batteryChargeToday].numericState) || 0)).toFixed(2)
                   fill: currentColor
                   font-size: 12
                   font-weight: normal
@@ -1887,7 +1877,7 @@ slots:
                     config:
                       x: 197.8
                       y: 61.4
-                      content: Photovoltaik
+                      content: Photovoltaics
                       fill: '#ffb300'
                       font-size: 13
                       font-weight: '700'
@@ -1895,7 +1885,7 @@ slots:
                     config:
                       x: 197.8
                       y: 79.4
-                      content: Eigenverbrauch
+                      content: Self-consumption
                       fill: currentColor
                       opacity: '0.7'
                       font-size: 12
@@ -1921,9 +1911,8 @@ slots:
                     config:
                       x: 349.8
                       y: 96.4
-                      content: =((Number(items[props.pvPv1Power].numericState) || 0) / 1000).toFixed(2).replace('.', ',')
-                        + ' · ' + ((Number(items[props.pvPv2Power].numericState) || 0) / 1000).toFixed(2).replace('.', ',')
-                        + ' kW'
+                      content: =((Number(items[props.pvPv1Power].numericState) || 0) / 1000).toFixed(2) + ' · ' + ((Number(items[props.pvPv2Power].numericState)
+                        || 0) / 1000).toFixed(2) + ' kW'
                       fill: currentColor
                       font-size: 12
                       font-weight: '700'
@@ -1945,7 +1934,7 @@ slots:
                     config:
                       x: 131.8
                       y: 182.0
-                      content: Stromzähler
+                      content: Power Meter
                       fill: '#e53935'
                       font-size: 13
                       font-weight: '700'
@@ -1953,7 +1942,7 @@ slots:
                     config:
                       x: 131.8
                       y: 200.0
-                      content: Strompreis
+                      content: Electricity Price
                       fill: currentColor
                       opacity: '0.7'
                       font-size: 12
@@ -1984,7 +1973,7 @@ slots:
                     config:
                       x: 164.3
                       y: 291.0
-                      content: Batteriespeicher
+                      content: Battery
                       fill: '#7cb342'
                       font-size: 13
                       font-weight: '700'
@@ -1993,8 +1982,8 @@ slots:
                       x: 164.3
                       y: 309.0
                       content: '=(((Number(items[props.batteryPower5min].numericState) || 0) < -50) || ((Number(items[props.batteryPower5min].numericState)
-                        || 0) > 50)) ? (((Number(items[props.batteryPower5min].numericState) || 0) < -50) ? ''Voll in'' :
-                        ''Leer in'') : ''Akku'''
+                        || 0) > 50)) ? (((Number(items[props.batteryPower5min].numericState) || 0) < -50) ? ''Full in'' :
+                        ''Empty in'') : ''Battery'''
                       fill: currentColor
                       opacity: '0.7'
                       font-size: 12
@@ -2003,11 +1992,11 @@ slots:
                       x: 316.3
                       y: 309.0
                       content: '=(((Number(items[props.batteryPower5min].numericState) || 0) < -50) || ((Number(items[props.batteryPower5min].numericState)
-                        || 0) > 50)) ? ((m) => m >= 2880 ? ''über 2 Tage'' : m < 60 ? Math.max(1, m) + '' min'' : Math.floor(m
+                        || 0) > 50)) ? ((m) => m >= 2880 ? ''over 2 days'' : m < 60 ? Math.max(1, m) + '' min'' : Math.floor(m
                         / 60) + '':'' + (''0'' + m % 60).slice(-2) + '' h'')(Math.round((((Number(items[props.batteryPower5min].numericState)
                         || 0) < -50) ? Math.max(0, 100 - (Number(items[props.batterySoc].numericState) || 0)) * 0.07 / (-(Number(items[props.batteryPower5min].numericState)
                         || 0) / 1000) : Math.max(0, (Number(items[props.batterySoc].numericState) || 0) - 3) * 0.07 / ((Number(items[props.batteryPower5min].numericState)
-                        || 0) / 1000)) * 60)) : ''ruht'''
+                        || 0) / 1000)) * 60)) : ''idle'''
                       fill: currentColor
                       font-size: 12
                       font-weight: '700'
@@ -2017,8 +2006,8 @@ slots:
                       x: 164.3
                       y: 326.0
                       content: '=(((Number(items[props.batteryPower5min].numericState) || 0) < -50) || ((Number(items[props.batteryPower5min].numericState)
-                        || 0) > 50)) ? (((Number(items[props.batteryPower5min].numericState) || 0) < -50) ? ''Voll um'' :
-                        ''Leer um'') : '''''
+                        || 0) > 50)) ? (((Number(items[props.batteryPower5min].numericState) || 0) < -50) ? ''Full at'' :
+                        ''Empty at'') : '''''
                       fill: currentColor
                       opacity: '0.7'
                       font-size: 12
@@ -2031,7 +2020,7 @@ slots:
                         : dayjs().add(m, ''minute'').format(''dd HH:mm''))(Math.round((((Number(items[props.batteryPower5min].numericState)
                         || 0) < -50) ? Math.max(0, 100 - (Number(items[props.batterySoc].numericState) || 0)) * 0.07 / (-(Number(items[props.batteryPower5min].numericState)
                         || 0) / 1000) : Math.max(0, (Number(items[props.batterySoc].numericState) || 0) - 3) * 0.07 / ((Number(items[props.batteryPower5min].numericState)
-                        || 0) / 1000)) * 60)) + '' Uhr'' : '''''
+                        || 0) / 1000)) * 60)) : '''''
                       fill: currentColor
                       font-size: 12
                       font-weight: '700'
@@ -2048,8 +2037,7 @@ slots:
                     config:
                       x: 316.3
                       y: 343.0
-                      content: =((Number(items[props.batteryPower5min].numericState) || 0) / 1000).toFixed(2).replace('.',
-                        ',') + ' kW'
+                      content: =((Number(items[props.batteryPower5min].numericState) || 0) / 1000).toFixed(2) + ' kW'
                       fill: currentColor
                       font-size: 12
                       font-weight: '700'
@@ -2071,7 +2059,7 @@ slots:
                     config:
                       x: 300.1
                       y: 205.7
-                      content: Haus
+                      content: Home
                       fill: '#1e88e5'
                       font-size: 13
                       font-weight: '700'
@@ -2079,7 +2067,7 @@ slots:
                     config:
                       x: 300.1
                       y: 223.7
-                      content: Aus PV heute
+                      content: From PV today
                       fill: currentColor
                       opacity: '0.7'
                       font-size: 12
@@ -2112,7 +2100,7 @@ slots:
                     config:
                       x: 167.4
                       y: 86.4
-                      content: Wärmepumpe
+                      content: Heat Pump
                       fill: '#fb8c00'
                       font-size: 13
                       font-weight: '700'
@@ -2120,7 +2108,7 @@ slots:
                     config:
                       x: 167.4
                       y: 104.4
-                      content: Betrieb
+                      content: Operation
                       fill: currentColor
                       opacity: '0.7'
                       font-size: 12
@@ -2128,9 +2116,9 @@ slots:
                     config:
                       x: 319.4
                       y: 104.4
-                      content: '=(items[props.heatpumpDefrostOperaton].state === ''ON'' ? ''Abtauen'' : (Number(items[props.heatpumpInvFrequency].numericState)
+                      content: '=(items[props.heatpumpDefrostOperaton].state === ''ON'' ? ''Defrost'' : (Number(items[props.heatpumpInvFrequency].numericState)
                         || 0) > 0 || (items[props.heatpumpWaterPumpOperation].state === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState)
-                        || 0) > 0) ? (items[props.heatpumpValve].state === ''DHW'' ? ''Warmwasser'' : ''Heizung'') : ''Bereit'')'
+                        || 0) > 0) ? (items[props.heatpumpValve].state === ''DHW'' ? ''Hot water'' : ''Heating'') : ''Ready'')'
                       fill: currentColor
                       font-size: 12
                       font-weight: '700'
@@ -2139,7 +2127,7 @@ slots:
                     config:
                       x: 167.4
                       y: 121.4
-                      content: Wärme
+                      content: Heat
                       fill: currentColor
                       opacity: '0.7'
                       font-size: 12
@@ -2148,7 +2136,7 @@ slots:
                       x: 319.4
                       y: 121.4
                       content: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpHeatPower].state) ? ''–'' : ((Number(items[props.heatpumpHeatPower].numericState)
-                        || 0) / 1000).toFixed(2).replace(''.'', '','') + '' kW'')'
+                        || 0) / 1000).toFixed(2) + '' kW'')'
                       fill: currentColor
                       font-size: 12
                       font-weight: '700'
@@ -2166,7 +2154,7 @@ slots:
                       x: 319.4
                       y: 138.4
                       content: '=(Number(items[props.heatpumpCop].numericState) || 0) > 0 ? ((Number(items[props.heatpumpCop].numericState)
-                        || 0)).toFixed(2).replace(''.'', '','') : ''–'''
+                        || 0)).toFixed(2) : ''–'''
                       fill: currentColor
                       font-size: 12
                       font-weight: '700'
@@ -2190,7 +2178,7 @@ slots:
                     config:
                       x: 167.4
                       y: 69.4
-                      content: Wärmepumpe
+                      content: Heat Pump
                       fill: '#fb8c00'
                       font-size: 13
                       font-weight: '700'
@@ -2198,7 +2186,7 @@ slots:
                     config:
                       x: 167.4
                       y: 87.4
-                      content: Betrieb
+                      content: Operation
                       fill: currentColor
                       opacity: '0.7'
                       font-size: 12
@@ -2206,9 +2194,9 @@ slots:
                     config:
                       x: 319.4
                       y: 87.4
-                      content: '=(items[props.heatpumpDefrostOperaton].state === ''ON'' ? ''Abtauen'' : (Number(items[props.heatpumpInvFrequency].numericState)
+                      content: '=(items[props.heatpumpDefrostOperaton].state === ''ON'' ? ''Defrost'' : (Number(items[props.heatpumpInvFrequency].numericState)
                         || 0) > 0 || (items[props.heatpumpWaterPumpOperation].state === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState)
-                        || 0) > 0) ? (items[props.heatpumpValve].state === ''DHW'' ? ''Warmwasser'' : ''Heizung'') : ''Bereit'')'
+                        || 0) > 0) ? (items[props.heatpumpValve].state === ''DHW'' ? ''Hot water'' : ''Heating'') : ''Ready'')'
                       fill: currentColor
                       font-size: 12
                       font-weight: '700'
@@ -2217,7 +2205,7 @@ slots:
                     config:
                       x: 167.4
                       y: 104.4
-                      content: Fertig in
+                      content: Done in
                       fill: currentColor
                       opacity: '0.7'
                       font-size: 12
@@ -2239,7 +2227,7 @@ slots:
                     config:
                       x: 167.4
                       y: 121.4
-                      content: Fertig um
+                      content: Done at
                       fill: currentColor
                       opacity: '0.7'
                       font-size: 12
@@ -2247,7 +2235,7 @@ slots:
                     config:
                       x: 319.4
                       y: 121.4
-                      content: =dayjs(items[props.heatpumpDhwEta].state).format('HH:mm') + ' Uhr'
+                      content: =dayjs(items[props.heatpumpDhwEta].state).format('HH:mm')
                       fill: currentColor
                       font-size: 12
                       font-weight: '700'
@@ -2256,7 +2244,7 @@ slots:
                     config:
                       x: 167.4
                       y: 138.4
-                      content: Wärme
+                      content: Heat
                       fill: currentColor
                       opacity: '0.7'
                       font-size: 12
@@ -2265,7 +2253,7 @@ slots:
                       x: 319.4
                       y: 138.4
                       content: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpHeatPower].state) ? ''–'' : ((Number(items[props.heatpumpHeatPower].numericState)
-                        || 0) / 1000).toFixed(2).replace(''.'', '','') + '' kW'')'
+                        || 0) / 1000).toFixed(2) + '' kW'')'
                       fill: currentColor
                       font-size: 12
                       font-weight: '700'
@@ -2283,7 +2271,7 @@ slots:
                       x: 319.4
                       y: 155.4
                       content: '=(Number(items[props.heatpumpCop].numericState) || 0) > 0 ? ((Number(items[props.heatpumpCop].numericState)
-                        || 0)).toFixed(2).replace(''.'', '','') : ''–'''
+                        || 0)).toFixed(2) : ''–'''
                       fill: currentColor
                       font-size: 12
                       font-weight: '700'
@@ -2305,7 +2293,7 @@ slots:
                     config:
                       x: 199.9
                       y: 220.9
-                      content: Klimaanlage
+                      content: Air Conditioner
                       fill: '#29b6f6'
                       font-size: 13
                       font-weight: '700'
@@ -2313,7 +2301,7 @@ slots:
                     config:
                       x: 199.9
                       y: 238.9
-                      content: Betrieb
+                      content: Operation
                       fill: currentColor
                       opacity: '0.7'
                       font-size: 12
@@ -2322,7 +2310,7 @@ slots:
                       x: 351.9
                       y: 238.9
                       content: '=items[props.acSwitch].state === ''ON'' ? ([''NULL'', ''UNDEF''].includes(items[props.acMode].state)
-                        ? ''–'' : (items[props.acMode].displayState || items[props.acMode].state)) : ''Aus'''
+                        ? ''–'' : (items[props.acMode].displayState || items[props.acMode].state)) : ''Off'''
                       fill: currentColor
                       font-size: 12
                       font-weight: '700'
@@ -2331,7 +2319,7 @@ slots:
                     config:
                       x: 199.9
                       y: 255.9
-                      content: Raum · Soll
+                      content: Room · Target
                       fill: currentColor
                       opacity: '0.7'
                       font-size: 12
@@ -2363,7 +2351,7 @@ slots:
                     config:
                       x: 133.9
                       y: 341.5
-                      content: E-Auto
+                      content: E-Car
                       fill: '#26a69a'
                       font-size: 13
                       font-weight: '700'
@@ -2379,7 +2367,7 @@ slots:
                     config:
                       x: 285.9
                       y: 359.5
-                      content: '=(Number(items[props.ecarPower].numericState) || 0) > 500 ? ''lädt'' : ''lädt nicht'''
+                      content: '=(Number(items[props.ecarPower].numericState) || 0) > 500 ? ''charging'' : ''not charging'''
                       fill: currentColor
                       font-size: 12
                       font-weight: '700'
@@ -2401,7 +2389,7 @@ slots:
                     config:
                       x: 276.4
                       y: 374.0
-                      content: Haushaltsgeräte
+                      content: Appliances
                       fill: '#5c6bc0'
                       font-size: 13
                       font-weight: '700'
@@ -2409,7 +2397,7 @@ slots:
                     config:
                       x: 276.4
                       y: 392.0
-                      content: Läuft
+                      content: Running
                       fill: currentColor
                       opacity: '0.7'
                       font-size: 12
@@ -2417,9 +2405,9 @@ slots:
                     config:
                       x: 496.4
                       y: 392.0
-                      content: '=((r) => r.length ? r.join('', '') : ''nichts'')([[(Number(items[props.washingMachine1Power].numericState)
+                      content: '=((r) => r.length ? r.join('', '') : ''nothing'')([[(Number(items[props.washingMachine1Power].numericState)
                         || 0), ''WM 1''], [(Number(items[props.washingMachine2Power].numericState) || 0), ''WM 2''], [(Number(items[props.tumbleDryerPower].numericState)
-                        || 0), ''Trockner''], [(Number(items[props.dishwasherPower].numericState) || 0), ''Geschirrspüler'']].filter((m)
+                        || 0), ''Dryer''], [(Number(items[props.dishwasherPower].numericState) || 0), ''Dishwasher'']].filter((m)
                         => m[0] > 10).map((m) => m[1]))'
                       fill: currentColor
                       font-size: 12
@@ -2442,7 +2430,7 @@ slots:
                     config:
                       x: 323.9
                       y: 28.9
-                      content: Lüftung
+                      content: Ventilation
                       fill: '#26a69a'
                       font-size: 13
                       font-weight: '700'
@@ -2468,7 +2456,7 @@ slots:
                     config:
                       x: 323.9
                       y: 63.9
-                      content: Luftfeuchtigkeit
+                      content: Humidity
                       fill: currentColor
                       opacity: '0.7'
                       font-size: 12
@@ -2733,8 +2721,8 @@ slots:
                           default:
                           - component: Label
                             config:
-                              text: =(Math.abs((Number(items[props.homePower].numericState) || 0)) / 1000).toFixed(3).replace('.',
-                                ',') + ' kW'
+                              text: =(Math.abs((Number(items[props.homePower].numericState) || 0)) / 1000).toFixed(3) + '
+                                kW'
                               style:
                                 font-size: 16px
                                 font-weight: '700'
@@ -2742,8 +2730,7 @@ slots:
                                 white-space: nowrap
                           - component: Label
                             config:
-                              text: ='' + ((Number(items[props.homeEnergyToday].numericState) || 0)).toFixed(2).replace('.',
-                                ',') + ' kWh heute'
+                              text: ='' + ((Number(items[props.homeEnergyToday].numericState) || 0)).toFixed(2) + ' kWh today'
                               style:
                                 font-size: 11px
                                 opacity: '0.7'
@@ -2803,7 +2790,7 @@ slots:
                         config:
                           x: 24
                           y: 25
-                          title: Eigenverbrauch
+                          title: Self-consumption
                           part: =(Number(items[props.pvSelfUseToday].numericState) || 0)
                           whole: =(Number(items[props.pvEnergyToday].numericState) || 0)
               - component: oh-link
@@ -2861,7 +2848,7 @@ slots:
                         config:
                           x: 24
                           y: 25
-                          title: Autarkie
+                          title: Self-sufficiency
                           part: =(Number(items[props.pvSelfUseToday].numericState) || 0)
                           whole: =(Number(items[props.homeEnergyToday].numericState) || 0)
               - component: oh-link

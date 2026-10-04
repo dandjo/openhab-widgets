@@ -4,7 +4,7 @@
   const st = document.querySelector("#app").__vue_app__.config.globalProperties.$pinia._s.get("states");
   st.stopTrackingStates();
   const q = (v, unit, digits) => ({ state: `${v} ${unit}`, numericState: v, unit, type: "Quantity",
-    displayState: `${v.toFixed(digits).replace(".", ",")} ${unit}` });
+    displayState: `${v.toFixed(digits)} ${unit}` });  // English, as the repository's screenshots
   const demo = {
     huawei_inverter_input_power: q(6240, "W", 0), huawei_inverter_power_meter_active_power: q(-870, "W", 0),
     huawei_inverter_energy_storage_power: q(-1480, "W", 0), huawei_inverter_energy_storage_soc: q(64, "%", 0),

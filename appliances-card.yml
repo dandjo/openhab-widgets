@@ -4,136 +4,136 @@ tags:
 props:
   parameters:
   - name: washer1ProgramProgress
-    label: Miele Waschmaschine WWG360 Fortschritt
+    label: Miele Washing Machine WWG360 Program Progress
     description: Number:Dimensionless item
     type: TEXT
     required: true
     context: item
   - name: washer1OperationState
-    label: Miele Waschmaschine WWG360 Status
+    label: Miele Washing Machine WWG360 Operation State
     description: String item
     type: TEXT
     required: true
     context: item
   - name: washer1ActiveProgram
-    label: Miele Waschmaschine WWG360 Programm
+    label: Miele Washing Machine WWG360 Active Program
     description: String item
     type: TEXT
     required: true
     context: item
   - name: washer1ProgramPhase
-    label: Miele Waschmaschine WWG360 Programmphase
+    label: Miele Washing Machine WWG360 Program Phase
     description: String item
     type: TEXT
     required: true
     context: item
   - name: washer1ProgramFinishedTime
-    label: Miele Waschmaschine WWG360 Fertig um
+    label: Miele Washing Machine WWG360 Program Finished Time
     description: DateTime item
     type: TEXT
     required: true
     context: item
   - name: washer1ProgramRemainingTime
-    label: Miele Waschmaschine WWG360 Restzeit
+    label: Miele Washing Machine WWG360 Program Remaining Time
     description: Number item
     type: TEXT
     required: true
     context: item
   - name: washingMachine2Power
-    label: Waschmaschine 2 Leistung
+    label: Washing Machine 2 Power
     description: Number:Power item
     type: TEXT
     required: true
     context: item
   - name: washingMachine2Finished
-    label: Waschmaschine 2 Fertig
+    label: Washing Machine 2 Finished
     description: Switch item
     type: TEXT
     required: true
     context: item
   - name: washingMachine2Since
-    label: Waschmaschine 2 läuft seit
+    label: Washing Machine 2 Running Since
     description: DateTime item
     type: TEXT
     required: true
     context: item
   - name: dryerProgramProgress
-    label: Miele Wäschetrockner TWC560WP Fortschritt
+    label: Miele Tumble Dryer TWC560WP Program Progress
     description: Number:Dimensionless item
     type: TEXT
     required: true
     context: item
   - name: dryerOperationState
-    label: Miele Wäschetrockner TWC560WP Status
+    label: Miele Tumble Dryer TWC560WP Operation State
     description: String item
     type: TEXT
     required: true
     context: item
   - name: dryerActiveProgram
-    label: Miele Wäschetrockner TWC560WP Programm
+    label: Miele Tumble Dryer TWC560WP Active Program
     description: String item
     type: TEXT
     required: true
     context: item
   - name: dryerProgramPhase
-    label: Miele Wäschetrockner TWC560WP Programmphase
+    label: Miele Tumble Dryer TWC560WP Program Phase
     description: String item
     type: TEXT
     required: true
     context: item
   - name: dryerProgramFinishedTime
-    label: Miele Wäschetrockner TWC560WP Fertig um
+    label: Miele Tumble Dryer TWC560WP Program Finished Time
     description: DateTime item
     type: TEXT
     required: true
     context: item
   - name: dryerProgramRemainingTime
-    label: Miele Wäschetrockner TWC560WP Restzeit
+    label: Miele Tumble Dryer TWC560WP Program Remaining Time
     description: Number item
     type: TEXT
     required: true
     context: item
   - name: dishwasherProgramProgress
-    label: Miele Geschirrspüler G7465 Fortschritt
+    label: Miele Dishwasher G7465 Program Progress
     description: Number:Dimensionless item
     type: TEXT
     required: true
     context: item
   - name: dishwasherOperationState
-    label: Miele Geschirrspüler G7465 Status
+    label: Miele Dishwasher G7465 Operation State
     description: String item
     type: TEXT
     required: true
     context: item
   - name: dishwasherActiveProgram
-    label: Miele Geschirrspüler G7465 Programm
+    label: Miele Dishwasher G7465 Active Program
     description: String item
     type: TEXT
     required: true
     context: item
   - name: dishwasherProgramPhase
-    label: Miele Geschirrspüler G7465 Programmphase
+    label: Miele Dishwasher G7465 Program Phase
     description: String item
     type: TEXT
     required: true
     context: item
   - name: dishwasherProgramFinishedTime
-    label: Miele Geschirrspüler G7465 Fertig um
+    label: Miele Dishwasher G7465 Program Finished Time
     description: DateTime item
     type: TEXT
     required: true
     context: item
   - name: dishwasherProgramRemainingTime
-    label: Miele Geschirrspüler G7465 Restzeit
+    label: Miele Dishwasher G7465 Program Remaining Time
     description: Number item
     type: TEXT
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 4, 2026, 9:05:35 PM
+timestamp: Oct 4, 2026, 11:05:34 PM
 component: oh-card
 config:
-  title: Haushaltsgeräte
+  title: Appliances
   style:
     height: calc(100% - 2 * var(--f7-card-margin-vertical))
     display: flex
@@ -158,7 +158,7 @@ slots:
       - component: widget:appliance-tile
         config:
           kind: washer
-          title: Waschmaschine 1
+          title: Washing Machine 1
           popup: washing_machine_1
           progress: =props.washer1ProgramProgress
           state: =props.washer1OperationState
@@ -169,7 +169,7 @@ slots:
       - component: widget:appliance-tile
         config:
           kind: washer
-          title: Waschmaschine 2
+          title: Washing Machine 2
           popup: washing_machine_2
           power: =props.washingMachine2Power
           done: =props.washingMachine2Finished
@@ -177,7 +177,7 @@ slots:
       - component: widget:appliance-tile
         config:
           kind: dryer
-          title: Wäschetrockner
+          title: Tumble Dryer
           popup: tumble_dryer
           progress: =props.dryerProgramProgress
           state: =props.dryerOperationState
@@ -188,7 +188,7 @@ slots:
       - component: widget:appliance-tile
         config:
           kind: dish-washer
-          title: Geschirrspüler
+          title: Dishwasher
           popup: dishwasher
           progress: =props.dishwasherProgramProgress
           state: =props.dishwasherOperationState

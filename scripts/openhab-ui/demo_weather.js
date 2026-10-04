@@ -6,9 +6,9 @@
   st.stopTrackingStates();
   const now = Math.floor(Date.now() / 3600000) * 3600;
   const list = JSON.stringify([
-    { type: "Gewitter", level: 2, start: now - 3600, end: now + 6 * 3600,
-      text: "Gewitter mit Starkregen, Hagel und Sturmböen. Lokal sind Überflutungen möglich." },
-    { type: "Wind", level: 1, start: now + 20 * 3600, end: now + 32 * 3600, text: "Sturmböen bis 70 km/h." },
+    { type: "Thunderstorm", level: 2, start: now - 3600, end: now + 6 * 3600,
+      text: "Thunderstorms with heavy rain, hail and gale-force gusts. Local flooding possible." },
+    { type: "Wind", level: 1, start: now + 20 * 3600, end: now + 32 * 3600, text: "Gale-force gusts up to 70 km/h." },
   ]);
   const text = (s) => ({ state: s, displayState: s, type: "String" });
   await new Promise(r => setTimeout(r, 500));

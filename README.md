@@ -3,8 +3,10 @@
 MainUI widgets from my openHAB 5 installation: the cards of an energy and home dashboard and the parts they are built
 from, which work on their own too: the quick popups they open, pills, bars and sliders, the nodes and lines of the
 energy flow, appliance icons and tiles, a weather drawing; besides them a set of cards for every metered plug, a popup
-for any item and the tile their values stand in. The UI texts are German, numbers use a decimal comma. No widget names
-an item: every item comes in as a prop, so the widgets work with any item names.
+for any item and the tile their values stand in. The UI texts are English, numbers use a decimal point; my own
+installation runs the same widgets in German, as the generator builds them, and
+[`scripts/openhab-ui/i18n/en.py`](scripts/openhab-ui/i18n/en.py) translates them for this repository. No widget
+names an item: every item comes in as a prop, so the widgets work with any item names.
 
 ![Overview](screenshots/overview-light.png)
 
@@ -21,7 +23,7 @@ this repository. Use it on a layout page as a component `widget:<uid>` with its 
 - component: widget:plug-card
   config:
     prefix: coffee_machine
-    title: Kaffeemaschine
+    title: Coffee Machine
     icon: material:coffee
     color: "#8d6e63"
 ```
@@ -96,9 +98,9 @@ clear, behind one or two clouds or veil streaks, clouds with rain, snow, a bolt 
 gently animated), the outdoor temperature from a local sensor, and today and the next two days, each with its weather
 drawn beside its maximum over its minimum. While an official warning of GeoSphere Austria is in effect or begins within
 24 hours, it is teased beside the temperature: a disc in its level's colour (yellow, orange, red) with an exclamation
-mark and a ring pulsing out of it, on a wider screen in a pill with the warning's short text (*Gewitter bis 20:00*). On
-a phone the gaps narrow, and below 380 px the chevron goes, so the bar keeps its fit. A tap opens the weather page of my
-installation as a popup (see [Weather](#weather)). Its items come from two rules,
+mark and a ring pulsing out of it, on a wider screen in a pill with the warning's short text (*Thunderstorm until
+20:00*). On a phone the gaps narrow, and below 380 px the chevron goes, so the bar keeps its fit. A tap opens the
+weather page of my installation as a popup (see [Weather](#weather)). Its items come from two rules,
 `scripts/openhab-ui/applied/weather_forecast_rule.js`, which reads Open-Meteo's GeoSphere AROME Austria model, and
 `weather_warnings_rule.js`, which reads GeoSphere Austria's warnings and sends a broadcast notification when their level
 rises to orange or red.
@@ -114,18 +116,18 @@ Needs `weather-icon`.
 
 | Prop | Item | Item type |
 |---|---|---|
-| `weatherSymbol` | Wetter aktuell | String |
-| `weatherIsDay` | Wetter Tag | Switch |
-| `heatpumpExtAmbientTemp` | ESPAltherma Außentemperatur | Number:Temperature |
-| `weatherWarningLevel` | Wetterwarnung Stufe | Number |
-| `weatherWarningText` | Wetterwarnung | String |
-| `weatherDaily` | Wetter Tagesprognose | String |
-| `weatherDay0Max` | Wetter heute Max. | Number:Temperature |
-| `weatherDay0Min` | Wetter heute Min. | Number:Temperature |
-| `weatherDay1Max` | Wetter morgen Max. | Number:Temperature |
-| `weatherDay1Min` | Wetter morgen Min. | Number:Temperature |
-| `weatherDay2Max` | Wetter übermorgen Max. | Number:Temperature |
-| `weatherDay2Min` | Wetter übermorgen Min. | Number:Temperature |
+| `weatherSymbol` | Weather Current | String |
+| `weatherIsDay` | Weather Day | Switch |
+| `heatpumpExtAmbientTemp` | ESPAltherma External Ambient Temperature | Number:Temperature |
+| `weatherWarningLevel` | Weather Warning Level | Number |
+| `weatherWarningText` | Weather Warning | String |
+| `weatherDaily` | Weather Daily Forecast | String |
+| `weatherDay0Max` | Weather Today Max. | Number:Temperature |
+| `weatherDay0Min` | Weather Today Min. | Number:Temperature |
+| `weatherDay1Max` | Weather Tomorrow Max. | Number:Temperature |
+| `weatherDay1Min` | Weather Tomorrow Min. | Number:Temperature |
+| `weatherDay2Max` | Weather Day After Tomorrow Max. | Number:Temperature |
+| `weatherDay2Min` | Weather Day After Tomorrow Min. | Number:Temperature |
 
 </details>
 
@@ -157,84 +159,84 @@ Needs `air-conditioner-quick`, `boost-pill`, `flow-link`, `flow-node`, `flow-sha
 
 ![Energy flow](screenshots/energy-flow-card.gif)
 
-![Energy flow in dark mode](screenshots/energy-flow-card-dark.png)
+![Energy flow in dark mode](screenshots/energy-flow-card-dark.gif)
 
 <details>
 <summary>65 props</summary>
 
 | Prop | Item | Item type |
 |---|---|---|
-| `pvPower` | Wechselrichter Eingangsleistung | Number:Power |
-| `gridPower` | Stromzähler Wirkleistung | Number:Power |
-| `heatpumpPower` | ESPAltherma Elektrische Leistung | Number:Power |
-| `acSwitch` | Faikout Perfera Schalter | Switch |
-| `acUnitPower` | Klimaanlage Geräteleistung | Number:Power |
-| `ecarPower` | E-Auto Leistung | Number:Power |
-| `washingMachine1Power` | Waschmaschine 1 Leistung | Number:Power |
-| `washingMachine2Power` | Waschmaschine 2 Leistung | Number:Power |
-| `tumbleDryerPower` | Wäschetrockner Leistung | Number:Power |
-| `dishwasherPower` | Geschirrspüler Leistung | Number:Power |
-| `batteryPower` | Batteriespeicher Leistung | Number:Power |
-| `ventilationPower` | Lüftung Leistung | Number:Power |
-| `batterySoc` | Batteriespeicher Ladestand | Number:Dimensionless |
-| `heatpumpDhwEta` | Wärmepumpe Warmwasser fertig um | DateTime |
-| `heatpumpDhwSince` | Wärmepumpe Warmwasser lädt seit | DateTime |
-| `homePower` | Haus Leistung | Number:Power |
-| `acTimer` | Klimaanlage Timer | Number:Time |
-| `acTimerSet` | Klimaanlage Timer eingestellt | Number:Time |
-| `ventilationTimer` | Lüftung Timer | Number:Time |
-| `ventilationTimerSet` | Lüftung Timer eingestellt | Number:Time |
-| `heatpumpInvFrequency` | ESPAltherma Verdichterfrequenz | Number:Frequency |
-| `heatpumpBuhStep1Mode` | ESPAltherma Heizstab Stufe 1 | Switch |
-| `heatpumpBuhStep2Mode` | ESPAltherma Heizstab Stufe 2 | Switch |
-| `heatpumpBshMode` | ESPAltherma Zusatzheizung Speicher | Switch |
-| `heatpumpDefrostOperaton` | ESPAltherma Abtauen | Switch |
-| `heatpumpValve` | ESPAltherma 3-Wege-Ventil | String |
-| `acMode` | Faikout Perfera Modus | String |
-| `ventilationLevel` | ESPLyfterl Stufe | String |
-| `pvEnergyToday` | Wechselrichter Ertrag heute | Number:Energy |
-| `gridImportToday` | Stromzähler Bezug heute | Number:Energy |
-| `gridExportToday` | Stromzähler Einspeisung heute | Number:Energy |
-| `heatpumpEnergyToday` | ESPAltherma Energie heute | Number:Energy |
-| `acUnitEnergyToday` | Klimaanlage Geräteenergie heute | Number:Energy |
-| `ecarEnergyToday` | E-Auto Energie heute | Number:Energy |
-| `washingMachine1EnergyToday` | Waschmaschine 1 Energie heute | Number:Energy |
-| `washingMachine2EnergyToday` | Waschmaschine 2 Energie heute | Number:Energy |
-| `tumbleDryerEnergyToday` | Wäschetrockner Energie heute | Number:Energy |
-| `dishwasherEnergyToday` | Geschirrspüler Energie heute | Number:Energy |
-| `batteryDischargeToday` | Batteriespeicher Entladung heute | Number:Energy |
-| `batteryChargeToday` | Batteriespeicher Ladung heute | Number:Energy |
-| `pvSelfUseToday` | Photovoltaik Eigenverbrauch heute | Number:Energy |
-| `pvPv1Power` | Wechselrichter PV1 Leistung | Number:Power |
-| `pvPv2Power` | Wechselrichter PV2 Leistung | Number:Power |
-| `priceTotalGross` | Strompreis gesamt brutto | Number:EnergyPrice |
-| `batteryPower5min` | Batteriespeicher Leistung 5 min | Number:Power |
-| `homeEnergyToday` | Haus Energie heute | Number:Energy |
-| `heatpumpWaterPumpOperation` | ESPAltherma Umwälzpumpe | Switch |
-| `heatpumpFlowSensor` | ESPAltherma Durchfluss | Number:VolumetricFlowRate |
-| `heatpumpHeatPower` | ESPAltherma Heizleistung | Number:Power |
+| `pvPower` | Huawei Inverter Input Power | Number:Power |
+| `gridPower` | Huawei Inverter Power Meter Active Power | Number:Power |
+| `heatpumpPower` | ESPAltherma Electrical Power | Number:Power |
+| `acSwitch` | Faikout Perfera Switch | Switch |
+| `acUnitPower` | Air Conditioning Unit Power | Number:Power |
+| `ecarPower` | E-Car Power | Number:Power |
+| `washingMachine1Power` | Washing Machine 1 Power | Number:Power |
+| `washingMachine2Power` | Washing Machine 2 Power | Number:Power |
+| `tumbleDryerPower` | Tumble Dryer Power | Number:Power |
+| `dishwasherPower` | Dishwasher Power | Number:Power |
+| `batteryPower` | Huawei Inverter Energy Storage Power | Number:Power |
+| `ventilationPower` | Ventilation Power | Number:Power |
+| `batterySoc` | Huawei Inverter Energy Storage SOC | Number:Dimensionless |
+| `heatpumpDhwEta` | Heatpump DHW Done At | DateTime |
+| `heatpumpDhwSince` | Heatpump DHW Charging Since | DateTime |
+| `homePower` | Home Active Power | Number:Power |
+| `acTimer` | Air Conditioning Timer | Number:Time |
+| `acTimerSet` | Air Conditioning Timer Set | Number:Time |
+| `ventilationTimer` | Ventilation Timer | Number:Time |
+| `ventilationTimerSet` | Ventilation Timer Set | Number:Time |
+| `heatpumpInvFrequency` | ESPAltherma Inverter Frequency | Number:Frequency |
+| `heatpumpBuhStep1Mode` | ESPAltherma Backup Heater (BUH) Step 1 Mode | Switch |
+| `heatpumpBuhStep2Mode` | ESPAltherma Backup Heater (BUH) Step 2 Mode | Switch |
+| `heatpumpBshMode` | ESPAltherma Booster Heater (BSH) Mode | Switch |
+| `heatpumpDefrostOperaton` | ESPAltherma Defrost Operation | Switch |
+| `heatpumpValve` | ESPAltherma 3-Way Valve Mode | String |
+| `acMode` | Faikout Perfera Mode | String |
+| `ventilationLevel` | ESPLyfterl Level | String |
+| `pvEnergyToday` | Huawei Inverter E-Day | Number:Energy |
+| `gridImportToday` | Huawei Inverter Power Meter Ec-Day | Number:Energy |
+| `gridExportToday` | Huawei Inverter Power Meter Ep-Day | Number:Energy |
+| `heatpumpEnergyToday` | ESPAltherma Energy Today | Number:Energy |
+| `acUnitEnergyToday` | Air Conditioning Unit Energy Today | Number:Energy |
+| `ecarEnergyToday` | E-Car Energy Today | Number:Energy |
+| `washingMachine1EnergyToday` | Washing Machine 1 Energy Today | Number:Energy |
+| `washingMachine2EnergyToday` | Washing Machine 2 Energy Today | Number:Energy |
+| `tumbleDryerEnergyToday` | Tumble Dryer Energy Today | Number:Energy |
+| `dishwasherEnergyToday` | Dishwasher Energy Today | Number:Energy |
+| `batteryDischargeToday` | Huawei Inverter Energy Storage Day Discharge | Number:Energy |
+| `batteryChargeToday` | Huawei Inverter Energy Storage Day Charge | Number:Energy |
+| `pvSelfUseToday` | Photovoltaics Own Ec-Day | Number:Energy |
+| `pvPv1Power` | Huawei Inverter PV1 Power | Number:Power |
+| `pvPv2Power` | Huawei Inverter PV2 Power | Number:Power |
+| `priceTotalGross` | EPEX Spot aWATTar Total Gross | Number:EnergyPrice |
+| `batteryPower5min` | Energy Storage Power 5 min | Number:Power |
+| `homeEnergyToday` | Home Energy Day | Number:Energy |
+| `heatpumpWaterPumpOperation` | ESPAltherma Water Pump Operation | Switch |
+| `heatpumpFlowSensor` | ESPAltherma Flow Sensor (l/min) | Number:VolumetricFlowRate |
+| `heatpumpHeatPower` | ESPAltherma Heating Power | Number:Power |
 | `heatpumpCop` | ESPAltherma COP | Number |
-| `acTemperature` | Faikout Perfera Temperatur | Number:Temperature |
-| `acTemperatureSetpoint` | Faikout Perfera Solltemperatur | Number:Temperature |
-| `netatmoWeatherstationCo2` | Netatmo Wetterstation CO2 | Number:Dimensionless |
-| `netatmoWeatherstationAtmosphericHumidity` | Netatmo Wetterstation Luftfeuchtigkeit | Number:Dimensionless |
-| `heatpumpDhwTankTemp` | ESPAltherma Warmwasserspeicher Temperatur | Number:Temperature |
-| `heatpumpDhwBoost` | Pyaltherma Warmwasser-Boost | Switch |
+| `acTemperature` | Faikout Perfera Temperature | Number:Temperature |
+| `acTemperatureSetpoint` | Faikout Perfera Temperature Setpoint | Number:Temperature |
+| `netatmoWeatherstationCo2` | Netatmo Weatherstation CO2 | Number:Dimensionless |
+| `netatmoWeatherstationAtmosphericHumidity` | Netatmo Weatherstation Atmospheric Humidity | Number:Dimensionless |
+| `heatpumpDhwTankTemp` | ESPAltherma DHW Tank Temperature | Number:Temperature |
+| `heatpumpDhwBoost` | Pyaltherma DHW Powerful | Switch |
 | `heatpumpSmartGrid` | ESPAltherma Smart Grid | String |
-| `heatpumpClimateControlPower` | Pyaltherma Heizung Ein/Aus | Switch |
-| `heatpumpDhwPower` | Pyaltherma Warmwasser Ein/Aus | Switch |
-| `heatpumpManagement` | Wärmepumpe Automatik | Group |
-| `heatpumpDhwTempHeating` | Pyaltherma Warmwasser Solltemperatur | Number:Temperature |
-| `heatpumpDhwManagement` | Wärmepumpe Warmwasser-Automatik | Switch |
-| `acFan` | Faikout Perfera Lüfter | String |
+| `heatpumpClimateControlPower` | Pyaltherma Climate Control Power | Switch |
+| `heatpumpDhwPower` | Pyaltherma DHW Power | Switch |
+| `heatpumpManagement` | Heatpump Management | Group |
+| `heatpumpDhwTempHeating` | Pyaltherma DHW Temp Heating | Number:Temperature |
+| `heatpumpDhwManagement` | Heatpump DHW Management | Switch |
+| `acFan` | Faikout Perfera Fan | String |
 | `acPowerful` | Faikout Perfera Powerful | Switch |
-| `ventilationManagement` | Lüftung Automatik | Group |
+| `ventilationManagement` | Ventilation Management | Group |
 
 </details>
 
 ### Switches: `switches-card`
 
-The switchable plugs under the energy flow as `switch-tile`s, five abreast, three on a phone: icon, *An* or *Aus*, name,
+The switchable plugs under the energy flow as `switch-tile`s, five abreast, three on a phone: icon, *On* or *Off*, name,
 power and today's energy; a tap anywhere switches, and while on a tile is tinted and outlined in its colour.
 
 Needs `switch-tile`.
@@ -246,21 +248,21 @@ Needs `switch-tile`.
 
 | Prop | Item | Item type |
 |---|---|---|
-| `coffeeMachineSwitch` | Kaffeemaschine Schalter | Switch |
-| `coffeeMachinePower` | Kaffeemaschine Leistung | Number:Power |
-| `coffeeMachineEnergyToday` | Kaffeemaschine Energie heute | Number:Energy |
-| `bicycleBatteriesSwitch` | Fahrradakkus Schalter | Switch |
-| `bicycleBatteriesPower` | Fahrradakkus Leistung | Number:Power |
-| `bicycleBatteriesEnergyToday` | Fahrradakkus Energie heute | Number:Energy |
-| `office1Switch` | Büro 1 Schalter | Switch |
-| `office1Power` | Büro 1 Leistung | Number:Power |
-| `office1EnergyToday` | Büro 1 Energie heute | Number:Energy |
-| `office2Switch` | Büro 2 Schalter | Switch |
-| `office2Power` | Büro 2 Leistung | Number:Power |
-| `office2EnergyToday` | Büro 2 Energie heute | Number:Energy |
-| `terraceLightSwitch` | Terrassenlicht Schalter | Switch |
-| `terraceLightPower` | Terrassenlicht Leistung | Number:Power |
-| `terraceLightEnergyToday` | Terrassenlicht Energie heute | Number:Energy |
+| `coffeeMachineSwitch` | Coffee Machine Switch | Switch |
+| `coffeeMachinePower` | Coffee Machine Power | Number:Power |
+| `coffeeMachineEnergyToday` | Coffee Machine Energy Today | Number:Energy |
+| `bicycleBatteriesSwitch` | Bicycle Batteries Switch | Switch |
+| `bicycleBatteriesPower` | Bicycle Batteries Power | Number:Power |
+| `bicycleBatteriesEnergyToday` | Bicycle Batteries Energy Today | Number:Energy |
+| `office1Switch` | Office 1 Switch | Switch |
+| `office1Power` | Office 1 Power | Number:Power |
+| `office1EnergyToday` | Office 1 Energy Today | Number:Energy |
+| `office2Switch` | Office 2 Switch | Switch |
+| `office2Power` | Office 2 Power | Number:Power |
+| `office2EnergyToday` | Office 2 Energy Today | Number:Energy |
+| `terraceLightSwitch` | Terrace Light Switch | Switch |
+| `terraceLightPower` | Terrace Light Power | Number:Power |
+| `terraceLightEnergyToday` | Terrace Light Energy Today | Number:Energy |
 
 </details>
 
@@ -280,27 +282,27 @@ Needs `appliance-icon`, `appliance-tile`.
 
 | Prop | Item | Item type |
 |---|---|---|
-| `washer1ProgramProgress` | Miele Waschmaschine WWG360 Fortschritt | Number:Dimensionless |
-| `washer1OperationState` | Miele Waschmaschine WWG360 Status | String |
-| `washer1ActiveProgram` | Miele Waschmaschine WWG360 Programm | String |
-| `washer1ProgramPhase` | Miele Waschmaschine WWG360 Programmphase | String |
-| `washer1ProgramFinishedTime` | Miele Waschmaschine WWG360 Fertig um | DateTime |
-| `washer1ProgramRemainingTime` | Miele Waschmaschine WWG360 Restzeit | Number |
-| `washingMachine2Power` | Waschmaschine 2 Leistung | Number:Power |
-| `washingMachine2Finished` | Waschmaschine 2 Fertig | Switch |
-| `washingMachine2Since` | Waschmaschine 2 läuft seit | DateTime |
-| `dryerProgramProgress` | Miele Wäschetrockner TWC560WP Fortschritt | Number:Dimensionless |
-| `dryerOperationState` | Miele Wäschetrockner TWC560WP Status | String |
-| `dryerActiveProgram` | Miele Wäschetrockner TWC560WP Programm | String |
-| `dryerProgramPhase` | Miele Wäschetrockner TWC560WP Programmphase | String |
-| `dryerProgramFinishedTime` | Miele Wäschetrockner TWC560WP Fertig um | DateTime |
-| `dryerProgramRemainingTime` | Miele Wäschetrockner TWC560WP Restzeit | Number |
-| `dishwasherProgramProgress` | Miele Geschirrspüler G7465 Fortschritt | Number:Dimensionless |
-| `dishwasherOperationState` | Miele Geschirrspüler G7465 Status | String |
-| `dishwasherActiveProgram` | Miele Geschirrspüler G7465 Programm | String |
-| `dishwasherProgramPhase` | Miele Geschirrspüler G7465 Programmphase | String |
-| `dishwasherProgramFinishedTime` | Miele Geschirrspüler G7465 Fertig um | DateTime |
-| `dishwasherProgramRemainingTime` | Miele Geschirrspüler G7465 Restzeit | Number |
+| `washer1ProgramProgress` | Miele Washing Machine WWG360 Program Progress | Number:Dimensionless |
+| `washer1OperationState` | Miele Washing Machine WWG360 Operation State | String |
+| `washer1ActiveProgram` | Miele Washing Machine WWG360 Active Program | String |
+| `washer1ProgramPhase` | Miele Washing Machine WWG360 Program Phase | String |
+| `washer1ProgramFinishedTime` | Miele Washing Machine WWG360 Program Finished Time | DateTime |
+| `washer1ProgramRemainingTime` | Miele Washing Machine WWG360 Program Remaining Time | Number |
+| `washingMachine2Power` | Washing Machine 2 Power | Number:Power |
+| `washingMachine2Finished` | Washing Machine 2 Finished | Switch |
+| `washingMachine2Since` | Washing Machine 2 Running Since | DateTime |
+| `dryerProgramProgress` | Miele Tumble Dryer TWC560WP Program Progress | Number:Dimensionless |
+| `dryerOperationState` | Miele Tumble Dryer TWC560WP Operation State | String |
+| `dryerActiveProgram` | Miele Tumble Dryer TWC560WP Active Program | String |
+| `dryerProgramPhase` | Miele Tumble Dryer TWC560WP Program Phase | String |
+| `dryerProgramFinishedTime` | Miele Tumble Dryer TWC560WP Program Finished Time | DateTime |
+| `dryerProgramRemainingTime` | Miele Tumble Dryer TWC560WP Program Remaining Time | Number |
+| `dishwasherProgramProgress` | Miele Dishwasher G7465 Program Progress | Number:Dimensionless |
+| `dishwasherOperationState` | Miele Dishwasher G7465 Operation State | String |
+| `dishwasherActiveProgram` | Miele Dishwasher G7465 Active Program | String |
+| `dishwasherProgramPhase` | Miele Dishwasher G7465 Program Phase | String |
+| `dishwasherProgramFinishedTime` | Miele Dishwasher G7465 Program Finished Time | DateTime |
+| `dishwasherProgramRemainingTime` | Miele Dishwasher G7465 Program Remaining Time | Number |
 
 </details>
 
@@ -312,13 +314,13 @@ filled by its temperature and a badge for where its heat comes from (the booster
 while the compressor charges the tank); the heat pump as the energy flow's node with its mode badge, filled while the
 heat pump's own measured circuit draws, its red bolt only for the backup heater in the wall unit (the tank's booster
 heater shows on the tank), its ring as in the energy flow, whole while it draws and filling towards the expected end of
-a hot-water charge, which a line under the tile names. Each tile's pill holds the temperature, the tank's and the
-leaving water's, filled in the tile's colour while hot water or heating is switched on, outlined while off, beside a
-tinted pill with the setpoint and a small target icon; a tap opens the heat pump's quick popup. Below them today's
-electricity and heat of the heat pump split into space heating, DHW and standby as bars (hovering a part lifts it
-everywhere), and today's COPs of space heating, DHW and in total in one row as rings like the energy flow's
-self-consumption. While the tank charges or the heating runs, a line under its tile says since when. The screenshots
-show it with the heat pump card's demo values.
+a hot-water charge, while the setpoint pill gives way to the time left, as a Miele machine's, and a line names the end.
+Each tile's pill holds the temperature, the tank's and the leaving water's, filled in the tile's colour while hot water
+or heating is switched on, outlined while off, beside a tinted pill with the setpoint and a small target icon; a tap
+opens the heat pump's quick popup. Below them today's electricity and heat of the heat pump split into space heating,
+DHW and standby as bars (hovering a part lifts it everywhere), and today's COPs of space heating, DHW and in total in
+one row as rings like the energy flow's self-consumption. While the tank charges or the heating runs, a line under its
+tile says since when. The screenshots show it with the heat pump card's demo values.
 
 Needs `boost-pill`, `flow-node`, `heatpump-cop-quick`, `heatpump-quick`, `pill-slider`, `pill-switch`, `state-bar`.
 
@@ -331,42 +333,42 @@ Needs `boost-pill`, `flow-node`, `heatpump-cop-quick`, `heatpump-quick`, `pill-s
 
 | Prop | Item | Item type |
 |---|---|---|
-| `heatpumpDhwTankTemp` | ESPAltherma Warmwasserspeicher Temperatur | Number:Temperature |
-| `heatpumpWaterPumpOperation` | ESPAltherma Umwälzpumpe | Switch |
-| `heatpumpFlowSensor` | ESPAltherma Durchfluss | Number:VolumetricFlowRate |
-| `heatpumpValve` | ESPAltherma 3-Wege-Ventil | String |
-| `heatpumpBshMode` | ESPAltherma Zusatzheizung Speicher | Switch |
-| `heatpumpInvFrequency` | ESPAltherma Verdichterfrequenz | Number:Frequency |
-| `heatpumpDhwPower` | Pyaltherma Warmwasser Ein/Aus | Switch |
-| `heatpumpDhwSetpoint` | ESPAltherma Warmwasser Sollwert | Number:Temperature |
-| `heatpumpDhwSince` | Wärmepumpe Warmwasser lädt seit | DateTime |
-| `heatpumpPower` | ESPAltherma Elektrische Leistung | Number:Power |
-| `heatpumpDhwBoost` | Pyaltherma Warmwasser-Boost | Switch |
+| `heatpumpDhwTankTemp` | ESPAltherma DHW Tank Temperature | Number:Temperature |
+| `heatpumpWaterPumpOperation` | ESPAltherma Water Pump Operation | Switch |
+| `heatpumpFlowSensor` | ESPAltherma Flow Sensor (l/min) | Number:VolumetricFlowRate |
+| `heatpumpValve` | ESPAltherma 3-Way Valve Mode | String |
+| `heatpumpBshMode` | ESPAltherma Booster Heater (BSH) Mode | Switch |
+| `heatpumpInvFrequency` | ESPAltherma Inverter Frequency | Number:Frequency |
+| `heatpumpDhwPower` | Pyaltherma DHW Power | Switch |
+| `heatpumpDhwSetpoint` | ESPAltherma DHW Setpoint | Number:Temperature |
+| `heatpumpDhwSince` | Heatpump DHW Charging Since | DateTime |
+| `heatpumpPower` | ESPAltherma Electrical Power | Number:Power |
+| `heatpumpDhwBoost` | Pyaltherma DHW Powerful | Switch |
 | `heatpumpSmartGrid` | ESPAltherma Smart Grid | String |
-| `heatpumpClimateControlPower` | Pyaltherma Heizung Ein/Aus | Switch |
-| `heatpumpManagement` | Wärmepumpe Automatik | Group |
-| `heatpumpDhwTempHeating` | Pyaltherma Warmwasser Solltemperatur | Number:Temperature |
-| `heatpumpDhwManagement` | Wärmepumpe Warmwasser-Automatik | Switch |
-| `heatpumpDhwEta` | Wärmepumpe Warmwasser fertig um | DateTime |
-| `heatpumpBuhStep1Mode` | ESPAltherma Heizstab Stufe 1 | Switch |
-| `heatpumpBuhStep2Mode` | ESPAltherma Heizstab Stufe 2 | Switch |
-| `heatpumpCircuitPower` | Wärmepumpe Leistung | Number:Power |
-| `heatpumpDefrostOperaton` | ESPAltherma Abtauen | Switch |
-| `heatpumpLeavingWaterTempAfterBuh` | ESPAltherma Vorlauftemperatur nach Heizstab | Number:Temperature |
-| `heatpumpLeavingWaterSetpoint` | ESPAltherma Vorlauf Sollwert | Number:Temperature |
-| `heatpumpHeatingSince` | Wärmepumpe Heizung läuft seit | DateTime |
-| `heatpumpEnergyToday` | ESPAltherma Energie heute | Number:Energy |
-| `heatpumpEnergySpaceToday` | ESPAltherma Energie Heizung heute | Number:Energy |
-| `heatpumpEnergyDhwToday` | ESPAltherma Energie Warmwasser heute | Number:Energy |
-| `heatpumpEnergyStandbyToday` | ESPAltherma Energie Standby heute | Number:Energy |
-| `heatpumpHeatingEnergyToday` | ESPAltherma Heizenergie heute | Number:Energy |
-| `heatpumpHeatingEnergySpaceToday` | ESPAltherma Heizenergie Heizung heute | Number:Energy |
-| `heatpumpHeatingEnergyDhwToday` | ESPAltherma Heizenergie Warmwasser heute | Number:Energy |
-| `heatpumpDcopSpace` | ESPAltherma Tages-COP Heizung | Number |
+| `heatpumpClimateControlPower` | Pyaltherma Climate Control Power | Switch |
+| `heatpumpManagement` | Heatpump Management | Group |
+| `heatpumpDhwTempHeating` | Pyaltherma DHW Temp Heating | Number:Temperature |
+| `heatpumpDhwManagement` | Heatpump DHW Management | Switch |
+| `heatpumpDhwEta` | Heatpump DHW Done At | DateTime |
+| `heatpumpBuhStep1Mode` | ESPAltherma Backup Heater (BUH) Step 1 Mode | Switch |
+| `heatpumpBuhStep2Mode` | ESPAltherma Backup Heater (BUH) Step 2 Mode | Switch |
+| `heatpumpCircuitPower` | Heatpump Power | Number:Power |
+| `heatpumpDefrostOperaton` | ESPAltherma Defrost Operation | Switch |
+| `heatpumpLeavingWaterTempAfterBuh` | ESPAltherma Leaving Water Temperature After BUH | Number:Temperature |
+| `heatpumpLeavingWaterSetpoint` | ESPAltherma Leaving Water Setpoint | Number:Temperature |
+| `heatpumpHeatingSince` | Heatpump Heating Running Since | DateTime |
+| `heatpumpEnergyToday` | ESPAltherma Energy Today | Number:Energy |
+| `heatpumpEnergySpaceToday` | ESPAltherma Energy Space Today | Number:Energy |
+| `heatpumpEnergyDhwToday` | ESPAltherma Energy DHW Today | Number:Energy |
+| `heatpumpEnergyStandbyToday` | ESPAltherma Energy Standby Today | Number:Energy |
+| `heatpumpHeatingEnergyToday` | ESPAltherma Heating Energy Today | Number:Energy |
+| `heatpumpHeatingEnergySpaceToday` | ESPAltherma Heating Energy Space Today | Number:Energy |
+| `heatpumpHeatingEnergyDhwToday` | ESPAltherma Heating Energy DHW Today | Number:Energy |
+| `heatpumpDcopSpace` | ESPAltherma DCOP Space | Number |
 | `heatpumpCop` | ESPAltherma COP | Number |
-| `heatpumpDcop` | ESPAltherma Tages-COP | Number |
-| `heatpumpExtAmbientTemp` | ESPAltherma Außentemperatur | Number:Temperature |
-| `heatpumpDcopDhw` | ESPAltherma Tages-COP Warmwasser | Number |
+| `heatpumpDcop` | ESPAltherma DCOP | Number |
+| `heatpumpExtAmbientTemp` | ESPAltherma External Ambient Temperature | Number:Temperature |
+| `heatpumpDcopDhw` | ESPAltherma DCOP DHW | Number |
 
 </details>
 
@@ -382,12 +384,12 @@ orange and red by price.
 
 | Prop | Item | Item type |
 |---|---|---|
-| `priceTotalGross` | Strompreis gesamt brutto | Number:EnergyPrice |
-| `priceCheapestHour` | Günstigste Stunde | DateTime |
-| `pricePriciestHour` | Teuerste Stunde | DateTime |
-| `priceTotalNet` | Strompreis gesamt netto | Number:EnergyPrice |
-| `priceMarketGross` | Strompreis Markt brutto | Number:EnergyPrice |
-| `priceMarketNet` | Strompreis Markt netto | Number:EnergyPrice |
+| `priceTotalGross` | EPEX Spot aWATTar Total Gross | Number:EnergyPrice |
+| `priceCheapestHour` | Cheapest hour | DateTime |
+| `pricePriciestHour` | EPEX Spot aWATTar Priciest Hour | DateTime |
+| `priceTotalNet` | EPEX Spot aWATTar Total Net | Number:EnergyPrice |
+| `priceMarketGross` | EPEX Spot aWATTar Market Gross | Number:EnergyPrice |
+| `priceMarketNet` | EPEX Spot aWATTar | Number:EnergyPrice |
 
 </details>
 
@@ -422,69 +424,69 @@ Needs `boost-pill`, `flow-node`, `ground-floor-quick`, `heatpump-circuit-quick`,
 
 ![Heat pump](screenshots/heatpump-card.gif)
 
-![Heat pump in dark mode](screenshots/heatpump-card-dark.png)
+![Heat pump in dark mode](screenshots/heatpump-card-dark.gif)
 
 <details>
 <summary>56 props</summary>
 
 | Prop | Item | Item type |
 |---|---|---|
-| `heatpumpPower` | ESPAltherma Elektrische Leistung | Number:Power |
-| `heatpumpEnergyToday` | ESPAltherma Energie heute | Number:Energy |
-| `heatpumpElectricalPowerSpace` | ESPAltherma Elektrische Leistung Heizung | Number:Power |
-| `heatpumpElectricalPowerDhw` | ESPAltherma Elektrische Leistung Warmwasser | Number:Power |
-| `heatpumpElectricalPowerStandby` | ESPAltherma Elektrische Leistung Standby | Number:Power |
-| `heatpumpEnergySpaceToday` | ESPAltherma Energie Heizung heute | Number:Energy |
-| `heatpumpEnergyDhwToday` | ESPAltherma Energie Warmwasser heute | Number:Energy |
-| `heatpumpEnergyStandbyToday` | ESPAltherma Energie Standby heute | Number:Energy |
-| `heatpumpHeatPower` | ESPAltherma Heizleistung | Number:Power |
-| `heatpumpHeatingEnergyToday` | ESPAltherma Heizenergie heute | Number:Energy |
-| `heatpumpHeatingPowerSpace` | ESPAltherma Heizleistung Heizung | Number:Power |
-| `heatpumpHeatingPowerDhw` | ESPAltherma Heizleistung Warmwasser | Number:Power |
-| `heatpumpHeatingEnergySpaceToday` | ESPAltherma Heizenergie Heizung heute | Number:Energy |
-| `heatpumpHeatingEnergyDhwToday` | ESPAltherma Heizenergie Warmwasser heute | Number:Energy |
+| `heatpumpPower` | ESPAltherma Electrical Power | Number:Power |
+| `heatpumpEnergyToday` | ESPAltherma Energy Today | Number:Energy |
+| `heatpumpElectricalPowerSpace` | ESPAltherma Electrical Power Space | Number:Power |
+| `heatpumpElectricalPowerDhw` | ESPAltherma Electrical Power DHW | Number:Power |
+| `heatpumpElectricalPowerStandby` | ESPAltherma Electrical Power Standby | Number:Power |
+| `heatpumpEnergySpaceToday` | ESPAltherma Energy Space Today | Number:Energy |
+| `heatpumpEnergyDhwToday` | ESPAltherma Energy DHW Today | Number:Energy |
+| `heatpumpEnergyStandbyToday` | ESPAltherma Energy Standby Today | Number:Energy |
+| `heatpumpHeatPower` | ESPAltherma Heating Power | Number:Power |
+| `heatpumpHeatingEnergyToday` | ESPAltherma Heating Energy Today | Number:Energy |
+| `heatpumpHeatingPowerSpace` | ESPAltherma Heating Power Space | Number:Power |
+| `heatpumpHeatingPowerDhw` | ESPAltherma Heating Power DHW | Number:Power |
+| `heatpumpHeatingEnergySpaceToday` | ESPAltherma Heating Energy Space Today | Number:Energy |
+| `heatpumpHeatingEnergyDhwToday` | ESPAltherma Heating Energy DHW Today | Number:Energy |
 | `heatpumpCop` | ESPAltherma COP | Number |
-| `heatpumpDcop` | ESPAltherma Tages-COP | Number |
-| `heatpumpExtAmbientTemp` | ESPAltherma Außentemperatur | Number:Temperature |
-| `heatpumpDcopSpace` | ESPAltherma Tages-COP Heizung | Number |
-| `heatpumpDcopDhw` | ESPAltherma Tages-COP Warmwasser | Number |
-| `heatpumpDhwTankTemp` | ESPAltherma Warmwasserspeicher Temperatur | Number:Temperature |
-| `heatpumpInvFrequency` | ESPAltherma Verdichterfrequenz | Number:Frequency |
-| `heatpumpDefrostOperaton` | ESPAltherma Abtauen | Switch |
-| `heatpumpWaterPumpOperation` | ESPAltherma Umwälzpumpe | Switch |
-| `heatpumpFlowSensor` | ESPAltherma Durchfluss | Number:VolumetricFlowRate |
-| `heatpumpValve` | ESPAltherma 3-Wege-Ventil | String |
-| `heatpumpBuhStep1Mode` | ESPAltherma Heizstab Stufe 1 | Switch |
-| `heatpumpBuhStep2Mode` | ESPAltherma Heizstab Stufe 2 | Switch |
-| `heatpumpBshMode` | ESPAltherma Zusatzheizung Speicher | Switch |
-| `heatpumpLeavingWaterTempAfterBuh` | ESPAltherma Vorlauftemperatur nach Heizstab | Number:Temperature |
-| `heatpumpCircuitPower` | Wärmepumpe Leistung | Number:Power |
-| `heatpumpHeatExchangerMidTemp` | ESPAltherma Wärmetauscher Mitte | Number:Temperature |
+| `heatpumpDcop` | ESPAltherma DCOP | Number |
+| `heatpumpExtAmbientTemp` | ESPAltherma External Ambient Temperature | Number:Temperature |
+| `heatpumpDcopSpace` | ESPAltherma DCOP Space | Number |
+| `heatpumpDcopDhw` | ESPAltherma DCOP DHW | Number |
+| `heatpumpDhwTankTemp` | ESPAltherma DHW Tank Temperature | Number:Temperature |
+| `heatpumpInvFrequency` | ESPAltherma Inverter Frequency | Number:Frequency |
+| `heatpumpDefrostOperaton` | ESPAltherma Defrost Operation | Switch |
+| `heatpumpWaterPumpOperation` | ESPAltherma Water Pump Operation | Switch |
+| `heatpumpFlowSensor` | ESPAltherma Flow Sensor (l/min) | Number:VolumetricFlowRate |
+| `heatpumpValve` | ESPAltherma 3-Way Valve Mode | String |
+| `heatpumpBuhStep1Mode` | ESPAltherma Backup Heater (BUH) Step 1 Mode | Switch |
+| `heatpumpBuhStep2Mode` | ESPAltherma Backup Heater (BUH) Step 2 Mode | Switch |
+| `heatpumpBshMode` | ESPAltherma Booster Heater (BSH) Mode | Switch |
+| `heatpumpLeavingWaterTempAfterBuh` | ESPAltherma Leaving Water Temperature After BUH | Number:Temperature |
+| `heatpumpCircuitPower` | Heatpump Power | Number:Power |
+| `heatpumpHeatExchangerMidTemp` | ESPAltherma Heat Exchanger Mid Temperature | Number:Temperature |
 | `heatpumpSmartGrid` | ESPAltherma Smart Grid | String |
-| `heatpumpClimateControlPower` | Pyaltherma Heizung Ein/Aus | Switch |
-| `heatpumpDhwBoost` | Pyaltherma Warmwasser-Boost | Switch |
-| `heatpumpDhwPower` | Pyaltherma Warmwasser Ein/Aus | Switch |
-| `heatpumpManagement` | Wärmepumpe Automatik | Group |
-| `heatpumpDischargePipeTemp` | ESPAltherma Heißgastemperatur | Number:Temperature |
-| `heatpumpRefrigerantTemp` | ESPAltherma Kältemittel flüssig | Number:Temperature |
-| `heatpumpRefrigerantPressure` | ESPAltherma Kältemitteldruck | Number:Pressure |
-| `heatpumpHeatingPowerAfterBuh` | ESPAltherma Heizleistung nach Heizstab | Number:Power |
-| `heatpumpInletWaterTemp` | ESPAltherma Rücklauftemperatur | Number:Temperature |
-| `acTemperature` | Faikout Perfera Temperatur | Number:Temperature |
-| `tadoHumidity` | Tado Luftfeuchtigkeit | Number:Dimensionless |
-| `heatpumpIndoorAmbientTemp` | ESPAltherma Raumtemperatur | Number:Temperature |
-| `netatmoWeatherstationAtmosphericHumidity` | Netatmo Wetterstation Luftfeuchtigkeit | Number:Dimensionless |
-| `netatmoWeatherstationCo2` | Netatmo Wetterstation CO2 | Number:Dimensionless |
-| `heatpumpDhwSetpoint` | ESPAltherma Warmwasser Sollwert | Number:Temperature |
-| `heatpumpBshPower` | ESPAltherma Elektrische Leistung Zusatzheizung | Number:Power |
-| `heatpumpBuhPower` | ESPAltherma Elektrische Leistung Heizstab | Number:Power |
-| `heatpumpWaterPressure` | ESPAltherma Wasserdruck | Number:Pressure |
-| `heatpumpDhwTempHeating` | Pyaltherma Warmwasser Solltemperatur | Number:Temperature |
-| `heatpumpDhwManagement` | Wärmepumpe Warmwasser-Automatik | Switch |
-| `heatpumpLeavingWaterTempOffsetHeating` | Pyaltherma Vorlauf-Offset Heizen | Number:Temperature |
-| `heatpumpLeavingWaterSetpoint` | ESPAltherma Vorlauf Sollwert | Number:Temperature |
-| `heatpumpOutdoorAirTemp` | ESPAltherma Außenluft Temperatur | Number:Temperature |
-| `heatpumpTargetDischargeTemp` | ESPAltherma Soll-Heißgastemperatur | Number:Temperature |
+| `heatpumpClimateControlPower` | Pyaltherma Climate Control Power | Switch |
+| `heatpumpDhwBoost` | Pyaltherma DHW Powerful | Switch |
+| `heatpumpDhwPower` | Pyaltherma DHW Power | Switch |
+| `heatpumpManagement` | Heatpump Management | Group |
+| `heatpumpDischargePipeTemp` | ESPAltherma Discharge Pipe Temperature | Number:Temperature |
+| `heatpumpRefrigerantTemp` | ESPAltherma Refrigerant Temperature Liquid Side | Number:Temperature |
+| `heatpumpRefrigerantPressure` | ESPAltherma Refrigerant Pressure Sensor | Number:Pressure |
+| `heatpumpHeatingPowerAfterBuh` | ESPAltherma Heating Power After BUH | Number:Power |
+| `heatpumpInletWaterTemp` | ESPAltherma Inlet Water Temperature | Number:Temperature |
+| `acTemperature` | Faikout Perfera Temperature | Number:Temperature |
+| `tadoHumidity` | Tado Humidity | Number:Dimensionless |
+| `heatpumpIndoorAmbientTemp` | ESPAltherma Indoor Ambient Temperature | Number:Temperature |
+| `netatmoWeatherstationAtmosphericHumidity` | Netatmo Weatherstation Atmospheric Humidity | Number:Dimensionless |
+| `netatmoWeatherstationCo2` | Netatmo Weatherstation CO2 | Number:Dimensionless |
+| `heatpumpDhwSetpoint` | ESPAltherma DHW Setpoint | Number:Temperature |
+| `heatpumpBshPower` | ESPAltherma Electrical Power Booster Heater | Number:Power |
+| `heatpumpBuhPower` | ESPAltherma Electrical Power Backup Heater | Number:Power |
+| `heatpumpWaterPressure` | ESPAltherma Water Pressure | Number:Pressure |
+| `heatpumpDhwTempHeating` | Pyaltherma DHW Temp Heating | Number:Temperature |
+| `heatpumpDhwManagement` | Heatpump DHW Management | Switch |
+| `heatpumpLeavingWaterTempOffsetHeating` | Pyaltherma Leaving Water Temp Offset Heating | Number:Temperature |
+| `heatpumpLeavingWaterSetpoint` | ESPAltherma Leaving Water Setpoint | Number:Temperature |
+| `heatpumpOutdoorAirTemp` | ESPAltherma Outdoor Air Temperature | Number:Temperature |
+| `heatpumpTargetDischargeTemp` | ESPAltherma Target Discharge Temperature | Number:Temperature |
 
 </details>
 
@@ -500,26 +502,26 @@ lifts it everywhere. The screenshot shows it with demo values.
 
 | Prop | Item | Item type |
 |---|---|---|
-| `homeEnergyToday` | Haus Energie heute | Number:Energy |
-| `pvSelfUseToday` | Photovoltaik Eigenverbrauch heute | Number:Energy |
-| `gridImportToday` | Stromzähler Bezug heute | Number:Energy |
-| `heatpumpEnergyToday` | ESPAltherma Energie heute | Number:Energy |
-| `ecarEnergyToday` | E-Auto Energie heute | Number:Energy |
-| `acUnitEnergyToday` | Klimaanlage Geräteenergie heute | Number:Energy |
-| `office1EnergyToday` | Büro 1 Energie heute | Number:Energy |
-| `office2EnergyToday` | Büro 2 Energie heute | Number:Energy |
-| `networkEnergyToday` | Netzwerk Energie heute | Number:Energy |
-| `ventilationEnergyToday` | Lüftung Energie heute | Number:Energy |
-| `refrigeratorEnergyToday` | Kühlschrank Energie heute | Number:Energy |
-| `coffeeMachineEnergyToday` | Kaffeemaschine Energie heute | Number:Energy |
-| `livingRoomEntertainmentEnergyToday` | Wohnzimmer Medien Energie heute | Number:Energy |
-| `dishwasherEnergyToday` | Geschirrspüler Energie heute | Number:Energy |
-| `washingMachine1EnergyToday` | Waschmaschine 1 Energie heute | Number:Energy |
-| `washingMachine2EnergyToday` | Waschmaschine 2 Energie heute | Number:Energy |
-| `tumbleDryerEnergyToday` | Wäschetrockner Energie heute | Number:Energy |
-| `terraceLightEnergyToday` | Terrassenlicht Energie heute | Number:Energy |
-| `bicycleBatteriesEnergyToday` | Fahrradakkus Energie heute | Number:Energy |
-| `acMeterEnergyToday` | Klimaanlage Energie heute | Number:Energy |
+| `homeEnergyToday` | Home Energy Day | Number:Energy |
+| `pvSelfUseToday` | Photovoltaics Own Ec-Day | Number:Energy |
+| `gridImportToday` | Huawei Inverter Power Meter Ec-Day | Number:Energy |
+| `heatpumpEnergyToday` | ESPAltherma Energy Today | Number:Energy |
+| `ecarEnergyToday` | E-Car Energy Today | Number:Energy |
+| `acUnitEnergyToday` | Air Conditioning Unit Energy Today | Number:Energy |
+| `office1EnergyToday` | Office 1 Energy Today | Number:Energy |
+| `office2EnergyToday` | Office 2 Energy Today | Number:Energy |
+| `networkEnergyToday` | Network Energy Today | Number:Energy |
+| `ventilationEnergyToday` | Ventilation Energy Today | Number:Energy |
+| `refrigeratorEnergyToday` | Refrigerator Energy Today | Number:Energy |
+| `coffeeMachineEnergyToday` | Coffee Machine Energy Today | Number:Energy |
+| `livingRoomEntertainmentEnergyToday` | Living Room Entertainment Energy Today | Number:Energy |
+| `dishwasherEnergyToday` | Dishwasher Energy Today | Number:Energy |
+| `washingMachine1EnergyToday` | Washing Machine 1 Energy Today | Number:Energy |
+| `washingMachine2EnergyToday` | Washing Machine 2 Energy Today | Number:Energy |
+| `tumbleDryerEnergyToday` | Tumble Dryer Energy Today | Number:Energy |
+| `terraceLightEnergyToday` | Terrace Light Energy Today | Number:Energy |
+| `bicycleBatteriesEnergyToday` | Bicycle Batteries Energy Today | Number:Energy |
+| `acMeterEnergyToday` | Air Conditioning Energy Today | Number:Energy |
 
 </details>
 
@@ -534,9 +536,9 @@ The month's daily home consumption as stacked bars: from PV and from the grid, w
 
 | Prop | Item | Item type |
 |---|---|---|
-| `dailySelfUse` | Energie täglich Eigenverbrauch | Number:Energy |
-| `dailyGridImport` | Energie täglich Netzbezug | Number:Energy |
-| `dailyPv` | Energie täglich PV | Number:Energy |
+| `dailySelfUse` | Energy Daily Self Use | Number:Energy |
+| `dailyGridImport` | Energy Daily Grid Import | Number:Energy |
+| `dailyPv` | Energy Daily PV | Number:Energy |
 
 </details>
 
@@ -553,7 +555,7 @@ half-years instead of the year.
 
 | Prop | Item | Item type |
 |---|---|---|
-| `dailyPv` | Energie täglich PV | Number:Energy |
+| `dailyPv` | Energy Daily PV | Number:Energy |
 
 </details>
 
@@ -568,17 +570,17 @@ Indoor and outdoor temperature now, the day's minimum and maximum, and the last 
 
 | Prop | Item | Item type |
 |---|---|---|
-| `heatpumpIndoorAmbientTemp` | ESPAltherma Raumtemperatur | Number:Temperature |
-| `heatpumpExtAmbientTemp` | ESPAltherma Außentemperatur | Number:Temperature |
-| `temperatureIndoor15min` | Temperatur innen 15 min | Number:Temperature |
-| `temperatureOutdoor15min` | Temperatur außen 15 min | Number:Temperature |
+| `heatpumpIndoorAmbientTemp` | ESPAltherma Indoor Ambient Temperature | Number:Temperature |
+| `heatpumpExtAmbientTemp` | ESPAltherma External Ambient Temperature | Number:Temperature |
+| `temperatureIndoor15min` | Temperature Indoor 15 min | Number:Temperature |
+| `temperatureOutdoor15min` | Temperature Outdoor 15 min | Number:Temperature |
 
 </details>
 
 ## Quick popups
 
 Compact popups the cards open: a device's main controls or the charts of one of its parts, under a small head with
-its state and above *Alle Details*, which opens the device's page of my installation. Each is a widget that takes its
+its state and above *All details*, which opens the device's page of my installation. Each is a widget that takes its
 items as props; open it from a link with `action: popup`, `actionModal: widget:<uid>` and its items in
 `actionModalConfig`, as the cards do:
 
@@ -633,15 +635,15 @@ closed period menu takes no room. The energy flow's heat pump, air conditioner a
 
 | Prop | Item | Item type |
 |---|---|---|
-| `heatpumpDhwTankTemp` | ESPAltherma Warmwasserspeicher Temperatur | Number:Temperature |
-| `heatpumpPower` | ESPAltherma Elektrische Leistung | Number:Power |
-| `heatpumpDhwBoost` | Pyaltherma Warmwasser-Boost | Switch |
+| `heatpumpDhwTankTemp` | ESPAltherma DHW Tank Temperature | Number:Temperature |
+| `heatpumpPower` | ESPAltherma Electrical Power | Number:Power |
+| `heatpumpDhwBoost` | Pyaltherma DHW Powerful | Switch |
 | `heatpumpSmartGrid` | ESPAltherma Smart Grid | String |
-| `heatpumpClimateControlPower` | Pyaltherma Heizung Ein/Aus | Switch |
-| `heatpumpDhwPower` | Pyaltherma Warmwasser Ein/Aus | Switch |
-| `heatpumpManagement` | Wärmepumpe Automatik | Group |
-| `heatpumpDhwTempHeating` | Pyaltherma Warmwasser Solltemperatur | Number:Temperature |
-| `heatpumpDhwManagement` | Wärmepumpe Warmwasser-Automatik | Switch |
+| `heatpumpClimateControlPower` | Pyaltherma Climate Control Power | Switch |
+| `heatpumpDhwPower` | Pyaltherma DHW Power | Switch |
+| `heatpumpManagement` | Heatpump Management | Group |
+| `heatpumpDhwTempHeating` | Pyaltherma DHW Temp Heating | Number:Temperature |
+| `heatpumpDhwManagement` | Heatpump DHW Management | Switch |
 
 </details>
 
@@ -652,13 +654,13 @@ closed period menu takes no room. The energy flow's heat pump, air conditioner a
 
 | Prop | Item | Item type |
 |---|---|---|
-| `acSwitch` | Faikout Perfera Schalter | Switch |
-| `acMode` | Faikout Perfera Modus | String |
-| `acTemperature` | Faikout Perfera Temperatur | Number:Temperature |
-| `acFan` | Faikout Perfera Lüfter | String |
-| `acTemperatureSetpoint` | Faikout Perfera Solltemperatur | Number:Temperature |
-| `acTimer` | Klimaanlage Timer | Number:Time |
-| `acTimerSet` | Klimaanlage Timer eingestellt | Number:Time |
+| `acSwitch` | Faikout Perfera Switch | Switch |
+| `acMode` | Faikout Perfera Mode | String |
+| `acTemperature` | Faikout Perfera Temperature | Number:Temperature |
+| `acFan` | Faikout Perfera Fan | String |
+| `acTemperatureSetpoint` | Faikout Perfera Temperature Setpoint | Number:Temperature |
+| `acTimer` | Air Conditioning Timer | Number:Time |
+| `acTimerSet` | Air Conditioning Timer Set | Number:Time |
 | `acPowerful` | Faikout Perfera Powerful | Switch |
 
 </details>
@@ -670,11 +672,11 @@ closed period menu takes no room. The energy flow's heat pump, air conditioner a
 
 | Prop | Item | Item type |
 |---|---|---|
-| `ventilationLevel` | ESPLyfterl Stufe | String |
-| `netatmoWeatherstationCo2` | Netatmo Wetterstation CO2 | Number:Dimensionless |
-| `ventilationTimer` | Lüftung Timer | Number:Time |
-| `ventilationManagement` | Lüftung Automatik | Group |
-| `ventilationTimerSet` | Lüftung Timer eingestellt | Number:Time |
+| `ventilationLevel` | ESPLyfterl Level | String |
+| `netatmoWeatherstationCo2` | Netatmo Weatherstation CO2 | Number:Dimensionless |
+| `ventilationTimer` | Ventilation Timer | Number:Time |
+| `ventilationManagement` | Ventilation Management | Group |
+| `ventilationTimerSet` | Ventilation Timer Set | Number:Time |
 
 </details>
 
@@ -685,16 +687,16 @@ closed period menu takes no room. The energy flow's heat pump, air conditioner a
 
 | Prop | Item | Item type |
 |---|---|---|
-| `heatpumpClimateControlPower` | Pyaltherma Heizung Ein/Aus | Switch |
-| `heatpumpDhwPower` | Pyaltherma Warmwasser Ein/Aus | Switch |
+| `heatpumpClimateControlPower` | Pyaltherma Climate Control Power | Switch |
+| `heatpumpDhwPower` | Pyaltherma DHW Power | Switch |
 | `heatpumpSmartGrid` | ESPAltherma Smart Grid | String |
-| `heatpumpManagement` | Wärmepumpe Automatik | Group |
-| `heatpumpDhwTempHeating` | Pyaltherma Warmwasser Solltemperatur | Number:Temperature |
-| `heatpumpDhwTankTemp` | ESPAltherma Warmwasserspeicher Temperatur | Number:Temperature |
-| `heatpumpDhwManagement` | Wärmepumpe Warmwasser-Automatik | Switch |
-| `heatpumpDhwBoost` | Pyaltherma Warmwasser-Boost | Switch |
-| `heatpumpLeavingWaterTempOffsetHeating` | Pyaltherma Vorlauf-Offset Heizen | Number:Temperature |
-| `heatpumpLeavingWaterSetpoint` | ESPAltherma Vorlauf Sollwert | Number:Temperature |
+| `heatpumpManagement` | Heatpump Management | Group |
+| `heatpumpDhwTempHeating` | Pyaltherma DHW Temp Heating | Number:Temperature |
+| `heatpumpDhwTankTemp` | ESPAltherma DHW Tank Temperature | Number:Temperature |
+| `heatpumpDhwManagement` | Heatpump DHW Management | Switch |
+| `heatpumpDhwBoost` | Pyaltherma DHW Powerful | Switch |
+| `heatpumpLeavingWaterTempOffsetHeating` | Pyaltherma Leaving Water Temp Offset Heating | Number:Temperature |
+| `heatpumpLeavingWaterSetpoint` | ESPAltherma Leaving Water Setpoint | Number:Temperature |
 
 </details>
 
@@ -703,10 +705,10 @@ closed period menu takes no room. The energy flow's heat pump, air conditioner a
 
 | Prop | Item | Item type |
 |---|---|---|
-| `heatpumpCircuitPower` | Wärmepumpe Leistung | Number:Power |
-| `heatpumpBuhPower` | ESPAltherma Elektrische Leistung Heizstab | Number:Power |
-| `heatpumpFlowSensor` | ESPAltherma Durchfluss | Number:VolumetricFlowRate |
-| `heatpumpWaterPressure` | ESPAltherma Wasserdruck | Number:Pressure |
+| `heatpumpCircuitPower` | Heatpump Power | Number:Power |
+| `heatpumpBuhPower` | ESPAltherma Electrical Power Backup Heater | Number:Power |
+| `heatpumpFlowSensor` | ESPAltherma Flow Sensor (l/min) | Number:VolumetricFlowRate |
+| `heatpumpWaterPressure` | ESPAltherma Water Pressure | Number:Pressure |
 
 </details>
 
@@ -715,11 +717,11 @@ closed period menu takes no room. The energy flow's heat pump, air conditioner a
 
 | Prop | Item | Item type |
 |---|---|---|
-| `heatpumpCircuitPower` | Wärmepumpe Leistung | Number:Power |
-| `heatpumpInvFrequency` | ESPAltherma Verdichterfrequenz | Number:Frequency |
-| `heatpumpExtAmbientTemp` | ESPAltherma Außentemperatur | Number:Temperature |
-| `heatpumpHeatExchangerMidTemp` | ESPAltherma Wärmetauscher Mitte | Number:Temperature |
-| `heatpumpOutdoorAirTemp` | ESPAltherma Außenluft Temperatur | Number:Temperature |
+| `heatpumpCircuitPower` | Heatpump Power | Number:Power |
+| `heatpumpInvFrequency` | ESPAltherma Inverter Frequency | Number:Frequency |
+| `heatpumpExtAmbientTemp` | ESPAltherma External Ambient Temperature | Number:Temperature |
+| `heatpumpHeatExchangerMidTemp` | ESPAltherma Heat Exchanger Mid Temperature | Number:Temperature |
+| `heatpumpOutdoorAirTemp` | ESPAltherma Outdoor Air Temperature | Number:Temperature |
 
 </details>
 
@@ -728,11 +730,11 @@ closed period menu takes no room. The energy flow's heat pump, air conditioner a
 
 | Prop | Item | Item type |
 |---|---|---|
-| `heatpumpDischargePipeTemp` | ESPAltherma Heißgastemperatur | Number:Temperature |
-| `heatpumpRefrigerantPressure` | ESPAltherma Kältemitteldruck | Number:Pressure |
-| `heatpumpTargetDischargeTemp` | ESPAltherma Soll-Heißgastemperatur | Number:Temperature |
-| `heatpumpRefrigerantTemp` | ESPAltherma Kältemittel flüssig | Number:Temperature |
-| `heatpumpHeatExchangerMidTemp` | ESPAltherma Wärmetauscher Mitte | Number:Temperature |
+| `heatpumpDischargePipeTemp` | ESPAltherma Discharge Pipe Temperature | Number:Temperature |
+| `heatpumpRefrigerantPressure` | ESPAltherma Refrigerant Pressure Sensor | Number:Pressure |
+| `heatpumpTargetDischargeTemp` | ESPAltherma Target Discharge Temperature | Number:Temperature |
+| `heatpumpRefrigerantTemp` | ESPAltherma Refrigerant Temperature Liquid Side | Number:Temperature |
+| `heatpumpHeatExchangerMidTemp` | ESPAltherma Heat Exchanger Mid Temperature | Number:Temperature |
 
 </details>
 
@@ -743,12 +745,12 @@ closed period menu takes no room. The energy flow's heat pump, air conditioner a
 
 | Prop | Item | Item type |
 |---|---|---|
-| `heatpumpLeavingWaterTempAfterBuh` | ESPAltherma Vorlauftemperatur nach Heizstab | Number:Temperature |
-| `heatpumpInletWaterTemp` | ESPAltherma Rücklauftemperatur | Number:Temperature |
-| `heatpumpLeavingWaterTempOffsetHeating` | Pyaltherma Vorlauf-Offset Heizen | Number:Temperature |
-| `heatpumpLeavingWaterSetpoint` | ESPAltherma Vorlauf Sollwert | Number:Temperature |
-| `heatpumpClimateControlPower` | Pyaltherma Heizung Ein/Aus | Switch |
-| `heatpumpHeatingPowerAfterBuh` | ESPAltherma Heizleistung nach Heizstab | Number:Power |
+| `heatpumpLeavingWaterTempAfterBuh` | ESPAltherma Leaving Water Temperature After BUH | Number:Temperature |
+| `heatpumpInletWaterTemp` | ESPAltherma Inlet Water Temperature | Number:Temperature |
+| `heatpumpLeavingWaterTempOffsetHeating` | Pyaltherma Leaving Water Temp Offset Heating | Number:Temperature |
+| `heatpumpLeavingWaterSetpoint` | ESPAltherma Leaving Water Setpoint | Number:Temperature |
+| `heatpumpClimateControlPower` | Pyaltherma Climate Control Power | Switch |
+| `heatpumpHeatingPowerAfterBuh` | ESPAltherma Heating Power After BUH | Number:Power |
 
 </details>
 
@@ -757,10 +759,10 @@ closed period menu takes no room. The energy flow's heat pump, air conditioner a
 
 | Prop | Item | Item type |
 |---|---|---|
-| `heatpumpDhwTankTemp` | ESPAltherma Warmwasserspeicher Temperatur | Number:Temperature |
-| `heatpumpDhwSetpoint` | ESPAltherma Warmwasser Sollwert | Number:Temperature |
-| `heatpumpBshMode` | ESPAltherma Zusatzheizung Speicher | Switch |
-| `heatpumpBshPower` | ESPAltherma Elektrische Leistung Zusatzheizung | Number:Power |
+| `heatpumpDhwTankTemp` | ESPAltherma DHW Tank Temperature | Number:Temperature |
+| `heatpumpDhwSetpoint` | ESPAltherma DHW Setpoint | Number:Temperature |
+| `heatpumpBshMode` | ESPAltherma Booster Heater (BSH) Mode | Switch |
+| `heatpumpBshPower` | ESPAltherma Electrical Power Booster Heater | Number:Power |
 
 </details>
 
@@ -769,7 +771,7 @@ closed period menu takes no room. The energy flow's heat pump, air conditioner a
 
 | Prop | Item | Item type |
 |---|---|---|
-| `heatpumpValve` | ESPAltherma 3-Wege-Ventil | String |
+| `heatpumpValve` | ESPAltherma 3-Way Valve Mode | String |
 
 </details>
 
@@ -778,8 +780,8 @@ closed period menu takes no room. The energy flow's heat pump, air conditioner a
 
 | Prop | Item | Item type |
 |---|---|---|
-| `acTemperature` | Faikout Perfera Temperatur | Number:Temperature |
-| `tadoHumidity` | Tado Luftfeuchtigkeit | Number:Dimensionless |
+| `acTemperature` | Faikout Perfera Temperature | Number:Temperature |
+| `tadoHumidity` | Tado Humidity | Number:Dimensionless |
 
 </details>
 
@@ -788,9 +790,9 @@ closed period menu takes no room. The energy flow's heat pump, air conditioner a
 
 | Prop | Item | Item type |
 |---|---|---|
-| `heatpumpIndoorAmbientTemp` | ESPAltherma Raumtemperatur | Number:Temperature |
-| `netatmoWeatherstationAtmosphericHumidity` | Netatmo Wetterstation Luftfeuchtigkeit | Number:Dimensionless |
-| `netatmoWeatherstationCo2` | Netatmo Wetterstation CO2 | Number:Dimensionless |
+| `heatpumpIndoorAmbientTemp` | ESPAltherma Indoor Ambient Temperature | Number:Temperature |
+| `netatmoWeatherstationAtmosphericHumidity` | Netatmo Weatherstation Atmospheric Humidity | Number:Dimensionless |
+| `netatmoWeatherstationCo2` | Netatmo Weatherstation CO2 | Number:Dimensionless |
 
 </details>
 
@@ -799,14 +801,14 @@ closed period menu takes no room. The energy flow's heat pump, air conditioner a
 
 | Prop | Item | Item type |
 |---|---|---|
-| `heatpumpPower` | ESPAltherma Elektrische Leistung | Number:Power |
-| `heatpumpEnergyToday` | ESPAltherma Energie heute | Number:Energy |
-| `heatpumpElectricalPowerSpace` | ESPAltherma Elektrische Leistung Heizung | Number:Power |
-| `heatpumpElectricalPowerDhw` | ESPAltherma Elektrische Leistung Warmwasser | Number:Power |
-| `heatpumpElectricalPowerStandby` | ESPAltherma Elektrische Leistung Standby | Number:Power |
-| `heatpumpEnergySpaceToday` | ESPAltherma Energie Heizung heute | Number:Energy |
-| `heatpumpEnergyDhwToday` | ESPAltherma Energie Warmwasser heute | Number:Energy |
-| `heatpumpEnergyStandbyToday` | ESPAltherma Energie Standby heute | Number:Energy |
+| `heatpumpPower` | ESPAltherma Electrical Power | Number:Power |
+| `heatpumpEnergyToday` | ESPAltherma Energy Today | Number:Energy |
+| `heatpumpElectricalPowerSpace` | ESPAltherma Electrical Power Space | Number:Power |
+| `heatpumpElectricalPowerDhw` | ESPAltherma Electrical Power DHW | Number:Power |
+| `heatpumpElectricalPowerStandby` | ESPAltherma Electrical Power Standby | Number:Power |
+| `heatpumpEnergySpaceToday` | ESPAltherma Energy Space Today | Number:Energy |
+| `heatpumpEnergyDhwToday` | ESPAltherma Energy DHW Today | Number:Energy |
+| `heatpumpEnergyStandbyToday` | ESPAltherma Energy Standby Today | Number:Energy |
 
 </details>
 
@@ -815,12 +817,12 @@ closed period menu takes no room. The energy flow's heat pump, air conditioner a
 
 | Prop | Item | Item type |
 |---|---|---|
-| `heatpumpHeatPower` | ESPAltherma Heizleistung | Number:Power |
-| `heatpumpHeatingEnergyToday` | ESPAltherma Heizenergie heute | Number:Energy |
-| `heatpumpHeatingPowerSpace` | ESPAltherma Heizleistung Heizung | Number:Power |
-| `heatpumpHeatingPowerDhw` | ESPAltherma Heizleistung Warmwasser | Number:Power |
-| `heatpumpHeatingEnergySpaceToday` | ESPAltherma Heizenergie Heizung heute | Number:Energy |
-| `heatpumpHeatingEnergyDhwToday` | ESPAltherma Heizenergie Warmwasser heute | Number:Energy |
+| `heatpumpHeatPower` | ESPAltherma Heating Power | Number:Power |
+| `heatpumpHeatingEnergyToday` | ESPAltherma Heating Energy Today | Number:Energy |
+| `heatpumpHeatingPowerSpace` | ESPAltherma Heating Power Space | Number:Power |
+| `heatpumpHeatingPowerDhw` | ESPAltherma Heating Power DHW | Number:Power |
+| `heatpumpHeatingEnergySpaceToday` | ESPAltherma Heating Energy Space Today | Number:Energy |
+| `heatpumpHeatingEnergyDhwToday` | ESPAltherma Heating Energy DHW Today | Number:Energy |
 
 </details>
 
@@ -830,10 +832,10 @@ closed period menu takes no room. The energy flow's heat pump, air conditioner a
 | Prop | Item | Item type |
 |---|---|---|
 | `heatpumpCop` | ESPAltherma COP | Number |
-| `heatpumpDcop` | ESPAltherma Tages-COP | Number |
-| `heatpumpExtAmbientTemp` | ESPAltherma Außentemperatur | Number:Temperature |
-| `heatpumpDcopSpace` | ESPAltherma Tages-COP Heizung | Number |
-| `heatpumpDcopDhw` | ESPAltherma Tages-COP Warmwasser | Number |
+| `heatpumpDcop` | ESPAltherma DCOP | Number |
+| `heatpumpExtAmbientTemp` | ESPAltherma External Ambient Temperature | Number:Temperature |
+| `heatpumpDcopSpace` | ESPAltherma DCOP Space | Number |
+| `heatpumpDcopDhw` | ESPAltherma DCOP DHW | Number |
 
 </details>
 
@@ -847,7 +849,7 @@ The parts of the quick popups and of my device pages' controls.
 
 The states of one item as the segments of a bar, the current one filled in the colour; a tap sends a segment's state.
 `options` holds `value=label` pairs separated by semicolons. With `byText` the segments are as wide as their labels, so
-a long one such as *Entfeuchten* fits on a phone; Framework7's sliding highlight is sized for equal segments and is
+a long one such as *Recommended* fits on a phone; Framework7's sliding highlight is sized for equal segments and is
 hidden then. `color` may be an expression, e.g. grey while the device is off.
 
 ![Segmented bars](screenshots/state-bars.png)
@@ -863,7 +865,7 @@ config:
 | Prop | Description | Type | Default |
 |---|---|---|---|
 | `item` | The item whose states the segments send | Item |  |
-| `options` | value=label pairs separated by semicolons, e.g. 1=Niedrig;2=Mittel;3=Hoch | TEXT |  |
+| `options` | value=label pairs separated by semicolons, e.g. 1=Low;2=Medium;3=High | TEXT |  |
 | `color` | Colour of the current segment as #rrggbb; may be an expression | TEXT | `#78909c` |
 | `byText` | Segments as wide as their labels instead of equal widths | BOOLEAN |  |
 | `flex` | CSS flex of the bar in a row, e.g. 1 1 240px | TEXT |  |
@@ -871,7 +873,7 @@ config:
 
 ### Switch tile: `switch-tile`
 
-A plug or device as a small tile: its icon, *An* or *Aus*, the name and a value such as its power; a tap anywhere
+A plug or device as a small tile: its icon, *On* or *Off*, the name and a value such as its power; a tap anywhere
 switches it. While on it is tinted and outlined in its colour. Put several in a grid, e.g. `grid-template-columns:
 repeat(auto-fill, minmax(120px, 1fr))`.
 
@@ -881,7 +883,7 @@ repeat(auto-fill, minmax(120px, 1fr))`.
 component: widget:switch-tile
 config:
   item: coffee_machine_switch
-  title: Kaffeemaschine
+  title: Coffee Machine
   icon: material:coffee
   color: "#8d6e63"
   value: =Math.round(Number(items.coffee_machine_power.numericState) || 0) + ' W'
@@ -909,20 +911,20 @@ component: widget:power-pill
 config:
   item: faikout_perfera_switch
   color: "#29b6f6"
-  onText: ="An · " + items.faikout_perfera_mode.displayState
+  onText: ="On · " + items.faikout_perfera_mode.displayState
 ```
 
 | Prop | Description | Type | Default |
 |---|---|---|---|
 | `item` | The switch item | Item |  |
 | `color` | Device colour as #rrggbb, of the pill while on | TEXT | `#78909c` |
-| `onText` | What the pill says while on, e.g. An · Lüften; usually an expression | TEXT | `An` |
+| `onText` | What the pill says while on, e.g. On · Fan; usually an expression | TEXT | `On` |
 
 ### Boost pill: `boost-pill`
 
 A boost that runs for a while, as a pill: its icon in a tinted circle, the name, what it does while it runs (`running`,
-an expression) or *Aus*, and *Starten* or *Stoppen*; while it runs the pill fills with a gradient of the device colour
-and rings pulse from the icon. A tap anywhere switches the item. My heat pump's hot-water boost and my air conditioner's
+an expression) or *Off*, and *Start* or *Stop*; while it runs the pill fills with a gradient of the device colour and
+rings pulse from the icon. A tap anywhere switches the item. My heat pump's hot-water boost and my air conditioner's
 boost both carry a rocket.
 
 ![Boost pills](screenshots/boost-pills.png)
@@ -931,10 +933,10 @@ boost both carry a rocket.
 component: widget:boost-pill
 config:
   item: pyaltherma_dhw_powerful
-  title: Warmwasser-Boost
+  title: Hot water boost
   icon: material:rocket_launch
   color: "#fb8c00"
-  running: ="läuft · Speicher " + items.espaltherma_dhw_tank_temp.displayState
+  running: ="running · tank " + items.espaltherma_dhw_tank_temp.displayState
 ```
 
 | Prop | Description | Type | Default |
@@ -943,7 +945,7 @@ config:
 | `title` | Name of the boost | TEXT | `Boost` |
 | `icon` | Icon, e.g. material:rocket_launch; a classic openHAB icon follows the item's state | TEXT | `material:bolt` |
 | `color` | Device colour as #rrggbb | TEXT | `#fb8c00` |
-| `running` | The line under the title while the boost runs; usually an expression | TEXT | `läuft` |
+| `running` | The line under the title while the boost runs; usually an expression | TEXT | `running` |
 
 ### Slider: `pill-slider`
 
@@ -964,10 +966,10 @@ config:
   max: 30
   step: 0.5
   unit: °C
-  title: Soll
+  title: Target
   icon: material:device_thermostat
   value: =items.faikout_perfera_temperature_setpoint.displayState
-  context: ="Raum " + items.faikout_perfera_temperature.displayState
+  context: ="Room " + items.faikout_perfera_temperature.displayState
   marks: 18=18 °C;22=22;26=26;30=30 °C
 ```
 
@@ -998,14 +1000,14 @@ A switch for switches that stand side by side: a pill 34 px high in which a whit
 switches (`icon`; the power symbol without one) slides to the right while the pill fills with the card's colour, the
 name in the part the knob leaves free. Every pill has the same sizes and 12 px text. Put several in a grid that places
 as many as fit, e.g. `grid-template-columns: repeat(auto-fit, minmax(120px, 1fr))`, which holds a name such as
-*Warmwasser* and lets three pills stand abreast where there is room and two and one on a phone. A tap anywhere on the
+*Hot water* and lets three pills stand abreast where there is room and two and one on a phone. A tap anywhere on the
 pill switches the item.
 
 ```yaml
 component: widget:pill-switch
 config:
   item: pyaltherma_climate_control_power
-  title: Heizung
+  title: Heating
   icon: material:local_fire_department
   color: "#fb8c00"
 ```
@@ -1021,7 +1023,7 @@ config:
 
 ### Switch row: `switch-row`
 
-A switch in a list of switches: its icon in a circle tinted in the card's colour while on, the name, *An* or *Aus*, and
+A switch in a list of switches: its icon in a circle tinted in the card's colour while on, the name, *On* or *Off*, and
 a switch drawn in the card's colour, a track that fills while on and a white knob that slides over. A tap anywhere
 on the row switches the item.
 
@@ -1091,6 +1093,8 @@ and its badges.
 
 ![Flow nodes](screenshots/flow-node.gif)
 
+![Flow nodes in dark mode](screenshots/flow-node-dark.gif)
+
 | Prop | Description | Type | Default |
 |---|---|---|---|
 | `kind` | The device drawn | TEXT |  |
@@ -1109,6 +1113,8 @@ fades. The dots run a dot radius past both ends, so they slide out from under on
 
 ![Flow lines between three nodes](screenshots/flow-link.gif)
 
+![Flow lines between three nodes in dark mode](screenshots/flow-link-dark.gif)
+
 | Prop | Description | Type | Default |
 |---|---|---|---|
 | `x1` | Start point's x in the flow's viewBox | DECIMAL |  |
@@ -1122,7 +1128,7 @@ fades. The dots run a dot radius past both ends, so they slide out from under on
 
 ### Share ring: `flow-share-ring`
 
-A ring around (`x`, `y`) filled to `part` / `whole`, the percentage inside and `title` with *heute* beside it; the
+A ring around (`x`, `y`) filled to `part` / `whole`, the percentage inside and `title` with *today* beside it; the
 energy flow shows today's self-consumption and self-sufficiency with it.
 
 ![Share rings](screenshots/flow-share-rings.png)
@@ -1132,7 +1138,7 @@ component: widget:flow-share-ring
 config:
   x: 40
   y: 40
-  title: Eigenverbrauch
+  title: Self-consumption
   part: =Number(items.photovoltaics_own_ec_day.numericState) || 0
   whole: =Number(items.huawei_inverter_e_day.numericState) || 0
 ```
@@ -1141,7 +1147,7 @@ config:
 |---|---|---|---|
 | `x` | Centre's x in the flow's viewBox | DECIMAL |  |
 | `y` | Centre's y in the flow's viewBox | DECIMAL |  |
-| `title` | Text beside the ring, e.g. Eigenverbrauch | TEXT |  |
+| `title` | Text beside the ring, e.g. Self-consumption | TEXT |  |
 | `part` | The part, e.g. today's PV energy used at home; usually an expression | TEXT |  |
 | `whole` | The whole, e.g. today's PV energy; usually an expression | TEXT |  |
 
@@ -1156,6 +1162,8 @@ dryer's paddles or the dishwasher's spray arm turn while `running` holds, drople
 the ring fills with `progress`, or pulses where there is none.
 
 ![Appliance icons](screenshots/appliance-icon.gif)
+
+![Appliance icons in dark mode](screenshots/appliance-icon-dark.gif)
 
 ```yaml
 component: widget:appliance-icon
@@ -1189,7 +1197,7 @@ and its ring pulses. Put the tiles in a grid, e.g. two columns.
 - component: widget:appliance-tile
   config:
     kind: washer
-    title: Waschmaschine 1
+    title: Washing Machine 1
     popup: washing_machine_1
     progress: miele_washing_machine_wwg360_program_progress
     state: miele_washing_machine_wwg360_operation_state
@@ -1200,7 +1208,7 @@ and its ring pulses. Put the tiles in a grid, e.g. two columns.
 - component: widget:appliance-tile
   config:
     kind: washer
-    title: Waschmaschine 2
+    title: Washing Machine 2
     popup: washing_machine_2
     power: washing_machine_2_power
     done: washing_machine_2_finished
@@ -1278,7 +1286,7 @@ Now: power, on/off pill, energy today and total. Needs `item-popup`, `power-pill
 | Prop | Description | Type | Default |
 |---|---|---|---|
 | `prefix` | Name prefix of the plug's items: `<prefix>_power`, _switch, _energy_today, _energy_total, _voltage, _current, _power_factor, _apparent_power, _reactive_power | TEXT |  |
-| `title` | Card title, the device's name where the card is not a plug | TEXT | `Steckdose` |
+| `title` | Card title, the device's name where the card is not a plug | TEXT | `Plug` |
 | `icon` | Device icon, e.g. material:coffee | TEXT | `material:power` |
 | `color` | Device colour as #rrggbb | TEXT | `#8d6e63` |
 | `controllable` | Show the plug's switch | BOOLEAN | `true` |
@@ -1310,7 +1318,7 @@ Voltage, current, power factor, apparent and reactive power. Needs `item-popup`,
 | Prop | Description | Type | Default |
 |---|---|---|---|
 | `prefix` | Name prefix of the plug's items: `<prefix>_power`, _switch, _energy_today, _energy_total, _voltage, _current, _power_factor, _apparent_power, _reactive_power | TEXT |  |
-| `title` | Card title | TEXT | `Elektrisch` |
+| `title` | Card title | TEXT | `Electrical` |
 
 ## Item popup: `item-popup`
 
@@ -1324,7 +1332,7 @@ action: popup
 actionModal: widget:item-popup
 actionModalConfig:
   item: coffee_machine_energy_today
-  title: Energie heute
+  title: Energy today
   kind: number
 ```
 
@@ -1349,7 +1357,7 @@ font. `wrap` lets a long text wrap across the whole row of a grid.
 ```yaml
 component: widget:value-tile
 config:
-  title: Vorlauf
+  title: Flow
   value: =items.espaltherma_leaving_water_temp_after_buh.displayState
   icon: material:thermostat
   color: "#e57373"

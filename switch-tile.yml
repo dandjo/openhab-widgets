@@ -36,7 +36,7 @@ props:
     type: TEXT
     required: false
   parameterGroups: []
-timestamp: Oct 3, 2026, 2:28:59 AM
+timestamp: Oct 4, 2026, 11:05:34 PM
 component: div
 config:
   style:
@@ -69,7 +69,7 @@ slots:
           height: 22
       - component: Label
         config:
-          text: '=items[props.item].state === ''ON'' ? ''An'' : ''Aus'''
+          text: '=items[props.item].state === ''ON'' ? ''On'' : ''Off'''
           style:
             font-size: 11px
             font-weight: '700'

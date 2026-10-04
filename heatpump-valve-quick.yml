@@ -4,18 +4,18 @@ tags:
 props:
   parameters:
   - name: heatpumpValve
-    label: ESPAltherma 3-Wege-Ventil
+    label: ESPAltherma 3-Way Valve Mode
     description: String item
     type: TEXT
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 4, 2026, 5:20:43 PM
+timestamp: Oct 4, 2026, 11:05:34 PM
 component: div
 config:
   style:
     --quick-popup: panel
-  label: 3-Wege-Ventil
+  label: 3-Way Valve
   stylesheet: ':root .popup:has(> .oh-popup[style*="--quick-popup"]) { --f7-popup-tablet-width: 420px; --f7-popup-tablet-height:
     min(660px, calc(100vh - 64px)); }
 
@@ -70,13 +70,13 @@ slots:
               default:
               - component: Label
                 config:
-                  text: 3-Wege-Ventil
+                  text: 3-Way Valve
                   style:
                     font-size: 15px
                     font-weight: '600'
               - component: Label
                 config:
-                  text: '=(items[props.heatpumpValve].state === ''DHW'' ? ''Warmwasser'' : ''Heizung'')'
+                  text: '=(items[props.heatpumpValve].state === ''DHW'' ? ''Hot water'' : ''Heating'')'
                   style:
                     font-size: 12px
                     opacity: '0.7'
@@ -114,17 +114,17 @@ slots:
             config:
               categoryType: values
               data:
-              - Stellung
+              - Position
               show: false
               gridIndex: 0
           series:
           - component: oh-state-series
             config:
-              name: Stellung
+              name: Position
               item: =props.heatpumpValve
               yValue: 0
               yHeight: 0.7
-              mapState: '=(s) => s === ''Space'' ? ''Heizung'' : s === ''DHW'' ? ''Warmwasser'' : s'
+              mapState: '=(s) => s === ''Space'' ? ''Heating'' : s === ''DHW'' ? ''Hot water'' : s'
               stateColor:
                 Heizung: '#ffb74d'
                 Warmwasser: '#e57373'
@@ -135,7 +135,7 @@ slots:
           - component: oh-chart-title
             config:
               show: true
-              text: Stellung
+              text: Position
               left: 10
               top: 15
               textStyle:
@@ -156,7 +156,7 @@ slots:
           default:
           - component: oh-button
             config:
-              text: Alle Details
+              text: All details
               action: popup
               actionModal: page:heatpump
               outline: true

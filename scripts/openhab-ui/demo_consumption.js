@@ -4,7 +4,7 @@
   const st = document.querySelector("#app").__vue_app__.config.globalProperties.$pinia._s.get("states");
   st.stopTrackingStates();
   const q = v => ({ state: `${v} kWh`, numericState: v, unit: "kWh", type: "Quantity",
-    displayState: `${v.toFixed(2).replace(".", ",")} kWh` });
+    displayState: `${v.toFixed(2)} kWh` });  // English, as the repository's screenshots
   const demo = {
     home_ec_day: 16.3, photovoltaics_own_ec_day: 13.9, huawei_inverter_power_meter_ec_day: 2.4,
     espaltherma_energy_today: 3.9, e_car_energy_today: 5.1, air_conditioning_unit_energy_today: 1.3,

@@ -4,67 +4,67 @@ tags:
 props:
   parameters:
   - name: heatpumpDhwTankTemp
-    label: ESPAltherma Warmwasserspeicher Temperatur
+    label: ESPAltherma DHW Tank Temperature
     description: Number:Temperature item
     type: TEXT
     required: true
     context: item
   - name: heatpumpWaterPumpOperation
-    label: ESPAltherma Umwälzpumpe
+    label: ESPAltherma Water Pump Operation
     description: Switch item
     type: TEXT
     required: true
     context: item
   - name: heatpumpFlowSensor
-    label: ESPAltherma Durchfluss
+    label: ESPAltherma Flow Sensor (l/min)
     description: Number:VolumetricFlowRate item
     type: TEXT
     required: true
     context: item
   - name: heatpumpValve
-    label: ESPAltherma 3-Wege-Ventil
+    label: ESPAltherma 3-Way Valve Mode
     description: String item
     type: TEXT
     required: true
     context: item
   - name: heatpumpBshMode
-    label: ESPAltherma Zusatzheizung Speicher
+    label: ESPAltherma Booster Heater (BSH) Mode
     description: Switch item
     type: TEXT
     required: true
     context: item
   - name: heatpumpInvFrequency
-    label: ESPAltherma Verdichterfrequenz
+    label: ESPAltherma Inverter Frequency
     description: Number:Frequency item
     type: TEXT
     required: true
     context: item
   - name: heatpumpDhwPower
-    label: Pyaltherma Warmwasser Ein/Aus
+    label: Pyaltherma DHW Power
     description: Switch item
     type: TEXT
     required: true
     context: item
   - name: heatpumpDhwSetpoint
-    label: ESPAltherma Warmwasser Sollwert
+    label: ESPAltherma DHW Setpoint
     description: Number:Temperature item
     type: TEXT
     required: true
     context: item
   - name: heatpumpDhwSince
-    label: Wärmepumpe Warmwasser lädt seit
+    label: Heatpump DHW Charging Since
     description: DateTime item
     type: TEXT
     required: true
     context: item
   - name: heatpumpPower
-    label: ESPAltherma Elektrische Leistung
+    label: ESPAltherma Electrical Power
     description: Number:Power item
     type: TEXT
     required: true
     context: item
   - name: heatpumpDhwBoost
-    label: Pyaltherma Warmwasser-Boost
+    label: Pyaltherma DHW Powerful
     description: Switch item
     type: TEXT
     required: true
@@ -76,121 +76,121 @@ props:
     required: true
     context: item
   - name: heatpumpClimateControlPower
-    label: Pyaltherma Heizung Ein/Aus
+    label: Pyaltherma Climate Control Power
     description: Switch item
     type: TEXT
     required: true
     context: item
   - name: heatpumpManagement
-    label: Wärmepumpe Automatik
+    label: Heatpump Management
     description: Group item
     type: TEXT
     required: true
     context: item
   - name: heatpumpDhwTempHeating
-    label: Pyaltherma Warmwasser Solltemperatur
+    label: Pyaltherma DHW Temp Heating
     description: Number:Temperature item
     type: TEXT
     required: true
     context: item
   - name: heatpumpDhwManagement
-    label: Wärmepumpe Warmwasser-Automatik
+    label: Heatpump DHW Management
     description: Switch item
     type: TEXT
     required: true
     context: item
   - name: heatpumpDhwEta
-    label: Wärmepumpe Warmwasser fertig um
+    label: Heatpump DHW Done At
     description: DateTime item
     type: TEXT
     required: true
     context: item
   - name: heatpumpBuhStep1Mode
-    label: ESPAltherma Heizstab Stufe 1
+    label: ESPAltherma Backup Heater (BUH) Step 1 Mode
     description: Switch item
     type: TEXT
     required: true
     context: item
   - name: heatpumpBuhStep2Mode
-    label: ESPAltherma Heizstab Stufe 2
+    label: ESPAltherma Backup Heater (BUH) Step 2 Mode
     description: Switch item
     type: TEXT
     required: true
     context: item
   - name: heatpumpCircuitPower
-    label: Wärmepumpe Leistung
+    label: Heatpump Power
     description: Number:Power item
     type: TEXT
     required: true
     context: item
   - name: heatpumpDefrostOperaton
-    label: ESPAltherma Abtauen
+    label: ESPAltherma Defrost Operation
     description: Switch item
     type: TEXT
     required: true
     context: item
   - name: heatpumpLeavingWaterTempAfterBuh
-    label: ESPAltherma Vorlauftemperatur nach Heizstab
+    label: ESPAltherma Leaving Water Temperature After BUH
     description: Number:Temperature item
     type: TEXT
     required: true
     context: item
   - name: heatpumpLeavingWaterSetpoint
-    label: ESPAltherma Vorlauf Sollwert
+    label: ESPAltherma Leaving Water Setpoint
     description: Number:Temperature item
     type: TEXT
     required: true
     context: item
   - name: heatpumpHeatingSince
-    label: Wärmepumpe Heizung läuft seit
+    label: Heatpump Heating Running Since
     description: DateTime item
     type: TEXT
     required: true
     context: item
   - name: heatpumpEnergyToday
-    label: ESPAltherma Energie heute
+    label: ESPAltherma Energy Today
     description: Number:Energy item
     type: TEXT
     required: true
     context: item
   - name: heatpumpEnergySpaceToday
-    label: ESPAltherma Energie Heizung heute
+    label: ESPAltherma Energy Space Today
     description: Number:Energy item
     type: TEXT
     required: true
     context: item
   - name: heatpumpEnergyDhwToday
-    label: ESPAltherma Energie Warmwasser heute
+    label: ESPAltherma Energy DHW Today
     description: Number:Energy item
     type: TEXT
     required: true
     context: item
   - name: heatpumpEnergyStandbyToday
-    label: ESPAltherma Energie Standby heute
+    label: ESPAltherma Energy Standby Today
     description: Number:Energy item
     type: TEXT
     required: true
     context: item
   - name: heatpumpHeatingEnergyToday
-    label: ESPAltherma Heizenergie heute
+    label: ESPAltherma Heating Energy Today
     description: Number:Energy item
     type: TEXT
     required: true
     context: item
   - name: heatpumpHeatingEnergySpaceToday
-    label: ESPAltherma Heizenergie Heizung heute
+    label: ESPAltherma Heating Energy Space Today
     description: Number:Energy item
     type: TEXT
     required: true
     context: item
   - name: heatpumpHeatingEnergyDhwToday
-    label: ESPAltherma Heizenergie Warmwasser heute
+    label: ESPAltherma Heating Energy DHW Today
     description: Number:Energy item
     type: TEXT
     required: true
     context: item
   - name: heatpumpDcopSpace
-    label: ESPAltherma Tages-COP Heizung
+    label: ESPAltherma DCOP Space
     description: Number item
     type: TEXT
     required: true
@@ -202,28 +202,28 @@ props:
     required: true
     context: item
   - name: heatpumpDcop
-    label: ESPAltherma Tages-COP
+    label: ESPAltherma DCOP
     description: Number item
     type: TEXT
     required: true
     context: item
   - name: heatpumpExtAmbientTemp
-    label: ESPAltherma Außentemperatur
+    label: ESPAltherma External Ambient Temperature
     description: Number:Temperature item
     type: TEXT
     required: true
     context: item
   - name: heatpumpDcopDhw
-    label: ESPAltherma Tages-COP Warmwasser
+    label: ESPAltherma DCOP DHW
     description: Number item
     type: TEXT
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 4, 2026, 9:05:35 PM
+timestamp: Oct 4, 2026, 11:05:34 PM
 component: oh-card
 config:
-  title: Heizung & Warmwasser
+  title: Heating & Hot Water
   style:
     height: calc(100% - 2 * var(--f7-card-margin-vertical))
 slots:
@@ -612,9 +612,10 @@ slots:
                             font-feature-settings: '''liga'''
               - component: Label
                 config:
-                  text: Warmwasserspeicher
+                  text: Hot Water Tank
                   style:
                     font-weight: '600'
+                    margin-top: -2px
               - component: div
                 config:
                   style:
@@ -662,12 +663,12 @@ slots:
                             || items[props.heatpumpDhwSetpoint].state))'
               - component: Label
                 config:
-                  text: '=(items[props.heatpumpBshMode].state === ''ON'' ? ''Zusatzheizung'' : ''Laden'') + '' seit '' + dayjs(items[props.heatpumpDhwSince].state).format(''HH:mm'')
-                    + '' · '' + (dayjs().diff(dayjs(items[props.heatpumpDhwSince].state), ''minute'') >= 60 ? Math.floor(dayjs().diff(dayjs(items[props.heatpumpDhwSince].state),
-                    ''minute'') / 60) + '':'' + (Math.floor(dayjs().diff(dayjs(items[props.heatpumpDhwSince].state), ''minute'')
-                    % 60) < 10 ? ''0'' : '''') + Math.floor(dayjs().diff(dayjs(items[props.heatpumpDhwSince].state), ''minute'')
-                    % 60) + '' h'' : Math.round(dayjs().diff(dayjs(items[props.heatpumpDhwSince].state), ''minute'')) + ''
-                    min'')'
+                  text: '=(items[props.heatpumpBshMode].state === ''ON'' ? ''Booster heater'' : ''Charging'') + '' since ''
+                    + dayjs(items[props.heatpumpDhwSince].state).format(''HH:mm'') + '' · '' + (dayjs().diff(dayjs(items[props.heatpumpDhwSince].state),
+                    ''minute'') >= 60 ? Math.floor(dayjs().diff(dayjs(items[props.heatpumpDhwSince].state), ''minute'') /
+                    60) + '':'' + (Math.floor(dayjs().diff(dayjs(items[props.heatpumpDhwSince].state), ''minute'') % 60) <
+                    10 ? ''0'' : '''') + Math.floor(dayjs().diff(dayjs(items[props.heatpumpDhwSince].state), ''minute'') %
+                    60) + '' h'' : Math.round(dayjs().diff(dayjs(items[props.heatpumpDhwSince].state), ''minute'')) + '' min'')'
                   visible: =(items[props.heatpumpDhwSince].state !== 'UNDEF' && items[props.heatpumpDhwSince].state !== 'NULL')
                   style:
                     font-size: 12px
@@ -956,9 +957,10 @@ slots:
                             font-feature-settings: '''liga'''
               - component: Label
                 config:
-                  text: Heizung
+                  text: Heating
                   style:
                     font-weight: '600'
+                    margin-top: -2px
               - component: div
                 config:
                   style:
@@ -994,6 +996,9 @@ slots:
                         font-size: 12px
                         font-weight: '600'
                         white-space: nowrap
+                      visible: =!((items[props.heatpumpDhwEta].state !== 'UNDEF' && items[props.heatpumpDhwEta].state !==
+                        'NULL' && items[props.heatpumpDhwSince].state !== 'UNDEF' && items[props.heatpumpDhwSince].state !==
+                        'NULL'))
                     slots:
                       default:
                       - component: f7-icon
@@ -1004,9 +1009,37 @@ slots:
                         config:
                           text: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpLeavingWaterSetpoint].state) ? ''–''
                             : (items[props.heatpumpLeavingWaterSetpoint].displayState || items[props.heatpumpLeavingWaterSetpoint].state))'
+                  - component: div
+                    config:
+                      style:
+                        display: inline-flex
+                        align-items: center
+                        gap: 4px
+                        color: '=themeOptions.dark === ''dark'' ? ''#ffb74d'' : ''#e65100'''
+                        background: rgba(255, 183, 77, 0.16)
+                        border-radius: 10px
+                        padding: 2px 8px
+                        font-size: 12px
+                        font-weight: '600'
+                        white-space: nowrap
+                      visible: =(items[props.heatpumpDhwEta].state !== 'UNDEF' && items[props.heatpumpDhwEta].state !== 'NULL'
+                        && items[props.heatpumpDhwSince].state !== 'UNDEF' && items[props.heatpumpDhwSince].state !== 'NULL')
+                    slots:
+                      default:
+                      - component: f7-icon
+                        config:
+                          f7: timer
+                          size: 13
+                      - component: Label
+                        config:
+                          text: '=((Math.max(0, dayjs(items[props.heatpumpDhwEta].state).diff(dayjs(), ''minute'', true)))
+                            * 60 >= 3600 ? Math.floor((Math.max(0, dayjs(items[props.heatpumpDhwEta].state).diff(dayjs(),
+                            ''minute'', true))) * 60 / 3600) + '':'' + (''0'' + Math.floor((Math.max(0, dayjs(items[props.heatpumpDhwEta].state).diff(dayjs(),
+                            ''minute'', true))) * 60 % 3600 / 60)).slice(-2) + '' h'' : Math.ceil((Math.max(0, dayjs(items[props.heatpumpDhwEta].state).diff(dayjs(),
+                            ''minute'', true))) * 60 / 60) + '' min'')'
               - component: Label
                 config:
-                  text: '=''Heizen'' + '' seit '' + dayjs(items[props.heatpumpHeatingSince].state).format(''HH:mm'') + ''
+                  text: '=''Heating'' + '' since '' + dayjs(items[props.heatpumpHeatingSince].state).format(''HH:mm'') + ''
                     · '' + (dayjs().diff(dayjs(items[props.heatpumpHeatingSince].state), ''minute'') >= 60 ? Math.floor(dayjs().diff(dayjs(items[props.heatpumpHeatingSince].state),
                     ''minute'') / 60) + '':'' + (Math.floor(dayjs().diff(dayjs(items[props.heatpumpHeatingSince].state), ''minute'')
                     % 60) < 10 ? ''0'' : '''') + Math.floor(dayjs().diff(dayjs(items[props.heatpumpHeatingSince].state), ''minute'')
@@ -1019,13 +1052,7 @@ slots:
                     opacity: '0.75'
               - component: Label
                 config:
-                  text: '=''WW fertig um '' + dayjs(items[props.heatpumpDhwEta].state).format(''HH:mm'') + '' · noch '' +
-                    (Math.max(0, dayjs(items[props.heatpumpDhwEta].state).diff(dayjs(), ''minute'', true)) >= 60 ? Math.floor(Math.max(0,
-                    dayjs(items[props.heatpumpDhwEta].state).diff(dayjs(), ''minute'', true)) / 60) + '':'' + (Math.floor(Math.max(0,
-                    dayjs(items[props.heatpumpDhwEta].state).diff(dayjs(), ''minute'', true)) % 60) < 10 ? ''0'' : '''') +
-                    Math.floor(Math.max(0, dayjs(items[props.heatpumpDhwEta].state).diff(dayjs(), ''minute'', true)) % 60)
-                    + '' h'' : Math.round(Math.max(0, dayjs(items[props.heatpumpDhwEta].state).diff(dayjs(), ''minute'', true)))
-                    + '' min'')'
+                  text: ='Hot water charge · done at ' + dayjs(items[props.heatpumpDhwEta].state).format('HH:mm')
                   visible: =(items[props.heatpumpDhwEta].state !== 'UNDEF' && items[props.heatpumpDhwEta].state !== 'NULL'
                     && items[props.heatpumpDhwSince].state !== 'UNDEF' && items[props.heatpumpDhwSince].state !== 'NULL')
                   style:
@@ -1095,13 +1122,12 @@ slots:
                   default:
                   - component: Label
                     config:
-                      text: Strom heute
+                      text: Electricity today
                       style:
                         opacity: '0.7'
                   - component: Label
                     config:
-                      text: =((Number(items[props.heatpumpEnergyToday].numericState) || 0)).toFixed(1).replace('.', ',') +
-                        ' kWh'
+                      text: =((Number(items[props.heatpumpEnergyToday].numericState) || 0)).toFixed(1) + ' kWh'
                       style:
                         font-weight: '700'
               - component: div
@@ -1115,8 +1141,8 @@ slots:
                   - component: div
                     config:
                       class: seg k k-heizung
-                      title: ='Heizung · ' + ((Number(items[props.heatpumpEnergySpaceToday].numericState) || 0)).toFixed(2).replace('.',
-                        ',') + ' kWh'
+                      title: ='Heating · ' + ((Number(items[props.heatpumpEnergySpaceToday].numericState) || 0)).toFixed(2)
+                        + ' kWh'
                       visible: =(Number(items[props.heatpumpEnergySpaceToday].numericState) || 0) > 0.005
                       style:
                         width: '=((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ? 100 * (Number(items[props.heatpumpEnergySpaceToday].numericState)
@@ -1129,8 +1155,8 @@ slots:
                   - component: div
                     config:
                       class: seg k k-warmwasser
-                      title: ='Warmwasser · ' + ((Number(items[props.heatpumpEnergyDhwToday].numericState) || 0)).toFixed(2).replace('.',
-                        ',') + ' kWh'
+                      title: ='Hot water · ' + ((Number(items[props.heatpumpEnergyDhwToday].numericState) || 0)).toFixed(2)
+                        + ' kWh'
                       visible: =(Number(items[props.heatpumpEnergyDhwToday].numericState) || 0) > 0.005
                       style:
                         width: '=((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ? 100 * (Number(items[props.heatpumpEnergyDhwToday].numericState)
@@ -1143,8 +1169,8 @@ slots:
                   - component: div
                     config:
                       class: seg k k-standby
-                      title: ='Standby · ' + ((Number(items[props.heatpumpEnergyStandbyToday].numericState) || 0)).toFixed(2).replace('.',
-                        ',') + ' kWh'
+                      title: ='Standby · ' + ((Number(items[props.heatpumpEnergyStandbyToday].numericState) || 0)).toFixed(2)
+                        + ' kWh'
                       visible: =(Number(items[props.heatpumpEnergyStandbyToday].numericState) || 0) > 0.005
                       style:
                         width: '=((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ? 100 * (Number(items[props.heatpumpEnergyStandbyToday].numericState)
@@ -1170,13 +1196,12 @@ slots:
                   default:
                   - component: Label
                     config:
-                      text: Wärme heute
+                      text: Heat today
                       style:
                         opacity: '0.7'
                   - component: Label
                     config:
-                      text: =((Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0)).toFixed(1).replace('.',
-                        ',') + ' kWh'
+                      text: =((Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0)).toFixed(1) + ' kWh'
                       style:
                         font-weight: '700'
               - component: div
@@ -1190,8 +1215,8 @@ slots:
                   - component: div
                     config:
                       class: seg k k-heizung
-                      title: ='Heizung · ' + ((Number(items[props.heatpumpHeatingEnergySpaceToday].numericState) || 0)).toFixed(2).replace('.',
-                        ',') + ' kWh'
+                      title: ='Heating · ' + ((Number(items[props.heatpumpHeatingEnergySpaceToday].numericState) || 0)).toFixed(2)
+                        + ' kWh'
                       visible: =(Number(items[props.heatpumpHeatingEnergySpaceToday].numericState) || 0) > 0.005
                       style:
                         width: '=((Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0) > 0 ? 100 * (Number(items[props.heatpumpHeatingEnergySpaceToday].numericState)
@@ -1204,8 +1229,8 @@ slots:
                   - component: div
                     config:
                       class: seg k k-warmwasser
-                      title: ='Warmwasser · ' + ((Number(items[props.heatpumpHeatingEnergyDhwToday].numericState) || 0)).toFixed(2).replace('.',
-                        ',') + ' kWh'
+                      title: ='Hot water · ' + ((Number(items[props.heatpumpHeatingEnergyDhwToday].numericState) || 0)).toFixed(2)
+                        + ' kWh'
                       visible: =(Number(items[props.heatpumpHeatingEnergyDhwToday].numericState) || 0) > 0.005
                       style:
                         width: '=((Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0) > 0 ? 100 * (Number(items[props.heatpumpHeatingEnergyDhwToday].numericState)
@@ -1243,7 +1268,7 @@ slots:
                       default: []
                   - component: Label
                     config:
-                      text: Heizung
+                      text: Heating
                       style:
                         font-size: 12px
                         opacity: '0.75'
@@ -1267,7 +1292,7 @@ slots:
                       default: []
                   - component: Label
                     config:
-                      text: Warmwasser
+                      text: Hot water
                       style:
                         font-size: 12px
                         opacity: '0.75'
@@ -1373,7 +1398,7 @@ slots:
                           x: 24
                           y: 30
                           content: '=(Number(items[props.heatpumpDcopSpace].numericState) || 0) > 0 ? ((Number(items[props.heatpumpDcopSpace].numericState)
-                            || 0)).toFixed(1).replace(''.'', '','') : ''–'''
+                            || 0)).toFixed(1) : ''–'''
                           fill: currentColor
                           font-size: 13
                           font-weight: '700'
@@ -1383,7 +1408,7 @@ slots:
                         config:
                           x: 56
                           y: 23
-                          content: COP Heizung
+                          content: COP heating
                           fill: currentColor
                           font-size: 12
                           font-weight: normal
@@ -1393,7 +1418,7 @@ slots:
                         config:
                           x: 56
                           y: 39
-                          content: heute
+                          content: today
                           fill: currentColor
                           font-size: 11
                           font-weight: normal
@@ -1484,7 +1509,7 @@ slots:
                           x: 24
                           y: 30
                           content: '=(Number(items[props.heatpumpDcopDhw].numericState) || 0) > 0 ? ((Number(items[props.heatpumpDcopDhw].numericState)
-                            || 0)).toFixed(1).replace(''.'', '','') : ''–'''
+                            || 0)).toFixed(1) : ''–'''
                           fill: currentColor
                           font-size: 13
                           font-weight: '700'
@@ -1494,7 +1519,7 @@ slots:
                         config:
                           x: 56
                           y: 23
-                          content: COP WW
+                          content: COP DHW
                           fill: currentColor
                           font-size: 12
                           font-weight: normal
@@ -1504,7 +1529,7 @@ slots:
                         config:
                           x: 56
                           y: 39
-                          content: heute
+                          content: today
                           fill: currentColor
                           font-size: 11
                           font-weight: normal
@@ -1596,7 +1621,7 @@ slots:
                           x: 24
                           y: 30
                           content: '=(Number(items[props.heatpumpDcop].numericState) || 0) > 0 ? ((Number(items[props.heatpumpDcop].numericState)
-                            || 0)).toFixed(1).replace(''.'', '','') : ''–'''
+                            || 0)).toFixed(1) : ''–'''
                           fill: currentColor
                           font-size: 13
                           font-weight: '700'
@@ -1606,7 +1631,7 @@ slots:
                         config:
                           x: 56
                           y: 23
-                          content: COP gesamt
+                          content: COP total
                           fill: currentColor
                           font-size: 12
                           font-weight: normal
@@ -1616,7 +1641,7 @@ slots:
                         config:
                           x: 56
                           y: 39
-                          content: heute
+                          content: today
                           fill: currentColor
                           font-size: 11
                           font-weight: normal

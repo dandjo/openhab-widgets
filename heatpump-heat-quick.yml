@@ -4,48 +4,48 @@ tags:
 props:
   parameters:
   - name: heatpumpHeatPower
-    label: ESPAltherma Heizleistung
+    label: ESPAltherma Heating Power
     description: Number:Power item
     type: TEXT
     required: true
     context: item
   - name: heatpumpHeatingEnergyToday
-    label: ESPAltherma Heizenergie heute
+    label: ESPAltherma Heating Energy Today
     description: Number:Energy item
     type: TEXT
     required: true
     context: item
   - name: heatpumpHeatingPowerSpace
-    label: ESPAltherma Heizleistung Heizung
+    label: ESPAltherma Heating Power Space
     description: Number:Power item
     type: TEXT
     required: true
     context: item
   - name: heatpumpHeatingPowerDhw
-    label: ESPAltherma Heizleistung Warmwasser
+    label: ESPAltherma Heating Power DHW
     description: Number:Power item
     type: TEXT
     required: true
     context: item
   - name: heatpumpHeatingEnergySpaceToday
-    label: ESPAltherma Heizenergie Heizung heute
+    label: ESPAltherma Heating Energy Space Today
     description: Number:Energy item
     type: TEXT
     required: true
     context: item
   - name: heatpumpHeatingEnergyDhwToday
-    label: ESPAltherma Heizenergie Warmwasser heute
+    label: ESPAltherma Heating Energy DHW Today
     description: Number:Energy item
     type: TEXT
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 4, 2026, 5:20:43 PM
+timestamp: Oct 4, 2026, 11:05:34 PM
 component: div
 config:
   style:
     --quick-popup: panel
-  label: Wärme
+  label: Heat
   stylesheet: ':root .popup:has(> .oh-popup[style*="--quick-popup"]) { --f7-popup-tablet-width: 420px; --f7-popup-tablet-height:
     min(660px, calc(100vh - 64px)); }
 
@@ -100,15 +100,15 @@ slots:
               default:
               - component: Label
                 config:
-                  text: Wärme
+                  text: Heat
                   style:
                     font-size: 15px
                     font-weight: '600'
               - component: Label
                 config:
                   text: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpHeatPower].state) ? ''–'' : ((Number(items[props.heatpumpHeatPower].numericState)
-                    || 0) / 1000).toFixed(2).replace(''.'', '','') + '' kW'') + '' · heute '' + ((Number(items[props.heatpumpHeatingEnergyToday].numericState)
-                    || 0)).toFixed(1).replace(''.'', '','') + '' kWh'''
+                    || 0) / 1000).toFixed(2) + '' kW'') + '' · today '' + ((Number(items[props.heatpumpHeatingEnergyToday].numericState)
+                    || 0)).toFixed(1) + '' kWh'''
                   style:
                     font-size: 12px
                     opacity: '0.7'
@@ -169,7 +169,7 @@ slots:
           series:
           - component: oh-time-series
             config:
-              name: Heizung
+              name: Heating
               gridIndex: 0
               xAxisIndex: 0
               yAxisIndex: 0
@@ -196,7 +196,7 @@ slots:
                     color: rgba(255, 183, 77, 0.02)
           - component: oh-time-series
             config:
-              name: Warmwasser
+              name: Hot water
               gridIndex: 0
               xAxisIndex: 1
               yAxisIndex: 0
@@ -238,7 +238,7 @@ slots:
           - component: oh-chart-title
             config:
               show: true
-              text: Leistung
+              text: Power
               left: 10
               top: 15
               textStyle:
@@ -262,7 +262,7 @@ slots:
             config:
               gridIndex: 0
               categoryType: month
-              name: Tag
+              name: Day
               nameGap: 12
               axisTick:
                 show: false
@@ -286,7 +286,7 @@ slots:
           series:
           - component: oh-aggregate-series
             config:
-              name: Heizung
+              name: Heating
               gridIndex: 0
               xAxisIndex: 0
               yAxisIndex: 0
@@ -299,7 +299,7 @@ slots:
               stack: day
           - component: oh-aggregate-series
             config:
-              name: Warmwasser
+              name: Hot water
               gridIndex: 0
               xAxisIndex: 0
               yAxisIndex: 0
@@ -332,7 +332,7 @@ slots:
           - component: oh-chart-title
             config:
               show: true
-              text: Energie pro Tag
+              text: Energy per Day
               left: 10
               top: 15
               textStyle:
@@ -348,7 +348,7 @@ slots:
           default:
           - component: oh-button
             config:
-              text: Alle Details
+              text: All details
               action: popup
               actionModal: page:heatpump
               outline: true

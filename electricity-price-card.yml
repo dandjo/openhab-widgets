@@ -4,46 +4,46 @@ tags:
 props:
   parameters:
   - name: priceTotalGross
-    label: Strompreis gesamt brutto
+    label: EPEX Spot aWATTar Total Gross
     description: Number:EnergyPrice item
     type: TEXT
     required: true
     context: item
   - name: priceCheapestHour
-    label: Günstigste Stunde
+    label: Cheapest hour
     description: DateTime item
     type: TEXT
     required: true
     context: item
   - name: pricePriciestHour
-    label: Teuerste Stunde
+    label: EPEX Spot aWATTar Priciest Hour
     description: DateTime item
     type: TEXT
     required: true
     context: item
   - name: priceTotalNet
-    label: Strompreis gesamt netto
+    label: EPEX Spot aWATTar Total Net
     description: Number:EnergyPrice item
     type: TEXT
     required: true
     context: item
   - name: priceMarketGross
-    label: Strompreis Markt brutto
+    label: EPEX Spot aWATTar Market Gross
     description: Number:EnergyPrice item
     type: TEXT
     required: true
     context: item
   - name: priceMarketNet
-    label: Strompreis Markt netto
+    label: EPEX Spot aWATTar
     description: Number:EnergyPrice item
     type: TEXT
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 4, 2026, 5:20:43 PM
+timestamp: Oct 4, 2026, 11:05:34 PM
 component: oh-card
 config:
-  title: Strompreis
+  title: Electricity Price
   style:
     height: calc(100% - 2 * var(--f7-card-margin-vertical))
     display: flex
@@ -75,12 +75,12 @@ slots:
               || 0) < 0.3 ? ''#fb8c00'' : ''#e53935'''
       - component: Label
         config:
-          text: pro kWh gesamt
+          text: per kWh all-in
           style:
             opacity: '0.7'
   - component: Label
     config:
-      text: ='Günstigste ' + items[props.priceCheapestHour].displayState + ' · teuerste ' + items[props.pricePriciestHour].displayState
+      text: ='Cheapest ' + items[props.priceCheapestHour].displayState + ' · priciest ' + items[props.pricePriciestHour].displayState
       style:
         padding: 0 16px
         opacity: '0.7'
@@ -168,7 +168,7 @@ slots:
               series:
               - component: oh-time-series
                 config:
-                  name: Gesamtpreis
+                  name: All-in price
                   gridIndex: 0
                   xAxisIndex: 0
                   yAxisIndex: 0
@@ -191,7 +191,7 @@ slots:
                     - xAxis: =dayjs().valueOf()
               - component: oh-time-series
                 config:
-                  name: Gesamt netto
+                  name: Total net
                   gridIndex: 0
                   xAxisIndex: 1
                   yAxisIndex: 0
@@ -204,7 +204,7 @@ slots:
                   symbol: none
               - component: oh-time-series
                 config:
-                  name: Markt brutto
+                  name: Market gross
                   gridIndex: 0
                   xAxisIndex: 2
                   yAxisIndex: 0
@@ -217,7 +217,7 @@ slots:
                   symbol: none
               - component: oh-time-series
                 config:
-                  name: Markt netto
+                  name: Market net
                   gridIndex: 0
                   xAxisIndex: 3
                   yAxisIndex: 0

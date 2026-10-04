@@ -27,7 +27,7 @@ props:
     required: false
     default: '#78909c'
   parameterGroups: []
-timestamp: Sep 27, 2026, 8:52:40 PM
+timestamp: Oct 4, 2026, 11:05:34 PM
 component: div
 config:
   style:
@@ -71,7 +71,7 @@ slots:
         text-overflow: ellipsis
   - component: Label
     config:
-      text: '=items[props.item].state === ''ON'' ? ''An'' : ''Aus'''
+      text: '=items[props.item].state === ''ON'' ? ''On'' : ''Off'''
       style:
         font-size: 10px
         font-weight: '700'

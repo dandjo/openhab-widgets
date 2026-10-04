@@ -14,7 +14,7 @@ props:
     description: Card title, the device's name where the card is not a plug
     type: TEXT
     required: false
-    default: Steckdose
+    default: Plug
   - name: icon
     label: Icon
     description: Device icon, e.g. material:coffee
@@ -45,7 +45,7 @@ props:
     required: false
     context: item
   parameterGroups: []
-timestamp: Sep 27, 2026, 9:44:33 PM
+timestamp: Oct 4, 2026, 11:05:34 PM
 component: oh-card
 config:
   title: =props.title
@@ -96,7 +96,7 @@ slots:
           default:
           - component: Label
             config:
-              text: Leistung
+              text: Power
               style:
                 font-size: 12px
                 opacity: '0.7'
@@ -111,7 +111,7 @@ slots:
                 white-space: nowrap
           - component: Label
             config:
-              text: '=items[(props.switch || props.prefix + ''_switch'')].state === ''ON'' ? ''An'' : ''Aus'''
+              text: '=items[(props.switch || props.prefix + ''_switch'')].state === ''ON'' ? ''On'' : ''Off'''
               style:
                 background: '=items[(props.switch || props.prefix + ''_switch'')].state === ''ON'' ? props.color : ''#9e9e9e'''
                 color: '#ffffff'
@@ -131,7 +131,7 @@ slots:
         config:
           item: =(props.switch || props.prefix + '_switch')
           color: =props.color
-          onText: ='An'
+          onText: ='On'
   - component: div
     config:
       style:
@@ -143,7 +143,7 @@ slots:
       default:
       - component: widget:value-tile
         config:
-          title: Energie heute
+          title: Energy today
           value: '=(([''NULL'', ''UNDEF''].includes(items[props.prefix + ''_energy_today''].state) ? ''–'' : (items[props.prefix
             + ''_energy_today''].displayState || items[props.prefix + ''_energy_today''].state)) || ''–'')'
           icon: material:offline_bolt
@@ -152,7 +152,7 @@ slots:
           kind: number
       - component: widget:value-tile
         config:
-          title: Energie gesamt
+          title: Energy total
           value: '=(([''NULL'', ''UNDEF''].includes(items[props.prefix + ''_energy_total''].state) ? ''–'' : (items[props.prefix
             + ''_energy_total''].displayState || items[props.prefix + ''_energy_total''].state)) || ''–'')'
           icon: material:offline_bolt
