@@ -87,6 +87,7 @@ EN = {
     "{s0|Temperatur} · {s1|Soll gestrichelt}": "{s0|Temperature} · {s1|Target dashed}",
     "{s0|Vorlauf} · {s1|Rücklauf}": "{s0|Flow} · {s1|Return}",
     "{s0|Heizstab} · {s1|Zusatzheizung}": "{s0|Backup heater} · {s1|Booster heater}",
+    "Ventil auf Warmwasser": "Valve on hot water", "Auf Warmwasser": "On hot water",
     "Space=Heizung,DHW=Warmwasser": "Space=Heating,DHW=Hot water",
     "Heating=Heizen,Heating + DHW=Heizen + Warmwasser,DHW=Warmwasser,Stop=Stopp":
         "Heating=Heating,Heating + DHW=Heating + Hot water,DHW=Hot water,Stop=Stop",

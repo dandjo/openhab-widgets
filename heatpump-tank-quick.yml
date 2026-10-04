@@ -28,7 +28,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 4, 2026, 11:05:34 PM
+timestamp: Oct 5, 2026, 1:29:38 AM
 component: div
 config:
   style:
@@ -109,7 +109,7 @@ slots:
           chartType: ''
           periodVisible: true
           period: D
-          height: 314px
+          height: 288px
           options:
             axisPointer:
               link:
@@ -119,15 +119,18 @@ slots:
           - component: oh-chart-grid
             config:
               top: 62
-              height: 120
+              height: 140
               left: '50'
               right: '20'
           - component: oh-chart-grid
             config:
               top: 242
-              height: 42
+              height: 16
               left: '50'
               right: '20'
+              show: true
+              backgroundColor: rgba(127, 127, 127, 0.13)
+              borderWidth: 0
           xAxis:
           - component: oh-time-axis
             config:
@@ -227,11 +230,10 @@ slots:
               name: Booster heater
               item: =props.heatpumpBshMode
               yValue: 0
-              yHeight: 0.7
-              mapState: '=(s) => s === ''ON'' ? ''On'' : s === ''OFF'' ? ''Off'' : s'
+              yHeight: 1
+              mapState: '=(s) => s === ''ON'' ? ''​'' : ''UNDEF'''
               stateColor:
-                An: '#fb8c00'
-                Aus: '=themeOptions.dark === ''dark'' ? ''#3c3c3c'' : ''#e0e0e0'''
+                ​: '#fb8c00'
               tooltip:
                 show: false
               xAxisIndex: 2
@@ -272,12 +274,17 @@ slots:
           - component: oh-chart-title
             config:
               show: true
-              text: Booster heater
+              text: '{s0|Booster heater}'
               left: 10
-              top: 190
+              top: 210
               textStyle:
                 fontSize: 13
                 fontWeight: 600
+                rich:
+                  s0:
+                    fontSize: 13
+                    fontWeight: 600
+                    color: '#fb8c00'
           tooltip:
           - component: oh-chart-tooltip
             config:
