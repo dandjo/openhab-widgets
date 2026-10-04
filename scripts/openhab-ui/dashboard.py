@@ -4890,6 +4890,17 @@ def miele_page(uid, title, front, p, plug, extra, icon, color):
 # ---- the individual devices
 
 
+# Heizbetrieb heute as high as the outdoor unit over the tank beside it (two cards of 640 and 420 px charts)
+HP_OPERATION_H = 1150
+
+
+def split_month(spec):
+    """Electricity or heat by purpose per day of the month, two of them as high as the COP card beside them."""
+    month = hp_split_charts(*spec)[1]
+    month["config"]["height"] = "298px"
+    return month
+
+
 def heatpump_blocks():
     P = HPX
     controls = controls_box(
@@ -4965,20 +4976,18 @@ def heatpump_blocks():
                            vtile("3-Wege-Ventil", P["valve"]), vtile("Fehlercode", "espaltherma_error_code")])
     return [two(card("Steuerung", [controls]), card("Jetzt", now)),
             two(card("Leistung heute", [power_chart_]), card("Temperaturen heute", [temps_chart])),
-            # how it heats: valve, defrost, compressor, flow, water and heaters on one time pointer (user, 2026-10-04)
-            one(card("Heizbetrieb heute", [stacked_chart(hp_operation_panels(), 1000)])),
-            # the charts of the heat pump card's popups, device by device (user, 2026-10-04)
-            two(card("Außengerät heute", [stacked_chart(hp_outdoor_panels(), 640)]),
-                card("Innengerät heute", [stacked_chart(hp_indoor_panels(), 640)])),
-            two(card("Kältemittel heute", [stacked_chart(hp_refrigerant_panels(), 640)]),
-                card("Heizkreis heute", [stacked_chart(hp_circuit_panels(), 640)])),
-            two(stack(card("Warmwasserspeicher heute", [stacked_chart(hp_tank_panels(), 420)]),
-                      card("3-Wege-Ventil heute", [hp_valve_band()])),
-                card("COP", [stacked_chart(hp_cop_panels(), 420), titled(hp_cop_month(), "COP pro Tag")])),
-            two(card("Strom nach Zweck", [titled(c, t) for c, t in zip(hp_split_charts(*HP_ELECTRIC),
-                                                                         ("Leistung", "Energie pro Tag"))]),
-                card("Wärme nach Zweck", [titled(c, t) for c, t in zip(hp_split_charts(*HP_HEAT),
-                                                                         ("Leistung", "Energie pro Tag"))])),
+            # how it heats: valve, defrost, compressor, flow, water and heaters on one time pointer (user, 2026-10-04),
+            # half the width beside the outdoor unit over the tank, then the charts of the heat pump card's popups
+            # device by device (user, 2026-10-04); without the valve's and the heating circuit's charts and the split
+            # powers, which Heizbetrieb heute and Leistung heute already show (user, 2026-10-05)
+            two(card("Heizbetrieb heute", [stacked_chart(hp_operation_panels(), HP_OPERATION_H)]),
+                stack(card("Außengerät heute", [stacked_chart(hp_outdoor_panels(), 640)]),
+                      card("Warmwasserspeicher heute", [stacked_chart(hp_tank_panels(), 420)]))),
+            two(card("Innengerät heute", [stacked_chart(hp_indoor_panels(), 640)]),
+                card("Kältemittel heute", [stacked_chart(hp_refrigerant_panels(), 640)])),
+            two(card("COP", [stacked_chart(hp_cop_panels(), 420), titled(hp_cop_month(), "COP pro Tag")]),
+                stack(card("Strom nach Zweck", [titled(split_month(HP_ELECTRIC), "Energie pro Tag")]),
+                      card("Wärme nach Zweck", [titled(split_month(HP_HEAT), "Energie pro Tag")]))),
             two(card("Energie heute", [today]), card("Leistung aufgeteilt", [split])),
             two(card("Temperaturen", [temps]), card("Sollwerte", [setpoints])),
             one(card("Modi", [modes])),
