@@ -45,6 +45,18 @@ props:
     type: TEXT
     required: true
     context: item
+  - name: heatpumpDhwSetpoint
+    label: ESPAltherma Warmwasser Sollwert
+    description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpDhwSince
+    label: Wärmepumpe Warmwasser lädt seit
+    description: DateTime item
+    type: TEXT
+    required: true
+    context: item
   - name: heatpumpPower
     label: ESPAltherma Elektrische Leistung
     description: Number:Power item
@@ -87,6 +99,12 @@ props:
     type: TEXT
     required: true
     context: item
+  - name: heatpumpDhwEta
+    label: Wärmepumpe Warmwasser fertig um
+    description: DateTime item
+    type: TEXT
+    required: true
+    context: item
   - name: heatpumpBuhStep1Mode
     label: ESPAltherma Heizstab Stufe 1
     description: Switch item
@@ -114,6 +132,18 @@ props:
   - name: heatpumpLeavingWaterTempAfterBuh
     label: ESPAltherma Vorlauftemperatur nach Heizstab
     description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpLeavingWaterSetpoint
+    label: ESPAltherma Vorlauf Sollwert
+    description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpHeatingSince
+    label: Wärmepumpe Heizung läuft seit
+    description: DateTime item
     type: TEXT
     required: true
     context: item
@@ -190,7 +220,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 4, 2026, 5:20:43 PM
+timestamp: Oct 4, 2026, 9:05:35 PM
 component: oh-card
 config:
   title: Heizung & Warmwasser
@@ -602,11 +632,46 @@ slots:
                         background: '=items[props.heatpumpDhwPower].state === ''ON'' ? ''#e57373'' : ''transparent'''
                         color: '=items[props.heatpumpDhwPower].state === ''ON'' ? ''#ffffff'' : ''#e57373'''
                         border: '1.5px solid #e57373'
-                        border-radius: 12px
-                        padding: 1px 11px
-                        font-size: 15px
-                        font-weight: '700'
+                        border-radius: 10px
+                        padding: 0.5px 8.5px
+                        font-size: 12px
+                        font-weight: '600'
                         white-space: nowrap
+                  - component: div
+                    config:
+                      style:
+                        display: inline-flex
+                        align-items: center
+                        gap: 4px
+                        color: '=themeOptions.dark === ''dark'' ? ''#e57373'' : ''#c62828'''
+                        background: rgba(229, 115, 115, 0.16)
+                        border-radius: 10px
+                        padding: 2px 8px
+                        font-size: 12px
+                        font-weight: '600'
+                        white-space: nowrap
+                    slots:
+                      default:
+                      - component: f7-icon
+                        config:
+                          f7: scope
+                          size: 13
+                      - component: Label
+                        config:
+                          text: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpDhwSetpoint].state) ? ''–'' : (items[props.heatpumpDhwSetpoint].displayState
+                            || items[props.heatpumpDhwSetpoint].state))'
+              - component: Label
+                config:
+                  text: '=(items[props.heatpumpBshMode].state === ''ON'' ? ''Zusatzheizung'' : ''Laden'') + '' seit '' + dayjs(items[props.heatpumpDhwSince].state).format(''HH:mm'')
+                    + '' · '' + (dayjs().diff(dayjs(items[props.heatpumpDhwSince].state), ''minute'') >= 60 ? Math.floor(dayjs().diff(dayjs(items[props.heatpumpDhwSince].state),
+                    ''minute'') / 60) + '':'' + (Math.floor(dayjs().diff(dayjs(items[props.heatpumpDhwSince].state), ''minute'')
+                    % 60) < 10 ? ''0'' : '''') + Math.floor(dayjs().diff(dayjs(items[props.heatpumpDhwSince].state), ''minute'')
+                    % 60) + '' h'' : Math.round(dayjs().diff(dayjs(items[props.heatpumpDhwSince].state), ''minute'')) + ''
+                    min'')'
+                  visible: =(items[props.heatpumpDhwSince].state !== 'UNDEF' && items[props.heatpumpDhwSince].state !== 'NULL')
+                  style:
+                    font-size: 12px
+                    opacity: '0.75'
               - component: oh-link
                 config:
                   action: popup
@@ -682,8 +747,11 @@ slots:
                           fill: none
                           stroke: '#fb8c00'
                           stroke-width: 2.9
-                          visible: =((Number(items[props.heatpumpInvFrequency].numericState) || 0) > 0) && !(((Number(items[props.heatpumpInvFrequency].numericState)
-                            || 0) / 74) > 0.01)
+                          visible: '=(Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) > 50) && !((((items[props.heatpumpDhwEta].state
+                            !== ''UNDEF'' && items[props.heatpumpDhwEta].state !== ''NULL'' && items[props.heatpumpDhwSince].state
+                            !== ''UNDEF'' && items[props.heatpumpDhwSince].state !== ''NULL'') ? Math.max(0, dayjs().diff(dayjs(items[props.heatpumpDhwSince].state)))
+                            / Math.max(1, dayjs(items[props.heatpumpDhwEta].state).diff(dayjs(items[props.heatpumpDhwSince].state)))
+                            : 0)) > 0.01)'
                         slots:
                           default:
                           - component: animate
@@ -692,24 +760,33 @@ slots:
                               values: 0.3;1;0.3
                               dur: 2s
                               repeatCount: indefinite
-                              visible: =((Number(items[props.heatpumpInvFrequency].numericState) || 0) > 0) && !(((Number(items[props.heatpumpInvFrequency].numericState)
-                                || 0) / 74) > 0.01)
+                              visible: '=(Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) > 50) && !((((items[props.heatpumpDhwEta].state
+                                !== ''UNDEF'' && items[props.heatpumpDhwEta].state !== ''NULL'' && items[props.heatpumpDhwSince].state
+                                !== ''UNDEF'' && items[props.heatpumpDhwSince].state !== ''NULL'') ? Math.max(0, dayjs().diff(dayjs(items[props.heatpumpDhwSince].state)))
+                                / Math.max(1, dayjs(items[props.heatpumpDhwEta].state).diff(dayjs(items[props.heatpumpDhwSince].state)))
+                                : 0)) > 0.01)'
                           - component: animate
                             config:
                               attributeName: stroke-width
                               values: 2.9;4.5;2.9
                               dur: 2s
                               repeatCount: indefinite
-                              visible: =((Number(items[props.heatpumpInvFrequency].numericState) || 0) > 0) && !(((Number(items[props.heatpumpInvFrequency].numericState)
-                                || 0) / 74) > 0.01)
+                              visible: '=(Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) > 50) && !((((items[props.heatpumpDhwEta].state
+                                !== ''UNDEF'' && items[props.heatpumpDhwEta].state !== ''NULL'' && items[props.heatpumpDhwSince].state
+                                !== ''UNDEF'' && items[props.heatpumpDhwSince].state !== ''NULL'') ? Math.max(0, dayjs().diff(dayjs(items[props.heatpumpDhwSince].state)))
+                                / Math.max(1, dayjs(items[props.heatpumpDhwEta].state).diff(dayjs(items[props.heatpumpDhwSince].state)))
+                                : 0)) > 0.01)'
                           - component: animate
                             config:
                               attributeName: r
                               values: 29.2;30;29.2
                               dur: 2s
                               repeatCount: indefinite
-                              visible: =((Number(items[props.heatpumpInvFrequency].numericState) || 0) > 0) && !(((Number(items[props.heatpumpInvFrequency].numericState)
-                                || 0) / 74) > 0.01)
+                              visible: '=(Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) > 50) && !((((items[props.heatpumpDhwEta].state
+                                !== ''UNDEF'' && items[props.heatpumpDhwEta].state !== ''NULL'' && items[props.heatpumpDhwSince].state
+                                !== ''UNDEF'' && items[props.heatpumpDhwSince].state !== ''NULL'') ? Math.max(0, dayjs().diff(dayjs(items[props.heatpumpDhwSince].state)))
+                                / Math.max(1, dayjs(items[props.heatpumpDhwEta].state).diff(dayjs(items[props.heatpumpDhwSince].state)))
+                                : 0)) > 0.01)'
                       - component: circle
                         config:
                           cx: 0
@@ -718,8 +795,11 @@ slots:
                           fill: none
                           stroke: '#fb8c00'
                           stroke-width: 2.9
-                          visible: =((Number(items[props.heatpumpInvFrequency].numericState) || 0) > 0) && (((Number(items[props.heatpumpInvFrequency].numericState)
-                            || 0) / 74) > 0.01)
+                          visible: '=(Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) > 50) && ((((items[props.heatpumpDhwEta].state
+                            !== ''UNDEF'' && items[props.heatpumpDhwEta].state !== ''NULL'' && items[props.heatpumpDhwSince].state
+                            !== ''UNDEF'' && items[props.heatpumpDhwSince].state !== ''NULL'') ? Math.max(0, dayjs().diff(dayjs(items[props.heatpumpDhwSince].state)))
+                            / Math.max(1, dayjs(items[props.heatpumpDhwEta].state).diff(dayjs(items[props.heatpumpDhwSince].state)))
+                            : 0)) > 0.01)'
                         slots:
                           default:
                           - component: animate
@@ -728,11 +808,18 @@ slots:
                               values: 0.3;0.06;0.3
                               dur: 2s
                               repeatCount: indefinite
-                              visible: =((Number(items[props.heatpumpInvFrequency].numericState) || 0) > 0) && (((Number(items[props.heatpumpInvFrequency].numericState)
-                                || 0) / 74) > 0.01)
+                              visible: '=(Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) > 50) && ((((items[props.heatpumpDhwEta].state
+                                !== ''UNDEF'' && items[props.heatpumpDhwEta].state !== ''NULL'' && items[props.heatpumpDhwSince].state
+                                !== ''UNDEF'' && items[props.heatpumpDhwSince].state !== ''NULL'') ? Math.max(0, dayjs().diff(dayjs(items[props.heatpumpDhwSince].state)))
+                                / Math.max(1, dayjs(items[props.heatpumpDhwEta].state).diff(dayjs(items[props.heatpumpDhwSince].state)))
+                                : 0)) > 0.01)'
                   - component: g
                     config:
-                      visible: =(Number(items[props.heatpumpInvFrequency].numericState) || 0) / 74 > 0.01
+                      visible: '=((items[props.heatpumpDhwEta].state !== ''UNDEF'' && items[props.heatpumpDhwEta].state !==
+                        ''NULL'' && items[props.heatpumpDhwSince].state !== ''UNDEF'' && items[props.heatpumpDhwSince].state
+                        !== ''NULL'') ? Math.max(0, dayjs().diff(dayjs(items[props.heatpumpDhwSince].state))) / Math.max(1,
+                        dayjs(items[props.heatpumpDhwEta].state).diff(dayjs(items[props.heatpumpDhwSince].state))) : 0) >
+                        0.01'
                     slots:
                       default:
                       - component: circle
@@ -745,8 +832,11 @@ slots:
                           fill: none
                           transform: rotate(-90 0 0)
                           stroke-linecap: round
-                          stroke-dasharray: =(Math.min(1, (Number(items[props.heatpumpInvFrequency].numericState) || 0) /
-                            74) * 100).toFixed(2) + ' 100'
+                          stroke-dasharray: '=(Math.min(1, ((items[props.heatpumpDhwEta].state !== ''UNDEF'' && items[props.heatpumpDhwEta].state
+                            !== ''NULL'' && items[props.heatpumpDhwSince].state !== ''UNDEF'' && items[props.heatpumpDhwSince].state
+                            !== ''NULL'') ? Math.max(0, dayjs().diff(dayjs(items[props.heatpumpDhwSince].state))) / Math.max(1,
+                            dayjs(items[props.heatpumpDhwEta].state).diff(dayjs(items[props.heatpumpDhwSince].state))) : 0))
+                            * 100).toFixed(2) + '' 100'''
                           pathLength: 100
                           stroke-width: 4.9
                       - component: circle
@@ -758,8 +848,11 @@ slots:
                           fill: none
                           transform: rotate(-90 0 0)
                           stroke-linecap: round
-                          stroke-dasharray: =(Math.min(1, (Number(items[props.heatpumpInvFrequency].numericState) || 0) /
-                            74) * 100).toFixed(2) + ' 100'
+                          stroke-dasharray: '=(Math.min(1, ((items[props.heatpumpDhwEta].state !== ''UNDEF'' && items[props.heatpumpDhwEta].state
+                            !== ''NULL'' && items[props.heatpumpDhwSince].state !== ''UNDEF'' && items[props.heatpumpDhwSince].state
+                            !== ''NULL'') ? Math.max(0, dayjs().diff(dayjs(items[props.heatpumpDhwSince].state))) / Math.max(1,
+                            dayjs(items[props.heatpumpDhwEta].state).diff(dayjs(items[props.heatpumpDhwSince].state))) : 0))
+                            * 100).toFixed(2) + '' 100'''
                           pathLength: 100
                           stroke-width: 2.9
                           opacity: '0.9'
@@ -771,21 +864,21 @@ slots:
                               values: 1;0.55;1
                               dur: 2s
                               repeatCount: indefinite
-                              visible: =(Number(items[props.heatpumpInvFrequency].numericState) || 0) > 0
+                              visible: =Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) > 50
                           - component: animate
                             config:
                               attributeName: stroke-width
                               values: 4.5;2.9;4.5
                               dur: 2s
                               repeatCount: indefinite
-                              visible: =(Number(items[props.heatpumpInvFrequency].numericState) || 0) > 0
+                              visible: =Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) > 50
                           - component: animate
                             config:
                               attributeName: r
                               values: 30;29.2;30
                               dur: 2s
                               repeatCount: indefinite
-                              visible: =(Number(items[props.heatpumpInvFrequency].numericState) || 0) > 0
+                              visible: =Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) > 50
                   - component: widget:flow-node
                     config:
                       kind: heat-pump-split
@@ -883,11 +976,61 @@ slots:
                         background: '=items[props.heatpumpClimateControlPower].state === ''ON'' ? ''#ffb74d'' : ''transparent'''
                         color: '=items[props.heatpumpClimateControlPower].state === ''ON'' ? ''#ffffff'' : ''#ffb74d'''
                         border: '1.5px solid #ffb74d'
-                        border-radius: 12px
-                        padding: 1px 11px
-                        font-size: 15px
-                        font-weight: '700'
+                        border-radius: 10px
+                        padding: 0.5px 8.5px
+                        font-size: 12px
+                        font-weight: '600'
                         white-space: nowrap
+                  - component: div
+                    config:
+                      style:
+                        display: inline-flex
+                        align-items: center
+                        gap: 4px
+                        color: '=themeOptions.dark === ''dark'' ? ''#ffb74d'' : ''#e65100'''
+                        background: rgba(255, 183, 77, 0.16)
+                        border-radius: 10px
+                        padding: 2px 8px
+                        font-size: 12px
+                        font-weight: '600'
+                        white-space: nowrap
+                    slots:
+                      default:
+                      - component: f7-icon
+                        config:
+                          f7: scope
+                          size: 13
+                      - component: Label
+                        config:
+                          text: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpLeavingWaterSetpoint].state) ? ''–''
+                            : (items[props.heatpumpLeavingWaterSetpoint].displayState || items[props.heatpumpLeavingWaterSetpoint].state))'
+              - component: Label
+                config:
+                  text: '=''Heizen'' + '' seit '' + dayjs(items[props.heatpumpHeatingSince].state).format(''HH:mm'') + ''
+                    · '' + (dayjs().diff(dayjs(items[props.heatpumpHeatingSince].state), ''minute'') >= 60 ? Math.floor(dayjs().diff(dayjs(items[props.heatpumpHeatingSince].state),
+                    ''minute'') / 60) + '':'' + (Math.floor(dayjs().diff(dayjs(items[props.heatpumpHeatingSince].state), ''minute'')
+                    % 60) < 10 ? ''0'' : '''') + Math.floor(dayjs().diff(dayjs(items[props.heatpumpHeatingSince].state), ''minute'')
+                    % 60) + '' h'' : Math.round(dayjs().diff(dayjs(items[props.heatpumpHeatingSince].state), ''minute''))
+                    + '' min'')'
+                  visible: =(items[props.heatpumpHeatingSince].state !== 'UNDEF' && items[props.heatpumpHeatingSince].state
+                    !== 'NULL')
+                  style:
+                    font-size: 12px
+                    opacity: '0.75'
+              - component: Label
+                config:
+                  text: '=''WW fertig um '' + dayjs(items[props.heatpumpDhwEta].state).format(''HH:mm'') + '' · noch '' +
+                    (Math.max(0, dayjs(items[props.heatpumpDhwEta].state).diff(dayjs(), ''minute'', true)) >= 60 ? Math.floor(Math.max(0,
+                    dayjs(items[props.heatpumpDhwEta].state).diff(dayjs(), ''minute'', true)) / 60) + '':'' + (Math.floor(Math.max(0,
+                    dayjs(items[props.heatpumpDhwEta].state).diff(dayjs(), ''minute'', true)) % 60) < 10 ? ''0'' : '''') +
+                    Math.floor(Math.max(0, dayjs(items[props.heatpumpDhwEta].state).diff(dayjs(), ''minute'', true)) % 60)
+                    + '' h'' : Math.round(Math.max(0, dayjs(items[props.heatpumpDhwEta].state).diff(dayjs(), ''minute'', true)))
+                    + '' min'')'
+                  visible: =(items[props.heatpumpDhwEta].state !== 'UNDEF' && items[props.heatpumpDhwEta].state !== 'NULL'
+                    && items[props.heatpumpDhwSince].state !== 'UNDEF' && items[props.heatpumpDhwSince].state !== 'NULL')
+                  style:
+                    font-size: 12px
+                    opacity: '0.75'
               - component: oh-link
                 config:
                   action: popup
@@ -1157,7 +1300,7 @@ slots:
           style:
             display: grid
             gap: 8px
-            grid-template-columns: repeat(2, minmax(0, 1fr))
+            grid-template-columns: '=screen.width < 600 ? ''repeat(2, minmax(0, 1fr))'' : ''repeat(3, minmax(0, 1fr))'''
         slots:
           default:
           - component: div
@@ -1200,7 +1343,7 @@ slots:
                         display: block
                         overflow: visible
                         max-width: 170px
-                        width: '=screen.width < 600 ? ''100%'' : ''calc(66.7% - 9.3px)'''
+                        width: 100%
                     slots:
                       default:
                       - component: circle
@@ -1311,7 +1454,7 @@ slots:
                         display: block
                         overflow: visible
                         max-width: 170px
-                        width: '=screen.width < 600 ? ''100%'' : ''calc(66.7% - 9.3px)'''
+                        width: 100%
                     slots:
                       default:
                       - component: circle
@@ -1351,7 +1494,7 @@ slots:
                         config:
                           x: 56
                           y: 23
-                          content: COP Warmwasser
+                          content: COP WW
                           fill: currentColor
                           font-size: 12
                           font-weight: normal
@@ -1393,7 +1536,7 @@ slots:
                 min-width: '0'
                 display: flex
                 align-items: center
-                grid-column: 1 / -1
+                grid-column: '=screen.width < 600 ? ''1 / -1'' : ''auto'''
             slots:
               default:
               - component: oh-icon
@@ -1423,7 +1566,7 @@ slots:
                         display: block
                         overflow: visible
                         max-width: 170px
-                        width: '=screen.width < 600 ? ''calc(50% - 14px)'' : ''calc(33.3% - 18.7px)'''
+                        width: '=screen.width < 600 ? ''calc(50% - 14px)'' : ''100%'''
                     slots:
                       default:
                       - component: circle
