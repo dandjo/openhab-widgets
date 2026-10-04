@@ -4339,6 +4339,17 @@ def stacked_chart(panels, height, visual_map=None, **cfg):
                  if texts or bands else tooltip(trigger="axis", smartFormatter=True), **slots)
 
 
+def fill_stacked(chart_, min_height):
+    """A stacked chart of one grid that fills a filled card: its grid reaches down to the chart's bottom instead of
+    standing at a fixed height, and the chart takes the card's height, at least min_height (as high as the card
+    beside it, user 2026-10-05)."""
+    chart_["config"]["height"] = "100%"
+    cfg = chart_["slots"]["grid"][0]["config"]
+    cfg.pop("height", None)
+    cfg["bottom"] = STACK_BOTTOM
+    return fill_chart(chart_, min_height)
+
+
 def own_time_axes(tree):
     """Every series of a chart over time on a time axis of its own, the extra ones hidden, their pointers linked and
     standing where the mouse is, so the tooltip lists every value at the time pointed at (user, 2026-10-04): ECharts'
@@ -5074,10 +5085,11 @@ def energy_storage_blocks():
     # the power (negative while charging) and the charge overlapping in one grid (user, 2026-10-05)
     chart_ = stacked_chart([((("Leistung", "#7cb342"), ("Ladestand", "#2e7d32")),
                              [area("Leistung", BATT, "#7cb342"), line("Ladestand", SOC, "#2e7d32", y=1)],
-                             [value_axis("W"), value_axis("%", min=0, max=100)])], 510)  # as high as Jetzt and Speicher
-    # the storage's totals under "Jetzt", in the room the chart leaves beside them (user, 2026-10-05)
-    return [two(stack(card("Jetzt", now), card("Speicher", [totals])), card("Leistung heute", [chart_])),
-            two(card("Steuerung", controls), card("Einheit 1", [unit]))]
+                             [value_axis("W"), value_axis("%", min=0, max=100)])], 400)
+    # the chart as high as Jetzt beside it, at least 250 px; the storage's totals over unit 1 beside the controls
+    # (user, 2026-10-05: with the totals under Jetzt the chart grew too high)
+    return [two(card("Jetzt", now), card("Leistung heute", [fill_stacked(chart_, "250px")], fill=True)),
+            two(card("Steuerung", controls), stack(card("Speicher", [totals]), card("Einheit 1", [unit])))]
 
 
 def photovoltaics_blocks():
@@ -5207,14 +5219,9 @@ def epex_spot_blocks():
                              [*price("Gesamt", PRICE, "epex_spot_awattar_total_net", "#e53935", now=True),
                               *price("Markt", "epex_spot_awattar_market_gross", "epex_spot_awattar", "#fb8c00")],
                              value_axis("EUR/kWh"))], 400, period="2D", future="0.75")
-    # as high as Jetzt beside it, at least 300 px (user, 2026-10-05: 400 px left Jetzt with 100 px of empty card): the
-    # one grid reaches down to the chart's bottom instead of standing at a fixed height
-    prices["config"]["height"] = "100%"
-    grid_cfg = prices["slots"]["grid"][0]["config"]
-    del grid_cfg["height"]
-    grid_cfg["bottom"] = STACK_BOTTOM
+    # as high as Jetzt beside it, at least 300 px (user, 2026-10-05: 400 px left Jetzt with 100 px of empty card)
     return [two(card("Jetzt", now),
-                card("Preise 12 h zurück, 36 h voraus", [fill_chart(prices, "300px")], fill=True))]
+                card("Preise 12 h zurück, 36 h voraus", [fill_stacked(prices, "300px")], fill=True))]
 
 
 GRID_SIGN = f"={num(GRID)} < 0 ? '#43a047' : '#e53935'"
