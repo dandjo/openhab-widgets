@@ -10,7 +10,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 4, 2026, 11:05:34 PM
+timestamp: Oct 5, 2026, 1:29:38 AM
 component: div
 config:
   style:
@@ -88,7 +88,7 @@ slots:
           chartType: ''
           periodVisible: true
           period: D
-          height: 150px
+          height: 120px
           options:
             axisPointer:
               link:
@@ -98,9 +98,12 @@ slots:
           - component: oh-chart-grid
             config:
               top: '62'
-              height: 58
+              height: 16
               left: '50'
               right: '20'
+              show: true
+              backgroundColor: rgba(127, 127, 127, 0.13)
+              borderWidth: 0
           xAxis:
           - component: oh-time-axis
             config:
@@ -123,11 +126,15 @@ slots:
               name: Position
               item: =props.heatpumpValve
               yValue: 0
-              yHeight: 0.7
-              mapState: '=(s) => s === ''Space'' ? ''Heating'' : s === ''DHW'' ? ''Hot water'' : s'
+              yHeight: 1
+              mapState: '=(s) => s === ''DHW'' ? ''​'' : ''UNDEF'''
               stateColor:
-                Heizung: '#ffb74d'
-                Warmwasser: '#e57373'
+                ​: '#e57373'
+              tooltip:
+                formatter: '=(p) => p.seriesName + ''<br/>'' + p.marker + (p.value[3] === ''​'' ? ''Hot water'' : ''Heating'')
+                  + '' · '' + (((p.value[2] - p.value[1]) / 60000) >= 60 ? Math.floor(((p.value[2] - p.value[1]) / 60000)
+                  / 60) + '':'' + (Math.floor(((p.value[2] - p.value[1]) / 60000) % 60) < 10 ? ''0'' : '''') + Math.floor(((p.value[2]
+                  - p.value[1]) / 60000) % 60) + '' h'' : Math.round(((p.value[2] - p.value[1]) / 60000)) + '' min'')'
               xAxisIndex: 0
               yAxisIndex: 0
               gridIndex: 0
@@ -135,12 +142,17 @@ slots:
           - component: oh-chart-title
             config:
               show: true
-              text: Position
+              text: '{s0|On hot water}'
               left: 10
               top: 15
               textStyle:
                 fontSize: 13
                 fontWeight: 600
+                rich:
+                  s0:
+                    fontSize: 13
+                    fontWeight: 600
+                    color: '#e57373'
           tooltip:
           - component: oh-chart-tooltip
             config:

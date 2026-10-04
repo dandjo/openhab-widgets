@@ -394,7 +394,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 5, 2026, 12:48:05 AM
+timestamp: Oct 5, 2026, 1:29:38 AM
 component: oh-card
 config:
   title: Energy Flow
@@ -2706,7 +2706,7 @@ slots:
   - component: div
     config:
       style:
-        padding: 8px 12px 14px
+        padding: 8px 16px 14px
     slots:
       default:
       - component: div

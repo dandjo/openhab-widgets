@@ -1200,7 +1200,8 @@ def energy_flow():
                # it centres itself in the height the row leaves, the cards below stay at the card's bottom
                **{"padding": f"={NARROW} ? '4px' : '12px'", "flex": "1 1 auto", "display": "flex",
                   "flex-direction": "column", "justify-content": "center"})
-    strip = div([house_tiles()], **{"padding": "8px 12px 14px"})
+    # its tiles as far in from the card's edge as the other cards' tiles (16 px, user 2026-10-05)
+    strip = div([house_tiles()], **{"padding": "8px 16px 14px"})
     return [star, strip]
 
 
@@ -2275,7 +2276,7 @@ def heatpump_content():
              *[hp_popup_link(hp_box(cx - HP_ORBIT, cy - HP_ORBIT, 2 * HP_ORBIT, 2 * HP_ORBIT, "50%"), uid)
                for (cx, cy), uid in HP_NODE_POPUPS]]
     drawing = div([hp_svg, *links], **{"position": "relative"})
-    return [div([hp_stats()], **{"padding": f"={NARROW} ? '8px 4px 0' : '12px 12px 0'"}),
+    return [div([hp_stats()], **{"padding": f"={NARROW} ? '8px 4px 0' : '12px 16px 0'"}),  # as the other cards' tiles
             div([drawing],
                 # at its own size outside a phone, so its circles never shrink there (user, 2026-10-05: below 1500 px
                 # the card is narrower than the drawing); centred, reaching into the card's padding, whose edge the
@@ -2891,9 +2892,10 @@ QUICK_GRID = 120  # a grid's height in a quick popup's stacked chart
 def quick_stack(*panels, weights=None):
     """A quick popup's values over the day: stacked_chart() with grids of QUICK_GRID (a panel's own weight scales
     it), so the popup's charts share one tooltip and one pair of period arrows."""
-    total = sum(pnl[3] if len(pnl) > 3 else 1 for pnl in panels)
-    return stacked_chart(list(panels), round(STACK_TOP + STACK_BOTTOM + (len(panels) - 1) * STACK_GAP +
-                                              total * QUICK_GRID))
+    weights = [pnl[3] if len(pnl) > 3 else 1 for pnl in panels]
+    # a fixed height ("16px", a state band) counts as it is
+    total = sum(float(w[:-2]) if isinstance(w, str) else w * QUICK_GRID for w in weights)
+    return stacked_chart(list(panels), round(STACK_TOP + STACK_BOTTOM + (len(panels) - 1) * STACK_GAP + total))
 
 
 def hp_control_quick():
@@ -2945,56 +2947,70 @@ def hp_circuit_panels():
             ("Wärme", [area("Wärme", HPX["water_heat"], HP_ORANGE)], value_axis("W"))]
 
 
-def band_panel(title, item, states, extra=(), in_tooltip=False):
-    """An item's states as a horizontal band, one bar per period in its state's colour, named in it, as a panel of
-    stacked_chart() (a thin grid); states: (state, label, colour) for each the item takes, the colours opaque, as
-    ECharts picks the name's colour by its bar's (white on a translucent one, unreadable in the light theme). It stays
-    out of the chart's axis tooltip: MainUI's smart formatter would read a bar's start as its value and a part of its id
-    as its unit ("NaN" and a long number); its bars name their states themselves."""
-    names = " : ".join(f"s === '{v}' ? '{t}'" for v, t, _ in states)
-    return (title, [comp("oh-state-series", {"name": title, "item": item, "yValue": 0, "yHeight": 0.7,
-                                             "mapState": f"=(s) => {names} : s",
-                                             "stateColor": {t: c for _, t, c in states},
-                                             **({} if in_tooltip else {"tooltip": {"show": False}})}), *extra],
-            comp("oh-category-axis", {"categoryType": "values", "data": [title], "show": False}), 0.35)
+BAND_H = "16px"  # every state band as high, its bars filling it
+BAND_GAP = 40  # above a band, which has no axis name: room for its title
+# a band's track, a grey that reads on both themes' backgrounds (MainUI evaluates no expression in a grid's config)
+BAND_TRACK = "rgba(127, 127, 127, 0.13)"
 
 
-def state_band(title, item, states):
-    """A day chart of nothing but an item's states as a band (band_panel()); its tooltip gives a bar's duration."""
-    band = stacked_chart([band_panel(title, item, states)], 150)
-    band["slots"]["tooltip"] = [comp("oh-chart-tooltip", {"show": True, "confine": True})]
-    band["slots"]["series"][0]["config"].pop("tooltip")  # alone, a bar's own tooltip with its duration
+def band_panel(title, item, active, rest, extra=(), in_tooltip=False, display=None):
+    """An item's states as a slim horizontal band, a panel of stacked_chart() (user, 2026-10-05): the periods of the
+    active states, (state, label, colour), as bars in their colours on a faint track (the grid's background, see
+    stacked_chart()); every other state, named rest, transparent, so a quiet day is an empty track instead of a grey
+    bar saying Aus. No text in the bars: the title names the active state in its colour (display, (name, colour)
+    pairs; by default the title in the first active state's colour). It stays out of the chart's axis tooltip: MainUI's
+    smart formatter would read a bar's start as its value and a part of its id as its unit ("NaN" and a long number)."""
+    # MainUI draws every bar's state as text in it and leaves out UNDEF and NULL only: the rest becomes UNDEF, so
+    # nothing is drawn there, an active state a run of zero-width spaces, a key of its own for its colour that writes
+    # nothing; a bar's tooltip names it in words
+    keys = {v: "\u200b" * (k + 1) for k, (v, _, _) in enumerate(active)}
+    names = " : ".join(f"s === '{v}' ? '{keys[v]}'" for v, _, _ in active)
+    words = " : ".join(f"p.value[3] === '{keys[v]}' ? '{t}'" for v, t, _ in active)
+    tip = (f"=(p) => p.seriesName + '<br/>' + p.marker + ({words} : '{rest}') + ' · ' + "
+           f"{hm('((p.value[2] - p.value[1]) / 60000)')}")
+    return (display or [(title, active[0][2])],
+            [comp("oh-state-series", {"name": title, "item": item, "yValue": 0, "yHeight": 1,
+                                      "mapState": f"=(s) => {names} : 'UNDEF'",
+                                      "stateColor": {keys[v]: c for v, _, c in active},
+                                      "tooltip": {"formatter": tip} if in_tooltip else {"show": False}}), *extra],
+            comp("oh-category-axis", {"categoryType": "values", "data": [title], "show": False}), BAND_H)
+
+
+def state_band(title, item, active, rest, display=None):
+    """A day chart of nothing but an item's states as a band (band_panel()); its tooltip gives a bar's state and
+    duration, the rest's too."""
+    band = stacked_chart([band_panel(title, item, active, rest, in_tooltip=True, display=display)], 120)
+    band["slots"]["tooltip"] = [comp("oh-chart-tooltip", {"show": True, "confine": True})]  # alone, a bar's own
     return band
 
 
 def hp_tank_panels():
-    """The DHW tank: its temperature with its setpoint, and when its booster heater (BSH) ran, as a band, off in a
-    grey just off the chart's background in either theme."""
+    """The DHW tank: its temperature with its setpoint, and when its booster heater (BSH) ran, as a band."""
     return [([("Temperatur", DHW_C), ("Soll gestrichelt", DHW_C)],
              [line("Temperatur", HPX["tank"], DHW_C), line("Soll", HPX["tank_set"], DHW_C, dashed=True)],
              span_axis("°C")),
             # the band's own state series stays out of the tooltip (band_panel()); its state comes in by the heater's
             # power, 2 kW while it heats
-            band_panel("Zusatzheizung", HPX["bsh"], [("ON", "An", HP_ORANGE),
-                                                     ("OFF", "Aus", "=themeOptions.dark === 'dark' ? '#3c3c3c' : '#e0e0e0'")],
+            band_panel("Zusatzheizung", HPX["bsh"], [("ON", "An", HP_ORANGE)], "Aus",
                        extra=[on_off_series("Zusatzheizung", HPX["bsh_power"], HP_ORANGE)])]
 
 
 def hp_valve_band():
     """The three-way valve: when it served the heating circuits and when the tank."""
-    return state_band("Stellung", HPX["valve"], [("Space", "Heizung", SPACE_C), ("DHW", "Warmwasser", DHW_C)])
+    return state_band("Stellung", HPX["valve"], [("DHW", "Warmwasser", DHW_C)], "Heizung",
+                      display=[("Auf Warmwasser", DHW_C)])
 
 
 def hp_operation_panels():
     """How the heat pump heats over the day: the valve's position and the defrosts as bands, the compressor, the
     water's flow, leaving and inlet water, the water's heat and the two electric heaters."""
-    off = "=themeOptions.dark === 'dark' ? '#3c3c3c' : '#e0e0e0'"  # as the tank's booster heater band
     # the bands' states reach the tooltip by numeric mirrors (rule heatpump_state_numbers), as ECharts leaves a band
-    # out of a shared tooltip
-    return [band_panel("Ventil", HPX["valve"], [("Space", "Heizung", SPACE_C), ("DHW", "Warmwasser", DHW_C)],
-                       extra=[state_text_series("Ventil", "heatpump_valve_value", SPACE_C,
-                                                [(0, "Heizung"), (1, "Warmwasser")])]),
-            band_panel("Abtauen", HPX["defrost"], [("ON", "An", "#4fc3f7"), ("OFF", "Aus", off)],
+    # out of a shared tooltip; the valve's position for the heating circuits, its rest, stays an empty track
+    return [band_panel("Ventil", HPX["valve"], [("DHW", "Warmwasser", DHW_C)], "Heizung",
+                       extra=[state_text_series("Ventil", "heatpump_valve_value", DHW_C,
+                                                [(0, "Heizung"), (1, "Warmwasser")])],
+                       display=[("Ventil auf Warmwasser", DHW_C)]),
+            band_panel("Abtauen", HPX["defrost"], [("ON", "An", "#4fc3f7")], "Aus",
                        extra=[state_text_series("Abtauen", "heatpump_defrost_value", "#4fc3f7", [(0, "Aus"), (1, "An")])]),
             ("Verdichter", [line("Verdichter", HPX["hz"], "#78909c")], value_axis("Hz", min=0)),
             ("Durchfluss", [area("Durchfluss", HPX["flow"], "#64b5f6")], value_axis("l/min", min=0)),
@@ -4297,13 +4313,24 @@ def stacked_chart(panels, height, visual_map=None, **cfg):
     whose reading lies nearest to the time pointed at, so two values persisted at different moments would hide each
     other."""
     weights = [pnl[3] if len(pnl) > 3 else 1 for pnl in panels]
-    unit = (height - STACK_TOP - STACK_BOTTOM - (len(panels) - 1) * STACK_GAP) / sum(weights)
+    # a weight may be a fixed height ("16px", a state band); the others share what is left
+    fixed = sum(float(w[:-2]) for w in weights if isinstance(w, str))
+    is_band = [any(one["component"] == "oh-state-series" for one in pn[1]) for pn in panels]
+    # above a band only its title, above a plot its title and its axis' name
+    gaps = sum(BAND_GAP if b else STACK_GAP for b in is_band[1:])
+    unit = ((height - STACK_TOP - STACK_BOTTOM - gaps - fixed)
+            / (sum(w for w in weights if not isinstance(w, str)) or 1))
     grids, xs, ys, series, titles, top, texts, bands = [], [], [], [], [], STACK_TOP, {}, False
+    gap_before = STACK_GAP
     for i, (pnl, w) in enumerate(zip(panels, weights)):
         title, ser, axis = pnl[:3]
-        h = unit * w
+        h = float(w[:-2]) if isinstance(w, str) else unit * w
+        band = any(one["component"] == "oh-state-series" for one in ser)
         grids.append(comp("oh-chart-grid", {"top": round(top), "height": round(h), "left": "50",
-                                             "right": "50" if any(isinstance(pn[2], list) for pn in panels) else "20"}))
+                                             "right": "50" if any(isinstance(pn[2], list) for pn in panels) else "20",
+                                             # a state band's track
+                                             **({"show": True, "backgroundColor": BAND_TRACK, "borderWidth": 0}
+                                                if band else {})}))
         y_of = []
         for k, ax in enumerate(axis if isinstance(axis, list) else [axis]):
             ax = copy.deepcopy(ax)
@@ -4316,6 +4343,9 @@ def stacked_chart(panels, height, visual_map=None, **cfg):
         for j, one in enumerate(ser):
             # the pointer stands where the mouse is, one line through every grid, without a label of its own
             xs.append(comp("oh-time-axis", {"gridIndex": i, "axisPointer": {"snap": False, "label": {"show": False}},
+                                            # a band without its axis line and ticks, its track is enough
+                                            **({"axisLine": {"show": False}, "axisTick": {"show": False}}
+                                               if band and i < len(panels) - 1 else {}),
                                             **({"show": False} if j else {} if i == len(panels) - 1
                                                else {"axisLabel": {"show": False}})}))
             one = copy.deepcopy(one)
@@ -4329,8 +4359,9 @@ def stacked_chart(panels, height, visual_map=None, **cfg):
                 bands = True
             one["config"].update(xAxisIndex=len(xs) - 1, yAxisIndex=y, gridIndex=i)
             series.append(one)
-        titles.append(stack_title(title, 15 if i == 0 else round(top - 52)))
-        top += h + STACK_GAP
+        titles.append(stack_title(title, 15 if i == 0 else round(top - gap_before + 8)))
+        gap_before = BAND_GAP if i + 1 < len(panels) and is_band[i + 1] else STACK_GAP
+        top += h + gap_before
     slots = {"visualMap": visual_map} if visual_map else {}
     return chart({"period": "D", "periodVisible": True, "height": f"{height}px",
                   "options": {"axisPointer": {"link": [{"xAxisIndex": "all"}]}}, **cfg},

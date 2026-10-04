@@ -52,8 +52,15 @@ def split(text):
     return text[:i], text[i:j], text[j:]
 
 
+RICH = re.compile(r"\{(s\d+)\|([^{}]*)\}")  # a chart title's coloured names, {s0|Name} · {s1|Name}
+
+
 def tr_core(core):
-    return EN.get(core) or ITEM_LABELS.get(core) or core
+    if core in EN or core in ITEM_LABELS:
+        return EN.get(core) or ITEM_LABELS[core]
+    if RICH.search(core):  # each coloured name of a title on its own
+        return RICH.sub(lambda m: "{" + m.group(1) + "|" + tr_plain(m.group(2)) + "}", core)
+    return core
 
 
 def tr_plain(text):
