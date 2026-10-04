@@ -32,7 +32,7 @@ props:
     type: TEXT
     required: false
   parameterGroups: []
-timestamp: Oct 3, 2026, 2:28:59 AM
+timestamp: Oct 4, 2026, 11:05:34 PM
 component: div
 config:
   style:
@@ -61,7 +61,7 @@ slots:
             padding: 4px 16px 18px
   - component: oh-card
     config:
-      title: Verlauf
+      title: History
       style:
         height: calc(100% - 2 * var(--f7-card-margin-vertical))
       visible: =!props.kind || props.kind === 'number'
@@ -141,7 +141,7 @@ slots:
               smartFormatter: true
   - component: oh-card
     config:
-      title: Verlauf
+      title: History
       style:
         height: calc(100% - 2 * var(--f7-card-margin-vertical))
       visible: =props.kind === 'state'
@@ -180,7 +180,7 @@ slots:
               xAxisIndex: 0
               yAxisIndex: 0
               yValue: 0
-              mapState: =(s) => ((props.states || 'ON=An,OFF=Aus').split(',').map((o) => o.trim().split('=')).find((o) =>
+              mapState: =(s) => ((props.states || 'ON=On,OFF=Off').split(',').map((o) => o.trim().split('=')).find((o) =>
                 o[0] === s) || [s, s])[1]
           tooltip:
           - component: oh-chart-tooltip

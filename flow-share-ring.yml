@@ -15,7 +15,7 @@ props:
     required: true
   - name: title
     label: Title
-    description: Text beside the ring, e.g. Eigenverbrauch
+    description: Text beside the ring, e.g. Self-consumption
     type: TEXT
     required: true
   - name: part
@@ -29,7 +29,7 @@ props:
     type: TEXT
     required: true
   parameterGroups: []
-timestamp: Sep 27, 2026, 9:44:33 PM
+timestamp: Oct 4, 2026, 11:05:34 PM
 component: g
 config:
   transform: ='translate(' + props.x + ' ' + props.y + ')'
@@ -86,7 +86,7 @@ slots:
         config:
           x: 32
           y: 14
-          content: heute
+          content: today
           fill: currentColor
           font-size: 11
           font-weight: normal

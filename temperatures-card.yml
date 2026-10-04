@@ -4,34 +4,34 @@ tags:
 props:
   parameters:
   - name: heatpumpIndoorAmbientTemp
-    label: ESPAltherma Raumtemperatur
+    label: ESPAltherma Indoor Ambient Temperature
     description: Number:Temperature item
     type: TEXT
     required: true
     context: item
   - name: heatpumpExtAmbientTemp
-    label: ESPAltherma Außentemperatur
+    label: ESPAltherma External Ambient Temperature
     description: Number:Temperature item
     type: TEXT
     required: true
     context: item
   - name: temperatureIndoor15min
-    label: Temperatur innen 15 min
+    label: Temperature Indoor 15 min
     description: Number:Temperature item
     type: TEXT
     required: true
     context: item
   - name: temperatureOutdoor15min
-    label: Temperatur außen 15 min
+    label: Temperature Outdoor 15 min
     description: Number:Temperature item
     type: TEXT
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 4, 2026, 5:20:43 PM
+timestamp: Oct 4, 2026, 11:05:34 PM
 component: oh-card
 config:
-  title: Temperaturen
+  title: Temperatures
   style:
     height: calc(100% - 2 * var(--f7-card-margin-vertical))
 slots:
@@ -54,7 +54,7 @@ slots:
           default:
           - component: Label
             config:
-              text: Innen
+              text: Indoor
               style:
                 font-size: 13px
                 opacity: '0.7'
@@ -68,7 +68,7 @@ slots:
                 line-height: 36px
           - component: Label
             config:
-              text: Fühler der Wärmepumpe
+              text: Heat pump sensor
               style:
                 font-size: 12px
                 opacity: '0.6'
@@ -81,7 +81,7 @@ slots:
           default:
           - component: Label
             config:
-              text: Außen
+              text: Outdoor
               style:
                 font-size: 13px
                 opacity: '0.7'
@@ -95,7 +95,7 @@ slots:
                 line-height: 36px
           - component: Label
             config:
-              text: Fühler der Wärmepumpe
+              text: Heat pump sensor
               style:
                 font-size: 12px
                 opacity: '0.6'
@@ -154,7 +154,7 @@ slots:
       series:
       - component: oh-time-series
         config:
-          name: Innen
+          name: Indoor
           gridIndex: 0
           xAxisIndex: 0
           yAxisIndex: 0
@@ -184,7 +184,7 @@ slots:
               show: true
               position: top
               distance: 10
-              formatter: '{c} °C'
+              formatter: =(p) => (Number(p.value)).toFixed(1) + ' °C'
               fontSize: 14
               fontWeight: 700
               color: '#ffffff'
@@ -195,7 +195,7 @@ slots:
               borderRadius: 6
       - component: oh-time-series
         config:
-          name: Außen
+          name: Outdoor
           gridIndex: 0
           xAxisIndex: 1
           yAxisIndex: 0
@@ -237,7 +237,7 @@ slots:
               show: true
               position: top
               distance: 10
-              formatter: '{c} °C'
+              formatter: =(p) => (Number(p.value)).toFixed(1) + ' °C'
               fontSize: 14
               fontWeight: 700
               color: '#ffffff'

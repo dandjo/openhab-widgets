@@ -4,30 +4,30 @@ tags:
 props:
   parameters:
   - name: heatpumpIndoorAmbientTemp
-    label: ESPAltherma Raumtemperatur
+    label: ESPAltherma Indoor Ambient Temperature
     description: Number:Temperature item
     type: TEXT
     required: true
     context: item
   - name: netatmoWeatherstationAtmosphericHumidity
-    label: Netatmo Wetterstation Luftfeuchtigkeit
+    label: Netatmo Weatherstation Atmospheric Humidity
     description: Number:Dimensionless item
     type: TEXT
     required: true
     context: item
   - name: netatmoWeatherstationCo2
-    label: Netatmo Wetterstation CO2
+    label: Netatmo Weatherstation CO2
     description: Number:Dimensionless item
     type: TEXT
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 4, 2026, 5:20:43 PM
+timestamp: Oct 4, 2026, 11:05:34 PM
 component: div
 config:
   style:
     --quick-popup: panel
-  label: Erdgeschoss
+  label: Ground Floor
   stylesheet: ':root .popup:has(> .oh-popup[style*="--quick-popup"]) { --f7-popup-tablet-width: 420px; --f7-popup-tablet-height:
     min(660px, calc(100vh - 64px)); }
 
@@ -82,7 +82,7 @@ slots:
               default:
               - component: Label
                 config:
-                  text: Erdgeschoss
+                  text: Ground Floor
                   style:
                     font-size: 15px
                     font-weight: '600'
@@ -90,9 +90,9 @@ slots:
                 config:
                   text: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpIndoorAmbientTemp].state) ? ''–'' : (items[props.heatpumpIndoorAmbientTemp].displayState
                     || items[props.heatpumpIndoorAmbientTemp].state)) + '' · '' + ([''NULL'', ''UNDEF''].includes(items[props.netatmoWeatherstationAtmosphericHumidity].state)
-                    ? ''–'' : ((Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState) || 0)).toFixed(0).replace(''.'',
-                    '','') + '' %'') + '' · '' + ([''NULL'', ''UNDEF''].includes(items[props.netatmoWeatherstationCo2].state)
-                    ? ''–'' : (items[props.netatmoWeatherstationCo2].displayState || items[props.netatmoWeatherstationCo2].state))'
+                    ? ''–'' : ((Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState) || 0)).toFixed(0)
+                    + '' %'') + '' · '' + ([''NULL'', ''UNDEF''].includes(items[props.netatmoWeatherstationCo2].state) ? ''–''
+                    : (items[props.netatmoWeatherstationCo2].displayState || items[props.netatmoWeatherstationCo2].state))'
                   style:
                     font-size: 12px
                     opacity: '0.7'
@@ -214,7 +214,7 @@ slots:
           series:
           - component: oh-time-series
             config:
-              name: Temperatur
+              name: Temperature
               gridIndex: 0
               xAxisIndex: 0
               yAxisIndex: 0
@@ -228,7 +228,7 @@ slots:
                 color: '#f48fb1'
           - component: oh-time-series
             config:
-              name: Luftfeuchtigkeit
+              name: Humidity
               gridIndex: 1
               xAxisIndex: 1
               yAxisIndex: 1
@@ -271,7 +271,7 @@ slots:
           - component: oh-chart-title
             config:
               show: true
-              text: Temperatur
+              text: Temperature
               left: 10
               top: 15
               textStyle:
@@ -280,7 +280,7 @@ slots:
           - component: oh-chart-title
             config:
               show: true
-              text: Luftfeuchtigkeit
+              text: Humidity
               left: 10
               top: 190
               textStyle:
@@ -312,7 +312,7 @@ slots:
           default:
           - component: oh-button
             config:
-              text: Alle Details
+              text: All details
               action: popup
               actionModal: page:netatmo
               outline: true

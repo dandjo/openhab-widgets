@@ -11,7 +11,7 @@ props:
     context: item
   - name: options
     label: Options
-    description: value=label pairs separated by semicolons, e.g. 1=Niedrig;2=Mittel;3=Hoch
+    description: value=label pairs separated by semicolons, e.g. 1=Low;2=Medium;3=High
     type: TEXT
     required: true
   - name: color
@@ -37,7 +37,7 @@ props:
     required: false
     default: 100%
   parameterGroups: []
-timestamp: Sep 27, 2026, 9:44:33 PM
+timestamp: Oct 4, 2026, 11:05:34 PM
 component: div
 config:
   style:

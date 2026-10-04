@@ -4,79 +4,79 @@ tags:
 props:
   parameters:
   - name: weatherSymbol
-    label: Wetter aktuell
+    label: Weather Current
     description: String item
     type: TEXT
     required: true
     context: item
   - name: weatherIsDay
-    label: Wetter Tag
+    label: Weather Day
     description: Switch item
     type: TEXT
     required: true
     context: item
   - name: heatpumpExtAmbientTemp
-    label: ESPAltherma Außentemperatur
+    label: ESPAltherma External Ambient Temperature
     description: Number:Temperature item
     type: TEXT
     required: true
     context: item
   - name: weatherWarningLevel
-    label: Wetterwarnung Stufe
+    label: Weather Warning Level
     description: Number item
     type: TEXT
     required: true
     context: item
   - name: weatherWarningText
-    label: Wetterwarnung
+    label: Weather Warning
     description: String item
     type: TEXT
     required: true
     context: item
   - name: weatherDaily
-    label: Wetter Tagesprognose
+    label: Weather Daily Forecast
     description: String item
     type: TEXT
     required: true
     context: item
   - name: weatherDay0Max
-    label: Wetter heute Max.
+    label: Weather Today Max.
     description: Number:Temperature item
     type: TEXT
     required: true
     context: item
   - name: weatherDay0Min
-    label: Wetter heute Min.
+    label: Weather Today Min.
     description: Number:Temperature item
     type: TEXT
     required: true
     context: item
   - name: weatherDay1Max
-    label: Wetter morgen Max.
+    label: Weather Tomorrow Max.
     description: Number:Temperature item
     type: TEXT
     required: true
     context: item
   - name: weatherDay1Min
-    label: Wetter morgen Min.
+    label: Weather Tomorrow Min.
     description: Number:Temperature item
     type: TEXT
     required: true
     context: item
   - name: weatherDay2Max
-    label: Wetter übermorgen Max.
+    label: Weather Day After Tomorrow Max.
     description: Number:Temperature item
     type: TEXT
     required: true
     context: item
   - name: weatherDay2Min
-    label: Wetter übermorgen Min.
+    label: Weather Day After Tomorrow Min.
     description: Number:Temperature item
     type: TEXT
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 2, 2026, 2:13:02 PM
+timestamp: Oct 4, 2026, 11:05:34 PM
 component: oh-card
 config:
   contentStyle:
@@ -124,7 +124,7 @@ slots:
                     white-space: nowrap
               - component: Label
                 config:
-                  text: Außen
+                  text: Outdoor
                   style:
                     font-size: 11px
                     opacity: '0.65'
@@ -223,7 +223,7 @@ slots:
               default:
               - component: Label
                 config:
-                  text: ='Heute'
+                  text: ='Today'
                   style:
                     font-size: 11px
                     opacity: '0.65'
@@ -276,7 +276,7 @@ slots:
               default:
               - component: Label
                 config:
-                  text: =['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'][dayjs().add(1, 'day').day()]
+                  text: =['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'][dayjs().add(1, 'day').day()]
                   style:
                     font-size: 11px
                     opacity: '0.65'
@@ -329,7 +329,7 @@ slots:
               default:
               - component: Label
                 config:
-                  text: =['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'][dayjs().add(2, 'day').day()]
+                  text: =['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'][dayjs().add(2, 'day').day()]
                   style:
                     font-size: 11px
                     opacity: '0.65'

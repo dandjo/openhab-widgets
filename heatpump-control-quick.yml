@@ -4,13 +4,13 @@ tags:
 props:
   parameters:
   - name: heatpumpClimateControlPower
-    label: Pyaltherma Heizung Ein/Aus
+    label: Pyaltherma Climate Control Power
     description: Switch item
     type: TEXT
     required: true
     context: item
   - name: heatpumpDhwPower
-    label: Pyaltherma Warmwasser Ein/Aus
+    label: Pyaltherma DHW Power
     description: Switch item
     type: TEXT
     required: true
@@ -22,54 +22,54 @@ props:
     required: true
     context: item
   - name: heatpumpManagement
-    label: Wärmepumpe Automatik
+    label: Heatpump Management
     description: Group item
     type: TEXT
     required: true
     context: item
   - name: heatpumpDhwTempHeating
-    label: Pyaltherma Warmwasser Solltemperatur
+    label: Pyaltherma DHW Temp Heating
     description: Number:Temperature item
     type: TEXT
     required: true
     context: item
   - name: heatpumpDhwTankTemp
-    label: ESPAltherma Warmwasserspeicher Temperatur
+    label: ESPAltherma DHW Tank Temperature
     description: Number:Temperature item
     type: TEXT
     required: true
     context: item
   - name: heatpumpDhwManagement
-    label: Wärmepumpe Warmwasser-Automatik
+    label: Heatpump DHW Management
     description: Switch item
     type: TEXT
     required: true
     context: item
   - name: heatpumpDhwBoost
-    label: Pyaltherma Warmwasser-Boost
+    label: Pyaltherma DHW Powerful
     description: Switch item
     type: TEXT
     required: true
     context: item
   - name: heatpumpLeavingWaterTempOffsetHeating
-    label: Pyaltherma Vorlauf-Offset Heizen
+    label: Pyaltherma Leaving Water Temp Offset Heating
     description: Number:Temperature item
     type: TEXT
     required: true
     context: item
   - name: heatpumpLeavingWaterSetpoint
-    label: ESPAltherma Vorlauf Sollwert
+    label: ESPAltherma Leaving Water Setpoint
     description: Number:Temperature item
     type: TEXT
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 4, 2026, 1:23:32 PM
+timestamp: Oct 4, 2026, 11:05:34 PM
 component: div
 config:
   style:
     --quick-popup: panel
-  label: Regelung
+  label: Control
   stylesheet: ':root .popup:has(> .oh-popup[style*="--quick-popup"]) { --f7-popup-tablet-width: 420px; --f7-popup-tablet-height:
     min(660px, calc(100vh - 64px)); }
 
@@ -124,14 +124,14 @@ slots:
               default:
               - component: Label
                 config:
-                  text: Regelung
+                  text: Control
                   style:
                     font-size: 15px
                     font-weight: '600'
               - component: Label
                 config:
-                  text: '=''Heizung '' + (items[props.heatpumpClimateControlPower].state === ''ON'' ? ''an'' : ''aus'') +
-                    '' · Warmwasser '' + (items[props.heatpumpDhwPower].state === ''ON'' ? ''an'' : ''aus'')'
+                  text: '=''Heating '' + (items[props.heatpumpClimateControlPower].state === ''ON'' ? ''on'' : ''off'') +
+                    '' · Hot water '' + (items[props.heatpumpDhwPower].state === ''ON'' ? ''on'' : ''off'')'
                   style:
                     font-size: 12px
                     opacity: '0.7'
@@ -183,7 +183,7 @@ slots:
           - component: widget:state-bar
             config:
               item: =props.heatpumpSmartGrid
-              options: 0=Normal;1=Sperre;2=Empfehlung;3=Befehl
+              options: 0=Normal;1=Blocked;2=Recommended;3=Forced
               color: '#fb8c00'
               byText: true
       - component: div
@@ -224,7 +224,7 @@ slots:
                       height: 15
               - component: Label
                 config:
-                  text: Betrieb
+                  text: Operation
                   style:
                     font-size: 13px
                     line-height: 16px
@@ -239,19 +239,19 @@ slots:
               - component: widget:pill-switch
                 config:
                   item: =props.heatpumpClimateControlPower
-                  title: Heizung
+                  title: Heating
                   color: '#fb8c00'
                   icon: material:local_fire_department
               - component: widget:pill-switch
                 config:
                   item: =props.heatpumpDhwPower
-                  title: Warmwasser
+                  title: Hot water
                   color: '#fb8c00'
                   icon: material:shower
               - component: widget:pill-switch
                 config:
                   item: =props.heatpumpManagement
-                  title: Automatik
+                  title: Automatic
                   color: '#fb8c00'
                   icon: material:auto_mode
       - component: widget:pill-slider
@@ -262,13 +262,12 @@ slots:
           max: 60
           step: 5
           unit: °C
-          title: Warmwasser Soll
+          title: Hot water target
           value: '=((Number(items[props.heatpumpDhwTempHeating].numericState) || 0) % 1 ? ((Number(items[props.heatpumpDhwTempHeating].numericState)
-            || 0)).toFixed(1).replace(''.'', '','') : (Number(items[props.heatpumpDhwTempHeating].numericState) || 0)) + ''
-            °C'''
-          context: '=''Speicher '' + ([''NULL'', ''UNDEF''].includes(items[props.heatpumpDhwTankTemp].state) ? ''–'' : (items[props.heatpumpDhwTankTemp].displayState
-            || items[props.heatpumpDhwTankTemp].state)) + (items[props.heatpumpDhwManagement].state === ''ON'' ? '' · Automatik
-            regelt'' : '''')'
+            || 0)).toFixed(1) : (Number(items[props.heatpumpDhwTempHeating].numericState) || 0)) + '' °C'''
+          context: '=''Tank '' + ([''NULL'', ''UNDEF''].includes(items[props.heatpumpDhwTankTemp].state) ? ''–'' : (items[props.heatpumpDhwTankTemp].displayState
+            || items[props.heatpumpDhwTankTemp].state)) + (items[props.heatpumpDhwManagement].state === ''ON'' ? '' · Automatic
+            controls'' : '''')'
           marks: 30=30 °C;40=40;50=50;60=60 °C
           icon: material:shower
           row: true
@@ -277,8 +276,8 @@ slots:
           item: =props.heatpumpDhwBoost
           icon: material:rocket_launch
           color: '#fb8c00'
-          title: Warmwasser-Boost
-          running: '=''läuft · Speicher '' + ([''NULL'', ''UNDEF''].includes(items[props.heatpumpDhwTankTemp].state) ? ''–''
+          title: Hot water boost
+          running: '=''running · tank '' + ([''NULL'', ''UNDEF''].includes(items[props.heatpumpDhwTankTemp].state) ? ''–''
             : (items[props.heatpumpDhwTankTemp].displayState || items[props.heatpumpDhwTankTemp].state))'
       - component: widget:pill-slider
         config:
@@ -288,12 +287,12 @@ slots:
           max: 10
           step: 1
           unit: °C
-          title: Vorlauf-Offset
+          title: Flow offset
           value: '=(Math.round((Number(items[props.heatpumpLeavingWaterTempOffsetHeating].numericState) || 0)) > 0 ? ''+''
             : '''') + Math.round((Number(items[props.heatpumpLeavingWaterTempOffsetHeating].numericState) || 0)) + '' °C'''
-          context: '=''Vorlauf-Soll '' + ([''NULL'', ''UNDEF''].includes(items[props.heatpumpLeavingWaterSetpoint].state)
-            ? ''–'' : (items[props.heatpumpLeavingWaterSetpoint].displayState || items[props.heatpumpLeavingWaterSetpoint].state))
-            + (items[props.heatpumpClimateControlPower].state === ''ON'' ? '''' : '' · Heizung aus'')'
+          context: '=''Flow target '' + ([''NULL'', ''UNDEF''].includes(items[props.heatpumpLeavingWaterSetpoint].state) ?
+            ''–'' : (items[props.heatpumpLeavingWaterSetpoint].displayState || items[props.heatpumpLeavingWaterSetpoint].state))
+            + (items[props.heatpumpClimateControlPower].state === ''ON'' ? '''' : '' · Heating off'')'
           marks: -10=−10 °C;-5=−5;0=0;5=+5;10=+10 °C
           icon: material:tune
           row: true
@@ -307,7 +306,7 @@ slots:
           default:
           - component: oh-button
             config:
-              text: Alle Details
+              text: All details
               action: popup
               actionModal: page:heatpump
               outline: true

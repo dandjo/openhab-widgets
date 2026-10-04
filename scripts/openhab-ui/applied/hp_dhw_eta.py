@@ -5,18 +5,20 @@ heatpump_dhw_eta sets heatpump_dhw_eta every minute while the tank charges (heat
 The charge's target: 60 °C while Smart Grid is forced on (3, as the hot-water automation sets it on a PV surplus with a
 full battery), else the DHW setpoint. Two phases, as the user described them (2026-10-04):
 - the compressor (valve on DHW) charges fast, up to 55 °C at most: per 0.1 K the mean of the tank's rise over the
-  last 3 minutes, shaped by the typical rise that slows as the tank warms (0.30 K/min at 35 °C, 0.26 at 49, 0.18
-  from 51), and of the heat power over those 3 minutes divided by the kWh one kelvin at the sensor takes (0.42 at
+  last 5 minutes, shaped by the typical rise that slows as the tank warms (0.30 K/min at 35 °C, 0.26 at 49, 0.18
+  from 51), and of the heat power over those 5 minutes divided by the kWh one kelvin at the sensor takes (0.42 at
   27 °C to 0.58 at 52, measured on the charges of winter 2025/26 and summer 2026); above 55 °C the booster heater
   takes 7 minutes per kelvin. From the charge's 5th minute on; during a defrost (the valve stays on DHW, the tank
-  loses about 2.5 K in 5 minutes) and the 3 minutes after it the end moves on with the clock.
+  loses about 2.5 K in 5 minutes) and the 5 minutes after it the end moves on with the clock.
 - the booster heater alone (valve off DHW) heats the water from the top, while the sensor sits in the upper third: a
   slow start, then a steep rise. Its curve, the share of the rise against the share of the time, goes as t^1.4;
   from the share reached and the rise over the last 3 minutes follow the phase's length and the time left, below 5 %
   of the rise 7 minutes per kelvin from the phase's start.
 Replayed on whole charges (winter 2025/26, summer 2026) the end was missed by a median 4 to 5 minutes with the
 compressor (about 1 in the last 10 minutes, 2 to 4 with 10 to 20 left), 3 (winter) to 9 (summer, PV surplus) with the
-booster heater alone; an estimate stood in 94 to 96 % of the charges' minutes.
+booster heater alone; an estimate stood in 94 to 96 % of the charges' minutes. The windows, compared on the raw data
+of September 2026 (typical miss with the compressor / with the booster heater alone, and how far the shown end jumps
+from one minute to the next): 1 minute 5.3 / 9.4 (4.4), 3 minutes 3.0 / 9.4 (1.2), 5 minutes 2.6 / 10.0 (1.0).
 Usage: hp_dhw_eta.py check|apply   (on homepi, as pi; the API token from ~/.openhab_token)"""
 import json
 import os
@@ -28,7 +30,9 @@ BASE = "http://127.0.0.1:8080/rest"
 TOKEN = open(os.path.expanduser("~/.openhab_token")).read().strip()
 ITEM, LABEL = "heatpump_dhw_eta", "Wärmepumpe Warmwasser fertig um"
 SCRIPT = """// when the tank's charge will end (see ~/scripts/openhab-ui/applied/hp_dhw_eta.py): the compressor from the tank's
-// rise and the heat power over the last 3 minutes, up to 55 °C; the booster heater alone along its steepening curve
+// rise and the heat power over the last 5 minutes, up to 55 °C; the booster heater alone along its steepening curve,
+// its rise over the last 3 minutes (windows agreed with the user, 2026-10-04: 5 minutes calm the compressor's estimate,
+// the booster's steep end needs the shorter one)
 const eta = items.getItem('heatpump_dhw_eta');
 const since = items.getItem('heatpump_dhw_since');
 const tank = items.getItem('espaltherma_dhw_tank_temp');
@@ -58,8 +62,10 @@ const interp = (pts, x) => {
   }
   return pts[pts.length - 1][1];
 };
-const past = tank.persistence.persistedState(now.minusMinutes(3), 'influxdb');
-const rise = past === null || past.numericState === null || T === null ? null : (T - past.numericState) / 3;
+const riseOver = (minutes) => {  // K/min over the last minutes, from InfluxDB
+  const past = tank.persistence.persistedState(now.minusMinutes(minutes), 'influxdb');
+  return past === null || past.numericState === null || T === null ? null : (T - past.numericState) / minutes;
+};
 let minutes = null;
 let hold = false;
 if (!running || T === null || target === null) {
@@ -69,10 +75,11 @@ if (!running || T === null || target === null) {
 } else if (dhw) {
   cache.private.remove('boosterStart');
   const defrost = cache.private.get('defrost');
-  if (defrost !== null && defrost !== undefined && nowMs - defrost < 3 * 60 * 1000) {
+  if (defrost !== null && defrost !== undefined && nowMs - defrost < 5 * 60 * 1000) {
     hold = true;
   } else if (nowMs - started >= 5 * 60 * 1000) {
-    const avg = items.getItem('espaltherma_heating_power').persistence.averageSince(now.minusMinutes(3), 'influxdb');
+    const avg = items.getItem('espaltherma_heating_power').persistence.averageSince(now.minusMinutes(5), 'influxdb');
+    const rise = riseOver(5);
     const kw = avg === null || avg.numericState === null ? 0 : avg.numericState / 1000;
     const hpTarget = Math.min(target, 55);
     let m = 0;
@@ -93,6 +100,7 @@ if (!running || T === null || target === null) {
   }
   const span = Math.max(0.5, target - start[1]);
   const share = (T - start[1]) / span;
+  const rise = riseOver(3);
   if (share >= 0.05 && rise !== null && rise > 0) {
     const tau = Math.min(0.99, Math.pow(share, 1 / 1.4));
     minutes = 1.4 * span * Math.pow(tau, 0.4) / rise * (1 - tau);
@@ -114,9 +122,9 @@ RULE = {
     "uid": "heatpump_dhw_eta",
     "name": "Wärmepumpe Warmwasser fertig um",
     "description": "Schätzt jede Minute, wann die Warmwasser-Ladung fertig ist (heatpump_dhw_eta): mit Verdichter aus "
-                   "Anstieg und Wärmeleistung der letzten 3 Minuten bis 55 °C, darüber und mit dem Heizstab allein "
-                   "entlang seiner steiler werdenden Kurve; für den Bogen der Wärmepumpe im Energiefluss und in "
-                   "Heizung & Warmwasser.",
+                   "Anstieg und Wärmeleistung der letzten 5 Minuten bis 55 °C, darüber und mit dem Heizstab allein "
+                   "entlang seiner steiler werdenden Kurve (Anstieg der letzten 3 Minuten); für den Bogen der "
+                   "Wärmepumpe im Energiefluss und in Heizung & Warmwasser.",
     "tags": [],
     "triggers": [{"type": "core.ItemStateChangeTrigger", "configuration": {"itemName": n}}
                  for n in ("espaltherma_3way_valve_mode", "heatpump_dhw_since", "espaltherma_dhw_setpoint",

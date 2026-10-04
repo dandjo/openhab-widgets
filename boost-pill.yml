@@ -32,9 +32,9 @@ props:
     description: The line under the title while the boost runs; usually an expression
     type: TEXT
     required: false
-    default: läuft
+    default: running
   parameterGroups: []
-timestamp: Sep 27, 2026, 11:33:43 PM
+timestamp: Oct 4, 2026, 11:05:34 PM
 component: div
 config:
   style:
@@ -149,7 +149,7 @@ slots:
             line-height: 18px
       - component: Label
         config:
-          text: '=items[props.item].state === ''ON'' ? (props.running || ''läuft'') : ''Aus'''
+          text: '=items[props.item].state === ''ON'' ? (props.running || ''running'') : ''Off'''
           style:
             font-size: 11px
             opacity: '0.8'
@@ -159,7 +159,7 @@ slots:
             text-overflow: ellipsis
   - component: Label
     config:
-      text: '=items[props.item].state === ''ON'' ? ''Stoppen'' : ''Starten'''
+      text: '=items[props.item].state === ''ON'' ? ''Stop'' : ''Start'''
       style:
         flex: 0 0 auto
         padding: 3px 12px

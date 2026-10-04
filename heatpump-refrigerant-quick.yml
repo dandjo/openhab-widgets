@@ -4,42 +4,42 @@ tags:
 props:
   parameters:
   - name: heatpumpDischargePipeTemp
-    label: ESPAltherma Heißgastemperatur
+    label: ESPAltherma Discharge Pipe Temperature
     description: Number:Temperature item
     type: TEXT
     required: true
     context: item
   - name: heatpumpRefrigerantPressure
-    label: ESPAltherma Kältemitteldruck
+    label: ESPAltherma Refrigerant Pressure Sensor
     description: Number:Pressure item
     type: TEXT
     required: true
     context: item
   - name: heatpumpTargetDischargeTemp
-    label: ESPAltherma Soll-Heißgastemperatur
+    label: ESPAltherma Target Discharge Temperature
     description: Number:Temperature item
     type: TEXT
     required: true
     context: item
   - name: heatpumpRefrigerantTemp
-    label: ESPAltherma Kältemittel flüssig
+    label: ESPAltherma Refrigerant Temperature Liquid Side
     description: Number:Temperature item
     type: TEXT
     required: true
     context: item
   - name: heatpumpHeatExchangerMidTemp
-    label: ESPAltherma Wärmetauscher Mitte
+    label: ESPAltherma Heat Exchanger Mid Temperature
     description: Number:Temperature item
     type: TEXT
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 4, 2026, 5:20:43 PM
+timestamp: Oct 4, 2026, 11:05:34 PM
 component: div
 config:
   style:
     --quick-popup: panel
-  label: Kältemittel
+  label: Refrigerant
   stylesheet: ':root .popup:has(> .oh-popup[style*="--quick-popup"]) { --f7-popup-tablet-width: 420px; --f7-popup-tablet-height:
     min(660px, calc(100vh - 64px)); }
 
@@ -94,13 +94,13 @@ slots:
               default:
               - component: Label
                 config:
-                  text: Kältemittel
+                  text: Refrigerant
                   style:
                     font-size: 15px
                     font-weight: '600'
               - component: Label
                 config:
-                  text: '=''Heißgas '' + ([''NULL'', ''UNDEF''].includes(items[props.heatpumpDischargePipeTemp].state) ? ''–''
+                  text: '=''Hot gas '' + ([''NULL'', ''UNDEF''].includes(items[props.heatpumpDischargePipeTemp].state) ? ''–''
                     : (items[props.heatpumpDischargePipeTemp].displayState || items[props.heatpumpDischargePipeTemp].state))
                     + '' · '' + ([''NULL'', ''UNDEF''].includes(items[props.heatpumpRefrigerantPressure].state) ? ''–'' :
                     (items[props.heatpumpRefrigerantPressure].displayState || items[props.heatpumpRefrigerantPressure].state))'
@@ -269,7 +269,7 @@ slots:
           series:
           - component: oh-time-series
             config:
-              name: Heißgas
+              name: Hot gas
               gridIndex: 0
               xAxisIndex: 0
               yAxisIndex: 0
@@ -283,7 +283,7 @@ slots:
                 color: '#ba68c8'
           - component: oh-time-series
             config:
-              name: Heißgas Soll
+              name: Hot gas target
               gridIndex: 0
               xAxisIndex: 1
               yAxisIndex: 0
@@ -298,7 +298,7 @@ slots:
                 color: '#ba68c8'
           - component: oh-time-series
             config:
-              name: Flüssig
+              name: Liquid
               gridIndex: 1
               xAxisIndex: 2
               yAxisIndex: 1
@@ -312,7 +312,7 @@ slots:
                 color: '#4fc3f7'
           - component: oh-time-series
             config:
-              name: Wärmetauscher
+              name: Heat exchanger
               gridIndex: 2
               xAxisIndex: 3
               yAxisIndex: 2
@@ -326,7 +326,7 @@ slots:
                 color: '#26a69a'
           - component: oh-time-series
             config:
-              name: Druck
+              name: Pressure
               gridIndex: 3
               xAxisIndex: 4
               yAxisIndex: 3
@@ -342,7 +342,7 @@ slots:
           - component: oh-chart-title
             config:
               show: true
-              text: '{s0|Heißgas} · {s1|Soll gestrichelt}'
+              text: '{s0|Hot gas} · {s1|Target dashed}'
               left: 10
               top: 15
               textStyle:
@@ -360,7 +360,7 @@ slots:
           - component: oh-chart-title
             config:
               show: true
-              text: Flüssig
+              text: Liquid
               left: 10
               top: 190
               textStyle:
@@ -369,7 +369,7 @@ slots:
           - component: oh-chart-title
             config:
               show: true
-              text: Wärmetauscher
+              text: Heat exchanger
               left: 10
               top: 370
               textStyle:
@@ -378,7 +378,7 @@ slots:
           - component: oh-chart-title
             config:
               show: true
-              text: Druck
+              text: Pressure
               left: 10
               top: 550
               textStyle:
@@ -401,7 +401,7 @@ slots:
           default:
           - component: oh-button
             config:
-              text: Alle Details
+              text: All details
               action: popup
               actionModal: page:heatpump
               outline: true

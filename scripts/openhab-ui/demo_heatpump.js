@@ -5,7 +5,7 @@
   const st = document.querySelector("#app").__vue_app__.config.globalProperties.$pinia._s.get("states");
   st.stopTrackingStates();
   const q = (v, unit, digits) => ({ state: `${v} ${unit}`, numericState: v, unit, type: "Quantity",
-    displayState: `${v.toFixed(digits).replace(".", ",")} ${unit}` });
+    displayState: `${v.toFixed(digits)} ${unit}` });  // English, as the repository's screenshots
   const on = (v) => ({ state: v ? "ON" : "OFF", type: "OnOff" });
   const text = (v) => ({ state: v, type: "String" });
   const demo = {

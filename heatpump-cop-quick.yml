@@ -10,31 +10,31 @@ props:
     required: true
     context: item
   - name: heatpumpDcop
-    label: ESPAltherma Tages-COP
+    label: ESPAltherma DCOP
     description: Number item
     type: TEXT
     required: true
     context: item
   - name: heatpumpExtAmbientTemp
-    label: ESPAltherma Außentemperatur
+    label: ESPAltherma External Ambient Temperature
     description: Number:Temperature item
     type: TEXT
     required: true
     context: item
   - name: heatpumpDcopSpace
-    label: ESPAltherma Tages-COP Heizung
+    label: ESPAltherma DCOP Space
     description: Number item
     type: TEXT
     required: true
     context: item
   - name: heatpumpDcopDhw
-    label: ESPAltherma Tages-COP Warmwasser
+    label: ESPAltherma DCOP DHW
     description: Number item
     type: TEXT
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 4, 2026, 5:20:43 PM
+timestamp: Oct 4, 2026, 11:05:34 PM
 component: div
 config:
   style:
@@ -100,10 +100,9 @@ slots:
                     font-weight: '600'
               - component: Label
                 config:
-                  text: '=''jetzt '' + ((Number(items[props.heatpumpCop].numericState) || 0) > 0 ? ((Number(items[props.heatpumpCop].numericState)
-                    || 0)).toFixed(2).replace(''.'', '','') : ''–'') + '' · heute '' + ((Number(items[props.heatpumpDcop].numericState)
-                    || 0) > 0 ? ((Number(items[props.heatpumpDcop].numericState) || 0)).toFixed(2).replace(''.'', '','') :
-                    ''–'')'
+                  text: '=''now '' + ((Number(items[props.heatpumpCop].numericState) || 0) > 0 ? ((Number(items[props.heatpumpCop].numericState)
+                    || 0)).toFixed(2) : ''–'') + '' · today '' + ((Number(items[props.heatpumpDcop].numericState) || 0) >
+                    0 ? ((Number(items[props.heatpumpDcop].numericState) || 0)).toFixed(2) : ''–'')'
                   style:
                     font-size: 12px
                     opacity: '0.7'
@@ -218,7 +217,7 @@ slots:
                     color: rgba(102, 187, 106, 0.02)
           - component: oh-time-series
             config:
-              name: Außen
+              name: Outdoor
               gridIndex: 1
               xAxisIndex: 1
               yAxisIndex: 1
@@ -243,7 +242,7 @@ slots:
           - component: oh-chart-title
             config:
               show: true
-              text: Außentemperatur
+              text: Outdoor temperature
               left: 10
               top: 190
               textStyle:
@@ -274,7 +273,7 @@ slots:
             config:
               gridIndex: 0
               categoryType: month
-              name: Tag
+              name: Day
               nameGap: 12
               axisTick:
                 show: false
@@ -298,7 +297,7 @@ slots:
           series:
           - component: oh-aggregate-series
             config:
-              name: Heizung
+              name: Heating
               gridIndex: 0
               xAxisIndex: 0
               yAxisIndex: 0
@@ -315,7 +314,7 @@ slots:
                 - 0
           - component: oh-aggregate-series
             config:
-              name: Warmwasser
+              name: Hot water
               gridIndex: 0
               xAxisIndex: 0
               yAxisIndex: 0
@@ -332,7 +331,7 @@ slots:
                 - 0
           - component: oh-aggregate-series
             config:
-              name: Gesamt
+              name: Total
               gridIndex: 0
               xAxisIndex: 0
               yAxisIndex: 0
@@ -364,7 +363,7 @@ slots:
           - component: oh-chart-title
             config:
               show: true
-              text: COP pro Tag
+              text: COP per day
               left: 10
               top: 15
               textStyle:
@@ -380,7 +379,7 @@ slots:
           default:
           - component: oh-button
             config:
-              text: Alle Details
+              text: All details
               action: popup
               actionModal: page:heatpump
               outline: true

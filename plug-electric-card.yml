@@ -14,9 +14,9 @@ props:
     description: Card title
     type: TEXT
     required: false
-    default: Elektrisch
+    default: Electrical
   parameterGroups: []
-timestamp: Sep 27, 2026, 8:52:40 PM
+timestamp: Oct 4, 2026, 11:05:34 PM
 component: oh-card
 config:
   title: =props.title
@@ -35,7 +35,7 @@ slots:
       default:
       - component: widget:value-tile
         config:
-          title: Spannung
+          title: Voltage
           value: '=(([''NULL'', ''UNDEF''].includes(items[props.prefix + ''_voltage''].state) ? ''–'' : (items[props.prefix
             + ''_voltage''].displayState || items[props.prefix + ''_voltage''].state)) || ''–'')'
           icon: material:power_input
@@ -44,7 +44,7 @@ slots:
           kind: number
       - component: widget:value-tile
         config:
-          title: Strom
+          title: Electricity
           value: '=(([''NULL'', ''UNDEF''].includes(items[props.prefix + ''_current''].state) ? ''–'' : (items[props.prefix
             + ''_current''].displayState || items[props.prefix + ''_current''].state)) || ''–'')'
           icon: material:cable
@@ -53,7 +53,7 @@ slots:
           kind: number
       - component: widget:value-tile
         config:
-          title: Leistungsfaktor
+          title: Power factor
           value: '=(([''NULL'', ''UNDEF''].includes(items[props.prefix + ''_power_factor''].state) ? ''–'' : (items[props.prefix
             + ''_power_factor''].displayState || items[props.prefix + ''_power_factor''].state)) || ''–'')'
           icon: material:functions
@@ -62,7 +62,7 @@ slots:
           kind: number
       - component: widget:value-tile
         config:
-          title: Scheinleistung
+          title: Apparent power
           value: '=(([''NULL'', ''UNDEF''].includes(items[props.prefix + ''_apparent_power''].state) ? ''–'' : (items[props.prefix
             + ''_apparent_power''].displayState || items[props.prefix + ''_apparent_power''].state)) || ''–'')'
           icon: material:bolt
@@ -71,7 +71,7 @@ slots:
           kind: number
       - component: widget:value-tile
         config:
-          title: Blindleistung
+          title: Reactive power
           value: '=(([''NULL'', ''UNDEF''].includes(items[props.prefix + ''_reactive_power''].state) ? ''–'' : (items[props.prefix
             + ''_reactive_power''].displayState || items[props.prefix + ''_reactive_power''].state)) || ''–'')'
           icon: material:bolt

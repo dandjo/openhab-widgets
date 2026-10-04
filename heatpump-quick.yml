@@ -4,19 +4,19 @@ tags:
 props:
   parameters:
   - name: heatpumpDhwTankTemp
-    label: ESPAltherma Warmwasserspeicher Temperatur
+    label: ESPAltherma DHW Tank Temperature
     description: Number:Temperature item
     type: TEXT
     required: true
     context: item
   - name: heatpumpPower
-    label: ESPAltherma Elektrische Leistung
+    label: ESPAltherma Electrical Power
     description: Number:Power item
     type: TEXT
     required: true
     context: item
   - name: heatpumpDhwBoost
-    label: Pyaltherma Warmwasser-Boost
+    label: Pyaltherma DHW Powerful
     description: Switch item
     type: TEXT
     required: true
@@ -28,42 +28,42 @@ props:
     required: true
     context: item
   - name: heatpumpClimateControlPower
-    label: Pyaltherma Heizung Ein/Aus
+    label: Pyaltherma Climate Control Power
     description: Switch item
     type: TEXT
     required: true
     context: item
   - name: heatpumpDhwPower
-    label: Pyaltherma Warmwasser Ein/Aus
+    label: Pyaltherma DHW Power
     description: Switch item
     type: TEXT
     required: true
     context: item
   - name: heatpumpManagement
-    label: Wärmepumpe Automatik
+    label: Heatpump Management
     description: Group item
     type: TEXT
     required: true
     context: item
   - name: heatpumpDhwTempHeating
-    label: Pyaltherma Warmwasser Solltemperatur
+    label: Pyaltherma DHW Temp Heating
     description: Number:Temperature item
     type: TEXT
     required: true
     context: item
   - name: heatpumpDhwManagement
-    label: Wärmepumpe Warmwasser-Automatik
+    label: Heatpump DHW Management
     description: Switch item
     type: TEXT
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 3, 2026, 11:36:34 PM
+timestamp: Oct 4, 2026, 11:05:34 PM
 component: div
 config:
   style:
     --quick-popup: panel
-  label: Wärmepumpe
+  label: Heat Pump
   stylesheet: ':root .popup:has(> .oh-popup[style*="--quick-popup"]) { --f7-popup-tablet-width: 420px; --f7-popup-tablet-height:
     min(660px, calc(100vh - 64px)); }
 
@@ -118,16 +118,15 @@ slots:
               default:
               - component: Label
                 config:
-                  text: Wärmepumpe
+                  text: Heat Pump
                   style:
                     font-size: 15px
                     font-weight: '600'
               - component: Label
                 config:
-                  text: '=''Speicher '' + ([''NULL'', ''UNDEF''].includes(items[props.heatpumpDhwTankTemp].state) ? ''–''
-                    : (items[props.heatpumpDhwTankTemp].displayState || items[props.heatpumpDhwTankTemp].state)) + '' · ''
-                    + (Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) / 1000).toFixed(3).replace(''.'',
-                    '','') + '' kW'''
+                  text: '=''Tank '' + ([''NULL'', ''UNDEF''].includes(items[props.heatpumpDhwTankTemp].state) ? ''–'' : (items[props.heatpumpDhwTankTemp].displayState
+                    || items[props.heatpumpDhwTankTemp].state)) + '' · '' + (Math.abs((Number(items[props.heatpumpPower].numericState)
+                    || 0)) / 1000).toFixed(3) + '' kW'''
                   style:
                     font-size: 12px
                     opacity: '0.7'
@@ -139,8 +138,8 @@ slots:
           item: =props.heatpumpDhwBoost
           icon: material:rocket_launch
           color: '#fb8c00'
-          title: Warmwasser-Boost
-          running: '=''läuft · Speicher '' + ([''NULL'', ''UNDEF''].includes(items[props.heatpumpDhwTankTemp].state) ? ''–''
+          title: Hot water boost
+          running: '=''running · tank '' + ([''NULL'', ''UNDEF''].includes(items[props.heatpumpDhwTankTemp].state) ? ''–''
             : (items[props.heatpumpDhwTankTemp].displayState || items[props.heatpumpDhwTankTemp].state))'
       - component: div
         config:
@@ -187,7 +186,7 @@ slots:
           - component: widget:state-bar
             config:
               item: =props.heatpumpSmartGrid
-              options: 0=Normal;1=Sperre;2=Empfehlung;3=Befehl
+              options: 0=Normal;1=Blocked;2=Recommended;3=Forced
               color: '#fb8c00'
               byText: true
       - component: div
@@ -228,7 +227,7 @@ slots:
                       height: 15
               - component: Label
                 config:
-                  text: Betrieb
+                  text: Operation
                   style:
                     font-size: 13px
                     line-height: 16px
@@ -243,19 +242,19 @@ slots:
               - component: widget:pill-switch
                 config:
                   item: =props.heatpumpClimateControlPower
-                  title: Heizung
+                  title: Heating
                   color: '#fb8c00'
                   icon: material:local_fire_department
               - component: widget:pill-switch
                 config:
                   item: =props.heatpumpDhwPower
-                  title: Warmwasser
+                  title: Hot water
                   color: '#fb8c00'
                   icon: material:shower
               - component: widget:pill-switch
                 config:
                   item: =props.heatpumpManagement
-                  title: Automatik
+                  title: Automatic
                   color: '#fb8c00'
                   icon: material:auto_mode
       - component: widget:pill-slider
@@ -266,13 +265,12 @@ slots:
           max: 60
           step: 5
           unit: °C
-          title: Warmwasser Soll
+          title: Hot water target
           value: '=((Number(items[props.heatpumpDhwTempHeating].numericState) || 0) % 1 ? ((Number(items[props.heatpumpDhwTempHeating].numericState)
-            || 0)).toFixed(1).replace(''.'', '','') : (Number(items[props.heatpumpDhwTempHeating].numericState) || 0)) + ''
-            °C'''
-          context: '=''Speicher '' + ([''NULL'', ''UNDEF''].includes(items[props.heatpumpDhwTankTemp].state) ? ''–'' : (items[props.heatpumpDhwTankTemp].displayState
-            || items[props.heatpumpDhwTankTemp].state)) + (items[props.heatpumpDhwManagement].state === ''ON'' ? '' · Automatik
-            regelt'' : '''')'
+            || 0)).toFixed(1) : (Number(items[props.heatpumpDhwTempHeating].numericState) || 0)) + '' °C'''
+          context: '=''Tank '' + ([''NULL'', ''UNDEF''].includes(items[props.heatpumpDhwTankTemp].state) ? ''–'' : (items[props.heatpumpDhwTankTemp].displayState
+            || items[props.heatpumpDhwTankTemp].state)) + (items[props.heatpumpDhwManagement].state === ''ON'' ? '' · Automatic
+            controls'' : '''')'
           marks: 30=30 °C;40=40;50=50;60=60 °C
           icon: material:shower
           row: true
@@ -286,7 +284,7 @@ slots:
           default:
           - component: oh-button
             config:
-              text: Alle Details
+              text: All details
               action: popup
               actionModal: page:heatpump
               outline: true

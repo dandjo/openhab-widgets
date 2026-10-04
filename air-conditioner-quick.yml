@@ -4,43 +4,43 @@ tags:
 props:
   parameters:
   - name: acSwitch
-    label: Faikout Perfera Schalter
+    label: Faikout Perfera Switch
     description: Switch item
     type: TEXT
     required: true
     context: item
   - name: acMode
-    label: Faikout Perfera Modus
+    label: Faikout Perfera Mode
     description: String item
     type: TEXT
     required: true
     context: item
   - name: acTemperature
-    label: Faikout Perfera Temperatur
+    label: Faikout Perfera Temperature
     description: Number:Temperature item
     type: TEXT
     required: true
     context: item
   - name: acFan
-    label: Faikout Perfera Lüfter
+    label: Faikout Perfera Fan
     description: String item
     type: TEXT
     required: true
     context: item
   - name: acTemperatureSetpoint
-    label: Faikout Perfera Solltemperatur
+    label: Faikout Perfera Temperature Setpoint
     description: Number:Temperature item
     type: TEXT
     required: true
     context: item
   - name: acTimer
-    label: Klimaanlage Timer
+    label: Air Conditioning Timer
     description: Number:Time item
     type: TEXT
     required: true
     context: item
   - name: acTimerSet
-    label: Klimaanlage Timer eingestellt
+    label: Air Conditioning Timer Set
     description: Number:Time item
     type: TEXT
     required: true
@@ -52,12 +52,12 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 3, 2026, 11:36:34 PM
+timestamp: Oct 4, 2026, 11:05:34 PM
 component: div
 config:
   style:
     --quick-popup: panel
-  label: Klimaanlage
+  label: Air Conditioner
   stylesheet: ':root .popup:has(> .oh-popup[style*="--quick-popup"]) { --f7-popup-tablet-width: 420px; --f7-popup-tablet-height:
     min(660px, calc(100vh - 64px)); }
 
@@ -112,14 +112,14 @@ slots:
               default:
               - component: Label
                 config:
-                  text: Klimaanlage
+                  text: Air Conditioner
                   style:
                     font-size: 15px
                     font-weight: '600'
               - component: Label
                 config:
-                  text: '=(items[props.acSwitch].state === ''ON'' ? ''An · '' : ''Aus · '') + ([''NULL'', ''UNDEF''].includes(items[props.acMode].state)
-                    ? ''–'' : (items[props.acMode].displayState || items[props.acMode].state)) + '' · Raum '' + ([''NULL'',
+                  text: '=(items[props.acSwitch].state === ''ON'' ? ''On · '' : ''Off · '') + ([''NULL'', ''UNDEF''].includes(items[props.acMode].state)
+                    ? ''–'' : (items[props.acMode].displayState || items[props.acMode].state)) + '' · Room '' + ([''NULL'',
                     ''UNDEF''].includes(items[props.acTemperature].state) ? ''–'' : (items[props.acTemperature].displayState
                     || items[props.acTemperature].state))'
                   style:
@@ -132,7 +132,7 @@ slots:
         config:
           item: =props.acSwitch
           color: '#29b6f6'
-          onText: '=''An · '' + ([''NULL'', ''UNDEF''].includes(items[props.acMode].state) ? ''–'' : (items[props.acMode].displayState
+          onText: '=''On · '' + ([''NULL'', ''UNDEF''].includes(items[props.acMode].state) ? ''–'' : (items[props.acMode].displayState
             || items[props.acMode].state))'
       - component: div
         config:
@@ -172,14 +172,14 @@ slots:
                       height: 15
               - component: Label
                 config:
-                  text: Modus
+                  text: Mode
                   style:
                     font-size: 13px
                     line-height: 16px
           - component: widget:state-bar
             config:
               item: =props.acMode
-              options: A=Auto;H=Heizen;C=Kühlen;D=Entfeuchten;F=Lüften
+              options: A=Auto;H=Heating;C=Cooling;D=Drying;F=Fan
               color: '=items[props.acSwitch].state === ''ON'' ? ''#29b6f6'' : ''#90a4ae'''
               byText: true
               flex: 1 1 100%
@@ -221,14 +221,14 @@ slots:
                       height: 15
               - component: Label
                 config:
-                  text: Lüfter
+                  text: Fan
                   style:
                     font-size: 13px
                     line-height: 16px
           - component: widget:state-bar
             config:
               item: =props.acFan
-              options: Q=Leise;A=Auto;1=1;2=2;3=3;4=4;5=5
+              options: Q=Quiet;A=Auto;1=1;2=2;3=3;4=4;5=5
               color: '=items[props.acSwitch].state === ''ON'' ? ''#29b6f6'' : ''#90a4ae'''
       - component: widget:pill-slider
         config:
@@ -238,11 +238,10 @@ slots:
           max: 30
           step: 0.5
           unit: °C
-          title: Soll
+          title: Target
           value: '=((Number(items[props.acTemperatureSetpoint].numericState) || 0) % 1 ? ((Number(items[props.acTemperatureSetpoint].numericState)
-            || 0)).toFixed(1).replace(''.'', '','') : (Number(items[props.acTemperatureSetpoint].numericState) || 0)) + ''
-            °C'''
-          context: '=''Raum '' + ([''NULL'', ''UNDEF''].includes(items[props.acTemperature].state) ? ''–'' : (items[props.acTemperature].displayState
+            || 0)).toFixed(1) : (Number(items[props.acTemperatureSetpoint].numericState) || 0)) + '' °C'''
+          context: '=''Room '' + ([''NULL'', ''UNDEF''].includes(items[props.acTemperature].state) ? ''–'' : (items[props.acTemperature].displayState
             || items[props.acTemperature].state))'
           marks: 18=18 °C;20=20;22=22;24=24;26=26;28=28;30=30 °C
           icon: material:device_thermostat
@@ -259,11 +258,11 @@ slots:
           value: '=(Number(items[props.acTimer].numericState) || 0) > 0 ? ((Number(items[props.acTimer].numericState) || 0)
             >= 60 ? Math.floor((Number(items[props.acTimer].numericState) || 0) / 60) + '' h'' + (Math.round((Number(items[props.acTimer].numericState)
             || 0) % 60) ? '' '' + Math.round((Number(items[props.acTimer].numericState) || 0) % 60) + '' min'' : '''') : Math.round((Number(items[props.acTimer].numericState)
-            || 0)) + '' min'') : ''Aus'''
-          context: '=(Number(items[props.acTimer].numericState) || 0) > 0 ? (items[props.acSwitch].state === ''ON'' ? ''schaltet
-            um '' + dayjs().add((Number(items[props.acTimer].numericState) || 0), ''minute'').format(''HH:mm'') + '' aus''
-            : ''läuft bis '' + dayjs().add((Number(items[props.acTimer].numericState) || 0), ''minute'').format(''HH:mm''))
-            : (items[props.acSwitch].state === ''ON'' ? ''läuft ohne Timer'' : ''beim Einschalten 6 h'')'
+            || 0)) + '' min'') : ''Off'''
+          context: '=(Number(items[props.acTimer].numericState) || 0) > 0 ? (items[props.acSwitch].state === ''ON'' ? ''switching
+            '' + dayjs().add((Number(items[props.acTimer].numericState) || 0), ''minute'').format(''HH:mm'') + '' off'' :
+            ''running until '' + dayjs().add((Number(items[props.acTimer].numericState) || 0), ''minute'').format(''HH:mm''))
+            : (items[props.acSwitch].state === ''ON'' ? ''running without timer'' : ''6 h when switched on'')'
           marks: 0=0;180=3 h;360=6 h;540=9 h;720=12 h
           ring: true
           ringFull: =Math.max((Number(items[props.acTimer].numericState) || 0), (Number(items[props.acTimerSet].numericState)
@@ -276,7 +275,7 @@ slots:
           icon: material:rocket_launch
           color: '#29b6f6'
           title: Boost
-          running: ='volle Leistung'
+          running: ='full power'
       - component: div
         config:
           style:
@@ -287,7 +286,7 @@ slots:
           default:
           - component: oh-button
             config:
-              text: Alle Details
+              text: All details
               action: popup
               actionModal: page:air_conditioning
               outline: true
