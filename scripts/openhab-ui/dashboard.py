@@ -3228,6 +3228,13 @@ def segment_bar(segments, height):
     return div(segments, **{"display": "flex", "gap": "2px", "height": height})
 
 
+def consumers_list(rows):
+    box = div(rows, **{"columns": "2 197px", "column-gap": "24px", "margin-top": "12px",
+                       "container-type": "inline-size"})
+    box["config"]["stylesheet"] = "@container (max-width: 559px) { .k > :nth-child(4) { display: none; } }"
+    return box
+
+
 def legend_row(key, name, value, color):
     return keyed(f"item k k-{key}", [
         dot(color),
@@ -3258,9 +3265,10 @@ consumption = [div([
     label("Consumers", **{"font-size": "13px", "opacity": "0.7", "margin": "16px 0 6px"}),
     hover_group([segment_bar([segment(f"c{i}", v, c, f"='{n} · ' + {fixed(v, 2)} + ' kWh · ' + {share(v)} + ' %'")
                               for i, (n, v, c) in enumerate(values)], "18px"),
-                 # read down the first column, then the second
-                 div([legend_row(f"c{i}", n, v, c) for i, (n, v, c) in enumerate(values)],
-                     **{"columns": "2 230px", "column-gap": "24px", "margin-top": "12px"})],
+                 # read down the first column, then the second; two columns from 418 px, the share (also in the
+                 # bar's tooltip) left out below 560 px, where a long name would not fit beside it (user, 2026-10-05:
+                 # a single column made the card so tall that the overview's columns no longer matched)
+                 consumers_list([legend_row(f"c{i}", n, v, c) for i, (n, v, c) in enumerate(values)])],
                 [(f"c{i}", c) for i, (_, _, c) in enumerate(values)]),
 ], **{"padding": "4px 16px 16px"})]
 
@@ -5399,10 +5407,16 @@ def widget_stack(*cards, grow=None):
     return column
 
 
+# below 1390 px window width the overview's cards stand in one column (user, 2026-10-05): two columns there are
+# too narrow for the heat pump drawing and the consumers, and one card had to stretch to even the columns out
+ONE_COLUMN = ("@media (max-width: 1389px) { .row > .oh-col { --f7-cols-per-row: 1 !important; "
+              "width: 100% !important; } }")
+
+
 def page(now):
     props = overview_widget_props()
     w = lambda uid: widget_ref(uid, **props[uid])  # every item a widget reads comes in as a prop
-    return layout_page(PAGE_UID, {"label": "Overview", "stylesheet": SCROLLBAR}, [
+    return layout_page(PAGE_UID, {"label": "Overview", "stylesheet": SCROLLBAR + "\n" + ONE_COLUMN}, [
         # the weather bar over the energy flow over the switches beside the appliances over heating and hot water (on
         # a phone the weather stays on top), the flow taking the height the row leaves; then two columns of their own,
         # the heat pump over the price beside today's consumption over the energy per day over the temperatures, each

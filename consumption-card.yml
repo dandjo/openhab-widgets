@@ -124,7 +124,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 4, 2026, 11:05:34 PM
+timestamp: Oct 5, 2026, 12:18:55 AM
 component: oh-card
 config:
   title: '=''Consumption Today · '' + ([''NULL'', ''UNDEF''].includes(items[props.homeEnergyToday].state) ? ''–'' : (items[props.homeEnergyToday].displayState
@@ -575,9 +575,11 @@ slots:
           - component: div
             config:
               style:
-                columns: 2 230px
+                columns: 2 197px
                 column-gap: 24px
                 margin-top: 12px
+                container-type: inline-size
+              stylesheet: '@container (max-width: 559px) { .k > :nth-child(4) { display: none; } }'
             slots:
               default:
               - component: div
