@@ -40,7 +40,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 3, 2026, 11:36:34 PM
+timestamp: Oct 4, 2026, 1:23:32 PM
 component: div
 config:
   style:
@@ -138,15 +138,15 @@ slots:
           chartType: ''
           periodVisible: true
           period: D
-          height: 300px
+          height: 270px
         slots:
           grid:
           - component: oh-chart-grid
             config:
-              top: '80'
+              top: '62'
               bottom: '60'
               left: '50'
-              right: '50'
+              right: '20'
           xAxis:
           - component: oh-time-axis
             config:
@@ -169,22 +169,8 @@ slots:
                   type: dashed
                   opacity: 0.4
               scale: true
-          - component: oh-value-axis
-            config:
-              gridIndex: 0
-              name: W
-              nameGap: 14
-              nameTextStyle:
-                align: left
-                padding:
-                - 0
-                - 0
-                - 0
-                - 8
-              splitLine:
-                lineStyle:
-                  type: dashed
-                  opacity: 0.4
+              min: =(v) => Math.floor(Math.min(v.min, (v.min + v.max - 4) / 2))
+              max: =(v) => Math.ceil(Math.max(v.max, (v.min + v.max + 4) / 2))
           series:
           - component: oh-time-series
             config:
@@ -214,12 +200,71 @@ slots:
                 color: '#64b5f6'
               itemStyle:
                 color: '#64b5f6'
+          tooltip:
+          - component: oh-chart-tooltip
+            config:
+              show: true
+              confine: true
+              trigger: axis
+              smartFormatter: true
+          legend:
+          - component: oh-chart-legend
+            config:
+              show: true
+              bottom: '0'
+              type: scroll
+          title:
+          - component: oh-chart-title
+            config:
+              show: true
+              text: Vorlauf und Rücklauf
+              left: 10
+              top: 15
+              textStyle:
+                fontSize: 13
+                fontWeight: 600
+      - component: oh-chart
+        config:
+          chartType: ''
+          periodVisible: true
+          period: D
+          height: 220px
+        slots:
+          grid:
+          - component: oh-chart-grid
+            config:
+              top: '62'
+              bottom: '35'
+              left: '50'
+              right: '20'
+          xAxis:
+          - component: oh-time-axis
+            config:
+              gridIndex: 0
+          yAxis:
+          - component: oh-value-axis
+            config:
+              gridIndex: 0
+              name: W
+              nameGap: 14
+              nameTextStyle:
+                align: right
+                padding:
+                - 0
+                - 8
+                - 0
+                - 0
+              splitLine:
+                lineStyle:
+                  type: dashed
+                  opacity: 0.4
+          series:
           - component: oh-time-series
             config:
               name: Wärme
               gridIndex: 0
               xAxisIndex: 0
-              yAxisIndex: 1
+              yAxisIndex: 0
               type: line
               item: =props.heatpumpHeatingPowerAfterBuh
               symbol: none
@@ -248,12 +293,16 @@ slots:
               confine: true
               trigger: axis
               smartFormatter: true
-          legend:
-          - component: oh-chart-legend
+          title:
+          - component: oh-chart-title
             config:
               show: true
-              bottom: '0'
-              type: scroll
+              text: Wärme
+              left: 10
+              top: 15
+              textStyle:
+                fontSize: 13
+                fontWeight: 600
       - component: div
         config:
           style:

@@ -35,6 +35,7 @@ for spec in "Energiefluss|Wärmepumpe|true|heatpump-quick" "Energiefluss|Klimaan
             "Energiefluss|Lüftung|true|ventilation-quick" "Wärmepumpe|Regelung|false|heatpump-control-quick" \
             "Wärmepumpe|Innengerät|false|heatpump-indoor-quick" "Wärmepumpe|Außengerät|false|heatpump-outdoor-quick" \
             "Wärmepumpe|Kältemittel|false|heatpump-refrigerant-quick" "Wärmepumpe|Heizkreis|false|heatpump-circuit-quick" \
+            "Wärmepumpe|Warmwasserspeicher|false|heatpump-tank-quick" "Wärmepumpe|3-Wege-Ventil|false|heatpump-valve-quick" \
             "Wärmepumpe|Obergeschoss|false|upper-floor-quick" "Wärmepumpe|Erdgeschoss|false|ground-floor-quick" \
             "Wärmepumpe|Elektrisch|false|heatpump-electric-quick" "Wärmepumpe|Wärme|false|heatpump-heat-quick" \
             "Wärmepumpe|COP|false|heatpump-cop-quick"; do

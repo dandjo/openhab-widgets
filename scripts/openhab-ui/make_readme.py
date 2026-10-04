@@ -43,7 +43,9 @@ OVERVIEW = [
      "the tank drawn as in the heat pump card, its water in three layers (the top in its temperature's colour) with "
      "the Effect Heater beside it, lit while it heats, its ring filled by its temperature and a badge for where its "
      "heat comes from (the booster heater's red bolt, else the heat pump while the compressor charges the tank); the "
-     "heat pump as the energy flow's node with the same mode badge, its ring filled by the compressor's frequency. "
+     "heat pump as the energy flow's node with its mode badge, filled while the heat pump's own measured circuit "
+     "draws, its red bolt only for the backup heater in the wall unit (the tank's booster heater shows on the tank), "
+     "its ring filled by the compressor's frequency. "
      "Each tile's pill holds the temperature, the tank's and the leaving water's, filled in the tile's colour while "
      "hot water or heating is switched on, outlined while off; a tap opens the heat pump's quick popup. Below them "
      "today's electricity and heat of the heat pump split into space heating, DHW and standby as bars (hovering a "
@@ -57,15 +59,17 @@ OVERVIEW = [
      "nodes, pulsing while it works, softly beside the arc that shows its value; the outdoor unit's fan turns while the compressor runs and its ring is filled by the compressor's "
      "frequency, the wall unit's by its own draw, the measured circuit (full and red while the backup heater runs; "
      "the tank's booster heater does not count), the tank's by its temperature, radiators and floor loops by the "
-     "leaving water while they carry it. Dots run along the pipes, as many as a pipe is long, faster with the water's flow or the compressor's "
+     "leaving water while they carry it. Dots run along the pipes, as many as a pipe is long, two at least on the "
+     "short ones between wall unit, valve and tank, faster with the water's flow or the compressor's "
      "frequency, and all of them backwards during a defrost. The valve shows its position in its icon. Badges just "
      "outside three rings say what the outdoor unit's ring shows (*Hz*) and the wall unit's (a bolt, red while the "
      "backup heater runs) and where the tank's heat comes from; grey while their device rests. Tiles in the "
      "style of the switch tiles hold the figures: the outdoor unit, the control (heating, hot water, Smart Grid, "
      "automation), the refrigerant, the heating circuit, the climate of the two floors, the tank with its booster "
      "heater and the indoor unit with its own power (the measured circuit plus the backup heater), each tinted in its "
-     "colour while what it shows is at work. A tap on a tile, the wall unit or the outdoor unit "
-     "opens its quick popup with charts or controls. Above the drawing the electrical power, the heat and the COP as "
+     "colour while what it shows is at work. A tap on a tile, the wall unit, the outdoor unit, "
+     "the tank or the valve opens its quick popup: the control all the heat pump's controls, the others their values "
+     "over the day, one chart each. Above the drawing the electrical power, the heat and the COP as "
      "a row of value tiles that open popups with their charts of the day and the month (today's split and COPs are "
      "in the heating card). On a phone the drawing takes the card's width; on a wider screen it stands at most at "
      "its own size, as the energy flow does, so their texts keep the UI's sizes and their rings come out the same, "
@@ -85,25 +89,33 @@ OVERVIEW = [
 PLUG = [("plug-card", "Now: power, on/off pill, energy today and total"), ("plug-power-card", "Power over the day"),
         ("plug-energy-days-card", "Energy per day of the month"), ("plug-electric-card", "Voltage, current, power factor, "
                                                                                       "apparent and reactive power")]
-QUICK = [  # uid, title, what it holds; the first three open from the energy flow, the rest from the heat pump card
+# uid, title, what it holds; the first three open from the energy flow, the rest from the heat pump card. Charts hold one
+# value each, two only where they belong together (a temperature and its target, leaving and inlet water, outdoor air
+# and heat exchanger) and the parts of one quantity as a balance
+QUICK = [
     ("heatpump-quick", "Heat pump", "the hot-water boost, the Smart Grid, heating, hot water and automation, the "
      "DHW setpoint"),
     ("air-conditioner-quick", "Air conditioner", "on/off, mode, fan, setpoint, timer and boost"),
     ("ventilation-quick", "Ventilation", "the level, the timer and the automation"),
-    ("heatpump-control-quick", "Control", "heating, hot water and automation, the hot-water boost and the Smart Grid"),
-    ("heatpump-indoor-quick", "Indoor unit", "all the heat pump's controls"),
-    ("heatpump-outdoor-quick", "Outdoor unit", "its power with the compressor frequency and the outdoor temperature "
-     "against its heat exchanger's over the day"),
+    ("heatpump-control-quick", "Control", "all the heat pump's controls: the Smart Grid, heating, hot water and "
+     "automation, the DHW setpoint, the hot-water boost and the leaving water offset"),
+    ("heatpump-indoor-quick", "Indoor unit", "its power without the backup heater, the water's flow and pressure and "
+     "the backup heater over the day"),
+    ("heatpump-outdoor-quick", "Outdoor unit", "its power, the compressor frequency, the outdoor temperature with its "
+     "heat exchanger's and the outdoor air sensor over the day"),
     ("heatpump-refrigerant-quick", "Refrigerant", "hot gas with its target, liquid, heat exchanger and pressure over "
      "the day"),
-    ("heatpump-circuit-quick", "Heating circuit", "the leaving water offset, leaving and inlet water with the heat over "
+    ("heatpump-circuit-quick", "Heating circuit", "the leaving water offset, leaving with inlet water and the heat over "
      "the day"),
+    ("heatpump-tank-quick", "DHW tank", "its temperature with its setpoint and its booster heater's on and off as a "
+     "band over the day"),
+    ("heatpump-valve-quick", "Three-way valve", "its position over the day as a band, space heating and DHW in turn"),
     ("upper-floor-quick", "Upper floor", "temperature and humidity over the day"),
     ("ground-floor-quick", "Ground floor", "temperature, humidity and CO₂ over the day"),
     ("heatpump-electric-quick", "Electricity", "the power of space heating, DHW and standby over the day, their energy "
      "per day of the month"),
     ("heatpump-heat-quick", "Heat", "the heat of space heating and DHW over the day, per day of the month"),
-    ("heatpump-cop-quick", "COP", "the COP against the outdoor temperature over the day, the daily COPs of the month")]
+    ("heatpump-cop-quick", "COP", "the COP and the outdoor temperature over the day, the daily COPs of the month")]
 
 def fill(text, indent=""):
     """A paragraph wrapped at 120 characters."""

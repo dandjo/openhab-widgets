@@ -303,15 +303,15 @@ props:
     type: TEXT
     required: true
     context: item
-  - name: heatpumpOutdoorAirTemp
-    label: ESPAltherma Außenluft Temperatur
+  - name: heatpumpDhwTempHeating
+    label: Pyaltherma Warmwasser Solltemperatur
     description: Number:Temperature item
     type: TEXT
     required: true
     context: item
-  - name: heatpumpTargetDischargeTemp
-    label: ESPAltherma Soll-Heißgastemperatur
-    description: Number:Temperature item
+  - name: heatpumpDhwManagement
+    label: Wärmepumpe Warmwasser-Automatik
+    description: Switch item
     type: TEXT
     required: true
     context: item
@@ -327,20 +327,20 @@ props:
     type: TEXT
     required: true
     context: item
-  - name: heatpumpDhwTempHeating
-    label: Pyaltherma Warmwasser Solltemperatur
+  - name: heatpumpOutdoorAirTemp
+    label: ESPAltherma Außenluft Temperatur
     description: Number:Temperature item
     type: TEXT
     required: true
     context: item
-  - name: heatpumpDhwManagement
-    label: Wärmepumpe Warmwasser-Automatik
-    description: Switch item
+  - name: heatpumpTargetDischargeTemp
+    label: ESPAltherma Soll-Heißgastemperatur
+    description: Number:Temperature item
     type: TEXT
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 4, 2026, 12:18:52 AM
+timestamp: Oct 4, 2026, 1:23:32 PM
 component: oh-card
 config:
   title: Wärmepumpe
@@ -812,6 +812,27 @@ slots:
                       calcMode: linear
                       keyPoints: 0;1
                       keyTimes: 0;1
+              - component: circle
+                config:
+                  r: 4.5
+                  fill: '#e57373'
+                  cx: 0
+                  cy: 0
+                  visible: =(items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
+                    || 0) > 0)
+                slots:
+                  default:
+                  - component: animateMotion
+                    config:
+                      path: '=items[props.heatpumpDefrostOperaton].state === ''ON'' ? ''M444,456 L502,456'' : ''M502,456 H444'''
+                      dur: '=Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 6 ? ''2.9s'' : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState)
+                        || 0)) < 12 ? ''1.66s'' : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) <
+                        18 ? ''1.16s'' : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 24 ? ''0.89s''
+                        : (''0.72s''))))'
+                      repeatCount: indefinite
+                      calcMode: linear
+                      keyPoints: 0.5;1;0;0.5
+                      keyTimes: 0;0.5;0.5;1
               - component: path
                 config:
                   d: M384,456 H326
@@ -843,6 +864,27 @@ slots:
                       calcMode: linear
                       keyPoints: 0;1
                       keyTimes: 0;1
+              - component: circle
+                config:
+                  r: 4.5
+                  fill: '#e57373'
+                  cx: 0
+                  cy: 0
+                  visible: =((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
+                    || 0) > 0) && (items[props.heatpumpValve].state === 'DHW'))
+                slots:
+                  default:
+                  - component: animateMotion
+                    config:
+                      path: '=items[props.heatpumpDefrostOperaton].state === ''ON'' ? ''M326,456 L384,456'' : ''M384,456 H326'''
+                      dur: '=Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 6 ? ''2.9s'' : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState)
+                        || 0)) < 12 ? ''1.66s'' : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) <
+                        18 ? ''1.16s'' : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 24 ? ''0.89s''
+                        : (''0.72s''))))'
+                      repeatCount: indefinite
+                      calcMode: linear
+                      keyPoints: 0.5;1;0;0.5
+                      keyTimes: 0;0.5;0.5;1
               - component: path
                 config:
                   d: M414,426 V216 H367
@@ -3184,10 +3226,14 @@ slots:
               actionModalConfig:
                 heatpumpClimateControlPower: =props.heatpumpClimateControlPower
                 heatpumpDhwPower: =props.heatpumpDhwPower
-                heatpumpManagement: =props.heatpumpManagement
-                heatpumpDhwBoost: =props.heatpumpDhwBoost
-                heatpumpDhwTankTemp: =props.heatpumpDhwTankTemp
                 heatpumpSmartGrid: =props.heatpumpSmartGrid
+                heatpumpManagement: =props.heatpumpManagement
+                heatpumpDhwTempHeating: =props.heatpumpDhwTempHeating
+                heatpumpDhwTankTemp: =props.heatpumpDhwTankTemp
+                heatpumpDhwManagement: =props.heatpumpDhwManagement
+                heatpumpDhwBoost: =props.heatpumpDhwBoost
+                heatpumpLeavingWaterTempOffsetHeating: =props.heatpumpLeavingWaterTempOffsetHeating
+                heatpumpLeavingWaterSetpoint: =props.heatpumpLeavingWaterSetpoint
               style:
                 position: absolute
                 display: block
@@ -3287,18 +3333,10 @@ slots:
               action: popup
               actionModal: widget:heatpump-indoor-quick
               actionModalConfig:
-                heatpumpLeavingWaterTempAfterBuh: =props.heatpumpLeavingWaterTempAfterBuh
+                heatpumpCircuitPower: =props.heatpumpCircuitPower
+                heatpumpBuhPower: =props.heatpumpBuhPower
                 heatpumpFlowSensor: =props.heatpumpFlowSensor
-                heatpumpSmartGrid: =props.heatpumpSmartGrid
-                heatpumpClimateControlPower: =props.heatpumpClimateControlPower
-                heatpumpDhwPower: =props.heatpumpDhwPower
-                heatpumpManagement: =props.heatpumpManagement
-                heatpumpDhwTempHeating: =props.heatpumpDhwTempHeating
-                heatpumpDhwTankTemp: =props.heatpumpDhwTankTemp
-                heatpumpDhwManagement: =props.heatpumpDhwManagement
-                heatpumpDhwBoost: =props.heatpumpDhwBoost
-                heatpumpLeavingWaterTempOffsetHeating: =props.heatpumpLeavingWaterTempOffsetHeating
-                heatpumpLeavingWaterSetpoint: =props.heatpumpLeavingWaterSetpoint
+                heatpumpWaterPressure: =props.heatpumpWaterPressure
               style:
                 position: absolute
                 display: block
@@ -3310,20 +3348,28 @@ slots:
           - component: oh-link
             config:
               action: popup
+              actionModal: widget:heatpump-tank-quick
+              actionModalConfig:
+                heatpumpDhwTankTemp: =props.heatpumpDhwTankTemp
+                heatpumpDhwSetpoint: =props.heatpumpDhwSetpoint
+                heatpumpBshMode: =props.heatpumpBshMode
+              style:
+                position: absolute
+                display: block
+                border-radius: 12px
+                left: 1.52%
+                top: 82.19%
+                width: 40.68%
+                height: 14.05%
+          - component: oh-link
+            config:
+              action: popup
               actionModal: widget:heatpump-indoor-quick
               actionModalConfig:
-                heatpumpLeavingWaterTempAfterBuh: =props.heatpumpLeavingWaterTempAfterBuh
+                heatpumpCircuitPower: =props.heatpumpCircuitPower
+                heatpumpBuhPower: =props.heatpumpBuhPower
                 heatpumpFlowSensor: =props.heatpumpFlowSensor
-                heatpumpSmartGrid: =props.heatpumpSmartGrid
-                heatpumpClimateControlPower: =props.heatpumpClimateControlPower
-                heatpumpDhwPower: =props.heatpumpDhwPower
-                heatpumpManagement: =props.heatpumpManagement
-                heatpumpDhwTempHeating: =props.heatpumpDhwTempHeating
-                heatpumpDhwTankTemp: =props.heatpumpDhwTankTemp
-                heatpumpDhwManagement: =props.heatpumpDhwManagement
-                heatpumpDhwBoost: =props.heatpumpDhwBoost
-                heatpumpLeavingWaterTempOffsetHeating: =props.heatpumpLeavingWaterTempOffsetHeating
-                heatpumpLeavingWaterSetpoint: =props.heatpumpLeavingWaterSetpoint
+                heatpumpWaterPressure: =props.heatpumpWaterPressure
               style:
                 position: absolute
                 display: block
@@ -3348,5 +3394,35 @@ slots:
                 border-radius: 50%
                 left: 86.12%
                 top: 9.31%
+                width: 11.41%
+                height: 9.80%
+          - component: oh-link
+            config:
+              action: popup
+              actionModal: widget:heatpump-tank-quick
+              actionModalConfig:
+                heatpumpDhwTankTemp: =props.heatpumpDhwTankTemp
+                heatpumpDhwSetpoint: =props.heatpumpDhwSetpoint
+                heatpumpBshMode: =props.heatpumpBshMode
+              style:
+                position: absolute
+                display: block
+                border-radius: 50%
+                left: 33.08%
+                top: 67.16%
+                width: 11.41%
+                height: 9.80%
+          - component: oh-link
+            config:
+              action: popup
+              actionModal: widget:heatpump-valve-quick
+              actionModalConfig:
+                heatpumpValve: =props.heatpumpValve
+              style:
+                position: absolute
+                display: block
+                border-radius: 50%
+                left: 55.51%
+                top: 67.16%
                 width: 11.41%
                 height: 9.80%

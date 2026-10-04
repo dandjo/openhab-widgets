@@ -1,17 +1,23 @@
-uid: upper-floor-quick
+uid: heatpump-tank-quick
 tags:
 - controls
 props:
   parameters:
-  - name: acTemperature
-    label: Faikout Perfera Temperatur
+  - name: heatpumpDhwTankTemp
+    label: ESPAltherma Warmwasserspeicher Temperatur
     description: Number:Temperature item
     type: TEXT
     required: true
     context: item
-  - name: tadoHumidity
-    label: Tado Luftfeuchtigkeit
-    description: Number:Dimensionless item
+  - name: heatpumpDhwSetpoint
+    label: ESPAltherma Warmwasser Sollwert
+    description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpBshMode
+    label: ESPAltherma Zusatzheizung Speicher
+    description: Switch item
     type: TEXT
     required: true
     context: item
@@ -21,7 +27,7 @@ component: div
 config:
   style:
     --quick-popup: panel
-  label: Obergeschoss
+  label: Warmwasserspeicher
   stylesheet: ':root .popup:has(> .oh-popup[style*="--quick-popup"]) { --f7-popup-tablet-width: 420px; --f7-popup-tablet-height:
     min(660px, calc(100vh - 64px)); }
 
@@ -58,12 +64,12 @@ slots:
                 display: flex
                 align-items: center
                 justify-content: center
-                background: 'color-mix(in srgb, #f48fb1 22%, transparent)'
+                background: 'color-mix(in srgb, #e57373 22%, transparent)'
             slots:
               default:
               - component: oh-icon
                 config:
-                  icon: material:bed
+                  icon: material:propane_tank
                   width: 20
                   height: 20
           - component: div
@@ -76,16 +82,16 @@ slots:
               default:
               - component: Label
                 config:
-                  text: Obergeschoss
+                  text: Warmwasserspeicher
                   style:
                     font-size: 15px
                     font-weight: '600'
               - component: Label
                 config:
-                  text: '=([''NULL'', ''UNDEF''].includes(items[props.acTemperature].state) ? ''–'' : (items[props.acTemperature].displayState
-                    || items[props.acTemperature].state)) + '' · '' + ([''NULL'', ''UNDEF''].includes(items[props.tadoHumidity].state)
-                    ? ''–'' : ((Number(items[props.tadoHumidity].numericState) || 0)).toFixed(0).replace(''.'', '','') + ''
-                    %'')'
+                  text: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpDhwTankTemp].state) ? ''–'' : (items[props.heatpumpDhwTankTemp].displayState
+                    || items[props.heatpumpDhwTankTemp].state)) + '' · Soll '' + ([''NULL'', ''UNDEF''].includes(items[props.heatpumpDhwSetpoint].state)
+                    ? ''–'' : (items[props.heatpumpDhwSetpoint].displayState || items[props.heatpumpDhwSetpoint].state)) +
+                    '' · Zusatzheizung '' + (items[props.heatpumpBshMode].state === ''ON'' ? ''an'' : ''aus'')'
                   style:
                     font-size: 12px
                     opacity: '0.7'
@@ -97,13 +103,13 @@ slots:
           chartType: ''
           periodVisible: true
           period: D
-          height: 220px
+          height: 270px
         slots:
           grid:
           - component: oh-chart-grid
             config:
               top: '62'
-              bottom: '35'
+              bottom: '60'
               left: '50'
               right: '20'
           xAxis:
@@ -138,13 +144,28 @@ slots:
               xAxisIndex: 0
               yAxisIndex: 0
               type: line
-              item: =props.acTemperature
+              item: =props.heatpumpDhwTankTemp
               symbol: none
               lineStyle:
                 width: 2
-                color: '#f48fb1'
+                color: '#e57373'
               itemStyle:
-                color: '#f48fb1'
+                color: '#e57373'
+          - component: oh-time-series
+            config:
+              name: Soll
+              gridIndex: 0
+              xAxisIndex: 0
+              yAxisIndex: 0
+              type: line
+              item: =props.heatpumpDhwSetpoint
+              symbol: none
+              lineStyle:
+                width: 1.5
+                type: dashed
+                color: '#e57373'
+              itemStyle:
+                color: '#e57373'
           tooltip:
           - component: oh-chart-tooltip
             config:
@@ -152,11 +173,17 @@ slots:
               confine: true
               trigger: axis
               smartFormatter: true
+          legend:
+          - component: oh-chart-legend
+            config:
+              show: true
+              bottom: '0'
+              type: scroll
           title:
           - component: oh-chart-title
             config:
               show: true
-              text: Temperatur
+              text: Temperatur und Soll
               left: 10
               top: 15
               textStyle:
@@ -167,66 +194,50 @@ slots:
           chartType: ''
           periodVisible: true
           period: D
-          height: 220px
+          height: 160px
         slots:
           grid:
           - component: oh-chart-grid
             config:
               top: '62'
               bottom: '35'
-              left: '50'
+              left: '20'
               right: '20'
           xAxis:
           - component: oh-time-axis
             config:
               gridIndex: 0
           yAxis:
-          - component: oh-value-axis
+          - component: oh-category-axis
             config:
               gridIndex: 0
-              name: '%'
-              nameGap: 14
-              nameTextStyle:
-                align: right
-                padding:
-                - 0
-                - 8
-                - 0
-                - 0
-              splitLine:
-                lineStyle:
-                  type: dashed
-                  opacity: 0.4
-              scale: true
-              min: =(v) => Math.floor(Math.min(v.min, (v.min + v.max - 10) / 2))
-              max: =(v) => Math.ceil(Math.max(v.max, (v.min + v.max + 10) / 2))
+              categoryType: values
+              data:
+              - Zusatzheizung
+              show: false
           series:
-          - component: oh-time-series
+          - component: oh-state-series
             config:
-              name: Luftfeuchtigkeit
-              gridIndex: 0
+              name: Zusatzheizung
+              item: =props.heatpumpBshMode
               xAxisIndex: 0
               yAxisIndex: 0
-              type: line
-              item: =props.tadoHumidity
-              symbol: none
-              lineStyle:
-                width: 2
-                color: '#4fc3f7'
-              itemStyle:
-                color: '#4fc3f7'
+              yValue: 0
+              yHeight: 0.7
+              mapState: '=(s) => s === ''ON'' ? ''An'' : s === ''OFF'' ? ''Aus'' : s'
+              stateColor:
+                An: '#fb8c00'
+                Aus: '=themeOptions.dark === ''dark'' ? ''#3c3c3c'' : ''#e0e0e0'''
           tooltip:
           - component: oh-chart-tooltip
             config:
               show: true
               confine: true
-              trigger: axis
-              smartFormatter: true
           title:
           - component: oh-chart-title
             config:
               show: true
-              text: Luftfeuchtigkeit
+              text: Zusatzheizung
               left: 10
               top: 15
               textStyle:
@@ -244,11 +255,11 @@ slots:
             config:
               text: Alle Details
               action: popup
-              actionModal: page:air_conditioning
+              actionModal: page:heatpump
               outline: true
               small: true
               style:
-                color: '#f48fb1'
-                border-color: '#f48fb1'
+                color: '#e57373'
+                border-color: '#e57373'
                 width: auto
                 padding: 0 12px
