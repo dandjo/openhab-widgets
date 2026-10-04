@@ -77,12 +77,13 @@ OVERVIEW = [
      "heater and the indoor unit with its own power (the measured circuit plus the backup heater), each tinted in its "
      "colour while what it shows is at work. A tap on a tile, the wall unit, the outdoor unit, "
      "the tank or the valve opens its quick popup: the control all the heat pump's controls, the others their values "
-     "over the day, one grid each in one chart whose tooltip lists them all at the time pointed at. Above the drawing the electrical power, the heat and the COP as "
-     "a row of value tiles that open popups with their charts of the day and the month (today's split and COPs are "
-     "in the heating card). On a phone the drawing takes the card's width; on a wider screen it stands at most at "
-     "its own size, as the energy flow does, so their texts keep the UI's sizes and their rings come out the same, "
-     "and in the middle of the height its row gives the card. The recording and the dark screenshot show it with demo values (a space "
-     "heating run)."),
+     "over the day, one grid each in one chart whose tooltip lists them all at the time pointed at. At the card's top, across its whole width as the energy "
+     "flow's tiles, the electrical power, the heat and the COP as a row of value tiles that open popups with their "
+     "charts of the day and the month (today's split and COPs are in the heating card). On a phone the drawing takes "
+     "the card's width; everywhere else it stands at its own size, as the energy flow does, so their texts keep the "
+     "UI's sizes and their rings come out the same and never shrink, reaching into the card's padding where the card "
+     "is a little narrower, and in the middle of the height the card is given. The recordings show it with demo "
+     "values (a space heating run)."),
     ("consumption-card", "Consumption today", "Today's consumption as one bar split by source (PV, grid) and by "
      "consumer, with a legend in two columns; hovering a part lifts it everywhere. The screenshot shows it with demo "
      "values."),

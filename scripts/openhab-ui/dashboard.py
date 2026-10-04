@@ -1071,11 +1071,14 @@ def flow_tips():
           ("String 1 · 2", f"={fixed(num('huawei_inverter_pv1_power') + ' / 1000', 2)} + ' · ' + "
                            f"{fixed(num('huawei_inverter_pv2_power') + ' / 1000', 2)} + ' kW'")]),
         ("grid", GRID_XY, 1, "Stromzähler", PILL_RED, [("Strompreis", f"={disp(PRICE)}")]),
+        # while it charges or discharges the time on two rows with telling names (as one row it ran into its name),
+        # at rest a shorter tooltip without the empty row between (user, 2026-10-05)
         ("battery", BATT_XY, 1, "Batteriespeicher", BATTERY_GREEN,
-         # the time on two rows with telling names, as one row it ran into its name
-         [(f"={at_work} ? ({charging} ? 'Voll in' : 'Leer in') : 'Akku'", f"={at_work} ? {dur} : 'ruht'"),
-          (f"={at_work} ? ({charging} ? 'Voll um' : 'Leer um') : ''", f"={at_work} ? {clock} + ' Uhr' : ''"),
-          ("Ø 5 min", f"={fixed(f'{BATT_5MIN} / 1000', 2)} + ' kW'")]),
+         [(f"={charging} ? 'Voll in' : 'Leer in'", f"={dur}"),
+          (f"={charging} ? 'Voll um' : 'Leer um'", f"={clock} + ' Uhr'"),
+          ("Ø 5 min", f"={fixed(f'{BATT_5MIN} / 1000', 2)} + ' kW'")], TIP_W, f"={at_work}"),
+        ("battery", BATT_XY, 1, "Batteriespeicher", BATTERY_GREEN,
+         [("Akku", "ruht"), ("Ø 5 min", f"={fixed(f'{BATT_5MIN} / 1000', 2)} + ' kW'")], TIP_W, f"=!({at_work})"),
         ("home", HOME_XY, 1, "Haus", "#1e88e5", [("Aus PV heute", pct("photovoltaics_own_ec_day", "home_ec_day"))]),
         ("hp", HP_XY, -1, "Wärmepumpe", HP_ORANGE, [hp_rows[0], *hp_rows[1:]], TIP_W, f"=!{DHW_ETA_OK}"),
         # while the tank charges with an expected end, the time left and the end on two rows, as the battery's
@@ -1186,8 +1189,12 @@ def energy_flow():
                                           "actionModalConfig": dict(quick_panel(uid)["config"])}))
                for xy, uid in quick]]
     inner = div([drawing, *links],
-                # at most at its own size, one unit a pixel, so its texts keep the UI's sizes on a wide screen
-                **{"position": "relative", "max-width": f"{FLOW_W}px", "width": "100%", "margin": "0 auto"})
+                # at its own size, one unit a pixel, so its texts keep the UI's sizes on a wide screen and its circles
+                # never shrink outside a phone (user, 2026-10-05); centred, reaching into the card's padding where the
+                # card is narrower; on a phone as wide as the card allows
+                **{"position": "relative", "max-width": f"{FLOW_W}px",
+                   "width": f"={NARROW} ? '100%' : '{FLOW_W}px'",
+                   "margin": f"={NARROW} ? '0 auto' : '0 calc((100% - {FLOW_W}px) / 2)'"})
     inner["config"]["stylesheet"] = tips_css(list(dict.fromkeys(key for key, *_ in tips)))
     star = div([inner],
                # it centres itself in the height the row leaves, the cards below stay at the card's bottom
@@ -2205,14 +2212,14 @@ legend_dot = lambda name, c: keyed(f"item k k-{name.lower()}", [
     div([], **{"width": "10px", "height": "10px", "border-radius": "3px", "background": c}),
     label(name, **{"font-size": "12px", "opacity": "0.75"})], style={"display": "flex", "align-items": "center", "gap": "5px"})
 def hp_stats():
-    """The figures above the drawing, built with it, as their tiles link to quick popups; the row is as wide as the
-    house below it, whose walls stand 7 of the drawing's 526 units in from its edges."""
+    """The figures above the drawing, built with it, as their tiles link to quick popups; a row across the card's
+    whole width, as the energy flow's tiles under its star (user, 2026-10-05)."""
     return div([stat_tile("Electrical", f"={kw2(HPX['power'])}", ELECTRIC_C, "bolt", "heatpump-electric-quick"),
                 stat_tile("Heat", f"={kw2(HPX['heat'])}", SUPPLY, "local_fire_department", "heatpump-heat-quick"),
                 stat_tile("COP", f"={num(HPX['cop'])} > 0 ? {fixed(num(HPX['cop']), 2)} : '–'", COP_C, "eco",
                           "heatpump-cop-quick")],
                **{"display": "grid", "grid-template-columns": "repeat(3, minmax(0, 1fr))", "gap": "8px",
-                  "padding": f"0 {7 / HP_VB[2] * 100:.2f}%", "font-size": "14px", "container-type": "inline-size"})
+                  "font-size": "14px", "container-type": "inline-size"})
 
 
 def hp_day_split():
@@ -2260,17 +2267,22 @@ HP_NODE_POPUPS = [(WALL, "heatpump-indoor-quick"), (OUT, "heatpump-outdoor-quick
 
 def heatpump_content():
     """The heat pump card's content, built when the card is, as its links need the quick popups: the three figures as
-    a row directly above the drawing, both as wide as the drawing. The drawing takes the card's width up to its own
-    size, one unit a pixel, so its texts keep the sizes of the rest of the UI instead of growing with the card; the
-    column stands centred in a wider card, and in the middle of a higher one (a filled card, its auto margins)."""
+    a row across the card's whole width at its top, as the energy flow's tiles, and the drawing below at its own
+    size, one unit a pixel, so its texts keep the sizes of the rest of the UI instead of growing with the card; it
+    stands centred in a wider card, and in the middle of a higher one (a filled card, its auto margins)."""
     links = [*[hp_popup_link(hp_box(cx - w / 2, y, w, 35 + TILE_ROW * rows, "12px"), uid)
                for (cx, y, w), rows, uid in HP_TILE_POPUPS],
              *[hp_popup_link(hp_box(cx - HP_ORBIT, cy - HP_ORBIT, 2 * HP_ORBIT, 2 * HP_ORBIT, "50%"), uid)
                for (cx, cy), uid in HP_NODE_POPUPS]]
     drawing = div([hp_svg, *links], **{"position": "relative"})
-    return [div([hp_stats(), drawing],
-                **{"display": "flex", "flex-direction": "column", "gap": "12px", "width": "100%",
-                   "max-width": f"{HP_VB[2]}px", "margin": "auto",
+    return [div([hp_stats()], **{"padding": f"={NARROW} ? '8px 4px 0' : '12px 12px 0'"}),
+            div([drawing],
+                # at its own size outside a phone, so its circles never shrink there (user, 2026-10-05: below 1500 px
+                # the card is narrower than the drawing); centred, reaching into the card's padding, whose edge the
+                # house stays 7 units clear of
+                **{"display": "flex", "flex-direction": "column", "gap": "12px",
+                   "width": f"={NARROW} ? '100%' : '{HP_VB[2]}px'", "max-width": f"={NARROW} ? '{HP_VB[2]}px' : 'none'",
+                   "margin": f"={NARROW} ? 'auto' : 'auto calc((100% - {HP_VB[2]}px) / 2)'",
                    "padding": f"={NARROW} ? '8px 4px 12px' : '8px 0 16px'"})]
 
 # ---------------------------------------------------------------- 3. price
@@ -4279,7 +4291,8 @@ def text_values(one, labels):
 
 def stacked_chart(panels, height, visual_map=None, **cfg):
     """panels: (title, series, value axis[, weight]); the grids share the height by weight, the time labels stand
-    under the last. A title is a string or (name, colour) pairs, for two values that belong together. Every series
+    under the last. The value axis may be a list of two, the second on the right, for two values that overlap in one
+    grid; a series picks its axis by its yAxisIndex, 0 or 1. A title is a string or (name, colour) pairs, for two values that belong together. Every series
     gets a time axis of its own, the second of a grid hidden: ECharts' axis tooltip lists, per axis, only the series
     whose reading lies nearest to the time pointed at, so two values persisted at different moments would hide each
     other."""
@@ -4289,18 +4302,24 @@ def stacked_chart(panels, height, visual_map=None, **cfg):
     for i, (pnl, w) in enumerate(zip(panels, weights)):
         title, ser, axis = pnl[:3]
         h = unit * w
-        grids.append(comp("oh-chart-grid", {"top": round(top), "height": round(h), "left": "50", "right": "20"}))
-        axis = copy.deepcopy(axis)
-        axis["config"]["gridIndex"] = i
-        ys.append(axis)
-        y_of = len(ys) - 1
+        grids.append(comp("oh-chart-grid", {"top": round(top), "height": round(h), "left": "50",
+                                             "right": "50" if any(isinstance(pn[2], list) for pn in panels) else "20"}))
+        y_of = []
+        for k, ax in enumerate(axis if isinstance(axis, list) else [axis]):
+            ax = copy.deepcopy(ax)
+            ax["config"]["gridIndex"] = i
+            if k:
+                ax["config"].update(position="right", nameTextStyle=RIGHT_AXIS_NAME,
+                                    splitLine={"show": False})
+            ys.append(ax)
+            y_of.append(len(ys) - 1)
         for j, one in enumerate(ser):
             # the pointer stands where the mouse is, one line through every grid, without a label of its own
             xs.append(comp("oh-time-axis", {"gridIndex": i, "axisPointer": {"snap": False, "label": {"show": False}},
                                             **({"show": False} if j else {} if i == len(panels) - 1
                                                else {"axisLabel": {"show": False}})}))
             one = copy.deepcopy(one)
-            y = y_of
+            y = y_of[min(int(one["config"].get("yAxisIndex", 0) or 0), len(y_of) - 1)]
             if "tooltipText" in one["config"]:
                 texts[one["config"]["name"]] = one["config"].pop("tooltipText")
             if one["config"].pop("ownAxis", False):  # on a hidden value axis, so it leaves the grid's own axis alone
@@ -4974,13 +4993,18 @@ def air_conditioning_blocks():
                       vtile("Solltemperatur", "faikout_perfera_temperature_setpoint"),
                       vtile("Lüfterdrehzahl", "faikout_perfera_fan_speed"),
                       vtile("Verdichterfrequenz", "faikout_perfera_compressor_frequency")])]
-    # its power and compressor beside the temperatures, on one time pointer (user, 2026-10-04)
+    # its power with the compressor and the room with the outdoor air, each pair overlapping in one grid (user,
+    # 2026-10-05), over the liquid line, on one time pointer
     temps = stacked_chart([
-        ("Leistung", [area("Leistung", "air_conditioning_unit_power", AC_BLUE)], value_axis("W", min=0)),
-        ("Verdichter", [line("Verdichter", "faikout_perfera_compressor_frequency", "#78909c")], value_axis("Hz", min=0)),
-        *[(n, [line(n, i, c)], span_axis("°C")) for n, i, c in (
-            ("Raum", "faikout_perfera_temperature", "#fb8c00"), ("Außen", "faikout_perfera_outdoor_temperature", "#26a69a"),
-            ("Flüssigkeit", "faikout_perfera_liquid_temperature", "#29b6f6"))]], 800)
+        ((("Leistung", AC_BLUE), ("Verdichter", "#78909c")),
+         [area("Leistung", "air_conditioning_unit_power", AC_BLUE),
+          line("Verdichter", "faikout_perfera_compressor_frequency", "#78909c", y=1)],
+         [value_axis("W", min=0), value_axis("Hz", min=0, minInterval=1)]),
+        ((("Raum", "#fb8c00"), ("Außen", "#26a69a")),
+         [line("Raum", "faikout_perfera_temperature", "#fb8c00"),
+          line("Außen", "faikout_perfera_outdoor_temperature", "#26a69a")], span_axis("°C")),
+        ("Flüssigkeit", [line("Flüssigkeit", "faikout_perfera_liquid_temperature", "#29b6f6")], span_axis("°C"))],
+        620)
     return [two(card("Steuerung", [controls]), stack(card("Jetzt", now), card("Betrieb heute", [temps]))),
             *plug_cards("air_conditioning_unit", "material:ac_unit", AC_BLUE, title="Shelly EM",
                         switch="air_conditioning_switch", electric_prefix="air_conditioning",
@@ -4998,17 +5022,18 @@ def ventilation_blocks():
         switch_row("CO2-Automatik", "material:co2", "ventilation_co2_management", VENT_TEAL),
         switch_row("Feuchte-Automatik", "material:water_drop", "ventilation_humidity_management", VENT_TEAL),
         switch_row("Temperatur-Automatik", "material:thermostat", "ventilation_temperature_management", VENT_TEAL))
-    # the level (a text item of 1 to 3, which MainUI's series reads as numbers) and the plug's power beside the air
-    # the automations act on, so their reactions read on one time pointer (user, 2026-10-04)
+    # the level (a text item of 1 to 3, which MainUI's series reads as numbers) over the air the automations act on,
+    # CO2 and humidity overlapping in one grid, so their reactions read on one time pointer (user, 2026-10-05: without
+    # the plug's power)
     names = [(int(v), t) for v, t in VENT_LEVELS]
     air = stacked_chart([
         ("Stufe", [text_values(line("Stufe", "esplyfterl_level", VENT_TEAL, step="end"), names)],
          value_axis("", min=0, max=3, interval=1, splitLine={"show": False},
                     axisLabel={"formatter": "=(v) => ['', " + ", ".join(f"'{t}'" for _, t in names) + "][v]"})),
-        ("Leistung", [area("Leistung", "ventilation_power", VENT_TEAL)], value_axis("W", min=0)),
-        ("CO₂", [line("CO₂", "netatmo_weatherstation_co2", "#78909c")], value_axis("ppm", scale=True)),
-        ("Luftfeuchtigkeit", [line("Luftfeuchtigkeit", "netatmo_weatherstation_atmospheric_humidity", "#29b6f6")],
-         span_axis("%"))], 700)
+        ((("CO₂", "#78909c"), ("Luftfeuchtigkeit", "#29b6f6")),
+         [line("CO₂", "netatmo_weatherstation_co2", "#78909c"),
+          line("Luftfeuchtigkeit", "netatmo_weatherstation_atmospheric_humidity", "#29b6f6", y=1)],
+         [value_axis("ppm", scale=True), span_axis("%")], 2)], 360)  # as high as the controls beside it
     return [two(card("Steuerung", [controls]), card("Lüftung heute", [air])),
             *plug_cards("ventilation", "material:air", VENT_TEAL)]
 
@@ -5046,12 +5071,13 @@ def energy_storage_blocks():
                       vtile("Geladen gesamt", u + "total_charge"), vtile("Entladen gesamt", u + "total_discharge"),
                       vtile("Busspannung", u + "bus_voltage"), vtile("Busstrom", u + "bus_current"),
                       vtile("Temperatur", u + "temperature")])
-    # the power negative while charging
-    chart_ = stacked_chart([("Leistung", [area("Leistung", BATT, "#7cb342")], value_axis("W")),
-                            ("Ladestand", [area("Ladestand", SOC, "#43a047")], value_axis("%", min=0, max=100))], 420)
-    return [two(card("Jetzt", now), card("Leistung heute", [chart_])),
-            two(card("Steuerung", controls), card("Speicher", [totals])),
-            one(card("Einheit 1", [unit]))]
+    # the power (negative while charging) and the charge overlapping in one grid (user, 2026-10-05)
+    chart_ = stacked_chart([((("Leistung", "#7cb342"), ("Ladestand", "#2e7d32")),
+                             [area("Leistung", BATT, "#7cb342"), line("Ladestand", SOC, "#2e7d32", y=1)],
+                             [value_axis("W"), value_axis("%", min=0, max=100)])], 510)  # as high as Jetzt and Speicher
+    # the storage's totals under "Jetzt", in the room the chart leaves beside them (user, 2026-10-05)
+    return [two(stack(card("Jetzt", now), card("Speicher", [totals])), card("Leistung heute", [chart_])),
+            two(card("Steuerung", controls), card("Einheit 1", [unit]))]
 
 
 def photovoltaics_blocks():
@@ -5069,7 +5095,8 @@ def photovoltaics_blocks():
                             ("Wirkleistung", [area("Wirkleistung", "huawei_inverter_active_power", "#5c6bc0")],
                              value_axis("W")),
                             ("String PV1", [area("PV1", "huawei_inverter_pv1_power", "#ffca28")], value_axis("W")),
-                            ("String PV2", [area("PV2", "huawei_inverter_pv2_power", "#ff8f00")], value_axis("W"))], 680)
+                            ("String PV2", [area("PV2", "huawei_inverter_pv2_power", "#ff8f00")], value_axis("W"))],
+                           780)  # as high as Jetzt, Strings and Netz beside it
     strings = phase_table(["PV1", "PV2"], [("Leistung", ["huawei_inverter_pv1_power", "huawei_inverter_pv2_power"]),
                                            ("Spannung", ["huawei_inverter_pv1_voltage", "huawei_inverter_pv2_voltage"]),
                                            ("Strom", ["huawei_inverter_pv1_current", "huawei_inverter_pv2_current"])])
@@ -5082,8 +5109,9 @@ def photovoltaics_blocks():
                           vtile("Fehlercode", "huawei_inverter_error_code"),
                           vtile("Optimierer online", "huawei_inverter_optimizers_online"),
                           vtile("Optimierer gesamt", "huawei_inverter_optimizers_total")])
-    return [two(card("Jetzt", now), card("Leistung heute", [chart_])),
-            two(card("Strings (DC)", [strings]), card("Netz (AC)", [grid_])),
+    # the strings and the grid under "Jetzt", in the room the chart leaves beside them (user, 2026-10-05)
+    return [two(stack(card("Jetzt", now), card("Strings (DC)", [strings]), card("Netz (AC)", [grid_])),
+                card("Leistung heute", [chart_])),
             two(card("Wechselrichter", [inverter]), card("Ertrag pro Tag", [month_bars("PV-Ertrag", "energy_daily_pv", "#ffb300")]))]
 
 
@@ -5110,11 +5138,14 @@ def netatmo_blocks():
                wide_grid([vtile("Luftfeuchtigkeit", o + "atmospheric_humidity"), vtile("Batteriestand", o + "battery_level")])]
     panel = lambda name, item, color, unit: (name, [line(name, item, color)],
                                              span_axis(unit) if unit in LEAST_SPAN else value_axis(unit, scale=True))
-    temps = stacked_chart([panel("Innen", w + "temperature", "#fb8c00", "°C"),
-                           panel("Außen", o + "temperature", "#29b6f6", "°C")], 520)
+    # inside and outside overlapping in one grid, the temperatures and the humidity (user, 2026-10-05)
+    temps = stacked_chart([((("Innen", "#fb8c00"), ("Außen", "#29b6f6")),
+                            [line("Innen", w + "temperature", "#fb8c00"), line("Außen", o + "temperature", "#29b6f6")],
+                            span_axis("°C"))], 420)
     air = stacked_chart([panel("CO₂", w + "co2", "#78909c", "ppm"),
-                         panel("Luftfeuchtigkeit innen", w + "atmospheric_humidity", "#29b6f6", "%"),
-                         panel("Luftfeuchtigkeit außen", o + "atmospheric_humidity", "#80deea", "%")], 520)
+                         ((("Luftfeuchtigkeit innen", "#29b6f6"), ("außen", "#80deea")),
+                          [line("Luftfeuchtigkeit innen", w + "atmospheric_humidity", "#29b6f6"),
+                           line("Luftfeuchtigkeit außen", o + "atmospheric_humidity", "#80deea")], span_axis("%"))], 420)
 
     def details(p, extra):
         return wide_grid([vtile("Zuletzt gesehen", p + "last_seen"), vtile("Messzeitpunkt", p + "measures_timestamp"),
@@ -5161,20 +5192,21 @@ def epex_spot_blocks():
                       vtile("Teuerste Stunde", "epex_spot_awattar_priciest_hour"),
                       vtile("Teuerster Preis", "epex_spot_awattar_priciest")])]
 
-    def price(name, gross, net, color):
-        """A price, gross, its net riding along invisibly on the same hours, so the tooltip lists both (one value
-        per grid, user 2026-10-04); a dashed line at the present."""
-        return (f"{name}preis", [
-            time_series(f"{name} brutto", gross, step="end", symbol="none", lineStyle={"width": 2.5, "color": color},
-                        itemStyle={"color": color}, areaStyle={"opacity": 0.12},
-                        markLine={"symbol": ["none", "none"], "silent": True, "label": {"show": False},
-                                  "lineStyle": {"color": "#888", "type": "dashed"},
-                                  "data": [{"xAxis": "=dayjs().valueOf()"}]}),
-            time_series(f"{name} netto", net, step="end", symbol="none", lineStyle={"opacity": 0},
-                        itemStyle={"color": color})], value_axis("EUR/kWh"))
-    prices = stacked_chart([price("Gesamt", PRICE, "epex_spot_awattar_total_net", "#e53935"),
-                            price("Markt", "epex_spot_awattar_market_gross", "epex_spot_awattar", "#fb8c00")], 520,
-                           period="2D", future="0.75")
+    def price(name, gross, net, color, now=False):
+        """A price, gross, its net riding along invisibly on the same hours, so the tooltip lists both; with now a
+        dashed line at the present."""
+        mark = {"markLine": {"symbol": ["none", "none"], "silent": True, "label": {"show": False},
+                             "lineStyle": {"color": "#888", "type": "dashed"},
+                             "data": [{"xAxis": "=dayjs().valueOf()"}]}} if now else {}
+        return [time_series(f"{name} brutto", gross, step="end", symbol="none", lineStyle={"width": 2.5, "color": color},
+                            itemStyle={"color": color}, areaStyle={"opacity": 0.12}, **mark),
+                time_series(f"{name} netto", net, step="end", symbol="none", lineStyle={"opacity": 0},
+                            itemStyle={"color": color})]
+    # both prices overlapping in one grid again (user, 2026-10-05)
+    prices = stacked_chart([((("Gesamtpreis", "#e53935"), ("Marktpreis", "#fb8c00")),
+                             [*price("Gesamt", PRICE, "epex_spot_awattar_total_net", "#e53935", now=True),
+                              *price("Markt", "epex_spot_awattar_market_gross", "epex_spot_awattar", "#fb8c00")],
+                             value_axis("EUR/kWh"))], 400, period="2D", future="0.75")
     return [two(card("Jetzt", now), card("Preise 12 h zurück, 36 h voraus", [prices]))]
 
 
@@ -5418,15 +5450,15 @@ def page(now):
     w = lambda uid: widget_ref(uid, **props[uid])  # every item a widget reads comes in as a prop
     return layout_page(PAGE_UID, {"label": "Overview", "stylesheet": SCROLLBAR + "\n" + ONE_COLUMN}, [
         # the weather bar over the energy flow over the switches beside the appliances over heating and hot water (on
-        # a phone the weather stays on top), the flow taking the height the row leaves; then two columns of their own,
-        # the heat pump over the price beside today's consumption over the energy per day over the temperatures, each
-        # with a chart that takes what its column lacks (the price's, the energy per day's): today's consumption lists
-        # its consumers in one column below about 1500 px and then stands taller than the heat pump, which a shared
-        # row stretched with up to 255 px of empty card (user, 2026-10-05); the PV calendar across the bottom
+        # a phone the weather stays on top), the flow taking the height the row leaves; the heat pump beside today's
+        # consumption over the energy per day, which fills the column down to the heat pump's height; the price beside
+        # the temperatures, on one line (user, 2026-10-05: back from two stacked columns); the PV calendar across the
+        # bottom. The consumers stay in two columns from 1390 px on and the page is one column below, so the heat pump
+        # and today's consumption with the energy per day come out about the same height
         block(row(col([widget_stack(w("weather-card"), w("energy-flow-card"), w("switches-card"), grow=2)]),
                   col([widget_stack(w("appliances-card"), w("heating-card"))])),
-              row(col([widget_stack(w("heatpump-card"), w("electricity-price-card"), grow=2)]),
-                  col([widget_stack(w("consumption-card"), w("energy-days-card"), w("temperatures-card"), grow=2)])),
+              row(col([w("heatpump-card")]), col([widget_stack(w("consumption-card"), w("energy-days-card"))])),
+              row(col([w("electricity-price-card")]), col([w("temperatures-card")])),
               row(full(w("pv-days-card")))),
     ], now)
 

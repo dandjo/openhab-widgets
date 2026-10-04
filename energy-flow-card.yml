@@ -394,7 +394,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 4, 2026, 11:05:34 PM
+timestamp: Oct 5, 2026, 12:48:05 AM
 component: oh-card
 config:
   title: Energy Flow
@@ -423,8 +423,8 @@ slots:
           style:
             position: relative
             max-width: 461px
-            width: 100%
-            margin: 0 auto
+            width: '=screen.width < 600 ? ''100%'' : ''461px'''
+            margin: '=screen.width < 600 ? ''0 auto'' : ''0 calc((100% - 461px) / 2)'''
           stylesheet: '.tip { opacity: 0; transition: opacity 0.15s; pointer-events: none; }
 
             .tip-on > a { position: absolute; inset: 0; border-radius: 50%; }
@@ -1959,6 +1959,8 @@ slots:
               - component: g
                 config:
                   class: tip tip-battery
+                  visible: =(((Number(items[props.batteryPower5min].numericState) || 0) < -50) || ((Number(items[props.batteryPower5min].numericState)
+                    || 0) > 50))
                 slots:
                   default:
                   - component: path
@@ -1981,9 +1983,8 @@ slots:
                     config:
                       x: 164.3
                       y: 309.0
-                      content: '=(((Number(items[props.batteryPower5min].numericState) || 0) < -50) || ((Number(items[props.batteryPower5min].numericState)
-                        || 0) > 50)) ? (((Number(items[props.batteryPower5min].numericState) || 0) < -50) ? ''Full in'' :
-                        ''Empty in'') : ''Battery'''
+                      content: '=((Number(items[props.batteryPower5min].numericState) || 0) < -50) ? ''Full in'' : ''Empty
+                        in'''
                       fill: currentColor
                       opacity: '0.7'
                       font-size: 12
@@ -1991,12 +1992,11 @@ slots:
                     config:
                       x: 316.3
                       y: 309.0
-                      content: '=(((Number(items[props.batteryPower5min].numericState) || 0) < -50) || ((Number(items[props.batteryPower5min].numericState)
-                        || 0) > 50)) ? ((m) => m >= 2880 ? ''over 2 days'' : m < 60 ? Math.max(1, m) + '' min'' : Math.floor(m
-                        / 60) + '':'' + (''0'' + m % 60).slice(-2) + '' h'')(Math.round((((Number(items[props.batteryPower5min].numericState)
+                      content: '=((m) => m >= 2880 ? ''over 2 days'' : m < 60 ? Math.max(1, m) + '' min'' : Math.floor(m /
+                        60) + '':'' + (''0'' + m % 60).slice(-2) + '' h'')(Math.round((((Number(items[props.batteryPower5min].numericState)
                         || 0) < -50) ? Math.max(0, 100 - (Number(items[props.batterySoc].numericState) || 0)) * 0.07 / (-(Number(items[props.batteryPower5min].numericState)
                         || 0) / 1000) : Math.max(0, (Number(items[props.batterySoc].numericState) || 0) - 3) * 0.07 / ((Number(items[props.batteryPower5min].numericState)
-                        || 0) / 1000)) * 60)) : ''idle'''
+                        || 0) / 1000)) * 60))'
                       fill: currentColor
                       font-size: 12
                       font-weight: '700'
@@ -2005,9 +2005,8 @@ slots:
                     config:
                       x: 164.3
                       y: 326.0
-                      content: '=(((Number(items[props.batteryPower5min].numericState) || 0) < -50) || ((Number(items[props.batteryPower5min].numericState)
-                        || 0) > 50)) ? (((Number(items[props.batteryPower5min].numericState) || 0) < -50) ? ''Full at'' :
-                        ''Empty at'') : '''''
+                      content: '=((Number(items[props.batteryPower5min].numericState) || 0) < -50) ? ''Full at'' : ''Empty
+                        at'''
                       fill: currentColor
                       opacity: '0.7'
                       font-size: 12
@@ -2015,12 +2014,11 @@ slots:
                     config:
                       x: 316.3
                       y: 326.0
-                      content: '=(((Number(items[props.batteryPower5min].numericState) || 0) < -50) || ((Number(items[props.batteryPower5min].numericState)
-                        || 0) > 50)) ? ((m) => dayjs().add(m, ''minute'').isSame(dayjs(), ''day'') ? dayjs().add(m, ''minute'').format(''HH:mm'')
+                      content: '=((m) => dayjs().add(m, ''minute'').isSame(dayjs(), ''day'') ? dayjs().add(m, ''minute'').format(''HH:mm'')
                         : dayjs().add(m, ''minute'').format(''dd HH:mm''))(Math.round((((Number(items[props.batteryPower5min].numericState)
                         || 0) < -50) ? Math.max(0, 100 - (Number(items[props.batterySoc].numericState) || 0)) * 0.07 / (-(Number(items[props.batteryPower5min].numericState)
                         || 0) / 1000) : Math.max(0, (Number(items[props.batterySoc].numericState) || 0) - 3) * 0.07 / ((Number(items[props.batteryPower5min].numericState)
-                        || 0) / 1000)) * 60)) : '''''
+                        || 0) / 1000)) * 60))'
                       fill: currentColor
                       font-size: 12
                       font-weight: '700'
@@ -2037,6 +2035,63 @@ slots:
                     config:
                       x: 316.3
                       y: 343.0
+                      content: =((Number(items[props.batteryPower5min].numericState) || 0) / 1000).toFixed(2) + ' kW'
+                      fill: currentColor
+                      font-size: 12
+                      font-weight: '700'
+                      text-anchor: end
+              - component: g
+                config:
+                  class: tip tip-battery
+                  visible: =!((((Number(items[props.batteryPower5min].numericState) || 0) < -50) || ((Number(items[props.batteryPower5min].numericState)
+                    || 0) > 50)))
+                slots:
+                  default:
+                  - component: path
+                    config:
+                      d: M162.3,279.5 H318.3 Q326.3,279.5 326.3,287.5 V337.5 Q326.3,345.5 318.3,345.5 H162.3 Q154.3,345.5
+                        154.3,337.5 V319.5 L146.3,312.5 L154.3,305.5 V287.5 Q154.3,279.5 162.3,279.5 Z
+                      fill: '=themeOptions.dark === ''dark'' ? ''#2b2b2c'' : ''#ffffff'''
+                      stroke: rgba(127, 127, 127, 0.35)
+                      stroke-width: 1
+                      stroke-linejoin: round
+                  - component: text
+                    config:
+                      x: 164.3
+                      y: 299.5
+                      content: Battery
+                      fill: '#7cb342'
+                      font-size: 13
+                      font-weight: '700'
+                  - component: text
+                    config:
+                      x: 164.3
+                      y: 317.5
+                      content: Battery
+                      fill: currentColor
+                      opacity: '0.7'
+                      font-size: 12
+                  - component: text
+                    config:
+                      x: 316.3
+                      y: 317.5
+                      content: idle
+                      fill: currentColor
+                      font-size: 12
+                      font-weight: '700'
+                      text-anchor: end
+                  - component: text
+                    config:
+                      x: 164.3
+                      y: 334.5
+                      content: Ø 5 min
+                      fill: currentColor
+                      opacity: '0.7'
+                      font-size: 12
+                  - component: text
+                    config:
+                      x: 316.3
+                      y: 334.5
                       content: =((Number(items[props.batteryPower5min].numericState) || 0) / 1000).toFixed(2) + ' kW'
                       fill: currentColor
                       font-size: 12
