@@ -52,7 +52,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 3, 2026, 11:36:34 PM
+timestamp: Oct 4, 2026, 1:23:32 PM
 component: div
 config:
   style:
@@ -257,6 +257,16 @@ slots:
               show: true
               bottom: '0'
               type: scroll
+          title:
+          - component: oh-chart-title
+            config:
+              show: true
+              text: Leistung
+              left: 10
+              top: 15
+              textStyle:
+                fontSize: 13
+                fontWeight: 600
       - component: oh-chart
         config:
           chartType: month
@@ -354,6 +364,16 @@ slots:
               confine: true
               trigger: axis
               smartFormatter: true
+          title:
+          - component: oh-chart-title
+            config:
+              show: true
+              text: Energie pro Tag
+              left: 10
+              top: 15
+              textStyle:
+                fontSize: 13
+                fontWeight: 600
       - component: div
         config:
           style:

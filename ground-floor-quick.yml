@@ -22,7 +22,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 3, 2026, 11:36:34 PM
+timestamp: Oct 4, 2026, 1:23:32 PM
 component: div
 config:
   style:
@@ -104,15 +104,15 @@ slots:
           chartType: ''
           periodVisible: true
           period: D
-          height: 290px
+          height: 220px
         slots:
           grid:
           - component: oh-chart-grid
             config:
-              top: '80'
-              bottom: '60'
+              top: '62'
+              bottom: '35'
               left: '50'
-              right: '50'
+              right: '20'
           xAxis:
           - component: oh-time-axis
             config:
@@ -135,23 +135,8 @@ slots:
                   type: dashed
                   opacity: 0.4
               scale: true
-          - component: oh-value-axis
-            config:
-              gridIndex: 0
-              name: '%'
-              nameGap: 14
-              nameTextStyle:
-                align: left
-                padding:
-                - 0
-                - 0
-                - 0
-                - 8
-              splitLine:
-                lineStyle:
-                  type: dashed
-                  opacity: 0.4
-              scale: true
+              min: =(v) => Math.floor(Math.min(v.min, (v.min + v.max - 4) / 2))
+              max: =(v) => Math.ceil(Math.max(v.max, (v.min + v.max + 4) / 2))
           series:
           - component: oh-time-series
             config:
@@ -167,12 +152,68 @@ slots:
                 color: '#f48fb1'
               itemStyle:
                 color: '#f48fb1'
+          tooltip:
+          - component: oh-chart-tooltip
+            config:
+              show: true
+              confine: true
+              trigger: axis
+              smartFormatter: true
+          title:
+          - component: oh-chart-title
+            config:
+              show: true
+              text: Temperatur
+              left: 10
+              top: 15
+              textStyle:
+                fontSize: 13
+                fontWeight: 600
+      - component: oh-chart
+        config:
+          chartType: ''
+          periodVisible: true
+          period: D
+          height: 220px
+        slots:
+          grid:
+          - component: oh-chart-grid
+            config:
+              top: '62'
+              bottom: '35'
+              left: '50'
+              right: '20'
+          xAxis:
+          - component: oh-time-axis
+            config:
+              gridIndex: 0
+          yAxis:
+          - component: oh-value-axis
+            config:
+              gridIndex: 0
+              name: '%'
+              nameGap: 14
+              nameTextStyle:
+                align: right
+                padding:
+                - 0
+                - 8
+                - 0
+                - 0
+              splitLine:
+                lineStyle:
+                  type: dashed
+                  opacity: 0.4
+              scale: true
+              min: =(v) => Math.floor(Math.min(v.min, (v.min + v.max - 10) / 2))
+              max: =(v) => Math.ceil(Math.max(v.max, (v.min + v.max + 10) / 2))
+          series:
           - component: oh-time-series
             config:
               name: Luftfeuchtigkeit
               gridIndex: 0
               xAxisIndex: 0
-              yAxisIndex: 1
+              yAxisIndex: 0
               type: line
               item: =props.netatmoWeatherstationAtmosphericHumidity
               symbol: none
@@ -188,18 +229,22 @@ slots:
               confine: true
               trigger: axis
               smartFormatter: true
-          legend:
-          - component: oh-chart-legend
+          title:
+          - component: oh-chart-title
             config:
               show: true
-              bottom: '0'
-              type: scroll
+              text: Luftfeuchtigkeit
+              left: 10
+              top: 15
+              textStyle:
+                fontSize: 13
+                fontWeight: 600
       - component: oh-chart
         config:
           chartType: ''
           periodVisible: true
           period: D
-          height: 200px
+          height: 220px
         slots:
           grid:
           - component: oh-chart-grid
@@ -265,6 +310,16 @@ slots:
               confine: true
               trigger: axis
               smartFormatter: true
+          title:
+          - component: oh-chart-title
+            config:
+              show: true
+              text: CO₂
+              left: 10
+              top: 15
+              textStyle:
+                fontSize: 13
+                fontWeight: 600
       - component: div
         config:
           style:

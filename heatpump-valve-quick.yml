@@ -1,0 +1,159 @@
+uid: heatpump-valve-quick
+tags:
+- controls
+props:
+  parameters:
+  - name: heatpumpValve
+    label: ESPAltherma 3-Wege-Ventil
+    description: String item
+    type: TEXT
+    required: true
+    context: item
+  parameterGroups: []
+timestamp: Oct 4, 2026, 1:23:32 PM
+component: div
+config:
+  style:
+    --quick-popup: panel
+  label: 3-Wege-Ventil
+  stylesheet: ':root .popup:has(> .oh-popup[style*="--quick-popup"]) { --f7-popup-tablet-width: 420px; --f7-popup-tablet-height:
+    min(660px, calc(100vh - 64px)); }
+
+    .menu-item-dropdown:not(.menu-item-dropdown-opened) .menu-dropdown { display: none; }
+
+    .oh-chart-container > .menu.padding { padding-top: 6px !important; }'
+slots:
+  default:
+  - component: div
+    config:
+      style:
+        display: flex
+        flex-direction: column
+        gap: 6px
+        padding: 12px 14px
+    slots:
+      default:
+      - component: div
+        config:
+          style:
+            display: flex
+            align-items: center
+            gap: 10px
+            padding-bottom: 4px
+        slots:
+          default:
+          - component: div
+            config:
+              style:
+                width: 34px
+                height: 34px
+                flex: 0 0 auto
+                border-radius: 50%
+                display: flex
+                align-items: center
+                justify-content: center
+                background: 'color-mix(in srgb, #ffb74d 22%, transparent)'
+            slots:
+              default:
+              - component: oh-icon
+                config:
+                  icon: material:call_split
+                  width: 20
+                  height: 20
+          - component: div
+            config:
+              style:
+                display: flex
+                flex-direction: column
+                min-width: '0'
+            slots:
+              default:
+              - component: Label
+                config:
+                  text: 3-Wege-Ventil
+                  style:
+                    font-size: 15px
+                    font-weight: '600'
+              - component: Label
+                config:
+                  text: '=(items[props.heatpumpValve].state === ''DHW'' ? ''Warmwasser'' : ''Heizung'')'
+                  style:
+                    font-size: 12px
+                    opacity: '0.7'
+                    white-space: nowrap
+                    overflow: hidden
+                    text-overflow: ellipsis
+      - component: oh-chart
+        config:
+          chartType: ''
+          periodVisible: true
+          period: D
+          height: 160px
+        slots:
+          grid:
+          - component: oh-chart-grid
+            config:
+              top: '62'
+              bottom: '35'
+              left: '20'
+              right: '20'
+          xAxis:
+          - component: oh-time-axis
+            config:
+              gridIndex: 0
+          yAxis:
+          - component: oh-category-axis
+            config:
+              gridIndex: 0
+              categoryType: values
+              data:
+              - Stellung
+              show: false
+          series:
+          - component: oh-state-series
+            config:
+              name: Stellung
+              item: =props.heatpumpValve
+              xAxisIndex: 0
+              yAxisIndex: 0
+              yValue: 0
+              yHeight: 0.7
+              mapState: '=(s) => s === ''Space'' ? ''Heizung'' : s === ''DHW'' ? ''Warmwasser'' : s'
+              stateColor:
+                Heizung: '#ffb74d'
+                Warmwasser: '#e57373'
+          tooltip:
+          - component: oh-chart-tooltip
+            config:
+              show: true
+              confine: true
+          title:
+          - component: oh-chart-title
+            config:
+              show: true
+              text: Stellung
+              left: 10
+              top: 15
+              textStyle:
+                fontSize: 13
+                fontWeight: 600
+      - component: div
+        config:
+          style:
+            display: flex
+            justify-content: flex-end
+            padding-top: 4px
+        slots:
+          default:
+          - component: oh-button
+            config:
+              text: Alle Details
+              action: popup
+              actionModal: page:heatpump
+              outline: true
+              small: true
+              style:
+                color: '#ffb74d'
+                border-color: '#ffb74d'
+                width: auto
+                padding: 0 12px

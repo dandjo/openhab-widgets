@@ -152,6 +152,14 @@ def chart(config, **slots):
     return comp("oh-chart", base, **slots)
 
 
+def titled(chart_, text):
+    """A chart named in its top left corner, level with its period buttons on the right, where no card title names it:
+    the quick popups stack several charts. ECharts' dark theme lightens the text in dark mode."""
+    chart_["slots"]["title"] = [comp("oh-chart-title", {"show": True, "text": text, "left": 10, "top": 15,
+                                                         "textStyle": {"fontSize": 13, "fontWeight": 600}})]
+    return chart_
+
+
 def tooltip(**cfg):
     return [comp("oh-chart-tooltip", {"show": True, "confine": True, **cfg})]
 
@@ -871,15 +879,16 @@ def timer_line(m, color, otherwise):
             "opacity": f"={m} > 0 ? '1' : '0.7'"}
 
 
-def hp_mode_badges(cx, cy):
+def hp_mode_badges(cx, cy, heaters=None, running=None):
     """The heat pump's badge, upper right on the ring of its node at (cx, cy): defrosting, else what its valve serves,
-    a flame for space heating, a shower for hot water; filled while it draws more than HP_ON watts. While only its
-    heaters run, the compressor standing, a bolt in the backup heater's red instead."""
+    a flame for space heating, a shower for hot water; filled while `running`, by default while it draws more than
+    HP_ON watts. While only its heaters run (`heaters`, by default the backup heater or the tank's booster heater),
+    the compressor standing, a bolt in the backup heater's red instead."""
     defrost = f"items.{HPX['defrost']}.state === 'ON'"
     operation = f"={defrost} ? 'ac_unit' : {DHW_MODE} ? 'shower' : 'local_fire_department'"
-    heaters_only = f"(({BUH_ON} || {BSH_ON}) && !({COMPRESSOR}))"
+    heaters_only = f"(({heaters or f'{BUH_ON} || {BSH_ON}'}) && !({COMPRESSOR}))"
     xy = round(cx + ON_RING, 1), round(cy - ON_RING, 1)
-    mode = ring_badge(*xy, operation, HP_ORANGE, HP_RUNNING)
+    mode = ring_badge(*xy, operation, HP_ORANGE, running or HP_RUNNING)
     mode["config"]["visible"] = f"=!{heaters_only}"
     heater = ring_badge(*xy, "electric_bolt", HEATER_RED, "true")
     heater["config"]["visible"] = f"={heaters_only}"
@@ -1373,13 +1382,16 @@ WX_RAIN_BAR = ("=(params, api) => api.value(1) > 0 ? ((w, top, base) => ({type: 
 
 
 def weather_forecast_chart():
-    """The next 60 hours: temperature as a line with the weather drawn above it, over the precipitation of each hour
-    as bars, the wind below with arrows of its direction, one tooltip for all three."""
-    # the wind's grid 75 px high, 55 px below the temperature's, room for its axis name and the arrows above it
+    """The next 60 hours, one value per grid (user, 2026-10-04): temperature as a line with the weather drawn above
+    it, the precipitation of each hour as bars, the wind with arrows of its direction; their data share the hours,
+    so one tooltip lists all three."""
+    # 55 px between the grids, room for the next one's axis name and the wind's arrows above its line
     grids = [comp("oh-chart-grid", {"top": "35", "height": "140", "left": "45", "right": "45"}),
-             comp("oh-chart-grid", {"top": "230", "bottom": "60", "left": "45", "right": "45"})]
+             comp("oh-chart-grid", {"top": "230", "height": "60", "left": "45", "right": "45"}),
+             comp("oh-chart-grid", {"top": "345", "bottom": "60", "left": "45", "right": "45"})]
     x_axes = [comp("oh-time-axis", {"gridIndex": 0, "axisLabel": {"show": False}}),
-              comp("oh-time-axis", {"gridIndex": 1, "axisLabel": {"formatter": WX_TIME_LABEL,
+              comp("oh-time-axis", {"gridIndex": 1, "axisLabel": {"show": False}}),
+              comp("oh-time-axis", {"gridIndex": 2, "axisLabel": {"formatter": WX_TIME_LABEL,
                                                                    "rich": {"day": {"fontWeight": "bold"}}}})]
     dashed = {"splitLine": {"lineStyle": {"type": "dashed", "opacity": 0.4}}}
     # a quarter of the temperature's span above its maximum, at least a degree, for the weather's drawings; the label
@@ -1387,13 +1399,11 @@ def weather_forecast_chart():
     y_axes = [value_axis("°C", scale=True, minInterval=1,
                          max="=(v) => Math.ceil(v.max + Math.max(1, (v.max - v.min) * 0.25))",
                          axisLabel={"showMaxLabel": False}),
-              # up to 2 mm at least so a drizzle stays small, half as much again so the bars keep out of the top third,
-              # where the weather's drawings stand over the warmer hours; no label at that odd top
-              comp("oh-value-axis", {"gridIndex": 0, "name": "mm", "nameGap": 14, "min": 0,
-                                     "max": "=(v) => Math.max(v.max, 2) * 1.5", "splitLine": {"show": False},
-                                     "axisLabel": {"showMaxLabel": False},
-                                     "nameTextStyle": {"align": "left", "padding": [0, 0, 0, 8]}}),
-              comp("oh-value-axis", {"gridIndex": 1, "name": "km/h", "nameGap": 10, "nameTextStyle": AXIS_NAME,
+              # up to 2 mm at least so a drizzle stays small, else up to the next whole millimetre, halved by
+              # splitNumber like the wind's
+              comp("oh-value-axis", {"gridIndex": 1, "name": "mm", "nameGap": 10, "nameTextStyle": AXIS_NAME, "min": 0,
+                                     "max": "=(v) => Math.max(2, Math.ceil(v.max))", "splitNumber": 2, **dashed}),
+              comp("oh-value-axis", {"gridIndex": 2, "name": "km/h", "nameGap": 10, "nameTextStyle": AXIS_NAME,
                                      # up to the next 20, halved by splitNumber: the peak gets no label of its own
                                      "min": 0, "max": "=(v) => Math.max(20, Math.ceil(v.max / 20) * 20)", "splitNumber": 2,
                                      **dashed})]
@@ -1403,14 +1413,15 @@ def weather_forecast_chart():
               # precipitation is the sum of the hour before its time; the bar stands on that time all the same, as
               # the axis tooltip lists only the series with a point at the time it snaps to. Drawn by a custom
               # series, not a bar series: a bar series widens its time axis by half an hour on each side for its
-              # outer bars, so the upper grid would map time to x otherwise than the wind's below it
-              wx_series("Niederschlag", "mm", 2, WX_RAIN_COLOR, 0, 1, type="custom", renderItem=WX_RAIN_BAR,
-                        encode={"x": 0, "y": 1}, clip=True, itemStyle={"color": WX_RAIN_COLOR}),
-              wx_series("Wind", "km/h", 3, WX_WIND_COLOR, 1, 2, type="line", smooth=0.5, symbol="none",
+              # outer bars, so its grid would map time to x otherwise than the others
+              wx_series("Niederschlag", "mm", 2, WX_RAIN_COLOR, 1, 1, type="custom", renderItem=WX_RAIN_BAR,
+                        encode={"x": 0, "y": 1}, clip=True, itemStyle={"color": WX_RAIN_COLOR},
+                        markLine=wx_midnights()),
+              wx_series("Wind", "km/h", 3, WX_WIND_COLOR, 2, 2, type="line", smooth=0.5, symbol="none",
                         lineStyle={"width": 2, "color": WX_WIND_COLOR}, areaStyle={"color": gradient(rgb_of(WX_WIND_COLOR))},
                         markLine=wx_midnights(), markPoint=wx_wind_arrows())]
-    return chart({"period": "60h", "future": 1, "height": "365px",
-                  # one tooltip for both grids
+    return chart({"period": "60h", "future": 1, "height": "480px",
+                  # one tooltip for all grids
                   "options": {"axisPointer": {"link": [{"xAxisIndex": "all"}]}}},
                  grid=grids, xAxis=x_axes, yAxis=y_axes, series=series,
                  tooltip=tooltip(trigger="axis", smartFormatter=True), legend=legend())
@@ -1665,8 +1676,9 @@ def reversed_path(d):
     return "M" + " L".join(f"{px:g},{py:g}" for px, py in reversed(path_points(d)))
 
 
-# every pipe's dots keep the same spacing, so a long pipe has more of them, not further apart ones; they all run at
-# the same speed, which follows the water's flow on the water pipes and the compressor's frequency on the
+# every pipe's dots keep the same spacing, so a long pipe has more of them, not further apart ones; the short pipes
+# between wall unit, valve and tank in the basement carry two (user, 2026-10-04: one looked lost there). They all run
+# at the same speed, which follows the water's flow on the water pipes and the compressor's frequency on the
 # refrigerant's, in steps, as a changed duration restarts the animation
 DOT_SPACING = 40  # units between two dots
 HP_ORBIT = ORBIT  # the ring round every device, as in the energy flow
@@ -1675,13 +1687,13 @@ FLOW_STEPS = [6, 12, 18, 24]  # l/min
 FREQUENCY_STEPS = [30, 45, 60, 75]  # Hz
 
 
-def hp_route(d, color, active, reverse=None, pace=None):
+def hp_route(d, color, active, reverse=None, pace=None, least=1):
     """Pipe along a polyline with dots running in its drawing direction while `active`, the other way while `reverse`
-    holds; one dot per DOT_SPACING of its length, at a speed from DOT_SPEEDS by `pace`, a (value, steps) pair. The
-    dots are spaced by their keyPoints, as on the energy flow's links."""
+    holds; one dot per DOT_SPACING of its length, `least` at least, at a speed from DOT_SPEEDS by `pace`, a (value,
+    steps) pair. The dots are spaced by their keyPoints, as on the energy flow's links."""
     points = path_points(d)
     length = sum(math.hypot(bx - ax, by - ay) for (ax, ay), (bx, by) in zip(points, points[1:]))
-    count = max(1, round(length / DOT_SPACING))
+    count = max(least, round(length / DOT_SPACING))
     value, bins = pace
     dur = steps(value, bins, [f"{round(length / speed, 2)}s" for speed in DOT_SPEEDS])
     path = f"={reverse} ? '{reversed_path(d)}' : '{d}'" if reverse else d
@@ -1822,8 +1834,10 @@ hp_svg = svg("svg", [
     # branch per level; during a defrost the dots run back, as the heat goes from the water to the outdoor unit
     *hp_route(f"M{REFRIGERANT_X},{OUT[1] + 27} V{WALL[1]} H{WALL[0] + 30}", REFRIGERANT, COMPRESSOR, reverse=DEFROSTING,
               pace=(num(HPX["hz"]), FREQUENCY_STEPS)),
-    *hp_route(f"M{WALL[0] - 30},{WALL[1]} H{VALVE[0] + 30}", SUPPLY, PUMP_ON, reverse=DEFROSTING, pace=WATER_PACE),
-    *hp_route(f"M{VALVE[0] - 30},{VALVE[1]} H{TANK[0] + 30}", SUPPLY, TANK_FLOW, reverse=DEFROSTING, pace=WATER_PACE),
+    *hp_route(f"M{WALL[0] - 30},{WALL[1]} H{VALVE[0] + 30}", SUPPLY, PUMP_ON, reverse=DEFROSTING, pace=WATER_PACE,
+              least=2),
+    *hp_route(f"M{VALVE[0] - 30},{VALVE[1]} H{TANK[0] + 30}", SUPPLY, TANK_FLOW, reverse=DEFROSTING, pace=WATER_PACE,
+              least=2),
     *hp_route(f"M{VALVE[0]},{VALVE[1] - 30} V{UPPER_FH[1]} H{UPPER_FH[0] + 30}", SUPPLY, HEATING_FLOW,
               reverse=DEFROSTING, pace=WATER_PACE),
     *hp_route(f"M{VALVE[0]},{GROUND_FH[1]} H{GROUND_FH[0] + 30}", SUPPLY, HEATING_FLOW, reverse=DEFROSTING,
@@ -2006,13 +2020,15 @@ def hp_popup_link(style, uid):
                             "actionModalConfig": dict(panel["config"]), "style": style})
 
 
-# what a tap opens: a tile its popup, the wall unit and the outdoor unit theirs; valve, tank, radiators and floor loops
-# open nothing
+# what a tap opens: a tile its popup, the wall unit, the outdoor unit, the tank and the valve theirs; radiators and floor
+# loops open nothing
 HP_TILE_POPUPS = [(CONTROL_TILE, 4, "heatpump-control-quick"), (OUTDOOR_TILE, 4, "heatpump-outdoor-quick"),
                   (REFRIGERANT_TILE, 3, "heatpump-refrigerant-quick"),
                   (CIRCUIT_TILE, 3, "heatpump-circuit-quick"), (UPPER_TILE, 2, "upper-floor-quick"),
-                  (GROUND_TILE, 3, "ground-floor-quick"), (INDOOR_TILE, 4, "heatpump-indoor-quick")]
-HP_NODE_POPUPS = [(WALL, "heatpump-indoor-quick"), (OUT, "heatpump-outdoor-quick")]
+                  (GROUND_TILE, 3, "ground-floor-quick"), (INDOOR_TILE, 4, "heatpump-indoor-quick"),
+                  (TANK_TILE, 3, "heatpump-tank-quick")]
+HP_NODE_POPUPS = [(WALL, "heatpump-indoor-quick"), (OUT, "heatpump-outdoor-quick"), (TANK, "heatpump-tank-quick"),
+                  (VALVE, "heatpump-valve-quick")]
 
 
 def heatpump_content():
@@ -2622,64 +2638,127 @@ def vent_quick():
                                                           VENT_TEAL)], "ventilation")
 
 
-# ---- the popups of the heat pump card's tiles
+# ---- the popups of the heat pump card's tiles: Regelung all the heat pump's controls, the devices their values over
+# the day, one chart per value (user, 2026-10-04), two together only where they belong together: a temperature and its
+# target, leaving and inlet water, the outdoor air and the heat exchanger that draws heat from it; the parts of the
+# heat pump's power and energy stay together, as energy balances do
+
+QUICK_CHART, QUICK_PAIR = "220px", "270px"  # a chart of one value, of two with their legend
+
+
+def quick_chart(title, series, axes=None, height=None):
+    """A day chart of a quick popup, titled, as the popup stacks several."""
+    return titled(day_chart(series, axes, height=height or (QUICK_PAIR if len(series) > 1 else QUICK_CHART)), title)
+
 
 def hp_control_quick():
-    """The heat pump's control: heating, hot water and the automation, the hot-water boost and the Smart Grid."""
+    """The heat pump's control: all its controls, as on its page: Smart Grid, heating, hot water and the automation,
+    the DHW setpoint, the hot-water boost and the leaving water offset."""
     on = lambda item: f"(items.{item}.state === 'ON' ? 'an' : 'aus')"
     state = f"'Heizung ' + {on('pyaltherma_climate_control_power')} + ' · Warmwasser ' + {on('pyaltherma_dhw_power')}"
     return quick("material:tune", "Regelung", HP_ORANGE, state,
-                 [operation_section(row=True), dhw_boost(), smart_grid_section(row=True)], "heatpump")
-
-
-def hp_indoor_quick():
-    """The indoor unit: all the heat pump's controls, as on its page."""
-    state = f"'Vorlauf ' + {disp(HPX['supply'])} + ' · ' + {disp(HPX['flow'])}"
-    return quick("material:hvac", "Innengerät", "#64b5f6", state,
                  [smart_grid_section(row=True), operation_section(row=True), dhw_setpoint(row=True), dhw_boost(),
                   lw_offset(row=True)], "heatpump")
 
 
+def hp_indoor_quick():
+    """The indoor unit over the day, as the outdoor unit's popup shows its own: the heat pump's measured draw without
+    the backup heater, the water's flow and pressure, the backup heater."""
+    state = (f"{kw2(HPX['circuit'], HPX['buh_power'])} + ' · ' + {disp(HPX['flow'])} + ' · ' + "
+             f"{disp(HPX['water_pressure'])}")
+    return quick("material:hvac", "Innengerät", "#64b5f6", state, [
+        quick_chart("Leistung ohne Heizstab", [area("Leistung", HPX["circuit"], HP_ORANGE)], [value_axis("W", min=0)]),
+        quick_chart("Durchfluss", [area("Durchfluss", HPX["flow"], "#64b5f6")], [value_axis("l/min", min=0)]),
+        quick_chart("Wasserdruck", [line("Wasserdruck", HPX["water_pressure"], "#4fc3f7")],
+                    [span_axis("bar")]),
+        quick_chart("Heizstab", [area("Heizstab", HPX["buh_power"], HEATER_RED)], [value_axis("W", min=0)])],
+        "heatpump")
+
+
 def hp_outdoor_quick():
-    """The outdoor unit over the day: its circuit's power with the compressor's frequency, the outdoor temperature
-    against its heat exchanger's, whose gap tells how hard it pulls heat from the air."""
+    """The outdoor unit over the day: its circuit's power, the compressor's frequency, the outdoor temperature against
+    its heat exchanger's, whose gap tells how hard it pulls heat from the air, and its outdoor air sensor."""
     state = f"{kw2(HPX['circuit'])} + ' · ' + {disp(HPX['hz'])} + ' · außen ' + {disp(HPX['outdoor'])}"
-    work = day_chart([area("Leistung", HPX["circuit"], HP_ORANGE), line("Verdichter", HPX["hz"], "#78909c", y=1)],
-                     [value_axis("W", min=0), value_axis("Hz", min=0)], height="280px")
-    temps = day_chart([line("Außen", HPX["outdoor"], "#26a69a"), line("Wärmetauscher", HPX["exchanger"], "#4fc3f7"),
-                       line("Außenluft", "espaltherma_outdoor_air_temp", "#9e9e9e", dashed=True)],
-                      [value_axis("°C", scale=True)], height="250px")
-    return quick("material:heat_pump", "Außengerät", HP_ORANGE, state, [work, temps], "heatpump")
+    return quick("material:heat_pump", "Außengerät", HP_ORANGE, state, [
+        quick_chart("Leistung", [area("Leistung", HPX["circuit"], HP_ORANGE)], [value_axis("W", min=0)]),
+        quick_chart("Verdichter", [line("Verdichter", HPX["hz"], "#78909c")], [value_axis("Hz", min=0)]),
+        quick_chart("Außen und Wärmetauscher", [line("Außen", HPX["outdoor"], "#26a69a"),
+                                                line("Wärmetauscher", HPX["exchanger"], "#4fc3f7")],
+                    [span_axis("°C")]),
+        quick_chart("Außenluft", [line("Außenluft", "espaltherma_outdoor_air_temp", "#9e9e9e")],
+                    [span_axis("°C")])], "heatpump")
 
 
 def hp_refrigerant_quick():
-    """The refrigerant over the day: hot gas with its target, liquid and the outdoor heat exchanger, the pressure."""
+    """The refrigerant over the day: hot gas with its target, liquid, the outdoor heat exchanger, the pressure."""
     state = f"'Heißgas ' + {disp(HPX['hot_gas'])} + ' · ' + {disp(HPX['pressure'])}"
-    temps = day_chart([line("Heißgas", HPX["hot_gas"], REFRIGERANT),
-                       line("Heißgas Soll", "espaltherma_target_discharge_temp", REFRIGERANT, dashed=True),
-                       line("Flüssig", HPX["refrigerant"], "#4fc3f7"),
-                       line("Wärmetauscher", HPX["exchanger"], "#26a69a")], [value_axis("°C", scale=True)],
-                      height="270px")
-    pressure = day_chart([line("Druck", HPX["pressure"], REFRIGERANT)], [value_axis("bar", scale=True)], height="200px")
-    return quick("material:severe_cold", "Kältemittel", REFRIGERANT, state, [temps, pressure], "heatpump")
+    return quick("material:severe_cold", "Kältemittel", REFRIGERANT, state, [
+        quick_chart("Heißgas und Soll", [line("Heißgas", HPX["hot_gas"], REFRIGERANT),
+                                         line("Heißgas Soll", "espaltherma_target_discharge_temp", REFRIGERANT,
+                                              dashed=True)], [span_axis("°C")]),
+        quick_chart("Flüssig", [line("Flüssig", HPX["refrigerant"], "#4fc3f7")], [span_axis("°C")]),
+        quick_chart("Wärmetauscher", [line("Wärmetauscher", HPX["exchanger"], "#26a69a")],
+                    [span_axis("°C")]),
+        quick_chart("Druck", [line("Druck", HPX["pressure"], REFRIGERANT)], [span_axis("bar")])],
+        "heatpump")
 
 
 def hp_circuit_quick():
-    """The heating circuit: its leaving water offset, leaving and inlet water over the day with the water's heat."""
+    """The heating circuit: its leaving water offset, leaving and inlet water over the day, the water's heat."""
     state = f"'Vorlauf ' + {disp(HPX['supply'])} + ' · Rücklauf ' + {disp(HPX['return'])}"
-    temps = day_chart([line("Vorlauf", HPX["supply"], SUPPLY), line("Rücklauf", HPX["return"], RETURN),
-                       area("Wärme", HPX["water_heat"], HP_ORANGE, y=1)],
-                      [value_axis("°C", scale=True), value_axis("W")], height="300px")
-    return quick("material:waves", "Heizkreis", SUPPLY, state, [lw_offset(row=True), temps], "heatpump")
+    return quick("material:waves", "Heizkreis", SUPPLY, state, [
+        lw_offset(row=True),
+        quick_chart("Vorlauf und Rücklauf", [line("Vorlauf", HPX["supply"], SUPPLY),
+                                             line("Rücklauf", HPX["return"], RETURN)], [span_axis("°C")]),
+        # negative while a defrost takes heat from the water
+        quick_chart("Wärme", [area("Wärme", HPX["water_heat"], HP_ORANGE)], [value_axis("W")])], "heatpump")
+
+
+def state_band(title, item, states, height="160px"):
+    """A titled day chart of an item's states as a horizontal band, one bar per period in its state's colour, named in
+    it; states: (state, label, colour) for each the item takes, the colours opaque, as ECharts picks the name's colour
+    by its bar's (white on a translucent one, unreadable in the light theme). The tooltip gives a bar's duration."""
+    names = " : ".join(f"s === '{v}' ? '{t}'" for v, t, _ in states)
+    return titled(chart({"period": "D", "periodVisible": True, "height": height},
+                        grid=[comp("oh-chart-grid", {"top": "35", "bottom": "35", "left": "20", "right": "20"})],
+                        xAxis=[comp("oh-time-axis", {"gridIndex": 0})],
+                        yAxis=[comp("oh-category-axis", {"gridIndex": 0, "categoryType": "values", "data": [title],
+                                                         "show": False})],
+                        series=[comp("oh-state-series", {"name": title, "item": item, "xAxisIndex": 0, "yAxisIndex": 0,
+                                                         "yValue": 0, "yHeight": 0.7, "mapState": f"=(s) => {names} : s",
+                                                         "stateColor": {t: c for _, t, c in states}})],
+                        tooltip=[comp("oh-chart-tooltip", {"show": True, "confine": True})]), title)
+
+
+def hp_tank_quick():
+    """The DHW tank over the day: its temperature with its setpoint, and when its booster heater (BSH) ran."""
+    state = (f"{disp(HPX['tank'])} + ' · Soll ' + {disp(HPX['tank_set'])} + ' · Zusatzheizung ' + "
+             f"({BSH_ON} ? 'an' : 'aus')")
+    return quick("material:propane_tank", "Warmwasserspeicher", DHW_C, state, [
+        quick_chart("Temperatur und Soll", [line("Temperatur", HPX["tank"], DHW_C),
+                                            line("Soll", HPX["tank_set"], DHW_C, dashed=True)], [span_axis("°C")]),
+        # off in a grey just off the chart's background in either theme
+        state_band("Zusatzheizung", HPX["bsh"], [("ON", "An", HP_ORANGE),
+                                                 ("OFF", "Aus", "=themeOptions.dark === 'dark' ? '#3c3c3c' : '#e0e0e0'")])],
+        "heatpump")
+
+
+def hp_valve_quick():
+    """The three-way valve over the day: when it served the heating circuits and when the tank."""
+    state = f"({DHW_MODE} ? 'Warmwasser' : 'Heizung')"
+    return quick("material:call_split", "3-Wege-Ventil", "#ffb74d", state, [
+        state_band("Stellung", HPX["valve"], [("Space", "Heizung", SPACE_C), ("DHW", "Warmwasser", DHW_C)])],
+        "heatpump")
 
 
 def floor_quick(title, icon, temperature, humidity, co2, page):
-    """A floor's climate over the day: temperature and humidity, the CO₂ where it is measured."""
+    """A floor's climate over the day: temperature, humidity, the CO₂ where it is measured."""
     state = f"{disp(temperature)} + ' · ' + {percent(humidity)}" + (f" + ' · ' + {disp(co2)}" if co2 else "")
-    charts = [day_chart([line("Temperatur", temperature, "#f48fb1"), line("Luftfeuchtigkeit", humidity, "#4fc3f7", y=1)],
-                        [value_axis("°C", scale=True), value_axis("%", scale=True)], height="290px")]
+    charts = [quick_chart("Temperatur", [line("Temperatur", temperature, "#f48fb1")], [span_axis("°C")]),
+              quick_chart("Luftfeuchtigkeit", [line("Luftfeuchtigkeit", humidity, "#4fc3f7")],
+                          [span_axis("%")])]
     if co2:
-        charts.append(day_chart([area("CO₂", co2, "#78909c")], [value_axis("ppm", scale=True)], height="200px"))
+        charts.append(quick_chart("CO₂", [area("CO₂", co2, "#78909c")], [value_axis("ppm", scale=True)]))
     return quick(f"material:{icon}", title, "#f48fb1", state, charts, page)
 
 
@@ -2689,37 +2768,38 @@ HP_PARTS = [("Heizung", "space", SPACE_C), ("Warmwasser", "dhw", DHW_C), ("Stand
 
 def hp_split_quick(title, icon, color, power, today, part_power, part_energy, parts):
     """Electricity or heat by part: the parts' power over the day, their energy per day of the month stacked;
-    part_power and part_energy name a part's items by its key."""
+    part_power and part_energy name a part's items by its key. A balance of one quantity, so the parts share a chart."""
     state = f"{kw2(power)} + ' · heute ' + {fixed(num(today), 1)} + ' kWh'"
-    day = day_chart([area(name, part_power.format(key), c) for name, key, c in parts], height="260px")
+    day = quick_chart("Leistung", [area(name, part_power.format(key), c) for name, key, c in parts], height="260px")
     month = month_chart([daily(name, part_energy.format(key), c, stack="day",
                                **({"itemStyle": {"color": c, "borderRadius": [4, 4, 0, 0]}} if i == len(parts) - 1
                                   else {}))
                          for i, (name, key, c) in enumerate(parts)], "kWh")
-    return quick(f"material:{icon}", title, color, state, [day, month], "heatpump")
+    return quick(f"material:{icon}", title, color, state, [day, titled(month, "Energie pro Tag")], "heatpump")
 
 
 def hp_cop_quick():
-    """The COP over the day against the outdoor temperature it follows, and the day's COPs per day of the month:
-    space heating and hot water as columns, the total as a line."""
+    """The COP over the day and the outdoor temperature it follows, and the day's COPs per day of the month: space
+    heating and hot water as columns, the total, their mix, as a line."""
     cop = num(HPX["cop"])
     day_cop = num("espaltherma_dcop")
     state = f"'jetzt ' + ({cop} > 0 ? {fixed(cop, 2)} : '–') + ' · heute ' + ({day_cop} > 0 ? {fixed(day_cop, 2)} : '–')"
-    day = day_chart([area("COP", HPX["cop"], COP_C), line("Außen", HPX["outdoor"], "#26a69a", y=1, dashed=True)],
-                    [value_axis("COP", min=0), value_axis("°C", scale=True)], height="280px")
+    day = quick_chart("COP", [area("COP", HPX["cop"], COP_C)], [value_axis("COP", min=0)])
+    outdoor = quick_chart("Außentemperatur", [line("Außen", HPX["outdoor"], "#26a69a")], [span_axis("°C")])
     month = month_chart([daily("Heizung", "espaltherma_dcop_space", SPACE_C,
                                itemStyle={"color": SPACE_C, "borderRadius": [3, 3, 0, 0]}),
                          daily("Warmwasser", "espaltherma_dcop_dhw", DHW_C,
                                itemStyle={"color": DHW_C, "borderRadius": [3, 3, 0, 0]}),
                          daily("Gesamt", "espaltherma_dcop", COP_C, type="line", symbol="circle", symbolSize=5,
                                lineStyle={"width": 2, "color": COP_C})], "COP")
-    return quick("material:eco", "COP", COP_C, state, [day, month], "heatpump")
+    return quick("material:eco", "COP", COP_C, state, [day, outdoor, titled(month, "COP pro Tag")], "heatpump")
 
 
 QUICK_PANELS = {"heatpump-quick": hp_quick, "air-conditioner-quick": ac_quick, "ventilation-quick": vent_quick,
                 "heatpump-control-quick": hp_control_quick, "heatpump-indoor-quick": hp_indoor_quick,
                 "heatpump-outdoor-quick": hp_outdoor_quick,
                 "heatpump-refrigerant-quick": hp_refrigerant_quick, "heatpump-circuit-quick": hp_circuit_quick,
+                "heatpump-tank-quick": hp_tank_quick, "heatpump-valve-quick": hp_valve_quick,
                 "heatpump-electric-quick": lambda: hp_split_quick(
                     "Elektrisch", "bolt", ELECTRIC_C, HPX["power"], "espaltherma_energy_today",
                     "espaltherma_electrical_power_{}", "espaltherma_energy_{}_today", HP_PARTS),
@@ -3412,14 +3492,16 @@ def heat_tile(icon, title, on, color, value):
 def heat_specs():
     """What the heating card's two tiles show, as keyword arguments of a tile builder: the tank as in the heat pump
     card with the source of its heat as a badge, its grey ring filled by its temperature, and the tank's temperature;
-    the heat pump as its node in the energy flow with the same badge, its grey ring filled by the compressor's
-    frequency, and the leaving water; on is the switch for hot water and for heating."""
+    the heat pump as its node in the energy flow with its badge (the red bolt only for the backup heater), its grey ring
+    filled by the compressor's frequency, and the leaving water; on is the switch for hot water and for heating."""
     tank = heat_icon([*tank_node(0, 0, "heatTank"), *tank_source_badge(0, 0)],
                      hp_orbit((0, 0), "#e57373", f"({TANK_FLOW} || {BSH_ON})",
                               f"{num(HPX['tank'])} / {TANK_FULL}"),
                      [tank_layers("heatTank")])
+    # the heating's badge: its red bolt only for the backup heater in the wall unit, filled by the heat pump's own
+    # draw, not by the booster heater in the tank (user, 2026-10-04)
     pump = heat_icon([flow_node("heat-pump", (0, 0), num(HPX["power"]), frequency=num(HPX["hz"])),
-                      *hp_mode_badges(0, 0)],
+                      *hp_mode_badges(0, 0, heaters=BUH_ON, running=f"{num(HPX['circuit'])} > {HP_ON}")],
                      hp_orbit((0, 0), HP_ORANGE, COMPRESSOR, f"{num(HPX['hz'])} / {HZ_FULL}"))
     return [dict(icon=tank, title="Warmwasserspeicher", on="items.pyaltherma_dhw_power.state === 'ON'", color=DHW_C,
                  value=f"={disp(HPX['tank'])}"),
@@ -3746,6 +3828,18 @@ def value_axis(name, **extra):
                                   "splitLine": {"lineStyle": {"type": "dashed", "opacity": 0.4}}, **extra})
 
 
+# the least span of an axis scaled to its values, so a sensor stepping by its resolution (a room's 24 and 24,5 °C, a
+# humidity's whole per cent, a pressure's tenth of a bar) does not fill a chart of its own as a block (2026-10-04)
+LEAST_SPAN = {"°C": 4, "%": 10, "bar": 1}
+
+
+def span_axis(name, **extra):
+    """A value axis scaled to its values, at least LEAST_SPAN of its unit wide around their middle, on whole units."""
+    span = LEAST_SPAN[name]
+    return value_axis(name, scale=True, min=f"=(v) => Math.floor(Math.min(v.min, (v.min + v.max - {span}) / 2))",
+                      max=f"=(v) => Math.ceil(Math.max(v.max, (v.min + v.max + {span}) / 2))", **extra)
+
+
 def day_chart(series, axes=None, height="260px", **slots):
     """The last day with arrows for earlier days; a legend once there is more than one series. A second axis stands
     on the right, its name over its labels."""
@@ -3916,16 +4010,18 @@ def month_sums(series):
 
 
 def home_blocks():
-    """The house, which has no device page: where its power comes from now, its power over the day beside PV and the
-    grid, the day's balance, the consumers of the day (the overview's card), and its energy per day and per month."""
+    """The house, which has no device page: where its power comes from now, its power, PV's and the grid's over the
+    day, one chart each, the day's balance, the consumers of the day (the overview's card), and its energy per day and per month."""
     pv_share = f"Math.round(100 * Math.max(0, Math.min({num(PV)}, {num(HOME)} - Math.max(0, {num(GRID)}) - " \
                f"Math.max(0, {num(BATT)}))) / Math.max(1, {num(HOME)}))"
     now = [hero("material:home", HOME_BLUE, "Hausverbrauch", f"={kw(HOME)}",
                 [chip(f"='jetzt ' + {pv_share} + ' % aus PV'", "#ffb300")]),
            *home_sources()]
-    power = day_chart([area("Haus", HOME, HOME_BLUE), line("PV", PV, "#ffb300", sampling="lttb"),
-                       # sampled, a day of 5-second readings is too much to draw
-                       line("Netz", GRID, "#e53935", sampling="lttb")], height="100%")
+    # one meter per chart (user, 2026-10-04); the grid's coloured by its sign as on its page
+    power = day_chart([area("Haus", HOME, HOME_BLUE)])
+    pv = day_chart([area("PV", PV, "#ffb300")])
+    grid_ = day_chart([time_series("Netz", GRID, symbol="none", sampling="lttb", lineStyle={"width": 1.5},
+                                   areaStyle={"opacity": 0.25})], visualMap=sign_colors())
     today = wide_grid([vtile("Verbrauch heute", "home_ec_day", color=HOME_BLUE),
                        vtile("aus PV", "photovoltaics_own_ec_day", color="#43a047"),
                        vtile("aus dem Netz", "huawei_inverter_power_meter_ec_day", color="#e53935"),
@@ -3943,7 +4039,8 @@ def home_blocks():
                          ("PV Production", "energy_daily_pv", PV_C,
                           {"type": "line", "symbol": "circle", "symbolSize": 7, "lineStyle": {"width": 2.5, "color": PV_C},
                            "z": 3})])
-    return [two(card("Jetzt", now), card("Leistung heute", [fill_chart(power, "260px")], fill=True)),
+    return [two(card("Jetzt", now), chart_card("Hausverbrauch heute", power)),
+            two(chart_card("PV-Leistung heute", pv), chart_card("Netz heute", grid_)),
             block(row(col([card("Heute", [today])]), col([widget_ref("consumption-card", **props["consumption-card"])]))),
             block(row(col([widget_ref("energy-days-card", **props["energy-days-card"])]),
                       col([card("Energie pro Monat", [months])])))]
@@ -3951,7 +4048,8 @@ def home_blocks():
 
 def appliances_blocks():
     """The household appliances together, which have no device page: their tiles, each opening its machine's page,
-    the power now and over the day, the day's energy and its share of the house's, energy per day and the meters."""
+    the power now, the day's energy and its share of the house's, energy per day, each one's power over the day and
+    the meters."""
     powers = [num(p + "_power") for p, _, _ in FLOW_APPLIANCES]
     running = "[" + ", ".join(powers) + f"].filter((w) => w > {APPL_ON}).length"
     state = f"=((n) => n === 0 ? 'alle aus' : n === 1 ? '1 läuft' : n + ' laufen')({running})"
@@ -3959,13 +4057,10 @@ def appliances_blocks():
     now = [hero("material:local_laundry_service", APPL_COLOR, "Leistung", f"={total}",
                 [chip(state, f"=({running}) > 0 ? '#1e88e5' : '#9e9e9e'")]),
            wide_grid([vtile(title, p + "_power") for p, title, _ in FLOW_APPLIANCES])]
-    # lines, not stacked areas: ECharts stacks a time axis by the points' index, not their time, and the four plugs
-    # are persisted at different moments
-    floor = comp("oh-data-series", {"name": "", "type": "line", "xAxisIndex": 0, "yAxisIndex": 0,
-                                     "data": [["=dayjs().valueOf()", 100]], "symbol": "none", "silent": True,
-                                     "tooltip": {"show": False}})  # keeps their standby noise from filling the axis
-    power = day_chart([*[line(title, p + "_power", color) for p, title, color in FLOW_APPLIANCES], floor],
-                      height="100%")
+    # one chart per machine, as on its page: the four plugs are persisted at different moments, so a shared axis
+    # tooltip would mix their times (user, 2026-10-04)
+    powers = [chart_card(f"{GEN_DE[title]} · Leistung heute", plug_chart(p + "_power", color))
+              for p, title, color in FLOW_APPLIANCES]
     home_share = f"({num('home_ec_day')} > 0 ? 100 * {APPL_DAY} / {num('home_ec_day')} : 0)"
     today = wide_grid([value_tile("Total", f"={fixed(APPL_DAY, 2)} + ' kWh'", color=APPL_COLOR),
                        *[vtile(title, p + "_energy_today") for p, title, _ in FLOW_APPLIANCES],
@@ -3982,8 +4077,9 @@ def appliances_blocks():
                  tooltip=tooltip(trigger="axis", smartFormatter=True), legend=legend())
     meters = wide_grid([vtile(title, p + "_energy_total") for p, title, _ in FLOW_APPLIANCES])
     return [two(card("Geräte", copy.deepcopy(appliances)), card("Jetzt", now)),
-            two(card("Leistung heute", [fill_chart(power, "260px")], fill=True), card("Heute", [today])),
-            two(card("Energie pro Tag", [days]), card("Zählerstände", [meters]))]
+            two(card("Heute", [today]), card("Energie pro Tag", [days])),
+            two(*powers[:2]), two(*powers[2:]),
+            one(card("Zählerstände", [meters]))]
 
 
 # the energy flow's own popups, for the two nodes without a device page, laid out like the device pages and opened as
@@ -4166,6 +4262,13 @@ def two(a, b):
     return block(row(col([a]), col([b])))
 
 
+def chart_card(title, chart_, min_height="260px"):
+    """A card holding one chart, which fills the card's height, at least min_height: one value per chart, its card
+    title naming it (user, 2026-10-04)."""
+    chart_["config"]["height"] = "100%"
+    return card(title, [fill_chart(chart_, min_height)], fill=True)
+
+
 def one(a):
     return block(row(full(a)))
 
@@ -4269,11 +4372,13 @@ def heatpump_blocks():
                       vtile("Verdichterfrequenz", P["hz"]), vtile("Inverter Strom", "espaltherma_inv_primary_current"),
                       vtile("Durchfluss", P["flow"]), vtile("Umwälzpumpe Signal", "espaltherma_water_pump_signal"),
                       vtile("Wasserdruck", "espaltherma_water_pressure")])]
-    power_chart_ = day_chart([area("Elektrisch", P["power"], "#fb8c00"), line("Heizleistung", P["heat"], "#e53935")],
-                             height="100%")
-    temps_chart = day_chart([line("Vorlauf", P["supply"], "#e53935"), line("Rücklauf", P["return"], "#1e88e5"),
-                             line("Warmwasser", P["tank"], "#ab47bc"), line("Außen", P["outdoor"], "#26a69a")],
-                            [value_axis("°C", scale=True)])
+    # one value per chart, leaving and inlet water together, as their spread is what counts
+    power_chart_ = day_chart([area("Elektrisch", P["power"], "#fb8c00")])
+    heat_chart = day_chart([area("Heizleistung", P["heat"], "#e53935")])
+    water_chart = day_chart([line("Vorlauf", P["supply"], "#e53935"), line("Rücklauf", P["return"], "#1e88e5")],
+                            [span_axis("°C")])
+    tank_chart = day_chart([line("Warmwasser", P["tank"], "#ab47bc")], [span_axis("°C")])
+    outdoor_chart = day_chart([line("Außen", P["outdoor"], "#26a69a")], [span_axis("°C")])
     today = wide_grid([vtile("Elektrisch heute", "espaltherma_energy_today"),
                        vtile("Heizung", "espaltherma_energy_space_today"),
                        vtile("Warmwasser", "espaltherma_energy_dhw_today"),
@@ -4323,11 +4428,13 @@ def heatpump_blocks():
                            vtile("Innengerät Betrieb", "espaltherma_i_u_operation_mode"),
                            vtile("3-Wege-Ventil", P["valve"]), vtile("Fehlercode", "espaltherma_error_code")])
     return [two(card("Steuerung", [controls]), card("Jetzt", now)),
-            two(card("Leistung heute", [fill_chart(power_chart_, "260px")], fill=True), card("Temperaturen heute", [temps_chart])),
+            two(chart_card("Elektrische Leistung heute", power_chart_), chart_card("Heizleistung heute", heat_chart)),
+            two(chart_card("Vorlauf und Rücklauf heute", water_chart), chart_card("Warmwasser heute", tank_chart)),
             two(card("Energie heute", [today]), card("Leistung aufgeteilt", [split])),
-            two(card("Temperaturen", [temps]), card("Sollwerte", [setpoints])),
+            two(card("Temperaturen", [temps]), chart_card("Außentemperatur heute", outdoor_chart)),
+            two(card("Sollwerte", [setpoints]), card("Kältemittel", [refrigerant])),
             one(card("Modi", [modes])),
-            two(card("Kältemittel", [refrigerant]), card("Betrieb", [operation])),
+            one(card("Betrieb", [operation])),
             *plug_cards("heatpump", "material:heat_pump", "#fb8c00", title="Shelly EM")]
 
 
@@ -4349,11 +4456,13 @@ def air_conditioning_blocks():
                       vtile("Solltemperatur", "faikout_perfera_temperature_setpoint"),
                       vtile("Lüfterdrehzahl", "faikout_perfera_fan_speed"),
                       vtile("Verdichterfrequenz", "faikout_perfera_compressor_frequency")])]
-    temps_chart = day_chart([line("Raum", "faikout_perfera_temperature", "#fb8c00"),
-                             line("Außen", "faikout_perfera_outdoor_temperature", "#26a69a"),
-                             line("Flüssigkeit", "faikout_perfera_liquid_temperature", "#29b6f6")],
-                            [value_axis("°C", scale=True)])
-    return [two(card("Steuerung", [controls]), stack(card("Jetzt", now), card("Temperaturen heute", [temps_chart]))),
+    temp = lambda name, item, color: day_chart([line(name, item, color)], [span_axis("°C")])
+    return [two(card("Steuerung", [controls]),
+                stack(card("Jetzt", now), chart_card("Raumtemperatur heute",
+                                                     temp("Raum", "faikout_perfera_temperature", "#fb8c00")))),
+            two(chart_card("Außentemperatur heute", temp("Außen", "faikout_perfera_outdoor_temperature", "#26a69a")),
+                chart_card("Flüssigkeitstemperatur heute",
+                           temp("Flüssigkeit", "faikout_perfera_liquid_temperature", "#29b6f6"))),
             *plug_cards("air_conditioning_unit", "material:ac_unit", AC_BLUE, title="Shelly EM",
                         switch="air_conditioning_switch", electric_prefix="air_conditioning",
                         electric_title="Elektrisch · Shelly EM")]
@@ -4370,10 +4479,11 @@ def ventilation_blocks():
         switch_row("CO2-Automatik", "material:co2", "ventilation_co2_management", VENT_TEAL),
         switch_row("Feuchte-Automatik", "material:water_drop", "ventilation_humidity_management", VENT_TEAL),
         switch_row("Temperatur-Automatik", "material:thermostat", "ventilation_temperature_management", VENT_TEAL))
-    air = day_chart([line("CO2", "netatmo_weatherstation_co2", "#78909c"),
-                     line("Luftfeuchtigkeit", "netatmo_weatherstation_atmospheric_humidity", "#29b6f6", y=1)],
-                    [value_axis("ppm", scale=True), value_axis("", splitLine={"show": False}, axisLabel={"formatter": "{value} %"})])
-    return [two(card("Steuerung", [controls]), card("Raumluft heute", [air])),
+    co2 = day_chart([line("CO₂", "netatmo_weatherstation_co2", "#78909c")], [value_axis("ppm", scale=True)])
+    humidity = day_chart([line("Luftfeuchtigkeit", "netatmo_weatherstation_atmospheric_humidity", "#29b6f6")],
+                         [span_axis("%")])
+    return [two(card("Steuerung", [controls]), stack(chart_card("CO₂ heute", co2, "200px"),
+                                                     chart_card("Luftfeuchtigkeit heute", humidity, "200px"))),
             *plug_cards("ventilation", "material:air", VENT_TEAL)]
 
 
@@ -4410,12 +4520,12 @@ def energy_storage_blocks():
                       vtile("Geladen gesamt", u + "total_charge"), vtile("Entladen gesamt", u + "total_discharge"),
                       vtile("Busspannung", u + "bus_voltage"), vtile("Busstrom", u + "bus_current"),
                       vtile("Temperatur", u + "temperature")])
-    chart_ = day_chart([area("Leistung", BATT, "#7cb342"), line("Ladestand", SOC, "#43a047", y=1)],
-                       [value_axis("W"), value_axis("", min=0, max=100, splitLine={"show": False}, axisLabel={"formatter": "{value} %"})],
-                       height="100%")
-    return [two(card("Jetzt", now), card("Leistung heute", [fill_chart(chart_, "260px")], fill=True)),
-            two(card("Steuerung", controls), card("Speicher", [totals])),
-            one(card("Einheit 1", [unit]))]
+    # negative while charging
+    power = day_chart([area("Leistung", BATT, "#7cb342")])
+    soc = day_chart([area("Ladestand", SOC, "#43a047")], [value_axis("%", min=0, max=100)])
+    return [two(card("Jetzt", now), chart_card("Leistung heute", power)),
+            two(card("Steuerung", controls), chart_card("Ladestand heute", soc)),
+            two(card("Speicher", [totals]), card("Einheit 1", [unit]))]
 
 
 def photovoltaics_blocks():
@@ -4428,8 +4538,8 @@ def photovoltaics_blocks():
                       vtile("Energie heute", "huawei_inverter_e_day", color="#ffb300"),
                       vtile("Eigenverbrauch heute", "photovoltaics_own_ec_day", color="#43a047"),
                       vtile("Energie gesamt", "huawei_inverter_e_total")])]
-    chart_ = day_chart([area("Eingang", PV, "#ffb300"), line("Wirkleistung", "huawei_inverter_active_power", "#5c6bc0")],
-                       height="100%")
+    pv = day_chart([area("Eingang", PV, "#ffb300")])
+    active = day_chart([area("Wirkleistung", "huawei_inverter_active_power", "#5c6bc0")])
     strings = phase_table(["PV1", "PV2"], [("Leistung", ["huawei_inverter_pv1_power", "huawei_inverter_pv2_power"]),
                                            ("Spannung", ["huawei_inverter_pv1_voltage", "huawei_inverter_pv2_voltage"]),
                                            ("Strom", ["huawei_inverter_pv1_current", "huawei_inverter_pv2_current"])])
@@ -4442,9 +4552,11 @@ def photovoltaics_blocks():
                           vtile("Fehlercode", "huawei_inverter_error_code"),
                           vtile("Optimierer online", "huawei_inverter_optimizers_online"),
                           vtile("Optimierer gesamt", "huawei_inverter_optimizers_total")])
-    return [two(card("Jetzt", now), card("Leistung heute", [fill_chart(chart_, "260px")], fill=True)),
+    return [two(card("Jetzt", now), chart_card("Eingangsleistung heute", pv)),
+            two(chart_card("Wirkleistung heute", active),
+                card("Ertrag pro Tag", [month_bars("PV-Ertrag", "energy_daily_pv", "#ffb300")])),
             two(card("Strings (DC)", [strings]), card("Netz (AC)", [grid_])),
-            two(card("Wechselrichter", [inverter]), card("Ertrag pro Tag", [month_bars("PV-Ertrag", "energy_daily_pv", "#ffb300")]))]
+            one(card("Wechselrichter", [inverter]))]
 
 
 def meter_blocks(title_item, color_expr, today, phases, heads, extra, chart_item):
@@ -4468,12 +4580,9 @@ def netatmo_blocks():
                          vtile("Lärm", w + "noise"), vtile("Luftdruck", w + "barometric_pressure")])]
     outside = [hero("material:wb_sunny", "#29b6f6", "Außen", f"={disp(o + 'temperature')}"),
                wide_grid([vtile("Luftfeuchtigkeit", o + "atmospheric_humidity"), vtile("Batteriestand", o + "battery_level")])]
-    temps = day_chart([line("Innen", w + "temperature", "#fb8c00"), line("Außen", o + "temperature", "#29b6f6")],
-                      [value_axis("°C", scale=True)])
-    air = day_chart([line("CO2", w + "co2", "#78909c"),
-                     line("Luftfeuchtigkeit innen", w + "atmospheric_humidity", "#29b6f6", y=1),
-                     line("Luftfeuchtigkeit außen", o + "atmospheric_humidity", "#80deea", y=1)],
-                    [value_axis("ppm", scale=True), value_axis("", splitLine={"show": False}, axisLabel={"formatter": "{value} %"})])
+    one_line = lambda name, item, color, unit: day_chart([line(name, item, color)],
+                                                         [span_axis(unit) if unit in LEAST_SPAN else
+                                                          value_axis(unit, scale=True)])
 
     def details(p, extra):
         return wide_grid([vtile("Zuletzt gesehen", p + "last_seen"), vtile("Messzeitpunkt", p + "measures_timestamp"),
@@ -4481,7 +4590,13 @@ def netatmo_blocks():
                           vtile("Taupunkt", p + "dewpoint"), vtile("Hitzeindex", p + "heat_index"),
                           vtile("Min. Temperatur", p + "min_temp"), vtile("Max. Temperatur", p + "max_temp")])
     return [two(card("Wetterstation", inside), card("Außenmodul", outside)),
-            two(card("Temperaturen heute", [temps]), card("Raumluft heute", [air])),
+            two(chart_card("Temperatur innen heute", one_line("Innen", w + "temperature", "#fb8c00", "°C")),
+                chart_card("Temperatur außen heute", one_line("Außen", o + "temperature", "#29b6f6", "°C"))),
+            two(chart_card("Luftfeuchtigkeit innen heute",
+                           one_line("Luftfeuchtigkeit innen", w + "atmospheric_humidity", "#29b6f6", "%")),
+                chart_card("Luftfeuchtigkeit außen heute",
+                           one_line("Luftfeuchtigkeit außen", o + "atmospheric_humidity", "#80deea", "%"))),
+            one(chart_card("CO₂ heute", one_line("CO₂", w + "co2", "#78909c", "ppm"))),
             two(card("Wetterstation Details", [details(w, [vtile("Absoluter Luftdruck", w + "absolute_pressure")])]),
                 card("Außenmodul Details", [details(o, [])]))]
 
@@ -4519,22 +4634,28 @@ def epex_spot_blocks():
                       vtile("Günstigster Preis", "epex_spot_awattar_cheapest"),
                       vtile("Teuerste Stunde", "epex_spot_awattar_priciest_hour"),
                       vtile("Teuerster Preis", "epex_spot_awattar_priciest")])]
-    prices = chart({"period": "2D", "future": "0.75", "periodVisible": True, "height": "100%"},
-                   grid=[comp("oh-chart-grid", {"top": "40", "bottom": "60", "left": "50", "right": "20"})],
-                   xAxis=[comp("oh-time-axis", {"gridIndex": 0})],
-                   yAxis=[value_axis("EUR/kWh")],
-                   series=[time_series(n, i, step="end", symbol="none", lineStyle={"width": w, "color": c},
-                                       itemStyle={"color": c}, **extra)
-                           for n, i, c, w, extra in (
-                               ("Gesamt brutto", PRICE, "#e53935", 2.5, {"areaStyle": {"opacity": 0.12},
-                                "markLine": {"symbol": ["none", "none"], "silent": True, "label": {"show": False},
-                                             "lineStyle": {"color": "#888", "type": "dashed"},
-                                             "data": [{"xAxis": "=dayjs().valueOf()"}]}}),
-                               ("Gesamt netto", "epex_spot_awattar_total_net", "#fb8c00", 1.5, {}),
-                               ("Markt brutto", "epex_spot_awattar_market_gross", "#ffb74d", 1.5, {}),
-                               ("Markt netto", "epex_spot_awattar", "#ffcc80", 1.5, {}))],
-                   tooltip=tooltip(trigger="axis", smartFormatter=True), legend=legend())
-    return [two(card("Jetzt", now), card("Preise 12 h zurück, 36 h voraus", [fill_chart(prices, "360px")], fill=True))]
+
+    def prices(name, gross, net, color):
+        """One price 12 hours back and 36 ahead, gross; its net rides along invisibly on the same hours, so the
+        tooltip lists both (one value per chart, user 2026-10-04); a dashed line at the present."""
+        return chart({"period": "2D", "future": "0.75", "periodVisible": True, "height": "100%"},
+                     grid=[comp("oh-chart-grid", {"top": "40", "bottom": "35", "left": "50", "right": "20"})],
+                     xAxis=[comp("oh-time-axis", {"gridIndex": 0})],
+                     yAxis=[value_axis("EUR/kWh")],
+                     series=[time_series(f"{name} brutto", gross, step="end", symbol="none",
+                                         lineStyle={"width": 2.5, "color": color}, itemStyle={"color": color},
+                                         areaStyle={"opacity": 0.12},
+                                         markLine={"symbol": ["none", "none"], "silent": True, "label": {"show": False},
+                                                   "lineStyle": {"color": "#888", "type": "dashed"},
+                                                   "data": [{"xAxis": "=dayjs().valueOf()"}]}),
+                             time_series(f"{name} netto", net, step="end", symbol="none", lineStyle={"opacity": 0},
+                                         itemStyle={"color": color})],
+                     tooltip=tooltip(trigger="axis", smartFormatter=True))
+    total = prices("Gesamt", PRICE, "epex_spot_awattar_total_net", "#e53935")
+    market = prices("Markt", "epex_spot_awattar_market_gross", "epex_spot_awattar", "#fb8c00")
+    return [one(card("Jetzt", now)),
+            two(chart_card("Gesamtpreis 12 h zurück, 36 h voraus", total, "360px"),
+                chart_card("Marktpreis 12 h zurück, 36 h voraus", market, "360px"))]
 
 
 GRID_SIGN = f"={num(GRID)} < 0 ? '#43a047' : '#e53935'"
