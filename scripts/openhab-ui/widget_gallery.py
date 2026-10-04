@@ -31,6 +31,7 @@ def caption(x, y, text):
 
 
 NODES = [("pv", 5200, None), ("grid", -800, None), ("home", 2400, None), ("heat-pump", 1500, None),
+         ("heat-pump-split", 1500, None),
          ("air-conditioner", 600, None), ("e-car", 2000, None), ("battery", None, 72), ("appliances", 1950, None),
          ("ventilation", 40, None)]
 
@@ -42,7 +43,7 @@ def nodes_card():
         # the grey ring, the node's one circle, is drawn by the card that places the node, as the energy flow does
         items += [g.track(x, 45),
                   g.flow_node(kind, (x, 45), None if power is None else str(power), None if soc is None else str(soc),
-                              "45" if kind == "heat-pump" else None),  # a compressor at 45 Hz turns the fan
+                              "45" if kind.startswith("heat-pump") else None),  # a compressor at 45 Hz turns the fan
                   caption(x, 100, kind)]
     width = 90 + 85 * (len(NODES) - 1)
     return g.card("flow-node", [drawing(items, width, 110, round(width * 1.2))])

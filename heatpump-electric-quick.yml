@@ -52,7 +52,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 4, 2026, 1:23:32 PM
+timestamp: Oct 4, 2026, 5:20:43 PM
 component: div
 config:
   style:
@@ -133,6 +133,10 @@ slots:
           periodVisible: true
           period: D
           height: 260px
+          options:
+            axisPointer:
+              link:
+              - xAxisIndex: all
         slots:
           grid:
           - component: oh-chart-grid
@@ -145,6 +149,26 @@ slots:
           - component: oh-time-axis
             config:
               gridIndex: 0
+              axisPointer:
+                snap: false
+                label:
+                  show: false
+          - component: oh-time-axis
+            config:
+              gridIndex: 0
+              show: false
+              axisPointer:
+                snap: false
+                label:
+                  show: false
+          - component: oh-time-axis
+            config:
+              gridIndex: 0
+              show: false
+              axisPointer:
+                snap: false
+                label:
+                  show: false
           yAxis:
           - component: oh-value-axis
             config:
@@ -194,7 +218,7 @@ slots:
             config:
               name: Warmwasser
               gridIndex: 0
-              xAxisIndex: 0
+              xAxisIndex: 1
               yAxisIndex: 0
               type: line
               item: =props.heatpumpElectricalPowerDhw
@@ -221,7 +245,7 @@ slots:
             config:
               name: Standby
               gridIndex: 0
-              xAxisIndex: 0
+              xAxisIndex: 2
               yAxisIndex: 0
               type: line
               item: =props.heatpumpElectricalPowerStandby

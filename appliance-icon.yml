@@ -39,7 +39,7 @@ props:
     required: false
     default: '72'
   parameterGroups: []
-timestamp: Oct 4, 2026, 12:18:52 AM
+timestamp: Oct 4, 2026, 5:20:43 PM
 component: svg
 config:
   viewBox: 0 0 64 64
@@ -51,9 +51,9 @@ slots:
     config:
       cx: 32
       cy: 32
-      r: 28
+      r: 27.29
       stroke: '#9e9e9e'
-      stroke-width: 4
+      stroke-width: 2.58
       stroke-linecap: round
       fill: none
       stroke-opacity: '0.25'
@@ -61,9 +61,9 @@ slots:
     config:
       cx: 32
       cy: 32
-      r: 28
+      r: 27.29
       stroke: =props.color || '#1e88e5'
-      stroke-width: 4
+      stroke-width: 2.58
       stroke-linecap: round
       fill: none
       visible: =!!props.running
@@ -74,21 +74,59 @@ slots:
           attributeName: opacity
           dur: 2s
           repeatCount: indefinite
-          values: '=(props.progress !== undefined && props.progress !== null && props.progress !== '''') ? ''0.5;0.12;0.5''
-            : ''1;0.3;1'''
+          values: '=(props.progress !== undefined && props.progress !== null && props.progress !== '''') ? ''0.3;0.06;0.3''
+            : ''0.3;1;0.3'''
           visible: =!!props.running
+      - component: animate
+        config:
+          attributeName: stroke-width
+          values: 2.58;4;2.58
+          dur: 2s
+          repeatCount: indefinite
+          visible: =!!props.running && !(props.progress !== undefined && props.progress !== null && props.progress !== '')
+      - component: animate
+        config:
+          attributeName: r
+          values: 27.29;28;27.29
+          dur: 2s
+          repeatCount: indefinite
+          visible: =!!props.running && !(props.progress !== undefined && props.progress !== null && props.progress !== '')
   - component: circle
     config:
       cx: 32
       cy: 32
-      r: 28
+      r: 27.29
       transform: rotate(-90 32 32)
+      pathLength: 100
       stroke: =props.color || '#1e88e5'
-      stroke-width: 4
+      stroke-width: 2.58
       stroke-linecap: round
       fill: none
-      stroke-dasharray: =(175.93 * Number(props.progress) / 100).toFixed(1) + ' 175.93'
+      stroke-dasharray: =Number(props.progress).toFixed(1) + ' 100'
       visible: =!!props.running && (props.progress !== undefined && props.progress !== null && props.progress !== '')
+    slots:
+      default:
+      - component: animate
+        config:
+          attributeName: opacity
+          values: 1;0.55;1
+          dur: 2s
+          repeatCount: indefinite
+          visible: =!!props.running && (props.progress !== undefined && props.progress !== null && props.progress !== '')
+      - component: animate
+        config:
+          attributeName: stroke-width
+          values: 4;2.58;4
+          dur: 2s
+          repeatCount: indefinite
+          visible: =!!props.running && (props.progress !== undefined && props.progress !== null && props.progress !== '')
+      - component: animate
+        config:
+          attributeName: r
+          values: 28;27.29;28
+          dur: 2s
+          repeatCount: indefinite
+          visible: =!!props.running && (props.progress !== undefined && props.progress !== null && props.progress !== '')
   - component: rect
     config:
       x: 20

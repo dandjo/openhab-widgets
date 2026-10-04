@@ -321,16 +321,16 @@ def svg_text(x, y, content, size, weight="normal", anchor="middle", opacity="1")
 def ring(cx, cy, color):
     """A node's disc inside its grey ring, the only circle a node has (track(), with its dots, arcs and badges): an
     opaque disc in the card colour under a tint of the node's colour, ending where the ring's stroke begins."""
-    r = ORBIT - RING_W / 2
+    r = ORBIT - RING_MAX / 2
     return svg("g", [svg("circle", cx=cx, cy=cy, r=r, style={"fill": "var(--f7-card-bg-color, #fff)"}),
                      svg("circle", cx=cx, cy=cy, r=r, fill=color, **{"fill-opacity": "0.12"})])
 
 
 def track(cx, cy):
-    """A node's grey ring of radius ORBIT, over an opaque disc in the card colour as wide as the ring's stroke, so
-    the dots of a link or pipe running in under the node never show through the translucent ring."""
-    return svg("g", [svg("circle", cx=cx, cy=cy, r=ORBIT + RING_W / 2, style={"fill": "var(--f7-card-bg-color, #fff)"}),
-                     svg("circle", cx=cx, cy=cy, r=ORBIT, fill="none", stroke="rgba(127, 127, 127, 0.28)",
+    """A node's grey ring at rest (RING_R, RING_W), over an opaque disc in the card colour out to the ring's widest
+    edge, so the dots of a link or pipe running in under the node never show through the translucent ring."""
+    return svg("g", [svg("circle", cx=cx, cy=cy, r=ORBIT + RING_MAX / 2, style={"fill": "var(--f7-card-bg-color, #fff)"}),
+                     svg("circle", cx=cx, cy=cy, r=RING_R, fill="none", stroke="rgba(127, 127, 127, 0.28)",
                          **{"stroke-width": RING_W})])
 
 
@@ -384,25 +384,38 @@ def pylon_node(cx, cy, color, power):
 
 
 def pv_node(cx, cy, power):
-    """Tilted module under a sun; both brighten with the power, the rays turn faster the more it produces."""
+    """A straight module of six cells with the sun in front of its upper right corner (user, 2026-10-04: module large
+    and level in the middle, the sun overlapping it, in front, standing clear of it); both brighten with the power,
+    the rays turn faster the more it produces. Sun and rays are edged in the colour of the node's tinted disc, so
+    over the module they stand off it by a gap and elsewhere the edge does not show; the sun stays strong (nine
+    tenths at least), the module from a quarter."""
     glow = f"=(0.25 + 0.75 * Math.min(1, Math.abs({power}) / 8000)).toFixed(2)"
+    sun_glow = f"=(0.9 + 0.1 * Math.min(1, Math.abs({power}) / 8000)).toFixed(2)"
     active = f"Math.abs({power}) > 10"
-    sx, sy = cx + 6, cy - 13
-    rays = []
-    for k in range(8):
-        a = math.radians(k * 45)
-        rays.append(svg("line", x1=round(sx + 6.5 * math.cos(a), 2), y1=round(sy + 6.5 * math.sin(a), 2),
-                        x2=round(sx + 9 * math.cos(a), 2), y2=round(sy + 9 * math.sin(a), 2),
-                        **stroke(1.6, "#ffb300")))
-    rays.append(spin(sx, sy, steps(power, [1000, 4000], ["12s", "7s", "4s"]), active))
-    panel = f"{cx - 18},{cy + 15} {cx + 12},{cy + 15} {cx + 18},{cy - 1} {cx - 12},{cy - 1}"
-    grid = [(cx - 18 + 30 * f, cy + 15, cx - 12 + 30 * f, cy - 1) for f in (0.25, 0.5, 0.75)]
-    grid.append((cx - 15, cy + 7, cx + 15, cy + 7))
+    disc = {"fill": "color-mix(in srgb, #ffb300 12%, var(--f7-card-bg-color, #fff))"}  # ring()'s tinted disc
+    # the module's farthest corner as far from the middle as the battery's (user, 2026-10-04): x -21..19, y -10..10,
+    # rx 3, stroke 2 reach 23.3; the module of 36 x 20 with the sun beside it, scaled to that
+    k = 0.9391
+    x0, x1, y0, y1 = cx - round(19 * k, 2), cx + round(17 * k, 2), cy - round(4 * k, 2), cy + round(16 * k, 2)
+    sx, sy = cx + round(11 * k, 2), cy - round(9 * k, 2)
+    ends = [(round(sx + r0 * math.cos(a), 2), round(sy + r0 * math.sin(a), 2), round(sx + r1 * math.cos(a), 2),
+             round(sy + r1 * math.sin(a), 2)) for a in (math.radians(k * 45 + 22.5) for k in range(8))
+            for r0, r1 in [(6.8, 9.3)]]
+    edges = [svg("line", x1=a, y1=b, x2=c, y2=d, style={"stroke": disc["fill"]},
+                 **{"stroke-width": 4, "stroke-linecap": "round"}) for a, b, c, d in ends]
+    rays = [svg("line", x1=a, y1=b, x2=c, y2=d, **stroke(1.8, "#ffb300", **{"stroke-linecap": "round"}))
+            for a, b, c, d in ends]
+    cells = [svg("line", x1=round(x0 + (x1 - x0) * f, 2), y1=y0, x2=round(x0 + (x1 - x0) * f, 2), y2=y1,
+                 **stroke(0.9, "#e3f2fd")) for f in (1 / 3, 2 / 3)]
+    cells.append(svg("line", x1=x0, y1=(y0 + y1) / 2, x2=x1, y2=(y0 + y1) / 2, **stroke(0.9, "#e3f2fd")))
     return [ring(cx, cy, "#ffb300"),
-            svg("g", rays, opacity=glow),
-            svg("circle", cx=sx, cy=sy, r=5, fill="#ffb300", opacity=glow),
-            svg("polygon", points=panel, **{"fill-opacity": glow}, **stroke(1.2, "currentColor", fill="#1e88e5")),
-            *[svg("line", x1=round(a, 2), y1=b, x2=round(c, 2), y2=e, **stroke(0.8, "#e3f2fd")) for a, b, c, e in grid]]
+            svg("rect", x=x0, y=y0, width=x1 - x0, height=y1 - y0, rx=1.5, **{"fill-opacity": glow},
+                **stroke(1.2, "currentColor", fill="#1e88e5")),
+            *cells,
+            svg("g", [*edges, svg("g", rays, opacity=sun_glow),
+                      spin(sx, sy, steps(power, [1000, 4000], ["12s", "7s", "4s"]), active)]),
+            svg("circle", cx=sx, cy=sy, r=6.6, style=disc),
+            svg("circle", cx=sx, cy=sy, r=5, fill="#ffb300", opacity=sun_glow)]
 
 
 def heatpump_node(cx, cy, hz):
@@ -425,6 +438,36 @@ def heatpump_node(cx, cy, hz):
             svg("line", x1=cx + 12, y1=cy + 12, x2=cx + 12, y2=cy + 15, **stroke(1.6))]
 
 
+def heatpump_split_node(cx, cy, hz):
+    """The whole split heat pump where one symbol stands for the heating (energy flow, heating card; user,
+    2026-10-04): the outdoor unit of heatpump_node, a little smaller and up to the left, its fan turning while the
+    compressor runs, and in front of its right side the indoor unit, the heat pump card's wall unit in small (display,
+    backup heater, pump), on an opaque face so it covers the outdoor unit behind it. Static, as a node knows no pump or
+    heater state; it fits the ring's disc (its farthest corner 25 units out)."""
+    fx, fy = cx - 11, cy - 3
+    active = f"{hz} > 0"
+    blades = [svg("path", d=f"M{fx},{fy} q3.5,-3 0,-7.5 q-3.5,3 0,7.5", fill="#fb8c00",
+                  transform=f"rotate({angle} {fx} {fy})") for angle in (0, 120, 240)]
+    blades.append(spin(fx, fy, steps(hz, [30, 55], ["1.4s", "0.9s", "0.5s"]), active))
+    grille = [svg("line", x1=cx + 1, y1=cy + dy, x2=cx + 8, y2=cy + dy, **stroke(1, opacity="0.7"))
+              for dy in (-10, -6.5, -3, 0.5, 4)]
+    face = {"x": cx + 3, "y": cy - 8, "width": 16, "height": 24, "rx": 2.5}
+    return [ring(cx, cy, "#fb8c00"),
+            svg("rect", x=cx - 21, y=cy - 14, width=32, height=22, rx=3, **stroke(1.6)),
+            svg("circle", cx=fx, cy=fy, r=8.5, **stroke(1.2)),
+            svg("g", blades),
+            svg("circle", cx=fx, cy=fy, r=1.5, fill="currentColor"),
+            *grille,
+            svg("line", x1=cx - 16, y1=cy + 8, x2=cx - 16, y2=cy + 11, **stroke(1.6)),
+            svg("rect", **face, style={"fill": "var(--f7-card-bg-color, #fff)"}),
+            svg("rect", **face, fill="#64b5f6", **{"fill-opacity": "0.12"}),
+            svg("rect", **face, **stroke(1.6)),
+            svg("rect", x=cx + 6, y=cy - 5, width=10, height=4, rx=1, fill="#37474f"),
+            svg("path", d=f"M{cx + 5.5},{cy + 4} l1.8,-2 l1.8,4 l1.8,-4 l1.8,4 l1.8,-4 l1.8,2",
+                **stroke(1.2, "#9e9e9e")),
+            svg("circle", cx=cx + 11, cy=cy + 11, r=2.3, **stroke(1.2, "#9e9e9e"))]
+
+
 def ac_node(cx, cy, power):
     """Indoor split unit; its air streams flow and its LED lights while it draws more than AC_ON watts."""
     active = f"Math.abs({power}) > {AC_ON}"
@@ -440,19 +483,25 @@ def ac_node(cx, cy, power):
 
 
 def home_node(cx, cy, power):
-    """House whose windows glow brighter with the consumption and pulse, faster the more it draws."""
+    """House whose windows glow brighter with the consumption and pulse, faster the more it draws. It stands 2 units
+    above the ring's middle, as its pointed roof leaves room above it, so it looks centred; the chimney rises out of
+    the right slope, without a line of its own along the roof (user, 2026-10-04)."""
     glow = f"=(0.3 + 0.7 * Math.min(1, Math.abs({power}) / 3000)).toFixed(2)"
     active = f"Math.abs({power}) > 50"
     pulse = svg("animate", attributeName="fill-opacity", values="0.35;1;0.35",
                 dur=steps(power, [500, 1500], ["2.4s", "1.6s", "1s"]), repeatCount="indefinite", visible=f"={active}")
-    windows = [svg("rect", [pulse], x=x, y=cy + 1, width=6, height=6, rx=1, fill="#ffd54f", **{"fill-opacity": glow})
+    y = cy - 2  # the house's own middle
+    apex, eave = y - 16, y - 2
+    slope = lambda x: round(apex + (eave - apex) * (x - cx) / 17, 2)  # the right slope's height at x
+    windows = [svg("rect", [pulse], x=x, y=y + 1, width=6, height=6, rx=1, fill="#ffd54f", **{"fill-opacity": glow})
                for x in (cx - 10, cx + 4)]
     return [ring(cx, cy, "#1e88e5"),
-            svg("rect", x=cx + 6, y=cy - 15, width=4, height=7, **stroke(1.4)),
-            svg("polygon", points=f"{cx - 17},{cy - 2} {cx},{cy - 16} {cx + 17},{cy - 2}",
+            svg("path", d=f"M{cx + 6.5},{slope(cx + 6.5)} V{y - 14} H{cx + 10.5} V{slope(cx + 10.5)}",
                 **stroke(1.8, **{"stroke-linejoin": "round"})),
-            svg("rect", x=cx - 13, y=cy - 2, width=26, height=19, **stroke(1.8)),
-            svg("rect", x=cx - 3, y=cy + 7, width=6, height=10, **stroke(1.4)),
+            svg("polygon", points=f"{cx - 17},{eave} {cx},{apex} {cx + 17},{eave}",
+                **stroke(1.8, **{"stroke-linejoin": "round"})),
+            svg("rect", x=cx - 13, y=eave, width=26, height=19, **stroke(1.8)),
+            svg("rect", x=cx - 3, y=y + 7, width=6, height=10, **stroke(1.4)),
             *windows]
 
 
@@ -478,9 +527,11 @@ def battery_node(cx, cy, soc=None):
 def ecar_node(cx, cy, power):
     """The Enyaq from the side, facing right, after a side photo: long flat bonnet, raked windscreen, long
     arched roof ending in a spoiler, short sloping tailgate, a narrow window band rising to a point at the
-    rear, big wheels at the corners. While it charges, a bolt over the roof fades in and out, slowly."""
+    rear, big wheels at the corners, centred in the ring. While it charges, a large bolt over the car's middle
+    fades in and out, slowly, edged in the card colour so it stands out from the car's lines (user, 2026-10-04)."""
     charging = f"Math.abs({power}) > {ECAR_CHARGING}"
-    k, ox, oy = 1.25, cx, cy + 0.5  # drawn in car units (36 long, roof at y -4.6, ground at 8), scaled, a little low
+    # drawn in car units (36 long, roof at y -4.9, wheels down to 9.6), scaled, the middle of that span on the ring's
+    k, ox, oy = 1.25, cx, cy - 2.9
 
     def p(x, y):
         return f"{round(ox + k * x, 2)},{round(oy + k * y, 2)}"
@@ -496,13 +547,15 @@ def ecar_node(cx, cy, power):
         wheels += [svg("circle", cx=x, cy=y, r=round(k * 4.3, 2), style={"fill": "var(--f7-card-bg-color, #fff)"}),
                    svg("circle", cx=x, cy=y, r=round(k * 3.1, 2), **stroke(1.6)),
                    svg("circle", cx=x, cy=y, r=1, fill="currentColor")]
-    bx, by = cx + 1, cy - 16  # the bolt stands over the roof
-    bolt = svg("polygon", [svg("animate", attributeName="opacity", values="0;1;0", dur="2.4s",
-                               repeatCount="indefinite")],
-               points=" ".join(f"{round(bx + px, 2)},{round(by + py, 2)}" for px, py in
-                               ((1.5, -8), (-4.5, 1.2), (-0.6, 1.2), (-1.8, 8), (4.5, -1.2), (0.6, -1.2))),
-               fill=ECAR_COLOR, opacity="0", **{"stroke": ECAR_COLOR, "stroke-width": 0.8, "stroke-linejoin": "round"},
-               visible=f"={charging}")
+    points = " ".join(f"{round(cx + 1.5 * px, 2)},{round(cy + 1.5 * py, 2)}" for px, py in
+                      ((1.5, -8), (-4.5, 1.2), (-0.6, 1.2), (-1.8, 8), (4.5, -1.2), (0.6, -1.2)))
+    bolt = svg("g", [svg("polygon", points=points, style={"fill": "var(--f7-card-bg-color, #fff)",
+                                                          "stroke": "var(--f7-card-bg-color, #fff)"},
+                         **{"stroke-width": 3.5, "stroke-linejoin": "round"}),
+                     svg("polygon", points=points, fill=ECAR_COLOR,
+                         **{"stroke": ECAR_COLOR, "stroke-width": 0.8, "stroke-linejoin": "round"}),
+                     svg("animate", attributeName="opacity", values="0;1;0", dur="2.4s", repeatCount="indefinite")],
+               opacity="0", visible=f"={charging}")
     return [ring(cx, cy, ECAR_COLOR),
             svg("path", d=body, **stroke(1.6, fill="#78909c", **{"fill-opacity": "0.3", "stroke-linejoin": "round"})),
             svg("path", d=window, **stroke(1.2, **{"stroke-linejoin": "round"})),
@@ -631,14 +684,32 @@ SPOKE = 170  # distance of every node from the house
 FLOW_W, FLOW_H = 461, 461
 STEP, TURN = 45, 8  # degrees between two nodes, and the star's turn clockwise from straight up
 ORBIT = 30  # every node's one ring, around its drawing; its dots, arcs and badges say what the node does
-RING_W = 4.5  # its stroke, the dots and arcs on it: as thick as the appliance icons' rings (4 of 64 units at 72 px)
+# the ring's stroke at its widest, while a working ring or arc swells at its brightest: as thick as the appliance
+# icons' rings were (4 of 64 units at 72 px); at rest it is SWELL times thinner and swells outwards only, its inner
+# edge fixed on the node's disc, so at its widest it is the ring it was before it pulsed (user, 2026-10-04)
+RING_MAX, SWELL = 4.5, 1.55
+RING_W = round(RING_MAX / SWELL, 2)  # 2.9, the ring at rest, its arcs and the soft pulse beside them
+RING_R = ORBIT - (RING_MAX - RING_W) / 2  # the middle of the ring at rest; ORBIT at its widest
 # a working node's ring pulses beside an arc that shows a value (user, 2026-10-03: running dots, then dashes, were
 # tried and replaced by this pulse), never stronger than half the arc's opacity, so the arc reads at the pulse's
 # peak too; a fixed duration, as a SMIL animation restarts whenever an expression in it changes
-PULSE = {"attributeName": "opacity", "values": "0.5;0.12;0.5", "dur": "2s", "repeatCount": "indefinite"}
+PULSE = {"attributeName": "opacity", "values": "0.3;0.06;0.3", "dur": "2s", "repeatCount": "indefinite"}
 # a working ring without an arc pulses as a whole and strongly, as the appliance icon of a machine without progress
-# does (user, 2026-10-04)
-PULSE_FULL = {**PULSE, "values": "1;0.3;1"}
+# does (user, 2026-10-04), and swells as an arc does (swell()): brightest and widest at once
+PULSE_FULL = {**PULSE, "values": "0.3;1;0.3"}
+# an arc that shows a value pulses in step with the soft pulse of the ring beside it, brightest and widest while the
+# ring is brightest (user, 2026-10-04: first against it, then in step, which tells them apart better; 0.7 to 1 alone
+# was hardly seen); only while its node works. The ring stays at about half the arc's opacity at most at every moment,
+# so the value reads in each phase. All start with the document, so they keep in step whenever they appear
+ARC_PULSE = {**PULSE, "values": "1;0.55;1"}
+
+
+def swell(rest_r, rest_w, max_r, max_w, visible, arc=False):
+    """A ring's or arc's swelling from its width at rest to its widest at its brightest, its radius growing with it so
+    its inner edge stays put: a whole ring's with PULSE_FULL, an arc's (arc) with ARC_PULSE, half a period apart."""
+    return [svg("animate", visible=visible, **{**PULSE, "attributeName": attr,
+                                               "values": f"{b};{a};{b}" if arc else f"{a};{b};{a}"})
+            for attr, a, b in (("stroke-width", rest_w, max_w), ("r", rest_r, max_r))]
 
 
 def at(angle):
@@ -746,6 +817,8 @@ FLOW_KINDS = {  # kind: (builder of the drawing around (0, 0) from the power exp
     "home": (lambda p: home_node(0, 0, p), "home: a house whose windows glow and pulse with the consumption"),
     "heat-pump": (lambda p: heatpump_node(0, 0, "Number(props.frequency)"),
                   "heat pump: an outdoor unit whose fan turns while its compressor runs (frequency)"),
+    "heat-pump-split": (lambda p: heatpump_split_node(0, 0, "Number(props.frequency)"),
+                        "split heat pump: the outdoor unit as heat-pump, the indoor unit standing in front of it"),
     "air-conditioner": (lambda p: ac_node(0, 0, p), "air conditioner: an indoor unit whose air streams flow"),
     "e-car": (lambda p: ecar_node(0, 0, p), "E-Car: a car whose bolt fades in and out while it charges"),
     "battery": (lambda p: battery_node(0, 0, "Number(props.soc)"), "battery: filled to its state of charge"),
@@ -759,8 +832,7 @@ FLOW_KINDS = {  # kind: (builder of the drawing around (0, 0) from the power exp
 def flow_node_widget():
     """The widget every node of the energy flow is an instance of: a device drawn in a ring of 30 around (x, y), its
     animations driven by power (the battery by soc, the heat pump's fan by frequency). kind: pv, grid, home, heat-pump,
-    air-conditioner, e-car, battery,
-    appliances or ventilation.
+    heat-pump-split, air-conditioner, e-car, battery, appliances or ventilation.
     The ring has an opaque disc in the card colour under its tint, so link dots slide under it."""
     power = "Number(props.power)"
     drawings = [svg("g", build(power), visible=f"=props.kind === '{kind}'") for kind, (build, _) in FLOW_KINDS.items()]
@@ -827,37 +899,46 @@ def ring_badge(x, y, name, color, on, r=12, text=False):
 
 
 def active_ring(xy, color, active, arc):
-    """What a working node shows on its ring: the whole ring pulsing strongly in its colour (PULSE_FULL); where an arc
+    """What a working node shows on its ring: the whole ring pulsing strongly in its colour (PULSE_FULL), swelling at
+    its brightest; where an arc
     on the ring shows a value (arc, an expression: a timer, the battery's charge, a frequency, power or temperature),
     a soft pulse (PULSE) instead, the arc standing still over it, so the value reads and the rest of the ring shows
     that the node works. Nothing while it rests."""
-    ring_ = svg("circle", [svg("animate", visible=f"=({active}) && !({arc})", **PULSE_FULL)],
-                visible=f"=({active}) && !({arc})", cx=xy[0], cy=xy[1], r=ORBIT, fill="none", stroke=color,
-                **{"stroke-width": RING_W})
+    whole = f"=({active}) && !({arc})"
+    ring_ = svg("circle", [svg("animate", visible=whole, **PULSE_FULL), *swell(RING_R, RING_W, ORBIT, RING_MAX, whole)],
+                visible=whole, cx=xy[0], cy=xy[1], r=RING_R, fill="none", stroke=color, **{"stroke-width": RING_W})
     pulse = svg("circle", [svg("animate", visible=f"=({active}) && ({arc})", **PULSE)],
-                visible=f"=({active}) && ({arc})", cx=xy[0], cy=xy[1], r=ORBIT, fill="none", stroke=color,
+                visible=f"=({active}) && ({arc})", cx=xy[0], cy=xy[1], r=RING_R, fill="none", stroke=color,
                 **{"stroke-width": RING_W})
     return svg("g", [ring_, pulse])
+
+
+def flowing(power, threshold):
+    """Whether power flows through a node: its amount above threshold."""
+    return f"Math.abs({power}) > {threshold}"
 
 
 def flow_orbit(xy, color, power, threshold, share=None, least=0):
     """A node's ring while power flows through it (above threshold): pulsing in its colour, softly where a share
     stands on it (share, an expression, above least)."""
-    return active_ring(xy, color, f"Math.abs({power}) > {threshold}", f"({share}) > {least}" if share else "false")
+    return active_ring(xy, color, flowing(power, threshold), f"({share}) > {least}" if share else "false")
 
 
-def share_orbit(xy, share, color, least=0):
+def share_orbit(xy, share, color, least=0, active=None):
     """A share as an arc on a node's ring, from the top clockwise, full at 1 (share an expression; shown above least):
-    a timer's time left, the battery's charge, the heat pump's frequency, power or tank temperature. An underlay in
-    the card colour hides the grey ring and the running dots under the arc, so they run on only where it leaves the
-    ring free; it is a little wider and longer than the arc, so no dot peeps out at its edges."""
-    c = round(2 * math.pi * ORBIT, 1)
-    dash = f"=(Math.min(1, {share}) * {c}).toFixed(1) + ' {c}'"
-    arc = {"cx": xy[0], "cy": xy[1], "r": ORBIT, "fill": "none", "transform": f"rotate(-90 {xy[0]} {xy[1]})",
-           "stroke-linecap": "round", "stroke-dasharray": dash}
+    a timer's time left, the battery's charge, the heat pump's frequency, power or tank temperature; while `active`
+    (the node works) pulsing in step with the ring beside it (ARC_PULSE). An underlay in the card colour hides the grey
+    ring and the running dots under the arc, so they run on only where it leaves the ring free; it is a little wider
+    and longer than the arc, so no dot peeps out at its edges. The circles' length counts as 100 (pathLength), so the
+    share holds while the arc's radius swells."""
+    dash = f"=(Math.min(1, {share}) * 100).toFixed(2) + ' 100'"
+    arc = {"cx": xy[0], "cy": xy[1], "r": RING_R, "fill": "none", "transform": f"rotate(-90 {xy[0]} {xy[1]})",
+           "stroke-linecap": "round", "stroke-dasharray": dash, "pathLength": 100}
     return svg("g", [svg("circle", style={"stroke": "var(--f7-card-bg-color, #fff)"}, **arc,
                          **{"stroke-width": RING_W + 2}),
-                     svg("circle", stroke=color, **arc, **{"stroke-width": RING_W, "opacity": "0.9"})],
+                     svg("circle", [svg("animate", visible=f"={active}", **ARC_PULSE),
+                                    *swell(RING_R, RING_W, ORBIT, RING_MAX, f"={active}", arc=True)] if active else [],
+                         stroke=color, **arc, **{"stroke-width": RING_W, "opacity": "0.9"})],
                visible=f"={share} > {least}")
 
 
@@ -935,13 +1016,15 @@ def energy_flow():
                    share=f"{M_AC} / {timer_full('air_conditioning_timer', 720)}"),
         flow_orbit(VENT_XY, VENT_TEAL, VENT_POWER, 5,
                    share=f"{M_VENT} / {timer_full('ventilation_timer', 360)}"),
-        share_orbit(AC_XY, f"{M_AC} / {timer_full('air_conditioning_timer', 720)}", AC_BLUE),
-        share_orbit(VENT_XY, f"{M_VENT} / {timer_full('ventilation_timer', 360)}", VENT_TEAL),
-        share_orbit(BATT_XY, f"{num(SOC)} / 100", "#7cb342"),
+        share_orbit(AC_XY, f"{M_AC} / {timer_full('air_conditioning_timer', 720)}", AC_BLUE,
+                    active=flowing(AC_FLOW, AC_ON)),
+        share_orbit(VENT_XY, f"{M_VENT} / {timer_full('ventilation_timer', 360)}", VENT_TEAL,
+                    active=flowing(VENT_POWER, 5)),
+        share_orbit(BATT_XY, f"{num(SOC)} / 100", "#7cb342", active=flowing(num(BATT), 10)),
         flow_node("pv", PV_XY, num(PV)),
         flow_node("grid", GRID_XY, num(GRID)),
         flow_node("home", HOME_XY, num(HOME)),
-        flow_node("heat-pump", HP_XY, num(HP), frequency=num(HPX["hz"])),
+        flow_node("heat-pump-split", HP_XY, num(HP), frequency=num(HPX["hz"])),
         flow_node("air-conditioner", AC_XY, AC_FLOW),
         flow_node("e-car", ECAR_XY, num(ECAR)),
         flow_node("appliances", APPL_XY, APPL_POWER),
@@ -1815,10 +1898,11 @@ WATER_PACE = (num(HPX["flow"]), FLOW_STEPS)
 
 def hp_orbit(xy, color, active, share=None, share_color=None):
     """A node's ring as in the energy flow; while `active` pulsing in the node's colour, softly where a share fills
-    part of it (from 1 % on, in share_color, an expression, or the node's colour)."""
+    part of it (from 1 % on, in share_color, an expression, or the node's colour), the share's arc pulsing in step
+    with it."""
     arc = f"({share}) > 0.01" if share else "false"
     return [track(*xy), active_ring(xy, color, active, arc)] + \
-        ([share_orbit(xy, share, share_color or color, 0.01)] if share else [])
+        ([share_orbit(xy, share, share_color or color, 0.01, active)] if share else [])
 
 
 hp_svg = svg("svg", [
@@ -2639,16 +2723,19 @@ def vent_quick():
 
 
 # ---- the popups of the heat pump card's tiles: Regelung all the heat pump's controls, the devices their values over
-# the day, one chart per value (user, 2026-10-04), two together only where they belong together: a temperature and its
-# target, leaving and inlet water, the outdoor air and the heat exchanger that draws heat from it; the parts of the
-# heat pump's power and energy stay together, as energy balances do
+# the day, one grid per value in one stacked chart with one tooltip (user, 2026-10-04), two together only where they
+# belong together: a temperature and its target, leaving and inlet water, the outdoor air and the heat exchanger that
+# draws heat from it; the parts of the heat pump's power and energy stay together, as energy balances do
 
-QUICK_CHART, QUICK_PAIR = "220px", "270px"  # a chart of one value, of two with their legend
+QUICK_GRID = 120  # a grid's height in a quick popup's stacked chart
 
 
-def quick_chart(title, series, axes=None, height=None):
-    """A day chart of a quick popup, titled, as the popup stacks several."""
-    return titled(day_chart(series, axes, height=height or (QUICK_PAIR if len(series) > 1 else QUICK_CHART)), title)
+def quick_stack(*panels, weights=None):
+    """A quick popup's values over the day: stacked_chart() with grids of QUICK_GRID (a panel's own weight scales
+    it), so the popup's charts share one tooltip and one pair of period arrows."""
+    total = sum(pnl[3] if len(pnl) > 3 else 1 for pnl in panels)
+    return stacked_chart(list(panels), round(STACK_TOP + STACK_BOTTOM + (len(panels) - 1) * STACK_GAP +
+                                              total * QUICK_GRID))
 
 
 def hp_control_quick():
@@ -2661,138 +2748,209 @@ def hp_control_quick():
                   lw_offset(row=True)], "heatpump")
 
 
+# the heat pump's charts over the day, as panels of stacked_chart(), shared by the card's popups and its page
+
+def hp_indoor_panels():
+    """The indoor unit: the heat pump's measured draw without the backup heater, the water's flow and pressure, the
+    backup heater."""
+    return [("Leistung ohne Heizstab", [area("Leistung", HPX["circuit"], HP_ORANGE)], value_axis("W", min=0)),
+            ("Durchfluss", [area("Durchfluss", HPX["flow"], "#64b5f6")], value_axis("l/min", min=0)),
+            ("Wasserdruck", [line("Wasserdruck", HPX["water_pressure"], "#4fc3f7")], span_axis("bar")),
+            ("Heizstab", [area("Heizstab", HPX["buh_power"], HEATER_RED)], value_axis("W", min=0))]
+
+
+def hp_outdoor_panels():
+    """The outdoor unit: its circuit's power, the compressor's frequency, the outdoor temperature against its heat
+    exchanger's, whose gap tells how hard it pulls heat from the air, and its outdoor air sensor."""
+    return [("Leistung", [area("Leistung", HPX["circuit"], HP_ORANGE)], value_axis("W", min=0)),
+            ("Verdichter", [line("Verdichter", HPX["hz"], "#78909c")], value_axis("Hz", min=0)),
+            ([("Außen", "#26a69a"), ("Wärmetauscher", "#4fc3f7")],
+             [line("Außen", HPX["outdoor"], "#26a69a"), line("Wärmetauscher", HPX["exchanger"], "#4fc3f7")],
+             span_axis("°C")),
+            ("Außenluft", [line("Außenluft", "espaltherma_outdoor_air_temp", "#9e9e9e")], span_axis("°C"))]
+
+
+def hp_refrigerant_panels():
+    """The refrigerant: hot gas with its target, liquid, the outdoor heat exchanger, the pressure."""
+    return [([("Heißgas", REFRIGERANT), ("Soll gestrichelt", REFRIGERANT)],
+             [line("Heißgas", HPX["hot_gas"], REFRIGERANT),
+              line("Heißgas Soll", "espaltherma_target_discharge_temp", REFRIGERANT, dashed=True)], span_axis("°C")),
+            ("Flüssig", [line("Flüssig", HPX["refrigerant"], "#4fc3f7")], span_axis("°C")),
+            ("Wärmetauscher", [line("Wärmetauscher", HPX["exchanger"], "#26a69a")], span_axis("°C")),
+            ("Druck", [line("Druck", HPX["pressure"], REFRIGERANT)], span_axis("bar"))]
+
+
+def hp_circuit_panels():
+    """The heating circuit: leaving and inlet water, the water's heat (negative while a defrost takes heat from it)."""
+    return [([("Vorlauf", SUPPLY), ("Rücklauf", RETURN)],
+             [line("Vorlauf", HPX["supply"], SUPPLY), line("Rücklauf", HPX["return"], RETURN)], span_axis("°C")),
+            ("Wärme", [area("Wärme", HPX["water_heat"], HP_ORANGE)], value_axis("W"))]
+
+
+def band_panel(title, item, states, extra=(), in_tooltip=False):
+    """An item's states as a horizontal band, one bar per period in its state's colour, named in it, as a panel of
+    stacked_chart() (a thin grid); states: (state, label, colour) for each the item takes, the colours opaque, as
+    ECharts picks the name's colour by its bar's (white on a translucent one, unreadable in the light theme). It stays
+    out of the chart's axis tooltip: MainUI's smart formatter would read a bar's start as its value and a part of its id
+    as its unit ("NaN" and a long number); its bars name their states themselves."""
+    names = " : ".join(f"s === '{v}' ? '{t}'" for v, t, _ in states)
+    return (title, [comp("oh-state-series", {"name": title, "item": item, "yValue": 0, "yHeight": 0.7,
+                                             "mapState": f"=(s) => {names} : s",
+                                             "stateColor": {t: c for _, t, c in states},
+                                             **({} if in_tooltip else {"tooltip": {"show": False}})}), *extra],
+            comp("oh-category-axis", {"categoryType": "values", "data": [title], "show": False}), 0.35)
+
+
+def state_band(title, item, states):
+    """A day chart of nothing but an item's states as a band (band_panel()); its tooltip gives a bar's duration."""
+    band = stacked_chart([band_panel(title, item, states)], 150)
+    band["slots"]["tooltip"] = [comp("oh-chart-tooltip", {"show": True, "confine": True})]
+    band["slots"]["series"][0]["config"].pop("tooltip")  # alone, a bar's own tooltip with its duration
+    return band
+
+
+def hp_tank_panels():
+    """The DHW tank: its temperature with its setpoint, and when its booster heater (BSH) ran, as a band, off in a
+    grey just off the chart's background in either theme."""
+    return [([("Temperatur", DHW_C), ("Soll gestrichelt", DHW_C)],
+             [line("Temperatur", HPX["tank"], DHW_C), line("Soll", HPX["tank_set"], DHW_C, dashed=True)],
+             span_axis("°C")),
+            # the band's own state series stays out of the tooltip (band_panel()); its state comes in by the heater's
+            # power, 2 kW while it heats
+            band_panel("Zusatzheizung", HPX["bsh"], [("ON", "An", HP_ORANGE),
+                                                     ("OFF", "Aus", "=themeOptions.dark === 'dark' ? '#3c3c3c' : '#e0e0e0'")],
+                       extra=[on_off_series("Zusatzheizung", HPX["bsh_power"], HP_ORANGE)])]
+
+
+def hp_valve_band():
+    """The three-way valve: when it served the heating circuits and when the tank."""
+    return state_band("Stellung", HPX["valve"], [("Space", "Heizung", SPACE_C), ("DHW", "Warmwasser", DHW_C)])
+
+
+def hp_operation_panels():
+    """How the heat pump heats over the day: the valve's position and the defrosts as bands, the compressor, the
+    water's flow, leaving and inlet water, the water's heat and the two electric heaters."""
+    off = "=themeOptions.dark === 'dark' ? '#3c3c3c' : '#e0e0e0'"  # as the tank's booster heater band
+    # the bands' states reach the tooltip by numeric mirrors (rule heatpump_state_numbers), as ECharts leaves a band
+    # out of a shared tooltip
+    return [band_panel("Ventil", HPX["valve"], [("Space", "Heizung", SPACE_C), ("DHW", "Warmwasser", DHW_C)],
+                       extra=[state_text_series("Ventil", "heatpump_valve_value", SPACE_C,
+                                                [(0, "Heizung"), (1, "Warmwasser")])]),
+            band_panel("Abtauen", HPX["defrost"], [("ON", "An", "#4fc3f7"), ("OFF", "Aus", off)],
+                       extra=[state_text_series("Abtauen", "heatpump_defrost_value", "#4fc3f7", [(0, "Aus"), (1, "An")])]),
+            ("Verdichter", [line("Verdichter", HPX["hz"], "#78909c")], value_axis("Hz", min=0)),
+            ("Durchfluss", [area("Durchfluss", HPX["flow"], "#64b5f6")], value_axis("l/min", min=0)),
+            ([("Vorlauf", SUPPLY), ("Rücklauf", RETURN)],
+             [line("Vorlauf", HPX["supply"], SUPPLY), line("Rücklauf", HPX["return"], RETURN)], span_axis("°C")),
+            ("Wärme", [area("Wärme", HPX["water_heat"], HP_ORANGE)], value_axis("W")),
+            ([("Heizstab", HEATER_RED), ("Zusatzheizung", HP_ORANGE)],
+             [area("Heizstab", HPX["buh_power"], HEATER_RED), area("Zusatzheizung", HPX["bsh_power"], HP_ORANGE)],
+             value_axis("W", min=0))]
+
+
+def hp_cop_panels():
+    """The COP over the day and the outdoor temperature it follows."""
+    return [("COP", [area("COP", HPX["cop"], COP_C)], value_axis("COP", min=0)),
+            ("Außentemperatur", [line("Außen", HPX["outdoor"], "#26a69a")], span_axis("°C"))]
+
+
+def hp_cop_month():
+    """The day's COPs per day of the month: space heating and hot water as columns, the total, their mix, as a line."""
+    return month_chart([daily("Heizung", "espaltherma_dcop_space", SPACE_C,
+                              itemStyle={"color": SPACE_C, "borderRadius": [3, 3, 0, 0]}),
+                        daily("Warmwasser", "espaltherma_dcop_dhw", DHW_C,
+                              itemStyle={"color": DHW_C, "borderRadius": [3, 3, 0, 0]}),
+                        daily("Gesamt", "espaltherma_dcop", COP_C, type="line", symbol="circle", symbolSize=5,
+                              lineStyle={"width": 2, "color": COP_C})], "COP")
+
+
+def hp_split_charts(part_power, part_energy, parts):
+    """Electricity or heat by part: the parts' power over the day, their energy per day of the month stacked;
+    part_power and part_energy name a part's items by its key. A balance of one quantity, so the parts share a chart
+    (each on a time axis of its own, see own_time_axes())."""
+    day = day_chart([area(name, part_power.format(key), c) for name, key, c in parts], height="260px")
+    month = month_chart([daily(name, part_energy.format(key), c, stack="day",
+                               **({"itemStyle": {"color": c, "borderRadius": [4, 4, 0, 0]}} if i == len(parts) - 1
+                                  else {}))
+                         for i, (name, key, c) in enumerate(parts)], "kWh")
+    return day, month
+
+
+# ---- the popups
+
 def hp_indoor_quick():
-    """The indoor unit over the day, as the outdoor unit's popup shows its own: the heat pump's measured draw without
-    the backup heater, the water's flow and pressure, the backup heater."""
+    """The indoor unit over the day, as the outdoor unit's popup shows its own."""
     state = (f"{kw2(HPX['circuit'], HPX['buh_power'])} + ' · ' + {disp(HPX['flow'])} + ' · ' + "
              f"{disp(HPX['water_pressure'])}")
-    return quick("material:hvac", "Innengerät", "#64b5f6", state, [
-        quick_chart("Leistung ohne Heizstab", [area("Leistung", HPX["circuit"], HP_ORANGE)], [value_axis("W", min=0)]),
-        quick_chart("Durchfluss", [area("Durchfluss", HPX["flow"], "#64b5f6")], [value_axis("l/min", min=0)]),
-        quick_chart("Wasserdruck", [line("Wasserdruck", HPX["water_pressure"], "#4fc3f7")],
-                    [span_axis("bar")]),
-        quick_chart("Heizstab", [area("Heizstab", HPX["buh_power"], HEATER_RED)], [value_axis("W", min=0)])],
-        "heatpump")
+    return quick("material:hvac", "Innengerät", "#64b5f6", state, [quick_stack(*hp_indoor_panels())], "heatpump")
 
 
 def hp_outdoor_quick():
-    """The outdoor unit over the day: its circuit's power, the compressor's frequency, the outdoor temperature against
-    its heat exchanger's, whose gap tells how hard it pulls heat from the air, and its outdoor air sensor."""
+    """The outdoor unit over the day."""
     state = f"{kw2(HPX['circuit'])} + ' · ' + {disp(HPX['hz'])} + ' · außen ' + {disp(HPX['outdoor'])}"
-    return quick("material:heat_pump", "Außengerät", HP_ORANGE, state, [
-        quick_chart("Leistung", [area("Leistung", HPX["circuit"], HP_ORANGE)], [value_axis("W", min=0)]),
-        quick_chart("Verdichter", [line("Verdichter", HPX["hz"], "#78909c")], [value_axis("Hz", min=0)]),
-        quick_chart("Außen und Wärmetauscher", [line("Außen", HPX["outdoor"], "#26a69a"),
-                                                line("Wärmetauscher", HPX["exchanger"], "#4fc3f7")],
-                    [span_axis("°C")]),
-        quick_chart("Außenluft", [line("Außenluft", "espaltherma_outdoor_air_temp", "#9e9e9e")],
-                    [span_axis("°C")])], "heatpump")
+    return quick("material:heat_pump", "Außengerät", HP_ORANGE, state, [quick_stack(*hp_outdoor_panels())],
+                 "heatpump")
 
 
 def hp_refrigerant_quick():
-    """The refrigerant over the day: hot gas with its target, liquid, the outdoor heat exchanger, the pressure."""
+    """The refrigerant over the day."""
     state = f"'Heißgas ' + {disp(HPX['hot_gas'])} + ' · ' + {disp(HPX['pressure'])}"
-    return quick("material:severe_cold", "Kältemittel", REFRIGERANT, state, [
-        quick_chart("Heißgas und Soll", [line("Heißgas", HPX["hot_gas"], REFRIGERANT),
-                                         line("Heißgas Soll", "espaltherma_target_discharge_temp", REFRIGERANT,
-                                              dashed=True)], [span_axis("°C")]),
-        quick_chart("Flüssig", [line("Flüssig", HPX["refrigerant"], "#4fc3f7")], [span_axis("°C")]),
-        quick_chart("Wärmetauscher", [line("Wärmetauscher", HPX["exchanger"], "#26a69a")],
-                    [span_axis("°C")]),
-        quick_chart("Druck", [line("Druck", HPX["pressure"], REFRIGERANT)], [span_axis("bar")])],
-        "heatpump")
+    return quick("material:severe_cold", "Kältemittel", REFRIGERANT, state, [quick_stack(*hp_refrigerant_panels())],
+                 "heatpump")
 
 
 def hp_circuit_quick():
-    """The heating circuit: its leaving water offset, leaving and inlet water over the day, the water's heat."""
+    """The heating circuit: its leaving water offset and its course over the day."""
     state = f"'Vorlauf ' + {disp(HPX['supply'])} + ' · Rücklauf ' + {disp(HPX['return'])}"
-    return quick("material:waves", "Heizkreis", SUPPLY, state, [
-        lw_offset(row=True),
-        quick_chart("Vorlauf und Rücklauf", [line("Vorlauf", HPX["supply"], SUPPLY),
-                                             line("Rücklauf", HPX["return"], RETURN)], [span_axis("°C")]),
-        # negative while a defrost takes heat from the water
-        quick_chart("Wärme", [area("Wärme", HPX["water_heat"], HP_ORANGE)], [value_axis("W")])], "heatpump")
-
-
-def state_band(title, item, states, height="160px"):
-    """A titled day chart of an item's states as a horizontal band, one bar per period in its state's colour, named in
-    it; states: (state, label, colour) for each the item takes, the colours opaque, as ECharts picks the name's colour
-    by its bar's (white on a translucent one, unreadable in the light theme). The tooltip gives a bar's duration."""
-    names = " : ".join(f"s === '{v}' ? '{t}'" for v, t, _ in states)
-    return titled(chart({"period": "D", "periodVisible": True, "height": height},
-                        grid=[comp("oh-chart-grid", {"top": "35", "bottom": "35", "left": "20", "right": "20"})],
-                        xAxis=[comp("oh-time-axis", {"gridIndex": 0})],
-                        yAxis=[comp("oh-category-axis", {"gridIndex": 0, "categoryType": "values", "data": [title],
-                                                         "show": False})],
-                        series=[comp("oh-state-series", {"name": title, "item": item, "xAxisIndex": 0, "yAxisIndex": 0,
-                                                         "yValue": 0, "yHeight": 0.7, "mapState": f"=(s) => {names} : s",
-                                                         "stateColor": {t: c for _, t, c in states}})],
-                        tooltip=[comp("oh-chart-tooltip", {"show": True, "confine": True})]), title)
+    return quick("material:waves", "Heizkreis", SUPPLY, state, [lw_offset(row=True), quick_stack(*hp_circuit_panels())],
+                 "heatpump")
 
 
 def hp_tank_quick():
-    """The DHW tank over the day: its temperature with its setpoint, and when its booster heater (BSH) ran."""
+    """The DHW tank over the day."""
     state = (f"{disp(HPX['tank'])} + ' · Soll ' + {disp(HPX['tank_set'])} + ' · Zusatzheizung ' + "
              f"({BSH_ON} ? 'an' : 'aus')")
-    return quick("material:propane_tank", "Warmwasserspeicher", DHW_C, state, [
-        quick_chart("Temperatur und Soll", [line("Temperatur", HPX["tank"], DHW_C),
-                                            line("Soll", HPX["tank_set"], DHW_C, dashed=True)], [span_axis("°C")]),
-        # off in a grey just off the chart's background in either theme
-        state_band("Zusatzheizung", HPX["bsh"], [("ON", "An", HP_ORANGE),
-                                                 ("OFF", "Aus", "=themeOptions.dark === 'dark' ? '#3c3c3c' : '#e0e0e0'")])],
-        "heatpump")
+    return quick("material:propane_tank", "Warmwasserspeicher", DHW_C, state, [quick_stack(*hp_tank_panels())],
+                 "heatpump")
 
 
 def hp_valve_quick():
-    """The three-way valve over the day: when it served the heating circuits and when the tank."""
+    """The three-way valve over the day."""
     state = f"({DHW_MODE} ? 'Warmwasser' : 'Heizung')"
-    return quick("material:call_split", "3-Wege-Ventil", "#ffb74d", state, [
-        state_band("Stellung", HPX["valve"], [("Space", "Heizung", SPACE_C), ("DHW", "Warmwasser", DHW_C)])],
-        "heatpump")
+    return quick("material:call_split", "3-Wege-Ventil", "#ffb74d", state, [hp_valve_band()], "heatpump")
 
 
 def floor_quick(title, icon, temperature, humidity, co2, page):
     """A floor's climate over the day: temperature, humidity, the CO₂ where it is measured."""
     state = f"{disp(temperature)} + ' · ' + {percent(humidity)}" + (f" + ' · ' + {disp(co2)}" if co2 else "")
-    charts = [quick_chart("Temperatur", [line("Temperatur", temperature, "#f48fb1")], [span_axis("°C")]),
-              quick_chart("Luftfeuchtigkeit", [line("Luftfeuchtigkeit", humidity, "#4fc3f7")],
-                          [span_axis("%")])]
+    panels = [("Temperatur", [line("Temperatur", temperature, "#f48fb1")], span_axis("°C")),
+              ("Luftfeuchtigkeit", [line("Luftfeuchtigkeit", humidity, "#4fc3f7")], span_axis("%"))]
     if co2:
-        charts.append(quick_chart("CO₂", [area("CO₂", co2, "#78909c")], [value_axis("ppm", scale=True)]))
-    return quick(f"material:{icon}", title, "#f48fb1", state, charts, page)
+        panels.append(("CO₂", [area("CO₂", co2, "#78909c")], value_axis("ppm", scale=True)))
+    return quick(f"material:{icon}", title, "#f48fb1", state, [quick_stack(*panels)], page)
 
 
 # the parts heatpump_metering splits the heat pump's power and energy into, in the colours of the card's day bars
 HP_PARTS = [("Heizung", "space", SPACE_C), ("Warmwasser", "dhw", DHW_C), ("Standby", "standby", STANDBY_C)]
+HP_ELECTRIC = ("espaltherma_electrical_power_{}", "espaltherma_energy_{}_today", HP_PARTS)
+HP_HEAT = ("espaltherma_heating_power_{}", "espaltherma_heating_energy_{}_today", HP_PARTS[:2])
 
 
-def hp_split_quick(title, icon, color, power, today, part_power, part_energy, parts):
-    """Electricity or heat by part: the parts' power over the day, their energy per day of the month stacked;
-    part_power and part_energy name a part's items by its key. A balance of one quantity, so the parts share a chart."""
+def hp_split_quick(title, icon, color, power, today, split):
+    """Electricity or heat by part (hp_split_charts(), split: HP_ELECTRIC or HP_HEAT)."""
     state = f"{kw2(power)} + ' · heute ' + {fixed(num(today), 1)} + ' kWh'"
-    day = quick_chart("Leistung", [area(name, part_power.format(key), c) for name, key, c in parts], height="260px")
-    month = month_chart([daily(name, part_energy.format(key), c, stack="day",
-                               **({"itemStyle": {"color": c, "borderRadius": [4, 4, 0, 0]}} if i == len(parts) - 1
-                                  else {}))
-                         for i, (name, key, c) in enumerate(parts)], "kWh")
-    return quick(f"material:{icon}", title, color, state, [day, titled(month, "Energie pro Tag")], "heatpump")
+    day, month = hp_split_charts(*split)
+    return quick(f"material:{icon}", title, color, state, [titled(day, "Leistung"), titled(month, "Energie pro Tag")],
+                 "heatpump")
 
 
 def hp_cop_quick():
-    """The COP over the day and the outdoor temperature it follows, and the day's COPs per day of the month: space
-    heating and hot water as columns, the total, their mix, as a line."""
+    """The COP over the day with the outdoor temperature, and the day's COPs per day of the month."""
     cop = num(HPX["cop"])
     day_cop = num("espaltherma_dcop")
     state = f"'jetzt ' + ({cop} > 0 ? {fixed(cop, 2)} : '–') + ' · heute ' + ({day_cop} > 0 ? {fixed(day_cop, 2)} : '–')"
-    day = quick_chart("COP", [area("COP", HPX["cop"], COP_C)], [value_axis("COP", min=0)])
-    outdoor = quick_chart("Außentemperatur", [line("Außen", HPX["outdoor"], "#26a69a")], [span_axis("°C")])
-    month = month_chart([daily("Heizung", "espaltherma_dcop_space", SPACE_C,
-                               itemStyle={"color": SPACE_C, "borderRadius": [3, 3, 0, 0]}),
-                         daily("Warmwasser", "espaltherma_dcop_dhw", DHW_C,
-                               itemStyle={"color": DHW_C, "borderRadius": [3, 3, 0, 0]}),
-                         daily("Gesamt", "espaltherma_dcop", COP_C, type="line", symbol="circle", symbolSize=5,
-                               lineStyle={"width": 2, "color": COP_C})], "COP")
-    return quick("material:eco", "COP", COP_C, state, [day, outdoor, titled(month, "COP pro Tag")], "heatpump")
+    return quick("material:eco", "COP", COP_C, state, [quick_stack(*hp_cop_panels()), titled(hp_cop_month(), "COP pro Tag")],
+                 "heatpump")
 
 
 QUICK_PANELS = {"heatpump-quick": hp_quick, "air-conditioner-quick": ac_quick, "ventilation-quick": vent_quick,
@@ -2801,11 +2959,9 @@ QUICK_PANELS = {"heatpump-quick": hp_quick, "air-conditioner-quick": ac_quick, "
                 "heatpump-refrigerant-quick": hp_refrigerant_quick, "heatpump-circuit-quick": hp_circuit_quick,
                 "heatpump-tank-quick": hp_tank_quick, "heatpump-valve-quick": hp_valve_quick,
                 "heatpump-electric-quick": lambda: hp_split_quick(
-                    "Elektrisch", "bolt", ELECTRIC_C, HPX["power"], "espaltherma_energy_today",
-                    "espaltherma_electrical_power_{}", "espaltherma_energy_{}_today", HP_PARTS),
+                    "Elektrisch", "bolt", ELECTRIC_C, HPX["power"], "espaltherma_energy_today", HP_ELECTRIC),
                 "heatpump-heat-quick": lambda: hp_split_quick(
-                    "Wärme", "local_fire_department", SUPPLY, HPX["heat"], "espaltherma_heating_energy_today",
-                    "espaltherma_heating_power_{}", "espaltherma_heating_energy_{}_today", HP_PARTS[:2]),
+                    "Wärme", "local_fire_department", SUPPLY, HPX["heat"], "espaltherma_heating_energy_today", HP_HEAT),
                 "heatpump-cop-quick": hp_cop_quick,
                 "upper-floor-quick": lambda: floor_quick("Obergeschoss", "bed", "faikout_perfera_temperature",
                                                          "tado_humidity", None, "air_conditioning"),
@@ -3292,20 +3448,26 @@ def appliance_icon_widget():
     """The widget every appliance icon is an instance of: a washer, dryer or dishwasher (kind: washer, dryer,
     dish-washer) drawn inside a ring, its drum, paddles or spray arm turning while running holds; the ring fills with
     progress (0 to 100) while it runs and pulses in the rest of it, as the energy flow's rings beside an arc do (the
-    arc, as wide and in the same colour, covers the pulsing ring under it), or pulses as a whole when there is no
-    progress."""
+    arc, as wide and in the same colour, covers the pulsing ring under it and pulses in step with it), or pulses as a whole
+    when there is no progress."""
     running = "!!props.running"
     has_progress = "(props.progress !== undefined && props.progress !== null && props.progress !== '')"
-    ring_ = round(2 * math.pi * 28, 2)
-    track = svg("circle", cx=32, cy=32, r=28, **stroke(4, "#9e9e9e", **{"stroke-opacity": "0.25"}))
-    arc = svg("circle", cx=32, cy=32, r=28, transform="rotate(-90 32 32)", visible=f"={running} && {has_progress}",
-              **stroke(4, "=props.color || '#1e88e5'",
-                       **{"stroke-dasharray": f"=({ring_} * Number(props.progress) / 100).toFixed(1) + ' {ring_}'"}))
+    # the ring as the energy flow's: at rest SWELL times thinner than at its widest (4, at radius 28), its inner edge
+    # fixed at 26
+    w, r = round(4 / SWELL, 2), round(26 + 4 / SWELL / 2, 2)
+    progressing = f"={running} && {has_progress}"
+    track = svg("circle", cx=32, cy=32, r=r, **stroke(w, "#9e9e9e", **{"stroke-opacity": "0.25"}))
+    arc = svg("circle", [svg("animate", visible=progressing, **ARC_PULSE), *swell(r, w, 28, 4, progressing, arc=True)],
+              cx=32, cy=32, r=r, transform="rotate(-90 32 32)", visible=progressing, pathLength=100,
+              **stroke(w, "=props.color || '#1e88e5'",
+                       **{"stroke-dasharray": "=Number(props.progress).toFixed(1) + ' 100'"}))
     # beside the progress arc as weak as the energy flow's pulse, alone as strong as before
     pulse = svg("circle", [svg("animate", attributeName="opacity", dur="2s", repeatCount="indefinite",
                                values=f"={has_progress} ? '{PULSE['values']}' : '{PULSE_FULL['values']}'",
                                visible=f"={running}")],
-                cx=32, cy=32, r=28, visible=f"={running}", **stroke(4, "=props.color || '#1e88e5'"))
+                cx=32, cy=32, r=r, visible=f"={running}", **stroke(w, "=props.color || '#1e88e5'"))
+    # without progress the whole ring swells as well, as the energy flow's do
+    pulse["slots"]["default"] += swell(r, w, 28, 4, f"={running} && !{has_progress}")
     fronts = [svg("g", front(running), visible=f"=props.kind === '{kind}'") for kind, front in APPLIANCE_FRONTS]
     return svg("svg", [track, pulse, arc, *machine_body(fronts)], viewBox="0 0 64 64", width="=props.size || 72",
                height="=props.size || 72")
@@ -3500,7 +3662,7 @@ def heat_specs():
                      [tank_layers("heatTank")])
     # the heating's badge: its red bolt only for the backup heater in the wall unit, filled by the heat pump's own
     # draw, not by the booster heater in the tank (user, 2026-10-04)
-    pump = heat_icon([flow_node("heat-pump", (0, 0), num(HPX["power"]), frequency=num(HPX["hz"])),
+    pump = heat_icon([flow_node("heat-pump-split", (0, 0), num(HPX["power"]), frequency=num(HPX["hz"])),
                       *hp_mode_badges(0, 0, heaters=BUH_ON, running=f"{num(HPX['circuit'])} > {HP_ON}")],
                      hp_orbit((0, 0), HP_ORANGE, COMPRESSOR, f"{num(HPX['hz'])} / {HZ_FULL}"))
     return [dict(icon=tank, title="Warmwasserspeicher", on="items.pyaltherma_dhw_power.state === 'ON'", color=DHW_C,
@@ -3853,6 +4015,154 @@ def day_chart(series, axes=None, height="260px", **slots):
                  tooltip=tooltip(trigger="axis", smartFormatter=True), **extra, **slots)
 
 
+# several values over one period stacked in one chart, a grid each, as the weather's forecast: their time axes'
+# pointers are linked, so one tooltip lists every value at the time pointed at, each grid's nearest reading (user,
+# 2026-10-04); one set of period buttons pages them all
+STACK_TOP, STACK_GAP, STACK_BOTTOM = 62, 60, 30  # the first plot below the period buttons; title and axis name between
+
+
+def stack_title(title, top):
+    """A grid's title over its top left corner: plain, or (name, colour) pairs, each name in its series' colour."""
+    style = {"fontSize": 13, "fontWeight": 600}
+    if isinstance(title, str):
+        text, rich = title, {}
+    else:
+        text = " · ".join(f"{{s{i}|{name}}}" for i, (name, _) in enumerate(title))
+        rich = {f"s{i}": {**style, "color": color} for i, (_, color) in enumerate(title)}
+    return comp("oh-chart-title", {"show": True, "text": text, "left": 10, "top": top,
+                                   "textStyle": {**style, **({"rich": rich} if rich else {})}})
+
+
+def texts_tooltip(texts, bands):
+    """A tooltip formatter as MainUI's smart one (the time, then each time series' marker, name and value with its
+    unit, from the series' id), but naming the series in texts by words: texts maps a series' name to a JS expression
+    of its value v; with bands, a state series' bar under the pointer by its state."""
+    cases = "".join(f"p.seriesName === '{n}' ? {expr} : " for n, expr in texts.items())
+    state = "p.seriesId.indexOf('oh-state-series') === 0 ? p.value[3] : " if bands else ""
+    # MainUI's expressions know no Array (nor isNaN, parseFloat); a time series' value is [time, number]
+    value = (f"((v) => {state}{cases}v.toLocaleString('de-AT') + ' ' + p.seriesId.split('#')[2])"
+             f"(Number(p.value[1]))")
+    kinds = "p.seriesId.indexOf('oh-time-series') === 0" + (" || p.seriesId.indexOf('oh-state-series') === 0" if bands
+                                                             else "")
+    # a state named by words shows only where its series has a reading within 16 minutes of the pointer (they are
+    # persisted at least every 15): a mirror item's history starts when it was made, and before that its nearest
+    # reading would name today's state
+    near = " || ".join(f"p.seriesName === '{n}'" for n in texts)
+    fresh = f" && (!({near}) || Math.abs(p.value[0] - ps[0].axisValue) <= 960000)" if texts else ""
+    return ("=(ps) => '<div>' + dayjs(ps[0].axisValue).format('llll') + '</div>' + ps.filter((p) => p.seriesId && "
+            f"({kinds}){fresh}).map((p) => p.marker + ' ' + p.seriesName + "
+            "'<span style=\"float: right; margin-left: 20px\"><b>' + " + value + " + '</b></span><br/>').join('')")
+
+
+def on_off_series(name, item, color, on="An", off="Aus"):
+    """A switch's state for a stacked chart's tooltip, by a numeric item above 0 while it is on: an invisible series on
+    a hidden axis of its own; stacked_chart() names it by on and off in its tooltip (MainUI turns a switch's ON into
+    NaN in a time series)."""
+    one = time_series(name, item, symbol="none", lineStyle={"opacity": 0}, itemStyle={"color": color})
+    one["config"]["tooltipText"] = f"(v > 0 ? '{on}' : '{off}')"
+    one["config"]["ownAxis"] = True
+    return one
+
+
+def state_text_series(name, item, color, labels):
+    """A state's words for a stacked chart's tooltip, from a numeric mirror of it (labels: value, word): an invisible
+    series on a hidden axis of its own, beside the band that draws it."""
+    one = time_series(name, item, symbol="none", lineStyle={"opacity": 0}, itemStyle={"color": color})
+    one["config"]["ownAxis"] = True
+    return text_values(one, labels)
+
+
+def text_values(one, labels):
+    """A series whose whole values stand for words (labels: value, word), named by them in a stacked chart's
+    tooltip."""
+    one["config"]["tooltipText"] = "(" + " : ".join(f"v === {v} ? '{t}'" for v, t in labels) + " : v)"
+    return one
+
+
+def stacked_chart(panels, height, visual_map=None, **cfg):
+    """panels: (title, series, value axis[, weight]); the grids share the height by weight, the time labels stand
+    under the last. A title is a string or (name, colour) pairs, for two values that belong together. Every series
+    gets a time axis of its own, the second of a grid hidden: ECharts' axis tooltip lists, per axis, only the series
+    whose reading lies nearest to the time pointed at, so two values persisted at different moments would hide each
+    other."""
+    weights = [pnl[3] if len(pnl) > 3 else 1 for pnl in panels]
+    unit = (height - STACK_TOP - STACK_BOTTOM - (len(panels) - 1) * STACK_GAP) / sum(weights)
+    grids, xs, ys, series, titles, top, texts, bands = [], [], [], [], [], STACK_TOP, {}, False
+    for i, (pnl, w) in enumerate(zip(panels, weights)):
+        title, ser, axis = pnl[:3]
+        h = unit * w
+        grids.append(comp("oh-chart-grid", {"top": round(top), "height": round(h), "left": "50", "right": "20"}))
+        axis = copy.deepcopy(axis)
+        axis["config"]["gridIndex"] = i
+        ys.append(axis)
+        y_of = len(ys) - 1
+        for j, one in enumerate(ser):
+            # the pointer stands where the mouse is, one line through every grid, without a label of its own
+            xs.append(comp("oh-time-axis", {"gridIndex": i, "axisPointer": {"snap": False, "label": {"show": False}},
+                                            **({"show": False} if j else {} if i == len(panels) - 1
+                                               else {"axisLabel": {"show": False}})}))
+            one = copy.deepcopy(one)
+            y = y_of
+            if "tooltipText" in one["config"]:
+                texts[one["config"]["name"]] = one["config"].pop("tooltipText")
+            if one["config"].pop("ownAxis", False):  # on a hidden value axis, so it leaves the grid's own axis alone
+                ys.append(comp("oh-value-axis", {"gridIndex": i, "show": False}))
+                y = len(ys) - 1
+            if one["component"] == "oh-state-series" and one["config"].get("tooltip", {}).get("show") is not False:
+                bands = True
+            one["config"].update(xAxisIndex=len(xs) - 1, yAxisIndex=y, gridIndex=i)
+            series.append(one)
+        titles.append(stack_title(title, 15 if i == 0 else round(top - 52)))
+        top += h + STACK_GAP
+    slots = {"visualMap": visual_map} if visual_map else {}
+    return chart({"period": "D", "periodVisible": True, "height": f"{height}px",
+                  "options": {"axisPointer": {"link": [{"xAxisIndex": "all"}]}}, **cfg},
+                 grid=grids, xAxis=xs, yAxis=ys, series=series, title=titles,
+                 tooltip=tooltip(trigger="axis", smartFormatter=False, formatter=texts_tooltip(texts, bands))
+                 if texts or bands else tooltip(trigger="axis", smartFormatter=True), **slots)
+
+
+def own_time_axes(tree):
+    """Every series of a chart over time on a time axis of its own, the extra ones hidden, their pointers linked and
+    standing where the mouse is, so the tooltip lists every value at the time pointed at (user, 2026-10-04): ECharts'
+    axis tooltip lists per axis only the series whose reading lies nearest, so values persisted at different moments
+    would hide each other. Series without a tooltip (a chart's invisible floor) stay where they are. In place."""
+    def fix(chart_):
+        slots = chart_.get("slots", {})
+        xs = slots.get("xAxis", [])
+        if not xs or any(a.get("component") != "oh-time-axis" for a in xs):
+            return
+        used, changed = set(), False
+        for one in slots.get("series", []):
+            cfg = one.get("config", {})
+            if cfg.get("tooltip", {}).get("show") is False:
+                continue
+            index = cfg.get("xAxisIndex", 0)
+            if index in used:
+                extra = copy.deepcopy(xs[index])
+                extra["config"]["show"] = False
+                xs.append(extra)
+                cfg["xAxisIndex"] = len(xs) - 1
+                changed = True
+            used.add(index)
+        if changed:
+            for a in xs:
+                a["config"]["axisPointer"] = {"snap": False, "label": {"show": False}}
+            chart_["config"].setdefault("options", {}).setdefault("axisPointer", {"link": [{"xAxisIndex": "all"}]})
+
+    def walk(v):
+        if isinstance(v, dict):
+            if v.get("component") == "oh-chart":
+                fix(v)
+            for x in v.values():
+                walk(x)
+        elif isinstance(v, list):
+            for x in v:
+                walk(x)
+    walk(tree)
+    return tree
+
+
 def scaled(factor, unit):
     """Axis labels and tooltip values of a series persisted in a larger unit, multiplied into the unit shown."""
     fmt = f"=(v) => Math.round(v * {factor}).toLocaleString('de-AT')"
@@ -3891,7 +4201,8 @@ def plots_below_controls(tree):
     overview."""
     def lower(v):
         if isinstance(v, dict):
-            if v.get("component") == "oh-chart" and v.get("config", {}).get("periodVisible"):
+            if v.get("component") == "oh-chart" and v.get("config", {}).get("periodVisible") and \
+                    len(v.get("slots", {}).get("grid", [])) == 1:  # stacked_chart() places its grids itself
                 named = [a for a in v.get("slots", {}).get("yAxis", []) if a["config"].get("name")]
                 for g in v.get("slots", {}).get("grid", []):
                     g["config"]["top"] = "80" if len(named) > 1 else "62"
@@ -3916,10 +4227,10 @@ def pct(part, whole):
     return f"=({num(whole)} > 0 ? Math.round(100 * {num(part)} / {num(whole)}) : 0) + ' %'"
 
 
-def sign_colors():
-    """Colours the first series by its sign: green below zero, red above. The pieces must be finite: with only
-    open-ended ones ECharts has no colour stops for the line gradient and throws instead of drawing."""
-    return [comp("oh-chart-visualmap", {"show": False, "type": "piecewise", "dimension": 1, "seriesIndex": 0,
+def sign_colors(series_index=0):
+    """Colours a series (the first by default) by its sign: green below zero, red above. The pieces must be finite:
+    with only open-ended ones ECharts has no colour stops for the line gradient and throws instead of drawing."""
+    return [comp("oh-chart-visualmap", {"show": False, "type": "piecewise", "dimension": 1, "seriesIndex": series_index,
                                         "pieces": [{"min": -100000, "max": 0, "color": "#43a047"},
                                                    {"min": 0, "max": 100000, "color": "#e53935"}]})]
 
@@ -4011,17 +4322,20 @@ def month_sums(series):
 
 def home_blocks():
     """The house, which has no device page: where its power comes from now, its power, PV's and the grid's over the
-    day, one chart each, the day's balance, the consumers of the day (the overview's card), and its energy per day and per month."""
+    day, one grid each, the day's balance, the consumers of the day (the overview's card), and its energy per day and per month."""
     pv_share = f"Math.round(100 * Math.max(0, Math.min({num(PV)}, {num(HOME)} - Math.max(0, {num(GRID)}) - " \
                f"Math.max(0, {num(BATT)}))) / Math.max(1, {num(HOME)}))"
     now = [hero("material:home", HOME_BLUE, "Hausverbrauch", f"={kw(HOME)}",
                 [chip(f"='jetzt ' + {pv_share} + ' % aus PV'", "#ffb300")]),
            *home_sources()]
-    # one meter per chart (user, 2026-10-04); the grid's coloured by its sign as on its page
-    power = day_chart([area("Haus", HOME, HOME_BLUE)])
-    pv = day_chart([area("PV", PV, "#ffb300")])
-    grid_ = day_chart([time_series("Netz", GRID, symbol="none", sampling="lttb", lineStyle={"width": 1.5},
-                                   areaStyle={"opacity": 0.25})], visualMap=sign_colors())
+    # one meter per grid (user, 2026-10-04); the grid's coloured by its sign as on its page
+    power = stacked_chart([("Haus", [area("Haus", HOME, HOME_BLUE)], value_axis("W")),
+                           ("PV", [area("PV", PV, "#ffb300")], value_axis("W")),
+                           ("Netz", [time_series("Netz", GRID, symbol="none", sampling="lttb", lineStyle={"width": 1.5},
+                                                 areaStyle={"opacity": 0.25})], value_axis("W")),
+                           # negative while it charges
+                           ("Batterie", [area("Batterie", BATT, BATTERY_GREEN)], value_axis("W"))], 720,
+                          visual_map=sign_colors(2))
     today = wide_grid([vtile("Verbrauch heute", "home_ec_day", color=HOME_BLUE),
                        vtile("aus PV", "photovoltaics_own_ec_day", color="#43a047"),
                        vtile("aus dem Netz", "huawei_inverter_power_meter_ec_day", color="#e53935"),
@@ -4039,8 +4353,7 @@ def home_blocks():
                          ("PV Production", "energy_daily_pv", PV_C,
                           {"type": "line", "symbol": "circle", "symbolSize": 7, "lineStyle": {"width": 2.5, "color": PV_C},
                            "z": 3})])
-    return [two(card("Jetzt", now), chart_card("Hausverbrauch heute", power)),
-            two(chart_card("PV-Leistung heute", pv), chart_card("Netz heute", grid_)),
+    return [two(card("Jetzt", now), card("Leistung heute", [power])),
             block(row(col([card("Heute", [today])]), col([widget_ref("consumption-card", **props["consumption-card"])]))),
             block(row(col([widget_ref("energy-days-card", **props["energy-days-card"])]),
                       col([card("Energie pro Monat", [months])])))]
@@ -4057,10 +4370,12 @@ def appliances_blocks():
     now = [hero("material:local_laundry_service", APPL_COLOR, "Leistung", f"={total}",
                 [chip(state, f"=({running}) > 0 ? '#1e88e5' : '#9e9e9e'")]),
            wide_grid([vtile(title, p + "_power") for p, title, _ in FLOW_APPLIANCES])]
-    # one chart per machine, as on its page: the four plugs are persisted at different moments, so a shared axis
-    # tooltip would mix their times (user, 2026-10-04)
-    powers = [chart_card(f"{GEN_DE[title]} · Leistung heute", plug_chart(p + "_power", color))
-              for p, title, color in FLOW_APPLIANCES]
+    # one grid per machine: the four plugs are persisted at different moments, so one grid's axis tooltip would mix
+    # their times (user, 2026-10-04); each with an invisible point at 100 W, so standby noise does not fill its axis
+    floor = comp("oh-data-series", {"name": "", "type": "line", "data": [["=dayjs().valueOf()", 100]], "symbol": "none",
+                                     "silent": True, "tooltip": {"show": False}})
+    power = stacked_chart([(GEN_DE[title], [area(GEN_DE[title], p + "_power", color), floor], value_axis("W"))
+                           for p, title, color in FLOW_APPLIANCES], 640)
     home_share = f"({num('home_ec_day')} > 0 ? 100 * {APPL_DAY} / {num('home_ec_day')} : 0)"
     today = wide_grid([value_tile("Total", f"={fixed(APPL_DAY, 2)} + ' kWh'", color=APPL_COLOR),
                        *[vtile(title, p + "_energy_today") for p, title, _ in FLOW_APPLIANCES],
@@ -4077,9 +4392,8 @@ def appliances_blocks():
                  tooltip=tooltip(trigger="axis", smartFormatter=True), legend=legend())
     meters = wide_grid([vtile(title, p + "_energy_total") for p, title, _ in FLOW_APPLIANCES])
     return [two(card("Geräte", copy.deepcopy(appliances)), card("Jetzt", now)),
-            two(card("Heute", [today]), card("Energie pro Tag", [days])),
-            two(*powers[:2]), two(*powers[2:]),
-            one(card("Zählerstände", [meters]))]
+            two(card("Leistung heute", [power]), card("Heute", [today])),
+            two(card("Energie pro Tag", [days]), card("Zählerstände", [meters]))]
 
 
 # the energy flow's own popups, for the two nodes without a device page, laid out like the device pages and opened as
@@ -4262,13 +4576,6 @@ def two(a, b):
     return block(row(col([a]), col([b])))
 
 
-def chart_card(title, chart_, min_height="260px"):
-    """A card holding one chart, which fills the card's height, at least min_height: one value per chart, its card
-    title naming it (user, 2026-10-04)."""
-    chart_["config"]["height"] = "100%"
-    return card(title, [fill_chart(chart_, min_height)], fill=True)
-
-
 def one(a):
     return block(row(full(a)))
 
@@ -4372,13 +4679,14 @@ def heatpump_blocks():
                       vtile("Verdichterfrequenz", P["hz"]), vtile("Inverter Strom", "espaltherma_inv_primary_current"),
                       vtile("Durchfluss", P["flow"]), vtile("Umwälzpumpe Signal", "espaltherma_water_pump_signal"),
                       vtile("Wasserdruck", "espaltherma_water_pressure")])]
-    # one value per chart, leaving and inlet water together, as their spread is what counts
-    power_chart_ = day_chart([area("Elektrisch", P["power"], "#fb8c00")])
-    heat_chart = day_chart([area("Heizleistung", P["heat"], "#e53935")])
-    water_chart = day_chart([line("Vorlauf", P["supply"], "#e53935"), line("Rücklauf", P["return"], "#1e88e5")],
-                            [span_axis("°C")])
-    tank_chart = day_chart([line("Warmwasser", P["tank"], "#ab47bc")], [span_axis("°C")])
-    outdoor_chart = day_chart([line("Außen", P["outdoor"], "#26a69a")], [span_axis("°C")])
+    # one value per grid, leaving and inlet water together, as their spread is what counts
+    power_chart_ = stacked_chart([("Elektrisch", [area("Elektrisch", P["power"], "#fb8c00")], value_axis("W")),
+                                  ("Heizleistung", [area("Heizleistung", P["heat"], "#e53935")], value_axis("W"))], 520)
+    temps_chart = stacked_chart([([("Vorlauf", "#e53935"), ("Rücklauf", "#1e88e5")],
+                                  [line("Vorlauf", P["supply"], "#e53935"), line("Rücklauf", P["return"], "#1e88e5")],
+                                  span_axis("°C")),
+                                 ("Warmwasser", [line("Warmwasser", P["tank"], "#ab47bc")], span_axis("°C")),
+                                 ("Außen", [line("Außen", P["outdoor"], "#26a69a")], span_axis("°C"))], 520)
     today = wide_grid([vtile("Elektrisch heute", "espaltherma_energy_today"),
                        vtile("Heizung", "espaltherma_energy_space_today"),
                        vtile("Warmwasser", "espaltherma_energy_dhw_today"),
@@ -4428,13 +4736,25 @@ def heatpump_blocks():
                            vtile("Innengerät Betrieb", "espaltherma_i_u_operation_mode"),
                            vtile("3-Wege-Ventil", P["valve"]), vtile("Fehlercode", "espaltherma_error_code")])
     return [two(card("Steuerung", [controls]), card("Jetzt", now)),
-            two(chart_card("Elektrische Leistung heute", power_chart_), chart_card("Heizleistung heute", heat_chart)),
-            two(chart_card("Vorlauf und Rücklauf heute", water_chart), chart_card("Warmwasser heute", tank_chart)),
+            two(card("Leistung heute", [power_chart_]), card("Temperaturen heute", [temps_chart])),
+            # how it heats: valve, defrost, compressor, flow, water and heaters on one time pointer (user, 2026-10-04)
+            one(card("Heizbetrieb heute", [stacked_chart(hp_operation_panels(), 1000)])),
+            # the charts of the heat pump card's popups, device by device (user, 2026-10-04)
+            two(card("Außengerät heute", [stacked_chart(hp_outdoor_panels(), 640)]),
+                card("Innengerät heute", [stacked_chart(hp_indoor_panels(), 640)])),
+            two(card("Kältemittel heute", [stacked_chart(hp_refrigerant_panels(), 640)]),
+                card("Heizkreis heute", [stacked_chart(hp_circuit_panels(), 640)])),
+            two(stack(card("Warmwasserspeicher heute", [stacked_chart(hp_tank_panels(), 420)]),
+                      card("3-Wege-Ventil heute", [hp_valve_band()])),
+                card("COP", [stacked_chart(hp_cop_panels(), 420), titled(hp_cop_month(), "COP pro Tag")])),
+            two(card("Strom nach Zweck", [titled(c, t) for c, t in zip(hp_split_charts(*HP_ELECTRIC),
+                                                                         ("Leistung", "Energie pro Tag"))]),
+                card("Wärme nach Zweck", [titled(c, t) for c, t in zip(hp_split_charts(*HP_HEAT),
+                                                                         ("Leistung", "Energie pro Tag"))])),
             two(card("Energie heute", [today]), card("Leistung aufgeteilt", [split])),
-            two(card("Temperaturen", [temps]), chart_card("Außentemperatur heute", outdoor_chart)),
-            two(card("Sollwerte", [setpoints]), card("Kältemittel", [refrigerant])),
+            two(card("Temperaturen", [temps]), card("Sollwerte", [setpoints])),
             one(card("Modi", [modes])),
-            one(card("Betrieb", [operation])),
+            two(card("Kältemittel", [refrigerant]), card("Betrieb", [operation])),
             *plug_cards("heatpump", "material:heat_pump", "#fb8c00", title="Shelly EM")]
 
 
@@ -4456,13 +4776,14 @@ def air_conditioning_blocks():
                       vtile("Solltemperatur", "faikout_perfera_temperature_setpoint"),
                       vtile("Lüfterdrehzahl", "faikout_perfera_fan_speed"),
                       vtile("Verdichterfrequenz", "faikout_perfera_compressor_frequency")])]
-    temp = lambda name, item, color: day_chart([line(name, item, color)], [span_axis("°C")])
-    return [two(card("Steuerung", [controls]),
-                stack(card("Jetzt", now), chart_card("Raumtemperatur heute",
-                                                     temp("Raum", "faikout_perfera_temperature", "#fb8c00")))),
-            two(chart_card("Außentemperatur heute", temp("Außen", "faikout_perfera_outdoor_temperature", "#26a69a")),
-                chart_card("Flüssigkeitstemperatur heute",
-                           temp("Flüssigkeit", "faikout_perfera_liquid_temperature", "#29b6f6"))),
+    # its power and compressor beside the temperatures, on one time pointer (user, 2026-10-04)
+    temps = stacked_chart([
+        ("Leistung", [area("Leistung", "air_conditioning_unit_power", AC_BLUE)], value_axis("W", min=0)),
+        ("Verdichter", [line("Verdichter", "faikout_perfera_compressor_frequency", "#78909c")], value_axis("Hz", min=0)),
+        *[(n, [line(n, i, c)], span_axis("°C")) for n, i, c in (
+            ("Raum", "faikout_perfera_temperature", "#fb8c00"), ("Außen", "faikout_perfera_outdoor_temperature", "#26a69a"),
+            ("Flüssigkeit", "faikout_perfera_liquid_temperature", "#29b6f6"))]], 800)
+    return [two(card("Steuerung", [controls]), stack(card("Jetzt", now), card("Betrieb heute", [temps]))),
             *plug_cards("air_conditioning_unit", "material:ac_unit", AC_BLUE, title="Shelly EM",
                         switch="air_conditioning_switch", electric_prefix="air_conditioning",
                         electric_title="Elektrisch · Shelly EM")]
@@ -4479,11 +4800,18 @@ def ventilation_blocks():
         switch_row("CO2-Automatik", "material:co2", "ventilation_co2_management", VENT_TEAL),
         switch_row("Feuchte-Automatik", "material:water_drop", "ventilation_humidity_management", VENT_TEAL),
         switch_row("Temperatur-Automatik", "material:thermostat", "ventilation_temperature_management", VENT_TEAL))
-    co2 = day_chart([line("CO₂", "netatmo_weatherstation_co2", "#78909c")], [value_axis("ppm", scale=True)])
-    humidity = day_chart([line("Luftfeuchtigkeit", "netatmo_weatherstation_atmospheric_humidity", "#29b6f6")],
-                         [span_axis("%")])
-    return [two(card("Steuerung", [controls]), stack(chart_card("CO₂ heute", co2, "200px"),
-                                                     chart_card("Luftfeuchtigkeit heute", humidity, "200px"))),
+    # the level (a text item of 1 to 3, which MainUI's series reads as numbers) and the plug's power beside the air
+    # the automations act on, so their reactions read on one time pointer (user, 2026-10-04)
+    names = [(int(v), t) for v, t in VENT_LEVELS]
+    air = stacked_chart([
+        ("Stufe", [text_values(line("Stufe", "esplyfterl_level", VENT_TEAL, step="end"), names)],
+         value_axis("", min=0, max=3, interval=1, splitLine={"show": False},
+                    axisLabel={"formatter": "=(v) => ['', " + ", ".join(f"'{t}'" for _, t in names) + "][v]"})),
+        ("Leistung", [area("Leistung", "ventilation_power", VENT_TEAL)], value_axis("W", min=0)),
+        ("CO₂", [line("CO₂", "netatmo_weatherstation_co2", "#78909c")], value_axis("ppm", scale=True)),
+        ("Luftfeuchtigkeit", [line("Luftfeuchtigkeit", "netatmo_weatherstation_atmospheric_humidity", "#29b6f6")],
+         span_axis("%"))], 700)
+    return [two(card("Steuerung", [controls]), card("Lüftung heute", [air])),
             *plug_cards("ventilation", "material:air", VENT_TEAL)]
 
 
@@ -4520,12 +4848,12 @@ def energy_storage_blocks():
                       vtile("Geladen gesamt", u + "total_charge"), vtile("Entladen gesamt", u + "total_discharge"),
                       vtile("Busspannung", u + "bus_voltage"), vtile("Busstrom", u + "bus_current"),
                       vtile("Temperatur", u + "temperature")])
-    # negative while charging
-    power = day_chart([area("Leistung", BATT, "#7cb342")])
-    soc = day_chart([area("Ladestand", SOC, "#43a047")], [value_axis("%", min=0, max=100)])
-    return [two(card("Jetzt", now), chart_card("Leistung heute", power)),
-            two(card("Steuerung", controls), chart_card("Ladestand heute", soc)),
-            two(card("Speicher", [totals]), card("Einheit 1", [unit]))]
+    # the power negative while charging
+    chart_ = stacked_chart([("Leistung", [area("Leistung", BATT, "#7cb342")], value_axis("W")),
+                            ("Ladestand", [area("Ladestand", SOC, "#43a047")], value_axis("%", min=0, max=100))], 420)
+    return [two(card("Jetzt", now), card("Leistung heute", [chart_])),
+            two(card("Steuerung", controls), card("Speicher", [totals])),
+            one(card("Einheit 1", [unit]))]
 
 
 def photovoltaics_blocks():
@@ -4538,8 +4866,12 @@ def photovoltaics_blocks():
                       vtile("Energie heute", "huawei_inverter_e_day", color="#ffb300"),
                       vtile("Eigenverbrauch heute", "photovoltaics_own_ec_day", color="#43a047"),
                       vtile("Energie gesamt", "huawei_inverter_e_total")])]
-    pv = day_chart([area("Eingang", PV, "#ffb300")])
-    active = day_chart([area("Wirkleistung", "huawei_inverter_active_power", "#5c6bc0")])
+    # the two strings under the inverter's input and output, so a shaded string shows (user, 2026-10-04)
+    chart_ = stacked_chart([("Eingang", [area("Eingang", PV, "#ffb300")], value_axis("W")),
+                            ("Wirkleistung", [area("Wirkleistung", "huawei_inverter_active_power", "#5c6bc0")],
+                             value_axis("W")),
+                            ("String PV1", [area("PV1", "huawei_inverter_pv1_power", "#ffca28")], value_axis("W")),
+                            ("String PV2", [area("PV2", "huawei_inverter_pv2_power", "#ff8f00")], value_axis("W"))], 680)
     strings = phase_table(["PV1", "PV2"], [("Leistung", ["huawei_inverter_pv1_power", "huawei_inverter_pv2_power"]),
                                            ("Spannung", ["huawei_inverter_pv1_voltage", "huawei_inverter_pv2_voltage"]),
                                            ("Strom", ["huawei_inverter_pv1_current", "huawei_inverter_pv2_current"])])
@@ -4552,11 +4884,9 @@ def photovoltaics_blocks():
                           vtile("Fehlercode", "huawei_inverter_error_code"),
                           vtile("Optimierer online", "huawei_inverter_optimizers_online"),
                           vtile("Optimierer gesamt", "huawei_inverter_optimizers_total")])
-    return [two(card("Jetzt", now), chart_card("Eingangsleistung heute", pv)),
-            two(chart_card("Wirkleistung heute", active),
-                card("Ertrag pro Tag", [month_bars("PV-Ertrag", "energy_daily_pv", "#ffb300")])),
+    return [two(card("Jetzt", now), card("Leistung heute", [chart_])),
             two(card("Strings (DC)", [strings]), card("Netz (AC)", [grid_])),
-            one(card("Wechselrichter", [inverter]))]
+            two(card("Wechselrichter", [inverter]), card("Ertrag pro Tag", [month_bars("PV-Ertrag", "energy_daily_pv", "#ffb300")]))]
 
 
 def meter_blocks(title_item, color_expr, today, phases, heads, extra, chart_item):
@@ -4580,9 +4910,13 @@ def netatmo_blocks():
                          vtile("Lärm", w + "noise"), vtile("Luftdruck", w + "barometric_pressure")])]
     outside = [hero("material:wb_sunny", "#29b6f6", "Außen", f"={disp(o + 'temperature')}"),
                wide_grid([vtile("Luftfeuchtigkeit", o + "atmospheric_humidity"), vtile("Batteriestand", o + "battery_level")])]
-    one_line = lambda name, item, color, unit: day_chart([line(name, item, color)],
-                                                         [span_axis(unit) if unit in LEAST_SPAN else
-                                                          value_axis(unit, scale=True)])
+    panel = lambda name, item, color, unit: (name, [line(name, item, color)],
+                                             span_axis(unit) if unit in LEAST_SPAN else value_axis(unit, scale=True))
+    temps = stacked_chart([panel("Innen", w + "temperature", "#fb8c00", "°C"),
+                           panel("Außen", o + "temperature", "#29b6f6", "°C")], 520)
+    air = stacked_chart([panel("CO₂", w + "co2", "#78909c", "ppm"),
+                         panel("Luftfeuchtigkeit innen", w + "atmospheric_humidity", "#29b6f6", "%"),
+                         panel("Luftfeuchtigkeit außen", o + "atmospheric_humidity", "#80deea", "%")], 520)
 
     def details(p, extra):
         return wide_grid([vtile("Zuletzt gesehen", p + "last_seen"), vtile("Messzeitpunkt", p + "measures_timestamp"),
@@ -4590,13 +4924,7 @@ def netatmo_blocks():
                           vtile("Taupunkt", p + "dewpoint"), vtile("Hitzeindex", p + "heat_index"),
                           vtile("Min. Temperatur", p + "min_temp"), vtile("Max. Temperatur", p + "max_temp")])
     return [two(card("Wetterstation", inside), card("Außenmodul", outside)),
-            two(chart_card("Temperatur innen heute", one_line("Innen", w + "temperature", "#fb8c00", "°C")),
-                chart_card("Temperatur außen heute", one_line("Außen", o + "temperature", "#29b6f6", "°C"))),
-            two(chart_card("Luftfeuchtigkeit innen heute",
-                           one_line("Luftfeuchtigkeit innen", w + "atmospheric_humidity", "#29b6f6", "%")),
-                chart_card("Luftfeuchtigkeit außen heute",
-                           one_line("Luftfeuchtigkeit außen", o + "atmospheric_humidity", "#80deea", "%"))),
-            one(chart_card("CO₂ heute", one_line("CO₂", w + "co2", "#78909c", "ppm"))),
+            two(card("Temperaturen heute", [temps]), card("Raumluft heute", [air])),
             two(card("Wetterstation Details", [details(w, [vtile("Absoluter Luftdruck", w + "absolute_pressure")])]),
                 card("Außenmodul Details", [details(o, [])]))]
 
@@ -4635,27 +4963,21 @@ def epex_spot_blocks():
                       vtile("Teuerste Stunde", "epex_spot_awattar_priciest_hour"),
                       vtile("Teuerster Preis", "epex_spot_awattar_priciest")])]
 
-    def prices(name, gross, net, color):
-        """One price 12 hours back and 36 ahead, gross; its net rides along invisibly on the same hours, so the
-        tooltip lists both (one value per chart, user 2026-10-04); a dashed line at the present."""
-        return chart({"period": "2D", "future": "0.75", "periodVisible": True, "height": "100%"},
-                     grid=[comp("oh-chart-grid", {"top": "40", "bottom": "35", "left": "50", "right": "20"})],
-                     xAxis=[comp("oh-time-axis", {"gridIndex": 0})],
-                     yAxis=[value_axis("EUR/kWh")],
-                     series=[time_series(f"{name} brutto", gross, step="end", symbol="none",
-                                         lineStyle={"width": 2.5, "color": color}, itemStyle={"color": color},
-                                         areaStyle={"opacity": 0.12},
-                                         markLine={"symbol": ["none", "none"], "silent": True, "label": {"show": False},
-                                                   "lineStyle": {"color": "#888", "type": "dashed"},
-                                                   "data": [{"xAxis": "=dayjs().valueOf()"}]}),
-                             time_series(f"{name} netto", net, step="end", symbol="none", lineStyle={"opacity": 0},
-                                         itemStyle={"color": color})],
-                     tooltip=tooltip(trigger="axis", smartFormatter=True))
-    total = prices("Gesamt", PRICE, "epex_spot_awattar_total_net", "#e53935")
-    market = prices("Markt", "epex_spot_awattar_market_gross", "epex_spot_awattar", "#fb8c00")
-    return [one(card("Jetzt", now)),
-            two(chart_card("Gesamtpreis 12 h zurück, 36 h voraus", total, "360px"),
-                chart_card("Marktpreis 12 h zurück, 36 h voraus", market, "360px"))]
+    def price(name, gross, net, color):
+        """A price, gross, its net riding along invisibly on the same hours, so the tooltip lists both (one value
+        per grid, user 2026-10-04); a dashed line at the present."""
+        return (f"{name}preis", [
+            time_series(f"{name} brutto", gross, step="end", symbol="none", lineStyle={"width": 2.5, "color": color},
+                        itemStyle={"color": color}, areaStyle={"opacity": 0.12},
+                        markLine={"symbol": ["none", "none"], "silent": True, "label": {"show": False},
+                                  "lineStyle": {"color": "#888", "type": "dashed"},
+                                  "data": [{"xAxis": "=dayjs().valueOf()"}]}),
+            time_series(f"{name} netto", net, step="end", symbol="none", lineStyle={"opacity": 0},
+                        itemStyle={"color": color})], value_axis("EUR/kWh"))
+    prices = stacked_chart([price("Gesamt", PRICE, "epex_spot_awattar_total_net", "#e53935"),
+                            price("Markt", "epex_spot_awattar_market_gross", "epex_spot_awattar", "#fb8c00")], 520,
+                           period="2D", future="0.75")
+    return [two(card("Jetzt", now), card("Preise 12 h zurück, 36 h voraus", [prices]))]
 
 
 GRID_SIGN = f"={num(GRID)} < 0 ? '#43a047' : '#e53935'"
@@ -4825,7 +5147,7 @@ WIDE_POPUP = (':root .popup:has(> .oh-popup[style*="--page-popup"]) { --f7-popup
 
 
 def layout_page(uid, config, blocks, now):
-    blocks = one_block(blocks)
+    blocks = own_time_axes(one_block(blocks))
     germanize(blocks, MISSING_DE)
     if config.get("label") in GEN_DE:
         config = {**config, "label": GEN_DE[config["label"]]}
@@ -5228,7 +5550,7 @@ def widgets():
 def widget_entries(now):
     entries = {}
     for uid, (card_, params, tags) in widgets().items():
-        tree = copy.deepcopy(card_)
+        tree = own_time_axes(copy.deepcopy(card_))
         germanize(tree, MISSING_DE)
         entries[uid] = {"class": "org.openhab.core.ui.components.RootUIComponent",
                         "value": {"uid": uid, "tags": ["generated", *tags],
