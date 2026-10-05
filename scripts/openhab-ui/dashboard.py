@@ -157,7 +157,7 @@ def chart(config, **slots):
 
 def titled(chart_, text):
     """A chart named in its top left corner, level with its period buttons on the right, where no card title names it:
-    the quick popups stack several charts. ECharts' dark theme lightens the text in dark mode."""
+    a card that stacks several charts. ECharts' dark theme lightens the text in dark mode."""
     chart_["slots"]["title"] = [comp("oh-chart-title", {"show": True, "text": text, "left": 10, "top": 15,
                                                          "textStyle": {"fontSize": 13, "fontWeight": 600}})]
     return chart_
@@ -631,6 +631,355 @@ def ventilation_node(cx, cy, power):
             air(f"M{cx + 7},{cy - 7} V{cy - 18}", VENT_EXHAUST), head(cx + 7, cy - 21, -1, VENT_EXHAUST)]
 
 
+# ---- devices the energy flow does not draw, for the icons at the heads of their pages (user, 2026-10-05: drawn after the
+# real devices, as the energy flow's nodes are)
+
+
+STEEL = "#b0bec5"  # brushed aluminium and stainless steel, as the E-Car's body is tinted
+STEEL_FILL = {"fill": STEEL, "fill-opacity": "0.35"}
+CARD_BG = {"fill": "var(--f7-card-bg-color, #fff)"}
+
+
+def co2_color(co2):
+    """The CO₂ graded as the Umweltbundesamt does: green up to 1000 ppm, orange up to 2000, red above."""
+    return f"={co2} > 2000 ? '#e53935' : {co2} > 1000 ? '#fb8c00' : '#43a047'"
+
+
+def netatmo_module(cx, bottom, width, height, top=None):
+    """A Netatmo module from the front, a little from above: an aluminium tube standing on bottom, its plastic cap on
+    top (filled with top, the indoor module's light), the joints of cap and foot, a highlight down the tube."""
+    w2, ry = width / 2, round(width * 0.2, 2)
+    x0, x1, y0 = round(cx - w2, 2), round(cx + w2, 2), round(bottom - height, 2)
+
+    def joint(y):
+        return svg("path", d=f"M{x0},{y} A{w2},{ry} 0 0 0 {x1},{y}", **stroke(1, opacity="0.6"))
+    return [svg("path", d=f"M{x0},{y0} V{bottom} A{w2},{ry} 0 0 0 {x1},{bottom} V{y0} A{w2},{ry} 0 0 0 {x0},{y0} Z",
+                **stroke(1.6, **STEEL_FILL, **{"stroke-linejoin": "round"})),
+            svg("ellipse", cx=cx, cy=y0, rx=w2, ry=ry, **stroke(1.2, fill=top or "#eceff1")),
+            joint(round(y0 + 4.5, 2)), joint(round(bottom - 2.5, 2)),
+            svg("line", x1=round(cx - w2 * 0.45, 2), y1=round(y0 + 7, 2), x2=round(cx - w2 * 0.45, 2),
+                y2=round(bottom - 4.5, 2), **stroke(1.3, "#ffffff", opacity="0.6"))]
+
+
+def netatmo_parts(color, own, co2):
+    """The Netatmo station as it stands: the tall indoor module, its top lit in the CO₂'s colour, beside the short
+    outdoor module; the page's own module (own: 'indoor' or 'outdoor') drawn fully, the other faint behind it."""
+    indoor = netatmo_module(-6.5, 17, 11, 36, top=co2_color(co2))
+    outdoor = netatmo_module(7.5, 17, 11, 25.6)
+    faint = lambda parts: svg("g", parts, opacity="0.3")
+    return [ring(0, 0, color), *((indoor + [faint(outdoor)]) if own == "indoor" else ([faint(indoor)] + outdoor))]
+
+
+def water_meter_parts(color, rate, value, digits=True):
+    """A classic dial water meter from above: brass connections left and right, the blue cover ring round the dial,
+    the roller counter (cubic metres black, tenths and hundredths red; the meter's own reading), and the red pointer
+    under it, which turns while water flows, faster the more flows, its star wheel faster still."""
+    lpm = f"({rate} * 1000)"
+    active = f"{rate} > 0"
+    parts = [ring(0, 0, color)]
+    for side in (-1, 1):
+        x = -24 if side < 0 else 15
+        parts += [svg("rect", x=x, y=-3, width=9, height=6, rx=1, **stroke(1.4, fill="#ffb300", **{"fill-opacity": "0.35"})),
+                  svg("rect", x=-24.5 if side < 0 else 20.5, y=-4.5, width=4, height=9, rx=1,
+                      **stroke(1.4, fill="#ffb300", **{"fill-opacity": "0.35"}))]
+    parts += [svg("circle", cx=0, cy=0, r=16.5, **stroke(1.6, fill=color, **{"fill-opacity": "0.35"})),
+              svg("circle", cx=0, cy=0, r=12.5, style=CARD_BG),
+              svg("circle", cx=0, cy=0, r=12.5, **stroke(1.1, fill="#e3f2fd", **{"fill-opacity": "0.5"}))]
+    cells = []
+    for k in range(5):
+        x = -8 + k * 3.2
+        cells.append(svg("rect", x=x, y=-9, width=3.2, height=5, fill="#37474f" if k < 3 else "#e53935"))
+        if digits:
+            ch = f"=('00000' + Math.floor({value} * 100)).slice(-5).slice({k}, {k + 1})"
+            cells.append(svg("text", x=round(x + 1.6, 2), y=-5.1, content=ch, fill="#ffffff",
+                             **{"font-size": 4.4, "font-weight": "700", "text-anchor": "middle"}))
+    parts += [svg("g", cells), svg("rect", x=-8, y=-9, width=16, height=5, rx=0.6, **stroke(0.9))]
+    dial = (-2.5, 4)
+    ticks = [svg("line", x1=round(dial[0] + 4.4 * math.cos(a), 2), y1=round(dial[1] + 4.4 * math.sin(a), 2),
+                 x2=round(dial[0] + 5.4 * math.cos(a), 2), y2=round(dial[1] + 5.4 * math.sin(a), 2),
+                 **stroke(0.7, opacity="0.7")) for a in (math.radians(36 * k) for k in range(10))]
+    pointer = svg("g", [svg("path", d=f"M{dial[0] - 1},{dial[1]} L{dial[0]},{dial[1] - 4.6} L{dial[0] + 1},{dial[1]} Z",
+                            fill="#e53935"),
+                        spin(*dial, steps(lpm, [3, 10], ["4s", "2s", "1s"]), active)])
+    star_c = (6.5, 3.5)
+    star = svg("g", [svg("path", d=sparkle(*star_c, 2.6), fill="#e53935"),
+                     spin(*star_c, steps(lpm, [3, 10], ["1.2s", "0.6s", "0.3s"]), active)])
+    parts += [svg("circle", cx=dial[0], cy=dial[1], r=5.4, **stroke(0.9)), *ticks, pointer,
+              svg("circle", cx=dial[0], cy=dial[1], r=1, fill="currentColor"), star]
+    return parts
+
+
+def coffee_node(cx, cy, power):
+    """A heat exchanger espresso machine as the Profitec in the kitchen (user, 2026-10-05) beside its grinder: the
+    stainless box with the cup rail on top, the manometer, the E61 group with its lever, the portafilter and a cup
+    on the drip tray, the steam wand at its side; the grinder with its bean hopper and spout. Its lamp lights while
+    the boiler heats (more than 300 W)."""
+    heating = f"Math.abs({power}) > 300"
+    m = lambda x: round(cx + 3 + x, 2)  # the pair centred on the ring
+    machine = [
+        svg("path", d=f"M{m(-21)},{cy - 10} V{cy - 13.5} H{m(-1)} V{cy - 10}", **stroke(1.2)),  # cup rail
+        svg("path", d=f"M{m(-22)},{cy - 7} H{m(-23.5)} V{cy + 4}", **stroke(1.4)),  # steam wand
+        svg("rect", x=m(-22), y=cy - 10, width=22, height=19, rx=2, **stroke(1.6, **STEEL_FILL)),
+        svg("rect", x=m(-21), y=cy + 9, width=20, height=2.5, rx=0.8, **stroke(1.2, **STEEL_FILL)),  # drip tray
+        svg("circle", cx=m(-17.5), cy=cy - 5.5, r=2.6, **stroke(1.1, fill="#ffffff")),
+        svg("line", x1=m(-17.5), y1=cy - 5.5, x2=m(-18.7), y2=cy - 7.1, **stroke(0.9, "#e53935")),  # manometer
+        svg("circle", cx=m(-3.2), cy=cy - 6.8, r=1.3, fill=f"={heating} ? '#fb8c00' : '#9e9e9e'"),  # heating lamp
+        # the E61 group with its lever up to the right, the portafilter's handle to the right
+        svg("line", x1=m(-10), y1=cy - 4, x2=m(-6.5), y2=cy - 7.5, **stroke(1.4)),
+        svg("circle", cx=m(-6.5), cy=cy - 7.5, r=1.3, fill="currentColor"),
+        svg("path", d=f"M{m(-13)},{cy + 0.5} V{cy - 1.5} Q{m(-13)},{cy - 4.5} {m(-10)},{cy - 4.5} "
+                      f"Q{m(-7)},{cy - 4.5} {m(-7)},{cy - 1.5} V{cy + 0.5} Z", **stroke(1.3, fill="#eceff1")),
+        svg("rect", x=m(-13.5), y=cy + 0.5, width=7, height=2, rx=0.8, fill="currentColor"),
+        svg("line", x1=m(-7), y1=cy + 1.5, x2=m(-2.5), y2=cy + 3.5, **stroke(2.4, "#5d4037")),
+        svg("path", d=f"M{m(-12.5)},{cy + 4.5} H{m(-7.5)} L{m(-8)},{cy + 8.2} H{m(-12)} Z", **stroke(1.1, fill="#ffffff")),
+    ]
+    grinder = [
+        svg("path", d=f"M{m(6)},{cy - 17} H{m(15)} L{m(13)},{cy - 10} H{m(8)} Z",
+            **stroke(1.3, fill="#8d6e63", **{"fill-opacity": "0.5", "stroke-linejoin": "round"})),  # bean hopper
+        svg("rect", x=m(7), y=cy - 10, width=7, height=21.5, rx=1, **stroke(1.6, **STEEL_FILL)),
+        svg("rect", x=m(9), y=cy - 0.5, width=3, height=2.4, rx=0.6, fill="currentColor"),  # spout
+        svg("line", x1=m(6), y1=cy + 11.5, x2=m(15), y2=cy + 11.5, **stroke(1.6)),
+    ]
+    return [ring(cx, cy, "#8d6e63"), *machine, *grinder]
+
+
+def fridge_node(cx, cy, power):
+    """A free-standing stainless steel fridge-freezer as the Liebherr in the kitchen (user, 2026-10-05): the fridge
+    door above with its bar handle, three freezer drawers below; a snowflake on the door brightens while the
+    compressor runs."""
+    running = f"Math.abs({power}) > 10"
+    x0, x1, y0, y1 = cx - 9, cx + 9, cy - 22, cy + 21
+    split = cy + 3
+    drawers = [round(split + (y1 - split) * k / 3, 2) for k in (1, 2)]
+    flake = [svg("line", x1=round(cx - 1.5 + 4.2 * math.cos(a), 2), y1=round(cy - 10 + 4.2 * math.sin(a), 2),
+                 x2=round(cx - 1.5 - 4.2 * math.cos(a), 2), y2=round(cy - 10 - 4.2 * math.sin(a), 2),
+                 **stroke(1.2, "#29b6f6")) for a in (math.radians(90 + 60 * k) for k in range(3))]
+    return [ring(cx, cy, "#78909c"),
+            svg("rect", x=x0, y=y0, width=x1 - x0, height=y1 - y0, rx=2.2, **stroke(1.6, **STEEL_FILL)),
+            svg("line", x1=x0, y1=split, x2=x1, y2=split, **stroke(1.4)),
+            *[svg("line", x1=x0, y1=y, x2=x1, y2=y, **stroke(1.2)) for y in drawers],
+            svg("line", x1=x1 - 3, y1=y0 + 4, x2=x1 - 3, y2=split - 6, **stroke(1.8)),  # the door's bar handle
+            *[svg("line", x1=cx - 4, y1=round(y + 2.3, 2), x2=cx + 4, y2=round(y + 2.3, 2), **stroke(1.6))
+              for y in (split, *drawers)],  # the drawers' handles
+            svg("line", x1=x0 + 2.5, y1=y0 + 3, x2=x0 + 2.5, y2=y1 - 3, **stroke(1.3, "#ffffff", opacity="0.6")),
+            svg("g", flake, opacity=f"={running} ? '1' : '0.35'")]
+
+
+def media_node(cx, cy, power, tv_on=None, receiver_on=None):
+    """The living room's media as they stand: the Panasonic TV on its square pedestal, the Vu+ Uno 4K below it; the
+    screen lights while the TV is on, the receiver's display while it is."""
+    tv_on = tv_on or f"Math.abs({power}) > 50"
+    receiver_on = receiver_on or tv_on
+    x0, x1, y0, y1 = cx - 17, cx + 17, cy - 17, cy + 2
+    return [ring(cx, cy, "#ec407a"),
+            svg("rect", x=x0, y=y0, width=x1 - x0, height=y1 - y0, rx=1.5, **stroke(1.6, fill="#37474f",
+                                                                                   **{"fill-opacity": "0.85"})),
+            svg("rect", x=x0 + 1.6, y=y0 + 1.6, width=x1 - x0 - 3.2, height=y1 - y0 - 3.2, rx=0.6, fill="#4fc3f7",
+                opacity=f"={tv_on} ? '0.75' : '0'"),
+            svg("path", d=f"M{x0 + 1.6},{y1 - 1.6} L{cx - 6},{cy - 8} L{cx - 1},{cy - 3} L{cx + 5},{cy - 10} "
+                          f"L{x1 - 1.6},{y1 - 1.6} Z", fill="#ffffff", opacity=f"={tv_on} ? '0.55' : '0'"),
+            svg("circle", cx=cx + 9, cy=cy - 11, r=2, fill="#fff59d", opacity=f"={tv_on} ? '0.9' : '0'"),
+            svg("rect", x=cx - 2, y=y1, width=4, height=4, **stroke(1.2, **STEEL_FILL)),  # the pedestal's neck
+            svg("rect", x=cx - 9, y=y1 + 4, width=18, height=2, rx=0.8, **stroke(1.2, **STEEL_FILL)),
+            # the receiver, its display at the right of its front
+            svg("rect", x=cx - 11, y=cy + 10, width=22, height=6, rx=1.2, **stroke(1.4, fill="#263238")),
+            svg("rect", x=cx + 2, y=cy + 11.8, width=6, height=2.4, rx=0.5,
+                fill=f"={receiver_on} ? '#4fc3f7' : '#546e7a'")]
+
+
+SCREEN_OFF = {"fill": "#37474f", "fill-opacity": "0.85"}  # a screen while it is off
+
+
+def bent(x0, x1, top, bottom, sag, inset=0.0):
+    """The outline of a wide screen bent towards the viewer, seen a little from above: its ends come forward and so
+    sit lower, both edges arch up by sag in the middle; inset shrinks it to the picture inside its frame."""
+    a, b, t, u = round(x0 + inset, 2), round(x1 - inset, 2), round(top + inset, 2), round(bottom - inset, 2)
+    mid = round((x0 + x1) / 2, 2)
+    return (f"M{a},{t + sag} Q{mid},{round(t - sag, 2)} {b},{t + sag} L{b},{u + sag} Q{mid},{round(u - sag, 2)} "
+            f"{a},{u + sag} Z")
+
+
+def desktop(on, x0, x1, top, bottom, sag=0.0, outline=None):
+    """What a screen shows while on (an expression): a light desktop with two windows, in the box or the outline
+    given; nothing while off."""
+    w, h = x1 - x0, bottom - top
+    ground = {"fill": "#90caf9", "fill-opacity": "0.6"}
+    windows = [svg("rect", x=round(x0 + w * f, 2), y=round(top + h * 0.2 + sag, 2), width=round(w * width, 2),
+                   height=round(h * 0.55, 2), rx=0.5, fill="#ffffff", **{"fill-opacity": opacity})
+               for f, width, opacity in ((0.08, 0.38, "0.85"), (0.52, 0.4, "0.6"))]
+    return svg("g", [svg("path", d=outline, **ground) if outline else
+                     svg("rect", x=x0, y=top, width=w, height=h, rx=0.4, **ground), *windows], visible=f"={on}")
+
+
+def laptop_front(x0, x1, top, bottom, on, deck=2.6, flare=1.6):
+    """An open laptop from the front, a little from above: the lid with its screen, the keyboard deck below it, both
+    on the card colour so they cover what stands behind."""
+    base = f"M{x0 - flare},{bottom + deck} L{x0},{bottom} H{x1} L{x1 + flare},{bottom + deck} Z"
+    return [svg("rect", x=x0, y=top, width=x1 - x0, height=bottom - top, rx=1, style=CARD_BG),
+            svg("rect", x=x0, y=top, width=x1 - x0, height=bottom - top, rx=1, **stroke(1.5, **SCREEN_OFF)),
+            desktop(on, x0 + 1.4, x1 - 1.4, top + 1.4, bottom - 1.4),
+            svg("path", d=base, style=CARD_BG),
+            svg("path", d=base, **stroke(1.4, **STEEL_FILL, **{"stroke-linejoin": "round"})),
+            svg("line", x1=round(x0 + 1.2, 2), y1=round(bottom + deck * 0.5, 2), x2=round(x1 - 1.2, 2),
+                y2=round(bottom + deck * 0.5, 2), **stroke(0.7, opacity="0.5"))]
+
+
+def wide_screen(x0, x1, top, bottom, sag, on, neck_x, foot_y, foot_w):
+    """The curved wide screen on its stand: the neck at neck_x down to its curved foot at foot_y, foot_w to each
+    side."""
+    return [svg("rect", x=neck_x - 1.5, y=bottom + sag - 0.5, width=3, height=round(foot_y - bottom - sag + 0.5, 2),
+                **stroke(1.2, **STEEL_FILL)),
+            svg("path", d=f"M{neck_x - foot_w},{foot_y + 1.6} Q{neck_x},{foot_y - 1} {neck_x + foot_w},{foot_y + 1.6}",
+                **stroke(1.8)),
+            svg("path", d=bent(x0, x1, top, bottom, sag), **stroke(1.6, **SCREEN_OFF, **{"stroke-linejoin": "round"})),
+            desktop(on, x0 + 1.6, x1 - 1.6, top + 1.6, bottom - 1.6, sag=sag * 0.3,
+                    outline=bent(x0, x1, top, bottom, sag, inset=1.6))]
+
+
+def office_node(cx, cy, power):
+    """An office desk (the user's pick C of four, 2026-10-05): the slightly curved wide screen centred above on its
+    foot, the laptop open in front of it; both screens show a light desktop while the office draws."""
+    on = f"Math.abs({power}) > 10"
+    return [ring(cx, cy, "#ab47bc"),
+            *wide_screen(cx - 19, cx + 19, cy - 17, cy - 1.5, 1.8, on, cx, cy + 4, 5),
+            *laptop_front(cx - 8, cx + 8, cy + 4.5, cy + 14, on, deck=3, flare=2)]
+
+
+WOOD = "#a1887f"
+
+
+def wood(width=1.3):
+    return stroke(width, fill=WOOD, **{"fill-opacity": "0.6", "stroke-linejoin": "round"})
+
+
+def bulb_string(points, on, sag, per):
+    """A string of lights along the polyline points, sagging by sag between them, per bulbs on each span and one on
+    every inner joint; they glow while on."""
+    d, bulbs = f"M{points[0][0]},{points[0][1]}", []
+    for i, ((x0, y0), (x1, y1)) in enumerate(zip(points, points[1:])):
+        d += f" Q{round((x0 + x1) / 2, 2)},{round((y0 + y1) / 2 + sag, 2)} {x1},{y1}"
+        for k in range(1, per + 1):
+            t = k / (per + 1)
+            bulbs.append((round(x0 + (x1 - x0) * t, 2), round(y0 + (y1 - y0) * t + 2 * sag * t * (1 - t), 2)))
+        if i + 2 < len(points):
+            bulbs.append((x1, y1))
+    return [svg("path", d=d, **stroke(0.8, opacity="0.7")),
+            *[svg("circle", cx=x, cy=y, r=2.5, fill="#fbc02d", opacity=f"={on} ? '0.3' : '0'") for x, y in bulbs],
+            *[svg("circle", cx=x, cy=y, r=1.25, fill=f"={on} ? '#fbc02d' : '#9e9e9e'") for x, y in bulbs]]
+
+
+def pergola_node(cx, cy, power):
+    """The terrace's wooden pergola from a corner, a little from above (the user's pick C of four, 2026-10-05): the
+    frame as a rhombus with the white shade on it, the three posts in sight, the lights sagging along its two front
+    sides from corner to corner; the bulbs glow while the light is on."""
+    on = f"Math.abs({power}) > 2"
+    left, back, right, front = (cx - 20, cy - 8), (cx, cy - 17), (cx + 20, cy - 8), (cx, cy + 1)
+    top = f"M{left[0]},{left[1]} L{back[0]},{back[1]} L{right[0]},{right[1]} L{front[0]},{front[1]} Z"
+    folds = [svg("line", x1=round(left[0] + 20 * t, 2), y1=round(left[1] + 9 * t, 2), x2=round(back[0] + 20 * t, 2),
+                 y2=round(back[1] + 9 * t, 2), **stroke(0.8, opacity="0.35")) for t in (0.25, 0.5, 0.75)]
+    return [ring(cx, cy, "#fbc02d"),
+            *[svg("rect", x=x - 1.4, y=y, width=2.8, height=16 if (x, y) == front else 17, **wood())
+              for x, y in (left, front, right)],
+            svg("path", d=top, **stroke(1.2, fill="#ffffff", **{"stroke-linejoin": "round"})),
+            *folds,
+            svg("path", d=top, **stroke(2.2, WOOD, fill="none", **{"stroke-linejoin": "round"})),
+            *bulb_string([(left[0], left[1] + 1.5), (front[0], front[1] + 1.5), (right[0], right[1] + 1.5)], on, 3.2, 3)]
+
+
+def ebike_node(cx, cy, power):
+    """A classic men's trekking E-Bike from the side (the user's pick A of four, 2026-10-05): diamond frame, mudguards,
+    rack, upright bar, the motor at the crank and the battery outside on the down tube, grey at rest, green while it
+    charges, its level rising again and again; centred upright in the ring (user, 2026-10-05: its drawing spans
+    -10.9 to 15 around its own middle, measured by getBBox, so that sits 2.04 above the ring's)."""
+    charging = f"Math.abs({power}) > 10"
+    oy = cy - 2.04
+    rear, front_ = (cx - 12.5, oy + 6.5), (cx + 12.5, oy + 6.5)
+    crank, seat, head, head_low = (cx - 1.5, oy + 7.5), (cx - 5.5, oy - 6.5), (cx + 7.5, oy - 7), (cx + 9, oy - 2.5)
+    wheel, guard = 8.5, 10.1
+    parts = [ring(cx, cy, "#7cb342")]
+    for x, y in (rear, front_):
+        parts += [svg("circle", cx=x, cy=y, r=wheel, **stroke(1.6)), svg("circle", cx=x, cy=y, r=1, fill="currentColor")]
+    # the mudguards over the wheels' tops, the rack over the rear wheel with its strut to the axle
+    parts += [svg("path", d=f"M{round(rear[0] - guard, 2)},{rear[1]} A{guard},{guard} 0 0 1 {round(rear[0] + guard * 0.5, 2)},"
+                            f"{round(rear[1] - guard * 0.866, 2)}", **stroke(1.2, opacity="0.75")),
+              svg("path", d=f"M{round(front_[0] - guard * 0.5, 2)},{round(front_[1] - guard * 0.866, 2)} A{guard},{guard} 0 0 1 "
+                            f"{round(front_[0] + guard, 2)},{front_[1]}", **stroke(1.2, opacity="0.75")),
+              svg("path", d=f"M{rear[0] - 5},{round(oy - 4, 2)} H{seat[0] - 1} M{rear[0] - 3},{round(oy - 4, 2)} "
+                            f"L{rear[0]},{rear[1]}", **stroke(1.3))]
+    frame = (f"M{rear[0]},{rear[1]} L{seat[0]},{seat[1]} L{head[0]},{head[1]} L{head_low[0]},{head_low[1]} "
+             f"L{crank[0]},{crank[1]} Z M{seat[0]},{seat[1]} L{crank[0]},{crank[1]} M{head_low[0]},{head_low[1]} "
+             f"L{front_[0]},{front_[1]}")
+    parts += [svg("path", d=frame, **stroke(1.6, **{"stroke-linejoin": "round"})),
+              svg("line", x1=seat[0], y1=seat[1], x2=seat[0] - 0.8, y2=round(seat[1] - 3, 2), **stroke(1.4)),
+              svg("path", d=f"M{seat[0] - 4.5},{round(seat[1] - 3.4, 2)} H{seat[0] + 2.5}", **stroke(2.2)),  # saddle
+              svg("path", d=f"M{head[0]},{head[1]} L{head[0] - 0.4},{round(head[1] - 3.2, 2)} Q{head[0] - 1},"
+                            f"{round(head[1] - 4.4, 2)} {head[0] - 4.5},{round(head[1] - 3.6, 2)}", **stroke(1.4)),  # bar
+              svg("circle", cx=crank[0], cy=crank[1], r=2.6, **stroke(1.3, fill="#78909c", **{"fill-opacity": "0.5"})),
+              svg("line", x1=crank[0], y1=crank[1], x2=crank[0] + 2, y2=round(crank[1] + 3.5, 2), **stroke(1.3))]
+    # the battery standing on the down tube, 3 off its axis
+    dx, dy = head_low[0] - crank[0], head_low[1] - crank[1]
+    angle = math.degrees(math.atan2(dy, dx))
+    mx, my = crank[0] + dx * 0.52, crank[1] + dy * 0.52
+    bx, by = round(mx + 3 * math.sin(math.radians(angle)), 2), round(my - 3 * math.cos(math.radians(angle)), 2)
+    w, h = 14, 5
+    level = svg("rect", [svg("animate", attributeName="width", values=f"0;{w - 2}", dur="2.4s", repeatCount="indefinite",
+                             visible=f"={charging}")],
+                x=-w / 2 + 1, y=-h / 2 + 1, width=w - 2, height=h - 2, rx=0.8,
+                fill=f"={charging} ? '#7cb342' : '#546e7a'", **{"fill-opacity": "0.9"})
+    parts.append(svg("g", [svg("rect", x=-w / 2, y=-h / 2, width=w, height=h, rx=1.6, style=CARD_BG), level,
+                           svg("rect", x=-w / 2, y=-h / 2, width=w, height=h, rx=1.6, **stroke(1.2))],
+                     transform=f"translate({bx} {by}) rotate({round(angle, 2)})"))
+    return parts
+
+def price_coin(color):
+    """The electricity price as a euro coin with a bolt stamped beside the sign, its face in the price's colour (an
+    expression; the user's pick D of four, 2026-10-05)."""
+    bolt = " ".join(f"{round(4 + px, 2)},{py}" for px, py in
+                    ((1.5, -8), (-4.5, 1.2), (-0.6, 1.2), (-1.8, 8), (4.5, -1.2), (0.6, -1.2)))
+    return [ring(0, 0, "#fb8c00"),
+            svg("circle", cx=0, cy=0, r=19, **stroke(1.6, fill=color, **{"fill-opacity": "0.3"})),
+            svg("circle", cx=0, cy=0, r=15.5, **stroke(1, opacity="0.6")),
+            svg("text", x=-4, y=6, content="€", fill="currentColor",
+                **{"font-size": 17, "font-weight": "700", "text-anchor": "middle"}),
+            svg("polygon", points=bolt, fill=color, **{"stroke": "var(--f7-card-bg-color, #fff)", "stroke-width": 1.2,
+                                                       "stroke-linejoin": "round", "paint-order": "stroke"})]
+
+
+def rack_node(cx, cy, power):
+    """The network's 6U wall rack from the front: the cabinet with its rails, from the top a patch panel, the switch
+    with its link lights, a brush panel, the gateway, a shelf with a box on it and the power strip; the lights
+    flicker while the network draws."""
+    on = f"Math.abs({power}) > 10"
+    x0, x1, y0, y1 = cx - 20, cx + 20, cy - 14, cy + 13
+    u = (y1 - y0 - 5) / 6  # one height unit inside the cabinet
+    top = lambda k: round(y0 + 2.5 + k * u, 2)
+    unit = lambda k, **kw: svg("rect", x=cx - 15.5, y=round(top(k) + 0.4, 2), width=31, height=round(u - 0.8, 2), rx=0.5,
+                               **stroke(0.9, **kw))
+    ports = lambda k, n, x, gap: [svg("rect", x=round(x + i * gap, 2), y=round(top(k) + 1.3, 2), width=1.6, height=1.2,
+                                      fill="#263238") for i in range(n)]
+
+    def lights(k, xs, values, dur):
+        return svg("g", [svg("circle", cx=x, cy=round(top(k) + u / 2, 2), r=0.95, fill="#69f0ae") for x in xs] +
+                   [svg("animate", attributeName="opacity", values=values, dur=dur, repeatCount="indefinite",
+                        visible=f"={on}")], opacity=f"={on} ? '1' : '0.3'")
+    light = {"fill": "#cfd8dc", "fill-opacity": "0.9"}
+    return [ring(cx, cy, "#5c6bc0"),
+            svg("rect", x=x0, y=y0, width=x1 - x0, height=y1 - y0, rx=1.5, **stroke(1.6, fill="#37474f",
+                                                                                   **{"fill-opacity": "0.85"})),
+            *[svg("line", x1=x, y1=y0 + 2, x2=x, y2=y1 - 2, **stroke(1.2, STEEL)) for x in (cx - 16.5, cx + 16.5)],
+            unit(0, **light), *ports(0, 12, cx - 13.5, 2.3),
+            unit(1, **light), *ports(1, 8, cx - 13.5, 2.3),
+            lights(1, [cx + 6.5, cx + 9], "1;0.25;1", "0.9s"), lights(1, [cx + 11.5, cx + 14], "0.25;1;0.25", "1.3s"),
+            unit(2, fill="#263238"), svg("line", x1=cx - 13, y1=round(top(2) + u / 2, 2), x2=cx + 13,
+                                         y2=round(top(2) + u / 2, 2), **stroke(0.8, STEEL, opacity="0.7")),
+            unit(3, **light), *ports(3, 4, cx - 13.5, 2.3),
+            lights(3, [cx + 12.5], "1;0.4;1", "2s"),
+            svg("line", x1=cx - 15.5, y1=round(top(5) - 0.2, 2), x2=cx + 15.5, y2=round(top(5) - 0.2, 2), **stroke(1, STEEL)),
+            svg("rect", x=cx - 12, y=round(top(4) + 0.6, 2), width=11, height=round(u - 1, 2), rx=0.6, **stroke(0.8, **light)),
+            unit(5, **light),
+            *[svg("circle", cx=x, cy=round(top(5) + u / 2, 2), r=1, fill="#263238") for x in (cx - 9, cx - 3, cx + 3, cx + 9)]]
+
+
 PV = "huawei_inverter_input_power"
 HP = "espaltherma_electrical_power"
 ECAR = "e_car_power"
@@ -729,10 +1078,11 @@ def at(angle):
 # viewBox keeps the margins that star had around its rings, badges and texts (measured in the browser).
 VENT_XY, HP_XY, AC_XY, ECAR_XY, APPL_XY, BATT_XY, GRID_XY, PV_XY = (at(-90 + TURN + k * STEP) for k in range(8))
 TEXT_GAP = 10  # between a ring and the texts beside it (user, 2026-10-04)
-# the page each node opens as a popup: the device's page; house and appliances, which have none, a popup of their own;
-# heat pump, air conditioner and ventilation open their quick controls instead (QUICK_NODES)
+# the page each node opens as a popup: the device's page; house and appliances, which have none, a popup of their own
+# (user, 2026-10-05: no small quick popups any more, heat pump, air conditioner and ventilation open their pages too)
 NODE_POPUPS = [(*PV_XY, "photovoltaics"), (*GRID_XY, "power_meter"), (*HOME_XY, "flow_home"),
-               (*BATT_XY, "energy_storage"), (*ECAR_XY, "e_car"), (*APPL_XY, "flow_appliances")]
+               (*BATT_XY, "energy_storage"), (*ECAR_XY, "e_car"), (*APPL_XY, "flow_appliances"),
+               (*HP_XY, "heatpump"), (*AC_XY, "air_conditioning"), (*VENT_XY, "ventilation")]
 
 
 def node_box(cx, cy, size=2 * ORBIT + 8):
@@ -742,9 +1092,14 @@ def node_box(cx, cy, size=2 * ORBIT + 8):
             "width": f"{size / FLOW_W * 100:.2f}%", "height": f"{size / FLOW_H * 100:.2f}%"}
 
 
+def page_link(style, page):
+    """Transparent link that opens the page named by page in a popup (a device page the large one)."""
+    return comp("oh-link", {"action": "popup", "actionModal": f"page:{page}", "style": style})
+
+
 def node_link(cx, cy, popup):
     """Transparent link over a node that opens the page named by popup in a popup."""
-    return comp("oh-link", {"action": "popup", "actionModal": f"page:{popup}", "style": node_box(cx, cy)})
+    return page_link(node_box(cx, cy), popup)
 
 
 def spoke(node, color, power, inward, threshold=10):
@@ -834,13 +1189,26 @@ FLOW_KINDS = {  # kind: (builder of the drawing around (0, 0) from the power exp
                    "appliances: an appliance with sparkles that breathe and twinkle while they run"),
     "ventilation": (lambda p: ventilation_node(0, 0, p),
                     "ventilation: a ventilation unit whose fan turns and whose air streams flow while it runs"),
+    # devices outside the energy flow, drawn by plug cards (kind)
+    "coffee-machine": (lambda p: coffee_node(0, 0, p),
+                       "coffee machine: an espresso machine beside its grinder, its lamp lit while the boiler heats"),
+    "refrigerator": (lambda p: fridge_node(0, 0, p),
+                     "refrigerator: a fridge-freezer with three drawers, its snowflake bright while the compressor runs"),
+    "media": (lambda p: media_node(0, 0, p), "media: a TV on its pedestal over a receiver, both lit while the TV is on"),
+    "office": (lambda p: office_node(0, 0, p),
+               "office: a laptop before a curved wide screen, both showing a desktop while they draw"),
+    "terrace-light": (lambda p: pergola_node(0, 0, p),
+                      "terrace light: a pergola seen from a corner, the lights along its front sides glowing while on"),
+    "e-bike": (lambda p: ebike_node(0, 0, p), "E-Bike: a trekking bike whose battery fills up green while it charges"),
+    "network-rack": (lambda p: rack_node(0, 0, p), "network rack: a 6U rack whose link lights flicker while it draws"),
 }
 
 
 def flow_node_widget():
     """The widget every node of the energy flow is an instance of: a device drawn in a ring of 30 around (x, y), its
     animations driven by power (the battery by soc, the heat pump's fan by frequency). kind: pv, grid, home, heat-pump,
-    heat-pump-split, air-conditioner, e-car, battery, appliances or ventilation.
+    heat-pump-split, air-conditioner, e-car, battery, appliances or ventilation; for the plug cards of devices outside
+    the flow also coffee-machine, refrigerator, media, office, terrace-light, e-bike and network-rack.
     The ring has an opaque disc in the card colour under its tint, so link dots slide under it."""
     power = "Number(props.power)"
     drawings = [svg("g", build(power), visible=f"=props.kind === '{kind}'") for kind, (build, _) in FLOW_KINDS.items()]
@@ -1025,42 +1393,43 @@ def share_pill(node, power, threshold, color):
                          **{"font-size": 11, "font-weight": "700", "text-anchor": "middle"})])
 
 
-def house_pie():
-    """The house's ring as a pie of its power, pulsing as the battery's ring does beside its charge (user,
-    2026-10-05): each consumer's share as an arc in its colour, clockwise from the top in the order of the nodes,
-    clamped so they never add up beyond the ring, always shown and opaque, swelling while the house draws power as the
-    battery's arc does (only in size); the rest, which no known consumer draws, is the ring itself, pulsing grey only
-    in its opacity, as the battery's ring beside its arc (PULSE). An underlay in the card colour under the arcs hides
-    that pulse, the grey ring and the dots running in under them. Where two arcs meet they join straight; the band of
-    them ends round at both sides, as the battery's arc does (user, 2026-10-05), by a dot of the band's width in the
-    colour of its first and of its last arc. The arcs' length counts as 100 (pathLength), so the shares hold while
-    they swell."""
-    (hx, hy), working = HOME_XY, flowing(num(HOME), 10)
+def house_pie(xy=HOME_XY, r=RING_R, w=RING_W, max_r=ORBIT, max_w=RING_MAX, underlay=True):
+    """The house's ring around xy (r and w at rest, max_r and max_w at its widest) as a pie of its power, pulsing as the
+    battery's ring does beside its charge (user, 2026-10-05): each consumer's share as an arc in its colour, clockwise
+    from the top in the order of the nodes, clamped so they never add up beyond the ring, always shown and opaque,
+    swelling while the house draws power as the battery's arc does (only in size); the rest, which no known consumer
+    draws, is the ring itself, pulsing grey only in its opacity, as the battery's ring beside its arc (PULSE). An
+    underlay in the card colour under the arcs hides that pulse, the grey ring and the dots running in under them. Where
+    two arcs meet they join straight; the band of them ends round at both sides, as the battery's arc does (user,
+    2026-10-05), by a dot of the band's width in the colour of its first and of its last arc. The arcs' length counts as
+    100 (pathLength), so the shares hold while they swell. Without underlay where nothing runs in under it (a tile,
+    whose face is not the card colour)."""
+    (hx, hy), working = xy, flowing(num(HOME), 10)
     parts, before = [], "0"
     for _, power, _, color in consumers():
         own = f"Math.max(0, Math.min({house_share(power)}, 100 - ({before})))"
         parts.append((before, own, color))
         before = f"({before} + {own})"
-    ring_ = {"cx": hx, "cy": hy, "r": RING_R, "fill": "none"}
+    ring_ = {"cx": hx, "cy": hy, "r": r, "fill": "none"}
     arc = {**ring_, "pathLength": 100, "transform": f"rotate(-90 {hx} {hy})"}
     rest = svg("circle", [svg("animate", visible=f"={working}", **PULSE)], visible=f"={working}", stroke=BADGE_OFF,
-               **ring_, **{"stroke-width": RING_W})
+               **ring_, **{"stroke-width": w})
     known = f"({before}) > 0.05"
-    underlay = svg("circle", style={"stroke": "var(--f7-card-bg-color, #fff)"}, visible=f"={known}", **arc,
-                   **{"stroke-width": RING_W + 2, "stroke-linecap": "round",
-                      "stroke-dasharray": f"=({before}).toFixed(2) + ' 100'"})
-    arcs = [svg("circle", swell(RING_R, RING_W, ORBIT, RING_MAX, f"={working}", arc=True), stroke=color, **arc,
-                **{"stroke-width": RING_W, "stroke-dasharray": f"=({own}).toFixed(2) + ' 100'",
+    under = [svg("circle", style={"stroke": "var(--f7-card-bg-color, #fff)"}, visible=f"={known}", **arc,
+                 **{"stroke-width": w + 2, "stroke-linecap": "round",
+                    "stroke-dasharray": f"=({before}).toFixed(2) + ' 100'"})] if underlay else []
+    arcs = [svg("circle", swell(r, w, max_r, max_w, f"={working}", arc=True), stroke=color, **arc,
+                **{"stroke-width": w, "stroke-dasharray": f"=({own}).toFixed(2) + ' 100'",
                    "stroke-dashoffset": f"=(-({start})).toFixed(2)"})
             for start, own, color in parts]
 
     def end(at, order):
         """A round end of the band at the share at, in the colour of the first arc in order that has a length."""
         color = "=" + " : ".join(f"({own}) > 0.05 ? '{c}'" for _, own, c in order) + f" : '{order[-1][2]}'"
-        return svg("circle", swell(RING_R, RING_W, ORBIT, RING_MAX, f"={working}", arc=True), visible=f"={known}",
-                   stroke=color, **arc, **{"stroke-width": RING_W, "stroke-linecap": "round",
+        return svg("circle", swell(r, w, max_r, max_w, f"={working}", arc=True), visible=f"={known}",
+                   stroke=color, **arc, **{"stroke-width": w, "stroke-linecap": "round",
                                            "stroke-dasharray": "0.001 100", "stroke-dashoffset": at})
-    return [rest, underlay, *arcs, end("0", parts), end(f"=(-({before})).toFixed(2)", parts[::-1])]
+    return [rest, *under, *arcs, end("0", parts), end(f"=(-({before})).toFixed(2)", parts[::-1])]
 
 
 def energy_flow():
@@ -1132,11 +1501,7 @@ def energy_flow():
                into_out_of(("Entl.", num("huawei_inverter_energy_storage_day_discharge")),
                            ("Gel.", num("huawei_inverter_energy_storage_day_charge")))),
     ], viewBox=f"0 0 {FLOW_W} {FLOW_H}", width="100%", style={"display": "block", "overflow": "visible"})
-    quick = [(HP_XY, "heatpump-quick"), (AC_XY, "air-conditioner-quick"), (VENT_XY, "ventilation-quick")]
-    links = [*[node_link(cx, cy, popup) for cx, cy, popup in NODE_POPUPS],
-             *[comp("oh-link", {"action": "popup", "actionModal": quick_panel(uid)["component"],
-                                "actionModalConfig": dict(quick_panel(uid)["config"]), "style": node_box(*xy)})
-               for xy, uid in quick]]
+    links = [node_link(cx, cy, popup) for cx, cy, popup in NODE_POPUPS]
     inner = div([drawing, *links],
                 # at its own size, one unit a pixel, so its texts keep the UI's sizes on a wide screen and its circles
                 # never shrink outside a phone (user, 2026-10-05); centred, reaching into the card's padding where the
@@ -1160,15 +1525,25 @@ def house_tiles():
     """The house's power and energy today, today's self-consumption and self-sufficiency, as three small cards under
     the star, each opening its popup with a tap anywhere on it: three abreast, on a phone the house above the two
     rings. Each has a large pale icon at its lower right, as the value tiles have."""
-    home = div([comp("oh-icon", {"icon": "material:home", "width": 24, "height": 24,
-                                 "style": {"color": "#1e88e5", "flex": "0 0 auto"}}),
-                div([label(f"={kw(HOME)}", **{"font-size": "16px", "font-weight": "700", "line-height": "20px",
-                                              "white-space": "nowrap"}),
-                     label(kwh(num("home_ec_day")), **{"font-size": "11px", "opacity": "0.7", "white-space": "nowrap"})],
-                    **{"display": "flex", "flex-direction": "column", "min-width": "0"})],
-               **{"display": "flex", "align-items": "center", "gap": "8px"})
-    ring_svg = lambda ring: svg("svg", [flow_share_ring((24, 25), *ring)], viewBox="0 0 150 50", width="100%",
-                                style={"display": "block", "overflow": "visible", "max-width": "170px"})
+    ring_svg = lambda parts: svg("svg", parts, viewBox="0 0 150 50", width="100%",
+                                 style={"display": "block", "overflow": "visible", "max-width": "170px"})
+    share = lambda ring: ring_svg([flow_share_ring((24, 25), *ring)])
+    # the house as its node in the star, the ring the pie of what the consumers draw, at its widest pulse as large and
+    # as wide as the self-consumption ring beside it (user, 2026-10-05), SWELL times thinner at rest with its inner
+    # edge fixed, as the star's rings; its power and today's energy beside it
+    max_r, max_w = 22, 5  # share_ring()'s
+    w = round(max_w / SWELL, 2)
+    r = max_r - (max_w - w) / 2
+    home = ring_svg([svg("circle", cx=24, cy=25, r=r, fill="none", stroke="rgba(127, 127, 127, 0.28)",
+                         **{"stroke-width": w}),
+                     *house_pie((24, 25), r, w, max_r, max_w, underlay=False),
+                     # the node's disc just inside the ring
+                     svg("g", [flow_node("home", (0, 0), num(HOME))],
+                         transform=f"translate(24 25) scale({(r - w / 2) / (ORBIT - RING_MAX / 2):.3f})"),
+                     svg_text(56, 23, f"={kw(HOME)}", 13, "700", anchor="start"),
+                     svg_text(56, 39, kwh(num("home_ec_day")), 11, anchor="start", opacity="0.5")])
+    # on a phone its tile spans the row: the drawing as wide as in a tile of half the row, so the rings match there too
+    home["config"]["style"]["width"] = f"={NARROW} ? 'calc(50% - 14px)' : '100%'"
 
     def tile(child, popup, icon, color, **extra):
         # the value tiles' watermark: 58 px, 6 px past the right edge and 10 past the bottom, at 16 %
@@ -1181,8 +1556,8 @@ def house_tiles():
                    **{"position": "relative", "overflow": "hidden", "padding": "8px 10px", "border-radius": "12px",
                       "background": TILE_BG, "min-width": "0", "display": "flex", "align-items": "center", **extra})
     return div([tile(home, "flow_home", "home", "#1e88e5", **{"grid-column": f"={NARROW} ? '1 / -1' : 'auto'"}),
-                tile(ring_svg(SELF_CONSUMPTION), "flow_self_consumption", "solar_power", "#43a047"),
-                tile(ring_svg(SELF_SUFFICIENCY), "flow_self_sufficiency", "energy_savings_leaf", "#43a047")],
+                tile(share(SELF_CONSUMPTION), "flow_self_consumption", "solar_power", "#43a047"),
+                tile(share(SELF_SUFFICIENCY), "flow_self_sufficiency", "energy_savings_leaf", "#43a047")],
                **{"display": "grid", "gap": "8px",
                   "grid-template-columns": f"={NARROW} ? 'repeat(2, minmax(0, 1fr))' : 'repeat(3, minmax(0, 1fr))'"})
 
@@ -2114,10 +2489,10 @@ hp_svg = svg("svg", [
 def stat_tile(title, value, color, icon, popup):
     """A figure of the heat pump card: a value tile sized by the width of its row (a container): a tenth larger than
     elsewhere where the row is as wide as the drawing, smaller down to 11.9 px in a narrow card or on a phone, where a
-    power in kW to two decimals still fits. A tap opens its quick popup."""
+    power in kW to two decimals still fits. A tap opens the page named by popup."""
     tile = comp("widget:value-tile", {"title": title, "value": value, "icon": f"material:{icon}", "color": color,
                                       "fontSize": "clamp(11.9px, 2.93cqw, 15.4px)"})
-    link = hp_popup_link({"position": "absolute", "inset": "0", "display": "block", "border-radius": "12px"}, popup)
+    link = page_link({"position": "absolute", "inset": "0", "display": "block", "border-radius": "12px"}, popup)
     return div([tile, link], **{"position": "relative", "min-width": "0"})
 
 
@@ -2137,7 +2512,7 @@ def stacked_bar(title, total, parts):
 def cop_tile(title, item, color, icon, width="100%", popup=None):
     """A day's COP as Eigenverbrauch and Autarkie stand under the energy flow, the ring the same size at the same
     width: a small card with a ring filled up to 6, the value inside, the title and heute beside it, a large pale icon
-    at its lower right; width is the drawing's width in the card; a tap opens the quick panel popup, if given."""
+    at its lower right; width is the drawing's width in the card; a tap opens the page named by popup, if given."""
     value = num(item)
     length = round(2 * math.pi * 22, 2)
     ring = svg("svg", [svg("circle", cx=24, cy=25, r=22, **stroke(5, "#9e9e9e", **{"stroke-opacity": "0.25"})),
@@ -2151,8 +2526,8 @@ def cop_tile(title, item, color, icon, width="100%", popup=None):
                                                           "width": width})
     mark = comp("oh-icon", {"icon": f"material:{icon}", "width": 58, "height": 58, "style": {
         "position": "absolute", "right": "-6px", "bottom": "-10px", "opacity": "0.16", "color": color}})
-    link = [hp_popup_link({"position": "absolute", "inset": "0", "display": "block", "border-radius": "12px"},
-                          popup)] if popup else []
+    link = [page_link({"position": "absolute", "inset": "0", "display": "block", "border-radius": "12px"},
+                      popup)] if popup else []
     return div([mark, div([ring], **{"position": "relative", "min-width": "0", "flex": "1 1 auto"}), *link],
                **{"position": "relative", "overflow": "hidden", "padding": "8px 10px", "border-radius": "12px",
                   "background": TILE_BG, "min-width": "0", "display": "flex", "align-items": "center"})
@@ -2162,12 +2537,12 @@ legend_dot = lambda name, c: keyed(f"item k k-{name.lower()}", [
     div([], **{"width": "10px", "height": "10px", "border-radius": "3px", "background": c}),
     label(name, **{"font-size": "12px", "opacity": "0.75"})], style={"display": "flex", "align-items": "center", "gap": "5px"})
 def hp_stats():
-    """The figures above the drawing, built with it, as their tiles link to quick popups; a row across the card's
-    whole width, as the energy flow's tiles under its star (user, 2026-10-05)."""
-    return div([stat_tile("Electrical", f"={kw2(HPX['power'])}", ELECTRIC_C, "bolt", "heatpump-electric-quick"),
-                stat_tile("Heat", f"={kw2(HPX['heat'])}", SUPPLY, "local_fire_department", "heatpump-heat-quick"),
+    """The figures above the drawing, each opening the heat pump's page; a row across the card's whole width, as the
+    energy flow's tiles under its star (user, 2026-10-05)."""
+    return div([stat_tile("Electrical", f"={kw2(HPX['power'])}", ELECTRIC_C, "bolt", "heatpump"),
+                stat_tile("Heat", f"={kw2(HPX['heat'])}", SUPPLY, "local_fire_department", "heatpump"),
                 stat_tile("COP", f"={num(HPX['cop'])} > 0 ? {fixed(num(HPX['cop']), 2)} : '–'", COP_C, "eco",
-                          "heatpump-cop-quick")],
+                          "heatpump")],
                **{"display": "grid", "grid-template-columns": "repeat(3, minmax(0, 1fr))", "gap": "8px",
                   "font-size": "14px", "container-type": "inline-size"})
 
@@ -2197,33 +2572,24 @@ def hp_box(x, y, w, h, radius):
             "width": f"{w / vw * 100:.2f}%", "height": f"{h / vh * 100:.2f}%"}
 
 
-def hp_popup_link(style, uid):
-    """Transparent link that opens a quick popup with the items it reads."""
-    panel = quick_panel(uid)
-    return comp("oh-link", {"action": "popup", "actionModal": panel["component"],
-                            "actionModalConfig": dict(panel["config"]), "style": style})
-
-
-# what a tap opens: a tile its popup, the wall unit, the outdoor unit, the tank and the valve theirs; radiators and floor
-# loops open nothing
-HP_TILE_POPUPS = [(CONTROL_TILE, 4, "heatpump-control-quick"), (OUTDOOR_TILE, 4, "heatpump-outdoor-quick"),
-                  (REFRIGERANT_TILE, 3, "heatpump-refrigerant-quick"),
-                  (CIRCUIT_TILE, 3, "heatpump-circuit-quick"), (UPPER_TILE, 2, "upper-floor-quick"),
-                  (GROUND_TILE, 3, "ground-floor-quick"), (INDOOR_TILE, 4, "heatpump-indoor-quick"),
-                  (TANK_TILE, 3, "heatpump-tank-quick")]
-HP_NODE_POPUPS = [(WALL, "heatpump-indoor-quick"), (OUT, "heatpump-outdoor-quick"), (TANK, "heatpump-tank-quick"),
-                  (VALVE, "heatpump-valve-quick")]
+# the page a tap opens (user, 2026-10-05: no small quick popups any more): a tile and the wall unit, the outdoor unit,
+# the tank and the valve the heat pump's, the floors the page of the device that measures their air; radiators and
+# floor loops open nothing
+HP_TILE_POPUPS = [(CONTROL_TILE, 4, "heatpump"), (OUTDOOR_TILE, 4, "heatpump"), (REFRIGERANT_TILE, 3, "heatpump"),
+                  (CIRCUIT_TILE, 3, "heatpump"), (UPPER_TILE, 2, "air_conditioning"), (GROUND_TILE, 3, "netatmo"),
+                  (INDOOR_TILE, 4, "heatpump"), (TANK_TILE, 3, "heatpump")]
+HP_NODE_POPUPS = [(WALL, "heatpump"), (OUT, "heatpump"), (TANK, "heatpump"), (VALVE, "heatpump")]
 
 
 def heatpump_content():
-    """The heat pump card's content, built when the card is, as its links need the quick popups: the three figures as
-    a row across the card's whole width at its top, as the energy flow's tiles, and the drawing below at its own
-    size, one unit a pixel, so its texts keep the sizes of the rest of the UI instead of growing with the card; it
-    stands centred in a wider card, and in the middle of a higher one (a filled card, its auto margins)."""
-    links = [*[hp_popup_link(hp_box(cx - w / 2, y, w, 35 + TILE_ROW * rows, "12px"), uid)
-               for (cx, y, w), rows, uid in HP_TILE_POPUPS],
-             *[hp_popup_link(hp_box(cx - HP_ORBIT, cy - HP_ORBIT, 2 * HP_ORBIT, 2 * HP_ORBIT, "50%"), uid)
-               for (cx, cy), uid in HP_NODE_POPUPS]]
+    """The heat pump card's content, built when the card is: the three figures as a row across the card's whole width
+    at its top, as the energy flow's tiles, and the drawing below at its own size, one unit a pixel, so its texts keep
+    the sizes of the rest of the UI instead of growing with the card; it stands centred in a wider card, and in the
+    middle of a higher one (a filled card, its auto margins)."""
+    links = [*[page_link(hp_box(cx - w / 2, y, w, 35 + TILE_ROW * rows, "12px"), page)
+               for (cx, y, w), rows, page in HP_TILE_POPUPS],
+             *[page_link(hp_box(cx - HP_ORBIT, cy - HP_ORBIT, 2 * HP_ORBIT, 2 * HP_ORBIT, "50%"), page)
+               for (cx, cy), page in HP_NODE_POPUPS]]
     drawing = div([hp_svg, *links], **{"position": "relative"})
     # its tiles as far in from the card's edge as the other cards' tiles, on a phone too (user, 2026-10-05)
     return [div([hp_stats()], **{"padding": f"={NARROW} ? '8px 16px 0' : '12px 16px 0'"}),
@@ -2768,99 +3134,7 @@ def operation_section(*titles, row=False):
                    row=row)
 
 
-# ---- quick controls: the panels the energy flow's heat pump, air conditioner and ventilation open
-
-# a quick panel opens as a compact popup instead of Framework7's 630 × 630 px: MainUI puts a popup widget's style on
-# the popup's page, where the mark tells it from other popups; ":root" keeps the rule unscoped while it is shown
-QUICK_POPUP = (':root .popup:has(> .oh-popup[style*="--quick-popup"]) { --f7-popup-tablet-width: 420px; '
-               '--f7-popup-tablet-height: min(660px, calc(100vh - 64px)); }')  # the air conditioner's needs 651
-
-
-def details_button(page, color):
-    return div([comp("oh-button", {"text": "Alle Details", "action": "popup", "actionModal": f"page:{page}",
-                                   "outline": True, "small": True,
-                                   "style": {"color": color, "border-color": color, "width": "auto",
-                                             "padding": "0 12px"}})],
-               **{"display": "flex", "justify-content": "flex-end", "padding-top": "4px"})
-
-
-def quick(icon, title, color, state, children, page):
-    """A device's main controls under a small head with its state, and the way to its page; opened as a compact
-    popup, the bar names the device (config.label)."""
-    head = div([div([comp("oh-icon", {"icon": icon, "width": 20, "height": 20})],
-                    **{"width": "34px", "height": "34px", "flex": "0 0 auto", "border-radius": "50%",
-                       "display": "flex", "align-items": "center", "justify-content": "center",
-                       "background": f"color-mix(in srgb, {color} 22%, transparent)"}),
-                div([label(title, **{"font-size": "15px", "font-weight": "600"}),
-                     label(f"={state}", **{"font-size": "12px", "opacity": "0.7", "white-space": "nowrap",
-                                           "overflow": "hidden", "text-overflow": "ellipsis"})],
-                    **{"display": "flex", "flex-direction": "column", "min-width": "0"})],
-               **{"display": "flex", "align-items": "center", "gap": "10px", "padding-bottom": "4px"})
-    root = div([div([head, *children, details_button(page, color)],
-                    **{"display": "flex", "flex-direction": "column", "gap": "6px", "padding": "12px 14px"})])
-    # a chart's closed period menu would stretch the popup by its full length, as on the pages (PERIOD_MENU)
-    root["config"].update({"label": title, "style": {"--quick-popup": "panel"},
-                           "stylesheet": "\n".join([QUICK_POPUP, PERIOD_MENU])})
-    return root
-
-
-def hp_quick():
-    """The heat pump: Warmwasser-Boost, Smart Grid, Betrieb and the DHW setpoint; the energy flow's heat pump and the
-    heating card's tiles open it."""
-    state = f"'Speicher ' + {disp(HPX['tank'])} + ' · ' + {kw(HPX['power'])}"
-    return quick("material:heat_pump", "Wärmepumpe", HP_ORANGE, state,
-                 [dhw_boost(), smart_grid_section(row=True), operation_section(row=True), dhw_setpoint(row=True)],
-                 "heatpump")
-
-
-def ac_quick():
-    """The air conditioner: on/off, mode, fan, setpoint, timer and boost, in the order of its page."""
-    state = (f"({AC_ON_STATE} ? 'An · ' : 'Aus · ') + {disp('faikout_perfera_mode')} + ' · Raum ' + "
-             f"{disp('faikout_perfera_temperature')}")
-    return quick("material:ac_unit", "Klimaanlage", AC_BLUE, state,
-                 [ac_power(), ac_mode_section(row=True), ac_fan_section(row=True), ac_setpoint(row=True),
-                  ac_timer(row=True), ac_boost()],
-                 "air_conditioning")
-
-
-def vent_quick():
-    """The ventilation: its level, the timer and the automation."""
-    state = f"'Stufe ' + {disp('esplyfterl_level')} + ' · CO₂ ' + {disp('netatmo_weatherstation_co2')}"
-    level = section("material:air", "Stufe", VENT_TEAL, [state_bar("esplyfterl_level", VENT_LEVELS, VENT_TEAL)],
-                    row=True)
-    return quick("material:air", "Lüftung", VENT_TEAL, state,
-                 [level, vent_timer(row=True), switch_row("Automatik", "material:tune", "ventilation_management",
-                                                          VENT_TEAL)], "ventilation")
-
-
-# ---- the popups of the heat pump card's tiles: Regelung all the heat pump's controls, the devices their values over
-# the day, one grid per value in one stacked chart with one tooltip (user, 2026-10-04), two together only where they
-# belong together: a temperature and its target, leaving and inlet water, the outdoor air and the heat exchanger that
-# draws heat from it; the parts of the heat pump's power and energy stay together, as energy balances do
-
-QUICK_GRID = 120  # a grid's height in a quick popup's stacked chart
-
-
-def quick_stack(*panels, weights=None):
-    """A quick popup's values over the day: stacked_chart() with grids of QUICK_GRID (a panel's own weight scales
-    it), so the popup's charts share one tooltip and one pair of period arrows."""
-    weights = [pnl[3] if len(pnl) > 3 else 1 for pnl in panels]
-    # a fixed height ("16px", a state band) counts as it is
-    total = sum(float(w[:-2]) if isinstance(w, str) else w * QUICK_GRID for w in weights)
-    return stacked_chart(list(panels), round(STACK_TOP + STACK_BOTTOM + (len(panels) - 1) * STACK_GAP + total))
-
-
-def hp_control_quick():
-    """The heat pump's control: all its controls, as on its page: Smart Grid, heating, hot water and the automation,
-    the DHW setpoint, the hot-water boost and the leaving water offset."""
-    on = lambda item: f"(items.{item}.state === 'ON' ? 'an' : 'aus')"
-    state = f"'Heizung ' + {on('pyaltherma_climate_control_power')} + ' · Warmwasser ' + {on('pyaltherma_dhw_power')}"
-    return quick("material:tune", "Regelung", HP_ORANGE, state,
-                 [smart_grid_section(row=True), operation_section(row=True), dhw_setpoint(row=True), dhw_boost(),
-                  lw_offset(row=True)], "heatpump")
-
-
-# the heat pump's charts over the day, as panels of stacked_chart(), shared by the card's popups and its page
+# the heat pump's charts over the day, as panels of stacked_chart(), on its page
 
 def hp_indoor_panels():
     """The indoor unit: the heat pump's measured draw without the backup heater, the water's flow and pressure, the
@@ -2892,20 +3166,13 @@ def hp_refrigerant_panels():
             ("Druck", [line("Druck", HPX["pressure"], REFRIGERANT)], span_axis("bar"))]
 
 
-def hp_circuit_panels():
-    """The heating circuit: leaving and inlet water, the water's heat (negative while a defrost takes heat from it)."""
-    return [([("Vorlauf", SUPPLY), ("Rücklauf", RETURN)],
-             [line("Vorlauf", HPX["supply"], SUPPLY), line("Rücklauf", HPX["return"], RETURN)], span_axis("°C")),
-            ("Wärme", [area("Wärme", HPX["water_heat"], HP_ORANGE)], value_axis("W"))]
-
-
 BAND_H = "16px"  # every state band as high, its bars filling it
 BAND_GAP = 40  # above a band, which has no axis name: room for its title
 # a band's track, a grey that reads on both themes' backgrounds (MainUI evaluates no expression in a grid's config)
 BAND_TRACK = "rgba(127, 127, 127, 0.13)"
 
 
-def band_panel(title, item, active, rest, extra=(), in_tooltip=False, display=None):
+def band_panel(title, item, active, rest, extra=(), display=None):
     """An item's states as a slim horizontal band, a panel of stacked_chart() (user, 2026-10-05): the periods of the
     active states, (state, label, colour), as bars in their colours on a faint track (the grid's background, see
     stacked_chart()); every other state, named rest, transparent, so a quiet day is an empty track instead of a grey
@@ -2914,26 +3181,15 @@ def band_panel(title, item, active, rest, extra=(), in_tooltip=False, display=No
     smart formatter would read a bar's start as its value and a part of its id as its unit ("NaN" and a long number)."""
     # MainUI draws every bar's state as text in it and leaves out UNDEF and NULL only: the rest becomes UNDEF, so
     # nothing is drawn there, an active state a run of zero-width spaces, a key of its own for its colour that writes
-    # nothing; a bar's tooltip names it in words
+    # nothing
     keys = {v: "\u200b" * (k + 1) for k, (v, _, _) in enumerate(active)}
     names = " : ".join(f"s === '{v}' ? '{keys[v]}'" for v, _, _ in active)
-    words = " : ".join(f"p.value[3] === '{keys[v]}' ? '{t}'" for v, t, _ in active)
-    tip = (f"=(p) => p.seriesName + '<br/>' + p.marker + ({words} : '{rest}') + ' · ' + "
-           f"{hm('((p.value[2] - p.value[1]) / 60000)')}")
     return (display or [(title, active[0][2])],
             [comp("oh-state-series", {"name": title, "item": item, "yValue": 0, "yHeight": 1,
                                       "mapState": f"=(s) => {names} : 'UNDEF'",
                                       "stateColor": {keys[v]: c for v, _, c in active},
-                                      "tooltip": {"formatter": tip} if in_tooltip else {"show": False}}), *extra],
+                                      "tooltip": {"show": False}}), *extra],
             comp("oh-category-axis", {"categoryType": "values", "data": [title], "show": False}), BAND_H)
-
-
-def state_band(title, item, active, rest, display=None):
-    """A day chart of nothing but an item's states as a band (band_panel()); its tooltip gives a bar's state and
-    duration, the rest's too."""
-    band = stacked_chart([band_panel(title, item, active, rest, in_tooltip=True, display=display)], 120)
-    band["slots"]["tooltip"] = [comp("oh-chart-tooltip", {"show": True, "confine": True})]  # alone, a bar's own
-    return band
 
 
 def hp_tank_panels():
@@ -2945,12 +3201,6 @@ def hp_tank_panels():
             # power, 2 kW while it heats
             band_panel("Zusatzheizung", HPX["bsh"], [("ON", "An", HP_ORANGE)], "Aus",
                        extra=[on_off_series("Zusatzheizung", HPX["bsh_power"], HP_ORANGE)])]
-
-
-def hp_valve_band():
-    """The three-way valve: when it served the heating circuits and when the tank."""
-    return state_band("Stellung", HPX["valve"], [("DHW", "Warmwasser", DHW_C)], "Heizung",
-                      display=[("Auf Warmwasser", DHW_C)])
 
 
 def hp_operation_panels():
@@ -3002,106 +3252,10 @@ def hp_split_charts(part_power, part_energy, parts):
     return day, month
 
 
-# ---- the popups
-
-def hp_indoor_quick():
-    """The indoor unit over the day, as the outdoor unit's popup shows its own."""
-    state = (f"{kw2(HPX['circuit'], HPX['buh_power'])} + ' · ' + {disp(HPX['flow'])} + ' · ' + "
-             f"{disp(HPX['water_pressure'])}")
-    return quick("material:hvac", "Innengerät", "#64b5f6", state, [quick_stack(*hp_indoor_panels())], "heatpump")
-
-
-def hp_outdoor_quick():
-    """The outdoor unit over the day."""
-    state = f"{kw2(HPX['circuit'])} + ' · ' + {disp(HPX['hz'])} + ' · außen ' + {disp(HPX['outdoor'])}"
-    return quick("material:heat_pump", "Außengerät", HP_ORANGE, state, [quick_stack(*hp_outdoor_panels())],
-                 "heatpump")
-
-
-def hp_refrigerant_quick():
-    """The refrigerant over the day."""
-    state = f"'Heißgas ' + {disp(HPX['hot_gas'])} + ' · ' + {disp(HPX['pressure'])}"
-    return quick("material:severe_cold", "Kältemittel", REFRIGERANT, state, [quick_stack(*hp_refrigerant_panels())],
-                 "heatpump")
-
-
-def hp_circuit_quick():
-    """The heating circuit: its leaving water offset and its course over the day."""
-    state = f"'Vorlauf ' + {disp(HPX['supply'])} + ' · Rücklauf ' + {disp(HPX['return'])}"
-    return quick("material:waves", "Heizkreis", SUPPLY, state, [lw_offset(row=True), quick_stack(*hp_circuit_panels())],
-                 "heatpump")
-
-
-def hp_tank_quick():
-    """The DHW tank over the day."""
-    state = (f"{disp(HPX['tank'])} + ' · Soll ' + {disp(HPX['tank_set'])} + ' · Zusatzheizung ' + "
-             f"({BSH_ON} ? 'an' : 'aus')")
-    return quick("material:propane_tank", "Warmwasserspeicher", DHW_C, state, [quick_stack(*hp_tank_panels())],
-                 "heatpump")
-
-
-def hp_valve_quick():
-    """The three-way valve over the day."""
-    state = f"({DHW_MODE} ? 'Warmwasser' : 'Heizung')"
-    return quick("material:call_split", "3-Wege-Ventil", "#ffb74d", state, [hp_valve_band()], "heatpump")
-
-
-def floor_quick(title, icon, temperature, humidity, co2, page):
-    """A floor's climate over the day: temperature, humidity, the CO₂ where it is measured."""
-    state = f"{disp(temperature)} + ' · ' + {percent(humidity)}" + (f" + ' · ' + {disp(co2)}" if co2 else "")
-    panels = [("Temperatur", [line("Temperatur", temperature, "#f48fb1")], span_axis("°C")),
-              ("Luftfeuchtigkeit", [line("Luftfeuchtigkeit", humidity, "#4fc3f7")], span_axis("%"))]
-    if co2:
-        panels.append(("CO₂", [area("CO₂", co2, "#78909c")], value_axis("ppm", scale=True)))
-    return quick(f"material:{icon}", title, "#f48fb1", state, [quick_stack(*panels)], page)
-
-
 # the parts heatpump_metering splits the heat pump's power and energy into, in the colours of the card's day bars
 HP_PARTS = [("Heizung", "space", SPACE_C), ("Warmwasser", "dhw", DHW_C), ("Standby", "standby", STANDBY_C)]
 HP_ELECTRIC = ("espaltherma_electrical_power_{}", "espaltherma_energy_{}_today", HP_PARTS)
 HP_HEAT = ("espaltherma_heating_power_{}", "espaltherma_heating_energy_{}_today", HP_PARTS[:2])
-
-
-def hp_split_quick(title, icon, color, power, today, split):
-    """Electricity or heat by part (hp_split_charts(), split: HP_ELECTRIC or HP_HEAT)."""
-    state = f"{kw2(power)} + ' · heute ' + {fixed(num(today), 1)} + ' kWh'"
-    day, month = hp_split_charts(*split)
-    return quick(f"material:{icon}", title, color, state, [titled(day, "Leistung"), titled(month, "Energie pro Tag")],
-                 "heatpump")
-
-
-def hp_cop_quick():
-    """The COP over the day with the outdoor temperature, and the day's COPs per day of the month."""
-    cop = num(HPX["cop"])
-    day_cop = num("espaltherma_dcop")
-    state = f"'jetzt ' + ({cop} > 0 ? {fixed(cop, 2)} : '–') + ' · heute ' + ({day_cop} > 0 ? {fixed(day_cop, 2)} : '–')"
-    return quick("material:eco", "COP", COP_C, state, [quick_stack(*hp_cop_panels()), titled(hp_cop_month(), "COP pro Tag")],
-                 "heatpump")
-
-
-QUICK_PANELS = {"heatpump-quick": hp_quick, "air-conditioner-quick": ac_quick, "ventilation-quick": vent_quick,
-                "heatpump-control-quick": hp_control_quick, "heatpump-indoor-quick": hp_indoor_quick,
-                "heatpump-outdoor-quick": hp_outdoor_quick,
-                "heatpump-refrigerant-quick": hp_refrigerant_quick, "heatpump-circuit-quick": hp_circuit_quick,
-                "heatpump-tank-quick": hp_tank_quick, "heatpump-valve-quick": hp_valve_quick,
-                "heatpump-electric-quick": lambda: hp_split_quick(
-                    "Elektrisch", "bolt", ELECTRIC_C, HPX["power"], "espaltherma_energy_today", HP_ELECTRIC),
-                "heatpump-heat-quick": lambda: hp_split_quick(
-                    "Wärme", "local_fire_department", SUPPLY, HPX["heat"], "espaltherma_heating_energy_today", HP_HEAT),
-                "heatpump-cop-quick": hp_cop_quick,
-                "upper-floor-quick": lambda: floor_quick("Obergeschoss", "bed", "faikout_perfera_temperature",
-                                                         "tado_humidity", None, "air_conditioning"),
-                "ground-floor-quick": lambda: floor_quick("Erdgeschoss", "weekend", HPX["indoor"],
-                                                          "netatmo_weatherstation_atmospheric_humidity",
-                                                          "netatmo_weatherstation_co2", "netatmo")}
-_QUICK = {}
-
-
-def quick_panel(uid):
-    """An instance of a quick panel widget with its items (built once)."""
-    if uid not in _QUICK:
-        _QUICK[uid] = role_widget(uid, QUICK_PANELS[uid])
-    return _QUICK[uid]
 
 
 # widgets whose props are items named by their role, built with the items and turned into props (see widgets()):
@@ -3801,7 +3955,7 @@ def heat_tile(icon, title, on, color, value, setpoint, dark, light, runtime=None
     style of a Miele machine's program line; notes: (text, visible) expressions for further lines in its style;
     countdown: (seconds, visible) expressions for a pill with a timer that stands in the setpoint's place while
     visible, as a Miele machine's remaining time (the heating tile during a hot-water charge). A tap opens the heat
-    pump's quick panel, as in the energy flow."""
+    pump's page, as in the energy flow."""
     temperature = label(value, **{"background": f"={on} ? '{color}' : 'transparent'",
                                   "color": f"={on} ? '#ffffff' : '{color}'", "border": f"1.5px solid {color}",
                                   "border-radius": "10px", "padding": "0.5px 8.5px", "font-size": "12px",
@@ -3826,8 +3980,7 @@ def heat_tile(icon, title, on, color, value, setpoint, dark, light, runtime=None
                                 "style": {"font-size": "12px", "opacity": "0.75"}})]
     lines += [comp("Label", {"text": f"={text}", "visible": f"={visible}", "style": {"font-size": "12px", "opacity": "0.75"}})
               for text, visible in notes]
-    return tile([icon, label(title, **TILE_TITLE), chips(*pills), *lines], None,
-                hp_popup_link(TILE_LINK, "heatpump-quick"))
+    return tile([icon, label(title, **TILE_TITLE), chips(*pills), *lines], "heatpump")
 
 
 def heat_specs():
@@ -3867,7 +4020,7 @@ def heating(tile=heat_tile):
     # one row of three (user, 2026-10-04: back to one row, "COP WW" so the title fits), every ring as large as
     # Eigenverbrauch's and Autarkie's under the energy flow, which stand three abreast on a desktop and two on a phone;
     # on a phone space heating and DHW side by side over the total, its drawing half its width less 14 px
-    pop = "heatpump-cop-quick"  # a tap on any of them opens the COP popup, as the heat pump card's COP tile does
+    pop = "heatpump"  # a tap on any of them opens the heat pump's page, as the heat pump card's COP tile does
     total = cop_tile("COP gesamt", "espaltherma_dcop", COP_C, "eco", f"={NARROW} ? 'calc(50% - 14px)' : '100%'", pop)
     total["config"]["style"]["grid-column"] = f"={NARROW} ? '1 / -1' : 'auto'"
     cops = div([cop_tile("COP Heizung", "espaltherma_dcop_space", SPACE_C, "local_fire_department", "100%", pop),
@@ -4553,8 +4706,14 @@ def month_sums(series):
 
 
 def home_icon():
-    """The house's icon at the head of its popups: its node from the energy flow, pulsing while it draws power."""
-    return node_icon("home", HOME_BLUE, flowing(num(HOME), 10), power=num(HOME))
+    """The house's icon at the head of its popups: its node from the energy flow with its ring as the pie of its
+    power (user, 2026-10-05), pulsing while it draws power, as in the energy flow."""
+    return device_icon([*house_pie((0, 0)), flow_node("home", (0, 0), num(HOME))], HOME_BLUE)
+
+
+# as high as Jetzt over Heute over the day's consumers beside it in the popup at its full width of 1240 px (measured
+# in the browser)
+HOME_DAY_H = 1003
 
 
 def home_blocks():
@@ -4571,7 +4730,7 @@ def home_blocks():
                            ("Netz", [time_series("Netz", GRID, symbol="none", sampling="lttb", lineStyle={"width": 1.5},
                                                  areaStyle={"opacity": 0.25})], value_axis("W")),
                            # negative while it charges
-                           ("Batterie", [area("Batterie", BATT, BATTERY_GREEN)], value_axis("W"))], 720,
+                           ("Batterie", [area("Batterie", BATT, BATTERY_GREEN)], value_axis("W"))], HOME_DAY_H,
                           visual_map=sign_colors(2))
     today = wide_grid([vtile("Verbrauch heute", "home_ec_day", color=HOME_BLUE),
                        vtile("aus PV", "photovoltaics_own_ec_day", color="#43a047"),
@@ -4590,8 +4749,11 @@ def home_blocks():
                          ("PV Production", "energy_daily_pv", PV_C,
                           {"type": "line", "symbol": "circle", "symbolSize": 7, "lineStyle": {"width": 2.5, "color": PV_C},
                            "z": 3})])
-    return [two(card("Jetzt", now), card("Leistung heute", [power])),
-            block(row(col([card("Heute", [today])]), col([widget_ref("consumption-card", **props["consumption-card"])]))),
+    # Heute under Jetzt, where Jetzt left space beside the day's power (user, 2026-10-05), and the consumers of the
+    # day under them, so the four grids of power beside keep their height; per day beside per month below
+    return [two(widget_stack(card("Jetzt", now), card("Heute", [today]),
+                             widget_ref("consumption-card", **props["consumption-card"])),
+                card("Leistung heute", [power])),
             block(row(col([widget_ref("energy-days-card", **props["energy-days-card"])]),
                       col([card("Energie pro Monat", [months])])))]
 
@@ -5159,10 +5321,10 @@ def ventilation_blocks():
         ((("CO₂", "#78909c"), ("Luftfeuchtigkeit", "#29b6f6")),
          [line("CO₂", "netatmo_weatherstation_co2", "#78909c"),
           line("Luftfeuchtigkeit", "netatmo_weatherstation_atmospheric_humidity", "#29b6f6", y=1)],
-         [value_axis("ppm", scale=True), span_axis("%")], 2)], 735)  # as high as Jetzt over the controls beside it
-    # Jetzt over the controls (user, 2026-10-05: as Waschmaschine 1): its node from the energy flow large, its level
-    # badge on the ring, the timer's time left as the arc; while the timer holds the level the time left, when the
-    # automations take over again (or the timer ends, with them off), large, and the timer as a bar
+         [value_axis("ppm", scale=True), span_axis("%")], 2)], 480)  # across the page's whole width
+    # Jetzt (user, 2026-10-05: as Waschmaschine 1): its node from the energy flow large, its level badge on the ring,
+    # the timer's time left as the arc; while the timer holds the level the time left, when the automations take over
+    # again (or the timer ends, with them off), large, and the timer as a bar
     full = timer_full("ventilation_timer", 360)
     icon = node_icon("ventilation", VENT_TEAL, flowing(VENT_POWER, 5), share=f"{M_VENT} / {full}",
                      badges=[vent_level_badge(0, 0)], power=VENT_POWER)
@@ -5177,7 +5339,10 @@ def ventilation_blocks():
            wide_grid([vtile("CO₂", "netatmo_weatherstation_co2"),
                       vtile("Luftfeuchtigkeit", "netatmo_weatherstation_atmospheric_humidity"),
                       vtile("Leistung", "ventilation_power"), vtile("Energie heute", "ventilation_energy_today")])]
-    return [two(stack(card("Jetzt", now), card("Steuerung", [controls])), card("Lüftung heute", [air])),
+    # the controls on the left beside Jetzt, on a phone on top (user, 2026-10-05), as on the heat pump's page; the day
+    # below across the whole width
+    return [two(card("Steuerung", [controls]), card("Jetzt", now)),
+            one(card("Lüftung heute", [air])),
             *plug_cards("ventilation", "material:air", VENT_TEAL, kind="ventilation", threshold=5)]
 
 
@@ -5318,10 +5483,14 @@ def meter_blocks(title_item, color_expr, today, phases, heads, extra, chart_item
 
 def netatmo_blocks():
     w, o = "netatmo_weatherstation_", "netatmo_outdoor_"
-    inside = [hero("material:thermostat", "#fb8c00", "Innen", f"={disp(w + 'temperature')}"),
+    # the station's two modules side by side, as they stand, each card's own drawn fully (user, 2026-10-05: icons after
+    # the real devices); the indoor module's top in the CO₂'s colour
+    inside = [hero("material:thermostat", "#fb8c00", "Innen", f"={disp(w + 'temperature')}",
+                   picture=device_icon(netatmo_parts("#fb8c00", "indoor", num(w + "co2")), "#fb8c00")),
               wide_grid([vtile("Luftfeuchtigkeit", w + "atmospheric_humidity"), vtile("CO2", w + "co2"),
                          vtile("Lärm", w + "noise"), vtile("Luftdruck", w + "barometric_pressure")])]
-    outside = [hero("material:wb_sunny", "#29b6f6", "Außen", f"={disp(o + 'temperature')}"),
+    outside = [hero("material:wb_sunny", "#29b6f6", "Außen", f"={disp(o + 'temperature')}",
+                    picture=device_icon(netatmo_parts("#29b6f6", "outdoor", num(w + "co2")), "#29b6f6")),
                wide_grid([vtile("Luftfeuchtigkeit", o + "atmospheric_humidity"), vtile("Batteriestand", o + "battery_level")])]
     panel = lambda name, item, color, unit: (name, [line(name, item, color)],
                                              span_axis(unit) if unit in LEAST_SPAN else value_axis(unit, scale=True))
@@ -5347,7 +5516,9 @@ def netatmo_blocks():
 
 def water_meter_blocks():
     now = [hero("material:water", "#1e88e5", "Verbrauch heute", f"={disp('water_meter_value_day')}",
-                picture=glyph_icon("material:water", "#1e88e5", f"{num('water_meter_rate')} > 0")),
+                # a classic dial water meter with the reading on its counter, its pointer turning while water flows
+                picture=device_icon(water_meter_parts("#1e88e5", num("water_meter_rate"), num("water_meter_value")),
+                                    "#1e88e5", f"{num('water_meter_rate')} > 0")),
            wide_grid([vtile("Zählerstand", "water_meter_value"), vtile("Durchfluss", "water_meter_rate"),
                       vtile("Status", "water_meter_status"), vtile("Zeitstempel", "water_meter_timestamp"),
                       text_tile("Fehler", "water_meter_error")])]
@@ -5363,16 +5534,21 @@ def living_room_blocks():
     vu = [hero("material:tv", "#ec407a", "Vu+ Uno 4k", f"={disp('vuuno4k_channel')}",
                [chip(f"=items.vuuno4k_power.state === 'ON' ? 'An' : 'Aus'",
                      f"=items.vuuno4k_power.state === 'ON' ? '#ec407a' : '#9e9e9e'")],
-               picture=glyph_icon("material:tv", "#ec407a", "items.vuuno4k_power.state === 'ON'")),
+               # the media as they stand, the receiver's display lit while it is on, the TV's screen while the TV is
+               picture=device_icon(media_node(0, 0, None, tv_on=f"{num('living_room_entertainment_power')} > "
+                                                                 f"{STANDBY_ABOVE['living_room_entertainment']}",
+                                              receiver_on="items.vuuno4k_power.state === 'ON'"),
+                                   "#ec407a", "items.vuuno4k_power.state === 'ON'")),
           controls_box(power_pill("vuuno4k_power", "#ec407a", "'An'")),  # the same on/off pill as the plugs'
           wide_grid([vtile("Sender", "vuuno4k_channel"), text_tile("Titel", "vuuno4k_title"),
                      text_tile("Beschreibung", "vuuno4k_description")])]
-    blocks = plug_cards("living_room_entertainment", "material:tv", "#ec407a")
+    blocks = plug_cards("living_room_entertainment", "material:tv", "#ec407a", kind="media")
     return [one(card("Receiver", vu)), *blocks]
 
 
 def epex_spot_blocks():
-    now = [hero("material:euro", "#fb8c00", "Gesamtpreis brutto", f"={disp(PRICE)}", value_color=price_color),
+    now = [hero("material:euro", "#fb8c00", "Gesamtpreis brutto", f"={disp(PRICE)}", value_color=price_color,
+                picture=device_icon(price_coin(price_color), "#fb8c00")),
            wide_grid([vtile("Gesamt netto", "epex_spot_awattar_total_net"),
                       vtile("Markt brutto", "epex_spot_awattar_market_gross"),
                       vtile("Markt netto", "epex_spot_awattar"),
@@ -5441,7 +5617,9 @@ DEVICE_PAGES = {
     "heatpump": heatpump_blocks,
     "ventilation": ventilation_blocks,
     "water_meter": water_meter_blocks,
-    "coffee_machine": plug_page("coffee_machine", "material:coffee", "#8d6e63"),
+    # working while switched on: idle it draws about 2 W, its boiler heats in bursts of 1.4 kW
+    "coffee_machine": plug_page("coffee_machine", "material:coffee", "#8d6e63", kind="coffee-machine",
+                                active="items.coffee_machine_switch.state === 'ON'"),
     "washing_machine_1": miele_page("washing_machine_1", "Waschmaschine 1", washer_front, "miele_washing_machine_wwg360",
                                     "washing_machine_1", [("Zieltemperatur", "target_temperature"),
                                                           ("Schleuderdrehzahl", "spinning_speed")],
@@ -5449,15 +5627,15 @@ DEVICE_PAGES = {
     "washing_machine_2": plug_page("washing_machine_2", "material:local_laundry_service", "#42a5f5", kind="washer"),
     "tumble_dryer": miele_page("tumble_dryer", "Wäschetrockner", dryer_front, "miele_tumble_dryer_twc560wp",
                                "tumble_dryer", [("Trocknungsziel", "drying_target")], "material:dry_cleaning", "#ffa726"),
-    "refrigerator": plug_page("refrigerator", "material:kitchen", "#78909c"),
+    "refrigerator": plug_page("refrigerator", "material:kitchen", "#78909c", kind="refrigerator"),
     "dishwasher": miele_page("dishwasher", "Geschirrspüler", dishwasher_front, "miele_dishwasher_g7465",
                              "dishwasher", [], "material:flatware", "#26c6da"),
     "living_room_entertainment": living_room_blocks,
-    "network": plug_page("network", "material:router", "#5c6bc0"),
-    "office_1": plug_page("office_1", "material:computer", "#ab47bc"),
-    "office_2": plug_page("office_2", "material:computer", "#ab47bc"),
-    "terrace_light": plug_page("terrace_light", "material:light", "#fbc02d"),
-    "bicycle_batteries": plug_page("bicycle_batteries", "material:electric_bike", "#7cb342"),
+    "network": plug_page("network", "material:router", "#5c6bc0", kind="network-rack"),
+    "office_1": plug_page("office_1", "material:computer", "#ab47bc", kind="office"),
+    "office_2": plug_page("office_2", "material:computer", "#ab47bc", kind="office"),
+    "terrace_light": plug_page("terrace_light", "material:light", "#fbc02d", kind="terrace-light"),
+    "bicycle_batteries": plug_page("bicycle_batteries", "material:electric_bike", "#7cb342", kind="e-bike"),
     "epex_spot": epex_spot_blocks,
 }
 DEVICE_PAGES = {uid: below_controls(builder) for uid, builder in DEVICE_PAGES.items()}
@@ -5978,7 +6156,7 @@ def widgets():
     out["pill-switch"] = (pill_switch_widget(), PILL_SWITCH_PARAMS, ["switch"])
     for uid, (card_, _, _) in out.items():
         assert not has_placeholder(str(card_)) and "1, 2, 3" not in str(card_), uid
-        # references to other widgets carry names such as heatpump-quick, which a group item may share, and the pages
+        # references to other widgets carry names such as flow-node, which a group item may share, and the pages
         # a tap opens and the energy flow's node kinds are named after their device, as its group item is (weather,
         # heatpump, ventilation)
         text = re.sub(r'"(widget:[a-z0-9-]+|page:[a-z0-9_]+)"', '""', m.json.dumps(card_))
