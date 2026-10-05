@@ -28,12 +28,15 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 4, 2026, 11:05:34 PM
+timestamp: Oct 5, 2026, 2:14:59 AM
 component: oh-card
 config:
   title: Temperatures
   style:
     height: calc(100% - 2 * var(--f7-card-margin-vertical))
+  stylesheet: '.menu-item-dropdown:not(.menu-item-dropdown-opened) .menu-dropdown { display: none; }
+
+    .oh-chart-container > .menu.padding { padding-top: 6px !important; }'
 slots:
   content:
   - component: div
@@ -106,6 +109,7 @@ slots:
       period: D
       height: 320px
       options:
+        backgroundColor: transparent
         axisPointer:
           link:
           - xAxisIndex: all

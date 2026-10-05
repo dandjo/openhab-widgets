@@ -32,7 +32,7 @@ props:
     type: TEXT
     required: false
   parameterGroups: []
-timestamp: Oct 4, 2026, 11:05:34 PM
+timestamp: Oct 5, 2026, 2:14:59 AM
 component: div
 config:
   style:
@@ -73,6 +73,8 @@ slots:
           periodVisible: true
           period: D
           height: 260px
+          options:
+            backgroundColor: transparent
         slots:
           grid:
           - component: oh-chart-grid
@@ -153,6 +155,8 @@ slots:
           periodVisible: true
           period: D
           height: 150px
+          options:
+            backgroundColor: transparent
         slots:
           grid:
           - component: oh-chart-grid

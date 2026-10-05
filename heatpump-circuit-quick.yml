@@ -40,7 +40,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 4, 2026, 11:05:34 PM
+timestamp: Oct 5, 2026, 2:14:59 AM
 component: div
 config:
   style:
@@ -140,6 +140,7 @@ slots:
           period: D
           height: 392px
           options:
+            backgroundColor: transparent
             axisPointer:
               link:
               - xAxisIndex: all

@@ -10,12 +10,15 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 4, 2026, 11:05:34 PM
+timestamp: Oct 5, 2026, 2:14:59 AM
 component: oh-card
 config:
   title: PV Yield per Day
   style:
     height: calc(100% - 2 * var(--f7-card-margin-vertical))
+  stylesheet: '.menu-item-dropdown:not(.menu-item-dropdown-opened) .menu-dropdown { display: none; }
+
+    .oh-chart-container > .menu.padding { padding-top: 6px !important; }'
 slots:
   content:
   - component: oh-context
@@ -115,6 +118,8 @@ slots:
           periodVisible: true
           height: 250px
           visible: '=!(screen.width < 600) && (vars.pvView || (screen.width < 600 ? ''halves'' : ''year'')) === ''year'''
+          options:
+            backgroundColor: transparent
         slots:
           calendar:
           - component: oh-calendar-axis
@@ -172,6 +177,7 @@ slots:
           height: 318px
           visible: '=(screen.width < 600) && (vars.pvView || (screen.width < 600 ? ''halves'' : ''year'')) === ''halves'''
           options:
+            backgroundColor: transparent
             graphic:
             - type: rect
               z: 100
@@ -360,6 +366,8 @@ slots:
           periodVisible: true
           height: '=screen.width < 600 ? (84 + 4 * (28 + 6 * Math.floor((screen.width - 60) / 21))) + ''px'' : ''420px'''
           visible: '=(vars.pvView || (screen.width < 600 ? ''halves'' : ''year'')) === ''months'''
+          options:
+            backgroundColor: transparent
         slots:
           calendar:
           - component: oh-calendar-axis
@@ -446,6 +454,8 @@ slots:
           periodVisible: true
           height: 250px
           visible: '=(vars.pvView || (screen.width < 600 ? ''halves'' : ''year'')) === ''bars'''
+          options:
+            backgroundColor: transparent
         slots:
           grid:
           - component: oh-chart-grid
