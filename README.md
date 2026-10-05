@@ -66,7 +66,7 @@ number formats come from the items.
 | `item-popup` | – |
 | `pill-slider` | – |
 | `pill-switch` | – |
-| `plug-card` | `item-popup`, `power-pill`, `value-tile` |
+| `plug-card` | `appliance-icon`, `flow-node`, `item-popup`, `power-pill`, `value-tile` |
 | `plug-electric-card` | `item-popup`, `value-tile` |
 | `plug-energy-days-card` | – |
 | `plug-power-card` | – |
@@ -134,25 +134,24 @@ Needs `weather-icon`.
 ### Energy flow: `energy-flow-card`
 
 A regular star around the house: PV, heat pump, air conditioner, E-Car, the household appliances together, ventilation,
-battery and grid, each with its power and today's energy, and a tooltip with a few details while the mouse is over it
-(the battery's time until full or empty at the power of the last 5 minutes, the heat pump's operation and COP and when a
-hot-water charge ends, the appliances that run …). Every node is one grey ring around its drawing, the ring carrying
-what the node shows beyond it; a working ring and its arc swell outwards at their brightest, about half again as wide as
-at rest. Dots run along the lines in the direction of the flow at four speeds and slide under the node rims; while power
-flows through a node, its ring pulses in its colour. The icons move with the power (sun rays, air streams, pylon dashes,
-a pulsing bolt over the middle of the charging car, sparkles twinkling while the appliances run, the battery filled to
-its state of charge, the ventilation unit's fan turning and its air arrows flowing, fresh air in and used air out), the
-heat pump, outdoor and indoor unit, its fan with its compressor: while only its electric heaters run it stands and the
-energy only flows. Badges just outside the rings tell what the heat pump does (space heating, hot water, defrost, a red
-bolt while only its electric heaters run), the air conditioner's mode (heating, cooling, drying, fan, automatic) and the
-ventilation's level; a badge is filled in its colour while its device works and grey otherwise. A running timer covers
-its device's ring with an arc, full at what it was last set to, the battery's ring is filled with its state of charge,
-and the heat pump's, while it charges the tank, towards the charge's expected end; beside such an arc the rest of the
-ring pulses softly and, while the node works, the arc pulses in step with it, brightest and widest with it. A tap on the
-heat pump, the air conditioner or the ventilation opens its quick popup (see [Quick popups](#quick-popups)). Under the
-star three tiles with large pale icons, the house's power and today's self-consumption and self-sufficiency as rings.
-The card places its lines, nodes and rings as `flow-link`, `flow-node` and `flow-share-ring`. The recording and the dark
-screenshot show it with demo values.
+battery and grid, each with its power and today's energy; each consumer's share of the house's power in a pill on its
+line, and the house's ring as a pie of that power, the rest no known consumer draws in grey. Every node is one grey ring
+around its drawing, the ring carrying what the node shows beyond it; a working ring and its arc swell outwards at their
+brightest, about half again as wide as at rest. Dots run along the lines in the direction of the flow at four speeds and
+slide under the node rims; while power flows through a node, its ring pulses in its colour. The icons move with the
+power (sun rays, air streams, pylon dashes, a pulsing bolt over the middle of the charging car, sparkles twinkling while
+the appliances run, the battery filled to its state of charge, the ventilation unit's fan turning and its air arrows
+flowing, fresh air in and used air out), the heat pump, outdoor and indoor unit, its fan with its compressor: while only
+its electric heaters run it stands and the energy only flows. Badges just outside the rings tell what the heat pump does
+(space heating, hot water, defrost, a red bolt while only its electric heaters run), the air conditioner's mode
+(heating, cooling, drying, fan, automatic) and the ventilation's level; a badge is filled in its colour while its device
+works and grey otherwise. A running timer covers its device's ring with an arc, full at what it was last set to, the
+battery's ring is filled with its state of charge, and the heat pump's, while it charges the tank, towards the charge's
+expected end; beside such an arc the rest of the ring pulses softly and, while the node works, the arc pulses in step
+with it, brightest and widest with it. A tap on the heat pump, the air conditioner or the ventilation opens its quick
+popup (see [Quick popups](#quick-popups)). Under the star three tiles with large pale icons, the house's power and
+today's self-consumption and self-sufficiency as rings. The card places its lines, nodes and rings as `flow-link`,
+`flow-node` and `flow-share-ring`. The recording and the dark screenshot show it with demo values.
 
 Needs `air-conditioner-quick`, `boost-pill`, `flow-link`, `flow-node`, `flow-share-ring`, `heatpump-quick`,
 `pill-slider`, `pill-switch`, `power-pill`, `state-bar`, `switch-row`, `ventilation-quick`.
@@ -162,7 +161,7 @@ Needs `air-conditioner-quick`, `boost-pill`, `flow-link`, `flow-node`, `flow-sha
 ![Energy flow in dark mode](screenshots/energy-flow-card-dark.gif)
 
 <details>
-<summary>65 props</summary>
+<summary>56 props</summary>
 
 | Prop | Item | Item type |
 |---|---|---|
@@ -206,20 +205,6 @@ Needs `air-conditioner-quick`, `boost-pill`, `flow-link`, `flow-node`, `flow-sha
 | `dishwasherEnergyToday` | Dishwasher Energy Today | Number:Energy |
 | `batteryDischargeToday` | Huawei Inverter Energy Storage Day Discharge | Number:Energy |
 | `batteryChargeToday` | Huawei Inverter Energy Storage Day Charge | Number:Energy |
-| `pvSelfUseToday` | Photovoltaics Own Ec-Day | Number:Energy |
-| `pvPv1Power` | Huawei Inverter PV1 Power | Number:Power |
-| `pvPv2Power` | Huawei Inverter PV2 Power | Number:Power |
-| `priceTotalGross` | EPEX Spot aWATTar Total Gross | Number:EnergyPrice |
-| `batteryPower5min` | Energy Storage Power 5 min | Number:Power |
-| `homeEnergyToday` | Home Energy Day | Number:Energy |
-| `heatpumpWaterPumpOperation` | ESPAltherma Water Pump Operation | Switch |
-| `heatpumpFlowSensor` | ESPAltherma Flow Sensor (l/min) | Number:VolumetricFlowRate |
-| `heatpumpHeatPower` | ESPAltherma Heating Power | Number:Power |
-| `heatpumpCop` | ESPAltherma COP | Number |
-| `acTemperature` | Faikout Perfera Temperature | Number:Temperature |
-| `acTemperatureSetpoint` | Faikout Perfera Temperature Setpoint | Number:Temperature |
-| `netatmoWeatherstationCo2` | Netatmo Weatherstation CO2 | Number:Dimensionless |
-| `netatmoWeatherstationAtmosphericHumidity` | Netatmo Weatherstation Atmospheric Humidity | Number:Dimensionless |
 | `heatpumpDhwTankTemp` | ESPAltherma DHW Tank Temperature | Number:Temperature |
 | `heatpumpDhwBoost` | Pyaltherma DHW Powerful | Switch |
 | `heatpumpSmartGrid` | ESPAltherma Smart Grid | String |
@@ -228,9 +213,14 @@ Needs `air-conditioner-quick`, `boost-pill`, `flow-link`, `flow-node`, `flow-sha
 | `heatpumpManagement` | Heatpump Management | Group |
 | `heatpumpDhwTempHeating` | Pyaltherma DHW Temp Heating | Number:Temperature |
 | `heatpumpDhwManagement` | Heatpump DHW Management | Switch |
+| `acTemperature` | Faikout Perfera Temperature | Number:Temperature |
 | `acFan` | Faikout Perfera Fan | String |
+| `acTemperatureSetpoint` | Faikout Perfera Temperature Setpoint | Number:Temperature |
 | `acPowerful` | Faikout Perfera Powerful | Switch |
+| `netatmoWeatherstationCo2` | Netatmo Weatherstation CO2 | Number:Dimensionless |
 | `ventilationManagement` | Ventilation Management | Group |
+| `homeEnergyToday` | Home Energy Day | Number:Energy |
+| `pvSelfUseToday` | Photovoltaics Own Ec-Day | Number:Energy |
 
 </details>
 
@@ -1282,7 +1272,7 @@ Every value tile carries a large pale icon of what it shows.
 
 ### `plug-card`
 
-Now: power, on/off pill, energy today and total. Needs `item-popup`, `power-pill`, `value-tile`.
+Now: the device's icon large in a ring, pulsing while it works (its energy-flow node or appliance icon, else its icon), power, on/off pill, energy today and total. Needs `appliance-icon`, `flow-node`, `item-popup`, `power-pill`, `value-tile`.
 
 | Prop | Description | Type | Default |
 |---|---|---|---|
@@ -1293,6 +1283,11 @@ Now: power, on/off pill, energy today and total. Needs `item-popup`, `power-pill
 | `controllable` | Show the plug's switch | BOOLEAN | `true` |
 | `note` | Small print under the energies, hidden when empty | TEXT |  |
 | `switch` | The switch's item where it is not `<prefix>_switch`, e.g. a shared meter's | Item |  |
+| `kind` | The device drawn in its icon: an energy-flow node or an appliance; empty: the icon above | TEXT |  |
+| `threshold` | Watts above which the icon's ring pulses | INTEGER | `10` |
+| `active` | Whether the device works, instead of the threshold; usually an expression | BOOLEAN |  |
+| `frequency` | The heat pump's compressor frequency, turning its drawing's fan; usually an expression | DECIMAL |  |
+| `progress` | An appliance's programme progress in %, filling its ring; usually an expression | DECIMAL |  |
 
 ### `plug-power-card`
 

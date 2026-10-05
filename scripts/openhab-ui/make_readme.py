@@ -17,9 +17,9 @@ OVERVIEW = [
      "and `weather_warnings_rule.js`, which reads GeoSphere Austria's warnings and sends a broadcast notification "
      "when their level rises to orange or red."),
     ("energy-flow-card", "Energy flow", "A regular star around the house: PV, heat pump, air conditioner, E-Car, the "
-     "household appliances together, ventilation, battery and grid, each with its power and today's energy, and a "
-     "tooltip with a few details while the mouse is over it (the battery's time until full or empty at the power of "
-     "the last 5 minutes, the heat pump's operation and COP and when a hot-water charge ends, the appliances that run …). Every node "
+     "household appliances together, ventilation, battery and grid, each with its power and today's energy; each "
+     "consumer's share of the house's power in a pill on its line, and the house's ring as a pie of that power, the "
+     "rest no known consumer draws in grey. Every node "
      "is one grey ring around its drawing, the ring carrying what the node shows beyond it; a working ring and its "
      "arc swell outwards at their brightest, about half again as wide as at rest. Dots run "
      "along the lines in the direction of the flow at four speeds and slide under the node rims; while power flows "
@@ -95,7 +95,8 @@ OVERVIEW = [
     ("temperatures-card", "Temperatures", "Indoor and outdoor temperature now, the day's minimum and maximum, and the "
      "last day as a chart from 15-minute means."),
 ]
-PLUG = [("plug-card", "Now: power, on/off pill, energy today and total"), ("plug-power-card", "Power over the day"),
+PLUG = [("plug-card", "Now: the device's icon large in a ring, pulsing while it works (its energy-flow node or "
+                       "appliance icon, else its icon), power, on/off pill, energy today and total"), ("plug-power-card", "Power over the day"),
         ("plug-energy-days-card", "Energy per day of the month"), ("plug-electric-card", "Voltage, current, power factor, "
                                                                                       "apparent and reactive power")]
 # uid, title, what it holds; the first three open from the energy flow, the rest from the heat pump card. Charts hold one

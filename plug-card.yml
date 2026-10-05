@@ -44,8 +44,62 @@ props:
     type: TEXT
     required: false
     context: item
+  - name: kind
+    label: Drawing
+    description: 'The device drawn in its icon: an energy-flow node or an appliance; empty: the icon above'
+    type: TEXT
+    required: false
+    limitToOptions: true
+    options:
+    - value: pv
+      label: pv
+    - value: grid
+      label: grid
+    - value: home
+      label: home
+    - value: heat-pump
+      label: heat-pump
+    - value: heat-pump-split
+      label: heat-pump-split
+    - value: air-conditioner
+      label: air-conditioner
+    - value: e-car
+      label: e-car
+    - value: battery
+      label: battery
+    - value: appliances
+      label: appliances
+    - value: ventilation
+      label: ventilation
+    - value: washer
+      label: washer
+    - value: dryer
+      label: dryer
+    - value: dish-washer
+      label: dish-washer
+  - name: threshold
+    label: Active from
+    description: Watts above which the icon's ring pulses
+    type: INTEGER
+    required: false
+    default: '10'
+  - name: active
+    label: Active
+    description: Whether the device works, instead of the threshold; usually an expression
+    type: BOOLEAN
+    required: false
+  - name: frequency
+    label: Frequency
+    description: The heat pump's compressor frequency, turning its drawing's fan; usually an expression
+    type: DECIMAL
+    required: false
+  - name: progress
+    label: Progress
+    description: An appliance's programme progress in %, filling its ring; usually an expression
+    type: DECIMAL
+    required: false
   parameterGroups: []
-timestamp: Oct 4, 2026, 11:05:34 PM
+timestamp: Oct 5, 2026, 3:36:33 PM
 component: oh-card
 config:
   title: =props.title
@@ -58,32 +112,167 @@ slots:
       style:
         display: flex
         align-items: center
-        gap: 16px
+        gap: 18px
         padding: 12px 16px 8px
     slots:
       default:
       - component: div
         config:
           style:
-            width: 56px
-            height: 56px
-            border-radius: 50%
-            display: flex
-            align-items: center
-            justify-content: center
             flex: 0 0 auto
-            color: =props.color
-            background: ='rgba(' + Number.parseInt(props.color.slice(1, 3), 16) + ', ' + Number.parseInt(props.color.slice(3,
-              5), 16) + ', ' + Number.parseInt(props.color.slice(5, 7), 16) + ', 0.14)'
-            box-shadow: ='inset 0 0 0 2px rgba(' + Number.parseInt(props.color.slice(1, 3), 16) + ', ' + Number.parseInt(props.color.slice(3,
-              5), 16) + ', ' + Number.parseInt(props.color.slice(5, 7), 16) + ', 0.55)'
         slots:
           default:
-          - component: oh-icon
+          - component: widget:appliance-icon
             config:
-              icon: =props.icon
-              width: 28
-              height: 28
+              kind: =props.kind
+              running: '=((props.active !== undefined && props.active !== null && props.active !== '''') ? (props.active ===
+                true || props.active === ''true'') : (Number(items[props.prefix + ''_power''].numericState) || 0) > (Number(props.threshold)
+                || 10))'
+              progress: =props.progress
+              size: 104
+              visible: =['washer', 'dryer', 'dish-washer'].includes(props.kind)
+          - component: svg
+            config:
+              viewBox: -34 -34 68 68
+              width: 104
+              height: 104
+              style:
+                display: block
+                flex: 0 0 auto
+                overflow: visible
+              visible: =!['washer', 'dryer', 'dish-washer'].includes(props.kind)
+            slots:
+              default:
+              - component: g
+                config: {}
+                slots:
+                  default:
+                  - component: circle
+                    config:
+                      cx: 0
+                      cy: 0
+                      r: 32.25
+                      style:
+                        fill: 'var(--f7-card-bg-color, #fff)'
+                  - component: circle
+                    config:
+                      cx: 0
+                      cy: 0
+                      r: 29.2
+                      fill: none
+                      stroke: rgba(127, 127, 127, 0.28)
+                      stroke-width: 2.9
+              - component: g
+                config: {}
+                slots:
+                  default:
+                  - component: circle
+                    config:
+                      cx: 0
+                      cy: 0
+                      r: 29.2
+                      fill: none
+                      stroke: =props.color
+                      stroke-width: 2.9
+                      visible: '=(((props.active !== undefined && props.active !== null && props.active !== '''') ? (props.active
+                        === true || props.active === ''true'') : (Number(items[props.prefix + ''_power''].numericState) ||
+                        0) > (Number(props.threshold) || 10))) && !(false)'
+                    slots:
+                      default:
+                      - component: animate
+                        config:
+                          attributeName: opacity
+                          values: 0.3;1;0.3
+                          dur: 2s
+                          repeatCount: indefinite
+                          visible: '=(((props.active !== undefined && props.active !== null && props.active !== '''') ? (props.active
+                            === true || props.active === ''true'') : (Number(items[props.prefix + ''_power''].numericState)
+                            || 0) > (Number(props.threshold) || 10))) && !(false)'
+                      - component: animate
+                        config:
+                          attributeName: stroke-width
+                          values: 2.9;4.5;2.9
+                          dur: 2s
+                          repeatCount: indefinite
+                          visible: '=(((props.active !== undefined && props.active !== null && props.active !== '''') ? (props.active
+                            === true || props.active === ''true'') : (Number(items[props.prefix + ''_power''].numericState)
+                            || 0) > (Number(props.threshold) || 10))) && !(false)'
+                      - component: animate
+                        config:
+                          attributeName: r
+                          values: 29.2;30;29.2
+                          dur: 2s
+                          repeatCount: indefinite
+                          visible: '=(((props.active !== undefined && props.active !== null && props.active !== '''') ? (props.active
+                            === true || props.active === ''true'') : (Number(items[props.prefix + ''_power''].numericState)
+                            || 0) > (Number(props.threshold) || 10))) && !(false)'
+                  - component: circle
+                    config:
+                      cx: 0
+                      cy: 0
+                      r: 29.2
+                      fill: none
+                      stroke: =props.color
+                      stroke-width: 2.9
+                      visible: '=(((props.active !== undefined && props.active !== null && props.active !== '''') ? (props.active
+                        === true || props.active === ''true'') : (Number(items[props.prefix + ''_power''].numericState) ||
+                        0) > (Number(props.threshold) || 10))) && (false)'
+                    slots:
+                      default:
+                      - component: animate
+                        config:
+                          attributeName: opacity
+                          values: 0.3;0.06;0.3
+                          dur: 2s
+                          repeatCount: indefinite
+                          visible: '=(((props.active !== undefined && props.active !== null && props.active !== '''') ? (props.active
+                            === true || props.active === ''true'') : (Number(items[props.prefix + ''_power''].numericState)
+                            || 0) > (Number(props.threshold) || 10))) && (false)'
+              - component: widget:flow-node
+                config:
+                  kind: =props.kind
+                  x: 0
+                  y: 0
+                  power: '=(((props.active !== undefined && props.active !== null && props.active !== '''') ? (props.active
+                    === true || props.active === ''true'') : (Number(items[props.prefix + ''_power''].numericState) || 0)
+                    > (Number(props.threshold) || 10))) ? (Number(items[props.prefix + ''_power''].numericState) || 0) : 0'
+                  frequency: =props.frequency
+                  visible: =(!!props.kind && !['washer', 'dryer', 'dish-washer'].includes(props.kind))
+              - component: g
+                config:
+                  visible: =!(!!props.kind && !['washer', 'dryer', 'dish-washer'].includes(props.kind))
+                slots:
+                  default:
+                  - component: g
+                    config: {}
+                    slots:
+                      default:
+                      - component: circle
+                        config:
+                          cx: 0
+                          cy: 0
+                          r: 27.75
+                          style:
+                            fill: 'var(--f7-card-bg-color, #fff)'
+                      - component: circle
+                        config:
+                          cx: 0
+                          cy: 0
+                          r: 27.75
+                          fill: =props.color
+                          fill-opacity: '0.12'
+                  - component: text
+                    config:
+                      x: 0
+                      y: 0
+                      content: =(props.icon).replace('material:', '')
+                      fill: =props.color
+                      font-size: 30
+                      text-anchor: middle
+                      dominant-baseline: central
+                      style:
+                        font-family: '''Material Icons'''
+                        font-feature-settings: '''liga'''
       - component: div
         config:
           style:
