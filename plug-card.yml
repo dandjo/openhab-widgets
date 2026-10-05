@@ -71,6 +71,20 @@ props:
       label: appliances
     - value: ventilation
       label: ventilation
+    - value: coffee-machine
+      label: coffee-machine
+    - value: refrigerator
+      label: refrigerator
+    - value: media
+      label: media
+    - value: office
+      label: office
+    - value: terrace-light
+      label: terrace-light
+    - value: e-bike
+      label: e-bike
+    - value: network-rack
+      label: network-rack
     - value: washer
       label: washer
     - value: dryer
@@ -99,7 +113,7 @@ props:
     type: DECIMAL
     required: false
   parameterGroups: []
-timestamp: Oct 5, 2026, 3:36:33 PM
+timestamp: Oct 5, 2026, 9:12:34 PM
 component: oh-card
 config:
   title: =props.title

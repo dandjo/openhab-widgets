@@ -30,6 +30,20 @@ props:
       label: appliances
     - value: ventilation
       label: ventilation
+    - value: coffee-machine
+      label: coffee-machine
+    - value: refrigerator
+      label: refrigerator
+    - value: media
+      label: media
+    - value: office
+      label: office
+    - value: terrace-light
+      label: terrace-light
+    - value: e-bike
+      label: e-bike
+    - value: network-rack
+      label: network-rack
   - name: x
     label: x
     description: Centre's x in the flow's viewBox
@@ -56,7 +70,7 @@ props:
     type: DECIMAL
     required: false
   parameterGroups: []
-timestamp: Oct 4, 2026, 5:20:43 PM
+timestamp: Oct 5, 2026, 9:12:34 PM
 component: g
 config:
   transform: ='translate(' + props.x + ' ' + props.y + ')'
@@ -1525,3 +1539,1364 @@ slots:
         config:
           d: M3.5,-17.5 L7,-21 L10.5,-17.5 Z
           fill: '#90a4ae'
+  - component: g
+    config:
+      visible: =props.kind === 'coffee-machine'
+    slots:
+      default:
+      - component: g
+        config: {}
+        slots:
+          default:
+          - component: circle
+            config:
+              cx: 0
+              cy: 0
+              r: 27.75
+              style:
+                fill: 'var(--f7-card-bg-color, #fff)'
+          - component: circle
+            config:
+              cx: 0
+              cy: 0
+              r: 27.75
+              fill: '#8d6e63'
+              fill-opacity: '0.12'
+      - component: path
+        config:
+          d: M-18,-10 V-13.5 H2 V-10
+          stroke: currentColor
+          stroke-width: 1.2
+          stroke-linecap: round
+          fill: none
+      - component: path
+        config:
+          d: M-19,-7 H-20.5 V4
+          stroke: currentColor
+          stroke-width: 1.4
+          stroke-linecap: round
+          fill: none
+      - component: rect
+        config:
+          x: -19
+          y: -10
+          width: 22
+          height: 19
+          rx: 2
+          stroke: currentColor
+          stroke-width: 1.6
+          stroke-linecap: round
+          fill: '#b0bec5'
+          fill-opacity: '0.35'
+      - component: rect
+        config:
+          x: -18
+          y: 9
+          width: 20
+          height: 2.5
+          rx: 0.8
+          stroke: currentColor
+          stroke-width: 1.2
+          stroke-linecap: round
+          fill: '#b0bec5'
+          fill-opacity: '0.35'
+      - component: circle
+        config:
+          cx: -14.5
+          cy: -5.5
+          r: 2.6
+          stroke: currentColor
+          stroke-width: 1.1
+          stroke-linecap: round
+          fill: '#ffffff'
+      - component: line
+        config:
+          x1: -14.5
+          y1: -5.5
+          x2: -15.7
+          y2: -7.1
+          stroke: '#e53935'
+          stroke-width: 0.9
+          stroke-linecap: round
+          fill: none
+      - component: circle
+        config:
+          cx: -0.2
+          cy: -6.8
+          r: 1.3
+          fill: '=Math.abs(Number(props.power)) > 300 ? ''#fb8c00'' : ''#9e9e9e'''
+      - component: line
+        config:
+          x1: -7
+          y1: -4
+          x2: -3.5
+          y2: -7.5
+          stroke: currentColor
+          stroke-width: 1.4
+          stroke-linecap: round
+          fill: none
+      - component: circle
+        config:
+          cx: -3.5
+          cy: -7.5
+          r: 1.3
+          fill: currentColor
+      - component: path
+        config:
+          d: M-10,0.5 V-1.5 Q-10,-4.5 -7,-4.5 Q-4,-4.5 -4,-1.5 V0.5 Z
+          stroke: currentColor
+          stroke-width: 1.3
+          stroke-linecap: round
+          fill: '#eceff1'
+      - component: rect
+        config:
+          x: -10.5
+          y: 0.5
+          width: 7
+          height: 2
+          rx: 0.8
+          fill: currentColor
+      - component: line
+        config:
+          x1: -4
+          y1: 1.5
+          x2: 0.5
+          y2: 3.5
+          stroke: '#5d4037'
+          stroke-width: 2.4
+          stroke-linecap: round
+          fill: none
+      - component: path
+        config:
+          d: M-9.5,4.5 H-4.5 L-5,8.2 H-9 Z
+          stroke: currentColor
+          stroke-width: 1.1
+          stroke-linecap: round
+          fill: '#ffffff'
+      - component: path
+        config:
+          d: M9,-17 H18 L16,-10 H11 Z
+          stroke: currentColor
+          stroke-width: 1.3
+          stroke-linecap: round
+          fill: '#8d6e63'
+          fill-opacity: '0.5'
+          stroke-linejoin: round
+      - component: rect
+        config:
+          x: 10
+          y: -10
+          width: 7
+          height: 21.5
+          rx: 1
+          stroke: currentColor
+          stroke-width: 1.6
+          stroke-linecap: round
+          fill: '#b0bec5'
+          fill-opacity: '0.35'
+      - component: rect
+        config:
+          x: 12
+          y: -0.5
+          width: 3
+          height: 2.4
+          rx: 0.6
+          fill: currentColor
+      - component: line
+        config:
+          x1: 9
+          y1: 11.5
+          x2: 18
+          y2: 11.5
+          stroke: currentColor
+          stroke-width: 1.6
+          stroke-linecap: round
+          fill: none
+  - component: g
+    config:
+      visible: =props.kind === 'refrigerator'
+    slots:
+      default:
+      - component: g
+        config: {}
+        slots:
+          default:
+          - component: circle
+            config:
+              cx: 0
+              cy: 0
+              r: 27.75
+              style:
+                fill: 'var(--f7-card-bg-color, #fff)'
+          - component: circle
+            config:
+              cx: 0
+              cy: 0
+              r: 27.75
+              fill: '#78909c'
+              fill-opacity: '0.12'
+      - component: rect
+        config:
+          x: -9
+          y: -22
+          width: 18
+          height: 43
+          rx: 2.2
+          stroke: currentColor
+          stroke-width: 1.6
+          stroke-linecap: round
+          fill: '#b0bec5'
+          fill-opacity: '0.35'
+      - component: line
+        config:
+          x1: -9
+          y1: 3
+          x2: 9
+          y2: 3
+          stroke: currentColor
+          stroke-width: 1.4
+          stroke-linecap: round
+          fill: none
+      - component: line
+        config:
+          x1: -9
+          y1: 9.0
+          x2: 9
+          y2: 9.0
+          stroke: currentColor
+          stroke-width: 1.2
+          stroke-linecap: round
+          fill: none
+      - component: line
+        config:
+          x1: -9
+          y1: 15.0
+          x2: 9
+          y2: 15.0
+          stroke: currentColor
+          stroke-width: 1.2
+          stroke-linecap: round
+          fill: none
+      - component: line
+        config:
+          x1: 6
+          y1: -18
+          x2: 6
+          y2: -3
+          stroke: currentColor
+          stroke-width: 1.8
+          stroke-linecap: round
+          fill: none
+      - component: line
+        config:
+          x1: -4
+          y1: 5.3
+          x2: 4
+          y2: 5.3
+          stroke: currentColor
+          stroke-width: 1.6
+          stroke-linecap: round
+          fill: none
+      - component: line
+        config:
+          x1: -4
+          y1: 11.3
+          x2: 4
+          y2: 11.3
+          stroke: currentColor
+          stroke-width: 1.6
+          stroke-linecap: round
+          fill: none
+      - component: line
+        config:
+          x1: -4
+          y1: 17.3
+          x2: 4
+          y2: 17.3
+          stroke: currentColor
+          stroke-width: 1.6
+          stroke-linecap: round
+          fill: none
+      - component: line
+        config:
+          x1: -6.5
+          y1: -19
+          x2: -6.5
+          y2: 18
+          stroke: '#ffffff'
+          stroke-width: 1.3
+          stroke-linecap: round
+          fill: none
+          opacity: '0.6'
+      - component: g
+        config:
+          opacity: '=Math.abs(Number(props.power)) > 10 ? ''1'' : ''0.35'''
+        slots:
+          default:
+          - component: line
+            config:
+              x1: -1.5
+              y1: -5.8
+              x2: -1.5
+              y2: -14.2
+              stroke: '#29b6f6'
+              stroke-width: 1.2
+              stroke-linecap: round
+              fill: none
+          - component: line
+            config:
+              x1: -5.14
+              y1: -7.9
+              x2: 2.14
+              y2: -12.1
+              stroke: '#29b6f6'
+              stroke-width: 1.2
+              stroke-linecap: round
+              fill: none
+          - component: line
+            config:
+              x1: -5.14
+              y1: -12.1
+              x2: 2.14
+              y2: -7.9
+              stroke: '#29b6f6'
+              stroke-width: 1.2
+              stroke-linecap: round
+              fill: none
+  - component: g
+    config:
+      visible: =props.kind === 'media'
+    slots:
+      default:
+      - component: g
+        config: {}
+        slots:
+          default:
+          - component: circle
+            config:
+              cx: 0
+              cy: 0
+              r: 27.75
+              style:
+                fill: 'var(--f7-card-bg-color, #fff)'
+          - component: circle
+            config:
+              cx: 0
+              cy: 0
+              r: 27.75
+              fill: '#ec407a'
+              fill-opacity: '0.12'
+      - component: rect
+        config:
+          x: -17
+          y: -17
+          width: 34
+          height: 19
+          rx: 1.5
+          stroke: currentColor
+          stroke-width: 1.6
+          stroke-linecap: round
+          fill: '#37474f'
+          fill-opacity: '0.85'
+      - component: rect
+        config:
+          x: -15.4
+          y: -15.4
+          width: 30.8
+          height: 15.8
+          rx: 0.6
+          fill: '#4fc3f7'
+          opacity: '=Math.abs(Number(props.power)) > 50 ? ''0.75'' : ''0'''
+      - component: path
+        config:
+          d: M-15.4,0.3999999999999999 L-6,-8 L-1,-3 L5,-10 L15.4,0.3999999999999999 Z
+          fill: '#ffffff'
+          opacity: '=Math.abs(Number(props.power)) > 50 ? ''0.55'' : ''0'''
+      - component: circle
+        config:
+          cx: 9
+          cy: -11
+          r: 2
+          fill: '#fff59d'
+          opacity: '=Math.abs(Number(props.power)) > 50 ? ''0.9'' : ''0'''
+      - component: rect
+        config:
+          x: -2
+          y: 2
+          width: 4
+          height: 4
+          stroke: currentColor
+          stroke-width: 1.2
+          stroke-linecap: round
+          fill: '#b0bec5'
+          fill-opacity: '0.35'
+      - component: rect
+        config:
+          x: -9
+          y: 6
+          width: 18
+          height: 2
+          rx: 0.8
+          stroke: currentColor
+          stroke-width: 1.2
+          stroke-linecap: round
+          fill: '#b0bec5'
+          fill-opacity: '0.35'
+      - component: rect
+        config:
+          x: -11
+          y: 10
+          width: 22
+          height: 6
+          rx: 1.2
+          stroke: currentColor
+          stroke-width: 1.4
+          stroke-linecap: round
+          fill: '#263238'
+      - component: rect
+        config:
+          x: 2
+          y: 11.8
+          width: 6
+          height: 2.4
+          rx: 0.5
+          fill: '=Math.abs(Number(props.power)) > 50 ? ''#4fc3f7'' : ''#546e7a'''
+  - component: g
+    config:
+      visible: =props.kind === 'office'
+    slots:
+      default:
+      - component: g
+        config: {}
+        slots:
+          default:
+          - component: circle
+            config:
+              cx: 0
+              cy: 0
+              r: 27.75
+              style:
+                fill: 'var(--f7-card-bg-color, #fff)'
+          - component: circle
+            config:
+              cx: 0
+              cy: 0
+              r: 27.75
+              fill: '#ab47bc'
+              fill-opacity: '0.12'
+      - component: rect
+        config:
+          x: -1.5
+          y: -0.19999999999999996
+          width: 3
+          height: 4.2
+          stroke: currentColor
+          stroke-width: 1.2
+          stroke-linecap: round
+          fill: '#b0bec5'
+          fill-opacity: '0.35'
+      - component: path
+        config:
+          d: M-5,5.6 Q0,3 5,5.6
+          stroke: currentColor
+          stroke-width: 1.8
+          stroke-linecap: round
+          fill: none
+      - component: path
+        config:
+          d: M-19.0,-15.2 Q0.0,-18.8 19.0,-15.2 L19.0,0.30000000000000004 Q0.0,-3.3 -19.0,0.30000000000000004 Z
+          stroke: currentColor
+          stroke-width: 1.6
+          stroke-linecap: round
+          fill: '#37474f'
+          fill-opacity: '0.85'
+          stroke-linejoin: round
+      - component: g
+        config:
+          visible: =Math.abs(Number(props.power)) > 10
+        slots:
+          default:
+          - component: path
+            config:
+              d: M-17.4,-13.6 Q0.0,-17.2 17.4,-13.6 L17.4,-1.3 Q0.0,-4.9 -17.4,-1.3 Z
+              fill: '#90caf9'
+              fill-opacity: '0.6'
+          - component: rect
+            config:
+              x: -14.62
+              y: -12.4
+              width: 13.22
+              height: 6.77
+              rx: 0.5
+              fill: '#ffffff'
+              fill-opacity: '0.85'
+          - component: rect
+            config:
+              x: 0.7
+              y: -12.4
+              width: 13.92
+              height: 6.77
+              rx: 0.5
+              fill: '#ffffff'
+              fill-opacity: '0.6'
+      - component: rect
+        config:
+          x: -8
+          y: 4.5
+          width: 16
+          height: 9.5
+          rx: 1
+          style:
+            fill: 'var(--f7-card-bg-color, #fff)'
+      - component: rect
+        config:
+          x: -8
+          y: 4.5
+          width: 16
+          height: 9.5
+          rx: 1
+          stroke: currentColor
+          stroke-width: 1.5
+          stroke-linecap: round
+          fill: '#37474f'
+          fill-opacity: '0.85'
+      - component: g
+        config:
+          visible: =Math.abs(Number(props.power)) > 10
+        slots:
+          default:
+          - component: rect
+            config:
+              x: -6.6
+              y: 5.9
+              width: 13.2
+              height: 6.699999999999999
+              rx: 0.4
+              fill: '#90caf9'
+              fill-opacity: '0.6'
+          - component: rect
+            config:
+              x: -5.54
+              y: 7.24
+              width: 5.02
+              height: 3.69
+              rx: 0.5
+              fill: '#ffffff'
+              fill-opacity: '0.85'
+          - component: rect
+            config:
+              x: 0.26
+              y: 7.24
+              width: 5.28
+              height: 3.69
+              rx: 0.5
+              fill: '#ffffff'
+              fill-opacity: '0.6'
+      - component: path
+        config:
+          d: M-10,17 L-8,14 H8 L10,17 Z
+          style:
+            fill: 'var(--f7-card-bg-color, #fff)'
+      - component: path
+        config:
+          d: M-10,17 L-8,14 H8 L10,17 Z
+          stroke: currentColor
+          stroke-width: 1.4
+          stroke-linecap: round
+          fill: '#b0bec5'
+          fill-opacity: '0.35'
+          stroke-linejoin: round
+      - component: line
+        config:
+          x1: -6.8
+          y1: 15.5
+          x2: 6.8
+          y2: 15.5
+          stroke: currentColor
+          stroke-width: 0.7
+          stroke-linecap: round
+          fill: none
+          opacity: '0.5'
+  - component: g
+    config:
+      visible: =props.kind === 'terrace-light'
+    slots:
+      default:
+      - component: g
+        config: {}
+        slots:
+          default:
+          - component: circle
+            config:
+              cx: 0
+              cy: 0
+              r: 27.75
+              style:
+                fill: 'var(--f7-card-bg-color, #fff)'
+          - component: circle
+            config:
+              cx: 0
+              cy: 0
+              r: 27.75
+              fill: '#fbc02d'
+              fill-opacity: '0.12'
+      - component: rect
+        config:
+          x: -21.4
+          y: -8
+          width: 2.8
+          height: 17
+          stroke: currentColor
+          stroke-width: 1.3
+          stroke-linecap: round
+          fill: '#a1887f'
+          fill-opacity: '0.6'
+          stroke-linejoin: round
+      - component: rect
+        config:
+          x: -1.4
+          y: 1
+          width: 2.8
+          height: 16
+          stroke: currentColor
+          stroke-width: 1.3
+          stroke-linecap: round
+          fill: '#a1887f'
+          fill-opacity: '0.6'
+          stroke-linejoin: round
+      - component: rect
+        config:
+          x: 18.6
+          y: -8
+          width: 2.8
+          height: 17
+          stroke: currentColor
+          stroke-width: 1.3
+          stroke-linecap: round
+          fill: '#a1887f'
+          fill-opacity: '0.6'
+          stroke-linejoin: round
+      - component: path
+        config:
+          d: M-20,-8 L0,-17 L20,-8 L0,1 Z
+          stroke: currentColor
+          stroke-width: 1.2
+          stroke-linecap: round
+          fill: '#ffffff'
+          stroke-linejoin: round
+      - component: line
+        config:
+          x1: -15.0
+          y1: -5.75
+          x2: 5.0
+          y2: -14.75
+          stroke: currentColor
+          stroke-width: 0.8
+          stroke-linecap: round
+          fill: none
+          opacity: '0.35'
+      - component: line
+        config:
+          x1: -10.0
+          y1: -3.5
+          x2: 10.0
+          y2: -12.5
+          stroke: currentColor
+          stroke-width: 0.8
+          stroke-linecap: round
+          fill: none
+          opacity: '0.35'
+      - component: line
+        config:
+          x1: -5.0
+          y1: -1.25
+          x2: 15.0
+          y2: -10.25
+          stroke: currentColor
+          stroke-width: 0.8
+          stroke-linecap: round
+          fill: none
+          opacity: '0.35'
+      - component: path
+        config:
+          d: M-20,-8 L0,-17 L20,-8 L0,1 Z
+          stroke: '#a1887f'
+          stroke-width: 2.2
+          stroke-linecap: round
+          fill: none
+          stroke-linejoin: round
+      - component: path
+        config:
+          d: M-20,-6.5 Q-10.0,1.2 0,2.5 Q10.0,1.2 20,-6.5
+          stroke: currentColor
+          stroke-width: 0.8
+          stroke-linecap: round
+          fill: none
+          opacity: '0.7'
+      - component: circle
+        config:
+          cx: -15.0
+          cy: -3.05
+          r: 2.5
+          fill: '#fbc02d'
+          opacity: '=Math.abs(Number(props.power)) > 2 ? ''0.3'' : ''0'''
+      - component: circle
+        config:
+          cx: -10.0
+          cy: -0.4
+          r: 2.5
+          fill: '#fbc02d'
+          opacity: '=Math.abs(Number(props.power)) > 2 ? ''0.3'' : ''0'''
+      - component: circle
+        config:
+          cx: -5.0
+          cy: 1.45
+          r: 2.5
+          fill: '#fbc02d'
+          opacity: '=Math.abs(Number(props.power)) > 2 ? ''0.3'' : ''0'''
+      - component: circle
+        config:
+          cx: 0
+          cy: 2.5
+          r: 2.5
+          fill: '#fbc02d'
+          opacity: '=Math.abs(Number(props.power)) > 2 ? ''0.3'' : ''0'''
+      - component: circle
+        config:
+          cx: 5.0
+          cy: 1.45
+          r: 2.5
+          fill: '#fbc02d'
+          opacity: '=Math.abs(Number(props.power)) > 2 ? ''0.3'' : ''0'''
+      - component: circle
+        config:
+          cx: 10.0
+          cy: -0.4
+          r: 2.5
+          fill: '#fbc02d'
+          opacity: '=Math.abs(Number(props.power)) > 2 ? ''0.3'' : ''0'''
+      - component: circle
+        config:
+          cx: 15.0
+          cy: -3.05
+          r: 2.5
+          fill: '#fbc02d'
+          opacity: '=Math.abs(Number(props.power)) > 2 ? ''0.3'' : ''0'''
+      - component: circle
+        config:
+          cx: -15.0
+          cy: -3.05
+          r: 1.25
+          fill: '=Math.abs(Number(props.power)) > 2 ? ''#fbc02d'' : ''#9e9e9e'''
+      - component: circle
+        config:
+          cx: -10.0
+          cy: -0.4
+          r: 1.25
+          fill: '=Math.abs(Number(props.power)) > 2 ? ''#fbc02d'' : ''#9e9e9e'''
+      - component: circle
+        config:
+          cx: -5.0
+          cy: 1.45
+          r: 1.25
+          fill: '=Math.abs(Number(props.power)) > 2 ? ''#fbc02d'' : ''#9e9e9e'''
+      - component: circle
+        config:
+          cx: 0
+          cy: 2.5
+          r: 1.25
+          fill: '=Math.abs(Number(props.power)) > 2 ? ''#fbc02d'' : ''#9e9e9e'''
+      - component: circle
+        config:
+          cx: 5.0
+          cy: 1.45
+          r: 1.25
+          fill: '=Math.abs(Number(props.power)) > 2 ? ''#fbc02d'' : ''#9e9e9e'''
+      - component: circle
+        config:
+          cx: 10.0
+          cy: -0.4
+          r: 1.25
+          fill: '=Math.abs(Number(props.power)) > 2 ? ''#fbc02d'' : ''#9e9e9e'''
+      - component: circle
+        config:
+          cx: 15.0
+          cy: -3.05
+          r: 1.25
+          fill: '=Math.abs(Number(props.power)) > 2 ? ''#fbc02d'' : ''#9e9e9e'''
+  - component: g
+    config:
+      visible: =props.kind === 'e-bike'
+    slots:
+      default:
+      - component: g
+        config: {}
+        slots:
+          default:
+          - component: circle
+            config:
+              cx: 0
+              cy: 0
+              r: 27.75
+              style:
+                fill: 'var(--f7-card-bg-color, #fff)'
+          - component: circle
+            config:
+              cx: 0
+              cy: 0
+              r: 27.75
+              fill: '#7cb342'
+              fill-opacity: '0.12'
+      - component: circle
+        config:
+          cx: -12.5
+          cy: 4.46
+          r: 8.5
+          stroke: currentColor
+          stroke-width: 1.6
+          stroke-linecap: round
+          fill: none
+      - component: circle
+        config:
+          cx: -12.5
+          cy: 4.46
+          r: 1
+          fill: currentColor
+      - component: circle
+        config:
+          cx: 12.5
+          cy: 4.46
+          r: 8.5
+          stroke: currentColor
+          stroke-width: 1.6
+          stroke-linecap: round
+          fill: none
+      - component: circle
+        config:
+          cx: 12.5
+          cy: 4.46
+          r: 1
+          fill: currentColor
+      - component: path
+        config:
+          d: M-22.6,4.46 A10.1,10.1 0 0 1 -7.45,-4.29
+          stroke: currentColor
+          stroke-width: 1.2
+          stroke-linecap: round
+          fill: none
+          opacity: '0.75'
+      - component: path
+        config:
+          d: M7.45,-4.29 A10.1,10.1 0 0 1 22.6,4.46
+          stroke: currentColor
+          stroke-width: 1.2
+          stroke-linecap: round
+          fill: none
+          opacity: '0.75'
+      - component: path
+        config:
+          d: M-17.5,-6.04 H-6.5 M-15.5,-6.04 L-12.5,4.46
+          stroke: currentColor
+          stroke-width: 1.3
+          stroke-linecap: round
+          fill: none
+      - component: path
+        config:
+          d: M-12.5,4.46 L-5.5,-8.54 L7.5,-9.04 L9,-4.54 L-1.5,5.46 Z M-5.5,-8.54 L-1.5,5.46 M9,-4.54 L12.5,4.46
+          stroke: currentColor
+          stroke-width: 1.6
+          stroke-linecap: round
+          fill: none
+          stroke-linejoin: round
+      - component: line
+        config:
+          x1: -5.5
+          y1: -8.54
+          x2: -6.3
+          y2: -11.54
+          stroke: currentColor
+          stroke-width: 1.4
+          stroke-linecap: round
+          fill: none
+      - component: path
+        config:
+          d: M-10.0,-11.94 H-3.0
+          stroke: currentColor
+          stroke-width: 2.2
+          stroke-linecap: round
+          fill: none
+      - component: path
+        config:
+          d: M7.5,-9.04 L7.1,-12.24 Q6.5,-13.44 3.0,-12.64
+          stroke: currentColor
+          stroke-width: 1.4
+          stroke-linecap: round
+          fill: none
+      - component: circle
+        config:
+          cx: -1.5
+          cy: 5.46
+          r: 2.6
+          stroke: currentColor
+          stroke-width: 1.3
+          stroke-linecap: round
+          fill: '#78909c'
+          fill-opacity: '0.5'
+      - component: line
+        config:
+          x1: -1.5
+          y1: 5.46
+          x2: 0.5
+          y2: 8.96
+          stroke: currentColor
+          stroke-width: 1.3
+          stroke-linecap: round
+          fill: none
+      - component: g
+        config:
+          transform: translate(1.89 -1.91) rotate(-43.6)
+        slots:
+          default:
+          - component: rect
+            config:
+              x: -7.0
+              y: -2.5
+              width: 14
+              height: 5
+              rx: 1.6
+              style:
+                fill: 'var(--f7-card-bg-color, #fff)'
+          - component: rect
+            config:
+              x: -6.0
+              y: -1.5
+              width: 12
+              height: 3
+              rx: 0.8
+              fill: '=Math.abs(Number(props.power)) > 10 ? ''#7cb342'' : ''#546e7a'''
+              fill-opacity: '0.9'
+            slots:
+              default:
+              - component: animate
+                config:
+                  attributeName: width
+                  values: 0;12
+                  dur: 2.4s
+                  repeatCount: indefinite
+                  visible: =Math.abs(Number(props.power)) > 10
+          - component: rect
+            config:
+              x: -7.0
+              y: -2.5
+              width: 14
+              height: 5
+              rx: 1.6
+              stroke: currentColor
+              stroke-width: 1.2
+              stroke-linecap: round
+              fill: none
+  - component: g
+    config:
+      visible: =props.kind === 'network-rack'
+    slots:
+      default:
+      - component: g
+        config: {}
+        slots:
+          default:
+          - component: circle
+            config:
+              cx: 0
+              cy: 0
+              r: 27.75
+              style:
+                fill: 'var(--f7-card-bg-color, #fff)'
+          - component: circle
+            config:
+              cx: 0
+              cy: 0
+              r: 27.75
+              fill: '#5c6bc0'
+              fill-opacity: '0.12'
+      - component: rect
+        config:
+          x: -20
+          y: -14
+          width: 40
+          height: 27
+          rx: 1.5
+          stroke: currentColor
+          stroke-width: 1.6
+          stroke-linecap: round
+          fill: '#37474f'
+          fill-opacity: '0.85'
+      - component: line
+        config:
+          x1: -16.5
+          y1: -12
+          x2: -16.5
+          y2: 11
+          stroke: '#b0bec5'
+          stroke-width: 1.2
+          stroke-linecap: round
+          fill: none
+      - component: line
+        config:
+          x1: 16.5
+          y1: -12
+          x2: 16.5
+          y2: 11
+          stroke: '#b0bec5'
+          stroke-width: 1.2
+          stroke-linecap: round
+          fill: none
+      - component: rect
+        config:
+          x: -15.5
+          y: -11.1
+          width: 31
+          height: 2.87
+          rx: 0.5
+          stroke: currentColor
+          stroke-width: 0.9
+          stroke-linecap: round
+          fill: '#cfd8dc'
+          fill-opacity: '0.9'
+      - component: rect
+        config:
+          x: -13.5
+          y: -10.2
+          width: 1.6
+          height: 1.2
+          fill: '#263238'
+      - component: rect
+        config:
+          x: -11.2
+          y: -10.2
+          width: 1.6
+          height: 1.2
+          fill: '#263238'
+      - component: rect
+        config:
+          x: -8.9
+          y: -10.2
+          width: 1.6
+          height: 1.2
+          fill: '#263238'
+      - component: rect
+        config:
+          x: -6.6
+          y: -10.2
+          width: 1.6
+          height: 1.2
+          fill: '#263238'
+      - component: rect
+        config:
+          x: -4.3
+          y: -10.2
+          width: 1.6
+          height: 1.2
+          fill: '#263238'
+      - component: rect
+        config:
+          x: -2.0
+          y: -10.2
+          width: 1.6
+          height: 1.2
+          fill: '#263238'
+      - component: rect
+        config:
+          x: 0.3
+          y: -10.2
+          width: 1.6
+          height: 1.2
+          fill: '#263238'
+      - component: rect
+        config:
+          x: 2.6
+          y: -10.2
+          width: 1.6
+          height: 1.2
+          fill: '#263238'
+      - component: rect
+        config:
+          x: 4.9
+          y: -10.2
+          width: 1.6
+          height: 1.2
+          fill: '#263238'
+      - component: rect
+        config:
+          x: 7.2
+          y: -10.2
+          width: 1.6
+          height: 1.2
+          fill: '#263238'
+      - component: rect
+        config:
+          x: 9.5
+          y: -10.2
+          width: 1.6
+          height: 1.2
+          fill: '#263238'
+      - component: rect
+        config:
+          x: 11.8
+          y: -10.2
+          width: 1.6
+          height: 1.2
+          fill: '#263238'
+      - component: rect
+        config:
+          x: -15.5
+          y: -7.43
+          width: 31
+          height: 2.87
+          rx: 0.5
+          stroke: currentColor
+          stroke-width: 0.9
+          stroke-linecap: round
+          fill: '#cfd8dc'
+          fill-opacity: '0.9'
+      - component: rect
+        config:
+          x: -13.5
+          y: -6.53
+          width: 1.6
+          height: 1.2
+          fill: '#263238'
+      - component: rect
+        config:
+          x: -11.2
+          y: -6.53
+          width: 1.6
+          height: 1.2
+          fill: '#263238'
+      - component: rect
+        config:
+          x: -8.9
+          y: -6.53
+          width: 1.6
+          height: 1.2
+          fill: '#263238'
+      - component: rect
+        config:
+          x: -6.6
+          y: -6.53
+          width: 1.6
+          height: 1.2
+          fill: '#263238'
+      - component: rect
+        config:
+          x: -4.3
+          y: -6.53
+          width: 1.6
+          height: 1.2
+          fill: '#263238'
+      - component: rect
+        config:
+          x: -2.0
+          y: -6.53
+          width: 1.6
+          height: 1.2
+          fill: '#263238'
+      - component: rect
+        config:
+          x: 0.3
+          y: -6.53
+          width: 1.6
+          height: 1.2
+          fill: '#263238'
+      - component: rect
+        config:
+          x: 2.6
+          y: -6.53
+          width: 1.6
+          height: 1.2
+          fill: '#263238'
+      - component: g
+        config:
+          opacity: '=Math.abs(Number(props.power)) > 10 ? ''1'' : ''0.3'''
+        slots:
+          default:
+          - component: circle
+            config:
+              cx: 6.5
+              cy: -6.0
+              r: 0.95
+              fill: '#69f0ae'
+          - component: circle
+            config:
+              cx: 9
+              cy: -6.0
+              r: 0.95
+              fill: '#69f0ae'
+          - component: animate
+            config:
+              attributeName: opacity
+              values: 1;0.25;1
+              dur: 0.9s
+              repeatCount: indefinite
+              visible: =Math.abs(Number(props.power)) > 10
+      - component: g
+        config:
+          opacity: '=Math.abs(Number(props.power)) > 10 ? ''1'' : ''0.3'''
+        slots:
+          default:
+          - component: circle
+            config:
+              cx: 11.5
+              cy: -6.0
+              r: 0.95
+              fill: '#69f0ae'
+          - component: circle
+            config:
+              cx: 14
+              cy: -6.0
+              r: 0.95
+              fill: '#69f0ae'
+          - component: animate
+            config:
+              attributeName: opacity
+              values: 0.25;1;0.25
+              dur: 1.3s
+              repeatCount: indefinite
+              visible: =Math.abs(Number(props.power)) > 10
+      - component: rect
+        config:
+          x: -15.5
+          y: -3.77
+          width: 31
+          height: 2.87
+          rx: 0.5
+          stroke: currentColor
+          stroke-width: 0.9
+          stroke-linecap: round
+          fill: '#263238'
+      - component: line
+        config:
+          x1: -13
+          y1: -2.34
+          x2: 13
+          y2: -2.34
+          stroke: '#b0bec5'
+          stroke-width: 0.8
+          stroke-linecap: round
+          fill: none
+          opacity: '0.7'
+      - component: rect
+        config:
+          x: -15.5
+          y: -0.1
+          width: 31
+          height: 2.87
+          rx: 0.5
+          stroke: currentColor
+          stroke-width: 0.9
+          stroke-linecap: round
+          fill: '#cfd8dc'
+          fill-opacity: '0.9'
+      - component: rect
+        config:
+          x: -13.5
+          y: 0.8
+          width: 1.6
+          height: 1.2
+          fill: '#263238'
+      - component: rect
+        config:
+          x: -11.2
+          y: 0.8
+          width: 1.6
+          height: 1.2
+          fill: '#263238'
+      - component: rect
+        config:
+          x: -8.9
+          y: 0.8
+          width: 1.6
+          height: 1.2
+          fill: '#263238'
+      - component: rect
+        config:
+          x: -6.6
+          y: 0.8
+          width: 1.6
+          height: 1.2
+          fill: '#263238'
+      - component: g
+        config:
+          opacity: '=Math.abs(Number(props.power)) > 10 ? ''1'' : ''0.3'''
+        slots:
+          default:
+          - component: circle
+            config:
+              cx: 12.5
+              cy: 1.33
+              r: 0.95
+              fill: '#69f0ae'
+          - component: animate
+            config:
+              attributeName: opacity
+              values: 1;0.4;1
+              dur: 2s
+              repeatCount: indefinite
+              visible: =Math.abs(Number(props.power)) > 10
+      - component: line
+        config:
+          x1: -15.5
+          y1: 6.63
+          x2: 15.5
+          y2: 6.63
+          stroke: '#b0bec5'
+          stroke-width: 1
+          stroke-linecap: round
+          fill: none
+      - component: rect
+        config:
+          x: -12
+          y: 3.77
+          width: 11
+          height: 2.67
+          rx: 0.6
+          stroke: currentColor
+          stroke-width: 0.8
+          stroke-linecap: round
+          fill: '#cfd8dc'
+          fill-opacity: '0.9'
+      - component: rect
+        config:
+          x: -15.5
+          y: 7.23
+          width: 31
+          height: 2.87
+          rx: 0.5
+          stroke: currentColor
+          stroke-width: 0.9
+          stroke-linecap: round
+          fill: '#cfd8dc'
+          fill-opacity: '0.9'
+      - component: circle
+        config:
+          cx: -9
+          cy: 8.66
+          r: 1
+          fill: '#263238'
+      - component: circle
+        config:
+          cx: -3
+          cy: 8.66
+          r: 1
+          fill: '#263238'
+      - component: circle
+        config:
+          cx: 3
+          cy: 8.66
+          r: 1
+          fill: '#263238'
+      - component: circle
+        config:
+          cx: 9
+          cy: 8.66
+          r: 1
+          fill: '#263238'

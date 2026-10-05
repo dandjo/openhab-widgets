@@ -63,42 +63,6 @@ props:
     type: TEXT
     required: true
     context: item
-  - name: heatpumpDhwBoost
-    label: Pyaltherma DHW Powerful
-    description: Switch item
-    type: TEXT
-    required: true
-    context: item
-  - name: heatpumpSmartGrid
-    label: ESPAltherma Smart Grid
-    description: String item
-    type: TEXT
-    required: true
-    context: item
-  - name: heatpumpClimateControlPower
-    label: Pyaltherma Climate Control Power
-    description: Switch item
-    type: TEXT
-    required: true
-    context: item
-  - name: heatpumpManagement
-    label: Heatpump Management
-    description: Group item
-    type: TEXT
-    required: true
-    context: item
-  - name: heatpumpDhwTempHeating
-    label: Pyaltherma DHW Temp Heating
-    description: Number:Temperature item
-    type: TEXT
-    required: true
-    context: item
-  - name: heatpumpDhwManagement
-    label: Heatpump DHW Management
-    description: Switch item
-    type: TEXT
-    required: true
-    context: item
   - name: heatpumpDhwEta
     label: Heatpump DHW Done At
     description: DateTime item
@@ -132,6 +96,12 @@ props:
   - name: heatpumpLeavingWaterTempAfterBuh
     label: ESPAltherma Leaving Water Temperature After BUH
     description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpClimateControlPower
+    label: Pyaltherma Climate Control Power
+    description: Switch item
     type: TEXT
     required: true
     context: item
@@ -195,8 +165,8 @@ props:
     type: TEXT
     required: true
     context: item
-  - name: heatpumpCop
-    label: ESPAltherma COP
+  - name: heatpumpDcopDhw
+    label: ESPAltherma DCOP DHW
     description: Number item
     type: TEXT
     required: true
@@ -207,20 +177,8 @@ props:
     type: TEXT
     required: true
     context: item
-  - name: heatpumpExtAmbientTemp
-    label: ESPAltherma External Ambient Temperature
-    description: Number:Temperature item
-    type: TEXT
-    required: true
-    context: item
-  - name: heatpumpDcopDhw
-    label: ESPAltherma DCOP DHW
-    description: Number item
-    type: TEXT
-    required: true
-    context: item
   parameterGroups: []
-timestamp: Oct 4, 2026, 11:05:34 PM
+timestamp: Oct 5, 2026, 9:12:34 PM
 component: oh-card
 config:
   title: Heating & Hot Water
@@ -676,17 +634,7 @@ slots:
               - component: oh-link
                 config:
                   action: popup
-                  actionModal: widget:heatpump-quick
-                  actionModalConfig:
-                    heatpumpDhwTankTemp: =props.heatpumpDhwTankTemp
-                    heatpumpPower: =props.heatpumpPower
-                    heatpumpDhwBoost: =props.heatpumpDhwBoost
-                    heatpumpSmartGrid: =props.heatpumpSmartGrid
-                    heatpumpClimateControlPower: =props.heatpumpClimateControlPower
-                    heatpumpDhwPower: =props.heatpumpDhwPower
-                    heatpumpManagement: =props.heatpumpManagement
-                    heatpumpDhwTempHeating: =props.heatpumpDhwTempHeating
-                    heatpumpDhwManagement: =props.heatpumpDhwManagement
+                  actionModal: page:heatpump
                   style:
                     position: absolute
                     inset: '0'
@@ -1061,17 +1009,7 @@ slots:
               - component: oh-link
                 config:
                   action: popup
-                  actionModal: widget:heatpump-quick
-                  actionModalConfig:
-                    heatpumpDhwTankTemp: =props.heatpumpDhwTankTemp
-                    heatpumpPower: =props.heatpumpPower
-                    heatpumpDhwBoost: =props.heatpumpDhwBoost
-                    heatpumpSmartGrid: =props.heatpumpSmartGrid
-                    heatpumpClimateControlPower: =props.heatpumpClimateControlPower
-                    heatpumpDhwPower: =props.heatpumpDhwPower
-                    heatpumpManagement: =props.heatpumpManagement
-                    heatpumpDhwTempHeating: =props.heatpumpDhwTempHeating
-                    heatpumpDhwManagement: =props.heatpumpDhwManagement
+                  actionModal: page:heatpump
                   style:
                     position: absolute
                     inset: '0'
@@ -1427,13 +1365,7 @@ slots:
               - component: oh-link
                 config:
                   action: popup
-                  actionModal: widget:heatpump-cop-quick
-                  actionModalConfig:
-                    heatpumpCop: =props.heatpumpCop
-                    heatpumpDcop: =props.heatpumpDcop
-                    heatpumpExtAmbientTemp: =props.heatpumpExtAmbientTemp
-                    heatpumpDcopSpace: =props.heatpumpDcopSpace
-                    heatpumpDcopDhw: =props.heatpumpDcopDhw
+                  actionModal: page:heatpump
                   style:
                     position: absolute
                     inset: '0'
@@ -1538,13 +1470,7 @@ slots:
               - component: oh-link
                 config:
                   action: popup
-                  actionModal: widget:heatpump-cop-quick
-                  actionModalConfig:
-                    heatpumpCop: =props.heatpumpCop
-                    heatpumpDcop: =props.heatpumpDcop
-                    heatpumpExtAmbientTemp: =props.heatpumpExtAmbientTemp
-                    heatpumpDcopSpace: =props.heatpumpDcopSpace
-                    heatpumpDcopDhw: =props.heatpumpDcopDhw
+                  actionModal: page:heatpump
                   style:
                     position: absolute
                     inset: '0'
@@ -1650,13 +1576,7 @@ slots:
               - component: oh-link
                 config:
                   action: popup
-                  actionModal: widget:heatpump-cop-quick
-                  actionModalConfig:
-                    heatpumpCop: =props.heatpumpCop
-                    heatpumpDcop: =props.heatpumpDcop
-                    heatpumpExtAmbientTemp: =props.heatpumpExtAmbientTemp
-                    heatpumpDcopSpace: =props.heatpumpDcopSpace
-                    heatpumpDcopDhw: =props.heatpumpDcopDhw
+                  actionModal: page:heatpump
                   style:
                     position: absolute
                     inset: '0'

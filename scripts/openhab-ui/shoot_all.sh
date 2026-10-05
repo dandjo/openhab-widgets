@@ -34,21 +34,6 @@ python3 cdp_cards_js.py $B/overview $O/ovhp-dark 1400 dark "$(cat demo_heatpump.
 # the heating card on the heat pump card's demo values: a space heating run, the tank not charging
 python3 cdp_cards_js.py $B/overview $O/ovhp 1400 light "$(cat demo_heatpump.js)" >/dev/null
 cp $(shot ovhp heating-hot-water) $R/heating-card.png; cp $(shot ovhp-dark heating-hot-water) $R/heating-card-dark.png
-# the quick popups as the energy flow's nodes and the heat pump card's tiles open them, each as tall as its content
-step popups
-for spec in "Energy Flow|Heat Pump|true|heatpump-quick" "Energy Flow|Air Conditioner|true|air-conditioner-quick" \
-            "Energy Flow|Ventilation|true|ventilation-quick" "Heat Pump|Control|false|heatpump-control-quick" \
-            "Heat Pump|Indoor Unit|false|heatpump-indoor-quick" "Heat Pump|Outdoor Unit|false|heatpump-outdoor-quick" \
-            "Heat Pump|Refrigerant|false|heatpump-refrigerant-quick" "Heat Pump|Heating Circuit|false|heatpump-circuit-quick" \
-            "Heat Pump|Hot Water Tank|false|heatpump-tank-quick" "Heat Pump|3-Way Valve|false|heatpump-valve-quick" \
-            "Heat Pump|Upper Floor|false|upper-floor-quick" "Heat Pump|Ground Floor|false|ground-floor-quick" \
-            "Heat Pump|Electrical|false|heatpump-electric-quick" "Heat Pump|Heat|false|heatpump-heat-quick" \
-            "Heat Pump|COP|false|heatpump-cop-quick"; do
-  IFS='|' read -r card title round name <<< "$spec"
-  python3 cdp_elems.py $B/overview 1400 $O/quick "$(cat screenshot-js/quick_rect.js)('$name')" \
-    "$(cat screenshot-js/quick.js)('$card', '$title', $round)" >/dev/null
-  cp $O/quick/$name.png $R/
-done
 step crops; python3 cdp_elems.py $B/heatpump 1400 $O/crops "$(cat screenshot-js/crops_hp.js)" >/dev/null
 python3 cdp_elems.py $B/air_conditioning 1400 $O/crops "$(cat screenshot-js/crops_ac.js)" >/dev/null
 python3 cdp_elems.py $B/heatpump 1400 $O/crops "$(cat screenshot-js/sliders.js)" >/dev/null

@@ -12,10 +12,6 @@ The widgets are the overview's eleven cards (`weather-card`, `energy-flow-card`,
 `electricity-price-card`, `consumption-card`, `energy-days-card`, `pv-days-card`, `temperatures-card`) and the parts they are built from, wherever a part stands in more than one place or makes sense
 on its own:
 
-- the quick popups: `heatpump-quick`, `air-conditioner-quick` and `ventilation-quick`, which the energy flow opens,
-  and the heat pump card's `heatpump-control-quick`, `heatpump-indoor-quick`, `heatpump-outdoor-quick`,
-  `heatpump-refrigerant-quick`, `heatpump-circuit-quick`, `upper-floor-quick`, `ground-floor-quick`,
-  `heatpump-electric-quick`, `heatpump-heat-quick` and `heatpump-cop-quick`, which its tiles open;
 - the controls: `state-bar`, every segmented bar; `pill-switch`, `power-pill` and `boost-pill`, the switches as pills; `pill-slider`, the slider of every setpoint, offset, power and timer;
   `switch-row`, every row with a switch outside the overview's tiles; and `switch-tile`, the switch cards under the
   energy flow;
@@ -27,7 +23,7 @@ on its own:
   `plug-energy-days-card`, `plug-electric-card`), `item-popup`, the popup every tile of the device pages opens, and
   `value-tile`, the tile itself: title and value over a large pale icon.
 
-A widget that places another takes the other's items from its own props: `role_widget()` builds a quick panel with
+A widget that places another takes the other's items from its own props: `role_widget()` builds a widget with
 its items and turns them into role props (`item_prop()`), `ITEM_PARAMS` names the props of a widget that take an
 item, and `items_in()` and `itemized()` follow them into the widgets a card places and into the `actionModalConfig`
 of a link that opens a widget as a popup. The plug cards are built by the
@@ -103,5 +99,4 @@ insertion in their sorted order. `OPENHAB_JSONDB` points them at another directo
     removes it too. `shoot_all.sh` takes every screenshot of the GitHub repository with
     these tools and the element scripts in `screenshot-js/`, the energy flow, the heat pump card, the consumption
     card and the weather page's warnings on demo values (`demo_flow.js`, `demo_heatpump.js`, `demo_consumption.js`,
-    `demo_weather.js`), and the quick popups
-    each as tall as its content (`screenshot-js/quick.js`), while the gallery is up.
+    `demo_weather.js`), while the gallery is up.
