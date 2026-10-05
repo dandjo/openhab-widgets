@@ -243,90 +243,6 @@ props:
     type: TEXT
     required: true
     context: item
-  - name: pvSelfUseToday
-    label: Photovoltaics Own Ec-Day
-    description: Number:Energy item
-    type: TEXT
-    required: true
-    context: item
-  - name: pvPv1Power
-    label: Huawei Inverter PV1 Power
-    description: Number:Power item
-    type: TEXT
-    required: true
-    context: item
-  - name: pvPv2Power
-    label: Huawei Inverter PV2 Power
-    description: Number:Power item
-    type: TEXT
-    required: true
-    context: item
-  - name: priceTotalGross
-    label: EPEX Spot aWATTar Total Gross
-    description: Number:EnergyPrice item
-    type: TEXT
-    required: true
-    context: item
-  - name: batteryPower5min
-    label: Energy Storage Power 5 min
-    description: Number:Power item
-    type: TEXT
-    required: true
-    context: item
-  - name: homeEnergyToday
-    label: Home Energy Day
-    description: Number:Energy item
-    type: TEXT
-    required: true
-    context: item
-  - name: heatpumpWaterPumpOperation
-    label: ESPAltherma Water Pump Operation
-    description: Switch item
-    type: TEXT
-    required: true
-    context: item
-  - name: heatpumpFlowSensor
-    label: ESPAltherma Flow Sensor (l/min)
-    description: Number:VolumetricFlowRate item
-    type: TEXT
-    required: true
-    context: item
-  - name: heatpumpHeatPower
-    label: ESPAltherma Heating Power
-    description: Number:Power item
-    type: TEXT
-    required: true
-    context: item
-  - name: heatpumpCop
-    label: ESPAltherma COP
-    description: Number item
-    type: TEXT
-    required: true
-    context: item
-  - name: acTemperature
-    label: Faikout Perfera Temperature
-    description: Number:Temperature item
-    type: TEXT
-    required: true
-    context: item
-  - name: acTemperatureSetpoint
-    label: Faikout Perfera Temperature Setpoint
-    description: Number:Temperature item
-    type: TEXT
-    required: true
-    context: item
-  - name: netatmoWeatherstationCo2
-    label: Netatmo Weatherstation CO2
-    description: Number:Dimensionless item
-    type: TEXT
-    required: true
-    context: item
-  - name: netatmoWeatherstationAtmosphericHumidity
-    label: Netatmo Weatherstation Atmospheric Humidity
-    description: Number:Dimensionless item
-    type: TEXT
-    required: true
-    context: item
   - name: heatpumpDhwTankTemp
     label: ESPAltherma DHW Tank Temperature
     description: Number:Temperature item
@@ -375,9 +291,21 @@ props:
     type: TEXT
     required: true
     context: item
+  - name: acTemperature
+    label: Faikout Perfera Temperature
+    description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
   - name: acFan
     label: Faikout Perfera Fan
     description: String item
+    type: TEXT
+    required: true
+    context: item
+  - name: acTemperatureSetpoint
+    label: Faikout Perfera Temperature Setpoint
+    description: Number:Temperature item
     type: TEXT
     required: true
     context: item
@@ -387,14 +315,32 @@ props:
     type: TEXT
     required: true
     context: item
+  - name: netatmoWeatherstationCo2
+    label: Netatmo Weatherstation CO2
+    description: Number:Dimensionless item
+    type: TEXT
+    required: true
+    context: item
   - name: ventilationManagement
     label: Ventilation Management
     description: Group item
     type: TEXT
     required: true
     context: item
+  - name: homeEnergyToday
+    label: Home Energy Day
+    description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  - name: pvSelfUseToday
+    label: Photovoltaics Own Ec-Day
+    description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
   parameterGroups: []
-timestamp: Oct 5, 2026, 2:59:59 AM
+timestamp: Oct 5, 2026, 3:36:33 PM
 component: oh-card
 config:
   title: Energy Flow
@@ -425,27 +371,6 @@ slots:
             max-width: 461px
             width: '=screen.width < 600 ? ''100%'' : ''461px'''
             margin: '=screen.width < 600 ? ''0 auto'' : ''0 calc((100% - 461px) / 2)'''
-          stylesheet: '.tip { opacity: 0; transition: opacity 0.15s; pointer-events: none; }
-
-            .tip-on > a { position: absolute; inset: 0; border-radius: 50%; }
-
-            :host:has(.tip-on-pv:hover) .tip-pv { opacity: 1; }
-
-            :host:has(.tip-on-grid:hover) .tip-grid { opacity: 1; }
-
-            :host:has(.tip-on-battery:hover) .tip-battery { opacity: 1; }
-
-            :host:has(.tip-on-home:hover) .tip-home { opacity: 1; }
-
-            :host:has(.tip-on-hp:hover) .tip-hp { opacity: 1; }
-
-            :host:has(.tip-on-ac:hover) .tip-ac { opacity: 1; }
-
-            :host:has(.tip-on-ecar:hover) .tip-ecar { opacity: 1; }
-
-            :host:has(.tip-on-appliances:hover) .tip-appliances { opacity: 1; }
-
-            :host:has(.tip-on-vent:hover) .tip-vent { opacity: 1; }'
         slots:
           default:
           - component: svg
@@ -1077,60 +1002,722 @@ slots:
                           visible: =(Math.abs(((Number(items[props.washingMachine1Power].numericState) || 0) + (Number(items[props.washingMachine2Power].numericState)
                             || 0) + (Number(items[props.tumbleDryerPower].numericState) || 0) + (Number(items[props.dishwasherPower].numericState)
                             || 0))) > 10) && (false)
-              - component: g
-                config: {}
+              - component: circle
+                config:
+                  stroke: '#9e9e9e'
+                  cx: 241.9
+                  cy: 210.2
+                  r: 29.2
+                  fill: none
+                  stroke-width: 2.9
+                  visible: =Math.abs((Number(items[props.homePower].numericState) || 0)) > 10
                 slots:
                   default:
-                  - component: circle
+                  - component: animate
                     config:
-                      cx: 241.9
-                      cy: 210.2
-                      r: 29.2
-                      fill: none
-                      stroke: '#1e88e5'
-                      stroke-width: 2.9
-                      visible: =(Math.abs((Number(items[props.homePower].numericState) || 0)) > 10) && !(false)
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          values: 0.3;1;0.3
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: =(Math.abs((Number(items[props.homePower].numericState) || 0)) > 10) && !(false)
-                      - component: animate
-                        config:
-                          attributeName: stroke-width
-                          values: 2.9;4.5;2.9
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: =(Math.abs((Number(items[props.homePower].numericState) || 0)) > 10) && !(false)
-                      - component: animate
-                        config:
-                          attributeName: r
-                          values: 29.2;30;29.2
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: =(Math.abs((Number(items[props.homePower].numericState) || 0)) > 10) && !(false)
-                  - component: circle
+                      attributeName: opacity
+                      values: 0.3;0.06;0.3
+                      dur: 2s
+                      repeatCount: indefinite
+                      visible: =Math.abs((Number(items[props.homePower].numericState) || 0)) > 10
+              - component: circle
+                config:
+                  style:
+                    stroke: 'var(--f7-card-bg-color, #fff)'
+                  cx: 241.9
+                  cy: 210.2
+                  r: 29.2
+                  fill: none
+                  pathLength: 100
+                  transform: rotate(-90 241.9 210.2)
+                  stroke-width: 4.9
+                  stroke-linecap: round
+                  stroke-dasharray: '=((((((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1,
+                    (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100,
+                    Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - (0)))))))) + Math.max(0, Math.min(Math.min(100, Math.max(0, (items[props.acSwitch].state
+                    === ''ON'' ? (Number(items[props.acUnitPower].numericState) || 0) : 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - (((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1,
+                    (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100,
+                    Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - (0)))))))))))) + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ecarPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((((0 + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1,
+                    (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0, Math.min(Math.min(100,
+                    Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))))))) + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
+                    || 0) : 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (((0 + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1,
+                    (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0, Math.min(Math.min(100,
+                    Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))))))))))))))
+                    + Math.max(0, Math.min(Math.min(100, Math.max(0, ((Number(items[props.washingMachine1Power].numericState)
+                    || 0) + (Number(items[props.washingMachine2Power].numericState) || 0) + (Number(items[props.tumbleDryerPower].numericState)
+                    || 0) + (Number(items[props.dishwasherPower].numericState) || 0))) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - (((((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1,
+                    (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100,
+                    Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - (0)))))))) + Math.max(0, Math.min(Math.min(100, Math.max(0, (items[props.acSwitch].state
+                    === ''ON'' ? (Number(items[props.acUnitPower].numericState) || 0) : 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - (((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1,
+                    (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100,
+                    Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - (0)))))))))))) + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ecarPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((((0 + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1,
+                    (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0, Math.min(Math.min(100,
+                    Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))))))) + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
+                    || 0) : 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (((0 + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1,
+                    (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0, Math.min(Math.min(100,
+                    Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))))))))))))))))))).toFixed(2)
+                    + '' 100'''
+                  visible: '=((((((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1,
+                    (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100,
+                    Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - (0)))))))) + Math.max(0, Math.min(Math.min(100, Math.max(0, (items[props.acSwitch].state
+                    === ''ON'' ? (Number(items[props.acUnitPower].numericState) || 0) : 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - (((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1,
+                    (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100,
+                    Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - (0)))))))))))) + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ecarPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((((0 + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1,
+                    (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0, Math.min(Math.min(100,
+                    Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))))))) + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
+                    || 0) : 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (((0 + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1,
+                    (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0, Math.min(Math.min(100,
+                    Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))))))))))))))
+                    + Math.max(0, Math.min(Math.min(100, Math.max(0, ((Number(items[props.washingMachine1Power].numericState)
+                    || 0) + (Number(items[props.washingMachine2Power].numericState) || 0) + (Number(items[props.tumbleDryerPower].numericState)
+                    || 0) + (Number(items[props.dishwasherPower].numericState) || 0))) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - (((((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1,
+                    (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100,
+                    Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - (0)))))))) + Math.max(0, Math.min(Math.min(100, Math.max(0, (items[props.acSwitch].state
+                    === ''ON'' ? (Number(items[props.acUnitPower].numericState) || 0) : 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - (((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1,
+                    (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100,
+                    Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - (0)))))))))))) + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ecarPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((((0 + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1,
+                    (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0, Math.min(Math.min(100,
+                    Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))))))) + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
+                    || 0) : 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (((0 + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1,
+                    (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0, Math.min(Math.min(100,
+                    Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))))))))))))))))))))
+                    > 0.05'
+              - component: circle
+                config:
+                  stroke: '#26a69a'
+                  cx: 241.9
+                  cy: 210.2
+                  r: 29.2
+                  fill: none
+                  pathLength: 100
+                  transform: rotate(-90 241.9 210.2)
+                  stroke-width: 2.9
+                  stroke-dasharray: =(Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))).toFixed(2)
+                    + ' 100'
+                  stroke-dashoffset: =(-(0)).toFixed(2)
+                slots:
+                  default:
+                  - component: animate
                     config:
-                      cx: 241.9
-                      cy: 210.2
-                      r: 29.2
-                      fill: none
-                      stroke: '#1e88e5'
-                      stroke-width: 2.9
-                      visible: =(Math.abs((Number(items[props.homePower].numericState) || 0)) > 10) && (false)
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          values: 0.3;0.06;0.3
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: =(Math.abs((Number(items[props.homePower].numericState) || 0)) > 10) && (false)
+                      attributeName: stroke-width
+                      values: 4.5;2.9;4.5
+                      dur: 2s
+                      repeatCount: indefinite
+                      visible: =Math.abs((Number(items[props.homePower].numericState) || 0)) > 10
+                  - component: animate
+                    config:
+                      attributeName: r
+                      values: 30;29.2;30
+                      dur: 2s
+                      repeatCount: indefinite
+                      visible: =Math.abs((Number(items[props.homePower].numericState) || 0)) > 10
+              - component: circle
+                config:
+                  stroke: '#fb8c00'
+                  cx: 241.9
+                  cy: 210.2
+                  r: 29.2
+                  fill: none
+                  pathLength: 100
+                  transform: rotate(-90 241.9 210.2)
+                  stroke-width: 2.9
+                  stroke-dasharray: =(Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1,
+                    (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))))))).toFixed(2) + ' 100'
+                  stroke-dashoffset: =(-((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))))).toFixed(2)
+                slots:
+                  default:
+                  - component: animate
+                    config:
+                      attributeName: stroke-width
+                      values: 4.5;2.9;4.5
+                      dur: 2s
+                      repeatCount: indefinite
+                      visible: =Math.abs((Number(items[props.homePower].numericState) || 0)) > 10
+                  - component: animate
+                    config:
+                      attributeName: r
+                      values: 30;29.2;30
+                      dur: 2s
+                      repeatCount: indefinite
+                      visible: =Math.abs((Number(items[props.homePower].numericState) || 0)) > 10
+              - component: circle
+                config:
+                  stroke: '#29b6f6'
+                  cx: 241.9
+                  cy: 210.2
+                  r: 29.2
+                  fill: none
+                  pathLength: 100
+                  transform: rotate(-90 241.9 210.2)
+                  stroke-width: 2.9
+                  stroke-dasharray: '=(Math.max(0, Math.min(Math.min(100, Math.max(0, (items[props.acSwitch].state === ''ON''
+                    ? (Number(items[props.acUnitPower].numericState) || 0) : 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - (((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1,
+                    (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100,
+                    Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - (0)))))))))))).toFixed(2) + '' 100'''
+                  stroke-dashoffset: =(-(((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1,
+                    (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100,
+                    Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - (0)))))))))).toFixed(2)
+                slots:
+                  default:
+                  - component: animate
+                    config:
+                      attributeName: stroke-width
+                      values: 4.5;2.9;4.5
+                      dur: 2s
+                      repeatCount: indefinite
+                      visible: =Math.abs((Number(items[props.homePower].numericState) || 0)) > 10
+                  - component: animate
+                    config:
+                      attributeName: r
+                      values: 30;29.2;30
+                      dur: 2s
+                      repeatCount: indefinite
+                      visible: =Math.abs((Number(items[props.homePower].numericState) || 0)) > 10
+              - component: circle
+                config:
+                  stroke: '#26a69a'
+                  cx: 241.9
+                  cy: 210.2
+                  r: 29.2
+                  fill: none
+                  pathLength: 100
+                  transform: rotate(-90 241.9 210.2)
+                  stroke-width: 2.9
+                  stroke-dasharray: '=(Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ecarPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((((0 + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1,
+                    (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0, Math.min(Math.min(100,
+                    Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))))))) + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
+                    || 0) : 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (((0 + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1,
+                    (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0, Math.min(Math.min(100,
+                    Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))))))))))))))).toFixed(2)
+                    + '' 100'''
+                  stroke-dashoffset: '=(-((((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1,
+                    (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100,
+                    Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - (0)))))))) + Math.max(0, Math.min(Math.min(100, Math.max(0, (items[props.acSwitch].state
+                    === ''ON'' ? (Number(items[props.acUnitPower].numericState) || 0) : 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - (((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1,
+                    (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100,
+                    Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - (0)))))))))))))).toFixed(2)'
+                slots:
+                  default:
+                  - component: animate
+                    config:
+                      attributeName: stroke-width
+                      values: 4.5;2.9;4.5
+                      dur: 2s
+                      repeatCount: indefinite
+                      visible: =Math.abs((Number(items[props.homePower].numericState) || 0)) > 10
+                  - component: animate
+                    config:
+                      attributeName: r
+                      values: 30;29.2;30
+                      dur: 2s
+                      repeatCount: indefinite
+                      visible: =Math.abs((Number(items[props.homePower].numericState) || 0)) > 10
+              - component: circle
+                config:
+                  stroke: '#5c6bc0'
+                  cx: 241.9
+                  cy: 210.2
+                  r: 29.2
+                  fill: none
+                  pathLength: 100
+                  transform: rotate(-90 241.9 210.2)
+                  stroke-width: 2.9
+                  stroke-dasharray: '=(Math.max(0, Math.min(Math.min(100, Math.max(0, ((Number(items[props.washingMachine1Power].numericState)
+                    || 0) + (Number(items[props.washingMachine2Power].numericState) || 0) + (Number(items[props.tumbleDryerPower].numericState)
+                    || 0) + (Number(items[props.dishwasherPower].numericState) || 0))) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - (((((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1,
+                    (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100,
+                    Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - (0)))))))) + Math.max(0, Math.min(Math.min(100, Math.max(0, (items[props.acSwitch].state
+                    === ''ON'' ? (Number(items[props.acUnitPower].numericState) || 0) : 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - (((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1,
+                    (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100,
+                    Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - (0)))))))))))) + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ecarPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((((0 + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1,
+                    (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0, Math.min(Math.min(100,
+                    Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))))))) + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
+                    || 0) : 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (((0 + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1,
+                    (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0, Math.min(Math.min(100,
+                    Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))))))))))))))))))).toFixed(2)
+                    + '' 100'''
+                  stroke-dashoffset: '=(-(((((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1,
+                    (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100,
+                    Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - (0)))))))) + Math.max(0, Math.min(Math.min(100, Math.max(0, (items[props.acSwitch].state
+                    === ''ON'' ? (Number(items[props.acUnitPower].numericState) || 0) : 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - (((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1,
+                    (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100,
+                    Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - (0)))))))))))) + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ecarPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((((0 + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1,
+                    (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0, Math.min(Math.min(100,
+                    Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))))))) + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
+                    || 0) : 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (((0 + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1,
+                    (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0, Math.min(Math.min(100,
+                    Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))))))))))))))))).toFixed(2)'
+                slots:
+                  default:
+                  - component: animate
+                    config:
+                      attributeName: stroke-width
+                      values: 4.5;2.9;4.5
+                      dur: 2s
+                      repeatCount: indefinite
+                      visible: =Math.abs((Number(items[props.homePower].numericState) || 0)) > 10
+                  - component: animate
+                    config:
+                      attributeName: r
+                      values: 30;29.2;30
+                      dur: 2s
+                      repeatCount: indefinite
+                      visible: =Math.abs((Number(items[props.homePower].numericState) || 0)) > 10
+              - component: circle
+                config:
+                  stroke: '=(Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) > 0.05 ?
+                    ''#26a69a'' : (Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1,
+                    (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))))))) > 0.05 ? ''#fb8c00'' : (Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
+                    || 0) : 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (((0 + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1,
+                    (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0, Math.min(Math.min(100,
+                    Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))))))))))
+                    > 0.05 ? ''#29b6f6'' : (Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ecarPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((((0 + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1,
+                    (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0, Math.min(Math.min(100,
+                    Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))))))) + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
+                    || 0) : 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (((0 + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1,
+                    (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0, Math.min(Math.min(100,
+                    Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))))))))))))))
+                    > 0.05 ? ''#26a69a'' : (Math.max(0, Math.min(Math.min(100, Math.max(0, ((Number(items[props.washingMachine1Power].numericState)
+                    || 0) + (Number(items[props.washingMachine2Power].numericState) || 0) + (Number(items[props.tumbleDryerPower].numericState)
+                    || 0) + (Number(items[props.dishwasherPower].numericState) || 0))) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - (((((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1,
+                    (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100,
+                    Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - (0)))))))) + Math.max(0, Math.min(Math.min(100, Math.max(0, (items[props.acSwitch].state
+                    === ''ON'' ? (Number(items[props.acUnitPower].numericState) || 0) : 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - (((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1,
+                    (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100,
+                    Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - (0)))))))))))) + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ecarPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((((0 + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1,
+                    (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0, Math.min(Math.min(100,
+                    Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))))))) + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
+                    || 0) : 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (((0 + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1,
+                    (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0, Math.min(Math.min(100,
+                    Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))))))))))))))))))
+                    > 0.05 ? ''#5c6bc0'' : ''#5c6bc0'''
+                  cx: 241.9
+                  cy: 210.2
+                  r: 29.2
+                  fill: none
+                  pathLength: 100
+                  transform: rotate(-90 241.9 210.2)
+                  stroke-width: 2.9
+                  stroke-linecap: round
+                  stroke-dasharray: 0.001 100
+                  stroke-dashoffset: '0'
+                  visible: '=((((((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1,
+                    (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100,
+                    Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - (0)))))))) + Math.max(0, Math.min(Math.min(100, Math.max(0, (items[props.acSwitch].state
+                    === ''ON'' ? (Number(items[props.acUnitPower].numericState) || 0) : 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - (((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1,
+                    (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100,
+                    Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - (0)))))))))))) + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ecarPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((((0 + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1,
+                    (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0, Math.min(Math.min(100,
+                    Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))))))) + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
+                    || 0) : 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (((0 + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1,
+                    (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0, Math.min(Math.min(100,
+                    Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))))))))))))))
+                    + Math.max(0, Math.min(Math.min(100, Math.max(0, ((Number(items[props.washingMachine1Power].numericState)
+                    || 0) + (Number(items[props.washingMachine2Power].numericState) || 0) + (Number(items[props.tumbleDryerPower].numericState)
+                    || 0) + (Number(items[props.dishwasherPower].numericState) || 0))) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - (((((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1,
+                    (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100,
+                    Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - (0)))))))) + Math.max(0, Math.min(Math.min(100, Math.max(0, (items[props.acSwitch].state
+                    === ''ON'' ? (Number(items[props.acUnitPower].numericState) || 0) : 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - (((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1,
+                    (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100,
+                    Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - (0)))))))))))) + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ecarPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((((0 + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1,
+                    (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0, Math.min(Math.min(100,
+                    Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))))))) + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
+                    || 0) : 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (((0 + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1,
+                    (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0, Math.min(Math.min(100,
+                    Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))))))))))))))))))))
+                    > 0.05'
+                slots:
+                  default:
+                  - component: animate
+                    config:
+                      attributeName: stroke-width
+                      values: 4.5;2.9;4.5
+                      dur: 2s
+                      repeatCount: indefinite
+                      visible: =Math.abs((Number(items[props.homePower].numericState) || 0)) > 10
+                  - component: animate
+                    config:
+                      attributeName: r
+                      values: 30;29.2;30
+                      dur: 2s
+                      repeatCount: indefinite
+                      visible: =Math.abs((Number(items[props.homePower].numericState) || 0)) > 10
+              - component: circle
+                config:
+                  stroke: '=(Math.max(0, Math.min(Math.min(100, Math.max(0, ((Number(items[props.washingMachine1Power].numericState)
+                    || 0) + (Number(items[props.washingMachine2Power].numericState) || 0) + (Number(items[props.tumbleDryerPower].numericState)
+                    || 0) + (Number(items[props.dishwasherPower].numericState) || 0))) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - (((((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1,
+                    (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100,
+                    Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - (0)))))))) + Math.max(0, Math.min(Math.min(100, Math.max(0, (items[props.acSwitch].state
+                    === ''ON'' ? (Number(items[props.acUnitPower].numericState) || 0) : 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - (((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1,
+                    (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100,
+                    Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - (0)))))))))))) + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ecarPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((((0 + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1,
+                    (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0, Math.min(Math.min(100,
+                    Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))))))) + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
+                    || 0) : 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (((0 + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1,
+                    (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0, Math.min(Math.min(100,
+                    Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))))))))))))))))))
+                    > 0.05 ? ''#5c6bc0'' : (Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ecarPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((((0 + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1,
+                    (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0, Math.min(Math.min(100,
+                    Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))))))) + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
+                    || 0) : 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (((0 + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1,
+                    (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0, Math.min(Math.min(100,
+                    Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))))))))))))))
+                    > 0.05 ? ''#26a69a'' : (Math.max(0, Math.min(Math.min(100, Math.max(0, (items[props.acSwitch].state ===
+                    ''ON'' ? (Number(items[props.acUnitPower].numericState) || 0) : 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - (((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1,
+                    (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100,
+                    Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - (0)))))))))))) > 0.05 ? ''#29b6f6'' : (Math.max(0, Math.min(Math.min(100, Math.max(0,
+                    (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))))))) > 0.05
+                    ? ''#fb8c00'' : (Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) > 0.05 ?
+                    ''#26a69a'' : ''#26a69a'''
+                  cx: 241.9
+                  cy: 210.2
+                  r: 29.2
+                  fill: none
+                  pathLength: 100
+                  transform: rotate(-90 241.9 210.2)
+                  stroke-width: 2.9
+                  stroke-linecap: round
+                  stroke-dasharray: 0.001 100
+                  stroke-dashoffset: '=(-((((((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1,
+                    (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100,
+                    Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - (0)))))))) + Math.max(0, Math.min(Math.min(100, Math.max(0, (items[props.acSwitch].state
+                    === ''ON'' ? (Number(items[props.acUnitPower].numericState) || 0) : 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - (((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1,
+                    (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100,
+                    Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - (0)))))))))))) + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ecarPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((((0 + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1,
+                    (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0, Math.min(Math.min(100,
+                    Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))))))) + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
+                    || 0) : 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (((0 + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1,
+                    (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0, Math.min(Math.min(100,
+                    Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))))))))))))))
+                    + Math.max(0, Math.min(Math.min(100, Math.max(0, ((Number(items[props.washingMachine1Power].numericState)
+                    || 0) + (Number(items[props.washingMachine2Power].numericState) || 0) + (Number(items[props.tumbleDryerPower].numericState)
+                    || 0) + (Number(items[props.dishwasherPower].numericState) || 0))) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - (((((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1,
+                    (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100,
+                    Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - (0)))))))) + Math.max(0, Math.min(Math.min(100, Math.max(0, (items[props.acSwitch].state
+                    === ''ON'' ? (Number(items[props.acUnitPower].numericState) || 0) : 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - (((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1,
+                    (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100,
+                    Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - (0)))))))))))) + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ecarPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((((0 + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1,
+                    (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0, Math.min(Math.min(100,
+                    Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))))))) + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
+                    || 0) : 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (((0 + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1,
+                    (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0, Math.min(Math.min(100,
+                    Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))))))))))))))))))))).toFixed(2)'
+                  visible: '=((((((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1,
+                    (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100,
+                    Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - (0)))))))) + Math.max(0, Math.min(Math.min(100, Math.max(0, (items[props.acSwitch].state
+                    === ''ON'' ? (Number(items[props.acUnitPower].numericState) || 0) : 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - (((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1,
+                    (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100,
+                    Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - (0)))))))))))) + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ecarPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((((0 + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1,
+                    (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0, Math.min(Math.min(100,
+                    Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))))))) + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
+                    || 0) : 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (((0 + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1,
+                    (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0, Math.min(Math.min(100,
+                    Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))))))))))))))
+                    + Math.max(0, Math.min(Math.min(100, Math.max(0, ((Number(items[props.washingMachine1Power].numericState)
+                    || 0) + (Number(items[props.washingMachine2Power].numericState) || 0) + (Number(items[props.tumbleDryerPower].numericState)
+                    || 0) + (Number(items[props.dishwasherPower].numericState) || 0))) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - (((((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1,
+                    (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100,
+                    Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - (0)))))))) + Math.max(0, Math.min(Math.min(100, Math.max(0, (items[props.acSwitch].state
+                    === ''ON'' ? (Number(items[props.acUnitPower].numericState) || 0) : 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - (((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1,
+                    (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100,
+                    Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - (0)))))))))))) + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ecarPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((((0 + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1,
+                    (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0, Math.min(Math.min(100,
+                    Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))))))) + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
+                    || 0) : 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (((0 + Math.max(0,
+                    Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1,
+                    (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0, Math.min(Math.min(100,
+                    Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                    || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                    || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))))))))))))))))))))
+                    > 0.05'
+                slots:
+                  default:
+                  - component: animate
+                    config:
+                      attributeName: stroke-width
+                      values: 4.5;2.9;4.5
+                      dur: 2s
+                      repeatCount: indefinite
+                      visible: =Math.abs((Number(items[props.homePower].numericState) || 0)) > 10
+                  - component: animate
+                    config:
+                      attributeName: r
+                      values: 30;29.2;30
+                      dur: 2s
+                      repeatCount: indefinite
+                      visible: =Math.abs((Number(items[props.homePower].numericState) || 0)) > 10
               - component: g
                 config: {}
                 slots:
@@ -1503,6 +2090,186 @@ slots:
                           dur: 2s
                           repeatCount: indefinite
                           visible: =Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) > 50
+              - component: g
+                config: {}
+                slots:
+                  default:
+                  - component: rect
+                    config:
+                      x: 233.8
+                      y: 117.0
+                      width: 40
+                      height: 18
+                      rx: 9.0
+                      style:
+                        fill: 'var(--f7-card-bg-color, #fff)'
+                  - component: rect
+                    config:
+                      x: 233.8
+                      y: 117.0
+                      width: 40
+                      height: 18
+                      rx: 9.0
+                      fill: '=Math.abs((Number(items[props.ventilationPower].numericState) || 0)) > 5 ? ''#26a69a'' : ''rgba(158,
+                        158, 158, 0.18)'''
+                      stroke: '=Math.abs((Number(items[props.ventilationPower].numericState) || 0)) > 5 ? ''#26a69a'' : ''#9e9e9e'''
+                      stroke-width: 1
+                  - component: text
+                    config:
+                      x: 253.8
+                      y: 130.0
+                      content: '=((v) => v > 0 && v < 1 ? ''<1 %'' : Math.round(v) + '' %'')(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
+                        || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100))'
+                      fill: '=Math.abs((Number(items[props.ventilationPower].numericState) || 0)) > 5 ? ''#ffffff'' : ''#9e9e9e'''
+                      font-size: 11
+                      font-weight: '700'
+                      text-anchor: middle
+              - component: g
+                config: {}
+                slots:
+                  default:
+                  - component: rect
+                    config:
+                      x: 289.8
+                      y: 150.1
+                      width: 40
+                      height: 18
+                      rx: 9.0
+                      style:
+                        fill: 'var(--f7-card-bg-color, #fff)'
+                  - component: rect
+                    config:
+                      x: 289.8
+                      y: 150.1
+                      width: 40
+                      height: 18
+                      rx: 9.0
+                      fill: '=Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) > 50 ? ''#fb8c00'' : ''rgba(158,
+                        158, 158, 0.18)'''
+                      stroke: '=Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) > 50 ? ''#fb8c00'' : ''#9e9e9e'''
+                      stroke-width: 1
+                  - component: text
+                    config:
+                      x: 309.8
+                      y: 163.1
+                      content: '=((v) => v > 0 && v < 1 ? ''<1 %'' : Math.round(v) + '' %'')(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState)
+                        || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100))'
+                      fill: '=Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) > 50 ? ''#ffffff'' : ''#9e9e9e'''
+                      font-size: 11
+                      font-weight: '700'
+                      text-anchor: middle
+              - component: g
+                config: {}
+                slots:
+                  default:
+                  - component: rect
+                    config:
+                      x: 306.1
+                      y: 213.1
+                      width: 40
+                      height: 18
+                      rx: 9.0
+                      style:
+                        fill: 'var(--f7-card-bg-color, #fff)'
+                  - component: rect
+                    config:
+                      x: 306.1
+                      y: 213.1
+                      width: 40
+                      height: 18
+                      rx: 9.0
+                      fill: '=Math.abs((items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
+                        || 0) : 0)) > 5 ? ''#29b6f6'' : ''rgba(158, 158, 158, 0.18)'''
+                      stroke: '=Math.abs((items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
+                        || 0) : 0)) > 5 ? ''#29b6f6'' : ''#9e9e9e'''
+                      stroke-width: 1
+                  - component: text
+                    config:
+                      x: 326.1
+                      y: 226.1
+                      content: '=((v) => v > 0 && v < 1 ? ''<1 %'' : Math.round(v) + '' %'')(Math.min(100, Math.max(0, (items[props.acSwitch].state
+                        === ''ON'' ? (Number(items[props.acUnitPower].numericState) || 0) : 0)) / Math.max(1, (Number(items[props.homePower].numericState)
+                        || 0)) * 100))'
+                      fill: '=Math.abs((items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
+                        || 0) : 0)) > 5 ? ''#ffffff'' : ''#9e9e9e'''
+                      font-size: 11
+                      font-weight: '700'
+                      text-anchor: middle
+              - component: g
+                config: {}
+                slots:
+                  default:
+                  - component: rect
+                    config:
+                      x: 273.1
+                      y: 269.1
+                      width: 40
+                      height: 18
+                      rx: 9.0
+                      style:
+                        fill: 'var(--f7-card-bg-color, #fff)'
+                  - component: rect
+                    config:
+                      x: 273.1
+                      y: 269.1
+                      width: 40
+                      height: 18
+                      rx: 9.0
+                      fill: '=Math.abs((Number(items[props.ecarPower].numericState) || 0)) > 100 ? ''#26a69a'' : ''rgba(158,
+                        158, 158, 0.18)'''
+                      stroke: '=Math.abs((Number(items[props.ecarPower].numericState) || 0)) > 100 ? ''#26a69a'' : ''#9e9e9e'''
+                      stroke-width: 1
+                  - component: text
+                    config:
+                      x: 293.1
+                      y: 282.1
+                      content: '=((v) => v > 0 && v < 1 ? ''<1 %'' : Math.round(v) + '' %'')(Math.min(100, Math.max(0, (Number(items[props.ecarPower].numericState)
+                        || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100))'
+                      fill: '=Math.abs((Number(items[props.ecarPower].numericState) || 0)) > 100 ? ''#ffffff'' : ''#9e9e9e'''
+                      font-size: 11
+                      font-weight: '700'
+                      text-anchor: middle
+              - component: g
+                config: {}
+                slots:
+                  default:
+                  - component: rect
+                    config:
+                      x: 210.1
+                      y: 285.4
+                      width: 40
+                      height: 18
+                      rx: 9.0
+                      style:
+                        fill: 'var(--f7-card-bg-color, #fff)'
+                  - component: rect
+                    config:
+                      x: 210.1
+                      y: 285.4
+                      width: 40
+                      height: 18
+                      rx: 9.0
+                      fill: '=Math.abs(((Number(items[props.washingMachine1Power].numericState) || 0) + (Number(items[props.washingMachine2Power].numericState)
+                        || 0) + (Number(items[props.tumbleDryerPower].numericState) || 0) + (Number(items[props.dishwasherPower].numericState)
+                        || 0))) > 10 ? ''#5c6bc0'' : ''rgba(158, 158, 158, 0.18)'''
+                      stroke: '=Math.abs(((Number(items[props.washingMachine1Power].numericState) || 0) + (Number(items[props.washingMachine2Power].numericState)
+                        || 0) + (Number(items[props.tumbleDryerPower].numericState) || 0) + (Number(items[props.dishwasherPower].numericState)
+                        || 0))) > 10 ? ''#5c6bc0'' : ''#9e9e9e'''
+                      stroke-width: 1
+                  - component: text
+                    config:
+                      x: 230.1
+                      y: 298.4
+                      content: '=((v) => v > 0 && v < 1 ? ''<1 %'' : Math.round(v) + '' %'')(Math.min(100, Math.max(0, ((Number(items[props.washingMachine1Power].numericState)
+                        || 0) + (Number(items[props.washingMachine2Power].numericState) || 0) + (Number(items[props.tumbleDryerPower].numericState)
+                        || 0) + (Number(items[props.dishwasherPower].numericState) || 0))) / Math.max(1, (Number(items[props.homePower].numericState)
+                        || 0)) * 100))'
+                      fill: '=Math.abs(((Number(items[props.washingMachine1Power].numericState) || 0) + (Number(items[props.washingMachine2Power].numericState)
+                        || 0) + (Number(items[props.tumbleDryerPower].numericState) || 0) + (Number(items[props.dishwasherPower].numericState)
+                        || 0))) > 10 ? ''#ffffff'' : ''#9e9e9e'''
+                      font-size: 11
+                      font-weight: '700'
+                      text-anchor: middle
               - component: widget:flow-node
                 config:
                   kind: pv
@@ -1860,979 +2627,10 @@ slots:
                   font-weight: normal
                   text-anchor: middle
                   opacity: '0.7'
-              - component: g
-                config:
-                  class: tip tip-pv
-                slots:
-                  default:
-                  - component: path
-                    config:
-                      d: M195.8,41.4 H351.8 Q359.8,41.4 359.8,49.4 V99.4 Q359.8,107.4 351.8,107.4 H195.8 Q187.8,107.4 187.8,99.4
-                        V81.4 L179.8,74.4 L187.8,67.4 V49.4 Q187.8,41.4 195.8,41.4 Z
-                      fill: '=themeOptions.dark === ''dark'' ? ''#2b2b2c'' : ''#ffffff'''
-                      stroke: rgba(127, 127, 127, 0.35)
-                      stroke-width: 1
-                      stroke-linejoin: round
-                  - component: text
-                    config:
-                      x: 197.8
-                      y: 61.4
-                      content: Photovoltaics
-                      fill: '#ffb300'
-                      font-size: 13
-                      font-weight: '700'
-                  - component: text
-                    config:
-                      x: 197.8
-                      y: 79.4
-                      content: Self-consumption
-                      fill: currentColor
-                      opacity: '0.7'
-                      font-size: 12
-                  - component: text
-                    config:
-                      x: 349.8
-                      y: 79.4
-                      content: '=((Number(items[props.pvEnergyToday].numericState) || 0) > 0 ? Math.round(100 * (Number(items[props.pvSelfUseToday].numericState)
-                        || 0) / (Number(items[props.pvEnergyToday].numericState) || 0)) : 0) + '' %'''
-                      fill: currentColor
-                      font-size: 12
-                      font-weight: '700'
-                      text-anchor: end
-                  - component: text
-                    config:
-                      x: 197.8
-                      y: 96.4
-                      content: String 1 · 2
-                      fill: currentColor
-                      opacity: '0.7'
-                      font-size: 12
-                  - component: text
-                    config:
-                      x: 349.8
-                      y: 96.4
-                      content: =((Number(items[props.pvPv1Power].numericState) || 0) / 1000).toFixed(2) + ' · ' + ((Number(items[props.pvPv2Power].numericState)
-                        || 0) / 1000).toFixed(2) + ' kW'
-                      fill: currentColor
-                      font-size: 12
-                      font-weight: '700'
-                      text-anchor: end
-              - component: g
-                config:
-                  class: tip tip-grid
-                slots:
-                  default:
-                  - component: path
-                    config:
-                      d: M129.8,162 H285.8 Q293.8,162 293.8,170 V203 Q293.8,211 285.8,211 H129.8 Q121.8,211 121.8,203 V193.5
-                        L113.8,186.5 L121.8,179.5 V170 Q121.8,162 129.8,162 Z
-                      fill: '=themeOptions.dark === ''dark'' ? ''#2b2b2c'' : ''#ffffff'''
-                      stroke: rgba(127, 127, 127, 0.35)
-                      stroke-width: 1
-                      stroke-linejoin: round
-                  - component: text
-                    config:
-                      x: 131.8
-                      y: 182.0
-                      content: Power Meter
-                      fill: '#e53935'
-                      font-size: 13
-                      font-weight: '700'
-                  - component: text
-                    config:
-                      x: 131.8
-                      y: 200.0
-                      content: Electricity Price
-                      fill: currentColor
-                      opacity: '0.7'
-                      font-size: 12
-                  - component: text
-                    config:
-                      x: 283.8
-                      y: 200.0
-                      content: '=([''NULL'', ''UNDEF''].includes(items[props.priceTotalGross].state) ? ''–'' : (items[props.priceTotalGross].displayState
-                        || items[props.priceTotalGross].state))'
-                      fill: currentColor
-                      font-size: 12
-                      font-weight: '700'
-                      text-anchor: end
-              - component: g
-                config:
-                  class: tip tip-battery
-                  visible: =(((Number(items[props.batteryPower5min].numericState) || 0) < -50) || ((Number(items[props.batteryPower5min].numericState)
-                    || 0) > 50))
-                slots:
-                  default:
-                  - component: path
-                    config:
-                      d: M162.3,271 H318.3 Q326.3,271 326.3,279 V346 Q326.3,354 318.3,354 H162.3 Q154.3,354 154.3,346 V319.5
-                        L146.3,312.5 L154.3,305.5 V279 Q154.3,271 162.3,271 Z
-                      fill: '=themeOptions.dark === ''dark'' ? ''#2b2b2c'' : ''#ffffff'''
-                      stroke: rgba(127, 127, 127, 0.35)
-                      stroke-width: 1
-                      stroke-linejoin: round
-                  - component: text
-                    config:
-                      x: 164.3
-                      y: 291.0
-                      content: Battery
-                      fill: '#7cb342'
-                      font-size: 13
-                      font-weight: '700'
-                  - component: text
-                    config:
-                      x: 164.3
-                      y: 309.0
-                      content: '=((Number(items[props.batteryPower5min].numericState) || 0) < -50) ? ''Full in'' : ''Empty
-                        in'''
-                      fill: currentColor
-                      opacity: '0.7'
-                      font-size: 12
-                  - component: text
-                    config:
-                      x: 316.3
-                      y: 309.0
-                      content: '=((m) => m >= 2880 ? ''over 2 days'' : m < 60 ? Math.max(1, m) + '' min'' : Math.floor(m /
-                        60) + '':'' + (''0'' + m % 60).slice(-2) + '' h'')(Math.round((((Number(items[props.batteryPower5min].numericState)
-                        || 0) < -50) ? Math.max(0, 100 - (Number(items[props.batterySoc].numericState) || 0)) * 0.07 / (-(Number(items[props.batteryPower5min].numericState)
-                        || 0) / 1000) : Math.max(0, (Number(items[props.batterySoc].numericState) || 0) - 3) * 0.07 / ((Number(items[props.batteryPower5min].numericState)
-                        || 0) / 1000)) * 60))'
-                      fill: currentColor
-                      font-size: 12
-                      font-weight: '700'
-                      text-anchor: end
-                  - component: text
-                    config:
-                      x: 164.3
-                      y: 326.0
-                      content: '=((Number(items[props.batteryPower5min].numericState) || 0) < -50) ? ''Full at'' : ''Empty
-                        at'''
-                      fill: currentColor
-                      opacity: '0.7'
-                      font-size: 12
-                  - component: text
-                    config:
-                      x: 316.3
-                      y: 326.0
-                      content: '=((m) => dayjs().add(m, ''minute'').isSame(dayjs(), ''day'') ? dayjs().add(m, ''minute'').format(''HH:mm'')
-                        : dayjs().add(m, ''minute'').format(''dd HH:mm''))(Math.round((((Number(items[props.batteryPower5min].numericState)
-                        || 0) < -50) ? Math.max(0, 100 - (Number(items[props.batterySoc].numericState) || 0)) * 0.07 / (-(Number(items[props.batteryPower5min].numericState)
-                        || 0) / 1000) : Math.max(0, (Number(items[props.batterySoc].numericState) || 0) - 3) * 0.07 / ((Number(items[props.batteryPower5min].numericState)
-                        || 0) / 1000)) * 60))'
-                      fill: currentColor
-                      font-size: 12
-                      font-weight: '700'
-                      text-anchor: end
-                  - component: text
-                    config:
-                      x: 164.3
-                      y: 343.0
-                      content: Ø 5 min
-                      fill: currentColor
-                      opacity: '0.7'
-                      font-size: 12
-                  - component: text
-                    config:
-                      x: 316.3
-                      y: 343.0
-                      content: =((Number(items[props.batteryPower5min].numericState) || 0) / 1000).toFixed(2) + ' kW'
-                      fill: currentColor
-                      font-size: 12
-                      font-weight: '700'
-                      text-anchor: end
-              - component: g
-                config:
-                  class: tip tip-battery
-                  visible: =!((((Number(items[props.batteryPower5min].numericState) || 0) < -50) || ((Number(items[props.batteryPower5min].numericState)
-                    || 0) > 50)))
-                slots:
-                  default:
-                  - component: path
-                    config:
-                      d: M162.3,279.5 H318.3 Q326.3,279.5 326.3,287.5 V337.5 Q326.3,345.5 318.3,345.5 H162.3 Q154.3,345.5
-                        154.3,337.5 V319.5 L146.3,312.5 L154.3,305.5 V287.5 Q154.3,279.5 162.3,279.5 Z
-                      fill: '=themeOptions.dark === ''dark'' ? ''#2b2b2c'' : ''#ffffff'''
-                      stroke: rgba(127, 127, 127, 0.35)
-                      stroke-width: 1
-                      stroke-linejoin: round
-                  - component: text
-                    config:
-                      x: 164.3
-                      y: 299.5
-                      content: Battery
-                      fill: '#7cb342'
-                      font-size: 13
-                      font-weight: '700'
-                  - component: text
-                    config:
-                      x: 164.3
-                      y: 317.5
-                      content: Battery
-                      fill: currentColor
-                      opacity: '0.7'
-                      font-size: 12
-                  - component: text
-                    config:
-                      x: 316.3
-                      y: 317.5
-                      content: idle
-                      fill: currentColor
-                      font-size: 12
-                      font-weight: '700'
-                      text-anchor: end
-                  - component: text
-                    config:
-                      x: 164.3
-                      y: 334.5
-                      content: Ø 5 min
-                      fill: currentColor
-                      opacity: '0.7'
-                      font-size: 12
-                  - component: text
-                    config:
-                      x: 316.3
-                      y: 334.5
-                      content: =((Number(items[props.batteryPower5min].numericState) || 0) / 1000).toFixed(2) + ' kW'
-                      fill: currentColor
-                      font-size: 12
-                      font-weight: '700'
-                      text-anchor: end
-              - component: g
-                config:
-                  class: tip tip-home
-                slots:
-                  default:
-                  - component: path
-                    config:
-                      d: M298.1,185.7 H454.1 Q462.1,185.7 462.1,193.7 V226.7 Q462.1,234.7 454.1,234.7 H298.1 Q290.1,234.7
-                        290.1,226.7 V217.2 L282.1,210.2 L290.1,203.2 V193.7 Q290.1,185.7 298.1,185.7 Z
-                      fill: '=themeOptions.dark === ''dark'' ? ''#2b2b2c'' : ''#ffffff'''
-                      stroke: rgba(127, 127, 127, 0.35)
-                      stroke-width: 1
-                      stroke-linejoin: round
-                  - component: text
-                    config:
-                      x: 300.1
-                      y: 205.7
-                      content: Home
-                      fill: '#1e88e5'
-                      font-size: 13
-                      font-weight: '700'
-                  - component: text
-                    config:
-                      x: 300.1
-                      y: 223.7
-                      content: From PV today
-                      fill: currentColor
-                      opacity: '0.7'
-                      font-size: 12
-                  - component: text
-                    config:
-                      x: 452.1
-                      y: 223.7
-                      content: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? Math.round(100 * (Number(items[props.pvSelfUseToday].numericState)
-                        || 0) / (Number(items[props.homeEnergyToday].numericState) || 0)) : 0) + '' %'''
-                      fill: currentColor
-                      font-size: 12
-                      font-weight: '700'
-                      text-anchor: end
-              - component: g
-                config:
-                  class: tip tip-hp
-                  visible: =!(items[props.heatpumpDhwEta].state !== 'UNDEF' && items[props.heatpumpDhwEta].state !== 'NULL'
-                    && items[props.heatpumpDhwSince].state !== 'UNDEF' && items[props.heatpumpDhwSince].state !== 'NULL')
-                slots:
-                  default:
-                  - component: path
-                    config:
-                      d: M165.4,66.4 H321.4 Q329.4,66.4 329.4,74.4 V100.9 L337.4,107.9 L329.4,114.9 V141.4 Q329.4,149.4 321.4,149.4
-                        H165.4 Q157.4,149.4 157.4,141.4 V74.4 Q157.4,66.4 165.4,66.4 Z
-                      fill: '=themeOptions.dark === ''dark'' ? ''#2b2b2c'' : ''#ffffff'''
-                      stroke: rgba(127, 127, 127, 0.35)
-                      stroke-width: 1
-                      stroke-linejoin: round
-                  - component: text
-                    config:
-                      x: 167.4
-                      y: 86.4
-                      content: Heat Pump
-                      fill: '#fb8c00'
-                      font-size: 13
-                      font-weight: '700'
-                  - component: text
-                    config:
-                      x: 167.4
-                      y: 104.4
-                      content: Operation
-                      fill: currentColor
-                      opacity: '0.7'
-                      font-size: 12
-                  - component: text
-                    config:
-                      x: 319.4
-                      y: 104.4
-                      content: '=(items[props.heatpumpDefrostOperaton].state === ''ON'' ? ''Defrost'' : (Number(items[props.heatpumpInvFrequency].numericState)
-                        || 0) > 0 || (items[props.heatpumpWaterPumpOperation].state === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState)
-                        || 0) > 0) ? (items[props.heatpumpValve].state === ''DHW'' ? ''Hot water'' : ''Heating'') : ''Ready'')'
-                      fill: currentColor
-                      font-size: 12
-                      font-weight: '700'
-                      text-anchor: end
-                  - component: text
-                    config:
-                      x: 167.4
-                      y: 121.4
-                      content: Heat
-                      fill: currentColor
-                      opacity: '0.7'
-                      font-size: 12
-                  - component: text
-                    config:
-                      x: 319.4
-                      y: 121.4
-                      content: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpHeatPower].state) ? ''–'' : ((Number(items[props.heatpumpHeatPower].numericState)
-                        || 0) / 1000).toFixed(2) + '' kW'')'
-                      fill: currentColor
-                      font-size: 12
-                      font-weight: '700'
-                      text-anchor: end
-                  - component: text
-                    config:
-                      x: 167.4
-                      y: 138.4
-                      content: COP
-                      fill: currentColor
-                      opacity: '0.7'
-                      font-size: 12
-                  - component: text
-                    config:
-                      x: 319.4
-                      y: 138.4
-                      content: '=(Number(items[props.heatpumpCop].numericState) || 0) > 0 ? ((Number(items[props.heatpumpCop].numericState)
-                        || 0)).toFixed(2) : ''–'''
-                      fill: currentColor
-                      font-size: 12
-                      font-weight: '700'
-                      text-anchor: end
-              - component: g
-                config:
-                  class: tip tip-hp
-                  visible: =(items[props.heatpumpDhwEta].state !== 'UNDEF' && items[props.heatpumpDhwEta].state !== 'NULL'
-                    && items[props.heatpumpDhwSince].state !== 'UNDEF' && items[props.heatpumpDhwSince].state !== 'NULL')
-                slots:
-                  default:
-                  - component: path
-                    config:
-                      d: M165.4,49.4 H321.4 Q329.4,49.4 329.4,57.4 V100.9 L337.4,107.9 L329.4,114.9 V158.4 Q329.4,166.4 321.4,166.4
-                        H165.4 Q157.4,166.4 157.4,158.4 V57.4 Q157.4,49.4 165.4,49.4 Z
-                      fill: '=themeOptions.dark === ''dark'' ? ''#2b2b2c'' : ''#ffffff'''
-                      stroke: rgba(127, 127, 127, 0.35)
-                      stroke-width: 1
-                      stroke-linejoin: round
-                  - component: text
-                    config:
-                      x: 167.4
-                      y: 69.4
-                      content: Heat Pump
-                      fill: '#fb8c00'
-                      font-size: 13
-                      font-weight: '700'
-                  - component: text
-                    config:
-                      x: 167.4
-                      y: 87.4
-                      content: Operation
-                      fill: currentColor
-                      opacity: '0.7'
-                      font-size: 12
-                  - component: text
-                    config:
-                      x: 319.4
-                      y: 87.4
-                      content: '=(items[props.heatpumpDefrostOperaton].state === ''ON'' ? ''Defrost'' : (Number(items[props.heatpumpInvFrequency].numericState)
-                        || 0) > 0 || (items[props.heatpumpWaterPumpOperation].state === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState)
-                        || 0) > 0) ? (items[props.heatpumpValve].state === ''DHW'' ? ''Hot water'' : ''Heating'') : ''Ready'')'
-                      fill: currentColor
-                      font-size: 12
-                      font-weight: '700'
-                      text-anchor: end
-                  - component: text
-                    config:
-                      x: 167.4
-                      y: 104.4
-                      content: Done in
-                      fill: currentColor
-                      opacity: '0.7'
-                      font-size: 12
-                  - component: text
-                    config:
-                      x: 319.4
-                      y: 104.4
-                      content: '=(Math.max(0, dayjs(items[props.heatpumpDhwEta].state).diff(dayjs(), ''minute'', true)) >=
-                        60 ? Math.floor(Math.max(0, dayjs(items[props.heatpumpDhwEta].state).diff(dayjs(), ''minute'', true))
-                        / 60) + '':'' + (Math.floor(Math.max(0, dayjs(items[props.heatpumpDhwEta].state).diff(dayjs(), ''minute'',
-                        true)) % 60) < 10 ? ''0'' : '''') + Math.floor(Math.max(0, dayjs(items[props.heatpumpDhwEta].state).diff(dayjs(),
-                        ''minute'', true)) % 60) + '' h'' : Math.round(Math.max(0, dayjs(items[props.heatpumpDhwEta].state).diff(dayjs(),
-                        ''minute'', true))) + '' min'')'
-                      fill: currentColor
-                      font-size: 12
-                      font-weight: '700'
-                      text-anchor: end
-                  - component: text
-                    config:
-                      x: 167.4
-                      y: 121.4
-                      content: Done at
-                      fill: currentColor
-                      opacity: '0.7'
-                      font-size: 12
-                  - component: text
-                    config:
-                      x: 319.4
-                      y: 121.4
-                      content: =dayjs(items[props.heatpumpDhwEta].state).format('HH:mm')
-                      fill: currentColor
-                      font-size: 12
-                      font-weight: '700'
-                      text-anchor: end
-                  - component: text
-                    config:
-                      x: 167.4
-                      y: 138.4
-                      content: Heat
-                      fill: currentColor
-                      opacity: '0.7'
-                      font-size: 12
-                  - component: text
-                    config:
-                      x: 319.4
-                      y: 138.4
-                      content: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpHeatPower].state) ? ''–'' : ((Number(items[props.heatpumpHeatPower].numericState)
-                        || 0) / 1000).toFixed(2) + '' kW'')'
-                      fill: currentColor
-                      font-size: 12
-                      font-weight: '700'
-                      text-anchor: end
-                  - component: text
-                    config:
-                      x: 167.4
-                      y: 155.4
-                      content: COP
-                      fill: currentColor
-                      opacity: '0.7'
-                      font-size: 12
-                  - component: text
-                    config:
-                      x: 319.4
-                      y: 155.4
-                      content: '=(Number(items[props.heatpumpCop].numericState) || 0) > 0 ? ((Number(items[props.heatpumpCop].numericState)
-                        || 0)).toFixed(2) : ''–'''
-                      fill: currentColor
-                      font-size: 12
-                      font-weight: '700'
-                      text-anchor: end
-              - component: g
-                config:
-                  class: tip tip-ac
-                slots:
-                  default:
-                  - component: path
-                    config:
-                      d: M197.9,200.9 H353.9 Q361.9,200.9 361.9,208.9 V226.9 L369.9,233.9 L361.9,240.9 V258.9 Q361.9,266.9
-                        353.9,266.9 H197.9 Q189.9,266.9 189.9,258.9 V208.9 Q189.9,200.9 197.9,200.9 Z
-                      fill: '=themeOptions.dark === ''dark'' ? ''#2b2b2c'' : ''#ffffff'''
-                      stroke: rgba(127, 127, 127, 0.35)
-                      stroke-width: 1
-                      stroke-linejoin: round
-                  - component: text
-                    config:
-                      x: 199.9
-                      y: 220.9
-                      content: Air Conditioner
-                      fill: '#29b6f6'
-                      font-size: 13
-                      font-weight: '700'
-                  - component: text
-                    config:
-                      x: 199.9
-                      y: 238.9
-                      content: Operation
-                      fill: currentColor
-                      opacity: '0.7'
-                      font-size: 12
-                  - component: text
-                    config:
-                      x: 351.9
-                      y: 238.9
-                      content: '=items[props.acSwitch].state === ''ON'' ? ([''NULL'', ''UNDEF''].includes(items[props.acMode].state)
-                        ? ''–'' : (items[props.acMode].displayState || items[props.acMode].state)) : ''Off'''
-                      fill: currentColor
-                      font-size: 12
-                      font-weight: '700'
-                      text-anchor: end
-                  - component: text
-                    config:
-                      x: 199.9
-                      y: 255.9
-                      content: Room · Target
-                      fill: currentColor
-                      opacity: '0.7'
-                      font-size: 12
-                  - component: text
-                    config:
-                      x: 351.9
-                      y: 255.9
-                      content: '=([''NULL'', ''UNDEF''].includes(items[props.acTemperature].state) ? ''–'' : (items[props.acTemperature].displayState
-                        || items[props.acTemperature].state)) + '' · '' + ([''NULL'', ''UNDEF''].includes(items[props.acTemperatureSetpoint].state)
-                        ? ''–'' : (items[props.acTemperatureSetpoint].displayState || items[props.acTemperatureSetpoint].state))'
-                      fill: currentColor
-                      font-size: 12
-                      font-weight: '700'
-                      text-anchor: end
-              - component: g
-                config:
-                  class: tip tip-ecar
-                slots:
-                  default:
-                  - component: path
-                    config:
-                      d: M131.9,321.5 H287.9 Q295.9,321.5 295.9,329.5 V339 L303.9,346 L295.9,353 V362.5 Q295.9,370.5 287.9,370.5
-                        H131.9 Q123.9,370.5 123.9,362.5 V329.5 Q123.9,321.5 131.9,321.5 Z
-                      fill: '=themeOptions.dark === ''dark'' ? ''#2b2b2c'' : ''#ffffff'''
-                      stroke: rgba(127, 127, 127, 0.35)
-                      stroke-width: 1
-                      stroke-linejoin: round
-                  - component: text
-                    config:
-                      x: 133.9
-                      y: 341.5
-                      content: E-Car
-                      fill: '#26a69a'
-                      font-size: 13
-                      font-weight: '700'
-                  - component: text
-                    config:
-                      x: 133.9
-                      y: 359.5
-                      content: Status
-                      fill: currentColor
-                      opacity: '0.7'
-                      font-size: 12
-                  - component: text
-                    config:
-                      x: 285.9
-                      y: 359.5
-                      content: '=(Number(items[props.ecarPower].numericState) || 0) > 500 ? ''charging'' : ''not charging'''
-                      fill: currentColor
-                      font-size: 12
-                      font-weight: '700'
-                      text-anchor: end
-              - component: g
-                config:
-                  class: tip tip-appliances
-                  visible: =[[(Number(items[props.washingMachine1Power].numericState) || 0), 'WM 1'], [(Number(items[props.washingMachine2Power].numericState)
-                    || 0), 'WM 2'], [(Number(items[props.tumbleDryerPower].numericState) || 0), 'Dryer'], [(Number(items[props.dishwasherPower].numericState)
-                    || 0), 'Dishwasher']].filter((m) => m[0] > 10).length === 0
-                slots:
-                  default:
-                  - component: path
-                    config:
-                      d: M274.4,354 H430.4 Q438.4,354 438.4,362 V395 Q438.4,403 430.4,403 H274.4 Q266.4,403 266.4,395 V385.5
-                        L258.4,378.5 L266.4,371.5 V362 Q266.4,354 274.4,354 Z
-                      fill: '=themeOptions.dark === ''dark'' ? ''#2b2b2c'' : ''#ffffff'''
-                      stroke: rgba(127, 127, 127, 0.35)
-                      stroke-width: 1
-                      stroke-linejoin: round
-                  - component: text
-                    config:
-                      x: 276.4
-                      y: 374.0
-                      content: Appliances
-                      fill: '#5c6bc0'
-                      font-size: 13
-                      font-weight: '700'
-                  - component: text
-                    config:
-                      x: 276.4
-                      y: 392.0
-                      content: Running
-                      fill: currentColor
-                      opacity: '0.7'
-                      font-size: 12
-                  - component: text
-                    config:
-                      x: 428.4
-                      y: 392.0
-                      content: nothing
-                      fill: currentColor
-                      font-size: 12
-                      font-weight: '700'
-                      text-anchor: end
-              - component: g
-                config:
-                  class: tip tip-appliances
-                  visible: =[[(Number(items[props.washingMachine1Power].numericState) || 0), 'WM 1'], [(Number(items[props.washingMachine2Power].numericState)
-                    || 0), 'WM 2'], [(Number(items[props.tumbleDryerPower].numericState) || 0), 'Dryer'], [(Number(items[props.dishwasherPower].numericState)
-                    || 0), 'Dishwasher']].filter((m) => m[0] > 10).length === 1
-                slots:
-                  default:
-                  - component: path
-                    config:
-                      d: M274.4,354 H430.4 Q438.4,354 438.4,362 V395 Q438.4,403 430.4,403 H274.4 Q266.4,403 266.4,395 V385.5
-                        L258.4,378.5 L266.4,371.5 V362 Q266.4,354 274.4,354 Z
-                      fill: '=themeOptions.dark === ''dark'' ? ''#2b2b2c'' : ''#ffffff'''
-                      stroke: rgba(127, 127, 127, 0.35)
-                      stroke-width: 1
-                      stroke-linejoin: round
-                  - component: text
-                    config:
-                      x: 276.4
-                      y: 374.0
-                      content: Appliances
-                      fill: '#5c6bc0'
-                      font-size: 13
-                      font-weight: '700'
-                  - component: text
-                    config:
-                      x: 276.4
-                      y: 392.0
-                      content: =[[(Number(items[props.washingMachine1Power].numericState) || 0), 'WM 1'], [(Number(items[props.washingMachine2Power].numericState)
-                        || 0), 'WM 2'], [(Number(items[props.tumbleDryerPower].numericState) || 0), 'Dryer'], [(Number(items[props.dishwasherPower].numericState)
-                        || 0), 'Dishwasher']].filter((m) => m[0] > 10)[0][1]
-                      fill: currentColor
-                      opacity: '0.7'
-                      font-size: 12
-                  - component: text
-                    config:
-                      x: 428.4
-                      y: 392.0
-                      content: =([[(Number(items[props.washingMachine1Power].numericState) || 0), 'WM 1'], [(Number(items[props.washingMachine2Power].numericState)
-                        || 0), 'WM 2'], [(Number(items[props.tumbleDryerPower].numericState) || 0), 'Dryer'], [(Number(items[props.dishwasherPower].numericState)
-                        || 0), 'Dishwasher']].filter((m) => m[0] > 10)[0][0] / 1000).toFixed(2) + ' kW'
-                      fill: currentColor
-                      font-size: 12
-                      font-weight: '700'
-                      text-anchor: end
-              - component: g
-                config:
-                  class: tip tip-appliances
-                  visible: =[[(Number(items[props.washingMachine1Power].numericState) || 0), 'WM 1'], [(Number(items[props.washingMachine2Power].numericState)
-                    || 0), 'WM 2'], [(Number(items[props.tumbleDryerPower].numericState) || 0), 'Dryer'], [(Number(items[props.dishwasherPower].numericState)
-                    || 0), 'Dishwasher']].filter((m) => m[0] > 10).length === 2
-                slots:
-                  default:
-                  - component: path
-                    config:
-                      d: M274.4,345.5 H430.4 Q438.4,345.5 438.4,353.5 V403.5 Q438.4,411.5 430.4,411.5 H274.4 Q266.4,411.5
-                        266.4,403.5 V385.5 L258.4,378.5 L266.4,371.5 V353.5 Q266.4,345.5 274.4,345.5 Z
-                      fill: '=themeOptions.dark === ''dark'' ? ''#2b2b2c'' : ''#ffffff'''
-                      stroke: rgba(127, 127, 127, 0.35)
-                      stroke-width: 1
-                      stroke-linejoin: round
-                  - component: text
-                    config:
-                      x: 276.4
-                      y: 365.5
-                      content: Appliances
-                      fill: '#5c6bc0'
-                      font-size: 13
-                      font-weight: '700'
-                  - component: text
-                    config:
-                      x: 276.4
-                      y: 383.5
-                      content: =[[(Number(items[props.washingMachine1Power].numericState) || 0), 'WM 1'], [(Number(items[props.washingMachine2Power].numericState)
-                        || 0), 'WM 2'], [(Number(items[props.tumbleDryerPower].numericState) || 0), 'Dryer'], [(Number(items[props.dishwasherPower].numericState)
-                        || 0), 'Dishwasher']].filter((m) => m[0] > 10)[0][1]
-                      fill: currentColor
-                      opacity: '0.7'
-                      font-size: 12
-                  - component: text
-                    config:
-                      x: 428.4
-                      y: 383.5
-                      content: =([[(Number(items[props.washingMachine1Power].numericState) || 0), 'WM 1'], [(Number(items[props.washingMachine2Power].numericState)
-                        || 0), 'WM 2'], [(Number(items[props.tumbleDryerPower].numericState) || 0), 'Dryer'], [(Number(items[props.dishwasherPower].numericState)
-                        || 0), 'Dishwasher']].filter((m) => m[0] > 10)[0][0] / 1000).toFixed(2) + ' kW'
-                      fill: currentColor
-                      font-size: 12
-                      font-weight: '700'
-                      text-anchor: end
-                  - component: text
-                    config:
-                      x: 276.4
-                      y: 400.5
-                      content: =[[(Number(items[props.washingMachine1Power].numericState) || 0), 'WM 1'], [(Number(items[props.washingMachine2Power].numericState)
-                        || 0), 'WM 2'], [(Number(items[props.tumbleDryerPower].numericState) || 0), 'Dryer'], [(Number(items[props.dishwasherPower].numericState)
-                        || 0), 'Dishwasher']].filter((m) => m[0] > 10)[1][1]
-                      fill: currentColor
-                      opacity: '0.7'
-                      font-size: 12
-                  - component: text
-                    config:
-                      x: 428.4
-                      y: 400.5
-                      content: =([[(Number(items[props.washingMachine1Power].numericState) || 0), 'WM 1'], [(Number(items[props.washingMachine2Power].numericState)
-                        || 0), 'WM 2'], [(Number(items[props.tumbleDryerPower].numericState) || 0), 'Dryer'], [(Number(items[props.dishwasherPower].numericState)
-                        || 0), 'Dishwasher']].filter((m) => m[0] > 10)[1][0] / 1000).toFixed(2) + ' kW'
-                      fill: currentColor
-                      font-size: 12
-                      font-weight: '700'
-                      text-anchor: end
-              - component: g
-                config:
-                  class: tip tip-appliances
-                  visible: =[[(Number(items[props.washingMachine1Power].numericState) || 0), 'WM 1'], [(Number(items[props.washingMachine2Power].numericState)
-                    || 0), 'WM 2'], [(Number(items[props.tumbleDryerPower].numericState) || 0), 'Dryer'], [(Number(items[props.dishwasherPower].numericState)
-                    || 0), 'Dishwasher']].filter((m) => m[0] > 10).length === 3
-                slots:
-                  default:
-                  - component: path
-                    config:
-                      d: M274.4,337 H430.4 Q438.4,337 438.4,345 V412 Q438.4,420 430.4,420 H274.4 Q266.4,420 266.4,412 V385.5
-                        L258.4,378.5 L266.4,371.5 V345 Q266.4,337 274.4,337 Z
-                      fill: '=themeOptions.dark === ''dark'' ? ''#2b2b2c'' : ''#ffffff'''
-                      stroke: rgba(127, 127, 127, 0.35)
-                      stroke-width: 1
-                      stroke-linejoin: round
-                  - component: text
-                    config:
-                      x: 276.4
-                      y: 357.0
-                      content: Appliances
-                      fill: '#5c6bc0'
-                      font-size: 13
-                      font-weight: '700'
-                  - component: text
-                    config:
-                      x: 276.4
-                      y: 375.0
-                      content: =[[(Number(items[props.washingMachine1Power].numericState) || 0), 'WM 1'], [(Number(items[props.washingMachine2Power].numericState)
-                        || 0), 'WM 2'], [(Number(items[props.tumbleDryerPower].numericState) || 0), 'Dryer'], [(Number(items[props.dishwasherPower].numericState)
-                        || 0), 'Dishwasher']].filter((m) => m[0] > 10)[0][1]
-                      fill: currentColor
-                      opacity: '0.7'
-                      font-size: 12
-                  - component: text
-                    config:
-                      x: 428.4
-                      y: 375.0
-                      content: =([[(Number(items[props.washingMachine1Power].numericState) || 0), 'WM 1'], [(Number(items[props.washingMachine2Power].numericState)
-                        || 0), 'WM 2'], [(Number(items[props.tumbleDryerPower].numericState) || 0), 'Dryer'], [(Number(items[props.dishwasherPower].numericState)
-                        || 0), 'Dishwasher']].filter((m) => m[0] > 10)[0][0] / 1000).toFixed(2) + ' kW'
-                      fill: currentColor
-                      font-size: 12
-                      font-weight: '700'
-                      text-anchor: end
-                  - component: text
-                    config:
-                      x: 276.4
-                      y: 392.0
-                      content: =[[(Number(items[props.washingMachine1Power].numericState) || 0), 'WM 1'], [(Number(items[props.washingMachine2Power].numericState)
-                        || 0), 'WM 2'], [(Number(items[props.tumbleDryerPower].numericState) || 0), 'Dryer'], [(Number(items[props.dishwasherPower].numericState)
-                        || 0), 'Dishwasher']].filter((m) => m[0] > 10)[1][1]
-                      fill: currentColor
-                      opacity: '0.7'
-                      font-size: 12
-                  - component: text
-                    config:
-                      x: 428.4
-                      y: 392.0
-                      content: =([[(Number(items[props.washingMachine1Power].numericState) || 0), 'WM 1'], [(Number(items[props.washingMachine2Power].numericState)
-                        || 0), 'WM 2'], [(Number(items[props.tumbleDryerPower].numericState) || 0), 'Dryer'], [(Number(items[props.dishwasherPower].numericState)
-                        || 0), 'Dishwasher']].filter((m) => m[0] > 10)[1][0] / 1000).toFixed(2) + ' kW'
-                      fill: currentColor
-                      font-size: 12
-                      font-weight: '700'
-                      text-anchor: end
-                  - component: text
-                    config:
-                      x: 276.4
-                      y: 409.0
-                      content: =[[(Number(items[props.washingMachine1Power].numericState) || 0), 'WM 1'], [(Number(items[props.washingMachine2Power].numericState)
-                        || 0), 'WM 2'], [(Number(items[props.tumbleDryerPower].numericState) || 0), 'Dryer'], [(Number(items[props.dishwasherPower].numericState)
-                        || 0), 'Dishwasher']].filter((m) => m[0] > 10)[2][1]
-                      fill: currentColor
-                      opacity: '0.7'
-                      font-size: 12
-                  - component: text
-                    config:
-                      x: 428.4
-                      y: 409.0
-                      content: =([[(Number(items[props.washingMachine1Power].numericState) || 0), 'WM 1'], [(Number(items[props.washingMachine2Power].numericState)
-                        || 0), 'WM 2'], [(Number(items[props.tumbleDryerPower].numericState) || 0), 'Dryer'], [(Number(items[props.dishwasherPower].numericState)
-                        || 0), 'Dishwasher']].filter((m) => m[0] > 10)[2][0] / 1000).toFixed(2) + ' kW'
-                      fill: currentColor
-                      font-size: 12
-                      font-weight: '700'
-                      text-anchor: end
-              - component: g
-                config:
-                  class: tip tip-appliances
-                  visible: =[[(Number(items[props.washingMachine1Power].numericState) || 0), 'WM 1'], [(Number(items[props.washingMachine2Power].numericState)
-                    || 0), 'WM 2'], [(Number(items[props.tumbleDryerPower].numericState) || 0), 'Dryer'], [(Number(items[props.dishwasherPower].numericState)
-                    || 0), 'Dishwasher']].filter((m) => m[0] > 10).length === 4
-                slots:
-                  default:
-                  - component: path
-                    config:
-                      d: M274.4,328.5 H430.4 Q438.4,328.5 438.4,336.5 V420.5 Q438.4,428.5 430.4,428.5 H274.4 Q266.4,428.5
-                        266.4,420.5 V385.5 L258.4,378.5 L266.4,371.5 V336.5 Q266.4,328.5 274.4,328.5 Z
-                      fill: '=themeOptions.dark === ''dark'' ? ''#2b2b2c'' : ''#ffffff'''
-                      stroke: rgba(127, 127, 127, 0.35)
-                      stroke-width: 1
-                      stroke-linejoin: round
-                  - component: text
-                    config:
-                      x: 276.4
-                      y: 348.5
-                      content: Appliances
-                      fill: '#5c6bc0'
-                      font-size: 13
-                      font-weight: '700'
-                  - component: text
-                    config:
-                      x: 276.4
-                      y: 366.5
-                      content: =[[(Number(items[props.washingMachine1Power].numericState) || 0), 'WM 1'], [(Number(items[props.washingMachine2Power].numericState)
-                        || 0), 'WM 2'], [(Number(items[props.tumbleDryerPower].numericState) || 0), 'Dryer'], [(Number(items[props.dishwasherPower].numericState)
-                        || 0), 'Dishwasher']].filter((m) => m[0] > 10)[0][1]
-                      fill: currentColor
-                      opacity: '0.7'
-                      font-size: 12
-                  - component: text
-                    config:
-                      x: 428.4
-                      y: 366.5
-                      content: =([[(Number(items[props.washingMachine1Power].numericState) || 0), 'WM 1'], [(Number(items[props.washingMachine2Power].numericState)
-                        || 0), 'WM 2'], [(Number(items[props.tumbleDryerPower].numericState) || 0), 'Dryer'], [(Number(items[props.dishwasherPower].numericState)
-                        || 0), 'Dishwasher']].filter((m) => m[0] > 10)[0][0] / 1000).toFixed(2) + ' kW'
-                      fill: currentColor
-                      font-size: 12
-                      font-weight: '700'
-                      text-anchor: end
-                  - component: text
-                    config:
-                      x: 276.4
-                      y: 383.5
-                      content: =[[(Number(items[props.washingMachine1Power].numericState) || 0), 'WM 1'], [(Number(items[props.washingMachine2Power].numericState)
-                        || 0), 'WM 2'], [(Number(items[props.tumbleDryerPower].numericState) || 0), 'Dryer'], [(Number(items[props.dishwasherPower].numericState)
-                        || 0), 'Dishwasher']].filter((m) => m[0] > 10)[1][1]
-                      fill: currentColor
-                      opacity: '0.7'
-                      font-size: 12
-                  - component: text
-                    config:
-                      x: 428.4
-                      y: 383.5
-                      content: =([[(Number(items[props.washingMachine1Power].numericState) || 0), 'WM 1'], [(Number(items[props.washingMachine2Power].numericState)
-                        || 0), 'WM 2'], [(Number(items[props.tumbleDryerPower].numericState) || 0), 'Dryer'], [(Number(items[props.dishwasherPower].numericState)
-                        || 0), 'Dishwasher']].filter((m) => m[0] > 10)[1][0] / 1000).toFixed(2) + ' kW'
-                      fill: currentColor
-                      font-size: 12
-                      font-weight: '700'
-                      text-anchor: end
-                  - component: text
-                    config:
-                      x: 276.4
-                      y: 400.5
-                      content: =[[(Number(items[props.washingMachine1Power].numericState) || 0), 'WM 1'], [(Number(items[props.washingMachine2Power].numericState)
-                        || 0), 'WM 2'], [(Number(items[props.tumbleDryerPower].numericState) || 0), 'Dryer'], [(Number(items[props.dishwasherPower].numericState)
-                        || 0), 'Dishwasher']].filter((m) => m[0] > 10)[2][1]
-                      fill: currentColor
-                      opacity: '0.7'
-                      font-size: 12
-                  - component: text
-                    config:
-                      x: 428.4
-                      y: 400.5
-                      content: =([[(Number(items[props.washingMachine1Power].numericState) || 0), 'WM 1'], [(Number(items[props.washingMachine2Power].numericState)
-                        || 0), 'WM 2'], [(Number(items[props.tumbleDryerPower].numericState) || 0), 'Dryer'], [(Number(items[props.dishwasherPower].numericState)
-                        || 0), 'Dishwasher']].filter((m) => m[0] > 10)[2][0] / 1000).toFixed(2) + ' kW'
-                      fill: currentColor
-                      font-size: 12
-                      font-weight: '700'
-                      text-anchor: end
-                  - component: text
-                    config:
-                      x: 276.4
-                      y: 417.5
-                      content: =[[(Number(items[props.washingMachine1Power].numericState) || 0), 'WM 1'], [(Number(items[props.washingMachine2Power].numericState)
-                        || 0), 'WM 2'], [(Number(items[props.tumbleDryerPower].numericState) || 0), 'Dryer'], [(Number(items[props.dishwasherPower].numericState)
-                        || 0), 'Dishwasher']].filter((m) => m[0] > 10)[3][1]
-                      fill: currentColor
-                      opacity: '0.7'
-                      font-size: 12
-                  - component: text
-                    config:
-                      x: 428.4
-                      y: 417.5
-                      content: =([[(Number(items[props.washingMachine1Power].numericState) || 0), 'WM 1'], [(Number(items[props.washingMachine2Power].numericState)
-                        || 0), 'WM 2'], [(Number(items[props.tumbleDryerPower].numericState) || 0), 'Dryer'], [(Number(items[props.dishwasherPower].numericState)
-                        || 0), 'Dishwasher']].filter((m) => m[0] > 10)[3][0] / 1000).toFixed(2) + ' kW'
-                      fill: currentColor
-                      font-size: 12
-                      font-weight: '700'
-                      text-anchor: end
-              - component: g
-                config:
-                  class: tip tip-vent
-                slots:
-                  default:
-                  - component: path
-                    config:
-                      d: M321.9,8.9 H477.9 Q485.9,8.9 485.9,16.9 V66.9 Q485.9,74.9 477.9,74.9 H321.9 Q313.9,74.9 313.9,66.9
-                        V48.9 L305.9,41.9 L313.9,34.9 V16.9 Q313.9,8.9 321.9,8.9 Z
-                      fill: '=themeOptions.dark === ''dark'' ? ''#2b2b2c'' : ''#ffffff'''
-                      stroke: rgba(127, 127, 127, 0.35)
-                      stroke-width: 1
-                      stroke-linejoin: round
-                  - component: text
-                    config:
-                      x: 323.9
-                      y: 28.9
-                      content: Ventilation
-                      fill: '#26a69a'
-                      font-size: 13
-                      font-weight: '700'
-                  - component: text
-                    config:
-                      x: 323.9
-                      y: 46.9
-                      content: CO₂
-                      fill: currentColor
-                      opacity: '0.7'
-                      font-size: 12
-                  - component: text
-                    config:
-                      x: 475.9
-                      y: 46.9
-                      content: '=([''NULL'', ''UNDEF''].includes(items[props.netatmoWeatherstationCo2].state) ? ''–'' : (items[props.netatmoWeatherstationCo2].displayState
-                        || items[props.netatmoWeatherstationCo2].state))'
-                      fill: currentColor
-                      font-size: 12
-                      font-weight: '700'
-                      text-anchor: end
-                  - component: text
-                    config:
-                      x: 323.9
-                      y: 63.9
-                      content: Humidity
-                      fill: currentColor
-                      opacity: '0.7'
-                      font-size: 12
-                  - component: text
-                    config:
-                      x: 475.9
-                      y: 63.9
-                      content: '=([''NULL'', ''UNDEF''].includes(items[props.netatmoWeatherstationAtmosphericHumidity].state)
-                        ? ''–'' : (items[props.netatmoWeatherstationAtmosphericHumidity].displayState || items[props.netatmoWeatherstationAtmosphericHumidity].state))'
-                      fill: currentColor
-                      font-size: 12
-                      font-weight: '700'
-                      text-anchor: end
-          - component: div
+          - component: oh-link
             config:
+              action: popup
+              actionModal: page:photovoltaics
               style:
                 position: absolute
                 display: block
@@ -2841,15 +2639,10 @@ slots:
                 top: 8.76%
                 width: 14.75%
                 height: 14.75%
-              class: tip-on tip-on-pv
-            slots:
-              default:
-              - component: oh-link
-                config:
-                  action: popup
-                  actionModal: page:photovoltaics
-          - component: div
+          - component: oh-link
             config:
+              action: popup
+              actionModal: page:power_meter
               style:
                 position: absolute
                 display: block
@@ -2858,15 +2651,10 @@ slots:
                 top: 33.08%
                 width: 14.75%
                 height: 14.75%
-              class: tip-on tip-on-grid
-            slots:
-              default:
-              - component: oh-link
-                config:
-                  action: popup
-                  actionModal: page:power_meter
-          - component: div
+          - component: oh-link
             config:
+              action: popup
+              actionModal: page:flow_home
               style:
                 position: absolute
                 display: block
@@ -2875,15 +2663,10 @@ slots:
                 top: 38.22%
                 width: 14.75%
                 height: 14.75%
-              class: tip-on tip-on-home
-            slots:
-              default:
-              - component: oh-link
-                config:
-                  action: popup
-                  actionModal: page:flow_home
-          - component: div
+          - component: oh-link
             config:
+              action: popup
+              actionModal: page:energy_storage
               style:
                 position: absolute
                 display: block
@@ -2892,15 +2675,10 @@ slots:
                 top: 60.41%
                 width: 14.75%
                 height: 14.75%
-              class: tip-on tip-on-battery
-            slots:
-              default:
-              - component: oh-link
-                config:
-                  action: popup
-                  actionModal: page:energy_storage
-          - component: div
+          - component: oh-link
             config:
+              action: popup
+              actionModal: page:e_car
               style:
                 position: absolute
                 display: block
@@ -2909,15 +2687,10 @@ slots:
                 top: 67.68%
                 width: 14.75%
                 height: 14.75%
-              class: tip-on tip-on-ecar
-            slots:
-              default:
-              - component: oh-link
-                config:
-                  action: popup
-                  actionModal: page:e_car
-          - component: div
+          - component: oh-link
             config:
+              action: popup
+              actionModal: page:flow_appliances
               style:
                 position: absolute
                 display: block
@@ -2926,15 +2699,20 @@ slots:
                 top: 74.73%
                 width: 14.75%
                 height: 14.75%
-              class: tip-on tip-on-appliances
-            slots:
-              default:
-              - component: oh-link
-                config:
-                  action: popup
-                  actionModal: page:flow_appliances
-          - component: div
+          - component: oh-link
             config:
+              action: popup
+              actionModal: widget:heatpump-quick
+              actionModalConfig:
+                heatpumpDhwTankTemp: =props.heatpumpDhwTankTemp
+                heatpumpPower: =props.heatpumpPower
+                heatpumpDhwBoost: =props.heatpumpDhwBoost
+                heatpumpSmartGrid: =props.heatpumpSmartGrid
+                heatpumpClimateControlPower: =props.heatpumpClimateControlPower
+                heatpumpDhwPower: =props.heatpumpDhwPower
+                heatpumpManagement: =props.heatpumpManagement
+                heatpumpDhwTempHeating: =props.heatpumpDhwTempHeating
+                heatpumpDhwManagement: =props.heatpumpDhwManagement
               style:
                 position: absolute
                 display: block
@@ -2943,25 +2721,19 @@ slots:
                 top: 16.03%
                 width: 14.75%
                 height: 14.75%
-              class: tip-on tip-on-hp
-            slots:
-              default:
-              - component: oh-link
-                config:
-                  action: popup
-                  actionModal: widget:heatpump-quick
-                  actionModalConfig:
-                    heatpumpDhwTankTemp: =props.heatpumpDhwTankTemp
-                    heatpumpPower: =props.heatpumpPower
-                    heatpumpDhwBoost: =props.heatpumpDhwBoost
-                    heatpumpSmartGrid: =props.heatpumpSmartGrid
-                    heatpumpClimateControlPower: =props.heatpumpClimateControlPower
-                    heatpumpDhwPower: =props.heatpumpDhwPower
-                    heatpumpManagement: =props.heatpumpManagement
-                    heatpumpDhwTempHeating: =props.heatpumpDhwTempHeating
-                    heatpumpDhwManagement: =props.heatpumpDhwManagement
-          - component: div
+          - component: oh-link
             config:
+              action: popup
+              actionModal: widget:air-conditioner-quick
+              actionModalConfig:
+                acSwitch: =props.acSwitch
+                acMode: =props.acMode
+                acTemperature: =props.acTemperature
+                acFan: =props.acFan
+                acTemperatureSetpoint: =props.acTemperatureSetpoint
+                acTimer: =props.acTimer
+                acTimerSet: =props.acTimerSet
+                acPowerful: =props.acPowerful
               style:
                 position: absolute
                 display: block
@@ -2970,24 +2742,16 @@ slots:
                 top: 43.36%
                 width: 14.75%
                 height: 14.75%
-              class: tip-on tip-on-ac
-            slots:
-              default:
-              - component: oh-link
-                config:
-                  action: popup
-                  actionModal: widget:air-conditioner-quick
-                  actionModalConfig:
-                    acSwitch: =props.acSwitch
-                    acMode: =props.acMode
-                    acTemperature: =props.acTemperature
-                    acFan: =props.acFan
-                    acTemperatureSetpoint: =props.acTemperatureSetpoint
-                    acTimer: =props.acTimer
-                    acTimerSet: =props.acTimerSet
-                    acPowerful: =props.acPowerful
-          - component: div
+          - component: oh-link
             config:
+              action: popup
+              actionModal: widget:ventilation-quick
+              actionModalConfig:
+                ventilationLevel: =props.ventilationLevel
+                netatmoWeatherstationCo2: =props.netatmoWeatherstationCo2
+                ventilationTimer: =props.ventilationTimer
+                ventilationManagement: =props.ventilationManagement
+                ventilationTimerSet: =props.ventilationTimerSet
               style:
                 position: absolute
                 display: block
@@ -2996,19 +2760,6 @@ slots:
                 top: 1.71%
                 width: 14.75%
                 height: 14.75%
-              class: tip-on tip-on-vent
-            slots:
-              default:
-              - component: oh-link
-                config:
-                  action: popup
-                  actionModal: widget:ventilation-quick
-                  actionModalConfig:
-                    ventilationLevel: =props.ventilationLevel
-                    netatmoWeatherstationCo2: =props.netatmoWeatherstationCo2
-                    ventilationTimer: =props.ventilationTimer
-                    ventilationManagement: =props.ventilationManagement
-                    ventilationTimerSet: =props.ventilationTimerSet
   - component: div
     config:
       style:
