@@ -1066,6 +1066,7 @@ def flow_tips():
     short = {"washing_machine_1": "WM 1", "washing_machine_2": "WM 2", "tumble_dryer": "Trockner",
              "dishwasher": "Geschirrspüler"}
     running = "[" + ", ".join(f"[{num(p + '_power')}, '{short[p]}']" for p, _, _ in FLOW_APPLIANCES) + "]"
+    on = f"{running}.filter((m) => m[0] > {APPL_ON})"  # the running machines, [power, name]
     hp_rows = [("Betrieb", f"={valve}"), ("Wärme", f"={kw2(HPX['heat'])}"),
                ("COP", f"={num(HPX['cop'])} > 0 ? {fixed(num(HPX['cop']), 2)} : '–'")]
     return [
@@ -1093,9 +1094,13 @@ def flow_tips():
           ("Raum · Soll", f"={disp('faikout_perfera_temperature')} + ' · ' + {disp('faikout_perfera_temperature_setpoint')}")]),
         ("ecar", ECAR_XY, -1, "E-Auto", ECAR_COLOR,
          [("Status", f"={num(ECAR)} > {ECAR_CHARGING} ? 'lädt' : 'lädt nicht'")]),
-        ("appliances", APPL_XY, 1, "Haushaltsgeräte", APPL_COLOR,
-         [("Läuft", f"=((r) => r.length ? r.join(', ') : 'nichts')({running}.filter((m) => m[0] > {APPL_ON})"
-                    ".map((m) => m[1]))")], 240),
+        # one row per running machine, its name and power, in a tooltip of the others' width; one variant per
+        # number of running machines, so there is never an empty row (user, 2026-10-05: a fixed 240 px row for all
+        # names left the tooltip mostly empty)
+        *[("appliances", APPL_XY, 1, "Haushaltsgeräte", APPL_COLOR,
+           [(f"={on}[{i}][1]", f"={fixed(f'{on}[{i}][0] / 1000', 2)} + ' kW'") for i in range(k)] or
+           [("Läuft", "nichts")], TIP_W, f"={on}.length === {k}")
+          for k in range(len(FLOW_APPLIANCES) + 1)],
         ("vent", VENT_XY, 1, "Lüftung", VENT_TEAL,
          [("CO₂", f"={disp('netatmo_weatherstation_co2')}"),
           ("Luftfeuchtigkeit", f"={disp('netatmo_weatherstation_atmospheric_humidity')}")]),
@@ -1613,10 +1618,11 @@ def weather_forecast_chart():
     """The next 60 hours, one value per grid (user, 2026-10-04): temperature as a line with the weather drawn above
     it, the precipitation of each hour as bars, the wind with arrows of its direction; their data share the hours,
     so one tooltip lists all three."""
-    # 55 px between the grids, room for the next one's axis name and the wind's arrows above its line
-    grids = [comp("oh-chart-grid", {"top": "35", "height": "140", "left": "45", "right": "45"}),
-             comp("oh-chart-grid", {"top": "230", "height": "60", "left": "45", "right": "45"}),
-             comp("oh-chart-grid", {"top": "345", "bottom": "60", "left": "45", "right": "45"})]
+    # 55 px between the grids, room for the next one's axis name and the wind's arrows above its line; 20 px on the
+    # right as the other stacked charts', since no axis stands there (user, 2026-10-05: it ended too early)
+    grids = [comp("oh-chart-grid", {"top": "35", "height": "140", "left": "45", "right": "20"}),
+             comp("oh-chart-grid", {"top": "230", "height": "60", "left": "45", "right": "20"}),
+             comp("oh-chart-grid", {"top": "345", "bottom": "60", "left": "45", "right": "20"})]
     x_axes = [comp("oh-time-axis", {"gridIndex": 0, "axisLabel": {"show": False}}),
               comp("oh-time-axis", {"gridIndex": 1, "axisLabel": {"show": False}}),
               comp("oh-time-axis", {"gridIndex": 2, "axisLabel": {"formatter": WX_TIME_LABEL,
@@ -3319,7 +3325,7 @@ def daily(name, item, color, **extra):
 
 # one column per day of the month: home consumption split into PV and grid, the PV production as a line
 energy_days = chart({"chartType": "month", "periodVisible": True, "height": "100%"},
-                    grid=[comp("oh-chart-grid", {"top": "40", "bottom": "70", "left": "45", "right": "45"})],
+                    grid=[comp("oh-chart-grid", {"top": "40", "bottom": "70", "left": "45", "right": "20"})],
                     xAxis=[comp("oh-category-axis", {"gridIndex": 0, "categoryType": "month", "name": "Tag", "nameGap": 12,
                                                      "axisTick": {"show": False}})],
                     yAxis=[comp("oh-value-axis", {"gridIndex": 0, "name": "kWh", "nameGap": 14,
@@ -4438,7 +4444,7 @@ def month_bars(name, item, color, unit="kWh", factor=None):
     """The daily totals of a day counter over the current month; the arrows page through months."""
     axis, tip = scaled(factor, unit) if factor else ({}, tooltip(trigger="axis", smartFormatter=True))
     return chart({"chartType": "month", "periodVisible": True, "height": "260px"},
-                 grid=[comp("oh-chart-grid", {"top": "40", "bottom": "35", "left": "45", "right": "45"})],
+                 grid=[comp("oh-chart-grid", {"top": "40", "bottom": "35", "left": "45", "right": "20"})],
                  xAxis=[comp("oh-category-axis", {"gridIndex": 0, "categoryType": "month", "name": "Tag", "nameGap": 12,
                                                   "axisTick": {"show": False}})],
                  yAxis=[value_axis(unit, **axis)],
@@ -4449,10 +4455,12 @@ def month_bars(name, item, color, unit="kWh", factor=None):
                  tooltip=tip)
 
 
+# A month chart ends 20 px before its right edge, as the stacked charts: its axis' name, Tag, is drawn past the grid's
+# end and fits there (user, 2026-10-05: 45 px made the charts end too early)
 def month_chart(series, unit, height="270px"):
     """Several day series over the current month with a legend; the arrows page through months."""
     return chart({"chartType": "month", "periodVisible": True, "height": height},
-                 grid=[comp("oh-chart-grid", {"top": "40", "bottom": "60", "left": "45", "right": "45"})],
+                 grid=[comp("oh-chart-grid", {"top": "40", "bottom": "60", "left": "45", "right": "20"})],
                  xAxis=[comp("oh-category-axis", {"gridIndex": 0, "categoryType": "month", "name": "Tag", "nameGap": 12,
                                                   "axisTick": {"show": False}})],
                  yAxis=[value_axis(unit)], series=series, legend=legend(),

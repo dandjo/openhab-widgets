@@ -22,7 +22,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 5, 2026, 2:14:59 AM
+timestamp: Oct 5, 2026, 2:59:59 AM
 component: oh-card
 config:
   title: Energy per Day
@@ -68,7 +68,7 @@ slots:
                   top: '62'
                   bottom: '70'
                   left: '45'
-                  right: '45'
+                  right: '20'
               xAxis:
               - component: oh-category-axis
                 config:
