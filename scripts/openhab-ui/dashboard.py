@@ -149,6 +149,9 @@ RIGHT_AXIS_NAME = {"align": "left", "padding": [0, 0, 0, 8]}  # over the labels 
 def chart(config, **slots):
     base = {"chartType": "", "periodVisible": False}
     base.update(config)
+    # no background of its own: MainUI's dark theme gives charts a darker one than the card, the chart takes the
+    # card's (user, 2026-10-05)
+    base["options"] = {"backgroundColor": "transparent", **config.get("options", {})}
     return comp("oh-chart", base, **slots)
 
 
@@ -5844,11 +5847,22 @@ def widgets():
     return out
 
 
+def has_chart(v):
+    """Whether a component tree holds an oh-chart."""
+    if isinstance(v, dict):
+        return v.get("component") == "oh-chart" or any(has_chart(x) for x in v.values())
+    if isinstance(v, list):
+        return any(has_chart(x) for x in v)
+    return False
+
+
 def widget_entries(now):
     entries = {}
     for uid, (card_, params, tags) in widgets().items():
         tree = own_time_axes(copy.deepcopy(card_))
         germanize(tree, MISSING_DE)
+        if has_chart(tree) and PERIOD_MENU not in tree["config"].get("stylesheet", ""):
+            tree["config"]["stylesheet"] = "\n".join(filter(None, [tree["config"].get("stylesheet"), PERIOD_MENU]))
         entries[uid] = {"class": "org.openhab.core.ui.components.RootUIComponent",
                         "value": {"uid": uid, "tags": ["generated", *tags],
                                   "props": {"parameters": params, "parameterGroups": []},

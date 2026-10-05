@@ -16,7 +16,7 @@ props:
     required: false
     default: '#8d6e63'
   parameterGroups: []
-timestamp: Oct 4, 2026, 11:05:34 PM
+timestamp: Oct 5, 2026, 2:14:59 AM
 component: oh-card
 config:
   title: Power today
@@ -28,6 +28,9 @@ config:
     flex: 1 1 auto
     display: flex
     flex-direction: column
+  stylesheet: '.menu-item-dropdown:not(.menu-item-dropdown-opened) .menu-dropdown { display: none; }
+
+    .oh-chart-container > .menu.padding { padding-top: 6px !important; }'
 slots:
   content:
   - component: div
@@ -51,6 +54,8 @@ slots:
               periodVisible: true
               period: D
               height: 100%
+              options:
+                backgroundColor: transparent
             slots:
               grid:
               - component: oh-chart-grid
