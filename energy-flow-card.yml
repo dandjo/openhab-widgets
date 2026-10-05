@@ -394,7 +394,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 5, 2026, 1:29:38 AM
+timestamp: Oct 5, 2026, 2:59:59 AM
 component: oh-card
 config:
   title: Energy Flow
@@ -2430,11 +2430,14 @@ slots:
               - component: g
                 config:
                   class: tip tip-appliances
+                  visible: =[[(Number(items[props.washingMachine1Power].numericState) || 0), 'WM 1'], [(Number(items[props.washingMachine2Power].numericState)
+                    || 0), 'WM 2'], [(Number(items[props.tumbleDryerPower].numericState) || 0), 'Dryer'], [(Number(items[props.dishwasherPower].numericState)
+                    || 0), 'Dishwasher']].filter((m) => m[0] > 10).length === 0
                 slots:
                   default:
                   - component: path
                     config:
-                      d: M274.4,354 H498.4 Q506.4,354 506.4,362 V395 Q506.4,403 498.4,403 H274.4 Q266.4,403 266.4,395 V385.5
+                      d: M274.4,354 H430.4 Q438.4,354 438.4,362 V395 Q438.4,403 430.4,403 H274.4 Q266.4,403 266.4,395 V385.5
                         L258.4,378.5 L266.4,371.5 V362 Q266.4,354 274.4,354 Z
                       fill: '=themeOptions.dark === ''dark'' ? ''#2b2b2c'' : ''#ffffff'''
                       stroke: rgba(127, 127, 127, 0.35)
@@ -2458,12 +2461,315 @@ slots:
                       font-size: 12
                   - component: text
                     config:
-                      x: 496.4
+                      x: 428.4
                       y: 392.0
-                      content: '=((r) => r.length ? r.join('', '') : ''nothing'')([[(Number(items[props.washingMachine1Power].numericState)
-                        || 0), ''WM 1''], [(Number(items[props.washingMachine2Power].numericState) || 0), ''WM 2''], [(Number(items[props.tumbleDryerPower].numericState)
-                        || 0), ''Dryer''], [(Number(items[props.dishwasherPower].numericState) || 0), ''Dishwasher'']].filter((m)
-                        => m[0] > 10).map((m) => m[1]))'
+                      content: nothing
+                      fill: currentColor
+                      font-size: 12
+                      font-weight: '700'
+                      text-anchor: end
+              - component: g
+                config:
+                  class: tip tip-appliances
+                  visible: =[[(Number(items[props.washingMachine1Power].numericState) || 0), 'WM 1'], [(Number(items[props.washingMachine2Power].numericState)
+                    || 0), 'WM 2'], [(Number(items[props.tumbleDryerPower].numericState) || 0), 'Dryer'], [(Number(items[props.dishwasherPower].numericState)
+                    || 0), 'Dishwasher']].filter((m) => m[0] > 10).length === 1
+                slots:
+                  default:
+                  - component: path
+                    config:
+                      d: M274.4,354 H430.4 Q438.4,354 438.4,362 V395 Q438.4,403 430.4,403 H274.4 Q266.4,403 266.4,395 V385.5
+                        L258.4,378.5 L266.4,371.5 V362 Q266.4,354 274.4,354 Z
+                      fill: '=themeOptions.dark === ''dark'' ? ''#2b2b2c'' : ''#ffffff'''
+                      stroke: rgba(127, 127, 127, 0.35)
+                      stroke-width: 1
+                      stroke-linejoin: round
+                  - component: text
+                    config:
+                      x: 276.4
+                      y: 374.0
+                      content: Appliances
+                      fill: '#5c6bc0'
+                      font-size: 13
+                      font-weight: '700'
+                  - component: text
+                    config:
+                      x: 276.4
+                      y: 392.0
+                      content: =[[(Number(items[props.washingMachine1Power].numericState) || 0), 'WM 1'], [(Number(items[props.washingMachine2Power].numericState)
+                        || 0), 'WM 2'], [(Number(items[props.tumbleDryerPower].numericState) || 0), 'Dryer'], [(Number(items[props.dishwasherPower].numericState)
+                        || 0), 'Dishwasher']].filter((m) => m[0] > 10)[0][1]
+                      fill: currentColor
+                      opacity: '0.7'
+                      font-size: 12
+                  - component: text
+                    config:
+                      x: 428.4
+                      y: 392.0
+                      content: =([[(Number(items[props.washingMachine1Power].numericState) || 0), 'WM 1'], [(Number(items[props.washingMachine2Power].numericState)
+                        || 0), 'WM 2'], [(Number(items[props.tumbleDryerPower].numericState) || 0), 'Dryer'], [(Number(items[props.dishwasherPower].numericState)
+                        || 0), 'Dishwasher']].filter((m) => m[0] > 10)[0][0] / 1000).toFixed(2) + ' kW'
+                      fill: currentColor
+                      font-size: 12
+                      font-weight: '700'
+                      text-anchor: end
+              - component: g
+                config:
+                  class: tip tip-appliances
+                  visible: =[[(Number(items[props.washingMachine1Power].numericState) || 0), 'WM 1'], [(Number(items[props.washingMachine2Power].numericState)
+                    || 0), 'WM 2'], [(Number(items[props.tumbleDryerPower].numericState) || 0), 'Dryer'], [(Number(items[props.dishwasherPower].numericState)
+                    || 0), 'Dishwasher']].filter((m) => m[0] > 10).length === 2
+                slots:
+                  default:
+                  - component: path
+                    config:
+                      d: M274.4,345.5 H430.4 Q438.4,345.5 438.4,353.5 V403.5 Q438.4,411.5 430.4,411.5 H274.4 Q266.4,411.5
+                        266.4,403.5 V385.5 L258.4,378.5 L266.4,371.5 V353.5 Q266.4,345.5 274.4,345.5 Z
+                      fill: '=themeOptions.dark === ''dark'' ? ''#2b2b2c'' : ''#ffffff'''
+                      stroke: rgba(127, 127, 127, 0.35)
+                      stroke-width: 1
+                      stroke-linejoin: round
+                  - component: text
+                    config:
+                      x: 276.4
+                      y: 365.5
+                      content: Appliances
+                      fill: '#5c6bc0'
+                      font-size: 13
+                      font-weight: '700'
+                  - component: text
+                    config:
+                      x: 276.4
+                      y: 383.5
+                      content: =[[(Number(items[props.washingMachine1Power].numericState) || 0), 'WM 1'], [(Number(items[props.washingMachine2Power].numericState)
+                        || 0), 'WM 2'], [(Number(items[props.tumbleDryerPower].numericState) || 0), 'Dryer'], [(Number(items[props.dishwasherPower].numericState)
+                        || 0), 'Dishwasher']].filter((m) => m[0] > 10)[0][1]
+                      fill: currentColor
+                      opacity: '0.7'
+                      font-size: 12
+                  - component: text
+                    config:
+                      x: 428.4
+                      y: 383.5
+                      content: =([[(Number(items[props.washingMachine1Power].numericState) || 0), 'WM 1'], [(Number(items[props.washingMachine2Power].numericState)
+                        || 0), 'WM 2'], [(Number(items[props.tumbleDryerPower].numericState) || 0), 'Dryer'], [(Number(items[props.dishwasherPower].numericState)
+                        || 0), 'Dishwasher']].filter((m) => m[0] > 10)[0][0] / 1000).toFixed(2) + ' kW'
+                      fill: currentColor
+                      font-size: 12
+                      font-weight: '700'
+                      text-anchor: end
+                  - component: text
+                    config:
+                      x: 276.4
+                      y: 400.5
+                      content: =[[(Number(items[props.washingMachine1Power].numericState) || 0), 'WM 1'], [(Number(items[props.washingMachine2Power].numericState)
+                        || 0), 'WM 2'], [(Number(items[props.tumbleDryerPower].numericState) || 0), 'Dryer'], [(Number(items[props.dishwasherPower].numericState)
+                        || 0), 'Dishwasher']].filter((m) => m[0] > 10)[1][1]
+                      fill: currentColor
+                      opacity: '0.7'
+                      font-size: 12
+                  - component: text
+                    config:
+                      x: 428.4
+                      y: 400.5
+                      content: =([[(Number(items[props.washingMachine1Power].numericState) || 0), 'WM 1'], [(Number(items[props.washingMachine2Power].numericState)
+                        || 0), 'WM 2'], [(Number(items[props.tumbleDryerPower].numericState) || 0), 'Dryer'], [(Number(items[props.dishwasherPower].numericState)
+                        || 0), 'Dishwasher']].filter((m) => m[0] > 10)[1][0] / 1000).toFixed(2) + ' kW'
+                      fill: currentColor
+                      font-size: 12
+                      font-weight: '700'
+                      text-anchor: end
+              - component: g
+                config:
+                  class: tip tip-appliances
+                  visible: =[[(Number(items[props.washingMachine1Power].numericState) || 0), 'WM 1'], [(Number(items[props.washingMachine2Power].numericState)
+                    || 0), 'WM 2'], [(Number(items[props.tumbleDryerPower].numericState) || 0), 'Dryer'], [(Number(items[props.dishwasherPower].numericState)
+                    || 0), 'Dishwasher']].filter((m) => m[0] > 10).length === 3
+                slots:
+                  default:
+                  - component: path
+                    config:
+                      d: M274.4,337 H430.4 Q438.4,337 438.4,345 V412 Q438.4,420 430.4,420 H274.4 Q266.4,420 266.4,412 V385.5
+                        L258.4,378.5 L266.4,371.5 V345 Q266.4,337 274.4,337 Z
+                      fill: '=themeOptions.dark === ''dark'' ? ''#2b2b2c'' : ''#ffffff'''
+                      stroke: rgba(127, 127, 127, 0.35)
+                      stroke-width: 1
+                      stroke-linejoin: round
+                  - component: text
+                    config:
+                      x: 276.4
+                      y: 357.0
+                      content: Appliances
+                      fill: '#5c6bc0'
+                      font-size: 13
+                      font-weight: '700'
+                  - component: text
+                    config:
+                      x: 276.4
+                      y: 375.0
+                      content: =[[(Number(items[props.washingMachine1Power].numericState) || 0), 'WM 1'], [(Number(items[props.washingMachine2Power].numericState)
+                        || 0), 'WM 2'], [(Number(items[props.tumbleDryerPower].numericState) || 0), 'Dryer'], [(Number(items[props.dishwasherPower].numericState)
+                        || 0), 'Dishwasher']].filter((m) => m[0] > 10)[0][1]
+                      fill: currentColor
+                      opacity: '0.7'
+                      font-size: 12
+                  - component: text
+                    config:
+                      x: 428.4
+                      y: 375.0
+                      content: =([[(Number(items[props.washingMachine1Power].numericState) || 0), 'WM 1'], [(Number(items[props.washingMachine2Power].numericState)
+                        || 0), 'WM 2'], [(Number(items[props.tumbleDryerPower].numericState) || 0), 'Dryer'], [(Number(items[props.dishwasherPower].numericState)
+                        || 0), 'Dishwasher']].filter((m) => m[0] > 10)[0][0] / 1000).toFixed(2) + ' kW'
+                      fill: currentColor
+                      font-size: 12
+                      font-weight: '700'
+                      text-anchor: end
+                  - component: text
+                    config:
+                      x: 276.4
+                      y: 392.0
+                      content: =[[(Number(items[props.washingMachine1Power].numericState) || 0), 'WM 1'], [(Number(items[props.washingMachine2Power].numericState)
+                        || 0), 'WM 2'], [(Number(items[props.tumbleDryerPower].numericState) || 0), 'Dryer'], [(Number(items[props.dishwasherPower].numericState)
+                        || 0), 'Dishwasher']].filter((m) => m[0] > 10)[1][1]
+                      fill: currentColor
+                      opacity: '0.7'
+                      font-size: 12
+                  - component: text
+                    config:
+                      x: 428.4
+                      y: 392.0
+                      content: =([[(Number(items[props.washingMachine1Power].numericState) || 0), 'WM 1'], [(Number(items[props.washingMachine2Power].numericState)
+                        || 0), 'WM 2'], [(Number(items[props.tumbleDryerPower].numericState) || 0), 'Dryer'], [(Number(items[props.dishwasherPower].numericState)
+                        || 0), 'Dishwasher']].filter((m) => m[0] > 10)[1][0] / 1000).toFixed(2) + ' kW'
+                      fill: currentColor
+                      font-size: 12
+                      font-weight: '700'
+                      text-anchor: end
+                  - component: text
+                    config:
+                      x: 276.4
+                      y: 409.0
+                      content: =[[(Number(items[props.washingMachine1Power].numericState) || 0), 'WM 1'], [(Number(items[props.washingMachine2Power].numericState)
+                        || 0), 'WM 2'], [(Number(items[props.tumbleDryerPower].numericState) || 0), 'Dryer'], [(Number(items[props.dishwasherPower].numericState)
+                        || 0), 'Dishwasher']].filter((m) => m[0] > 10)[2][1]
+                      fill: currentColor
+                      opacity: '0.7'
+                      font-size: 12
+                  - component: text
+                    config:
+                      x: 428.4
+                      y: 409.0
+                      content: =([[(Number(items[props.washingMachine1Power].numericState) || 0), 'WM 1'], [(Number(items[props.washingMachine2Power].numericState)
+                        || 0), 'WM 2'], [(Number(items[props.tumbleDryerPower].numericState) || 0), 'Dryer'], [(Number(items[props.dishwasherPower].numericState)
+                        || 0), 'Dishwasher']].filter((m) => m[0] > 10)[2][0] / 1000).toFixed(2) + ' kW'
+                      fill: currentColor
+                      font-size: 12
+                      font-weight: '700'
+                      text-anchor: end
+              - component: g
+                config:
+                  class: tip tip-appliances
+                  visible: =[[(Number(items[props.washingMachine1Power].numericState) || 0), 'WM 1'], [(Number(items[props.washingMachine2Power].numericState)
+                    || 0), 'WM 2'], [(Number(items[props.tumbleDryerPower].numericState) || 0), 'Dryer'], [(Number(items[props.dishwasherPower].numericState)
+                    || 0), 'Dishwasher']].filter((m) => m[0] > 10).length === 4
+                slots:
+                  default:
+                  - component: path
+                    config:
+                      d: M274.4,328.5 H430.4 Q438.4,328.5 438.4,336.5 V420.5 Q438.4,428.5 430.4,428.5 H274.4 Q266.4,428.5
+                        266.4,420.5 V385.5 L258.4,378.5 L266.4,371.5 V336.5 Q266.4,328.5 274.4,328.5 Z
+                      fill: '=themeOptions.dark === ''dark'' ? ''#2b2b2c'' : ''#ffffff'''
+                      stroke: rgba(127, 127, 127, 0.35)
+                      stroke-width: 1
+                      stroke-linejoin: round
+                  - component: text
+                    config:
+                      x: 276.4
+                      y: 348.5
+                      content: Appliances
+                      fill: '#5c6bc0'
+                      font-size: 13
+                      font-weight: '700'
+                  - component: text
+                    config:
+                      x: 276.4
+                      y: 366.5
+                      content: =[[(Number(items[props.washingMachine1Power].numericState) || 0), 'WM 1'], [(Number(items[props.washingMachine2Power].numericState)
+                        || 0), 'WM 2'], [(Number(items[props.tumbleDryerPower].numericState) || 0), 'Dryer'], [(Number(items[props.dishwasherPower].numericState)
+                        || 0), 'Dishwasher']].filter((m) => m[0] > 10)[0][1]
+                      fill: currentColor
+                      opacity: '0.7'
+                      font-size: 12
+                  - component: text
+                    config:
+                      x: 428.4
+                      y: 366.5
+                      content: =([[(Number(items[props.washingMachine1Power].numericState) || 0), 'WM 1'], [(Number(items[props.washingMachine2Power].numericState)
+                        || 0), 'WM 2'], [(Number(items[props.tumbleDryerPower].numericState) || 0), 'Dryer'], [(Number(items[props.dishwasherPower].numericState)
+                        || 0), 'Dishwasher']].filter((m) => m[0] > 10)[0][0] / 1000).toFixed(2) + ' kW'
+                      fill: currentColor
+                      font-size: 12
+                      font-weight: '700'
+                      text-anchor: end
+                  - component: text
+                    config:
+                      x: 276.4
+                      y: 383.5
+                      content: =[[(Number(items[props.washingMachine1Power].numericState) || 0), 'WM 1'], [(Number(items[props.washingMachine2Power].numericState)
+                        || 0), 'WM 2'], [(Number(items[props.tumbleDryerPower].numericState) || 0), 'Dryer'], [(Number(items[props.dishwasherPower].numericState)
+                        || 0), 'Dishwasher']].filter((m) => m[0] > 10)[1][1]
+                      fill: currentColor
+                      opacity: '0.7'
+                      font-size: 12
+                  - component: text
+                    config:
+                      x: 428.4
+                      y: 383.5
+                      content: =([[(Number(items[props.washingMachine1Power].numericState) || 0), 'WM 1'], [(Number(items[props.washingMachine2Power].numericState)
+                        || 0), 'WM 2'], [(Number(items[props.tumbleDryerPower].numericState) || 0), 'Dryer'], [(Number(items[props.dishwasherPower].numericState)
+                        || 0), 'Dishwasher']].filter((m) => m[0] > 10)[1][0] / 1000).toFixed(2) + ' kW'
+                      fill: currentColor
+                      font-size: 12
+                      font-weight: '700'
+                      text-anchor: end
+                  - component: text
+                    config:
+                      x: 276.4
+                      y: 400.5
+                      content: =[[(Number(items[props.washingMachine1Power].numericState) || 0), 'WM 1'], [(Number(items[props.washingMachine2Power].numericState)
+                        || 0), 'WM 2'], [(Number(items[props.tumbleDryerPower].numericState) || 0), 'Dryer'], [(Number(items[props.dishwasherPower].numericState)
+                        || 0), 'Dishwasher']].filter((m) => m[0] > 10)[2][1]
+                      fill: currentColor
+                      opacity: '0.7'
+                      font-size: 12
+                  - component: text
+                    config:
+                      x: 428.4
+                      y: 400.5
+                      content: =([[(Number(items[props.washingMachine1Power].numericState) || 0), 'WM 1'], [(Number(items[props.washingMachine2Power].numericState)
+                        || 0), 'WM 2'], [(Number(items[props.tumbleDryerPower].numericState) || 0), 'Dryer'], [(Number(items[props.dishwasherPower].numericState)
+                        || 0), 'Dishwasher']].filter((m) => m[0] > 10)[2][0] / 1000).toFixed(2) + ' kW'
+                      fill: currentColor
+                      font-size: 12
+                      font-weight: '700'
+                      text-anchor: end
+                  - component: text
+                    config:
+                      x: 276.4
+                      y: 417.5
+                      content: =[[(Number(items[props.washingMachine1Power].numericState) || 0), 'WM 1'], [(Number(items[props.washingMachine2Power].numericState)
+                        || 0), 'WM 2'], [(Number(items[props.tumbleDryerPower].numericState) || 0), 'Dryer'], [(Number(items[props.dishwasherPower].numericState)
+                        || 0), 'Dishwasher']].filter((m) => m[0] > 10)[3][1]
+                      fill: currentColor
+                      opacity: '0.7'
+                      font-size: 12
+                  - component: text
+                    config:
+                      x: 428.4
+                      y: 417.5
+                      content: =([[(Number(items[props.washingMachine1Power].numericState) || 0), 'WM 1'], [(Number(items[props.washingMachine2Power].numericState)
+                        || 0), 'WM 2'], [(Number(items[props.tumbleDryerPower].numericState) || 0), 'Dryer'], [(Number(items[props.dishwasherPower].numericState)
+                        || 0), 'Dishwasher']].filter((m) => m[0] > 10)[3][0] / 1000).toFixed(2) + ' kW'
                       fill: currentColor
                       font-size: 12
                       font-weight: '700'
