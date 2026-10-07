@@ -6,6 +6,7 @@ Usage: dashboard.py update|update-apply   (update-apply as root with openHAB sto
 """
 import base64
 import copy
+import hashlib
 import datetime
 import math
 import os
@@ -223,6 +224,7 @@ ITEM_PROP_NAMES = {
     "espaltherma_refrigerant_pressure_sensor": "heatpumpRefrigerantPressure",
 }
 ITEM_REF = re.compile(r"items\.([a-z][a-z0-9_]*)")
+HISTORY_KEY = re.compile(r"\)\['([a-z][a-z0-9_]*)'\] \|\| \{\}\)")  # vt_hv()'s lookup of an item's history
 ITEM_KEYS = ("item", "actionItem")  # config keys that take an item's name
 
 
@@ -292,7 +294,11 @@ def itemized(tree, props, keys=ITEM_KEYS):
     if isinstance(tree, list):
         return [itemized(x, props) for x in tree]
     if isinstance(tree, str) and tree.startswith("="):
-        return "=" + ITEM_REF.sub(lambda m: f"items[props.{props[m.group(1)]}]", tree[1:])
+        expr = ITEM_REF.sub(lambda m: f"items[props.{props[m.group(1)]}]", tree[1:])
+        # the tiles' history (vt_hv) is keyed by item name: inside a widget that name comes from the item's prop
+        expr = HISTORY_KEY.sub(lambda m: f")[props.{props[m.group(1)]}] || {{}})" if m.group(1) in props
+                               else m.group(0), expr)
+        return "=" + expr
     return tree
 
 
@@ -1017,16 +1023,17 @@ signed_kw = f"{fixed(f'{num(GRID)} / 1000', 3)} + ' kW'"
 NARROW = "screen.width < 600"
 
 
-def share_ring(cx, cy, title, part, whole, r=22, visible=None):
-    """Ring filled to part / whole of today, with the percentage inside and the title beside it."""
+def share_ring(cx, cy, title, part, whole, r=22, visible=None, lift=0):
+    """Ring filled to part / whole of today, with the percentage inside and the title beside it; lift raises the
+    title's two lines, so a pill under them leaves the block of texts in the ring's vertical middle."""
     pct = f"({whole} > 0 ? Math.min(100, Math.round(100 * {part} / {whole})) : 0)"
     length = round(2 * math.pi * r, 2)
     return [svg("g", [svg("circle", cx=cx, cy=cy, r=r, **stroke(5, "#9e9e9e", **{"stroke-opacity": "0.25"})),
             svg("circle", cx=cx, cy=cy, r=r, transform=f"rotate(-90 {cx} {cy})",
                 **stroke(5, "#43a047", **{"stroke-dasharray": f"=({length} * {pct} / 100).toFixed(1) + ' {length}'"})),
             svg_text(cx, cy + 5, f"={pct} + '%'", 13, "700"),
-            svg_text(cx + 32, cy - 2, title, 12, anchor="start", opacity="0.7"),
-            svg_text(cx + 32, cy + 14, "today", 11, anchor="start", opacity="0.5")], visible=visible)]
+            svg_text(cx + 32, cy - 2 - lift, title, 12, anchor="start", opacity="0.7"),
+            svg_text(cx + 32, cy + 14 - lift, "today", 11, anchor="start", opacity="0.5")], visible=visible)]
 
 
 SELF_CONSUMPTION = ("Self-consumption", num("photovoltaics_own_ec_day"), num("huawei_inverter_e_day"))
@@ -1224,18 +1231,6 @@ def flow_node(kind, xy, power=None, soc=None, frequency=None):
     if frequency is not None:
         cfg["frequency"] = f"={frequency}"
     return comp("widget:flow-node", cfg)
-
-
-def share_ring_widget():
-    """The widget every share ring is an instance of: a ring around (x, y) filled to part / whole, the percentage
-    inside and the title beside it."""
-    return svg("g", share_ring(0, 0, "=props.title", "Number(props.part)", "Number(props.whole)"),
-               transform="='translate(' + props.x + ' ' + props.y + ')'")
-
-
-def flow_share_ring(xy, title, part, whole):
-    return comp("widget:flow-share-ring", {"x": xy[0], "y": xy[1], "title": title, "part": f"={part}",
-                                           "whole": f"={whole}"})
 
 
 def hm(m):
@@ -1437,8 +1432,9 @@ def energy_flow():
     it the house's figures; the switches have a card of their own below it (switches-card)."""
     ac_texts = below(AC_XY, f"={fixed(f'{AC_NET} / 1000', 3)} + ' kW'", kwh(num("air_conditioning_unit_energy_today")))
     ac_texts[1]["config"].update(timer_line(M_AC, AC_BLUE, ac_texts[1]["config"]["content"]))
+    # its energy today as the other nodes' second line; the level stands in its badge (user, 2026-10-06)
     vent_texts = beside(VENT_XY, f"={fixed(f'{VENT_POWER} / 1000', 3)} + ' kW'",
-                        f"='Stufe ' + {disp('esplyfterl_level')}", 1)
+                        kwh(num("ventilation_energy_today")), 1)
     vent_texts[1]["config"].update(timer_line(M_VENT, VENT_TEAL, vent_texts[1]["config"]["content"]))
     nodes = [VENT_XY, HP_XY, AC_XY, ECAR_XY, APPL_XY, BATT_XY, GRID_XY, PV_XY, HOME_XY]
     drawing = svg("svg", [
@@ -1525,9 +1521,11 @@ def house_tiles():
     """The house's power and energy today, today's self-consumption and self-sufficiency, as three small cards under
     the star, each opening its popup with a tap anywhere on it: three abreast, on a phone the house above the two
     rings. Each has a large pale icon at its lower right, as the value tiles have."""
+    # a pill under the texts with today against yesterday at this time, flush with them (user, 2026-10-06); the texts
+    # rise by 10, so texts and pill stand as one block in the ring's vertical middle, and the ring in the tile's
     ring_svg = lambda parts: svg("svg", parts, viewBox="0 0 150 50", width="100%",
                                  style={"display": "block", "overflow": "visible", "max-width": "170px"})
-    share = lambda ring: ring_svg([flow_share_ring((24, 25), *ring)])
+    share = lambda ring, pill: ring_svg([*share_ring(24, 25, *ring, lift=10), pill])
     # the house as its node in the star, the ring the pie of what the consumers draw, at its widest pulse as large and
     # as wide as the self-consumption ring beside it (user, 2026-10-05), SWELL times thinner at rest with its inner
     # edge fixed, as the star's rings; its power and today's energy beside it
@@ -1540,8 +1538,9 @@ def house_tiles():
                      # the node's disc just inside the ring
                      svg("g", [flow_node("home", (0, 0), num(HOME))],
                          transform=f"translate(24 25) scale({(r - w / 2) / (ORBIT - RING_MAX / 2):.3f})"),
-                     svg_text(56, 23, f"={kw(HOME)}", 13, "700", anchor="start"),
-                     svg_text(56, 39, kwh(num("home_ec_day")), 11, anchor="start", opacity="0.5")])
+                     svg_text(56, 13, f"={kw(HOME)}", 13, "700", anchor="start"),
+                     svg_text(56, 29, kwh(num("home_ec_day")), 11, anchor="start", opacity="0.5"),
+                     svg_pill(56, 34, *day_change("home_ec_day", "less"))])
     # on a phone its tile spans the row: the drawing as wide as in a tile of half the row, so the rings match there too
     home["config"]["style"]["width"] = f"={NARROW} ? 'calc(50% - 14px)' : '100%'"
 
@@ -1556,8 +1555,12 @@ def house_tiles():
                    **{"position": "relative", "overflow": "hidden", "padding": "8px 10px", "border-radius": "12px",
                       "background": TILE_BG, "min-width": "0", "display": "flex", "align-items": "center", **extra})
     return div([tile(home, "flow_home", "home", "#1e88e5", **{"grid-column": f"={NARROW} ? '1 / -1' : 'auto'"}),
-                tile(share(SELF_CONSUMPTION), "flow_self_consumption", "solar_power", "#43a047"),
-                tile(share(SELF_SUFFICIENCY), "flow_self_sufficiency", "energy_savings_leaf", "#43a047")],
+                tile(share(SELF_CONSUMPTION, svg_pill(56, 34, *points_change("photovoltaics_own_ec_day",
+                                                                             "huawei_inverter_e_day"))),
+                     "flow_self_consumption", "solar_power", "#43a047"),
+                tile(share(SELF_SUFFICIENCY, svg_pill(56, 34, *points_change("photovoltaics_own_ec_day",
+                                                                             "home_ec_day"))),
+                     "flow_self_sufficiency", "energy_savings_leaf", "#43a047")],
                **{"display": "grid", "gap": "8px",
                   "grid-template-columns": f"={NARROW} ? 'repeat(2, minmax(0, 1fr))' : 'repeat(3, minmax(0, 1fr))'"})
 
@@ -2489,24 +2492,36 @@ hp_svg = svg("svg", [
 def stat_tile(title, value, color, icon, popup):
     """A figure of the heat pump card: a value tile sized by the width of its row (a container): a tenth larger than
     elsewhere where the row is as wide as the drawing, smaller down to 11.9 px in a narrow card or on a phone, where a
-    power in kW to two decimals still fits. A tap opens the page named by popup."""
+    power in kW to two decimals still fits. A tap opens its quick popup."""
     tile = comp("widget:value-tile", {"title": title, "value": value, "icon": f"material:{icon}", "color": color,
                                       "fontSize": "clamp(11.9px, 2.93cqw, 15.4px)"})
-    link = page_link({"position": "absolute", "inset": "0", "display": "block", "border-radius": "12px"}, popup)
+    link = hp_popup_link({"position": "absolute", "inset": "0", "display": "block", "border-radius": "12px"}, popup)
     return div([tile, link], **{"position": "relative", "min-width": "0"})
 
 
-def stacked_bar(title, total, parts):
+def stacked_bar(title, total, parts, middle=None):
     """Today's energy as one bar split into its parts, total on the right; the parts take part in the hover
-    highlight of their group, keyed by their lower-case name."""
+    highlight of their group, keyed by their lower-case name. middle: a component centred between title and total."""
     segs = [keyed(f"seg k k-{name.lower()}", [], title=f"='{name} · ' + {fixed(num(i), 2)} + ' kWh'",
                   visible=f"={num(i)} > 0.005", style={
                       "width": f"=({total} > 0 ? 100 * {num(i)} / {total} : 0).toFixed(1) + '%'", "background": c,
                       "height": "100%", "border-radius": "4px"}) for name, i, c in parts]
-    return div([div([label(title, **{"opacity": "0.7"}), label(f"={fixed(total, 1)} + ' kWh'", **{"font-weight": "700"})],
-                    **{"display": "flex", "justify-content": "space-between", "margin-bottom": "4px"}),
+    head_ = [label(title, **{"opacity": "0.7"}), label(f"={fixed(total, 1)} + ' kWh'", **{"font-weight": "700"})]
+    if middle is not None:  # title, the pill in the row's middle, the total (user, 2026-10-06)
+        head_[1]["config"]["style"]["justify-self"] = "end"
+        head_.insert(1, middle)
+        row_style = {"display": "grid", "grid-template-columns": "1fr auto 1fr", "align-items": "center",
+                     "gap": "8px", "margin-bottom": "4px"}
+    else:
+        row_style = {"display": "flex", "justify-content": "space-between", "margin-bottom": "4px"}
+    return div([div(head_, **row_style),
                 div(segs, **{"display": "flex", "gap": "2px", "height": "14px"})],
                **{"margin-bottom": "12px"})
+
+
+# the electricity each day's COP is a ratio of: its pill waits for that to be base enough
+COP_BASE = {"espaltherma_dcop": "espaltherma_energy_today", "espaltherma_dcop_space": "espaltherma_energy_space_today",
+            "espaltherma_dcop_dhw": "espaltherma_energy_dhw_today"}
 
 
 def cop_tile(title, item, color, icon, width="100%", popup=None):
@@ -2520,8 +2535,11 @@ def cop_tile(title, item, color, icon, width="100%", popup=None):
                            **stroke(5, color, **{"stroke-dasharray":
                                                   f"=({length} * Math.min(1, {value} / 6)).toFixed(1) + ' {length}'"})),
                        svg_text(24, 30, f"={value} > 0 ? {fixed(value, 1)} : '–'", 13, "700"),
-                       svg_text(56, 23, title, 12, anchor="start", opacity="0.7"),
-                       svg_text(56, 39, "heute", 11, anchor="start", opacity="0.5")],
+                       # title, heute and today's COP against yesterday's at this time in a pill, as one block in the
+                       # ring's vertical middle, as the energy flow's tiles (user, 2026-10-06)
+                       svg_text(56, 13, title, 12, anchor="start", opacity="0.7"),
+                       svg_text(56, 29, "heute", 11, anchor="start", opacity="0.5"),
+                       svg_pill(56, 34, *value_change(item, 1, base=COP_BASE.get(item)))],
                viewBox="0 0 150 50", width="100%", style={"display": "block", "overflow": "visible", "max-width": "170px",
                                                           "width": width})
     mark = comp("oh-icon", {"icon": f"material:{icon}", "width": 58, "height": 58, "style": {
@@ -2537,12 +2555,12 @@ legend_dot = lambda name, c: keyed(f"item k k-{name.lower()}", [
     div([], **{"width": "10px", "height": "10px", "border-radius": "3px", "background": c}),
     label(name, **{"font-size": "12px", "opacity": "0.75"})], style={"display": "flex", "align-items": "center", "gap": "5px"})
 def hp_stats():
-    """The figures above the drawing, each opening the heat pump's page; a row across the card's whole width, as the
-    energy flow's tiles under its star (user, 2026-10-05)."""
-    return div([stat_tile("Electrical", f"={kw2(HPX['power'])}", ELECTRIC_C, "bolt", "heatpump"),
-                stat_tile("Heat", f"={kw2(HPX['heat'])}", SUPPLY, "local_fire_department", "heatpump"),
+    """The figures above the drawing, built with it, as their tiles link to quick popups; a row across the card's
+    whole width, as the energy flow's tiles under its star (user, 2026-10-05)."""
+    return div([stat_tile("Electrical", f"={kw2(HPX['power'])}", ELECTRIC_C, "bolt", "heatpump-electric-quick"),
+                stat_tile("Heat", f"={kw2(HPX['heat'])}", SUPPLY, "local_fire_department", "heatpump-heat-quick"),
                 stat_tile("COP", f"={num(HPX['cop'])} > 0 ? {fixed(num(HPX['cop']), 2)} : '–'", COP_C, "eco",
-                          "heatpump")],
+                          "heatpump-cop-quick")],
                **{"display": "grid", "grid-template-columns": "repeat(3, minmax(0, 1fr))", "gap": "8px",
                   "font-size": "14px", "container-type": "inline-size"})
 
@@ -2555,10 +2573,12 @@ def hp_day_split():
         stacked_bar("Electricity Today", num("espaltherma_energy_today"),
                     [("Heizung", "espaltherma_energy_space_today", SPACE_C),
                      ("Warmwasser", "espaltherma_energy_dhw_today", DHW_C),
-                     ("Standby", "espaltherma_energy_standby_today", STANDBY_C)]),
+                     ("Standby", "espaltherma_energy_standby_today", STANDBY_C)],
+                    vt_chip(*day_change("espaltherma_energy_today", "less"))),
         stacked_bar("Heat Today", num("espaltherma_heating_energy_today"),
                     [("Heizung", "espaltherma_heating_energy_space_today", SPACE_C),
-                     ("Warmwasser", "espaltherma_heating_energy_dhw_today", DHW_C)]),
+                     ("Warmwasser", "espaltherma_heating_energy_dhw_today", DHW_C)],
+                    vt_chip(*day_change("espaltherma_heating_energy_today", "more"))),
         div([legend_dot("Heizung", SPACE_C), legend_dot("Warmwasser", DHW_C), legend_dot("Standby", STANDBY_C)],
             **{"display": "flex", "gap": "14px", "margin": "-4px 0 14px"})],
         [("heizung", SPACE_C), ("warmwasser", DHW_C), ("standby", STANDBY_C)])]
@@ -2572,24 +2592,34 @@ def hp_box(x, y, w, h, radius):
             "width": f"{w / vw * 100:.2f}%", "height": f"{h / vh * 100:.2f}%"}
 
 
-# the page a tap opens (user, 2026-10-05: no small quick popups any more): a tile and the wall unit, the outdoor unit,
-# the tank and the valve the heat pump's, the floors the page of the device that measures their air; radiators and
-# floor loops open nothing
-HP_TILE_POPUPS = [(CONTROL_TILE, 4, "heatpump"), (OUTDOOR_TILE, 4, "heatpump"), (REFRIGERANT_TILE, 3, "heatpump"),
-                  (CIRCUIT_TILE, 3, "heatpump"), (UPPER_TILE, 2, "air_conditioning"), (GROUND_TILE, 3, "netatmo"),
-                  (INDOOR_TILE, 4, "heatpump"), (TANK_TILE, 3, "heatpump")]
-HP_NODE_POPUPS = [(WALL, "heatpump"), (OUT, "heatpump"), (TANK, "heatpump"), (VALVE, "heatpump")]
+def hp_popup_link(style, uid):
+    """Transparent link that opens a quick popup with the items it reads."""
+    panel = quick_panel(uid)
+    return comp("oh-link", {"action": "popup", "actionModal": panel["component"],
+                            "actionModalConfig": dict(panel["config"]), "style": style})
+
+
+# what a tap opens: a tile its popup, the wall unit, the outdoor unit, the tank and the valve theirs; radiators and floor
+# loops open nothing (user, 2026-10-06: the heat pump card keeps its own popups, which the rest of the UI gave up on
+# 2026-10-05 for the device pages)
+HP_TILE_POPUPS = [(CONTROL_TILE, 4, "heatpump-control-quick"), (OUTDOOR_TILE, 4, "heatpump-outdoor-quick"),
+                  (REFRIGERANT_TILE, 3, "heatpump-refrigerant-quick"),
+                  (CIRCUIT_TILE, 3, "heatpump-circuit-quick"), (UPPER_TILE, 2, "upper-floor-quick"),
+                  (GROUND_TILE, 3, "ground-floor-quick"), (INDOOR_TILE, 4, "heatpump-indoor-quick"),
+                  (TANK_TILE, 3, "heatpump-tank-quick")]
+HP_NODE_POPUPS = [(WALL, "heatpump-indoor-quick"), (OUT, "heatpump-outdoor-quick"), (TANK, "heatpump-tank-quick"),
+                  (VALVE, "heatpump-valve-quick")]
 
 
 def heatpump_content():
-    """The heat pump card's content, built when the card is: the three figures as a row across the card's whole width
-    at its top, as the energy flow's tiles, and the drawing below at its own size, one unit a pixel, so its texts keep
-    the sizes of the rest of the UI instead of growing with the card; it stands centred in a wider card, and in the
-    middle of a higher one (a filled card, its auto margins)."""
-    links = [*[page_link(hp_box(cx - w / 2, y, w, 35 + TILE_ROW * rows, "12px"), page)
-               for (cx, y, w), rows, page in HP_TILE_POPUPS],
-             *[page_link(hp_box(cx - HP_ORBIT, cy - HP_ORBIT, 2 * HP_ORBIT, 2 * HP_ORBIT, "50%"), page)
-               for (cx, cy), page in HP_NODE_POPUPS]]
+    """The heat pump card's content, built when the card is, as its links need the quick popups: the three figures as
+    a row across the card's whole width at its top, as the energy flow's tiles, and the drawing below at its own
+    size, one unit a pixel, so its texts keep the sizes of the rest of the UI instead of growing with the card; it
+    stands centred in a wider card, and in the middle of a higher one (a filled card, its auto margins)."""
+    links = [*[hp_popup_link(hp_box(cx - w / 2, y, w, 35 + TILE_ROW * rows, "12px"), uid)
+               for (cx, y, w), rows, uid in HP_TILE_POPUPS],
+             *[hp_popup_link(hp_box(cx - HP_ORBIT, cy - HP_ORBIT, 2 * HP_ORBIT, 2 * HP_ORBIT, "50%"), uid)
+               for (cx, cy), uid in HP_NODE_POPUPS]]
     drawing = div([hp_svg, *links], **{"position": "relative"})
     # its tiles as far in from the card's edge as the other cards' tiles, on a phone too (user, 2026-10-05)
     return [div([hp_stats()], **{"padding": f"={NARROW} ? '8px 16px 0' : '12px 16px 0'"}),
@@ -3134,7 +3164,69 @@ def operation_section(*titles, row=False):
                    row=row)
 
 
-# the heat pump's charts over the day, as panels of stacked_chart(), on its page
+# ---- the popups of the heat pump card's tiles (the only quick popups left, user 2026-10-06): Regelung all the heat
+# pump's controls, the devices their values over the day, one grid per value in one stacked chart with one tooltip
+# (user, 2026-10-04), two together only where they belong together: a temperature and its target, leaving and inlet
+# water, the outdoor air and the heat exchanger that draws heat from it; the parts of the heat pump's power and energy
+# stay together, as energy balances do
+
+# a quick panel opens as a compact popup instead of Framework7's 630 × 630 px: MainUI puts a popup widget's style on
+# the popup's page, where the mark tells it from other popups; ":root" keeps the rule unscoped while it is shown
+QUICK_POPUP = (':root .popup:has(> .oh-popup[style*="--quick-popup"]) { --f7-popup-tablet-width: 420px; '
+               '--f7-popup-tablet-height: min(660px, calc(100vh - 64px)); }')
+
+
+def details_button(page, color):
+    return div([comp("oh-button", {"text": "Alle Details", "action": "popup", "actionModal": f"page:{page}",
+                                   "outline": True, "small": True,
+                                   "style": {"color": color, "border-color": color, "width": "auto",
+                                             "padding": "0 12px"}})],
+               **{"display": "flex", "justify-content": "flex-end", "padding-top": "4px"})
+
+
+def quick(icon, title, color, state, children, page):
+    """A part's values or controls under a small head with its state, and the way to its page; opened as a compact
+    popup, the bar names the part (config.label)."""
+    head = div([div([comp("oh-icon", {"icon": icon, "width": 20, "height": 20})],
+                    **{"width": "34px", "height": "34px", "flex": "0 0 auto", "border-radius": "50%",
+                       "display": "flex", "align-items": "center", "justify-content": "center",
+                       "background": f"color-mix(in srgb, {color} 22%, transparent)"}),
+                div([label(title, **{"font-size": "15px", "font-weight": "600"}),
+                     label(f"={state}", **{"font-size": "12px", "opacity": "0.7", "white-space": "nowrap",
+                                           "overflow": "hidden", "text-overflow": "ellipsis"})],
+                    **{"display": "flex", "flex-direction": "column", "min-width": "0"})],
+               **{"display": "flex", "align-items": "center", "gap": "10px", "padding-bottom": "4px"})
+    root = div([div([head, *children, details_button(page, color)],
+                    **{"display": "flex", "flex-direction": "column", "gap": "6px", "padding": "12px 14px"})])
+    # a chart's closed period menu would stretch the popup by its full length, as on the pages (PERIOD_MENU)
+    root["config"].update({"label": title, "style": {"--quick-popup": "panel"},
+                           "stylesheet": "\n".join([QUICK_POPUP, PERIOD_MENU])})
+    return root
+
+
+QUICK_GRID = 120  # a grid's height in a quick popup's stacked chart
+
+
+def quick_stack(*panels, weights=None):
+    """A quick popup's values over the day: stacked_chart() with grids of QUICK_GRID (a panel's own weight scales
+    it), so the popup's charts share one tooltip and one pair of period arrows."""
+    weights = [pnl[3] if len(pnl) > 3 else 1 for pnl in panels]
+    # a fixed height ("16px", a state band) counts as it is
+    total = sum(float(w[:-2]) if isinstance(w, str) else w * QUICK_GRID for w in weights)
+    return stacked_chart(list(panels), round(STACK_TOP + STACK_BOTTOM + (len(panels) - 1) * STACK_GAP + total))
+
+
+def hp_control_quick():
+    """The heat pump's control: all its controls, as on its page: Smart Grid, heating, hot water and the automation,
+    the DHW setpoint, the hot-water boost and the leaving water offset."""
+    on = lambda item: f"(items.{item}.state === 'ON' ? 'an' : 'aus')"
+    state = f"'Heizung ' + {on('pyaltherma_climate_control_power')} + ' · Warmwasser ' + {on('pyaltherma_dhw_power')}"
+    return quick("material:tune", "Regelung", HP_ORANGE, state,
+                 [smart_grid_section(row=True), operation_section(row=True), dhw_setpoint(row=True), dhw_boost(),
+                  lw_offset(row=True)], "heatpump")
+
+
+# the heat pump's charts over the day, as panels of stacked_chart(), shared by the card's popups and its page
 
 def hp_indoor_panels():
     """The indoor unit: the heat pump's measured draw without the backup heater, the water's flow and pressure, the
@@ -3166,13 +3258,20 @@ def hp_refrigerant_panels():
             ("Druck", [line("Druck", HPX["pressure"], REFRIGERANT)], span_axis("bar"))]
 
 
+def hp_circuit_panels():
+    """The heating circuit: leaving and inlet water, the water's heat (negative while a defrost takes heat from it)."""
+    return [([("Vorlauf", SUPPLY), ("Rücklauf", RETURN)],
+             [line("Vorlauf", HPX["supply"], SUPPLY), line("Rücklauf", HPX["return"], RETURN)], span_axis("°C")),
+            ("Wärme", [area("Wärme", HPX["water_heat"], HP_ORANGE)], value_axis("W"))]
+
+
 BAND_H = "16px"  # every state band as high, its bars filling it
 BAND_GAP = 40  # above a band, which has no axis name: room for its title
 # a band's track, a grey that reads on both themes' backgrounds (MainUI evaluates no expression in a grid's config)
 BAND_TRACK = "rgba(127, 127, 127, 0.13)"
 
 
-def band_panel(title, item, active, rest, extra=(), display=None):
+def band_panel(title, item, active, rest, extra=(), in_tooltip=False, display=None):
     """An item's states as a slim horizontal band, a panel of stacked_chart() (user, 2026-10-05): the periods of the
     active states, (state, label, colour), as bars in their colours on a faint track (the grid's background, see
     stacked_chart()); every other state, named rest, transparent, so a quiet day is an empty track instead of a grey
@@ -3181,15 +3280,26 @@ def band_panel(title, item, active, rest, extra=(), display=None):
     smart formatter would read a bar's start as its value and a part of its id as its unit ("NaN" and a long number)."""
     # MainUI draws every bar's state as text in it and leaves out UNDEF and NULL only: the rest becomes UNDEF, so
     # nothing is drawn there, an active state a run of zero-width spaces, a key of its own for its colour that writes
-    # nothing
+    # nothing; a bar's tooltip names it in words where the band stands alone (state_band())
     keys = {v: "\u200b" * (k + 1) for k, (v, _, _) in enumerate(active)}
     names = " : ".join(f"s === '{v}' ? '{keys[v]}'" for v, _, _ in active)
+    words = " : ".join(f"p.value[3] === '{keys[v]}' ? '{t}'" for v, t, _ in active)
+    tip = (f"=(p) => p.seriesName + '<br/>' + p.marker + ({words} : '{rest}') + ' \u00b7 ' + "
+           f"{hm('((p.value[2] - p.value[1]) / 60000)')}")
     return (display or [(title, active[0][2])],
             [comp("oh-state-series", {"name": title, "item": item, "yValue": 0, "yHeight": 1,
                                       "mapState": f"=(s) => {names} : 'UNDEF'",
                                       "stateColor": {keys[v]: c for v, _, c in active},
-                                      "tooltip": {"show": False}}), *extra],
+                                      "tooltip": {"formatter": tip} if in_tooltip else {"show": False}}), *extra],
             comp("oh-category-axis", {"categoryType": "values", "data": [title], "show": False}), BAND_H)
+
+
+def state_band(title, item, active, rest, display=None):
+    """A day chart of nothing but an item's states as a band (band_panel()); its tooltip gives a bar's state and
+    duration, the rest's too."""
+    band = stacked_chart([band_panel(title, item, active, rest, in_tooltip=True, display=display)], 120)
+    band["slots"]["tooltip"] = [comp("oh-chart-tooltip", {"show": True, "confine": True})]  # alone, a bar's own
+    return band
 
 
 def hp_tank_panels():
@@ -3201,6 +3311,12 @@ def hp_tank_panels():
             # power, 2 kW while it heats
             band_panel("Zusatzheizung", HPX["bsh"], [("ON", "An", HP_ORANGE)], "Aus",
                        extra=[on_off_series("Zusatzheizung", HPX["bsh_power"], HP_ORANGE)])]
+
+
+def hp_valve_band():
+    """The three-way valve: when it served the heating circuits and when the tank."""
+    return state_band("Stellung", HPX["valve"], [("DHW", "Warmwasser", DHW_C)], "Heizung",
+                      display=[("Auf Warmwasser", DHW_C)])
 
 
 def hp_operation_panels():
@@ -3252,10 +3368,157 @@ def hp_split_charts(part_power, part_energy, parts):
     return day, month
 
 
+# ---- the popups
+
+
+def quick_values(*tiles):
+    """Values of a compact popup in the device pages' forms, two abreast in its 420 px, over its charts. The tiles
+    open no item popup here: a popup over this compact one would hide it, and its charts show the course."""
+    def unlinked(v):
+        if isinstance(v, dict):
+            if v.get("component") == "oh-link" and v.get("config", {}).get("actionModal") == "widget:item-popup":
+                return None
+            return {k: unlinked(x) for k, x in v.items()}
+        if isinstance(v, list):
+            return [x for x in (unlinked(y) for y in v) if x is not None]
+        return v
+    tiles = [unlinked(t) for t in tiles]
+    if len(tiles) == 1:  # alone it takes the whole row, no empty half beside it
+        tiles[0]["config"]["style"]["grid-column"] = "1 / -1"
+    return div(tiles, **{"display": "grid", "grid-template-columns": "repeat(auto-fill, minmax(170px, 1fr))",
+                         "gap": "8px"})
+
+
+def hp_indoor_quick():
+    """The indoor unit over the day, as the outdoor unit's popup shows its own."""
+    state = (f"{kw2(HPX['circuit'], HPX['buh_power'])} + ' · ' + {disp(HPX['flow'])} + ' · ' + "
+             f"{disp(HPX['water_pressure'])}")
+    return quick("material:hvac", "Innengerät", "#64b5f6", state,
+                 [quick_values(pump_tile("", HPX["flow"]), rating_tile("Wasserdruck", "espaltherma_water_pressure",
+                                                                       "pressure")),
+                  quick_stack(*hp_indoor_panels())], "heatpump")
+
+
+def hp_outdoor_quick():
+    """The outdoor unit over the day."""
+    state = f"{kw2(HPX['circuit'])} + ' · ' + {disp(HPX['hz'])} + ' · außen ' + {disp(HPX['outdoor'])}"
+    # how hard it pulls heat from the air: the outdoor air against its heat exchanger
+    return quick("material:heat_pump", "Außengerät", HP_ORANGE, state,
+                 [quick_values(ring_tile("Verdichter", HPX["hz"], "#fb8c00", pct_expr=f"{num(HPX['hz'])} / {HZ_FULL} * 100",
+                                         sub=f"von {HZ_FULL} Hz"),
+                               pair_tile("Luft · Tauscher", HPX["outdoor"], HPX["exchanger"], "außen",
+                                         "Wärmetauscher")),
+                  quick_stack(*hp_outdoor_panels())], "heatpump")
+
+
+def hp_refrigerant_quick():
+    """The refrigerant over the day."""
+    state = f"'Heißgas ' + {disp(HPX['hot_gas'])} + ' · ' + {disp(HPX['pressure'])}"
+    target = "espaltherma_target_discharge_temp"
+    return quick("material:severe_cold", "Kältemittel", REFRIGERANT, state,
+                 [quick_values(setpoint_tile("Heißgas gegen Soll", HPX["hot_gas"], num(target), dash(disp(target)),
+                                             0, 100, "#ba68c8", tol=3, valid=f"{num(target)} > 0")),
+                  quick_stack(*hp_refrigerant_panels())], "heatpump")
+
+
+def hp_circuit_quick():
+    """The heating circuit: its leaving water offset and its course over the day."""
+    state = f"'Vorlauf ' + {disp(HPX['supply'])} + ' · Rücklauf ' + {disp(HPX['return'])}"
+    lws = "espaltherma_leaving_water_setpoint"
+    return quick("material:waves", "Heizkreis", SUPPLY, state,
+                 [lw_offset(row=True),
+                  quick_values(spread_tile("Vorlauf → Rücklauf", HPX["supply"], HPX["return"], "Vorlauf", "Rücklauf"),
+                               setpoint_tile("Vorlauf gegen Soll", HPX["supply"], num(lws), dash(disp(lws)), 20, 50,
+                                             "#e57373")),
+                  quick_stack(*hp_circuit_panels())], "heatpump")
+
+
+def hp_tank_quick():
+    """The DHW tank over the day."""
+    state = (f"{disp(HPX['tank'])} + ' · Soll ' + {disp(HPX['tank_set'])} + ' · Zusatzheizung ' + "
+             f"({BSH_ON} ? 'an' : 'aus')")
+    return quick("material:propane_tank", "Warmwasserspeicher", DHW_C, state,
+                 [quick_values(tank_tile("Temperatur oben", HPX["tank"], HPX["tank_set"])),
+                  quick_stack(*hp_tank_panels())], "heatpump")
+
+
+def hp_valve_quick():
+    """The three-way valve over the day."""
+    state = f"({DHW_MODE} ? 'Warmwasser' : 'Heizung')"
+    return quick("material:call_split", "3-Wege-Ventil", "#ffb74d", state, [hp_valve_band()], "heatpump")
+
+
+def floor_quick(title, icon, temperature, humidity, co2, page):
+    """A floor's climate over the day: temperature, humidity, the CO₂ where it is measured."""
+    state = f"{disp(temperature)} + ' · ' + {percent(humidity)}" + (f" + ' · ' + {disp(co2)}" if co2 else "")
+    panels = [("Temperatur", [line("Temperatur", temperature, "#f48fb1")], span_axis("°C")),
+              ("Luftfeuchtigkeit", [line("Luftfeuchtigkeit", humidity, "#4fc3f7")], span_axis("%"))]
+    if co2:
+        panels.append(("CO₂", [area("CO₂", co2, "#78909c")], value_axis("ppm", scale=True)))
+    # the air rated in words above its course (user, 2026-10-06)
+    ratings = ([rating_tile("Luftfeuchtigkeit", humidity, "humidity", value_expr=f"={percent(humidity)}")] +
+               ([rating_tile("CO₂", co2, "co2")] if co2 else []))
+    return quick(f"material:{icon}", title, "#f48fb1", state, [quick_values(*ratings), quick_stack(*panels)], page)
+
+
 # the parts heatpump_metering splits the heat pump's power and energy into, in the colours of the card's day bars
 HP_PARTS = [("Heizung", "space", SPACE_C), ("Warmwasser", "dhw", DHW_C), ("Standby", "standby", STANDBY_C)]
 HP_ELECTRIC = ("espaltherma_electrical_power_{}", "espaltherma_energy_{}_today", HP_PARTS)
 HP_HEAT = ("espaltherma_heating_power_{}", "espaltherma_heating_energy_{}_today", HP_PARTS[:2])
+
+
+def hp_split_quick(title, icon, color, power, today, split):
+    """Electricity or heat by part (hp_split_charts(), split: HP_ELECTRIC or HP_HEAT)."""
+    state = f"{kw2(power)} + ' · heute ' + {fixed(num(today), 1)} + ' kWh'"
+    day, month = hp_split_charts(*split)
+    # by purpose now and today, as bars of the parts, over the charts (user, 2026-10-06)
+    part_power, part_energy, parts = split
+    now_parts = [(n, f"{num(part_power.format(k))} / 1000", c) for n, k, c in parts]
+    day_parts = [(n, num(part_energy.format(k)), c) for n, k, c in parts]
+    now_total = " + ".join(e for _, e, _ in now_parts)
+    day_total = " + ".join(e for _, e, _ in day_parts)
+    values = quick_values(
+        vt_tile([vt_head("Jetzt nach Zweck"), vt_value(f"={fixed(f'{now_total}', 2)} + ' kW'"),
+                 split_bar(now_parts, now_total), split_legend(now_parts)], wide=True),
+        vt_tile([vt_head("Heute nach Zweck"), vt_value(f"={fixed(f'{day_total}', 2)} + ' kWh'"),
+                 split_bar(day_parts, day_total), split_legend(day_parts)], wide=True))
+    return quick(f"material:{icon}", title, color, state,
+                 [values, titled(day, "Leistung"), titled(month, "Energie pro Tag")], "heatpump")
+
+
+def hp_cop_quick():
+    """The COP over the day with the outdoor temperature, and the day's COPs per day of the month."""
+    cop = num(HPX["cop"])
+    day_cop = num("espaltherma_dcop")
+    state = f"'jetzt ' + ({cop} > 0 ? {fixed(cop, 2)} : '–') + ' · heute ' + ({day_cop} > 0 ? {fixed(day_cop, 2)} : '–')"
+    # the conversion now (while the compressor runs) and of the day with the purposes' COPs, over the charts
+    return quick("material:eco", "COP", COP_C, state,
+                 [quick_values(hp_flow("", HPX["heat"]), hp_day_flow("", "espaltherma_dcop")),
+                  quick_stack(*hp_cop_panels()), titled(hp_cop_month(), "COP pro Tag")], "heatpump")
+
+
+QUICK_PANELS = {"heatpump-control-quick": hp_control_quick, "heatpump-indoor-quick": hp_indoor_quick,
+                "heatpump-outdoor-quick": hp_outdoor_quick,
+                "heatpump-refrigerant-quick": hp_refrigerant_quick, "heatpump-circuit-quick": hp_circuit_quick,
+                "heatpump-tank-quick": hp_tank_quick, "heatpump-valve-quick": hp_valve_quick,
+                "heatpump-electric-quick": lambda: hp_split_quick(
+                    "Elektrisch", "bolt", ELECTRIC_C, HPX["power"], "espaltherma_energy_today", HP_ELECTRIC),
+                "heatpump-heat-quick": lambda: hp_split_quick(
+                    "Wärme", "local_fire_department", SUPPLY, HPX["heat"], "espaltherma_heating_energy_today", HP_HEAT),
+                "heatpump-cop-quick": hp_cop_quick,
+                "upper-floor-quick": lambda: floor_quick("Obergeschoss", "bed", "faikout_perfera_temperature",
+                                                         "tado_humidity", None, "air_conditioning"),
+                "ground-floor-quick": lambda: floor_quick("Erdgeschoss", "weekend", HPX["indoor"],
+                                                          "netatmo_weatherstation_atmospheric_humidity",
+                                                          "netatmo_weatherstation_co2", "netatmo")}
+_QUICK = {}
+
+
+def quick_panel(uid):
+    """An instance of a quick panel widget with its items (built once)."""
+    if uid not in _QUICK:
+        _QUICK[uid] = role_widget(uid, QUICK_PANELS[uid])
+    return _QUICK[uid]
 
 
 # widgets whose props are items named by their role, built with the items and turned into props (see widgets()):
@@ -3340,6 +3603,11 @@ ECAR_DAY = num("e_car_energy_today")
 values[1] = ("Klimaanlage", num("air_conditioning_unit_energy_today"), values[1][2])
 values.insert(1, ("E-Auto", ECAR_DAY, "#26a69a"))
 values.append(("Nicht gemessen", f"Math.max(0, {HOME_DAY} - ({metered}))", "#e0e0e0"))
+# the items of each row of values, for its change against yesterday (None: the house less every meter)
+value_items = [its for _, its, _ in parts]
+value_items[1] = ["air_conditioning_unit_energy_today"]
+value_items.insert(1, ["e_car_energy_today"])
+value_items.append(None)
 FROM_PV, FROM_GRID = num("photovoltaics_own_ec_day"), num("huawei_inverter_power_meter_ec_day")
 PV_GREEN, GRID_RED = "#a5d6a7", "#ef9a9a"
 
@@ -3363,19 +3631,42 @@ def segment_bar(segments, height):
 
 
 def consumers_list(rows):
-    box = div(rows, **{"columns": "2 197px", "column-gap": "24px", "margin-top": "12px",
-                       "container-type": "inline-size"})
-    box["config"]["stylesheet"] = "@container (max-width: 559px) { .k > :nth-child(4) { display: none; } }"
-    return box
+    # the last column is the change against yesterday, short enough to stay on a phone too (it replaced the share,
+    # which the bar's tooltip still names; user, 2026-10-06)
+    return div(rows, **{"columns": "2 197px", "column-gap": "24px", "margin-top": "12px"})
 
 
-def legend_row(key, name, value, color):
+def consumer_change(items_):
+    """A consumer's kWh more (orange) or fewer (green) than yesterday until this time; items_ None: the house less
+    every meter."""
+    if items_ is None:
+        all_ = [i for its in value_items if its for i in its]
+        for i in ["home_ec_day", *all_]:
+            track_history(i, c=True)
+        today = f"Math.max(0, {HOME_DAY} - ({' + '.join(num(i) for i in all_)}))"
+        ys = " + ".join(f"(Number({vt_hv(i, 'y')}) || 0)" for i in all_)
+        yday = f"Math.max(0, Number({vt_hv('home_ec_day', 'y')}) - ({ys}))"
+        known = vt_has(vt_hv("home_ec_day", "y"))
+    else:
+        for i in items_:
+            track_history(i, c=True)
+        today = "(" + " + ".join(num(i) for i in items_) + ")"
+        yday = "(" + " + ".join(f"(Number({vt_hv(i, 'y')}) || 0)" for i in items_) + ")"
+        known = "(" + " || ".join(vt_has(vt_hv(i, "y")) for i in items_) + ")"
+    d = f"({today} - {yday})"
+    cls = f"(Math.abs({d}) < 0.05 ? 'neutral' : {d} > 0 ? 'warn' : 'good')"
+    return label(f"={known} ? (Math.abs({d}) < 0.005 ? '±0' : ({d} > 0 ? '+' : '−') + {fixed(f'Math.abs({d})', 2)}) "
+                 f": '–'", **{"min-width": "46px", "text-align": "right", "font-size": "12px", "font-weight": "600",
+                              "white-space": "nowrap", "color": "=" + cls_color(cls)})
+
+
+def legend_row(key, name, value, color, items_=None):
     return keyed(f"item k k-{key}", [
         dot(color),
         label(name, **{"flex": "1", "min-width": "0", "white-space": "nowrap", "overflow": "hidden",
                        "text-overflow": "ellipsis"}),
         label(f"={fixed(value, 2)} + ' kWh'", **{"font-weight": "600", "white-space": "nowrap"}),
-        label(f"={share(value)} + ' %'", **{"opacity": "0.6", "min-width": "40px", "text-align": "right"})],
+        consumer_change(items_)],
         style={"display": "flex", "align-items": "center", "gap": "8px", "font-size": "13px",
                "break-inside": "avoid", "margin-bottom": "2px"})
 
@@ -3388,10 +3679,16 @@ def source_head(key, value, title, color, align):
         style={"text-align": align})
 
 
-consumption = [div([
-    hover_group([div([source_head("pv", FROM_PV, "aus PV", "#43a047", "left"),
+def consumption_content():
+    """Today's consumption card: from PV and from the grid with the total's change against yesterday in their middle,
+    the consumers' bar and list, each with its change (user, 2026-10-06)."""
+    total = vt_chip(*day_change("home_ec_day", "less"))
+    total["config"]["style"]["justify-self"] = "center"
+    return [div([
+    hover_group([div([source_head("pv", FROM_PV, "aus PV", "#43a047", "left"), total,
                       source_head("grid", FROM_GRID, "aus dem Netz", "#e53935", "right")],
-                     **{"display": "flex", "justify-content": "space-between", "margin-bottom": "6px"}),
+                     **{"display": "grid", "grid-template-columns": "1fr auto 1fr", "align-items": "center",
+                        "gap": "8px", "margin-bottom": "6px"}),
                  segment_bar([segment("pv", FROM_PV, PV_GREEN, "=" + share(FROM_PV) + " + ' % aus PV'"),
                               segment("grid", FROM_GRID, GRID_RED, "=" + share(FROM_GRID) + " + ' % aus dem Netz'")],
                              "10px")],
@@ -3402,7 +3699,8 @@ consumption = [div([
                  # read down the first column, then the second; two columns from 418 px, the share (also in the
                  # bar's tooltip) left out below 560 px, where a long name would not fit beside it (user, 2026-10-05:
                  # a single column made the card so tall that the overview's columns no longer matched)
-                 consumers_list([legend_row(f"c{i}", n, v, c) for i, (n, v, c) in enumerate(values)])],
+                 consumers_list([legend_row(f"c{i}", n, v, c, its)
+                                 for i, ((n, v, c), its) in enumerate(zip(values, value_items))])],
                 [(f"c{i}", c) for i, (_, _, c) in enumerate(values)]),
 ], **{"padding": "4px 16px 16px"})]
 
@@ -3650,11 +3948,22 @@ def gradient(rgb):
             "colorStops": [{"offset": 0, "color": f"rgba({rgb}, 0.45)"}, {"offset": 1, "color": f"rgba({rgb}, 0.02)"}]}
 
 
-def temp_stat(title, item, color, sub):
-    return div([label(title, **{"font-size": "13px", "opacity": "0.7"}),
-                label(f"={disp(item)}", **{"font-size": "30px", "font-weight": "700", "line-height": "36px"}),
-                label(sub, **{"font-size": "12px", "opacity": "0.6"})],
-               **{"border-left": f"4px solid {color}", "padding": "4px 12px"})
+def temp_stat(title, item, color, sub, pills=(), detail=None):
+    """A temperature large, its trend over the last hour and further pills right beside it (user, 2026-10-06), the
+    sensor and a detail line under it."""
+    track_history(item, t=1)
+    kids = [label(title, **{"font-size": "13px", "opacity": "0.7"}),
+            # the pills one over the other right beside the value, the trend on top: side by side they did not fit
+            # beside it in the overview's column and wrapped under it
+            div([label(f"={disp(item)}", **{"font-size": "30px", "font-weight": "700", "line-height": "36px",
+                                             "white-space": "nowrap"}),
+                 div([trend_chip(item, 1, "K"), *pills],
+                     **{"display": "flex", "flex-direction": "column", "align-items": "flex-start", "gap": "3px"})],
+                **{"display": "flex", "align-items": "center", "gap": "4px 10px", "flex-wrap": "wrap"}),
+            label(sub, **{"font-size": "12px", "opacity": "0.6"})]
+    if detail is not None:
+        kids.append(detail)
+    return div(kids, **{"border-left": f"4px solid {color}", "padding": "4px 12px", "min-width": "0"})
 
 
 INDOOR, OUTDOOR = "espaltherma_indoor_ambient_temp", "espaltherma_ext_ambient_temp"
@@ -3669,10 +3978,22 @@ def marks(color):
                       "formatter": f"=(p) => {fixed('Number(p.value)', 1)} + ' °C'",
                       "fontSize": 14, "fontWeight": 700, "color": "#ffffff", "backgroundColor": color,
                       "padding": [3, 7], "borderRadius": 6}}
-temps = [
-    div([temp_stat("Indoor", INDOOR, "#fb8c00", "Heatpump sensor"),
-         temp_stat("Outdoor", OUTDOOR, "#29b6f6", "Heatpump sensor")],
-        **{"display": "grid", "grid-template-columns": "1fr 1fr", "gap": "12px", "padding": "4px 16px 0"}),
+def temps_content():
+    """The temperatures card: indoors with the room's climate in a word (Netatmo's humidity), outdoors with whether
+    airing dries the rooms, both with their trend; the day's course below."""
+    hum = "netatmo_weatherstation_atmospheric_humidity"
+    lo, hi, segs = VT_SCALES["humidity"]
+    climate, _ = rating_parts(num(hum), lo, hi, segs)
+    airing_text, airing = airing_line()["slots"]["default"]
+    small = {"font-size": "12px", "opacity": "0.6"}
+    climate_text = label(f"='Raumklima · Feuchte ' + {disp(hum)}", **small)
+    airing_text["config"]["style"] = small
+    return [
+    div([temp_stat("Indoor", INDOOR, "#fb8c00", "Heatpump sensor", [climate], climate_text),
+         temp_stat("Outdoor", OUTDOOR, "#29b6f6", "Heatpump sensor", [airing], airing_text)],
+        # on a phone one under the other: side by side the pills beside the values stuck out (user, 2026-10-07)
+        **{"display": "grid", "grid-template-columns": f"={NARROW} ? '1fr' : '1fr 1fr'", "gap": "12px",
+           "padding": "4px 16px 0"}),
     chart({"period": "D", "height": "320px"},
           grid=[comp("oh-chart-grid", {"top": "40", "bottom": "40", "left": "40", "right": "15"})],
           xAxis=[comp("oh-time-axis", {"gridIndex": 0})],
@@ -3685,7 +4006,8 @@ temps = [
                               lineStyle={"width": 2.5, "color": "#29b6f6"}, itemStyle={"color": "#29b6f6"},
                               areaStyle={"color": gradient("41, 182, 246")}, markPoint=marks("#29b6f6"))],
           tooltip=tooltip(trigger="axis", smartFormatter=True), legend=legend()),
-]
+    ]
+
 
 def ok(item):
     return f"(items.{item}.state !== 'UNDEF' && items.{item}.state !== 'NULL')"
@@ -3975,12 +4297,15 @@ def heat_tile(icon, title, on, color, value, setpoint, dark, light, runtime=None
     if runtime:
         since, what = runtime
         minutes = f"dayjs().diff(dayjs(items.{since}.state), 'minute')"
-        lines = [comp("Label", {"text": f"={what} + ' seit ' + dayjs(items.{since}.state).format('HH:mm') + ' · ' + "
-                                        f"{hm(minutes)}", "visible": f"={ok(since)}",
-                                "style": {"font-size": "12px", "opacity": "0.75"}})]
-    lines += [comp("Label", {"text": f"={text}", "visible": f"={visible}", "style": {"font-size": "12px", "opacity": "0.75"}})
-              for text, visible in notes]
-    return tile([icon, label(title, **TILE_TITLE), chips(*pills), *lines], "heatpump")
+        lines = [(f"{what} + ' seit ' + dayjs(items.{since}.state).format('HH:mm') + ' · ' + {hm(minutes)}", ok(since))]
+    lines += list(notes)
+    # the lines as one block, close together (user, 2026-10-06: the tile's gap between them was too wide), shown only
+    # while one of them is, so an empty block adds no gap
+    block = div([comp("Label", {"text": f"={text}", "visible": f"={visible}"}) for text, visible in lines],
+                visible="=" + " || ".join(f"({visible})" for _, visible in lines),
+                **{"display": "flex", "flex-direction": "column", "font-size": "12px", "line-height": "1.35",
+                   "opacity": "0.75"}) if lines else None
+    return tile([icon, label(title, **TILE_TITLE), chips(*pills), *([block] if block else [])], "heatpump")
 
 
 def heat_specs():
@@ -3989,7 +4314,9 @@ def heat_specs():
     the heat pump as its node in the energy flow with its badge (the red bolt only for the backup heater), its ring as
     the energy flow's (user, 2026-10-04): full while it draws, no share as what one would show was unclear, but filling
     towards the tank's expected end while it charges, the end in a line under the tile; and the leaving water; on is
-    the switch for hot water and for heating."""
+    the switch for hot water and for heating. The charge's time left and end stand under the heat pump while it charges
+    the tank, under the tank while its booster heater heats it alone (user, 2026-10-06), as rule heatpump_dhw_eta
+    tells the two apart: the valve off hot water with the booster heater on."""
     tank = heat_icon([*tank_node(0, 0, "heatTank"), *tank_source_badge(0, 0)],
                      hp_orbit((0, 0), "#e57373", f"({TANK_FLOW} || {BSH_ON})",
                               f"{num(HPX['tank'])} / {TANK_FULL}"),
@@ -3999,17 +4326,19 @@ def heat_specs():
     pump = heat_icon([flow_node("heat-pump-split", (0, 0), num(HPX["power"]), frequency=num(HPX["hz"])),
                       *hp_mode_badges(0, 0, heaters=BUH_ON, running=f"{num(HPX['circuit'])} > {HP_ON}")],
                      hp_orbit((0, 0), HP_ORANGE, flowing(num(HP), HP_ON), DHW_PROGRESS))
+    # during a hot-water charge the time left in the setpoint's place, as a Miele machine's, and the end under it
+    # (user, 2026-10-04), on the tile of what charges the tank
+    bsh_alone = f"({BSH_ON} && !({DHW_MODE}))"
+    by_bsh, by_pump = f"({DHW_ETA_OK} && {bsh_alone})", f"({DHW_ETA_OK} && !{bsh_alone})"
+    charge = lambda shown: dict(countdown=(f"({DHW_LEFT}) * 60", shown),
+                                notes=[(f"'Warmwasserladung · fertig ' + {DHW_DONE}", shown)])
     return [dict(icon=tank, title="Warmwasserspeicher", on="items.pyaltherma_dhw_power.state === 'ON'", color=DHW_C,
                  value=f"={disp(HPX['tank'])}", setpoint=f"={disp(HPX['tank_set'])}", dark=DHW_C, light="#c62828",
-                 runtime=("heatpump_dhw_since", f"({BSH_ON} ? 'Zusatzheizung' : 'Laden')")),
+                 runtime=("heatpump_dhw_since", f"({BSH_ON} ? 'Zusatzheizung' : 'Laden')"), **charge(by_bsh)),
             dict(icon=pump, title="Heizung", on="items.pyaltherma_climate_control_power.state === 'ON'",
                  color=SPACE_C, value=f"={disp(HPX['supply'])}",
                  setpoint=f"={disp('espaltherma_leaving_water_setpoint')}", dark=SPACE_C, light="#e65100",
-                 runtime=("heatpump_heating_since", "'Heizen'"),
-                 # during a hot-water charge the time left in the setpoint's place, as a Miele machine's, and the end
-                 # under it (user, 2026-10-04)
-                 countdown=(f"({DHW_LEFT}) * 60", DHW_ETA_OK),
-                 notes=[(f"'Warmwasserladung · fertig ' + {DHW_DONE}", DHW_ETA_OK)])]
+                 runtime=("heatpump_heating_since", "'Heizen'"), **charge(by_pump))]
 
 
 def heating(tile=heat_tile):
@@ -4091,8 +4420,8 @@ TILE_ITEM_TYPES = {
               "faikout_perfera_power home_active_power huawei_inverter_active_peak_of_current_day "
               "huawei_inverter_active_power huawei_inverter_energy_storage_power "
               "huawei_inverter_energy_storage_unit_1_power huawei_inverter_input_power "
-              "huawei_inverter_power_meter_active_power huawei_inverter_power_meter_phase_a_active_power "
-              "huawei_inverter_power_meter_phase_b_active_power huawei_inverter_power_meter_phase_c_active_power "
+              "huawei_inverter_power_meter_active_power huawei_inverter_power_meter_l1_active_power "
+              "huawei_inverter_power_meter_l2_active_power huawei_inverter_power_meter_l3_active_power "
               "huawei_inverter_power_meter_reactive_power huawei_inverter_pv1_power huawei_inverter_pv2_power "
               "huawei_inverter_reactive_power netatmo_outdoor_signal netatmo_weatherstation_signal tumble_dryer_power "
               "ventilation_power washing_machine_1_power washing_machine_2_power zzpfx_apparent_power "
@@ -4628,19 +4957,14 @@ HOME_BLUE = "#1e88e5"
 
 
 def split_now(title, parts):
-    """Power split by where it comes from or goes to now, each part with its share, as a split bar over tiles; parts:
-    (title, watts, colour, icon)."""
-    whole = "Math.max(1, " + " + ".join(v for _, v, _, _ in parts) + ")"
-    share_ = lambda v: f"Math.round(100 * {v} / {whole})"
-    bar = div([div([], visible=f"={v} > 5", **{"width": f"=(100 * {v} / {whole}).toFixed(2) + '%'", "height": "100%",
-                                               "background": c, "border-radius": "4px"})
-               for _, v, c, _ in parts], **{"display": "flex", "gap": "2px", "height": "10px", "margin": "0 16px 10px"})
-    tiles = []
-    for t, v, c, icon in parts:
-        tile = value_tile(f"='{t} · ' + {share_(v)} + ' %'", f"={fixed(f'{v} / 1000', 3)} + ' kW'", color=c)
-        tile["config"]["icon"] = f"material:{icon}"  # the title's share names other items, which would mislead the rules
-        tiles.append(tile)
-    return [label(title, **{"font-size": "13px", "opacity": "0.7", "padding": "4px 16px 6px"}), bar, wide_grid(tiles)]
+    """Power split by where it comes from or goes to now, as the device pages' parts of a whole (user, 2026-10-06):
+    one tile with the whole, a bar of the parts' shares and each part's kW below; parts: (title, watts, colour,
+    icon)."""
+    whole = "(" + " + ".join(v for _, v, _, _ in parts) + ")"
+    kw_parts = [(t, f"({v}) / 1000", c) for t, v, c, _ in parts]
+    tile_ = vt_tile([vt_head(title), vt_value(f"={fixed(f'{whole} / 1000', 2)} + ' kW'"),
+                     split_bar(kw_parts, f"{whole} / 1000"), split_legend(kw_parts)], wide=True)
+    return [vt_grid([tile_])]
 
 
 GRID_IN, GRID_OUT = f"Math.max(0, {num(GRID)})", f"Math.max(0, -{num(GRID)})"
@@ -4705,6 +5029,24 @@ def month_sums(series):
                  tooltip=tooltip(trigger="axis", smartFormatter=False, valueFormatter=PV_MONTH_VALUE), legend=legend())
 
 
+def home_sources_today():
+    """Where today's consumption came from: from PV (the battery's share included) and from the grid, as a donut."""
+    own, imp = num("photovoltaics_own_ec_day"), num("huawei_inverter_power_meter_ec_day")
+    return donut_tile("Verbrauch heute: woher", "photovoltaics_own_ec_day",
+                      [("aus PV", own, "#43a047"), ("aus dem Netz", imp, "#e57373")], f"{own} + {imp}",
+                      fixed(num("home_ec_day"), 1), "kWh")
+
+
+def self_rings():
+    """Self-sufficiency and self-consumption of the day as rings."""
+    own, home, pv = num("photovoltaics_own_ec_day"), num("home_ec_day"), num("huawei_inverter_e_day")
+    share = lambda part, whole: f"({whole} > 0 ? 100 * {part} / {whole} : 0)"
+    return (ring_tile("Autarkie heute", "photovoltaics_own_ec_day", "#43a047", pct_expr=share(own, home),
+                      value_expr=f"=Math.round({share(own, home)}) + ' %'", sub="des Verbrauchs aus eigenem PV"),
+            ring_tile("Eigenverbrauch heute", "photovoltaics_own_ec_day", "#43a047", pct_expr=share(own, pv),
+                      value_expr=f"=Math.round({share(own, pv)}) + ' %'", sub="des PV-Ertrags selbst genutzt"))
+
+
 def home_icon():
     """The house's icon at the head of its popups: its node from the energy flow with its ring as the pie of its
     power (user, 2026-10-05), pulsing while it draws power, as in the energy flow."""
@@ -4732,16 +5074,14 @@ def home_blocks():
                            # negative while it charges
                            ("Batterie", [area("Batterie", BATT, BATTERY_GREEN)], value_axis("W"))], HOME_DAY_H,
                           visual_map=sign_colors(2))
-    today = wide_grid([vtile("Verbrauch heute", "home_ec_day", color=HOME_BLUE),
-                       vtile("aus PV", "photovoltaics_own_ec_day", color="#43a047"),
-                       vtile("aus dem Netz", "huawei_inverter_power_meter_ec_day", color="#e53935"),
-                       value_tile("Self-sufficiency", pct("photovoltaics_own_ec_day", "home_ec_day"), color="#43a047"),
-                       value_tile("Self-consumption", pct("photovoltaics_own_ec_day", "huawei_inverter_e_day"),
-                                  color="#43a047"),
-                       vtile("PV-Ertrag", "huawei_inverter_e_day"),
-                       vtile("Einspeisung", "huawei_inverter_power_meter_ep_day", color="#43a047"),
-                       vtile("Batterie geladen", "huawei_inverter_energy_storage_day_charge"),
-                       vtile("Batterie entladen", "huawei_inverter_energy_storage_day_discharge")])
+    # the day's values in the device pages' forms (user, 2026-10-06)
+    today = vt_grid([compare_tile("Verbrauch heute", "home_ec_day", HOME_BLUE, better="less"),
+                     compare_tile("PV-Ertrag", "huawei_inverter_e_day", "#ffb300", better="more"),
+                     home_sources_today(), self_rings()[0], self_rings()[1],
+                     grid_day("huawei_inverter_power_meter_ec_day", "huawei_inverter_power_meter_ep_day")(
+                         {"title": "", "item": "huawei_inverter_power_meter_ec_day"})[0],
+                     battery_day("Akku heute", "huawei_inverter_energy_storage_day_charge",
+                                 "huawei_inverter_energy_storage_day_discharge")])
     props = overview_widget_props()
     months = month_sums([("From PV", "energy_daily_self_use", SELF_C, {"stack": "home"}),
                          ("From Grid", "energy_daily_grid_import", IMPORT_C,
@@ -4766,22 +5106,29 @@ def appliances_blocks():
     running = "[" + ", ".join(powers) + f"].filter((w) => w > {APPL_ON}).length"
     state = f"=((n) => n === 0 ? 'alle aus' : n === 1 ? '1 läuft' : n + ' laufen')({running})"
     total = f"({APPL_POWER} >= 100 ? Math.round({APPL_POWER}) : {fixed(APPL_POWER, 1)}) + ' W'"
+    home_share = f"({num('home_ec_day')} > 0 ? 100 * {APPL_DAY} / {num('home_ec_day')} : 0)"
     now = [hero("material:local_laundry_service", APPL_COLOR, "Leistung", f"={total}",
                 [chip(state, f"=({running}) > 0 ? '#1e88e5' : '#9e9e9e'")],
                 picture=node_icon("appliances", APPL_COLOR, flowing(APPL_POWER, APPL_ON), power=APPL_POWER)),
-           wide_grid([vtile(title, p + "_power") for p, title, _ in FLOW_APPLIANCES])]
+           # the power now by machine, as the device pages' parts of a whole, and their share of the house's
+           # consumption today, which fills the card as high as the machines' tiles beside it (user, 2026-10-06)
+           vt_grid([vt_tile([vt_head("Leistung jetzt nach Gerät"),
+                             split_bar([(GEN_DE[t], num(p + "_power"), c) for p, t, c in FLOW_APPLIANCES], APPL_POWER),
+                             split_legend([(GEN_DE[t], num(p + "_power"), c) for p, t, c in FLOW_APPLIANCES], 0)],
+                            wide=True),
+                    ring_tile("Anteil am Hausverbrauch heute", "home_ec_day", HOME_BLUE, pct_expr=home_share,
+                              value_expr=f"=({home_share} < 10 ? {fixed(home_share, 1)} : Math.round({home_share})) + ' %'",
+                              sub=f"='Geräte ' + {fixed(APPL_DAY, 2)} + ' kWh'")])]
     # one grid per machine: the four plugs are persisted at different moments, so one grid's axis tooltip would mix
     # their times (user, 2026-10-04); each with an invisible point at 100 W, so standby noise does not fill its axis
     floor = comp("oh-data-series", {"name": "", "type": "line", "data": [["=dayjs().valueOf()", 100]], "symbol": "none",
                                      "silent": True, "tooltip": {"show": False}})
     power = stacked_chart([(GEN_DE[title], [area(GEN_DE[title], p + "_power", color), floor], value_axis("W"))
-                           for p, title, color in FLOW_APPLIANCES], 640)
-    home_share = f"({num('home_ec_day')} > 0 ? 100 * {APPL_DAY} / {num('home_ec_day')} : 0)"
-    today = wide_grid([value_tile("Total", f"={fixed(APPL_DAY, 2)} + ' kWh'", color=APPL_COLOR),
-                       *[vtile(title, p + "_energy_today") for p, title, _ in FLOW_APPLIANCES],
-                       # a decimal below 10 %, so a small day shows more than 0 %
-                       value_tile("Anteil am Hausverbrauch", f"=({home_share} < 10 ? {fixed(home_share, 1)} : "
-                                  f"Math.round({home_share})) + ' %'", color=HOME_BLUE)])
+                           for p, title, color in FLOW_APPLIANCES], 520)  # as high as Heute beside it
+    # the day by machine as a donut, each machine against yesterday (user, 2026-10-06: the device pages' forms)
+    parts = [(GEN_DE[title], num(p + "_energy_today"), color) for p, title, color in FLOW_APPLIANCES]
+    today = vt_grid([donut_tile("Heute nach Gerät", None, parts, APPL_DAY, fixed(APPL_DAY, 2), "kWh"),
+                     *[compare_tile(GEN_DE[title], p + "_energy_today", color) for p, title, color in FLOW_APPLIANCES]])
     days = chart({"chartType": "month", "periodVisible": True, "height": "260px"},
                  grid=[comp("oh-chart-grid", {"top": "40", "bottom": "60", "left": "45", "right": "20"})],
                  xAxis=[comp("oh-category-axis", {"gridIndex": 0, "categoryType": "month", "name": "Tag", "nameGap": 12,
@@ -4790,7 +5137,7 @@ def appliances_blocks():
                  series=[daily(title, p + "_energy_today", color, stack="appliances")
                          for p, title, color in FLOW_APPLIANCES],
                  tooltip=tooltip(trigger="axis", smartFormatter=True), legend=legend())
-    meters = wide_grid([vtile(title, p + "_energy_total") for p, title, _ in FLOW_APPLIANCES])
+    meters = vt_grid([counter_tile(GEN_DE[title], p + "_energy_total", 5, 1, "kWh") for p, title, _ in FLOW_APPLIANCES])
     return [two(card("Geräte", copy.deepcopy(appliances)), card("Jetzt", now)),
             two(card("Leistung heute", [power]), card("Heute", [today])),
             two(card("Energie pro Tag", [days]), card("Zählerstände", [meters]))]
@@ -4806,16 +5153,12 @@ def self_consumption_blocks():
                       f"' % selbst genutzt' : 'PV ruht'", f"={num(PV)} > 10 ? '#43a047' : '#9e9e9e'")],
                 picture=node_icon("pv", "#ffb300", flowing(num(PV), 10), power=num(PV))),
            *pv_destinations()]
-    today = wide_grid([value_tile("Self-consumption", pct("photovoltaics_own_ec_day", "huawei_inverter_e_day"),
-                                  color="#43a047"),
-                       vtile("PV-Ertrag", "huawei_inverter_e_day", color="#ffb300"),
-                       vtile("Selbst genutzt", "photovoltaics_own_ec_day", color="#43a047"),
-                       vtile("Eingespeist", "huawei_inverter_power_meter_ep_day"),
-                       vtile("Akku geladen", "huawei_inverter_energy_storage_day_charge")])
+    today = vt_grid([self_rings()[1], compare_tile("PV-Ertrag", "huawei_inverter_e_day", "#ffb300", better="more"),
+                     own_use("", "photovoltaics_own_ec_day"),
+                     vtile("Akku geladen", "huawei_inverter_energy_storage_day_charge")])
     split = [("Selbst genutzt", "energy_daily_self_use", SELF_C), ("Eingespeist", "energy_daily_grid_export", "#90a4ae")]
     months = month_sums([(n, i, c, {"stack": "pv"}) for n, i, c in split])
-    return [two(card("Jetzt", now), card("Heute", [today])),
-            two(card("Pro Tag", [day_sums(split, "pv")]), card("Pro Monat", [months]))]
+    return two_filled(now, today, day_sums(split, "pv"), months)
 
 
 def self_sufficiency_blocks():
@@ -4827,15 +5170,19 @@ def self_sufficiency_blocks():
                 [chip(f"='jetzt ' + Math.round(100 * Math.min(1, {own} / Math.max(1, {num(HOME)}))) + "
                       f"' % aus eigenen Quellen'", "#43a047")], picture=home_icon()),
            *home_sources()]
-    today = wide_grid([value_tile("Self-sufficiency", pct("photovoltaics_own_ec_day", "home_ec_day"), color="#43a047"),
-                       vtile("Verbrauch heute", "home_ec_day", color=HOME_BLUE),
-                       vtile("aus PV", "photovoltaics_own_ec_day", color="#43a047"),
-                       vtile("aus dem Netz", "huawei_inverter_power_meter_ec_day", color="#e53935"),
-                       vtile("Akku entladen", "huawei_inverter_energy_storage_day_discharge")])
+    today = vt_grid([self_rings()[0], compare_tile("Verbrauch heute", "home_ec_day", HOME_BLUE, better="less"),
+                     home_sources_today(), vtile("Akku entladen", "huawei_inverter_energy_storage_day_discharge")])
     split = [("From PV", "energy_daily_self_use", SELF_C), ("From Grid", "energy_daily_grid_import", IMPORT_C)]
     months = month_sums([(n, i, c, {"stack": "home"}) for n, i, c in split])
-    return [two(card("Jetzt", now), card("Heute", [today])),
-            two(card("Pro Tag", [day_sums(split, "home")]), card("Pro Monat", [months]))]
+    return two_filled(now, today, day_sums(split, "home"), months)
+
+
+def two_filled(now, today, days, months):
+    """Jetzt over the days beside Heute over the months, the days' chart taking the height Jetzt leaves beside the
+    taller Heute, so no card stands with empty space (user, 2026-10-06)."""
+    days["config"]["height"] = "100%"
+    return [two(stack(card("Jetzt", now), card("Pro Tag", [fill_chart(days, "260px")], fill=True)),
+                stack(card("Heute", [today]), card("Pro Monat", [months])))]
 
 
 FLOW_POPUPS = {"flow_home": ("Home", home_blocks), "flow_appliances": ("Appliances", appliances_blocks),
@@ -4967,26 +5314,6 @@ def hero(icon, color, caption, value, extra=(), value_color=None, picture=None):
                **{"display": "flex", "align-items": "center", "gap": "18px", "padding": "12px 16px 8px"})
 
 
-def cell(item, value=None, color=None, title=""):
-    style = {"font-size": "15px", "font-weight": "700", "text-align": "center", "white-space": "nowrap"}
-    if color:
-        style["color"] = color
-    return div([label(value or f"={disp(item)}", **style), link_over(item, radius="8px", title=title, color=color)],
-               **{"position": "relative", "padding": "7px 4px", "border-radius": "8px",
-                  "background": "rgba(127, 127, 127, 0.08)", "min-width": "0"})
-
-
-def phase_table(heads, rows):
-    """Measurements per phase side by side: one row per measurement, one column per phase."""
-    cells = [label(""), *[label(h, **{"font-size": "12px", "font-weight": "700", "opacity": "0.7",
-                                      "text-align": "center"}) for h in heads]]
-    for title, items_ in rows:
-        cells.append(label(title, **{"font-size": "13px", "opacity": "0.75", "align-self": "center"}))
-        cells += [cell(i, title=f"{title} {h}") for i, h in zip(items_, heads)]
-    return div(cells, **{"display": "grid", "grid-template-columns": f"minmax(90px, 1.3fr) repeat({len(heads)}, 1fr)",
-                         "gap": "6px 8px", "padding": "4px 16px 16px"})
-
-
 def plug_chart(item, color, floor=100, height="260px"):
     series = [area("Leistung", item, color)]
     if floor:  # keeps standby noise of a few tenths of a watt from filling the axis
@@ -5018,8 +5345,16 @@ def plug_now_card(prefix, icon, color, title, note, switch_item=None):
         hero(icon, color, "Leistung", f"={disp(prefix + '_power')}",
              [chip(f"={on} ? 'An' : 'Aus'", f"={on} ? '{color}' : '#9e9e9e'")], picture=plug_icon(prefix, icon, color)),
         switch,
-        wide_grid([vtile("Energie heute", f"{prefix}_energy_today"), vtile("Energie gesamt", f"{prefix}_energy_total")]),
+        energy_grid(prefix),
         label(note, visible="=!!props.note", **{"font-size": "12px", "opacity": "0.6", "padding": "0 16px 14px"})])
+
+
+def energy_grid(prefix):
+    """Energy today and total, and for a car what today's charge means in kilometres (props.range kWh per 100 km;
+    user, 2026-10-06: the E-car at 20)."""
+    grid_ = value_grid([vtile("Energie heute", f"{prefix}_energy_today"), vtile("Energie gesamt", f"{prefix}_energy_total")])
+    grid_["slots"]["default"].append(range_tile(prefix))
+    return grid_
 
 
 def plug_icon(prefix, icon, color):
@@ -5054,21 +5389,1812 @@ def plug_days_card(prefix, color):
 
 
 def plug_electric_card(prefix, title="Elektrisch"):
-    return card(title, [wide_grid([
-        vtile("Spannung", f"{prefix}_voltage"), vtile("Strom", f"{prefix}_current"),
+    return card(title, [value_grid([
+        vtile("Spannung", f"{prefix}_voltage"), vtile("Stromstärke", f"{prefix}_current"),
         vtile("Leistungsfaktor", f"{prefix}_power_factor"), vtile("Scheinleistung", f"{prefix}_apparent_power"),
         vtile("Blindleistung", f"{prefix}_reactive_power")])])
 
 
-def plug_cards(prefix, icon, color, title="Nous Steckdose", controllable=True, note=None, switch=None,
-               electric_prefix=None, electric_title=None, kind=None, threshold=None, active=None, frequency=None,
-               progress=None):
+# ---------------------------------------------------------------- 9b. value tiles of the device pages
+
+# The device pages' values each in the form that fits them best (user, 2026-10-06, from the proposals of that day,
+# applied/proposals_values.py; the design canvas numbers the forms): day
+# counters compared with yesterday at this time and the last 7 days (15), measurements with their day's course and
+# trend (03), ratings in words on a segment band (12), setpoints as bars (02), percentages as rings (04), parts of a
+# whole as donut or 100 % bar (05, 06), opposing amounts as a balance (06), pairs with their difference (07),
+# conversions as flow bands (08), fill levels and pictures (11), times on a time line (13), phases as pictures (14),
+# meter readings on rollers (16). The user rejected the semicircle gauge (01), dial instruments (09), one shared
+# temperature scale (10) and an energy label for the COP. value_grid() takes the tiles a page's builder lists, as
+# vtile() makes them, and swaps each for its form (VALUE_RENDER, by item); a form may take in further items of the
+# same grid, which then stand nowhere else. Items without a form stay plain value tiles.
+
+# The history the tiles need and no item holds (yesterday at this time, the mean of the last 7 days at this time, the
+# value hours ago, 24 hourly means, the prices ahead) is written every 10 minutes as JSON into the String item
+# tile_history by the rule tile_history (applied/tile_history.py, which takes the items to keep from
+# tile_history_track()). Inside the plug widgets the item comes from their prop history, as no widget names an item.
+TILE_HISTORY = "tile_history"
+TILE_HISTORY_REF = TILE_HISTORY  # PLUG_PLACEHOLDERS["history"] while the plug widgets are built
+TRACK = {}  # item: what the history rule keeps of it
+PLUG_PREFIXES = set()  # the metered plugs' prefixes, for the plug widgets' items
+
+
+def track_history(item, **want):
+    """Note what the history rule has to keep of an item: c (comparison), t (hours back), s (24 hourly means), f
+    (hours behind and ahead of a forecast). A plug widget's placeholder item stands for every plug's."""
+    if item.startswith(PLUG_PLACEHOLDERS["prefix"]):
+        for prefix in PLUG_PREFIXES:
+            track_history(prefix + item[len(PLUG_PLACEHOLDERS["prefix"]):], **want)
+        return
+    TRACK.setdefault(item, {}).update(want)
+
+
+def solar_noon_utc():
+    """The solar noon at openHAB's location in minutes after midnight UTC (from its longitude, without the equation of
+    time, a few minutes), read from openHAB's own configuration, so the location stands in no script; noon UTC
+    plus one hour where it cannot be read."""
+    try:
+        with open("/var/lib/openhab/config/org/openhab/i18n.config", encoding="utf-8") as f:
+            location = re.search(r'location="([^"]*)"', f.read()).group(1)
+        return round(720 - 4 * float(location.split(",")[1]))
+    except (OSError, AttributeError, IndexError, ValueError):
+        return 660
+
+
+SOLAR_NOON_UTC = solar_noon_utc()
+
+# ---------------------------------------------------------------- expression helpers
+
+VT_DARK = "(themeOptions.dark === 'dark')"
+
+
+def vt_hist():
+    """The history JSON of the tiles (rule tile_history) as an object, empty while the item holds none."""
+    hs = f"items.{TILE_HISTORY_REF}.state"
+    return f"((({hs}) || '').charAt(0) === '{{' ? JSON.parse({hs}) : {{}})"
+
+
+def vt_hv(item, key):
+    """A value of the history JSON, undefined where it has none."""
+    return f"((({vt_hist()})['{item}'] || {{}}).{key})"
+
+
+def vt_has(expr):
+    return f"({expr} !== undefined && {expr} !== null)"
+
+
+def js_str(text):
+    return "'" + text.replace("\\", "\\\\").replace("'", "\\'") + "'"
+
+
+# text colours for a class, (dark theme, light theme), at least 4.5:1 on the tile and on their own tint
+VT_CLS = {"good": ("#81c784", "#2e7d32"), "ok": ("#c5e1a5", "#558b2f"), "caution": ("#fff176", "#8d6e00"), "warn": ("#ffb74d", "#e65100"),
+       "bad": ("#ef9a9a", "#c62828"), "info": ("#81d4fa", "#0277bd"), "neutral": ("#c7c7cc", "#5f6368")}
+VT_CLS_TABLE = "({" + ", ".join(f"{k}: [{js_str(v[1])}, {js_str(v[0])}]" for k, v in VT_CLS.items()) + "})"
+
+
+def cls_color(cls_expr):
+    return f"(({VT_CLS_TABLE})[{cls_expr}] || ({VT_CLS_TABLE}).neutral)[{VT_DARK} ? 1 : 0]"
+
+
+
+VT_TILE = {"position": "relative", "box-sizing": "border-box", "min-width": "0", "border-radius": "12px",
+        "padding": "10px 12px", "background": "rgba(127, 127, 127, 0.08)", "overflow": "hidden"}
+VT_TITLE = {"font-size": "12px", "opacity": "0.65", "white-space": "nowrap", "overflow": "hidden",
+         "text-overflow": "ellipsis"}
+VT_VALUE = {"font-size": "20px", "font-weight": "700", "line-height": "1.3", "white-space": "nowrap"}
+VT_SUB = {"font-size": "11px", "opacity": "0.65"}
+VT_WIDE = {"grid-column": "1 / -1"}
+
+
+def vt_chip(text, cls_expr="'neutral'", visible=None):
+    color = cls_color(cls_expr)
+    return label(text, visible, **{"font-size": "11px", "font-weight": "600", "padding": "2px 8px",
+                                   "border-radius": "9px", "white-space": "nowrap", "width": "fit-content", "color": "=" + color,
+                                   "background": f"='color-mix(in srgb, ' + {color} + ' 16%, transparent)'"})
+
+
+def vt_icon_chip(icon, text, cls_expr="'neutral'", visible=None):
+    """A pill as vt_chip() with a Material icon before its text (icon: an expression of the icon's name)."""
+    chip_ = vt_chip(text, cls_expr)
+    style = chip_["config"]["style"]
+    return div([comp("oh-icon", {"icon": icon, "width": 13, "height": 13,
+                                 "style": {"width": "13px", "height": "13px", "flex": "0 0 auto"}}),
+                label(text)], visible,
+               **{**style, "display": "inline-flex", "align-items": "center", "gap": "3px", "padding": "1px 8px 1px 6px"})
+
+
+# a comparison with yesterday in per cent or points needs a base: yesterday's value at this time at least this share of
+# yesterday's whole day and this much in the item's unit (kWh, m³); right after midnight a day counter's few watt
+# hours would read +99 % or +100 points (user, 2026-10-07)
+DAY_BASE_SHARE, DAY_BASE_MIN = 0.05, 0.05
+
+
+def day_base_ok(item):
+    """Whether yesterday's value of a day counter at this time is base enough for a comparison in per cent or points
+    (DAY_BASE_SHARE of yesterday's whole day, d in the history, and DAY_BASE_MIN)."""
+    track_history(item, c=True)
+    y, d = vt_hv(item, "y"), vt_hv(item, "d")
+    return (f"({vt_has(y)} && Number({y}) >= Math.max({DAY_BASE_MIN}, "
+            f"{DAY_BASE_SHARE} * (Number({d}) || 0)))")
+
+
+def change_text(now, then, ok, unit, digits):
+    """A pill's text against yesterday: in per cent, past +300 % as a factor, where yesterday's value is base enough
+    (ok, day_base_ok()); else the difference itself in unit, as right after midnight a share of a few watt hours says
+    nothing (user, 2026-10-07: rather that than no pill at all)."""
+    d = f"(({now} - {then}) / {then} * 100)"
+    a = f"({now} - {then})"
+    pct = (f"({d} >= 300 ? '×' + {fixed(f'{now} / {then}', 0)} + ' zu gestern' : (Math.abs({d}) < 0.5 ? '±0' : "
+           f"({d} > 0 ? '+' : '−') + Math.round(Math.abs({d}))) + ' % zu gestern')")
+    absolute = (f"((Math.abs({a}) < {0.5 * 10 ** -digits} ? '±0' : ({a} > 0 ? '+' : '−') + "
+                f"{fixed(f'Math.abs({a})', digits)}) + ' {unit} zu gestern')")
+    return f"={ok} ? {pct} : {absolute}"
+
+
+def day_change(item, better="less", unit="kWh", digits=2):
+    """A day counter today against yesterday at this time, as (text, class, visible) for a pill: in per cent, green
+    where it moved the good way (better: 'less' or 'more'), past +300 % as a factor; on too small a base the
+    difference in unit, neutral (change_text())."""
+    track_history(item, c=True)
+    y = f"Number({vt_hv(item, 'y')})"
+    d = f"(({num(item)} - {y}) / {y} * 100)"
+    ok = day_base_ok(item)
+    good = "false" if better == "less" else "true"
+    cls = f"(!{ok} || Math.abs({d}) < 3 ? 'neutral' : ({d} > 0) === {good} ? 'good' : 'warn')"
+    return change_text(num(item), y, ok, unit, digits), cls, f"={vt_has(vt_hv(item, 'y'))}"
+
+
+def value_change(item, digits=1, unit="", base=None):
+    """A value today against its value yesterday at this time as (text, class, visible) for a pill: the difference
+    itself, as for a day's COP; green where it rose. base: the day counter the value is a ratio of (a COP's
+    electricity), the pill shows only once it is base enough (day_base_ok) today and yesterday."""
+    track_history(item, c=True)
+    y = f"Number({vt_hv(item, 'y')})"
+    d = f"({num(item)} - {y})"
+    small = 0.5 * 10 ** -digits
+    cls = f"(Math.abs({d}) < {2 * small} ? 'neutral' : {d} > 0 ? 'good' : 'warn')"
+    text = (f"=(Math.abs({d}) < {small} ? '±0' : ({d} > 0 ? '+' : '−') + {fixed(f'Math.abs({d})', digits)}) + "
+            f"'{unit} zu gestern'")
+    guard = f" && {day_base_ok(base)} && {num(base)} >= {DAY_BASE_MIN}" if base else ""
+    return text, cls, f"={vt_has(vt_hv(item, 'y'))} && {y} > 0{guard}"
+
+
+def points_change(own, base):
+    """A share (own / base) as yesterday's whole day, "gestern 78 %", as (text, class, visible) for a pill; green where
+    today's share so far is higher, orange where lower (more is better), neutral while today's whole has no base yet.
+    Yesterday's share at this time read nonsense at night: "+100 Pkt." after a night on an empty battery (user,
+    2026-10-07)."""
+    for i in (own, base):
+        track_history(i, c=True)
+    d_own, d_base = vt_hv(own, "d"), vt_hv(base, "d")
+    today = f"({num(own)} / Math.max({num(base)}, 0.001) * 100)"
+    yday = f"Math.min(100, Number({d_own}) / Math.max(Number({d_base}), 0.001) * 100)"
+    d = f"({today} - {yday})"
+    cls = f"({num(base)} < {DAY_BASE_MIN} || Math.abs({d}) < 2 ? 'neutral' : {d} > 0 ? 'good' : 'warn')"
+    return (f"='gestern ' + Math.round({yday}) + ' %'", cls,
+            f"={vt_has(d_own)} && {vt_has(d_base)} && Number({d_base}) >= {DAY_BASE_MIN}")
+
+
+def svg_pill(x, y, text, cls_expr, visible=None):
+    """A pill as vt_chip() draws it, inside an svg: from (x, y), as wide as its text (about 5.2 units a character at
+    9.5), its text in the class's colour on its tint."""
+    color = "=" + cls_color(cls_expr)
+    w = f"(({text[1:]}).length * 5.2 + 12)"
+    return svg("g", [svg("rect", x=x, y=y, height=13, rx=6.5, width=f"={w}.toFixed(1)", fill=color,
+                         **{"fill-opacity": "0.16"}),
+                     svg("text", x=x + 6, y=round(y + 9.3, 1), content=text, fill=color,
+                         **{"font-size": "9.5", "font-weight": "600"})], visible=visible)
+
+
+def vt_icon(name, size=12, **style):
+    """A Material icon inline with text, in the text's colour."""
+    return comp("oh-icon", {"icon": f"material:{name}", "width": size, "height": size,
+                            "style": {"width": f"{size}px", "height": f"{size}px", "flex": "0 0 auto", **style}})
+
+
+def vt_title(title, **style):
+    """A tile's title; "A → B" gets its arrow as an icon the size of the text, as text arrows suit the type poorly
+    (user, 2026-10-06)."""
+    if " → " not in title:
+        return label(title, **{**VT_TITLE, **style})
+    a, b = title.split(" → ", 1)
+    return div([label(a), vt_icon("arrow_forward"), label(b)],
+               **{**VT_TITLE, "display": "flex", "align-items": "center", "gap": "3px", **style})
+
+
+def vt_head(title, right=None):
+    kids = [vt_title(title, **{"flex": "1 1 auto"})]
+    if right is not None:
+        kids += right if isinstance(right, list) else [right]
+    return div(kids, **{"display": "flex", "align-items": "center", "gap": "8px"})
+
+
+def vt_tile(children, item=None, title="", color=None, wide=False, visible=None, **style):
+    kids = list(children)
+    if item:
+        kids.append(link_over(item, title=title, color=color))
+    return div(kids, visible, **{**VT_TILE, **(VT_WIDE if wide else {}), **style})
+
+
+def vt_value(expr, color=None, right=None, **style):
+    """A tile's value large; with right a chip beside it at the row's end."""
+    lbl = label(expr, **{**VT_VALUE, **({"color": color} if color else {}), **style})
+    if right is None:
+        return lbl
+    # where both do not fit beside each other, the chip goes below the value
+    return div([lbl, *(right if isinstance(right, list) else [right])],
+               **{"display": "flex", "flex-wrap": "wrap", "align-items": "center", "justify-content": "space-between",
+                  "gap": "2px 8px"})
+
+
+def vt_clamp(expr, lo=0, hi=100):
+    return f"Math.max({lo}, Math.min({hi}, {expr}))"
+
+
+def pct_of(expr, lo, hi):
+    """Where a value lies between lo and hi, in per cent, clamped."""
+    return vt_clamp(f"(({expr}) - ({lo})) / (({hi}) - ({lo})) * 100")
+
+
+def vt_signed(expr, digits, unit):
+    return (f"(({expr}) >= 0 ? '+' : '−') + {fixed(f'Math.abs({expr})', digits)} + ' {unit}'")
+
+
+def fill_bar(width_expr, color, height=8, opacity=None, visible=None, **style):
+    st = {"position": "absolute", "left": "0", "top": "0", "height": f"{height}px", "border-radius": f"{height // 2}px",
+          "background": color, "width": f"={width_expr} + '%'", **style}
+    if opacity:
+        st["opacity"] = opacity
+    return div([], visible, **st)
+
+
+def track_bar(children, height=8, **style):
+    return div([div([], **{"position": "absolute", "inset": "0", "border-radius": f"{height // 2}px",
+                           "background": "rgba(127, 127, 127, 0.18)"}), *children],
+               **{"position": "relative", "height": f"{height}px", **style})
+
+
+def vt_dot(color):
+    return div([], **{"width": "9px", "height": "9px", "border-radius": "50%", "background": color, "flex": "0 0 auto"})
+
+
+# ---------------------------------------------------------------- 15 · comparison with yesterday and the last 7 days
+
+
+def compare_tile(title, item, color, better=None, digits=2, unit="kWh", factor=1, value_expr=None, extra=(), tap=True):
+    """Today's value over yesterday's at this time and the mean of the last 7 days at this time, as three bars, the
+    difference to yesterday as a chip, green or orange where more (or less) is better."""
+    track_history(item, c=True)
+    v = f"({num(item)} * {factor})"
+    y, a = f"(Number({vt_hv(item, 'y')}) * {factor})", f"(Number({vt_hv(item, 'a')}) * {factor})"
+    top = f"(Math.max({v}, {vt_has(vt_hv(item, 'y'))} ? {y} : 0, {vt_has(vt_hv(item, 'a'))} ? {a} : 0) * 1.08 || 1)"
+    d = f"(({v} - {y}) / {y} * 100)"
+    ok = day_base_ok(item)
+    cls = ("'neutral'" if better is None else
+           f"(!{ok} || Math.abs({d}) < 3 ? 'neutral' : ({d} > 0) === {'true' if better == 'more' else 'false'} ? "
+           f"'good' : 'warn')")
+    diff = vt_chip(change_text(v, y, ok, unit, digits), cls, visible=f"={vt_has(vt_hv(item, 'y'))}")
+    rows = []
+    for name, expr, color_, dashed, known in (("heute", v, color, False, "true"),
+                                             ("gestern", y, "rgba(127, 127, 127, 0.55)", False, vt_has(vt_hv(item, 'y'))),
+                                             ("Ø 7 Tage", a, None, True, vt_has(vt_hv(item, 'a')))):
+        fill = ({"border": "1.5px dashed rgba(127, 127, 127, 0.7)", "box-sizing": "border-box"} if dashed else
+                {"background": color_})
+        rows += [label(name, **{"font-size": "11px", "opacity": "0.65"}),
+                 div([div([], **{"height": "8px", "border-radius": "4px", "width": f"={known} ? {vt_clamp(f'{expr} / {top} * 100')} + '%' : '0%'", **fill})],
+                     **{"height": "8px", "border-radius": "4px", "background": "rgba(127, 127, 127, 0.1)"}),
+                 label(f"={known} ? {fixed(expr, digits)} : '–'",
+                       **{"font-size": "11px", "text-align": "right", "white-space": "nowrap",
+                          **({"font-weight": "600"} if name == "heute" else {"opacity": "0.75"})})]
+    grid = div(rows, **{"display": "grid", "grid-template-columns": "58px minmax(0, 1fr) auto", "align-items": "center",
+                        "gap": "4px 8px", "margin-top": "6px"})
+    shown = value_expr or f"={dash(disp(item))}"
+    return vt_tile([vt_title(title), vt_value(shown, color, diff), grid, *extra], item if tap else None, title, color)
+
+
+# ---------------------------------------------------------------- 03 · sparkline and trend
+
+
+def series_points(item, span, factor=1, w=196, x0=2, top=6, bottom=40):
+    """The 24 hourly means as 'x y' points of a sparkline (nulls skipped), scaled to at least span."""
+    s = f"(({vt_hv(item, 's')}) || [])"
+    lo, hi = "f.reduce((a, b) => Math.min(a, b), 1e12)", "f.reduce((a, b) => Math.max(a, b), -1e12)"
+    L = f"((lo + hi) / 2 - Math.max({span}, hi - lo) / 2)"
+    R = f"Math.max({span}, hi - lo)"
+    pts = (f"s.map((v, i) => v === null ? null : ({x0} + {w} * i / Math.max(1, s.length - 1)).toFixed(1) + ' ' + "
+           f"({bottom} - {bottom - top} * (v * {factor} - L) / R).toFixed(1)).filter((p) => p !== null)")
+    return (f"((s) => ((f) => ((lo, hi) => ((L, R) => {pts})({L}, {R}))({lo}, {hi}))"
+            f"(s.filter((v) => v !== null).map((v) => v * {factor})))({s})"), s
+
+
+def sparkline(item, color, span, factor=1, threshold=None, threshold_label=None):
+    """The day's course as a line over its area, its last point marked; a dashed line at a threshold."""
+    pts, s = series_points(item, span, factor)
+    line_d = f"=((p) => p.length > 1 ? 'M' + p.join(' L') : '')({pts})"
+    area_d = (f"=((p) => p.length > 1 ? 'M' + p[0].split(' ')[0] + ' 44 L' + p.join(' L') + ' L' + "
+              f"p[p.length - 1].split(' ')[0] + ' 44 Z' : '')({pts})")
+    last_x = f"=((p) => p.length ? p[p.length - 1].split(' ')[0] : -10)({pts})"
+    last_y = f"=((p) => p.length ? p[p.length - 1].split(' ')[1] : -10)({pts})"
+    kids = [svg("path", d=area_d, fill=color, **{"fill-opacity": "0.14"}),
+            svg("path", d=line_d, fill="none", stroke=color,
+                **{"stroke-width": "1.6", "stroke-linejoin": "round", "stroke-linecap": "round"})]
+    if threshold is not None:
+        # where the threshold lies on the line's own scale, shown only inside it
+        f = f"(({s}).filter((v) => v !== null).map((v) => v * {factor}))"
+        lo, hi = f"{f}.reduce((a, b) => Math.min(a, b), 1e12)", f"{f}.reduce((a, b) => Math.max(a, b), -1e12)"
+        y = (f"((lo, hi) => ((L, R) => 40 - 34 * ({threshold} - L) / R)((lo + hi) / 2 - Math.max({span}, hi - lo) / 2, "
+             f"Math.max({span}, hi - lo)))({lo}, {hi})")
+        inside = f"(({y}) >= 4 && ({y}) <= 42)"
+        kids = [svg("line", x1=2, x2=198, y1=f"=({y}).toFixed(1)", y2=f"=({y}).toFixed(1)", visible=f"={inside}",
+                    stroke="currentColor", **{"stroke-opacity": "0.45", "stroke-width": "0.8", "stroke-dasharray": "3 3"}),
+                svg("text", x=3, y=f"=({y} - 2.5).toFixed(1)", content=threshold_label or str(threshold),
+                    visible=f"={inside}", fill="currentColor", **{"font-size": "7", "opacity": "0.6"}),
+                *kids]
+    kids.append(svg("circle", cx=last_x, cy=last_y, r=2.8, fill=color, style={"stroke": "var(--f7-card-bg-color, #fff)"},
+                    **{"stroke-width": "1.5"}))
+    return svg("svg", kids, viewBox="0 0 200 46", style={"display": "block", "width": "100%", "height": "auto",
+                                                        "margin-top": "4px"},
+               visible=f"=({s}).length > 1")
+
+
+def trend_chip(item, digits, unit, hours=1, factor=1, small=None):
+    """The change since some hours ago as an arrow and amount."""
+    then = f"(Number({vt_hv(item, 'h')}) * {factor})"
+    d = f"({num(item)} * {factor} - {then})"
+    small = small if small is not None else 0.5 * 10 ** -digits
+    icon = f"='material:' + (Math.abs({d}) < {small} ? 'trending_flat' : {d} > 0 ? 'trending_up' : 'trending_down')"
+    text = f"={fixed(f'Math.abs({d})', digits)} + ' {unit} / {hours} h'"
+    return vt_icon_chip(icon, text, "'neutral'", visible=f"={vt_has(vt_hv(item, 'h'))}")
+
+
+def minmax_line(item, digits, factor=1, unit=""):
+    s = f"((({vt_hv(item, 's')}) || []).filter((v) => v !== null).map((v) => v * {factor}))"
+    lo, hi = f"{s}.reduce((a, b) => Math.min(a, b), 1e12)", f"{s}.reduce((a, b) => Math.max(a, b), -1e12)"
+    return label(f"='24 h · min ' + {fixed(lo, digits)} + ' · max ' + {fixed(hi, digits)} + '{unit}'",
+                 visible=f"={s}.length > 1", **{**VT_SUB, "margin-top": "2px"})
+
+
+def spark_tile(title, item, color, unit, digits=1, span=4, factor=1, trend_h=1, threshold=None, threshold_label=None,
+          value_expr=None, extra_top=(), wide=False):
+    track_history(item, s=True, t=trend_h)
+    return vt_tile([vt_title(title),
+                 vt_value(value_expr or f"={dash(disp(item))}", None, trend_chip(item, digits, unit, trend_h, factor)),
+                 *extra_top,
+                 sparkline(item, color, span, factor, threshold, threshold_label),
+                 minmax_line(item, digits, factor)], item, title, color, wide)
+
+
+# ---------------------------------------------------------------- 12 · rating in words
+
+
+def rating_parts(expr, lo, hi, segs, digits=None):
+    """A segment band with the value's place marked and the segment's word: segs = [(upper, word, cls, colour)], the
+    last upper ends the scale (hi). Under the band the bounds between the segments. Returns (chip, band)."""
+    idx = " : ".join(f"({expr}) < {u} ? {i}" for i, (u, *_ ) in enumerate(segs[:-1])) + f" : {len(segs) - 1}"
+    idx = f"({idx})"
+    words = "[" + ", ".join(js_str(w) for _, w, _, _ in segs) + "]"
+    classes = "[" + ", ".join(js_str(c) for _, _, c, _ in segs) + "]"
+    word = vt_chip(f"={words}[{idx}]", f"{classes}[{idx}]")
+    bounds = [lo] + [u for u, *_ in segs[:-1]] + [hi]
+    parts = []
+    for i, (_, w, _, colour) in enumerate(segs):
+        share = round((bounds[i + 1] - bounds[i]) / (hi - lo) * 100, 2)
+        parts.append(div([], **{"flex": f"{share} 1 0", "height": "8px", "border-radius": "4px", "background": colour,
+                                "opacity": f"={idx} === {i} ? 1 : 0.28"}))
+    fmt = lambda x: (f"{x:.{digits}f}" if digits is not None else f"{x:g}").replace(".", ",")
+    ticks = [label(fmt(u), **{"position": "absolute", "top": "0", "transform": "translateX(-50%)",
+                              "left": f"{(u - lo) / (hi - lo) * 100:.2f}%"}) for u, *_ in segs[:-1]]
+    marker = svg("svg", [svg("path", d="M0 0 H10 L5 6 Z", fill="currentColor")], viewBox="0 0 10 6",
+                 style={"position": "absolute", "top": "0", "width": "10px", "height": "6px",
+                        "left": f"='calc(' + {pct_of(expr, lo, hi)} + '% - 5px)'"})
+    band = div([div([marker, div(parts, **{"position": "absolute", "left": "0", "right": "0", "top": "8px",
+                                          "display": "flex", "gap": "3px"})],
+                    **{"position": "relative", "height": "16px", "margin-top": "6px"}),
+                div(ticks, **{"position": "relative", "height": "13px", "margin-top": "3px", **VT_SUB})])
+    return word, band
+
+
+VT_GOOD, VT_OK, VT_WARN, VT_BAD, VT_INFO = "#66bb6a", "#aed581", "#ffa726", "#ef5350", "#42a5f5"
+VT_SCALES = {
+    # Umweltbundesamt: below 1000 ppm harmless, up to 2000 conspicuous, above unacceptable
+    "co2": (400, 2400, [(1000, "unbedenklich", "good", VT_GOOD), (2000, "auffällig", "warn", VT_WARN),
+                        (2400, "zu hoch", "bad", VT_BAD)]),
+    "humidity": (20, 80, [(30, "zu trocken", "warn", VT_WARN), (40, "trocken", "caution", "#fdd835"),
+                          (60, "behaglich", "good", VT_GOOD), (70, "feucht", "info", "#4fc3f7"),
+                          (80, "zu feucht", "bad", VT_INFO)]),
+    # outdoor air: dry, usual, damp, near saturation (fog, dew)
+    "humidity_out": (20, 100, [(40, "trocken", "caution", "#fdd835"), (70, "normal", "good", VT_GOOD),
+                               (90, "feucht", "info", "#4fc3f7"), (100, "gesättigt", "info", VT_INFO)]),
+    # the classic barometer's words on the pressure reduced to sea level
+    "air_pressure": (960, 1050, [(980, "Sturm", "bad", VT_BAD), (1000, "Regen", "info", VT_INFO),
+                                 (1020, "veränderlich", "caution", "#fdd835"), (1035, "schön", "good", VT_GOOD),
+                                 (1050, "beständig", "good", "#43a047")]),
+    "noise": (30, 75, [(45, "ruhig", "good", VT_GOOD), (60, "normal", "caution", "#fdd835"), (75, "laut", "warn", VT_WARN)]),
+    "heat_index": (10, 45, [(27, "unbedenklich", "good", VT_GOOD), (32, "Vorsicht", "caution", "#fdd835"),
+                            (41, "erhöhte Vorsicht", "warn", VT_WARN), (45, "Gefahr", "bad", VT_BAD)]),
+    "pressure": (0, 3, [(1, "zu niedrig", "bad", VT_BAD), (2.5, "normal", "good", VT_GOOD), (3, "zu hoch", "bad", VT_BAD)]),
+    "power_factor": (0, 1, [(0.7, "gering", "warn", VT_WARN), (0.9, "mäßig", "caution", "#fdd835"),
+                            (1, "gut", "good", VT_GOOD)]),
+    "battery_temp": (0, 50, [(10, "kalt", "info", VT_INFO), (30, "ideal", "good", VT_GOOD), (40, "warm", "caution", "#fdd835"),
+                             (50, "heiß", "bad", VT_BAD)]),
+    "price": (0.1, 0.5, [(0.2, "günstig", "good", "#43a047"), (0.3, "mittel", "warn", "#fb8c00"),
+                         (0.5, "teuer", "bad", "#e53935")]),
+}
+
+
+def rating_tile(title, item, scale, expr=None, value_expr=None, color=None, spark_of=None, extra=()):
+    """The value with its word and a segment band; with spark_of=(colour, span, unit, digits, threshold) its day's
+    course below as well (12 + 03), the change of the last hour beside the value."""
+    lo, hi, segs = VT_SCALES[scale]
+    word, band = rating_parts(expr or num(item), lo, hi, segs)
+    shown = value_expr or f"={dash(disp(item))}"
+    if not spark_of:
+        return vt_tile([vt_head(title, word), vt_value(shown, color), band, *extra], item, title, color)
+    colour, span, unit, digits, threshold, *rest = spark_of
+    hours = rest[0] if rest else 1
+    track_history(item, s=True, t=hours)
+    return vt_tile([vt_head(title, word), vt_value(shown, color, trend_chip(item, digits, unit, hours)), band, *extra,
+                 sparkline(item, colour, span, threshold=threshold), minmax_line(item, digits)], item, title, color)
+
+
+# ---------------------------------------------------------------- 02 · setpoint bar and normal band
+
+
+def setpoint_tile(title, item, set_expr, set_text, lo, hi, color, tol=1, unit="K", digits=1, value_expr=None, valid=None):
+    """The actual value as a bar, the setpoint as a tick, the difference beside; past the setpoint the bar pales.
+    valid: when the setpoint counts (else the bar alone, 'kein Soll')."""
+    v, s_ = num(item), set_expr
+    ok = valid or "true"
+    d = f"({v} - {s_})"
+    cls = f"(Math.abs({d}) <= {tol} ? 'good' : 'warn')"
+    bars = track_bar([fill_bar(pct_of(v, lo, hi), color, opacity=f"={ok} ? 0.45 : 1"),
+                      fill_bar(f"Math.min({pct_of(v, lo, hi)}, {pct_of(s_, lo, hi)})", color, visible=f"={ok}"),
+                      div([], visible=f"={ok}", **{"position": "absolute", "top": "-6px", "height": "20px",
+                                                     "width": "2px", "margin-left": "-1px", "border-radius": "1px",
+                                                     "background": "currentColor", "left": f"={pct_of(s_, lo, hi)} + '%'"})],
+                     **{"margin": "14px 0 4px"})
+    scale = div([label(str(lo).replace(".", ",")), label(f"={ok} ? 'Soll ' + {set_text} : 'kein Soll'"),
+                 label(str(hi).replace(".", ","))],
+                **{"display": "flex", "justify-content": "space-between", **VT_SUB, "margin-top": "6px"})
+    delta = label(f"={vt_signed(d, digits, unit)}", visible=f"={ok}",
+                  **{"font-size": "14px", "font-weight": "700", "color": "=" + cls_color(cls), "white-space": "nowrap"})
+    return vt_tile([vt_title(title), vt_value(value_expr or f"={dash(disp(item))}", None, delta), bars, scale],
+                item, title, color)
+
+
+def band_bar(title, item, lo, hi, ok_lo, ok_hi, color, nominal=None, ok_text="im Bereich", value_expr=None):
+    """The value on a scale with its normal range shaded; the word says whether it lies inside."""
+    v = num(item)
+    inside = f"({v} >= {ok_lo} && {v} <= {ok_hi})"
+    word = vt_chip(f"={inside} ? '{ok_text}' : 'außerhalb'", f"{inside} ? 'good' : 'bad'")
+    kids = [div([], **{"position": "absolute", "top": "-5px", "height": "18px", "border-radius": "5px",
+                       "background": "rgba(102, 187, 106, 0.28)", "left": f"{(ok_lo - lo) / (hi - lo) * 100:.2f}%",
+                       "width": f"{(ok_hi - ok_lo) / (hi - lo) * 100:.2f}%"})]
+    if nominal is not None:
+        kids.append(div([], **{"position": "absolute", "top": "-5px", "height": "18px", "width": "1px",
+                               "background": "currentColor", "opacity": "0.5",
+                               "left": f"{(nominal - lo) / (hi - lo) * 100:.2f}%"}))
+    kids.append(div([], **{"position": "absolute", "top": "-3px", "width": "14px", "height": "14px",
+                           "margin-left": "-7px", "border-radius": "50%", "box-sizing": "border-box",
+                           "background": color, "border": "2px solid var(--f7-card-bg-color, #fff)",
+                           "left": f"={pct_of(v, lo, hi)} + '%'"}))
+    fmt = lambda x: f"{x:g}".replace(".", ",")
+    scale = div([label(fmt(lo)), label(f"{fmt(ok_lo)}–{fmt(ok_hi)}"), label(fmt(hi))],
+                **{"display": "flex", "justify-content": "space-between", **VT_SUB, "margin-top": "8px"})
+    return vt_tile([vt_head(title, word), vt_value(value_expr or f"={dash(disp(item))}"),
+                 track_bar(kids, **{"margin": "10px 0 0"}), scale], item, title, color)
+
+
+def socket_load(title, item, limit=16):
+    """A plug's current against what the socket carries."""
+    v = num(item)
+    p = vt_clamp(f"{v} / {limit} * 100")
+    cls = f"({p} < 60 ? 'good' : {p} < 85 ? 'warn' : 'bad')"
+    return vt_tile([vt_head(title, vt_chip(f"={fixed(p, 0)} + ' % von {limit} A'", cls)), vt_value(f"={dash(disp(item))}"),
+                 track_bar([fill_bar(p, "=" + cls_color(cls))], **{"margin": "10px 0 2px"})], item, title)
+
+
+# ---------------------------------------------------------------- 04 · rings
+
+
+def ring_svg(pct_expr, color, size=46, width=7):
+    return svg("svg", [svg("circle", cx=32, cy=32, r=26, fill="none", stroke="rgba(127, 127, 127, 0.22)",
+                           **{"stroke-width": width}),
+                       svg("circle", cx=32, cy=32, r=26, fill="none", stroke=color, pathLength=100,
+                           transform="rotate(-90 32 32)",
+                           **{"stroke-width": width, "stroke-linecap": "round",
+                              "stroke-dasharray": f"=({vt_clamp(pct_expr)}).toFixed(1) + ' 100'"})],
+               viewBox="0 0 64 64", style={"width": f"{size}px", "height": f"{size}px", "flex": "0 0 auto"})
+
+
+def ring_tile(title, item, color, pct_expr=None, value_expr=None, sub=None):
+    p = pct_expr or num(item)
+    texts = [vt_title(title), vt_value(value_expr or f"={dash(disp(item))}")]
+    if sub:
+        texts.append(label(sub, **VT_SUB))
+    return vt_tile([div([ring_svg(p, color), div(texts, **{"min-width": "0"})],
+                     **{"display": "flex", "align-items": "center", "gap": "12px"})], item, title, color)
+
+
+# ---------------------------------------------------------------- 05 · donut, 06 · 100 % bar and balance
+
+
+def donut_tile(title, item, parts, total_expr, center_expr, unit, color=None, footer=None):
+    """Parts of a whole as a donut with the whole in its middle, each part with value and share beside it:
+    parts = [(name, expr, colour)]."""
+    rings, rows, before = [], [], "0"
+    total = f"(Math.max({total_expr}, 0.0001))"
+    for name, expr, colour in parts:
+        share = vt_clamp(f"({expr}) / {total} * 100")
+        rings.append(svg("circle", cx=50, cy=50, r=35.5, fill="none", stroke=colour, pathLength=100,
+                         transform="rotate(-90 50 50)",
+                         **{"stroke-width": 23, "stroke-dasharray": f"=Math.max(0, {share} - 0.6).toFixed(2) + ' 100'",
+                            "stroke-dashoffset": f"=(-({before})).toFixed(2)"}))
+        before = f"{before} + {share}"
+        rows.append(div([vt_dot(colour), label(name, **{"flex": "1 1 auto"}),
+                         label(f"={fixed(expr, 2)}", **{"font-weight": "700"}),
+                         label(f"=Math.round({share}) + ' %'", **{"width": "36px", "text-align": "right",
+                                                                   "opacity": "0.65"})],
+                        **{"display": "flex", "align-items": "center", "gap": "7px", "font-size": "12px"}))
+    if footer:
+        rows.append(footer)
+    pie = svg("svg", [svg("circle", cx=50, cy=50, r=35.5, fill="none", stroke="rgba(127, 127, 127, 0.15)",
+                          **{"stroke-width": 23}), *rings,
+                      svg("text", x=50, y=52, content=f"={center_expr}", fill="currentColor",
+                          **{"font-size": "14", "font-weight": "700", "text-anchor": "middle"}),
+                      svg("text", x=50, y=63, content=unit, fill="currentColor",
+                          **{"font-size": "8", "text-anchor": "middle", "opacity": "0.65"})],
+              viewBox="0 0 100 100", style={"width": "112px", "height": "112px", "flex": "0 0 auto"})
+    return vt_tile([vt_title(title),
+                 div([pie, div(rows, **{"display": "flex", "flex-direction": "column", "gap": "8px", "flex": "1 1 auto",
+                                        "min-width": "0", "max-width": "320px"})],
+                     **{"display": "flex", "align-items": "center", "gap": "14px", "margin-top": "6px"})],
+                item, title, color, wide=True)
+
+
+def split_bar(parts, total_expr, height=16):
+    """Parts of a whole as one bar of segments, each with its share inside where it fits."""
+    total = f"(Math.max({total_expr}, 0.0001))"
+    segs = []
+    for name, expr, colour in parts:
+        share = vt_clamp(f"({expr}) / {total} * 100")
+        segs.append(div([label(f"={share} >= 14 ? Math.round({share}) + ' %' : ''")],
+                        **{"flex": f"=({share}).toFixed(2) + ' 1 0'", "background": colour, "text-align": "center",
+                           "font-size": "10px", "font-weight": "700", "color": "#1a1a1a",
+                           "line-height": f"{height}px", "overflow": "hidden"}))
+    return div(segs, **{"display": "flex", "gap": "2px", "height": f"{height}px", "border-radius": "6px",
+                        "overflow": "hidden", "margin-top": "8px", "background": "rgba(127, 127, 127, 0.12)"})
+
+
+def split_legend(parts, digits=2):
+    return div([div([vt_dot(c), label(f"='{n} ' + {fixed(e, digits)}")],
+                    **{"display": "inline-flex", "align-items": "center", "gap": "5px"}) for n, e, c in parts],
+               **{"display": "flex", "flex-wrap": "wrap", "gap": "4px 14px", "font-size": "11px", "opacity": "0.8",
+                  "margin-top": "6px"})
+
+
+def split_tile(title, item, parts, total_expr, value_expr, color=None, right=None):
+    return vt_tile([vt_head(title, right), vt_value(value_expr, color), split_bar(parts, total_expr), split_legend(parts)],
+                item, title, color)
+
+
+def balance_tile(title, item, left, right, unit="kWh", digits=2, net_words=("eingespeist", "bezogen"), extra=()):
+    """Two opposing amounts around a middle line: left = (name, expr, colour), right likewise; the net below."""
+    (ln, le, lc), (rn, re_, rc) = left, right
+    top = f"(Math.max(Math.abs({le}), Math.abs({re_}), 0.0001) * 1.1)"
+    net = f"({re_} - {le})"
+    bars = div([div([], **{"position": "absolute", "left": "0", "right": "0", "top": "9px", "height": "8px",
+                           "border-radius": "4px", "background": "rgba(127, 127, 127, 0.12)"}),
+                div([], **{"position": "absolute", "right": "50%", "top": "6px", "height": "14px",
+                           "border-radius": "7px 0 0 7px", "background": lc,
+                           "width": f"=({vt_clamp(f'Math.abs({le}) / {top} * 50', 0, 50)}).toFixed(2) + '%'"}),
+                div([], **{"position": "absolute", "left": "50%", "top": "6px", "height": "14px",
+                           "border-radius": "0 7px 7px 0", "background": rc,
+                           "width": f"=({vt_clamp(f'Math.abs({re_}) / {top} * 50', 0, 50)}).toFixed(2) + '%'"}),
+                div([], **{"position": "absolute", "left": "50%", "top": "0", "width": "2px", "height": "26px",
+                           "margin-left": "-1px", "background": "currentColor", "opacity": "0.8"})],
+               **{"position": "relative", "height": "26px", "margin-top": "4px"})
+    ends = div([div([label(ln, **VT_SUB), label(f"={fixed(f'Math.abs({le})', digits)} + ' {unit}'",
+                                             **{"font-size": "15px", "font-weight": "700"})]),
+                label(title, **{**VT_TITLE, "align-self": "flex-start"}),
+                div([label(rn, **{**VT_SUB, "text-align": "right"}),
+                     label(f"={fixed(f'Math.abs({re_})', digits)} + ' {unit}'",
+                           **{"font-size": "15px", "font-weight": "700", "text-align": "right"})])],
+               **{"display": "flex", "justify-content": "space-between", "align-items": "flex-end", "gap": "8px"})
+    words = f"(Math.abs({net}) < {0.5 * 10 ** -digits} ? '' : {net} >= 0 ? ' {net_words[0]}' : ' {net_words[1]}')"
+    saldo = label(f"='Saldo ' + {fixed(f'Math.abs({net})', digits)} + ' {unit}' + {words}",
+                  **{"text-align": "center", "font-size": "12px", "font-weight": "600", "opacity": "0.8"})
+    return vt_tile([ends, bars, saldo, *extra], item, title, wide=True)
+
+
+# ---------------------------------------------------------------- 07 · pairs
+
+
+def spread_tile(title, hot, cold, hot_name, cold_name, color_hot="#e57373", color_cold="#64b5f6", sub=None):
+    """Two temperatures of one flow, the hot on the left, the cold on the right, a pipe shading from one into the
+    other below them, the difference beside the title."""
+    d = f"({num(hot)} - {num(cold)})"
+    side = lambda name, item, color, align: div([label(name, **VT_SUB),
+                                                 vt_value(f"={fixed(num(item), 1)} + ' °C'", color,
+                                                       **{"text-align": align})], **{"min-width": "0"})
+    pipe = div([vt_icon("chevron_right", 12) for _ in range(3)],
+               **{"display": "flex", "justify-content": "space-around", "align-items": "center", "color": "#ffffff",
+                  "height": "10px", "border-radius": "5px", "margin-top": "8px", "overflow": "hidden",
+                  "background": f"linear-gradient(90deg, {color_hot}, {color_cold})"})
+    kids = [vt_head(title, vt_chip(f"='ΔT ' + {fixed(d, 1)} + ' K'")),
+            div([side(hot_name, hot, color_hot, "left"), side(cold_name, cold, color_cold, "right")],
+                **{"display": "flex", "justify-content": "space-between", "gap": "8px", "margin-top": "4px"}),
+            pipe]
+    if sub:
+        kids.append(label(sub, **{**VT_SUB, "margin-top": "6px"}))
+    return vt_tile(kids, hot, title)
+
+
+def pair_tile(title, a, b, a_name, b_name, digits=1, unit="K", a_color=None, b_color=None, delta_text=None,
+         a_expr=None, b_expr=None, sub=None, value_unit=""):
+    """Two values that belong together side by side, their difference as a chip beside the title."""
+    av, bv = a_expr or num(a), b_expr or num(b)
+    d = f"({av} - {bv})"
+    def side(name, item, expr, color, align):
+        shown = f"={dash(disp(item))}" if item and not expr else f"={fixed(expr, digits)} + '{value_unit}'"
+        return div([label(name, **{**VT_SUB, "text-align": align}),
+                    vt_value(shown, color, **{"font-size": "18px", "text-align": align})], **{"min-width": "0"})
+    right = None if delta_text is False else vt_chip(f"={delta_text or vt_signed(d, digits, unit)}")
+    kids = [vt_head(title, right),
+            div([side(a_name, a, a_expr, a_color, "left"), side(b_name, b, b_expr, b_color, "right")],
+                **{"display": "flex", "align-items": "flex-end", "justify-content": "space-between", "gap": "8px",
+                   "margin-top": "4px"})]
+    if sub:
+        kids.append(label(sub, **{**VT_SUB, "margin-top": "4px"}))
+    return vt_tile(kids, a, title)
+
+
+def inout_tile(title, inside, outside, in_color="#fb8c00", out_color="#29b6f6", in_name="innen", out_name="außen"):
+    """Inside and outside side by side in their colours, the difference beside the title."""
+    return pair_tile(title, inside, outside, in_name, out_name, digits=1, unit="K", a_color=in_color, b_color=out_color)
+
+
+def dew_tile(title, dewpoint, temp, temp_name, inside=True):
+    """The distance between a temperature and its dew point: both as dots on a 0–30 °C bar, the distance large."""
+    d = f"({num(temp)} - {num(dewpoint)})"
+    risk = f"({d} > 3)"
+    word = vt_chip(f"={risk} ? '{'kein Kondensat' if inside else 'kein Tau'}' : "
+                f"'{'Kondensat möglich' if inside else 'Tau oder Nebel möglich'}'", f"{risk} ? 'good' : 'warn'")
+    p = lambda e: pct_of(e, 0, 30)
+    dot = lambda e, color: div([], **{"position": "absolute", "top": "-4px", "width": "16px", "height": "16px",
+                                     "margin-left": "-8px", "border-radius": "50%", "box-sizing": "border-box",
+                                     "background": color, "border": "2px solid var(--f7-card-bg-color, #fff)",
+                                     "left": f"={p(e)} + '%'"})
+    span_ = div([], **{"position": "absolute", "top": "0", "height": "8px", "background": "rgba(127, 127, 127, 0.45)",
+                       "left": f"={p(num(dewpoint))} + '%'", "width": f"=({p(num(temp))} - {p(num(dewpoint))}) + '%'"})
+    bar_ = track_bar([span_, dot(num(dewpoint), "#4fc3f7"), dot(num(temp), "#fb8c00")], **{"margin": "12px 6px 6px"})
+    ends = div([label(f"='Taupunkt ' + {dash(disp(dewpoint))}", **{"color": "#4fc3f7"}),
+                label(f"='{temp_name} ' + {dash(disp(temp))}", **{"color": "#fb8c00"})],
+               **{"display": "flex", "justify-content": "space-between", "gap": "8px", "font-size": "11px"})
+    return vt_tile([vt_head(title, word), vt_value(f"={fixed(d, 1)} + ' K'"), bar_, ends], dewpoint, title)
+
+
+def day_range(title, lo_item, hi_item, now_item, color):
+    """Today's lowest and highest value as a bar, the present value as a dot on it."""
+    lo, hi, v = num(lo_item), num(hi_item), num(now_item)
+    span = f"Math.max(4, {hi} - {lo})"
+    a, b = f"({lo} - ({span} - ({hi} - {lo})) / 2)", f"({lo} - ({span} - ({hi} - {lo})) / 2 + {span})"
+    p = lambda e: pct_of(e, a, b)
+    bar_ = div([div([], **{"position": "absolute", "top": "0", "height": "10px", "border-radius": "5px",
+                           "background": color, "opacity": "0.35", "left": f"={p(lo)} + '%'",
+                           "width": f"=({p(hi)} - {p(lo)}) + '%'"}),
+                div([], **{"position": "absolute", "top": "-3px", "width": "16px", "height": "16px",
+                           "margin-left": "-8px", "border-radius": "50%", "box-sizing": "border-box",
+                           "background": color, "border": "2px solid var(--f7-card-bg-color, #fff)",
+                           "left": f"={p(v)} + '%'"})],
+               **{"position": "relative", "height": "10px", "margin": "12px 4px 6px"})
+    ends = div([label(f"='min ' + {dash(disp(lo_item))}"), label(f"='jetzt ' + {dash(disp(now_item))}"),
+                label(f"='max ' + {dash(disp(hi_item))}")],
+               **{"display": "flex", "justify-content": "space-between", **VT_SUB})
+    return vt_tile([vt_title(title), bar_, ends], lo_item, title, color)
+
+
+def strings_tile(title, items_, names, volts, amps, colors):
+    """Strings side by side on one scale, the weaker one's shortfall named."""
+    vals = [num(i) for i in items_]
+    top = f"(Math.max({', '.join(vals)}, 1) * 1.08)"
+    hi, lo = f"Math.max({', '.join(vals)})", f"Math.min({', '.join(vals)})"
+    gap = f"(({hi} - {lo}) / Math.max({hi}, 1) * 100)"
+    weak = " : ".join(f"{v} === {lo} ? '{n}'" for v, n in zip(vals[:-1], names[:-1])) + f" : '{names[-1]}'"
+    word = vt_chip(f"={hi} < 50 ? 'keine Leistung' : ({weak}) + ' ' + Math.round({gap}) + ' % schwächer'",
+                f"({hi} < 50 || {gap} < 10) ? 'neutral' : 'warn'")
+    rows = []
+    for item, name, volt, amp, color in zip(items_, names, volts, amps, colors):
+        rows += [label(name, **{"font-size": "12px", "opacity": "0.65"}),
+                 track_bar([fill_bar(vt_clamp(f"{num(item)} / {top} * 100"), color, height=14)], height=14),
+                 label(f"={dash(disp(item))}", **{"font-size": "12px", "font-weight": "700", "text-align": "right",
+                                                    "white-space": "nowrap"}),
+                 label(""), label(f"={dash(disp(volt))} + ' · ' + {dash(disp(amp))}",
+                                  **{**VT_SUB, "margin-top": "-2px"}), label("")]
+    return vt_tile([vt_head(title, word), div(rows, **{"display": "grid", "grid-template-columns": "40px minmax(0, 1fr) auto",
+                                                "align-items": "center", "gap": "4px 8px", "margin-top": "8px"})],
+                items_[0], title, wide=True)
+
+
+# ---------------------------------------------------------------- 08 · flow bands
+
+
+def flow_cop(title, power, heat, cop_expr, unit="kW", factor=0.001, digits=2, footer=None, still="steht",
+             hide_idle=False, side=None, cop_large=True):
+    """Electricity plus ambient heat become heat: band widths by amount, the electricity's share of the heat's
+    height, so the widening is the COP."""
+    e, h = f"({num(power)} * {factor})", f"({num(heat)} * {factor})"
+    hs = f"({vt_clamp(f'{e} / Math.max({h}, {e}, 0.0001) * 92', 6, 92)})"
+    f1 = lambda e_: f"({e_}).toFixed(1)"
+    strom = (f"='M70 10 C160 10 160 17 250 17 L250 ' + {f1(f'17 + {hs}')} + ' C160 ' + {f1(f'17 + {hs}')} + "
+             f"' 160 ' + {f1(f'10 + {hs}')} + ' 70 ' + {f1(f'10 + {hs}')} + ' Z'")
+    umwelt = (f"='M70 ' + {f1(f'24 + {hs}')} + ' C160 ' + {f1(f'24 + {hs}')} + ' 160 ' + {f1(f'17 + {hs}')} + "
+              f"' 250 ' + {f1(f'17 + {hs}')} + ' L250 109 C160 109 160 116 70 116 Z'")
+    amb = f"Math.max(0, {h} - {e})"
+    texts = [svg("text", x=56, y=f"={f1(f'10 + {hs} / 2 - 1')}", content="Strom", fill="currentColor",
+                 **{"font-size": "10.5", "text-anchor": "end", "opacity": "0.65"}),
+             svg("text", x=56, y=f"={f1(f'10 + {hs} / 2 + 12')}", content=f"={fixed(e, digits)}", fill="#ffb74d",
+                 **{"font-size": "13", "font-weight": "700", "text-anchor": "end"}),
+             svg("text", x=56, y=f"={f1(f'24 + {hs} + (92 - {hs}) / 2 - 3')}", content="Umwelt", fill="currentColor",
+                 **{"font-size": "10.5", "text-anchor": "end", "opacity": "0.65"}),
+             svg("text", x=56, y=f"={f1(f'24 + {hs} + (92 - {hs}) / 2 + 11')}", content=f"={fixed(amb, digits)}",
+                 fill="#4db6ac", **{"font-size": "13", "font-weight": "700", "text-anchor": "end"}),
+             svg_text(264, 58, "Wärme", 10.5, anchor="start", opacity="0.65"),
+             svg("text", x=264, y=72, content=f"={fixed(h, digits)} + ' {unit}'", fill="#ef5350",
+                 **{"font-size": "13", "font-weight": "700"})]
+    drawing = svg("svg", [svg("path", d=strom, fill="#fb8c00", **{"fill-opacity": "0.45"}),
+                          svg("path", d=umwelt, fill="#26a69a", **{"fill-opacity": "0.4"}),
+                          svg("rect", x=62, y=10, width=8, height=f"={f1(hs)}", rx=2, fill="#fb8c00"),
+                          svg("rect", x=62, y=f"={f1(f'24 + {hs}')}", width=8, height=f"={f1(f'92 - {hs}')}", rx=2,
+                              fill="#26a69a"),
+                          svg("rect", x=250, y=17, width=8, height=92, rx=2, fill="#e53935"), *texts],
+                  viewBox="0 0 340 126", style={"display": "block", "width": "100%", "height": "auto",
+                                                "max-width": "460px", "margin-top": "4px"},
+                  visible=f"={h} > {e} && {e} > 0")
+    idle = label(still, visible=f"=!({h} > {e} && {e} > 0)", **{**VT_SUB, "margin": "18px 0", "text-align": "center"})
+    right = label(f"='COP ' + {cop_expr}", **{"font-size": "15px", "font-weight": "700", "white-space": "nowrap"})
+    if side is not None:  # the title over the COP large, the parts' COPs beside them at the top right
+        left = [vt_title(title)]
+        if cop_large:
+            left.append(vt_value(f"='COP ' + {cop_expr}", **{"font-size": "18px"}))
+        top_ = div([div(left, **{"min-width": "0"}), side],
+                   **{"display": "flex", "justify-content": "space-between", "align-items": "flex-start", "gap": "8px"})
+    else:
+        top_ = vt_head(title, right)
+    kids = [top_, drawing] + ([] if hide_idle else [idle])
+    if footer:
+        kids.append(footer)
+    return vt_tile(kids, heat, title, "#e53935", wide=True,
+                visible=f"={h} > {e} && {e} > 0" if hide_idle else None)
+
+
+def flow_split(title, item, parts, unit="kWh", digits=2, source_name="", source_color="#e53935"):
+    """A whole fanning out into its two parts, band widths by amount: parts = [(name, expr, colour)]."""
+    (an, ae, ac), (bn, be, bc) = parts
+    total = f"Math.max({ae} + {be}, 0.0001)"
+    ha = f"({vt_clamp(f'{ae} / {total} * 90', 4, 86)})"
+    f1 = lambda e_: f"({e_}).toFixed(1)"
+    band_a = (f"='M70 17 C160 17 160 10 250 10 L250 ' + {f1(f'10 + {ha}')} + ' C160 ' + {f1(f'10 + {ha}')} + "
+              f"' 160 ' + {f1(f'17 + {ha}')} + ' 70 ' + {f1(f'17 + {ha}')} + ' Z'")
+    band_b = (f"='M70 ' + {f1(f'17 + {ha}')} + ' C160 ' + {f1(f'17 + {ha}')} + ' 160 ' + {f1(f'24 + {ha}')} + "
+              f"' 250 ' + {f1(f'24 + {ha}')} + ' L250 114 C160 114 160 107 70 107 Z'")
+    pct_ = lambda e_: f"Math.round({e_} / {total} * 100) + ' %'"
+    texts = [svg_text(56, 58, source_name, 10.5, anchor="end", opacity="0.65"),
+             svg("text", x=56, y=72, content=f"={fixed(f'{ae} + {be}', digits)}", fill=source_color,
+                 **{"font-size": "13", "font-weight": "700", "text-anchor": "end"}),
+             svg("text", x=264, y=f"={f1(f'10 + {ha} / 2 - 1')}", content=f"='{an} · ' + {pct_(ae)}", fill="currentColor",
+                 **{"font-size": "10.5", "opacity": "0.65"}),
+             svg("text", x=264, y=f"={f1(f'10 + {ha} / 2 + 13')}", content=f"={fixed(ae, digits)} + ' {unit}'",
+                 fill=ac, **{"font-size": "13", "font-weight": "700"}),
+             svg("text", x=264, y=f"={f1(f'24 + {ha} + (90 - {ha}) / 2 - 1')}", content=f"='{bn} · ' + {pct_(be)}",
+                 fill="currentColor", **{"font-size": "10.5", "opacity": "0.65"}),
+             svg("text", x=264, y=f"={f1(f'24 + {ha} + (90 - {ha}) / 2 + 13')}",
+                 content=f"={fixed(be, digits)} + ' {unit}'", fill=bc, **{"font-size": "13", "font-weight": "700"})]
+    drawing = svg("svg", [svg("path", d=band_a, fill=ac, **{"fill-opacity": "0.45"}),
+                          svg("path", d=band_b, fill=bc, **{"fill-opacity": "0.45"}),
+                          svg("rect", x=62, y=17, width=8, height=90, rx=2, fill=source_color),
+                          svg("rect", x=250, y=10, width=8, height=f"={f1(ha)}", rx=2, fill=ac),
+                          svg("rect", x=250, y=f"={f1(f'24 + {ha}')}", width=8, height=f"={f1(f'90 - {ha}')}", rx=2,
+                              fill=bc), *texts],
+                  viewBox="0 0 360 124", style={"display": "block", "width": "100%", "height": "auto",
+                                                "max-width": "480px", "margin-top": "4px"},
+                  visible=f"={ae} + {be} > 0.01")
+    idle = label("noch keine Wärme heute", visible=f"=!({ae} + {be} > 0.01)",
+                 **{**VT_SUB, "margin": "18px 0", "text-align": "center"})
+    return vt_tile([vt_title(title), drawing, idle], item, title, source_color, wide=True)
+
+
+# ---------------------------------------------------------------- 11 · pictures
+
+
+def cells_tile(title, item, color, n=10, sub=None, pct_expr=None):
+    """A battery of n cells, as many lit as its charge fills, the last one partly."""
+    p = pct_expr or num(item)
+    w = 238 / n
+    rects = [svg("rect", x=round(8 + i * w, 1), y=8, width=round(w - 4, 1), height=32, rx=3, fill=color,
+                 **{"fill-opacity": f"={p} >= {(i + 1) * 100 / n:g} ? 1 : {p} > {i * 100 / n:g} ? 0.55 : 0.15"})
+             for i in range(n)]
+    drawing = svg("svg", [svg("rect", x=1, y=2, width=250, height=44, rx=8, fill="none", stroke=color,
+                              **{"stroke-width": "2"}),
+                          svg("rect", x=253, y=16, width=6, height=16, rx=2, fill=color), *rects],
+                  viewBox="0 0 262 48", style={"display": "block", "width": "100%", "height": "auto",
+                                               "max-width": "300px", "margin-top": "8px"})
+    kids = [vt_head(title, vt_value(f"={dash(disp(item))}", **{"font-size": "18px"})), drawing]
+    if sub:
+        kids.append(label(sub, **{**VT_SUB, "margin-top": "6px"}))
+    return vt_tile(kids, item, title, color)
+
+
+def tank_color(expr):
+    return f"({expr} > 50 ? '#e57373' : {expr} >= 40 ? '#fb8c00' : {expr} >= 35 ? '#fbc02d' : '#64b5f6')"
+
+
+def tank_tile(title, item, set_item):
+    """The hot water tank in layers, its top in the colour of its temperature (as in the heating card), the
+    setpoint beside it."""
+    t = num(item)
+    # an id of its own per item, which names no item (widgets may not), so two tanks on a page keep their gradients
+    gid = "tk-" + hashlib.sha1(item.encode()).hexdigest()[:8]
+    top = tank_color(t)
+    drawing = svg("svg", [svg("defs", [svg("linearGradient", [
+        svg("stop", offset="0", **{"stop-color": f"={top}"}), svg("stop", offset="0.52", **{"stop-color": f"={top}"}),
+        svg("stop", offset="0.52", **{"stop-color": "#ffcc80"}), svg("stop", offset="0.76", **{"stop-color": "#ffcc80"}),
+        svg("stop", offset="0.76", **{"stop-color": "#bbdefb"}), svg("stop", offset="1", **{"stop-color": "#bbdefb"})],
+        id=gid, x1="0", x2="0", y1="0", y2="1")]),
+        svg("rect", x=8, y=6, width=54, height=108, rx=16, fill=f"url(#{gid})", stroke="currentColor",
+            **{"fill-opacity": "0.85", "stroke-opacity": "0.3", "stroke-width": "1.5"})],
+        viewBox="0 0 70 120", style={"width": "44px", "height": "auto", "flex": "0 0 auto"})
+    d = f"({t} - {num(set_item)})"
+    word = vt_chip(f"={d} >= 0 ? 'über Soll' : 'unter Soll'", f"{d} >= 0 ? 'good' : 'warn'")
+    texts = div([vt_title(title), vt_value(f"={dash(disp(item))}"),
+                 label(f"='Soll ' + {dash(disp(set_item))} + ' · ' + {vt_signed(d, 1, 'K')}", **VT_SUB),
+                 div([word], **{"margin-top": "6px"})], **{"min-width": "0"})
+    return vt_tile([div([drawing, texts], **{"display": "flex", "align-items": "center", "gap": "14px"})], item, title)
+
+
+def levels_tile(title, item, names, color, sub=None, value_expr=None):
+    """A level as rising bars, as many lit as the level: names = [(state, word)] from the lowest."""
+    n = len(names)
+    idx = " : ".join(f"items.{item}.state === '{s_}' ? {i + 1}" for i, (s_, _) in enumerate(names)) + " : 0"
+    idx = f"({idx})"
+    word = "[" + ", ".join(["'–'"] + [js_str(w) for _, w in names]) + f"][{idx}]"
+    w, gap = 12, 5
+    bars = [svg("rect", x=2 + i * (w + gap), y=round(40 - 10 - 26 * (i + 1) / n, 1), width=w,
+                height=round(10 + 26 * (i + 1) / n, 1), rx=3, fill=color,
+                **{"fill-opacity": f"={idx} > {i} ? 1 : 0.18"}) for i in range(n)]
+    kids = [vt_title(title), vt_value(value_expr or f"={word}", **{"font-size": "17px", "overflow": "hidden",
+                                                                       "text-overflow": "ellipsis"})]
+    if sub:
+        kids.append(label(sub, **VT_SUB))
+    vw = 4 + n * (w + gap)
+    return vt_tile([div([svg("svg", bars, viewBox=f"0 0 {vw} 42", style={"width": f"{vw}px", "height": "auto",
+                                                                       "flex": "0 0 auto"}),
+                      div(kids, **{"min-width": "0"})], **{"display": "flex", "align-items": "center", "gap": "12px"})],
+                item, title, color)
+
+
+def tub(x, fill_expr, cid):
+    body = "M4 14 H56 V22 C56 31 49 36 40 36 H20 C11 36 4 31 4 22 Z"
+    return svg("g", [svg("rect", x=4, y=f"=(36 - 22 * {vt_clamp(fill_expr, 0, 1)}).toFixed(1)", width=52,
+                         height=f"=(22 * {vt_clamp(fill_expr, 0, 1)}).toFixed(1)", fill="#42a5f5",
+                         **{"fill-opacity": "0.8", "clip-path": f"url(#{cid})"}),
+                     svg("path", d=body, fill="none", stroke="#64b5f6", **{"stroke-width": "1.6"}),
+                     svg("path", d="M2 14 H58 M12 14 V7 C12 4 15 3 18 4 M14 36 L12 41 M46 36 L48 41", fill="none",
+                         stroke="#64b5f6", **{"stroke-width": "1.6", "stroke-linecap": "round"})],
+               transform=f"translate({x} 0)")
+
+
+def tubs(liters_expr, per=150, n=6):
+    """Bath tubs of per litres, filled as far as the litres reach (n drawn)."""
+    cid = "tub-clip"
+    body = "M4 14 H56 V22 C56 31 49 36 40 36 H20 C11 36 4 31 4 22 Z"
+    return svg("svg", [svg("defs", [svg("clipPath", [svg("path", d=body)], id=cid)]),
+                       *[tub(i * 66, f"({liters_expr} / {per} - {i})", cid) for i in range(n)]],
+               viewBox=f"0 0 {n * 66} 44", style={"display": "block", "width": "100%", "height": "auto",
+                                                  "max-width": "360px", "margin-top": "8px"})
+
+
+def counter_tile(title, item, ints, decs, unit, factor=1, sub=None, size=24, wide=False):
+    """A meter's reading on rollers, black for the whole, red for the fraction."""
+    v = f"({num(item)} * {factor})"
+    whole = f"('0000000000' + Math.floor({v})).slice(-{ints})"
+    frac = f"({v} - Math.floor({v})).toFixed({decs}).slice(2)"
+    w, h = round(size * 1.08), round(size * 1.58)
+    def roller(text, red):
+        bg = ("linear-gradient(#3a0606, #8e1b1b 28%, #8e1b1b 72%, #3a0606)" if red else
+              "linear-gradient(#050505, #2b2b2e 28%, #2b2b2e 72%, #050505)")
+        return label(text, **{"width": f"{w}px", "height": f"{h}px", "line-height": f"{h}px", "text-align": "center",
+                              "border-radius": "3px", "background": bg, "color": "#ffffff", "font-weight": "700",
+                              "font-size": f"{size}px", "font-variant-numeric": "tabular-nums"})
+    rollers = [roller(f"={whole}.charAt({k})", False) for k in range(ints)]
+    rollers.append(div([], **{"width": "3px"}))
+    rollers += [roller(f"={frac}.charAt({k})", True) for k in range(decs)]
+    meter = div([div(rollers, **{"display": "inline-flex", "gap": "3px", "padding": "5px", "background": "#0b0b0c",
+                                 "border-radius": "8px", "border": "1px solid rgba(127, 127, 127, 0.35)"}),
+                 label(unit, **{"font-size": "13px", "opacity": "0.7"})],
+                **{"display": "flex", "align-items": "center", "gap": "8px", "margin-top": "8px", "flex-wrap": "wrap"})
+    kids = [vt_title(title), meter]
+    if sub:
+        kids.append(label(sub, **{**VT_SUB, "margin-top": "6px"}))
+    # wider than a column of about 200 px: the whole row
+    return vt_tile(kids, item, title, wide=wide or (ints + decs) * (w + 3) + 16 > 200)
+
+
+def counters_tile(title, a, b, a_name, b_name, ints, decs, unit, sub):
+    """Two meters side by side, as charged and discharged."""
+    def one(item, name):
+        c = counter_tile(name, item, ints, decs, unit, size=17)
+        c["config"]["style"] = {"min-width": "0"}
+        return c
+    return vt_tile([vt_title(title), div([one(a, a_name), one(b, b_name)],
+                                             **{"display": "flex", "flex-wrap": "wrap", "gap": "6px 18px"}),
+                 label(sub, **{**VT_SUB, "margin-top": "6px"})], a, title, wide=True)
+
+
+def dots_tile(title, online, total, color):
+    """Optimizers as dots, lit while online."""
+    n = 14
+    ds = [svg("circle", cx=8 + i * 16, cy=8, r=5.5, fill=color,
+              **{"fill-opacity": f"={num(online)} > {i} ? 1 : 0.16"},
+              visible=f"={num(total)} > {i}") for i in range(n)]
+    return vt_tile([vt_head(title, vt_value(f"={dash(disp(online))} + ' / ' + {dash(disp(total))}", **{"font-size": "18px"})),
+                 svg("svg", ds, viewBox=f"0 0 {n * 16} 16", style={"display": "block", "width": "100%", "height": "auto",
+                                                                  "max-width": "300px", "margin-top": "10px"})],
+                online, title, color)
+
+
+def ok_tile(title, item, ok_expr):
+    good = f"({ok_expr})"
+    return vt_tile([vt_head(title, vt_chip(f"={good} ? 'kein Fehler' : 'Fehler'", f"{good} ? 'good' : 'bad'")),
+                 vt_value(f"={good} ? '–' : {dash(disp(item))}", **{"font-size": "16px", "white-space": "normal"})],
+                item, title)
+
+
+# ---------------------------------------------------------------- 13 · time
+
+
+def age_tile(title, item, interval):
+    """How long ago a time stamp lies, its ring emptying over the interval in which a new one is due."""
+    ok = f"(!['NULL', 'UNDEF'].includes(items.{item}.state))"
+    age = f"Math.max(0, dayjs().diff(dayjs(items.{item}.state), 'minute'))"
+    text = (f"={ok} ? (({age}) < 1 ? 'gerade eben' : ({age}) < 60 ? 'vor ' + ({age}) + ' min' : ({age}) < 1440 ? "
+            f"'vor ' + Math.floor(({age}) / 60) + ':' + ('0' + ({age}) % 60).slice(-2) + ' h' : "
+            f"dayjs(items.{item}.state).format('dd D.M. HH:mm')) : '–'")
+    fresh = f"({ok} ? 100 - {vt_clamp(f'{age} / {interval} * 100')} : 0)"
+    cls = f"(({age}) <= {interval} * 1.5 ? 'good' : 'warn')"
+    texts = [vt_title(title), vt_value(text, **{"font-size": "18px"}),
+             label(f"={ok} ? dayjs(items.{item}.state).format('HH:mm') + ' Uhr' : ''", **VT_SUB)]
+    return vt_tile([div([ring_svg(fresh, "=" + cls_color(cls), size=40), div(texts, **{"min-width": "0"})],
+                     **{"display": "flex", "align-items": "center", "gap": "12px"})], item, title)
+
+
+def countdown_tile(title, item, none_text="keine"):
+    ok = f"(!['NULL', 'UNDEF'].includes(items.{item}.state) && dayjs(items.{item}.state).isAfter(dayjs()))"
+    left = f"Math.max(0, dayjs(items.{item}.state).diff(dayjs(), 'minute'))"
+    text = (f"={ok} ? 'in ' + (({left}) < 60 ? ({left}) + ' min' : Math.floor(({left}) / 60) + ':' + "
+            f"('0' + ({left}) % 60).slice(-2) + ' h') : '{none_text}'")
+    return vt_tile([vt_title(title), vt_value(text, **{"font-size": "18px"}),
+                 label(f"={ok} ? 'um ' + dayjs(items.{item}.state).format('dd HH:mm') : ''", **VT_SUB)], item, title)
+
+
+
+
+def sun_tile(title, start, stop, peak, power_item):
+    """The inverter's day as a sun arc from its start to its end (estimated mirror-symmetric around the solar noon
+    while it runs), the sun at the present with the power beside it, the day's peak named."""
+    ok = lambda i: f"(!['NULL', 'UNDEF'].includes(items.{i}.state) && dayjs(items.{i}.state).isSame(dayjs(), 'day'))"
+    mins = lambda d: f"({d}.hour() * 60 + {d}.minute())"
+    t0 = f"({ok(start)} ? {mins(f'dayjs(items.{start}.state)')} : 420)"
+    noon = f"({SOLAR_NOON_UTC} + dayjs().utcOffset())"
+    t1 = f"({ok(stop)} ? {mins(f'dayjs(items.{stop}.state)')} : 2 * {noon} - {t0})"
+    now = mins("dayjs()")
+    X = lambda m: f"(14 + 432 * ({m}) / 1440)"
+    cx, rx = f"(({X(t0)} + {X(t1)}) / 2)", f"(({X(t1)} - {X(t0)}) / 2)"
+    xn = f"Math.max({X(t0)}, Math.min({X(t1)}, {X(now)}))"
+    yn = f"(96 - 64 * Math.sqrt(Math.max(0, 1 - Math.pow(({xn} - {cx}) / {rx}, 2))))"
+    f1 = lambda e: f"({e}).toFixed(1)"
+    done = f"'M' + {f1(X(t0))} + ' 96 A' + {f1(rx)} + ' 64 0 0 1 ' + {f1(xn)} + ' ' + {f1(yn)}"
+    rest = f"='M' + {f1(xn)} + ' ' + {f1(yn)} + ' A' + {f1(rx)} + ' 64 0 0 1 ' + {f1(X(t1))} + ' 96'"
+    hm_ = lambda m: f"(Math.floor(({m}) / 60) + ':' + ('0' + Math.round(({m}) % 60)).slice(-2))"
+    up = f"({ok(start)} && {now} < {t1})"
+    right_side = f"({xn} > 300)"
+    kids = [svg("path", d=f"={done} + ' L' + {f1(xn)} + ' 96 Z'", fill="#ffb300", **{"fill-opacity": "0.12"},
+                visible=f"={ok(start)}"),
+            svg("path", d=f"={done}", fill="none", stroke="#ffb300", **{"stroke-width": "2.5", "stroke-linecap": "round"},
+                visible=f"={ok(start)}"),
+            svg("path", d=rest, fill="none", stroke="#ffb300",
+                **{"stroke-opacity": "0.5", "stroke-width": "2", "stroke-dasharray": "3 4"}, visible=f"={ok(start)}"),
+            svg("line", x1=14, y1=96, x2=446, y2=96, stroke="currentColor", **{"stroke-opacity": "0.2",
+                                                                             "stroke-width": "1.5"}),
+            *[svg_text(14 + 108 * k, 114, f"{6 * k}" + (" Uhr" if k == 4 else ""), 11, opacity="0.5",
+                         anchor="start" if k == 0 else "end" if k == 4 else "middle") for k in range(5)],
+            svg_text(f"={f1(f'{X(t0)} + 4')}", 90, f"='Start ' + {hm_(t0)}", 12, anchor="start", opacity="0.85"),
+            svg_text(f"={f1(f'{X(t1)} - 4')}", 90, f"=({ok(stop)} ? 'Ende ' : 'Ende ≈ ') + {hm_(t1)}", 12,
+                       anchor="end", opacity="0.7"),
+            svg("circle", cx=f"={f1(xn)}", cy=f"={f1(yn)}", r=13, fill="#ffb300", **{"fill-opacity": "0.22"},
+                visible=f"={up}"),
+            svg("circle", cx=f"={f1(xn)}", cy=f"={f1(yn)}", r=8, fill="#ffb300", visible=f"={up}"),
+            svg_text(f"={f1(f'{xn} + ({right_side} ? -18 : 18)')}", f"={f1(f'{yn} + 4')}",
+                       f"={dash(disp(power_item))}", 13, weight="700", anchor=f"={right_side} ? 'end' : 'start'")]
+    kids[-1]["config"]["visible"] = f"={up}"
+    word = vt_chip(f"='Spitze ' + {dash(disp(peak))}", "'neutral'")
+    return vt_tile([vt_head(title, word), svg("svg", kids, viewBox="0 0 460 118",
+                                        style={"display": "block", "width": "100%", "height": "auto",
+                                               "max-width": "560px", "margin": "4px auto 0"})], start, title, wide=True)
+
+
+def price_strip(title, price, cheap_hour, dear_hour):
+    """The hourly prices ahead as bars in the price colours, the present dashed, the cheapest and dearest hours
+    named with how long until them."""
+    track_history(price, f=[2, 40])
+    rows = f"((({vt_hv(price, 'f')}) || []))"
+    n = 42
+    count = f"Math.max(1, {rows}.length)"
+    slot = f"(432 / {count})"
+    bars = []
+    for i in range(n):
+        r_ = f"({rows}[{i}] || [0, 0])"
+        v = f"({r_}[1])"
+        h = f"({vt_clamp(f'{v} / 0.55 * 50', 1, 50)})"
+        bars.append(svg("rect", x=f"=(14 + {i} * {slot} + 0.6).toFixed(2)", y=f"=(66 - {h}).toFixed(1)",
+                        width=f"=Math.max(1, {slot} - 1.2).toFixed(2)", height=f"=({h}).toFixed(1)", rx=1.5,
+                        fill=f"={v} < 0.2 ? '#43a047' : {v} < 0.3 ? '#fb8c00' : '#e53935'",
+                        **{"fill-opacity": f"=dayjs.unix({r_}[0]).add(1, 'hour').isBefore(dayjs()) ? 0.4 : 1"},
+                        visible=f"={rows}.length > {i}"))
+    t0 = f"({rows}.length ? {rows}[0][0] : 0)"
+    X = lambda unix: f"(14 + 432 * (({unix}) - {t0}) / ({count} * 3600))"
+    now_x = X("dayjs().unix()")
+    def mark(item, color, word):
+        x = f"Math.max(30, Math.min(430, {X(f'dayjs(items.{item}.state).unix() + 1800')}))"
+        shown = f"={rows}.length > 0 && dayjs(items.{item}.state).unix() >= {t0}"
+        icon = glyph(f"=({x} - 15).toFixed(1)", 8, word, 13, color)
+        icon["config"]["visible"] = shown
+        return svg("g", [icon, svg("text", x=f"=({x} - 7).toFixed(1)", y=12,
+                                   content=f"=dayjs(items.{item}.state).format('HH:mm')", fill=color,
+                                   **{"font-size": "12", "font-weight": "700"})], visible=shown)
+    midnight = X("dayjs().add(1, 'day').startOf('day').unix()")
+    kids = [*bars,
+            svg("line", x1=f"={midnight}.toFixed(1)", x2=f"={midnight}.toFixed(1)", y1=16, y2=68,
+                stroke="currentColor", **{"stroke-opacity": "0.25"}),
+            svg_text(f"=({midnight} + 4).toFixed(1)", 82, "=dayjs().add(1, 'day').format('dddd')", 11,
+                       anchor="start", opacity="0.6"),
+            svg_text(14, 82, "heute", 11, anchor="start", opacity="0.6"),
+            svg("line", x1=f"={now_x}.toFixed(1)", x2=f"={now_x}.toFixed(1)", y1=16, y2=68, stroke="currentColor",
+                **{"stroke-width": "1.2", "stroke-dasharray": "3 2"}),
+            mark(cheap_hour, "#43a047", "arrow_downward"), mark(dear_hour, "#e53935", "arrow_upward")]
+    def until(item, word):
+        left = f"Math.max(0, dayjs(items.{item}.state).diff(dayjs(), 'minute'))"
+        return label(f"='{word} ' + dayjs(items.{item}.state).format('dd HH:mm') + (({left}) > 0 ? ' · in ' + "
+                     f"Math.floor(({left}) / 60) + ':' + ('0' + ({left}) % 60).slice(-2) + ' h' : ' · jetzt')",
+                     **{"font-size": "12px"})
+    return vt_tile([vt_title(title),
+                 svg("svg", kids, viewBox="0 0 460 88", style={"display": "block", "width": "100%", "height": "auto",
+                                                               "max-width": "560px", "margin": "6px auto 0"}),
+                 div([until(cheap_hour, "Günstigste Stunde"), until(dear_hour, "Teuerste Stunde")],
+                     **{"display": "flex", "flex-wrap": "wrap", "gap": "4px 20px", "opacity": "0.85"})],
+                price, title, wide=True)
+
+
+def program_tile(title, p):
+    """A Miele programme from its start to its end as a bar, the present as a dot, elapsed and remaining time below,
+    its end large."""
+    running = f"(['NULL', 'UNDEF'].includes(items.{p}_program_finished_time.state) === false && {num(p + '_program_remaining_time')} > 0)"
+    el, rest = num(p + "_program_elapsed_time"), num(p + "_program_remaining_time")
+    share = f"({vt_clamp(f'{el} / Math.max(1, {el} + {rest}) * 100')})"
+    d = lambda s: (f"(({s}) >= 3600 ? Math.floor(({s}) / 3600) + ':' + ('0' + Math.floor(({s}) % 3600 / 60)).slice(-2) "
+                   f"+ ' h' : Math.ceil(({s}) / 60) + ' min')")
+    bar_ = div([fill_bar(share, "#42a5f5", height=10),
+                div([], **{"position": "absolute", "top": "-3px", "width": "16px", "height": "16px",
+                           "margin-left": "-8px", "border-radius": "50%", "box-sizing": "border-box",
+                           "background": "#42a5f5", "border": "2px solid var(--f7-card-bg-color, #fff)",
+                           "left": f"={share} + '%'"})],
+               **{"position": "relative", "height": "10px", "margin": "12px 4px 6px",
+                  "background": "rgba(127, 127, 127, 0.18)", "border-radius": "5px"})
+    ends = div([label(f"='Start ' + dayjs().subtract({el}, 'second').format('HH:mm')"),
+                label(f"='seit ' + {d(el)} + ' · noch ' + {d(rest)}"),
+                label(f"='Ende ' + dayjs(items.{p}_program_finished_time.state).format('HH:mm')")],
+               **{"display": "flex", "justify-content": "space-between", "gap": "8px", **VT_SUB})
+    kids = [vt_head(title, vt_chip(f"=Math.round({share}) + ' %'", "'info'")),
+            vt_value(f"='fertig um ' + dayjs(items.{p}_program_finished_time.state).format('HH:mm')"), bar_, ends]
+    idle = [vt_title(title), vt_value("kein Programm", **{"font-size": "16px", "opacity": "0.6"})]
+    return [vt_tile(kids, p + "_program_progress", title, wide=True, visible=f"={running}"),
+            vt_tile(idle, p + "_program_progress", title, visible=f"=!{running}")]
+
+
+# ---------------------------------------------------------------- 14 · phases
+
+
+def direction_rows(vals, names, top, unit, digits, one_sided=False):
+    """Values per phase as bars around a middle line: export (negative) to the left in green, import to the right in
+    red; one_sided: amounts only, to the right in the neutral colour."""
+    rows = []
+    for v, n in zip(vals, names):
+        share = f"({vt_clamp(f'Math.abs({v}) / {top} * 100')}).toFixed(1)"
+        right = div([div([], **{"height": "14px", "border-radius": "0 4px 4px 0",
+                                "background": "#7986cb" if one_sided else "#e57373",
+                                "width": f"={share} + '%'" if one_sided else f"={v} > 0 ? {share} + '%' : '0%'"})],
+                    **{"border-left": "1.5px solid rgba(127, 127, 127, 0.7)"})
+        shown = f"={fixed(f'Math.abs({v})', digits)} + ' {unit}'" if one_sided else f"={vt_signed(v, digits, unit)}"
+        cells = [label(n, **{"font-size": "11px", "opacity": "0.65"})]
+        if not one_sided:
+            cells.append(div([div([], **{"height": "14px", "border-radius": "4px 0 0 4px", "background": "#81c784",
+                                         "width": f"={v} < 0 ? {share} + '%' : '0%'"})],
+                             **{"display": "flex", "justify-content": "flex-end"}))
+        cells += [right, label(shown, **{"font-size": "11px", "font-weight": "600", "text-align": "right",
+                                         "white-space": "nowrap"})]
+        rows += cells
+    columns = "24px 1fr 64px" if one_sided else "24px 1fr 1fr 64px"
+    return div(rows, **{"display": "grid", "grid-template-columns": columns, "align-items": "center",
+                        "gap": "6px 0", "column-gap": "6px"})
+
+
+def direction_words():
+    return div([div([vt_icon("arrow_back"), label("Einspeisung")],
+                    **{"display": "flex", "align-items": "center", "gap": "3px", "color": "=" + cls_color("'good'")}),
+                div([label("Bezug"), vt_icon("arrow_forward")],
+                    **{"display": "flex", "align-items": "center", "gap": "3px", "color": "=" + cls_color("'bad'")})],
+               **{"display": "flex", "justify-content": "space-around", "font-size": "10.5px", "margin": "6px 0 2px"})
+
+
+def phase_power(title, items_, names):
+    """Power per phase around a middle line, its sum beside the title: values only, the currents judge imbalance."""
+    vals = [num(i) for i in items_]
+    top = f"(Math.max(50, {', '.join(f'Math.abs({v})' for v in vals)}) * 1.15)"
+    total = " + ".join(vals)
+    return vt_tile([vt_head(title, vt_chip(f"='Σ ' + {vt_signed(f'({total})', 0, 'W')}")), direction_words(),
+                 direction_rows(vals, names, top, "W", 0)], items_[0], title)
+
+
+def phase_volts(title, items_, names):
+    lo, hi = 200, 260
+    y = lambda e: f"(110 - {vt_clamp(f'(({e}) - {lo}) / {hi - lo} * 100', 0, 100)})"
+    kids = [svg("rect", x=14, y=21.7, width=100, height=76.6, rx=4, fill="#66bb6a", **{"fill-opacity": "0.12"}),
+            svg("line", x1=14, y1=60, x2=114, y2=60, stroke="currentColor",
+                **{"stroke-opacity": "0.4", "stroke-dasharray": "3 3"}),
+            svg_text(117, 63, "230", 8.5, anchor="start", opacity="0.6"),
+            svg_text(117, 25, "253", 8, anchor="start", opacity="0.6"),
+            svg_text(117, 101, "207", 8, anchor="start", opacity="0.6")]
+    ok = []
+    for k, (item, n) in enumerate(zip(items_, names)):
+        x = 28 + 32 * k
+        v = num(item)
+        ok.append(f"({v} >= 207 && {v} <= 253)")
+        kids += [svg("rect", x=x, y=f"={y(v)}.toFixed(1)", width=22, height=f"=(110 - {y(v)}).toFixed(1)", rx=3,
+                     fill="#7986cb"),
+                 svg_text(x + 11, f"=({y(v)} - 5).toFixed(1)", f"={fixed(v, 1)}", 9),
+                 svg_text(x + 11, 122, n, 9, opacity="0.65")]
+    inside = " && ".join(ok)
+    return vt_tile([vt_head(title, vt_chip(f"={inside} ? 'im Band ± 10 %' : 'außerhalb'", f"{inside} ? 'good' : 'bad'")),
+                 svg("svg", kids, viewBox="0 0 140 126", style={"display": "block", "width": "100%", "height": "auto",
+                                                               "max-width": "220px", "margin": "4px auto 0"})],
+                items_[0], title)
+
+
+def phase_amps(title, items_, names, neutral=None, powers=None):
+    """Current per phase. With the phases' active powers (a meter) each current carries their direction, |I| with
+    the sign of P (the Huawei meter signs currents, SmartPi gives amounts; the sign of SmartPi's cos φ contradicts its
+    power's in 5-8 % of readings), drawn around a middle line like the power; imbalance is the spread of these signed
+    currents: below 10 A even, below 20 A raised, from 20 A (about 4.6 kVA) an imbalance. Without powers (the PV
+    inverter, which only feeds in) amounts to one side and their spread without a verdict."""
+    if powers:
+        vals = [f"(Math.abs({num(i)}) * ({num(p_)} < 0 ? -1 : 1))" for i, p_ in zip(items_, powers)]
+    else:
+        vals = [f"Math.abs({num(i)})" for i in items_]
+    top = f"(Math.max(1, {', '.join(f'Math.abs({v})' for v in vals)}) * 1.15)"
+    spread_ = f"(Math.max({', '.join(vals)}) - Math.min({', '.join(vals)}))"
+    spread_text = f"'Spanne ' + {fixed(spread_, 2 if not powers else 1)} + ' A'"
+    if powers:
+        word = vt_chip(f"={spread_} < 10 ? 'ausgeglichen' : {spread_} < 20 ? 'erhöht' : 'Schieflast'",
+                    f"{spread_} < 10 ? 'good' : {spread_} < 20 ? 'warn' : 'bad'")
+        kids = [vt_head(title, word), direction_words(), direction_rows(vals, names, top, "A", 2)]
+    else:
+        kids = [vt_head(title, vt_chip(f"={spread_text}")), direction_rows(vals, names, top, "A", 2, one_sided=True)]
+    foot = [f"={spread_text}"] if powers else []
+    if neutral:
+        foot.append(f"='N ' + {fixed(num(neutral), 2)} + ' A'")
+    if foot:
+        kids.append(div([label(t) for t in foot], **{"display": "flex", "justify-content": "space-between",
+                                                     **VT_SUB, "margin-top": "8px"}))
+    return vt_tile(kids, items_[0], title)
+
+
+def pill_text(x, y, text, fill="#48484a", color="#ffffff", weight="normal"):
+    """A value in a dark grey pill: the pill as wide as its text (about 5.5 units a character at 10)."""
+    w = f"((({text}).length * 5.5 + 12))"
+    return svg("g", [svg("rect", x=f"=({x} - {w} / 2).toFixed(1)", y=round(y - 10.5, 1), width=f"={w}.toFixed(1)",
+                         height=14, rx=7, fill=fill),
+                     svg("text", x=x, y=y, fill=color, content=f"={text}",
+                         **{"font-size": "10", "font-weight": weight, "text-anchor": "middle"})])
+
+
+def phase_load(title, items_, names, neutral=None):
+    """How much current each line carries, as a triangle of the amounts (direction does not matter to a wire), each
+    value in a dark grey pill at its outer corner, the measured neutral (SmartPi) as a dashed circle on the same scale,
+    warned where it carries more than the most loaded phase. The scale follows the largest current, so a strong
+    imbalance draws a spike towards its phase and the neutral's circle grows with it."""
+    import math
+    cx, cy, R = 85, 70, 50
+    vals = [f"Math.abs({num(i)})" for i in items_]
+    n = f"Math.abs({num(neutral)})" if neutral else None
+    top = f"(Math.max(1, {', '.join(vals + ([n] if n else []))}) * 1.12)"
+    angles = (90, -30, 210)
+    def xy(v, ang, r=R):
+        c, s_ = math.cos(math.radians(ang)), math.sin(math.radians(ang))
+        return f"({cx} + {c:.4f} * {r} * {v} / {top})", f"({cy} - {s_:.4f} * {r} * {v} / {top})"
+    grid_ = []
+    for k in (1, 2 / 3, 1 / 3):
+        pts = " ".join(f"{cx + math.cos(math.radians(ang)) * R * k:.1f},{cy - math.sin(math.radians(ang)) * R * k:.1f}"
+                       for ang in angles)
+        grid_.append(svg("polygon", points=pts, fill="none", stroke="currentColor", **{"stroke-opacity": "0.14"}))
+    corners = [xy(v, ang) for v, ang in zip(vals, angles)]
+    poly = "=" + " + ' ' + ".join(f"{x}.toFixed(1) + ',' + {y}.toFixed(1)" for x, y in corners)
+    hi = f"Math.max({', '.join(vals)})"
+    def corner_label(k, dy):
+        # at the grid's outer corner, where no corner of the triangle and no circle can reach past it
+        ang = math.radians(angles[k])
+        return pill_text(round(cx + math.cos(ang) * R, 1), round(cy - math.sin(ang) * R + dy, 1),
+                         f"'{names[k]} ' + {fixed(vals[k], 2)} + ' A'")
+    kids = [*grid_]
+    if n:
+        over = f"({n} > {hi} * 1.1)"
+        kids.append(svg("circle", cx=cx, cy=cy, r=f"=({R} * {n} / {top}).toFixed(1)", fill="none",
+                        stroke="=" + cls_color(f"{over} ? 'warn' : 'neutral'"),
+                        **{"stroke-width": "1.6", "stroke-dasharray": "3 3", "stroke-opacity": "0.9"}))
+    kids += [svg("polygon", points=poly, fill="#7986cb", stroke="#9fa8da",
+                 **{"fill-opacity": "0.32", "stroke-width": "1.8", "stroke-linejoin": "round"}),
+             corner_label(0, -6), corner_label(1, 15), corner_label(2, 15)]
+    if n:
+        kids.append(pill_text(cx, cy + R + 18, f"'N ' + {fixed(n, 2)} + ' A'", weight="700",
+                              fill=f"={over} ? '#a35200' : '#48484a'"))
+    most = " : ".join(f"{v} === {hi} ? '{nm}'" for v, nm in zip(vals[:-1], names[:-1])) + f" : '{names[-1]}'"
+    word = vt_chip(f"='max. ' + ({most}) + ' ' + {fixed(hi, 2)} + ' A'")
+    if n:
+        word = vt_chip(f"={n} > {hi} * 1.1 ? 'N über allen Phasen' : 'max. ' + ({most}) + ' ' + {fixed(hi, 2)} + ' A'",
+                    f"{n} > {hi} * 1.1 ? 'warn' : 'neutral'")
+    if n:
+        # the neutral's pill reaches down to cy + R + 21.5 (141.5): the drawing ends a little below it
+        drawing = svg("svg", kids, viewBox="0 4 170 142", style={"display": "block", "width": "100%", "height": "auto",
+                                                                 "max-width": "240px", "margin": "4px auto 0"})
+        return vt_tile([vt_head(title, word), drawing], items_[0], title)
+    # without a neutral (the Huawei meter) the drawing grows into the height its row gives the tile, so no empty
+    # space stays under it (user, 2026-10-06)
+    drawing = div([svg("svg", kids, viewBox="0 4 170 118",
+                       style={"position": "absolute", "inset": "0", "width": "100%", "height": "100%"})],
+                  **{"position": "relative", "flex": "1 1 auto", "min-height": "160px", "margin-top": "4px"})
+    return vt_tile([vt_head(title, word), drawing], items_[0], title,
+                   **{"display": "flex", "flex-direction": "column"})
+
+
+def phase_cos(title, items_, names):
+    import math
+    kids = []
+    for k, (item, n) in enumerate(zip(items_, names)):
+        cx = 27 + 53 * k
+        c = f"Math.max(-1, Math.min(1, {num(item)}))"
+        kids += [svg("path", d=f"M{cx - 18} 32 A18 18 0 0 1 {cx + 18} 32", fill="none", stroke="currentColor",
+                     **{"stroke-opacity": "0.22", "stroke-width": "2"}),
+                 svg("line", x1=cx, y1=32, x2=f"=({cx} + 17 * {c}).toFixed(1)",
+                     y2=f"=(32 - 17 * Math.sqrt(1 - Math.pow({c}, 2))).toFixed(1)", stroke="#9fa8da",
+                     **{"stroke-width": "2", "stroke-linecap": "round"}),
+                 svg("circle", cx=cx, cy=32, r=2.5, fill="currentColor"),
+                 svg_text(cx, 45, f"='{n} ' + {fixed(num(item), 2)}", 8.5, opacity="0.75")]
+    return vt_tile([vt_title(title), svg("svg", kids, viewBox="0 0 160 48",
+                                            style={"display": "block", "width": "100%", "height": "auto",
+                                                   "max-width": "260px", "margin-top": "6px"})], items_[0], title)
+
+
+PHASE_NEUTRAL = {"smartpi_i1": "smartpi_i4"}
+
+
+def phase_table(heads, rows):
+    """Phases as pictures: power by direction, voltages in their band, currents as a triangle (Schieflast), cos φ as
+    needles, frequency on its band; two PV strings side by side."""
+    tiles = []
+    if len(heads) == 2:  # the PV strings
+        by = dict(rows)
+        tiles.append(strings_tile("Leistung je String", by["Leistung"], heads, by["Spannung"], by["Strom"],
+                             ["#ffca28", "#ff8f00"]))
+    else:
+        for title, items_ in rows:
+            if title in ("Leistung", "Wirkleistung"):
+                tiles.append(phase_power("Leistung je Phase", items_, heads))
+            elif title == "Spannung":
+                tiles.append(phase_volts("Spannung", items_, heads))
+            elif title == "Strom":
+                by = dict(rows)
+                powers = by.get("Leistung") or by.get("Wirkleistung")
+                # with the meters' powers the currents get their direction; the triangle shows what the lines
+                # carry, as amounts (user, 2026-10-06), the neutral there
+                tiles.append(phase_amps("Strom je Phase", items_, heads, None if powers else PHASE_NEUTRAL.get(items_[0]),
+                                        powers))
+                if powers:
+                    tiles.append(phase_load("Leitungsbelastung", items_, heads, PHASE_NEUTRAL.get(items_[0])))
+            elif title == "Frequenz":
+                tiles.append(band_bar("Frequenz", items_[0], 49.8, 50.2, 49.9, 50.1, "#7986cb", nominal=50))
+            elif title.startswith("cos"):
+                tiles.append(phase_cos("cos φ", items_, heads))
+            else:
+                tiles += [vtile(f"{title} {h}", i) for i, h in zip(items_, heads)]
+    return vt_grid(tiles)
+
+
+# ---------------------------------------------------------------- the electric card: power triangle
+
+
+def triangle_tile(title, prefix):
+    """Active, reactive and apparent power as a right triangle centred in its tile, its angle φ, the power factor
+    named."""
+    P, Q, S, pf = (num(f"{prefix}_power"), num(f"{prefix}_reactive_power"), num(f"{prefix}_apparent_power"),
+                   num(f"{prefix}_power_factor"))
+    phi = f"Math.acos(Math.max(0, Math.min(1, Math.abs({pf}))))"
+    L = f"Math.min(200 / Math.max(Math.cos({phi}), 0.05), 58 / Math.max(Math.sin({phi}), 0.05))"
+    w, h = f"({L} * Math.cos({phi}))", f"({L} * Math.sin({phi}))"
+    x0 = f"(140 - {w} / 2)"
+    xp, yq = f"({x0} + {w})", f"(72 - {h})"
+    f1 = lambda e: f"({e}).toFixed(1)"
+    loaded = f"({S} > 1)"
+    kids = [svg("path", d=f"='M' + {f1(x0)} + ' 72 L' + {f1(xp)} + ' 72 L' + {f1(xp)} + ' ' + {f1(yq)} + ' Z'",
+                fill="#7986cb", stroke="#9fa8da", **{"fill-opacity": "0.2", "stroke-width": "1.6",
+                                                     "stroke-linejoin": "round"}),
+            svg("line", x1=f"={f1(x0)}", y1=72, x2=f"={f1(xp)}", y2=72, stroke="#fb8c00", **{"stroke-width": "3"}),
+            svg("line", x1=f"={f1(xp)}", y1=72, x2=f"={f1(xp)}", y2=f"={f1(yq)}", stroke="#90a4ae",
+                **{"stroke-width": "3"}),
+            svg_text(f"={f1(f'{x0} + {w} / 2')}", 88, f"='P ' + {fixed(P, 0)} + ' W'", 11, weight="700"),
+            svg_text(f"={f1(f'{xp} + 7')}", f"={f1(f'72 - {h} / 2 + 4')}", f"='Q ' + {fixed(Q, 0)} + ' var'", 11,
+                       anchor="start"),
+            svg_text(f"={f1(f'{x0} + {w} / 2 - 8')}", f"={f1(f'72 - {h} / 2 - 4')}",
+                       f"='S ' + {fixed(S, 0)} + ' VA'", 11, anchor="end", opacity="0.8")]
+    lo, hi, segs = VT_SCALES["power_factor"]
+    word, _ = rating_parts(f"Math.abs({pf})", lo, hi, segs)
+    drawing = svg("svg", kids, viewBox="0 0 280 94", style={"display": "block", "width": "100%", "height": "auto",
+                                                           "max-width": "380px", "margin": "4px auto 0"},
+                  visible=f"={loaded}")
+    # without load cos φ is 0 and no rating applies: the head keeps its title only (2026-10-07)
+    head = div([label(f"='cos φ ' + {fixed(f'Math.abs({pf})', 2)}", **{"font-size": "13px", "font-weight": "700"}),
+                word], f"={loaded}", **{"display": "flex", "align-items": "center", "gap": "8px"})
+    return vt_tile([vt_head(title, head),
+                 drawing, label("keine Last", visible=f"=!{loaded}", **{**VT_SUB, "margin": "12px 0"})],
+                f"{prefix}_power_factor", title, wide=True)
+
+
+# ---------------------------------------------------------------- the grids
+
+
+def vt_grid(tiles):
+    return div(tiles, **{"display": "grid", "grid-template-columns": "repeat(auto-fill, minmax(220px, 1fr))",
+                         "gap": "10px", "padding": "4px 16px 16px"})
+
+
+def vt_plain(t):
+    return t["tile"]
+
+
+VT_DROP = object()
+
+
+def value_grid(tiles):
+    """The proposal's grid of a device page's tiles: each item's renderer, consumed items left out."""
+    present = [t["config"].get("item") for t in tiles]
+    out, used = [], set()
+    for t in tiles:
+        item = t["config"].get("item")
+        if item in used:
+            continue
+        rule = VALUE_RENDER.get(item)
+        if isinstance(rule, list):
+            n = VT_SEEN.get(item, 0)
+            VT_SEEN[item] = n + 1
+            rule = rule[min(n, len(rule) - 1)]
+        if rule is VT_DROP:
+            continue
+        if rule is None:
+            out.append(t)
+            continue
+        made, consumed = rule(dict(title=t["config"]["title"], item=item, tile=t, present=present))
+        used |= set(consumed)
+        out += made if isinstance(made, list) else [made]
+    return vt_grid(out)
+
+
+VT_SEEN = {}
+
+
+def vt_r(fn, *consumes):
+    """A renderer from a function of the tile's title and item that consumes the items named (from this grid)."""
+    return lambda t: (fn(t["title"], t["item"]), consumes)
+
+
+# ---------------------------------------------------------------- what each value becomes
+
+W, O = "netatmo_weatherstation_", "netatmo_outdoor_"
+HP_POWER_ALL = HPX["power"]  # the heat pump's electrical power, incl. its heaters
+kw_text = lambda item, d=2: f"={fixed(f'{num(item)} / 1000', d)} + ' kW'"
+STORAGE_ = "huawei_inverter_energy_storage_"
+STORAGE_UNIT1_ = STORAGE_ + "unit_1_"
+PV_DAY, PV_OWN = "huawei_inverter_e_day", "photovoltaics_own_ec_day"
+
+
+def absolute_humidity(temp, rh):
+    """Grams of water per cubic metre of air at a temperature (°C) and relative humidity (%), Magnus formula."""
+    return (f"(6.112 * Math.exp(17.67 * {num(temp)} / ({num(temp)} + 243.5)) * {num(rh)} * 2.1674 / "
+            f"(273.15 + {num(temp)}))")
+
+
+def airing_line():
+    """Whether outdoor air brought in dries or dampens the rooms: its absolute humidity against the indoor air's."""
+    out = absolute_humidity(O + "temperature", O + "atmospheric_humidity")
+    inn = absolute_humidity(W + "temperature", W + "atmospheric_humidity")
+    d = f"({out} - {inn})"
+    cls = f"({d} < -1 ? 'good' : {d} > 1 ? 'warn' : 'neutral')"
+    word = vt_chip(f"={d} < -1 ? 'Lüften trocknet' : {d} > 1 ? 'Lüften befeuchtet' : 'Lüften neutral'", cls)
+    text = label(f"='absolut ' + {fixed(out, 1)} + ' g/m³ · innen ' + {fixed(inn, 1)} + ' g/m³'",
+                 **{**VT_SUB, "flex": "1 1 auto"})
+    return div([text, word], **{"display": "flex", "flex-wrap": "wrap", "align-items": "center",
+                                "justify-content": "space-between", "gap": "4px 8px", "margin-top": "6px"})
+
+
+def battery_power(title, item):
+    return balance_tile(title, item, ("Entladen", f"Math.max(0, {num(item)} / 1000)", "#c5e1a5"),
+                   ("Laden", f"Math.max(0, -{num(item)} / 1000)", "#7cb342"), unit="kW", digits=2,
+                   net_words=("lädt", "entlädt"))
+
+
+def battery_day(title, item, other):
+    return balance_tile("Heute", item, ("Entladen", num(other), "#c5e1a5"), ("Geladen", num(item), "#7cb342"),
+                   net_words=("in den Akku", "aus dem Akku"))
+
+
+def battery_totals(title, item, other):
+    eff = f"({num(other)} / Math.max({num(item)}, 0.001) * 100)"
+    return counters_tile("Seit Inbetriebnahme", item, other, "geladen", "entladen", 5, 1, "kWh",
+                    f"='Wirkungsgrad ' + {fixed(eff, 1)} + ' %'")
+
+
+def grid_day(ec, ep):
+    def make(title, item):
+        def cmp_chip(i, better):
+            return vt_chip(*day_change(i, better))
+        chips_ = div([cmp_chip(ec, "less"), cmp_chip(ep, "more")],
+                     **{"display": "flex", "justify-content": "space-between", "margin-top": "8px"})
+        return balance_tile("Netz heute", ec, ("Bezug", num(ec), "#e57373"), ("Einspeisung", num(ep), "#81c784"),
+                       extra=[chips_])
+    return lambda t: (make(t["title"], t["item"]), {ep})
+
+
+def price_mix(title, item):
+    """The gross price split into what it consists of: market, the rest of the net price, VAT."""
+    market, net, gross = num("epex_spot_awattar"), num("epex_spot_awattar_total_net"), num(PRICE)
+    parts = [("Markt", market, "#fb8c00"), ("Netz & Abgaben", f"Math.max(0, {net} - {market})", "#7986cb"),
+             ("USt.", f"Math.max(0, {gross} - {net})", "#90a4ae")]
+    return vt_tile([vt_head("Zusammensetzung brutto", vt_value(f"={fixed(gross, 3)} + ' €'", **{"font-size": "16px"})),
+                 split_bar(parts, gross, 18), split_legend(parts, 3),
+                 label(f"='netto ' + {fixed(net, 3)} + ' € · Markt brutto ' + {fixed(num('epex_spot_awattar_market_gross'), 3)} + ' €'",
+                       **{**VT_SUB, "margin-top": "6px"})], item, title, wide=True)
+
+
+def price_now(title, item):
+    return rating_tile("Strompreis jetzt", PRICE, "price", value_expr=f"={fixed(num(PRICE), 3)} + ' €/kWh'")
+
+
+def hp_flow(title, item):
+    # only while it runs: the day's conversion stands right under Jetzt anyway
+    return flow_cop("Strom → Wärme jetzt", HP_POWER_ALL, HPX["heat"],
+                    f"({num(HPX['cop'])} > 0 ? {fixed(num(HPX['cop']), 2)} : '–')", hide_idle=True)
+
+
+def cop_badge(name, item, color, icon, full=6):
+    """A part's COP: a small ring filled to COP / full in the part's colour, its icon inside, the value beside."""
+    ring_ = div([ring_svg(f"{num(item)} / {full} * 100", color, size=26, width=8),
+                 comp("oh-icon", {"icon": icon, "width": 12, "height": 12,
+                                  "style": {"position": "absolute", "left": "50%", "top": "50%", "width": "12px",
+                                            "height": "12px", "transform": "translate(-50%, -50%)", "color": color}})],
+                **{"position": "relative", "width": "26px", "height": "26px", "flex": "0 0 auto"})
+    return div([ring_, label(f"='{name} ' + ({num(item)} > 0 ? {fixed(num(item), 2)} : '–')",
+                             **{"font-size": "12px", "font-weight": "600", "white-space": "nowrap"})],
+               **{"display": "flex", "align-items": "center", "gap": "6px"})
+
+
+def hp_day_flow(title, item):
+    # the purposes' COPs at the top right, one under the other, each with a ring filled by its value (user, 2026-10-06)
+    # the total over them, in the heating card's green with its leaf (user, 2026-10-06)
+    side = div([cop_badge("COP gesamt", "espaltherma_dcop", COP_C, "material:eco"),
+                cop_badge("COP Heizung", "espaltherma_dcop_space", SPACE_C, "material:local_fire_department"),
+                cop_badge("COP WW", "espaltherma_dcop_dhw", DHW_C, "material:water_drop")],
+               **{"display": "flex", "flex-direction": "column", "gap": "4px", "align-items": "flex-start"})
+    return flow_cop("Strom → Wärme heute", "espaltherma_energy_today", "espaltherma_heating_energy_today",
+                    dash(disp("espaltherma_dcop")), unit="kWh", factor=1, still="noch kein Betrieb heute", side=side,
+                    cop_large=False)
+
+
+def hp_heat_flow():
+    return flow_split("Wärme heute: wohin", "espaltherma_heating_energy_today",
+                      [("Heizung", num("espaltherma_heating_energy_space_today"), SPACE_C),
+                       ("Warmwasser", num("espaltherma_heating_energy_dhw_today"), DHW_C)], source_name="Wärme")
+
+
+def hp_energy(title, item):
+    parts = [("Heizung", num("espaltherma_energy_space_today"), SPACE_C),
+             ("Warmwasser", num("espaltherma_energy_dhw_today"), DHW_C),
+             ("Standby", num("espaltherma_energy_standby_today"), STANDBY_C)]
+    return compare_tile("Strom heute", item, "#ffa726", better="less",
+                   extra=[split_bar(parts, num(item)), split_legend(parts)])
+
+
+def hp_heat(title, item):
+    parts = [("Heizung", num("espaltherma_heating_energy_space_today"), SPACE_C),
+             ("Warmwasser", num("espaltherma_heating_energy_dhw_today"), DHW_C)]
+    return compare_tile("Wärme heute", item, "#e53935", extra=[split_bar(parts, num(item)), split_legend(parts)])
+
+
+def hp_split_power(title, item):
+    parts = [("Heizung", num("espaltherma_electrical_power_space"), SPACE_C),
+             ("Warmwasser", num("espaltherma_electrical_power_dhw"), DHW_C),
+             ("Standby", num("espaltherma_electrical_power_standby"), STANDBY_C)]
+    total = " + ".join(e for _, e, _ in parts)
+    return split_tile("Strom nach Zweck jetzt", item, parts, total, f"={fixed(f'({total}) / 1000', 2)} + ' kW'")
+
+
+def hp_split_heat(title, item):
+    parts = [("Heizung", num("espaltherma_heating_power_space"), SPACE_C),
+             ("Warmwasser", num("espaltherma_heating_power_dhw"), DHW_C)]
+    total = " + ".join(e for _, e, _ in parts)
+    return split_tile("Wärme nach Zweck jetzt", item, parts, total, f"={fixed(f'({total}) / 1000', 2)} + ' kW'", "#e53935")
+
+
+def pump_tile(title, item):
+    return ring_tile("Umwälzpumpe", item, "#42a5f5", pct_expr=num("espaltherma_water_pump_signal"),
+                value_expr=f"={dash(disp(item))}", sub=f"='Signal ' + {dash(disp('espaltherma_water_pump_signal'))}")
+
+
+WATER_RATE_L = f"({num('water_meter_rate')} * 1000)"
+
+
+def water_today(title, item):
+    liters = f"({num('water_meter_value_day')} * 1000)"
+    return compare_tile("Verbrauch heute", "water_meter_value_day", "#42a5f5", factor=1000, digits=0, unit="l",
+                   value_expr=f"=Math.round({liters}) + ' l'",
+                   extra=[tubs(liters), label(f"='≈ ' + {fixed(f'{liters} / 150', 1)} + ' Badewannen à 150 l'",
+                                              **{**VT_SUB, "margin-top": "4px"})])
+
+
+def own_use(title, item):
+    parts = [("Eigenverbrauch", num(PV_OWN), "#43a047"),
+             ("Einspeisung", f"Math.max(0, {num(PV_DAY)} - {num(PV_OWN)})", "#a5d6a7")]
+    return donut_tile("Ertrag heute: wohin", item, parts, num(PV_DAY), fixed(num(PV_DAY), 1), "kWh")
+
+
+def pv_power(title, item):
+    """The inverter's output against the day's peak: the bar to now, the peak as a tick."""
+    peak = "huawei_inverter_active_peak_of_current_day"
+    top = f"Math.max({num(peak)}, {num(item)}, 1)"
+    bars = track_bar([fill_bar(vt_clamp(f"{num(item)} / {top} * 100"), "#5c6bc0", height=10),
+                      div([], **{"position": "absolute", "right": "0", "top": "-5px", "height": "20px", "width": "2px",
+                                 "background": "currentColor"})], height=10, **{"margin": "12px 0 4px"})
+    sub = div([label("0"), label(f"='Spitze heute ' + {kw_text(peak, 3)[1:]}")],
+              **{"display": "flex", "justify-content": "space-between", **VT_SUB, "margin-top": "6px"})
+    return vt_tile([vt_head(title, vt_chip(f"=Math.round({num(item)} / {top} * 100) + ' % der Spitze'")),
+                 vt_value(kw_text(item, 3)), bars, sub], item, title, "#5c6bc0")
+
+
+def plug_energy(title, item):
+    return compare_tile(title, item, "#ffa726")
+
+
+def plug_total(title, item):
+    return counter_tile(title, item, 5, 1, "kWh")
+
+
+def socket_volt(title, item):
+    return band_bar(title, item, 200, 260, 207, 253, "#7986cb", nominal=230, ok_text="230 V ± 10 %")
+
+
+VALUE_RENDER = {
+    # Netatmo
+    W + "atmospheric_humidity": vt_r(lambda t, i: rating_tile(t, i, "humidity", spark_of=("#29b6f6", 10, "%", 0, None))),
+    W + "co2": vt_r(lambda t, i: rating_tile("CO₂", i, "co2", spark_of=("#90a4ae", 200, "ppm", 0, 1000))),
+    W + "noise": vt_r(lambda t, i: rating_tile(t, i, "noise", spark_of=("#9575cd", 10, "dB", 0, None))),
+    W + "barometric_pressure": vt_r(lambda t, i: rating_tile(t, i, "air_pressure", spark_of=("#7986cb", 6, "hPa", 1, None, 3))),
+    O + "atmospheric_humidity": vt_r(lambda t, i: rating_tile(t, i, "humidity_out", spark_of=("#80deea", 10, "%", 0, None),
+                                                      extra=[airing_line()])),
+    O + "battery_level": vt_r(lambda t, i: cells_tile(t, i, "#90a4ae", 5, sub="Außenmodul")),
+    W + "last_seen": vt_r(lambda t, i: age_tile(t, i, 10)), O + "last_seen": vt_r(lambda t, i: age_tile(t, i, 10)),
+    W + "measures_timestamp": vt_r(lambda t, i: age_tile(t, i, 10)),
+    O + "measures_timestamp": vt_r(lambda t, i: age_tile(t, i, 10)),
+    W + "signal": vt_r(lambda t, i: levels_tile("Funksignal", W + "signal_strength",
+                                        [("1", "schwach"), ("2", "mittel"), ("3", "gut"), ("4", "sehr gut")],
+                                        "#7986cb", sub=f"={dash(disp(i))}"), W + "signal_strength"),
+    O + "signal": vt_r(lambda t, i: levels_tile("Funksignal", O + "signal_strength",
+                                        [("1", "schwach"), ("2", "mittel"), ("3", "gut"), ("4", "sehr gut")],
+                                        "#7986cb", sub=f"={dash(disp(i))}"), O + "signal_strength"),
+    W + "dewpoint": vt_r(lambda t, i: dew_tile("Taupunktabstand", i, W + "temperature", "Raum")),
+    O + "dewpoint": vt_r(lambda t, i: dew_tile("Taupunktabstand", i, O + "temperature", "Luft", inside=False)),
+    W + "heat_index": vt_r(lambda t, i: rating_tile(t, i, "heat_index")),
+    O + "heat_index": vt_r(lambda t, i: rating_tile(t, i, "heat_index")),
+    W + "min_temp": vt_r(lambda t, i: day_range("Temperatur heute", i, W + "max_temp", W + "temperature", "#fb8c00"),
+                      W + "max_temp"),
+    O + "min_temp": vt_r(lambda t, i: day_range("Temperatur heute", i, O + "max_temp", O + "temperature", "#29b6f6"),
+                      O + "max_temp"),
+    # SmartPi and the Huawei power meter
+    "smartpi_ecday": grid_day("smartpi_ecday", "smartpi_epday"),
+    "smartpi_i4": VT_DROP,  # in the current triangle
+    "huawei_inverter_power_meter_ec_day": grid_day("huawei_inverter_power_meter_ec_day",
+                                                   "huawei_inverter_power_meter_ep_day"),
+    "huawei_inverter_power_meter_power_factor": vt_r(lambda t, i: rating_tile(t, i, "power_factor")),
+    "huawei_inverter_power_meter_frequency": vt_r(lambda t, i: band_bar(t, i, 49.8, 50.2, 49.9, 50.1, "#7986cb",
+                                                                     nominal=50)),
+    # photovoltaics
+    "huawei_inverter_active_power": vt_r(pv_power, "huawei_inverter_active_peak_of_current_day"),
+    # at night the inverter reports 100 % with nothing coming in: no value then (user, 2026-10-07)
+    "huawei_inverter_efficiency": vt_r(lambda t, i: ring_tile(
+        t, i, "#ffb300", pct_expr=f"({num(PV)} > 0.01 ? {num(i)} : 0)",
+        value_expr=f"={num(PV)} > 0.01 ? {dash(disp(i))} : '–'", sub="Wechselrichter")),
+    PV_DAY: vt_r(lambda t, i: compare_tile("Ertrag heute", i, "#ffb300", better="more")),
+    PV_OWN: vt_r(own_use),
+    "huawei_inverter_e_total": vt_r(lambda t, i: counter_tile("Ertrag gesamt", i, 6, 1, "kWh")),
+    "huawei_inverter_startup_time": vt_r(lambda t, i: sun_tile("Sonnenbogen des Wechselrichters", i,
+                                                       "huawei_inverter_shutdown_time",
+                                                       "huawei_inverter_active_peak_of_current_day", PV),
+                                      "huawei_inverter_shutdown_time"),
+    "huawei_inverter_internal_temperature": vt_r(lambda t, i: spark_tile(t, i, "#ff7043", "K", 1, span=6)),
+    "huawei_inverter_error_code": vt_r(lambda t, i: ok_tile(t, i, f"{num(i)} === 0")),
+    "huawei_inverter_optimizers_online": vt_r(lambda t, i: dots_tile("Optimierer online", i, "huawei_inverter_optimizers_total",
+                                                             "#ffb300"), "huawei_inverter_optimizers_total"),
+    # battery
+    STORAGE_ + "power": vt_r(battery_power),
+    STORAGE_ + "day_charge": vt_r(lambda t, i: battery_day(t, i, STORAGE_ + "day_discharge"), STORAGE_ + "day_discharge"),
+    STORAGE_ + "soc": vt_r(lambda t, i: cells_tile(t, i, "#7cb342",
+                                        sub=f"={fixed(f'Math.max(0, {num(i)} - 3) * 0.07', 2)} + ' kWh nutzbar'")),
+    STORAGE_ + "total_charge": vt_r(lambda t, i: battery_totals(t, i, STORAGE_ + "total_discharge"), STORAGE_ + "total_discharge"),
+    STORAGE_UNIT1_ + "soc": vt_r(lambda t, i: cells_tile(t, i, "#7cb342")),
+    STORAGE_UNIT1_ + "power": vt_r(battery_power),
+    STORAGE_UNIT1_ + "day_charge": vt_r(lambda t, i: battery_day(t, i, STORAGE_UNIT1_ + "day_discharge"), STORAGE_UNIT1_ + "day_discharge"),
+    STORAGE_UNIT1_ + "total_charge": vt_r(lambda t, i: battery_totals(t, i, STORAGE_UNIT1_ + "total_discharge"), STORAGE_UNIT1_ + "total_discharge"),
+    STORAGE_UNIT1_ + "temperature": vt_r(lambda t, i: rating_tile(t, i, "battery_temp")),
+    # air conditioner
+    "air_conditioning_unit_power": vt_r(lambda t, i: spark_tile(t, i, AC_BLUE, "W", 0, span=200)),
+    "faikout_perfera_outdoor_temperature": vt_r(lambda t, i: inout_tile("Raum und außen", "faikout_perfera_temperature", i)),
+    "faikout_perfera_temperature_setpoint": vt_r(lambda t, i: setpoint_tile("Raum gegen Soll", "faikout_perfera_temperature",
+                                                                   num(i), dash(disp(i)), 16, 30, AC_BLUE,
+                                                                   tol=0.5)),
+    "faikout_perfera_compressor_frequency": vt_r(lambda t, i: spark_tile(t, i, "#78909c", "Hz", 0, span=20)),
+    # the liquid line and the indoor fan with their day's course too, as the compressor (user, 2026-10-06)
+    "faikout_perfera_liquid_temperature": vt_r(lambda t, i: spark_tile(t, i, "#29b6f6", "K", 1, span=4)),
+    "faikout_perfera_fan_speed": vt_r(lambda t, i: spark_tile(t, i, "#26a69a", "Hz", 1, span=5)),
+    # heat pump
+    HPX["heat"]: vt_r(hp_flow, HPX["cop"]),
+    HPX["supply"]: vt_r(lambda t, i: spread_tile("Vorlauf → Rücklauf", i, HPX["return"], "Vorlauf", "Rücklauf",
+                                        sub=f"='Durchfluss ' + {dash(disp(HPX['flow']))}"), HPX["return"]),
+    HPX["tank"]: [vt_r(lambda t, i: tank_tile("Warmwasserspeicher", i, HPX["tank_set"])),
+                 vt_r(lambda t, i: spark_tile(t, i, "#ef5350", "K", 1, span=4, threshold=num(HPX["tank_set"]),
+                                      threshold_label="Soll"))],
+    HPX["outdoor"]: vt_r(lambda t, i: spark_tile(t, i, "#26a69a", "K", 1, span=4)),
+    HPX["hz"]: vt_r(lambda t, i: spark_tile(t, i, "#fb8c00", "Hz", 0, span=20)),
+    HPX["flow"]: vt_r(pump_tile, "espaltherma_water_pump_signal"),
+    "espaltherma_water_pressure": vt_r(lambda t, i: rating_tile(t, i, "pressure")),
+    "espaltherma_energy_today": vt_r(hp_energy, "espaltherma_energy_space_today", "espaltherma_energy_dhw_today",
+                                  "espaltherma_energy_standby_today"),
+    "espaltherma_heating_energy_today": vt_r(hp_heat, "espaltherma_heating_energy_space_today",
+                                          "espaltherma_heating_energy_dhw_today"),
+    # the day's conversion, and right under it where its heat went (user, 2026-10-06)
+    "espaltherma_dcop": vt_r(lambda t, i: [hp_day_flow(t, i), hp_heat_flow()], "espaltherma_dcop_space",
+                          "espaltherma_dcop_dhw"),
+    "espaltherma_electrical_power_space": vt_r(hp_split_power, "espaltherma_electrical_power_dhw",
+                                            "espaltherma_electrical_power_standby"),
+    "espaltherma_heating_power_space": vt_r(hp_split_heat, "espaltherma_heating_power_dhw"),
+    "espaltherma_heating_power_before_buh": vt_r(lambda t, i: pair_tile("Heizleistung vor · nach Heizstab", i,
+                                                                "espaltherma_heating_power_after_buh", "vor",
+                                                                "nach", digits=2, unit="kW",
+                                                                a_expr=f"{num(i)} / 1000",
+                                                                b_expr=f"{num('espaltherma_heating_power_after_buh')} / 1000",
+                                                                delta_text=f"'Heizstab ' + {fixed(f'Math.max(0, {num('espaltherma_heating_power_after_buh')} - {num(i)}) / 1000', 2)} + ' kW'",
+                                                                value_unit=" kW"),
+                                              "espaltherma_heating_power_after_buh"),
+    "espaltherma_cop_space": vt_r(lambda t, i: pair_tile("COP Heizung · Warmwasser", i, "espaltherma_cop_dhw", "Heizung",
+                                                 "Warmwasser", digits=2, unit="",
+                                                 delta_text=False), "espaltherma_cop_dhw"),
+    HPX["indoor"]: vt_r(lambda t, i: spark_tile(t, i, "#ff8a65", "K", 1, span=2)),
+    "espaltherma_outdoor_air_temp": vt_r(lambda t, i: pair_tile("Außen · zwei Fühler", HPX["outdoor"], i, "Außentemperatur",
+                                                        "Außenluft", digits=1, unit="K"), HPX["outdoor"]),
+    "espaltherma_leaving_water_temp_before_buh": vt_r(lambda t, i: pair_tile("Vorlauf vor · nach Heizstab", i, HPX["supply"],
+                                                                     "vor", "nach", digits=1, unit="K",
+                                                                     delta_text=f"'Heizstab ' + {vt_signed(f'{num(HPX['supply'])} - {num(i)}', 1, 'K')}"),
+                                                   HPX["supply"]),
+    HPX["return"]: vt_r(lambda t, i: spark_tile(t, i, "#64b5f6", "K", 1, span=4)),
+    "espaltherma_leaving_water_setpoint": vt_r(lambda t, i: setpoint_tile("Vorlauf gegen Soll", HPX["supply"], num(i),
+                                                                 dash(disp(i)), 20, 50, "#e57373")),
+    "espaltherma_room_temp_setpoint": vt_r(lambda t, i: setpoint_tile("Raum gegen Soll", HPX["indoor"], num(i), dash(disp(i)),
+                                                             18, 26, "#ff8a65", tol=0.5)),
+    HPX["tank_set"]: vt_r(lambda t, i: setpoint_tile("Warmwasser gegen Soll", HPX["tank"], num(i), dash(disp(i)), 20, 60,
+                                            "#ef5350", tol=2)),
+    "espaltherma_target_delta_t_heating": vt_r(lambda t, i: pair_tile("Spreizung Soll · Ist", i, None, "Soll", "Ist",
+                                                              digits=1, unit="K",
+                                                              b_expr=f"({num(HPX['supply'])} - {num(HPX['return'])})",
+                                                              value_unit=" K")),
+    "espaltherma_target_discharge_temp": vt_r(lambda t, i: setpoint_tile("Heißgas gegen Soll", HPX["hot_gas"], num(i),
+                                                                dash(disp(i)), 0, 100, "#ba68c8", tol=3,
+                                                                valid=f"{num(i)} > 0"),
+                                           HPX["hot_gas"]),
+    HPX["pressure"]: vt_r(lambda t, i: spark_tile(t, i, "#ba68c8", "bar", 1, span=2)),
+    "espaltherma_error_code": vt_r(lambda t, i: ok_tile(t, i, f"['0', '', 'NULL', 'UNDEF'].includes(items.{i}.state)")),
+    # ventilation
+    "ventilation_power": vt_r(lambda t, i: spark_tile(t, i, VENT_TEAL, "W", 1, span=20)),
+    "ventilation_energy_today": vt_r(lambda t, i: compare_tile("Energie heute", i, VENT_TEAL)),
+    # water meter
+    "water_meter_value": vt_r(lambda t, i: [water_today(t, i),
+                                         counter_tile("Zählerstand", i, 5, 3, "m³",
+                                                 sub=f"='Durchfluss ' + {fixed(WATER_RATE_L, 1)} + ' l/min'")]),
+    "water_meter_rate": vt_r(lambda t, i: spark_tile("Durchfluss", i, "#42a5f5", "l/min", 1, span=2, factor=1000,
+                                             value_expr=f"={fixed(f'{num(i)} * 1000', 1)} + ' l/min'")),
+    "water_meter_timestamp": vt_r(lambda t, i: age_tile("Letzte Ablesung", i, 5)),
+    "water_meter_error": vt_r(lambda t, i: ok_tile(t, i, f"['no error', '', 'NULL', 'UNDEF'].includes(items.{i}.state)")),
+    # electricity price
+    "epex_spot_awattar_total_net": vt_r(lambda t, i: [price_now(t, i), price_mix(t, i)], "epex_spot_awattar_market_gross",
+                                     "epex_spot_awattar"),
+    "epex_spot_awattar_cheapest_hour": vt_r(lambda t, i: price_strip("Preise der nächsten Stunden", PRICE, i,
+                                                                  "epex_spot_awattar_priciest_hour"),
+                                         "epex_spot_awattar_cheapest", "epex_spot_awattar_priciest_hour",
+                                         "epex_spot_awattar_priciest"),
+    # plugs (the widgets' placeholders)
+    "zzpfx_energy_today": vt_r(plug_energy),
+    "zzpfx_energy_total": vt_r(plug_total),
+    "zzpfx_voltage": vt_r(socket_volt),
+    "zzpfx_current": vt_r(lambda t, i: socket_load(t, i)),
+    "zzpfx_power_factor": vt_r(lambda t, i: triangle_tile("Leistungsdreieck", "zzpfx"), "zzpfx_apparent_power",
+                            "zzpfx_reactive_power"),
+}
+for miele in ("miele_washing_machine_wwg360", "miele_tumble_dryer_twc560wp", "miele_dishwasher_g7465"):
+    VALUE_RENDER[miele + "_program_progress"] = (lambda p: (lambda t: (program_tile("Programmablauf", p), {
+        p + "_program_elapsed_time", p + "_program_remaining_time", p + "_program_finished_time"})))(miele)
+    VALUE_RENDER[miele + "_delayed_start_time_absolute"] = vt_r(lambda t, i: countdown_tile("Startvorwahl", i))
+
+
+
+def range_tile(prefix):
+    """What the energy charged today means in kilometres at props.range kWh per 100 km: a road with the car where
+    the charge takes it, the total since the meter started below."""
+    per = "(Number(props.range) || 20)"
+    km = f"({num(prefix + '_energy_today')} / {per} * 100)"
+    total_km = f"({num(prefix + '_energy_total')} / {per} * 100)"
+    top = f"Math.max(50, Math.ceil({km} * 1.25 / 50) * 50)"
+    X = lambda e: f"(12 + 276 * {vt_clamp(f'({e}) / {top}', 0, 1)})"
+    car = svg("g", [svg("path", d="M-9 -9 L-5 -16 H6 L10 -9 Z", fill="#26a69a", stroke="#26a69a",
+                        **{"fill-opacity": "0.35", "stroke-width": "1.4", "stroke-linejoin": "round"}),
+                    svg("rect", x=-16, y=-9.5, width=32, height=9, rx=3, fill="#26a69a"),
+                    svg("circle", cx=-9, cy=0, r=3.6, fill="#26a69a", style={"stroke": "var(--f7-card-bg-color, #fff)"},
+                        **{"stroke-width": "1.6"}),
+                    svg("circle", cx=9, cy=0, r=3.6, fill="#26a69a", style={"stroke": "var(--f7-card-bg-color, #fff)"},
+                        **{"stroke-width": "1.6"})],
+              transform=f"='translate(' + Math.max(28, {X(km)}).toFixed(1) + ' 30)'")
+    ticks = [svg_text(f"={X(f'{top} * {k} / 5')}.toFixed(1)", 54, f"=Math.round({top} * {k} / 5) + ({k} === 5 ? ' km' : '')",
+                        10, opacity="0.55", anchor="start" if k == 0 else "end" if k == 5 else "middle") for k in range(6)]
+    road = svg("svg", [svg("line", x1=12, y1=38, x2=288, y2=38, stroke="currentColor",
+                           **{"stroke-opacity": "0.14", "stroke-width": "6", "stroke-linecap": "round"}),
+                       svg("line", x1=12, y1=38, x2=f"={X(km)}.toFixed(1)", y2=38, stroke="#26a69a",
+                           **{"stroke-width": "6", "stroke-linecap": "round"}),
+                       svg("line", x1=16, y1=38, x2=f"=Math.max(16, {X(km)} - 4).toFixed(1)", y2=38,
+                           style={"stroke": "var(--f7-card-bg-color, #fff)"},
+                           **{"stroke-width": "1.5", "stroke-dasharray": "6 6"}),
+                       car, *ticks],
+               viewBox="0 0 300 58", style={"display": "block", "width": "100%", "height": "auto", "max-width": "460px",
+                                            "margin-top": "4px"})
+    return vt_tile([vt_head("Reichweite der Ladung heute", vt_chip(f"={per} + ' kWh / 100 km'")),
+                 vt_value(f"='≈ ' + Math.round({km}) + ' km'", "#26a69a"), road,
+                 label(f"='seit Zählerbeginn ' + {fixed(num(prefix + '_energy_total'), 0)} + ' kWh ≈ ' + "
+                       f"Math.round({total_km}).toLocaleString('de-DE') + ' km'", **{**VT_SUB, "margin-top": "4px"})],
+                wide=True, visible="=Number(props.range) > 0")
+
+
+def plug_refs(prefix, icon, color, title="Nous Steckdose", controllable=True, note=None, switch=None,
+              electric_prefix=None, electric_title=None, kind=None, threshold=None, active=None, frequency=None,
+              progress=None, range_=None):
     """The cards every metered plug gets, as widgets: now with switch, power today, energy per day, electrical.
     A device behind a shared meter takes its switch and its electrical values from the meter's items. kind,
     threshold, active, frequency, progress: the device's drawing and when it works (plug_icon(); active, frequency
-    and progress expressions, as the energy flow or the device's head has them)."""
+    and progress expressions, as the energy flow or the device's head has them); range_: kWh per 100 km of a car.
+    Returns (now, power, energy per day, electrical)."""
+    PLUG_PREFIXES.add(prefix)
     # the first card is titled after what measures and switches: a Nous A1T socket, a Shelly EM on a circuit
-    now = {"prefix": prefix, "icon": icon, "color": color, "title": title}
+    now = {"prefix": prefix, "icon": icon, "color": color, "title": title, "history": TILE_HISTORY}
     if kind:
         now["kind"] = kind
     threshold = STANDBY_ABOVE.get(prefix, threshold)
@@ -5083,12 +7209,20 @@ def plug_cards(prefix, icon, color, title="Nous Steckdose", controllable=True, n
         now["note"] = note
     if switch:
         now["switch"] = switch
+    if range_:
+        now["range"] = range_
     electric = {"prefix": electric_prefix or prefix}
     if electric_title:
         electric["title"] = electric_title
-    return [two(widget_ref("plug-card", **now), widget_ref("plug-power-card", prefix=prefix, color=color)),
-            two(widget_ref("plug-energy-days-card", prefix=prefix, color=color),
-                widget_ref("plug-electric-card", **electric))]
+    return (widget_ref("plug-card", **now), widget_ref("plug-power-card", prefix=prefix, color=color),
+            widget_ref("plug-energy-days-card", prefix=prefix, color=color), widget_ref("plug-electric-card", **electric))
+
+
+def plug_cards(*args, **kw):
+    """The plug's cards in their usual two rows: now beside the day's power, the energy per day beside the electrical
+    values."""
+    now, power, days, electric = plug_refs(*args, **kw)
+    return [two(now, power), two(days, electric)]
 
 
 # from how many watts a metered device counts as working, its icon's ring pulsing (plug_icon(); 10 W otherwise),
@@ -5109,7 +7243,7 @@ def plug_page(prefix, icon, color, **kw):
 def miele_page(uid, title, front, p, plug, extra, icon, color):
     def blocks():
         running = miele_state(p)[0]
-        program = wide_grid([
+        program = value_grid([
             vtile("Status", f"{p}_operation_state"), vtile("Programm", f"{p}_active_program"),
             vtile("Programmphase", f"{p}_program_phase"),
             *[vtile(t, f"{p}_{s}") for t, s in extra],
@@ -5164,7 +7298,7 @@ def heatpump_blocks():
                 picture=icon),
            bar(f"100 * {DHW_PROGRESS}", HP_ORANGE, f"={hm(since)} + ' vergangen'", f"={hm(DHW_LEFT)} + ' übrig'",
                f"={DHW_ETA_OK}"),
-           wide_grid([vtile("Heizleistung", P["heat"], color="#e53935"),
+           value_grid([vtile("Heizleistung", P["heat"], color="#e53935"),
                       vtile("COP", P["cop"], f"={num(P['cop'])} > 0 ? {fixed(num(P['cop']), 2)} : '–'"),
                       vtile("Vorlauf nach Heizstab", P["supply"]), vtile("Rücklauf", P["return"]),
                       vtile("Warmwasser", P["tank"]), vtile("Außentemperatur", P["outdoor"]),
@@ -5179,7 +7313,7 @@ def heatpump_blocks():
                                   span_axis("°C")),
                                  ("Warmwasser", [line("Warmwasser", P["tank"], "#ab47bc")], span_axis("°C")),
                                  ("Außen", [line("Außen", P["outdoor"], "#26a69a")], span_axis("°C"))], 520)
-    today = wide_grid([vtile("Elektrisch heute", "espaltherma_energy_today"),
+    today = value_grid([vtile("Elektrisch heute", "espaltherma_energy_today"),
                        vtile("Heizung", "espaltherma_energy_space_today"),
                        vtile("Warmwasser", "espaltherma_energy_dhw_today"),
                        vtile("Standby", "espaltherma_energy_standby_today"),
@@ -5188,7 +7322,7 @@ def heatpump_blocks():
                        vtile("Wärme Warmwasser", "espaltherma_heating_energy_dhw_today"),
                        vtile("Tages-COP", "espaltherma_dcop"), vtile("Tages-COP Heizung", "espaltherma_dcop_space"),
                        vtile("Tages-COP Warmwasser", "espaltherma_dcop_dhw")])
-    split = wide_grid([vtile("Elektrisch Heizung", "espaltherma_electrical_power_space"),
+    split = value_grid([vtile("Elektrisch Heizung", "espaltherma_electrical_power_space"),
                        vtile("Elektrisch Warmwasser", "espaltherma_electrical_power_dhw"),
                        vtile("Elektrisch Standby", "espaltherma_electrical_power_standby"),
                        vtile("Heizleistung Heizung", "espaltherma_heating_power_space"),
@@ -5196,11 +7330,11 @@ def heatpump_blocks():
                        vtile("Heizleistung vor Heizstab", "espaltherma_heating_power_before_buh"),
                        vtile("Heizleistung nach Heizstab", "espaltherma_heating_power_after_buh"),
                        vtile("COP Heizung", "espaltherma_cop_space"), vtile("COP Warmwasser", "espaltherma_cop_dhw")])
-    temps = wide_grid([vtile("Raumtemperatur", P["indoor"]), vtile("Außenluft", "espaltherma_outdoor_air_temp"),
+    temps = value_grid([vtile("Raumtemperatur", P["indoor"]), vtile("Außenluft", "espaltherma_outdoor_air_temp"),
                        vtile("Außentemperatur", P["outdoor"]), vtile("Warmwasser", P["tank"]),
                        vtile("Vorlauf vor Heizstab", "espaltherma_leaving_water_temp_before_buh"),
                        vtile("Vorlauf nach Heizstab", P["supply"]), vtile("Rücklauf", P["return"])])
-    setpoints = wide_grid([vtile("Vorlauf Sollwert", "espaltherma_leaving_water_setpoint"),
+    setpoints = value_grid([vtile("Vorlauf Sollwert", "espaltherma_leaving_water_setpoint"),
                            vtile("Vorlauf Sollwert (Zusatz)", "espaltherma_leaving_water_setpoint_add"),
                            vtile("Raum Sollwert", "espaltherma_room_temp_setpoint"),
                            vtile("Warmwasser Sollwert", P["tank_set"]),
@@ -5218,16 +7352,27 @@ def heatpump_blocks():
         ("Anforderungssignal", "espaltherma_demand_signal"), ("Neustart-Standby", "espaltherma_restart_standby"),
         ("Anlaufsteuerung", "espaltherma_startup_control"), ("Ölrückführung", "espaltherma_oil_return_operation"),
         ("Druckausgleich", "espaltherma_pressure_equalizing_operation")]])
-    refrigerant = wide_grid([vtile("Wärmetauscher Mitte", "espaltherma_heat_exchanger_mid_temp"),
+    refrigerant = value_grid([vtile("Wärmetauscher Mitte", "espaltherma_heat_exchanger_mid_temp"),
                              vtile("Kältemittel flüssig", "espaltherma_refrig_temp_liquid_side"),
                              vtile("Soll-Heißgas", "espaltherma_target_discharge_temp"),
                              vtile("Heißgas", "espaltherma_discharge_pipe_temp"),
                              vtile("Kältemitteldruck", "espaltherma_refrigerant_pressure_sensor"),
                              vtile("Drucksensor Temperatur", "espaltherma_pressure_sensor_temp")])
-    operation = wide_grid([vtile("Außengerät Betrieb", "espaltherma_operation_mode"),
+    operation = value_grid([vtile("Außengerät Betrieb", "espaltherma_operation_mode"),
                            vtile("Innengerät Betrieb", "espaltherma_i_u_operation_mode"),
                            vtile("3-Wege-Ventil", P["valve"]), vtile("Fehlercode", "espaltherma_error_code")])
-    return [two(card("Steuerung", [controls]), card("Jetzt", now)),
+    plug, power, days, electric = plug_refs("heatpump", "material:heat_pump", "#fb8c00", title="Shelly EM",
+                                            kind="heat-pump-split", active=flowing(num(HP), HP_ON),
+                                            frequency=num(P["hz"]))
+    # the cards of values on top, the full charts below, the cards paired by height so none stands with much empty
+    # space (user, 2026-10-06): Jetzt beside the controls over the operation, today's energies with their conversion
+    # beside the split over the plug's electrical values, temperatures beside setpoints, the plug beside the
+    # refrigerant, the modes
+    return [two(stack(card("Steuerung", [controls]), card("Betrieb", [operation])), card("Jetzt", now)),
+            two(card("Energie heute", [today]), widget_stack(card("Leistung aufgeteilt", [split]), electric)),
+            two(card("Temperaturen", [temps]), card("Sollwerte", [setpoints])),
+            two(plug, card("Kältemittel", [refrigerant])),
+            one(card("Modi", [modes])),
             two(card("Leistung heute", [power_chart_]), card("Temperaturen heute", [temps_chart])),
             # how it heats: valve, defrost, compressor, flow, water and heaters on one time pointer (user, 2026-10-04),
             # half the width beside the outdoor unit over the tank, then the charts of the heat pump card's popups
@@ -5241,12 +7386,7 @@ def heatpump_blocks():
             two(card("COP", [stacked_chart(hp_cop_panels(), 420), titled(hp_cop_month(), "COP pro Tag")]),
                 stack(card("Strom nach Zweck", [titled(split_month(HP_ELECTRIC), "Energie pro Tag")]),
                       card("Wärme nach Zweck", [titled(split_month(HP_HEAT), "Energie pro Tag")]))),
-            two(card("Energie heute", [today]), card("Leistung aufgeteilt", [split])),
-            two(card("Temperaturen", [temps]), card("Sollwerte", [setpoints])),
-            one(card("Modi", [modes])),
-            two(card("Kältemittel", [refrigerant]), card("Betrieb", [operation])),
-            *plug_cards("heatpump", "material:heat_pump", "#fb8c00", title="Shelly EM", kind="heat-pump-split",
-                        active=flowing(num(HP), HP_ON), frequency=num(P["hz"]))]
+            two(power, days)]
 
 
 def air_conditioning_blocks():
@@ -5274,7 +7414,7 @@ def air_conditioning_blocks():
                        **{"font-size": "22px", "font-weight": "700"})],
                 picture=icon),
            timer_bar(M_AC, full, AC_BLUE),
-           wide_grid([vtile("Geräteleistung", "air_conditioning_unit_power", color=AC_BLUE),
+           value_grid([vtile("Geräteleistung", "air_conditioning_unit_power", color=AC_BLUE),
                       vtile("Außengerät", "faikout_perfera_power"), vtile("Außentemperatur", "faikout_perfera_outdoor_temperature"),
                       vtile("Flüssigkeitstemperatur", "faikout_perfera_liquid_temperature"),
                       vtile("Solltemperatur", "faikout_perfera_temperature_setpoint"),
@@ -5291,12 +7431,16 @@ def air_conditioning_blocks():
          [line("Raum", "faikout_perfera_temperature", "#fb8c00"),
           line("Außen", "faikout_perfera_outdoor_temperature", "#26a69a")], span_axis("°C")),
         ("Flüssigkeit", [line("Flüssigkeit", "faikout_perfera_liquid_temperature", "#29b6f6")], span_axis("°C"))],
-        620)
-    return [two(card("Steuerung", [controls]), stack(card("Jetzt", now), card("Betrieb heute", [temps]))),
-            *plug_cards("air_conditioning_unit", "material:ac_unit", AC_BLUE, title="Shelly EM",
-                        switch="air_conditioning_switch", electric_prefix="air_conditioning",
-                        electric_title="Elektrisch · Shelly EM", kind="air-conditioner",
-                        active=flowing(AC_FLOW, AC_ON))]
+        720)  # as high as the plug card over the electrical values beside it
+    plug, power, days, electric = plug_refs("air_conditioning_unit", "material:ac_unit", AC_BLUE, title="Shelly EM",
+                                            switch="air_conditioning_switch", electric_prefix="air_conditioning",
+                                            electric_title="Elektrisch · Shelly EM", kind="air-conditioner",
+                                            active=flowing(AC_FLOW, AC_ON))
+    # in its two-column grid without empty card space (user, 2026-10-06): the controls beside Jetzt, the day's
+    # operation beside the plug over the electrical values, the plug's power of the day beside its energy per day
+    return [two(card("Steuerung", [controls]), card("Jetzt", now)),
+            two(card("Betrieb heute", [temps]), widget_stack(plug, electric)),
+            two(power, days)]
 
 
 VENT_LEVELS = [("1", "Niedrig"), ("2", "Mittel"), ("3", "Hoch")]
@@ -5336,7 +7480,7 @@ def ventilation_blocks():
                  label(f"=({auto} ? 'Automatik ab ' : 'Timer bis ') + {clock_in(M_VENT)}", f"={M_VENT} > 0",
                        **{"font-size": "22px", "font-weight": "700"})], picture=icon),
            timer_bar(M_VENT, full, VENT_TEAL),
-           wide_grid([vtile("CO₂", "netatmo_weatherstation_co2"),
+           value_grid([vtile("CO₂", "netatmo_weatherstation_co2"),
                       vtile("Luftfeuchtigkeit", "netatmo_weatherstation_atmospheric_humidity"),
                       vtile("Leistung", "ventilation_power"), vtile("Energie heute", "ventilation_energy_today")])]
     # the controls on the left beside Jetzt, on a phone on top (user, 2026-10-05), as on the heat pump's page; the day
@@ -5390,7 +7534,7 @@ def energy_storage_blocks():
            bar(soc, BATTERY_GREEN,
                f"={fixed(f'Math.max(0, {soc} - {BATT_FLOOR}) * {BATT_KWH_PER_PERCENT}', 2)} + ' kWh nutzbar'",
                f"={fixed(f'(100 - {soc}) * {BATT_KWH_PER_PERCENT}', 2)} + ' kWh frei'"),
-           wide_grid([vtile("Leistung", BATT, kw_signed(BATT)),
+           value_grid([vtile("Leistung", BATT, kw_signed(BATT)),
                       vtile("Status", "huawei_inverter_energy_storage_running_status"),
                       vtile("Geladen heute", "huawei_inverter_energy_storage_day_charge"),
                       vtile("Entladen heute", "huawei_inverter_energy_storage_day_discharge")])]
@@ -5408,13 +7552,13 @@ def energy_storage_blocks():
                              battery_power_slider("huawei_inverter_energy_storage_forcible_discharge_power",
                                                   "Zwangsentladeleistung", "beim Zwangsentladen"),
                              battery_period_slider()),
-                wide_grid([vtile("Zwangsladestatus", "huawei_inverter_energy_storage_forcible_status")])]
-    totals = wide_grid([vtile("Ladestand", SOC), vtile("Geladen gesamt", "huawei_inverter_energy_storage_total_charge"),
+                value_grid([vtile("Zwangsladestatus", "huawei_inverter_energy_storage_forcible_status")])]
+    totals = value_grid([vtile("Ladestand", SOC), vtile("Geladen gesamt", "huawei_inverter_energy_storage_total_charge"),
                         vtile("Entladen gesamt", "huawei_inverter_energy_storage_total_discharge"),
                         vtile("Busspannung", "huawei_inverter_energy_storage_bus_voltage"),
                         vtile("Busstrom", "huawei_inverter_energy_storage_bus_current")])
     u = "huawei_inverter_energy_storage_unit_1_"
-    unit = wide_grid([vtile("Status", u + "running_status"), vtile("Ladestand", u + "soc"), vtile("Leistung", u + "power"),
+    unit = value_grid([vtile("Status", u + "running_status"), vtile("Ladestand", u + "soc"), vtile("Leistung", u + "power"),
                       vtile("Geladen heute", u + "day_charge"), vtile("Entladen heute", u + "day_discharge"),
                       vtile("Geladen gesamt", u + "total_charge"), vtile("Entladen gesamt", u + "total_discharge"),
                       vtile("Busspannung", u + "bus_voltage"), vtile("Busstrom", u + "bus_current"),
@@ -5423,16 +7567,17 @@ def energy_storage_blocks():
     chart_ = stacked_chart([((("Leistung", "#7cb342"), ("Ladestand", "#2e7d32")),
                              [area("Leistung", BATT, "#7cb342"), line("Ladestand", SOC, "#2e7d32", y=1)],
                              [value_axis("W"), value_axis("%", min=0, max=100)])], 400)
-    # the chart as high as Jetzt beside it, at least 250 px; the storage's totals over unit 1 beside the controls
-    # (user, 2026-10-05: with the totals under Jetzt the chart grew too high)
-    return [two(card("Jetzt", now), card("Leistung heute", [fill_stacked(chart_, "250px")], fill=True)),
-            two(card("Steuerung", controls), stack(card("Speicher", [totals]), card("Einheit 1", [unit])))]
+    # the controls beside Jetzt, the storage over the day's power beside unit 1, the chart taking the height unit 1
+    # leaves, at least 250 px, so no card stands with empty space (user, 2026-10-06)
+    return [two(card("Jetzt", now), card("Steuerung", controls)),
+            two(stack(card("Speicher", [totals]), card("Leistung heute", [fill_stacked(chart_, "250px")], fill=True)),
+                card("Einheit 1", [unit]))]
 
 
 def photovoltaics_blocks():
     now = [hero("material:solar_power", "#ffb300", "Eingangsleistung", kwc(PV),
                 picture=node_icon("pv", "#ffb300", flowing(num(PV), 10), power=num(PV))),
-           wide_grid([vtile("Wirkleistung", "huawei_inverter_active_power", kwc("huawei_inverter_active_power")),
+           value_grid([vtile("Wirkleistung", "huawei_inverter_active_power", kwc("huawei_inverter_active_power")),
                       vtile("Spitze heute", "huawei_inverter_active_peak_of_current_day",
                             kwc("huawei_inverter_active_peak_of_current_day")),
                       vtile("Blindleistung", "huawei_inverter_reactive_power"),
@@ -5446,23 +7591,26 @@ def photovoltaics_blocks():
                              value_axis("W")),
                             ("String PV1", [area("PV1", "huawei_inverter_pv1_power", "#ffca28")], value_axis("W")),
                             ("String PV2", [area("PV2", "huawei_inverter_pv2_power", "#ff8f00")], value_axis("W"))],
-                           780)  # as high as Jetzt, Strings and Netz beside it
+                           470)  # as high as the inverter's card beside it
     strings = phase_table(["PV1", "PV2"], [("Leistung", ["huawei_inverter_pv1_power", "huawei_inverter_pv2_power"]),
                                            ("Spannung", ["huawei_inverter_pv1_voltage", "huawei_inverter_pv2_voltage"]),
                                            ("Strom", ["huawei_inverter_pv1_current", "huawei_inverter_pv2_current"])])
-    grid_ = phase_table(["A", "B", "C"], [("Spannung", [f"huawei_inverter_phase_{x}_voltage" for x in "abc"]),
-                                           ("Strom", [f"huawei_inverter_phase_{x}_current" for x in "abc"])])
-    inverter = wide_grid([vtile("Gerätestatus", "huawei_inverter_device_status"),
+    grid_ = phase_table(["L1", "L2", "L3"], [("Spannung", [f"huawei_inverter_l{n}_voltage" for n in "123"]),
+                                              ("Strom", [f"huawei_inverter_l{n}_current" for n in "123"])])
+    inverter = value_grid([vtile("Gerätestatus", "huawei_inverter_device_status"),
                           vtile("Startzeit", "huawei_inverter_startup_time"),
                           vtile("Abschaltzeit", "huawei_inverter_shutdown_time"),
                           vtile("Innentemperatur", "huawei_inverter_internal_temperature"),
                           vtile("Fehlercode", "huawei_inverter_error_code"),
                           vtile("Optimierer online", "huawei_inverter_optimizers_online"),
                           vtile("Optimierer gesamt", "huawei_inverter_optimizers_total")])
-    # the strings and the grid under "Jetzt", in the room the chart leaves beside them (user, 2026-10-05)
-    return [two(stack(card("Jetzt", now), card("Strings (DC)", [strings]), card("Netz (AC)", [grid_])),
-                card("Leistung heute", [chart_])),
-            two(card("Wechselrichter", [inverter]), card("Ertrag pro Tag", [month_bars("PV-Ertrag", "energy_daily_pv", "#ffb300")]))]
+    days = month_bars("PV-Ertrag", "energy_daily_pv", "#ffb300")
+    days["config"]["height"] = "100%"
+    # strings and grid top right beside Jetzt, the yield per day under them filling the rest of that column; below
+    # the day's power as high as the inverter beside it (user, 2026-10-06: no empty card space, the grid kept)
+    return [two(card("Jetzt", now), stack(card("Strings (DC)", [strings]), card("Netz (AC)", [grid_]),
+                                          card("Ertrag pro Tag", [fill_chart(days, "180px")], fill=True))),
+            two(card("Leistung heute", [chart_]), card("Wechselrichter", [inverter]))]
 
 
 def meter_blocks(title_item, color_expr, today, phases, heads, extra, chart_item):
@@ -5472,7 +7620,7 @@ def meter_blocks(title_item, color_expr, today, phases, heads, extra, chart_item
         icon = node_icon("grid", color_expr, flowing(num(title_item), 10), power=num(title_item))
         now = [hero("material:electric_meter", "#5c6bc0", f"={num(title_item)} < 0 ? 'Einspeisung' : 'Bezug'",
                     kw_signed(title_item), value_color=color_expr, picture=icon),
-               wide_grid([vtile(t, i, color=c) for t, i, c in today] + [vtile(t, i) for t, i in extra])]
+               value_grid([vtile(t, i, color=c) for t, i, c in today] + [vtile(t, i) for t, i in extra])]
         # sampled, a day of 5-second readings is too much to draw
         chart_ = day_chart([time_series("Leistung", chart_item, symbol="none", sampling="lttb", lineStyle={"width": 1.5},
                                         areaStyle={"opacity": 0.25})], height="100%", visualMap=sign_colors())
@@ -5487,11 +7635,11 @@ def netatmo_blocks():
     # the real devices); the indoor module's top in the CO₂'s colour
     inside = [hero("material:thermostat", "#fb8c00", "Innen", f"={disp(w + 'temperature')}",
                    picture=device_icon(netatmo_parts("#fb8c00", "indoor", num(w + "co2")), "#fb8c00")),
-              wide_grid([vtile("Luftfeuchtigkeit", w + "atmospheric_humidity"), vtile("CO2", w + "co2"),
+              value_grid([vtile("Luftfeuchtigkeit", w + "atmospheric_humidity"), vtile("CO2", w + "co2"),
                          vtile("Lärm", w + "noise"), vtile("Luftdruck", w + "barometric_pressure")])]
     outside = [hero("material:wb_sunny", "#29b6f6", "Außen", f"={disp(o + 'temperature')}",
                     picture=device_icon(netatmo_parts("#29b6f6", "outdoor", num(w + "co2")), "#29b6f6")),
-               wide_grid([vtile("Luftfeuchtigkeit", o + "atmospheric_humidity"), vtile("Batteriestand", o + "battery_level")])]
+               value_grid([vtile("Luftfeuchtigkeit", o + "atmospheric_humidity"), vtile("Batteriestand", o + "battery_level")])]
     panel = lambda name, item, color, unit: (name, [line(name, item, color)],
                                              span_axis(unit) if unit in LEAST_SPAN else value_axis(unit, scale=True))
     # inside and outside overlapping in one grid, the temperatures and the humidity (user, 2026-10-05)
@@ -5504,7 +7652,7 @@ def netatmo_blocks():
                            line("Luftfeuchtigkeit außen", o + "atmospheric_humidity", "#80deea")], span_axis("%"))], 420)
 
     def details(p, extra):
-        return wide_grid([vtile("Zuletzt gesehen", p + "last_seen"), vtile("Messzeitpunkt", p + "measures_timestamp"),
+        return value_grid([vtile("Zuletzt gesehen", p + "last_seen"), vtile("Messzeitpunkt", p + "measures_timestamp"),
                           vtile("Signal", p + "signal"), vtile("Signalstärke", p + "signal_strength"), *extra,
                           vtile("Taupunkt", p + "dewpoint"), vtile("Hitzeindex", p + "heat_index"),
                           vtile("Min. Temperatur", p + "min_temp"), vtile("Max. Temperatur", p + "max_temp")])
@@ -5519,7 +7667,7 @@ def water_meter_blocks():
                 # a classic dial water meter with the reading on its counter, its pointer turning while water flows
                 picture=device_icon(water_meter_parts("#1e88e5", num("water_meter_rate"), num("water_meter_value")),
                                     "#1e88e5", f"{num('water_meter_rate')} > 0")),
-           wide_grid([vtile("Zählerstand", "water_meter_value"), vtile("Durchfluss", "water_meter_rate"),
+           value_grid([vtile("Zählerstand", "water_meter_value"), vtile("Durchfluss", "water_meter_rate"),
                       vtile("Status", "water_meter_status"), vtile("Zeitstempel", "water_meter_timestamp"),
                       text_tile("Fehler", "water_meter_error")])]
     image = comp("oh-image-card", {"action": "url", "actionUrl": "http://water-meter.domotics.lan", "lazy": True,
@@ -5540,7 +7688,7 @@ def living_room_blocks():
                                               receiver_on="items.vuuno4k_power.state === 'ON'"),
                                    "#ec407a", "items.vuuno4k_power.state === 'ON'")),
           controls_box(power_pill("vuuno4k_power", "#ec407a", "'An'")),  # the same on/off pill as the plugs'
-          wide_grid([vtile("Sender", "vuuno4k_channel"), text_tile("Titel", "vuuno4k_title"),
+          value_grid([vtile("Sender", "vuuno4k_channel"), text_tile("Titel", "vuuno4k_title"),
                      text_tile("Beschreibung", "vuuno4k_description")])]
     blocks = plug_cards("living_room_entertainment", "material:tv", "#ec407a", kind="media")
     return [one(card("Receiver", vu)), *blocks]
@@ -5549,7 +7697,7 @@ def living_room_blocks():
 def epex_spot_blocks():
     now = [hero("material:euro", "#fb8c00", "Gesamtpreis brutto", f"={disp(PRICE)}", value_color=price_color,
                 picture=device_icon(price_coin(price_color), "#fb8c00")),
-           wide_grid([vtile("Gesamt netto", "epex_spot_awattar_total_net"),
+           value_grid([vtile("Gesamt netto", "epex_spot_awattar_total_net"),
                       vtile("Markt brutto", "epex_spot_awattar_market_gross"),
                       vtile("Markt netto", "epex_spot_awattar"),
                       vtile("Günstigste Stunde", "epex_spot_awattar_cheapest_hour"),
@@ -5580,7 +7728,10 @@ def epex_spot_blocks():
 GRID_SIGN = f"={num(GRID)} < 0 ? '#43a047' : '#e53935'"
 SMARTPI_SIGN = f"={num('smartpi_ptot')} < 0 ? '#43a047' : '#e53935'"
 def below_controls(builder):
-    return lambda: plots_below_controls(builder())
+    def build():
+        VT_SEEN.clear()  # a value's forms by occurrence count per page
+        return plots_below_controls(builder())
+    return build
 
 
 # the label, icon and sidebar order of a page the generator adds, until the UI changes them
@@ -5600,16 +7751,16 @@ DEVICE_PAGES = {
     "power_meter": meter_blocks(GRID, GRID_SIGN,
                                 [("Bezug heute", "huawei_inverter_power_meter_ec_day", "#e53935"),
                                  ("Einspeisung heute", "huawei_inverter_power_meter_ep_day", "#43a047")],
-                                [("Wirkleistung", [f"huawei_inverter_power_meter_phase_{x}_active_power" for x in "abc"]),
-                                 ("Spannung", [f"huawei_inverter_power_meter_phase_{x}_voltage" for x in "abc"]),
-                                 ("Strom", [f"huawei_inverter_power_meter_phase_{x}_current" for x in "abc"])],
-                                ["A", "B", "C"],
+                                [("Wirkleistung", [f"huawei_inverter_power_meter_l{n}_active_power" for n in "123"]),
+                                 ("Spannung", [f"huawei_inverter_power_meter_l{n}_voltage" for n in "123"]),
+                                 ("Strom", [f"huawei_inverter_power_meter_l{n}_current" for n in "123"])],
+                                ["L1", "L2", "L3"],
                                 [("Blindleistung", "huawei_inverter_power_meter_reactive_power"),
                                  ("Leistungsfaktor", "huawei_inverter_power_meter_power_factor"),
                                  ("Frequenz", "huawei_inverter_power_meter_frequency")], GRID),
     "photovoltaics": photovoltaics_blocks,
     "energy_storage": energy_storage_blocks,
-    "e_car": plug_page("e_car", "material:electric_car", ECAR_COLOR, title="E-Auto", controllable=False,
+    "e_car": plug_page("e_car", "material:electric_car", ECAR_COLOR, title="E-Auto", controllable=False, range_=20,
                        kind="e-car", threshold=ECAR_ON,
                        note=ECAR_CALC + " Der Schalter spiegelt nur das Relais des Shelly EM, das mit nichts "
                                         "verbunden ist."),
@@ -5640,6 +7791,18 @@ DEVICE_PAGES = {
 }
 DEVICE_PAGES = {uid: below_controls(builder) for uid, builder in DEVICE_PAGES.items()}
 
+
+
+def tile_history_track():
+    """What the rule tile_history has to keep (applied/tile_history.py): the items whose history the tiles of the
+    device pages, the energy flow's popups and the plug widgets read, built as the pages and widgets are."""
+    TRACK.clear()
+    for build in DEVICE_PAGES.values():
+        build()
+    for _, build in FLOW_POPUPS.values():
+        build()
+    widgets()
+    return {k: v for k, v in sorted(TRACK.items()) if not k.startswith(PLUG_PLACEHOLDERS["prefix"])}
 
 
 # ---------------------------------------------------------------- German texts of the generated pages
@@ -5791,10 +7954,10 @@ def overview_cards():
         "heating-card": card("Heating & Hot Water", heating()),
         "electricity-price-card": card("Electricity Price", price, fill=True),
         "heatpump-card": card("Heatpump", heatpump_content(), fill=True),
-        "consumption-card": card("='Verbrauch heute · ' + " + disp("home_ec_day"), consumption),
+        "consumption-card": card("='Verbrauch heute · ' + " + disp("home_ec_day"), consumption_content()),
         "energy-days-card": card("Energy per Day", [fill_chart(energy_days, "340px")], fill=True),
         "pv-days-card": card("PV Production per Day", [pv_days()]),
-        "temperatures-card": card("Temperatures", temps),
+        "temperatures-card": card("Temperatures", temps_content()),
     }
 
 
@@ -5838,13 +8001,14 @@ def page(now):
 # The plug widgets are built by the same card builders from placeholders, then every placeholder becomes an
 # expression on the widget's props; the colour's rgba shades are worked out from props.color in the widget.
 PLUG_PLACEHOLDERS = {"prefix": "zzpfx", "icon": "zzicon", "color": "#010203", "title": "zztitle", "note": "zznote",
-                     "switch": "zzswitch", "item": "zzitem"}
+                     "switch": "zzswitch", "item": "zzitem", "history": "zzhist"}
 SWITCH_JS = "(props.switch || props.prefix + '_switch')"  # the switch item: its own prop, else the prefix's
 PROPS_RGB = ("Number.parseInt(props.color.slice(1, 3), 16) + ', ' + Number.parseInt(props.color.slice(3, 5), 16)"
              " + ', ' + Number.parseInt(props.color.slice(5, 7), 16)")
 PLACEHOLDER_JS = [("rgba(1, 2, 3, ", "rgba(' + " + PROPS_RGB + " + ', "), ("#010203", "' + props.color + '"),
                   ("zzicon", "' + props.icon + '"), ("zztitle", "' + props.title + '"), ("zznote", "' + props.note + '"),
                   ("zzswitch", "' + " + SWITCH_JS + " + '"), ("zzitem", "' + props.item + '"),
+                  ("zzhist", "' + props.history + '"),
                   ("zzpfx", "' + props.prefix + '")]
 
 
@@ -5878,6 +8042,7 @@ def templated(v):
         if v.startswith("="):
             expr = re.sub(r"items\.zzpfx_(\w+)", r"items[props.prefix + '_\1']", v[1:])
             expr = expr.replace("items.zzswitch", "items[" + SWITCH_JS + "]").replace("items.zzitem", "items[props.item]")
+            expr = expr.replace("items.zzhist", "items[props.history]")
             for token, js in PLACEHOLDER_JS:  # what is left sits inside string literals
                 expr = expr.replace(token, js)
             return "=" + tidy(expr)
@@ -5938,7 +8103,11 @@ PLUG_PARAMS = [PREFIX, param("title", "Title", "Card title, the device's name wh
                param("frequency", "Frequency", "The heat pump's compressor frequency, turning its drawing's fan; "
                      "usually an expression", "DECIMAL"),
                param("progress", "Progress", "An appliance's programme progress in %, filling its ring; usually an "
-                     "expression", "DECIMAL")]
+                     "expression", "DECIMAL"),
+               param("range", "Range", "kWh per 100 km of a car: today's charge shown as the kilometres it drives",
+                     "DECIMAL"),
+               dict(param("history", "History item", "The String item the rule tile_history writes the tiles' "
+                          "history into (comparison with yesterday)"), context="item")]
 
 
 _ITEMS = None
@@ -6080,12 +8249,6 @@ FLOW_NODE_PARAMS = [
     param("soc", "State of charge", "The battery's state of charge in %; usually an expression", "DECIMAL"),
     param("frequency", "Compressor frequency", "The heat pump's compressor frequency in Hz, which turns its fan; "
           "usually an expression", "DECIMAL")]
-FLOW_SHARE_RING_PARAMS = [
-    param("x", "x", "Centre's x in the flow's viewBox", "DECIMAL", required=True),
-    param("y", "y", "Centre's y in the flow's viewBox", "DECIMAL", required=True),
-    param("title", "Title", "Text beside the ring, e.g. Eigenverbrauch", required=True),
-    param("part", "Part", "The part, e.g. today's PV energy used at home; usually an expression", required=True),
-    param("whole", "Whole", "The whole, e.g. today's PV energy; usually an expression", required=True)]
 WEATHER_ICON_PARAMS = [
     param("symbol", "Symbol", "The weather drawn: " + ", ".join(k for k, _ in WX_SYMBOLS) + "; usually an "
           "expression", required=True),
@@ -6115,13 +8278,16 @@ APPLIANCE_TILE_PARAMS = [
 
 def widgets():
     """uid: (card, props parameters, tags) of every generated widget."""
+    global TILE_HISTORY_REF
     ph = PLUG_PLACEHOLDERS
+    TILE_HISTORY_REF = ph["history"]  # the plug widgets read the history item from their prop
     plug = {"plug-card": (plug_now_card(ph["prefix"], ph["icon"], ph["color"], ph["title"], ph["note"], ph["switch"]),
                           PLUG_PARAMS),
             "plug-power-card": (plug_power_card(ph["prefix"], ph["color"]), [PREFIX, COLOR]),
             "plug-energy-days-card": (plug_days_card(ph["prefix"], ph["color"]), [PREFIX, COLOR]),
             "plug-electric-card": (plug_electric_card(ph["prefix"], ph["title"]),
                                    [PREFIX, param("title", "Title", "Card title", default="Elektrisch")])}
+    TILE_HISTORY_REF = TILE_HISTORY
     out = {}
     names = known_items()
     for uid, card_ in overview_cards().items():
@@ -6145,7 +8311,6 @@ def widgets():
     out["switch-tile"] = (switch_tile_widget(), SWITCH_TILE_PARAMS, ["switch"])
     out["flow-link"] = (flow_link_widget(), FLOW_LINK_PARAMS, ["flow"])
     out["flow-node"] = (flow_node_widget(), FLOW_NODE_PARAMS, ["flow"])
-    out["flow-share-ring"] = (share_ring_widget(), FLOW_SHARE_RING_PARAMS, ["flow"])
     out["appliance-icon"] = (appliance_icon_widget(), APPLIANCE_ICON_PARAMS, ["appliance"])
     out["appliance-tile"] = (appliance_tile_widget(), APPLIANCE_TILE_PARAMS, ["appliance"])
     out["weather-icon"] = (weather_icon_widget(), WEATHER_ICON_PARAMS, ["weather"])

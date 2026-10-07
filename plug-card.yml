@@ -112,8 +112,19 @@ props:
     description: An appliance's programme progress in %, filling its ring; usually an expression
     type: DECIMAL
     required: false
+  - name: range
+    label: Range
+    description: 'kWh per 100 km of a car: today''s charge shown as the kilometres it drives'
+    type: DECIMAL
+    required: false
+  - name: history
+    label: History item
+    description: The String item the rule tile_history writes the tiles' history into (comparison with yesterday)
+    type: TEXT
+    required: false
+    context: item
   parameterGroups: []
-timestamp: Oct 5, 2026, 9:12:34 PM
+timestamp: Oct 7, 2026, 2:25:52 AM
 component: oh-card
 config:
   title: =props.title
@@ -339,29 +350,670 @@ slots:
     config:
       style:
         display: grid
-        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr))
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr))
         gap: 10px
         padding: 4px 16px 16px
     slots:
       default:
-      - component: widget:value-tile
+      - component: div
         config:
-          title: Energy today
-          value: '=(([''NULL'', ''UNDEF''].includes(items[props.prefix + ''_energy_today''].state) ? ''–'' : (items[props.prefix
-            + ''_energy_today''].displayState || items[props.prefix + ''_energy_today''].state)) || ''–'')'
-          icon: material:offline_bolt
-          iconColor: '#ffa726'
-          item: =props.prefix + '_energy_today'
-          kind: number
-      - component: widget:value-tile
+          style:
+            position: relative
+            box-sizing: border-box
+            min-width: '0'
+            border-radius: 12px
+            padding: 10px 12px
+            background: rgba(127, 127, 127, 0.08)
+            overflow: hidden
+        slots:
+          default:
+          - component: Label
+            config:
+              text: Energy today
+              style:
+                font-size: 12px
+                opacity: '0.65'
+                white-space: nowrap
+                overflow: hidden
+                text-overflow: ellipsis
+          - component: div
+            config:
+              style:
+                display: flex
+                flex-wrap: wrap
+                align-items: center
+                justify-content: space-between
+                gap: 2px 8px
+            slots:
+              default:
+              - component: Label
+                config:
+                  text: '=(([''NULL'', ''UNDEF''].includes(items[props.prefix + ''_energy_today''].state) ? ''–'' : (items[props.prefix
+                    + ''_energy_today''].displayState || items[props.prefix + ''_energy_today''].state)) || ''–'')'
+                  style:
+                    font-size: 20px
+                    font-weight: '700'
+                    line-height: '1.3'
+                    white-space: nowrap
+                    color: '#ffa726'
+              - component: Label
+                config:
+                  text: '=((((((((items[props.history].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state)
+                    : {}))[props.prefix + ''_energy_today''] || {}).y) !== undefined && ((((((items[props.history].state)
+                    || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today'']
+                    || {}).y) !== null) && Number(((((((items[props.history].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state)
+                    : {}))[props.prefix + ''_energy_today''] || {}).y)) >= Math.max(0.05, 0.05 * (Number(((((((items[props.history].state)
+                    || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today'']
+                    || {}).d)) || 0))) ? (((((Number(items[props.prefix + ''_energy_today''].numericState) || 0) * 1) - (Number(((((((items[props.history].state)
+                    || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today'']
+                    || {}).y)) * 1)) / (Number(((((((items[props.history].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state)
+                    : {}))[props.prefix + ''_energy_today''] || {}).y)) * 1) * 100) >= 300 ? ''×'' + (((Number(items[props.prefix
+                    + ''_energy_today''].numericState) || 0) * 1) / (Number(((((((items[props.history].state) || '''').charAt(0)
+                    === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today''] || {}).y))
+                    * 1)).toFixed(0) + '' vs. yesterday'' : (Math.abs(((((Number(items[props.prefix + ''_energy_today''].numericState)
+                    || 0) * 1) - (Number(((((((items[props.history].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state)
+                    : {}))[props.prefix + ''_energy_today''] || {}).y)) * 1)) / (Number(((((((items[props.history].state)
+                    || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today'']
+                    || {}).y)) * 1) * 100)) < 0.5 ? ''±0'' : (((((Number(items[props.prefix + ''_energy_today''].numericState)
+                    || 0) * 1) - (Number(((((((items[props.history].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state)
+                    : {}))[props.prefix + ''_energy_today''] || {}).y)) * 1)) / (Number(((((((items[props.history].state)
+                    || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today'']
+                    || {}).y)) * 1) * 100) > 0 ? ''+'' : ''−'') + Math.round(Math.abs(((((Number(items[props.prefix + ''_energy_today''].numericState)
+                    || 0) * 1) - (Number(((((((items[props.history].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state)
+                    : {}))[props.prefix + ''_energy_today''] || {}).y)) * 1)) / (Number(((((((items[props.history].state)
+                    || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today'']
+                    || {}).y)) * 1) * 100)))) + '' % vs. yesterday'') : ((Math.abs((((Number(items[props.prefix + ''_energy_today''].numericState)
+                    || 0) * 1) - (Number(((((((items[props.history].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state)
+                    : {}))[props.prefix + ''_energy_today''] || {}).y)) * 1))) < 0.005 ? ''±0'' : ((((Number(items[props.prefix
+                    + ''_energy_today''].numericState) || 0) * 1) - (Number(((((((items[props.history].state) || '''').charAt(0)
+                    === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today''] || {}).y))
+                    * 1)) > 0 ? ''+'' : ''−'') + (Math.abs((((Number(items[props.prefix + ''_energy_today''].numericState)
+                    || 0) * 1) - (Number(((((((items[props.history].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state)
+                    : {}))[props.prefix + ''_energy_today''] || {}).y)) * 1)))).toFixed(2)) + '' kWh vs. yesterday'')'
+                  style:
+                    font-size: 11px
+                    font-weight: '600'
+                    padding: 2px 8px
+                    border-radius: 9px
+                    white-space: nowrap
+                    width: fit-content
+                    color: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
+                      ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
+                      ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[''neutral''] || (({good: [''#2e7d32'', ''#81c784''],
+                      ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''],
+                      bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark
+                      === ''dark'') ? 1 : 0]'
+                    background: '=''color-mix(in srgb, '' + ((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''],
+                      caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''],
+                      info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[''neutral''] || (({good: [''#2e7d32'',
+                      ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'',
+                      ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'',
+                      ''#c7c7cc'']})).neutral)[(themeOptions.dark === ''dark'') ? 1 : 0] + '' 16%, transparent)'''
+                  visible: '=(((((((items[props.history].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state)
+                    : {}))[props.prefix + ''_energy_today''] || {}).y) !== undefined && ((((((items[props.history].state)
+                    || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today'']
+                    || {}).y) !== null)'
+          - component: div
+            config:
+              style:
+                display: grid
+                grid-template-columns: 58px minmax(0, 1fr) auto
+                align-items: center
+                gap: 4px 8px
+                margin-top: 6px
+            slots:
+              default:
+              - component: Label
+                config:
+                  text: today
+                  style:
+                    font-size: 11px
+                    opacity: '0.65'
+              - component: div
+                config:
+                  style:
+                    height: 8px
+                    border-radius: 4px
+                    background: rgba(127, 127, 127, 0.1)
+                slots:
+                  default:
+                  - component: div
+                    config:
+                      style:
+                        height: 8px
+                        border-radius: 4px
+                        width: '=true ? Math.max(0, Math.min(100, ((Number(items[props.prefix + ''_energy_today''].numericState)
+                          || 0) * 1) / (Math.max(((Number(items[props.prefix + ''_energy_today''].numericState) || 0) * 1),
+                          (((((((items[props.history].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state)
+                          : {}))[props.prefix + ''_energy_today''] || {}).y) !== undefined && ((((((items[props.history].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today'']
+                          || {}).y) !== null) ? (Number(((((((items[props.history].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state)
+                          : {}))[props.prefix + ''_energy_today''] || {}).y)) * 1) : 0, (((((((items[props.history].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today'']
+                          || {}).a) !== undefined && ((((((items[props.history].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state)
+                          : {}))[props.prefix + ''_energy_today''] || {}).a) !== null) ? (Number(((((((items[props.history].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today'']
+                          || {}).a)) * 1) : 0) * 1.08 || 1) * 100)) + ''%'' : ''0%'''
+                        background: '#ffa726'
+                    slots:
+                      default: []
+              - component: Label
+                config:
+                  text: '=true ? (((Number(items[props.prefix + ''_energy_today''].numericState) || 0) * 1)).toFixed(2) :
+                    ''–'''
+                  style:
+                    font-size: 11px
+                    text-align: right
+                    white-space: nowrap
+                    font-weight: '600'
+              - component: Label
+                config:
+                  text: yesterday
+                  style:
+                    font-size: 11px
+                    opacity: '0.65'
+              - component: div
+                config:
+                  style:
+                    height: 8px
+                    border-radius: 4px
+                    background: rgba(127, 127, 127, 0.1)
+                slots:
+                  default:
+                  - component: div
+                    config:
+                      style:
+                        height: 8px
+                        border-radius: 4px
+                        width: '=(((((((items[props.history].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state)
+                          : {}))[props.prefix + ''_energy_today''] || {}).y) !== undefined && ((((((items[props.history].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today'']
+                          || {}).y) !== null) ? Math.max(0, Math.min(100, (Number(((((((items[props.history].state) || '''').charAt(0)
+                          === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today''] || {}).y))
+                          * 1) / (Math.max(((Number(items[props.prefix + ''_energy_today''].numericState) || 0) * 1), (((((((items[props.history].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today'']
+                          || {}).y) !== undefined && ((((((items[props.history].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state)
+                          : {}))[props.prefix + ''_energy_today''] || {}).y) !== null) ? (Number(((((((items[props.history].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today'']
+                          || {}).y)) * 1) : 0, (((((((items[props.history].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state)
+                          : {}))[props.prefix + ''_energy_today''] || {}).a) !== undefined && ((((((items[props.history].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today'']
+                          || {}).a) !== null) ? (Number(((((((items[props.history].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state)
+                          : {}))[props.prefix + ''_energy_today''] || {}).a)) * 1) : 0) * 1.08 || 1) * 100)) + ''%'' : ''0%'''
+                        background: rgba(127, 127, 127, 0.55)
+                    slots:
+                      default: []
+              - component: Label
+                config:
+                  text: '=(((((((items[props.history].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state)
+                    : {}))[props.prefix + ''_energy_today''] || {}).y) !== undefined && ((((((items[props.history].state)
+                    || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today'']
+                    || {}).y) !== null) ? ((Number(((((((items[props.history].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state)
+                    : {}))[props.prefix + ''_energy_today''] || {}).y)) * 1)).toFixed(2) : ''–'''
+                  style:
+                    font-size: 11px
+                    text-align: right
+                    white-space: nowrap
+                    opacity: '0.75'
+              - component: Label
+                config:
+                  text: 7-day avg.
+                  style:
+                    font-size: 11px
+                    opacity: '0.65'
+              - component: div
+                config:
+                  style:
+                    height: 8px
+                    border-radius: 4px
+                    background: rgba(127, 127, 127, 0.1)
+                slots:
+                  default:
+                  - component: div
+                    config:
+                      style:
+                        height: 8px
+                        border-radius: 4px
+                        width: '=(((((((items[props.history].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state)
+                          : {}))[props.prefix + ''_energy_today''] || {}).a) !== undefined && ((((((items[props.history].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today'']
+                          || {}).a) !== null) ? Math.max(0, Math.min(100, (Number(((((((items[props.history].state) || '''').charAt(0)
+                          === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today''] || {}).a))
+                          * 1) / (Math.max(((Number(items[props.prefix + ''_energy_today''].numericState) || 0) * 1), (((((((items[props.history].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today'']
+                          || {}).y) !== undefined && ((((((items[props.history].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state)
+                          : {}))[props.prefix + ''_energy_today''] || {}).y) !== null) ? (Number(((((((items[props.history].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today'']
+                          || {}).y)) * 1) : 0, (((((((items[props.history].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state)
+                          : {}))[props.prefix + ''_energy_today''] || {}).a) !== undefined && ((((((items[props.history].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today'']
+                          || {}).a) !== null) ? (Number(((((((items[props.history].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state)
+                          : {}))[props.prefix + ''_energy_today''] || {}).a)) * 1) : 0) * 1.08 || 1) * 100)) + ''%'' : ''0%'''
+                        border: 1.5px dashed rgba(127, 127, 127, 0.7)
+                        box-sizing: border-box
+                    slots:
+                      default: []
+              - component: Label
+                config:
+                  text: '=(((((((items[props.history].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state)
+                    : {}))[props.prefix + ''_energy_today''] || {}).a) !== undefined && ((((((items[props.history].state)
+                    || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today'']
+                    || {}).a) !== null) ? ((Number(((((((items[props.history].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state)
+                    : {}))[props.prefix + ''_energy_today''] || {}).a)) * 1)).toFixed(2) : ''–'''
+                  style:
+                    font-size: 11px
+                    text-align: right
+                    white-space: nowrap
+                    opacity: '0.75'
+          - component: oh-link
+            config:
+              action: popup
+              style:
+                position: absolute
+                inset: '0'
+                display: block
+                border-radius: 12px
+              actionModal: widget:item-popup
+              actionModalConfig:
+                item: =props.prefix + '_energy_today'
+                title: Energy today
+                color: '#ffa726'
+                kind: number
+      - component: div
         config:
-          title: Energy total
-          value: '=(([''NULL'', ''UNDEF''].includes(items[props.prefix + ''_energy_total''].state) ? ''–'' : (items[props.prefix
-            + ''_energy_total''].displayState || items[props.prefix + ''_energy_total''].state)) || ''–'')'
-          icon: material:offline_bolt
-          iconColor: '#ffa726'
-          item: =props.prefix + '_energy_total'
-          kind: number
+          style:
+            position: relative
+            box-sizing: border-box
+            min-width: '0'
+            border-radius: 12px
+            padding: 10px 12px
+            background: rgba(127, 127, 127, 0.08)
+            overflow: hidden
+        slots:
+          default:
+          - component: Label
+            config:
+              text: Energy total
+              style:
+                font-size: 12px
+                opacity: '0.65'
+                white-space: nowrap
+                overflow: hidden
+                text-overflow: ellipsis
+          - component: div
+            config:
+              style:
+                display: flex
+                align-items: center
+                gap: 8px
+                margin-top: 8px
+                flex-wrap: wrap
+            slots:
+              default:
+              - component: div
+                config:
+                  style:
+                    display: inline-flex
+                    gap: 3px
+                    padding: 5px
+                    background: '#0b0b0c'
+                    border-radius: 8px
+                    border: 1px solid rgba(127, 127, 127, 0.35)
+                slots:
+                  default:
+                  - component: Label
+                    config:
+                      text: =('0000000000' + Math.floor(((Number(items[props.prefix + '_energy_total'].numericState) || 0)
+                        * 1))).slice(-5).charAt(0)
+                      style:
+                        width: 26px
+                        height: 38px
+                        line-height: 38px
+                        text-align: center
+                        border-radius: 3px
+                        background: 'linear-gradient(#050505, #2b2b2e 28%, #2b2b2e 72%, #050505)'
+                        color: '#ffffff'
+                        font-weight: '700'
+                        font-size: 24px
+                        font-variant-numeric: tabular-nums
+                  - component: Label
+                    config:
+                      text: =('0000000000' + Math.floor(((Number(items[props.prefix + '_energy_total'].numericState) || 0)
+                        * 1))).slice(-5).charAt(1)
+                      style:
+                        width: 26px
+                        height: 38px
+                        line-height: 38px
+                        text-align: center
+                        border-radius: 3px
+                        background: 'linear-gradient(#050505, #2b2b2e 28%, #2b2b2e 72%, #050505)'
+                        color: '#ffffff'
+                        font-weight: '700'
+                        font-size: 24px
+                        font-variant-numeric: tabular-nums
+                  - component: Label
+                    config:
+                      text: =('0000000000' + Math.floor(((Number(items[props.prefix + '_energy_total'].numericState) || 0)
+                        * 1))).slice(-5).charAt(2)
+                      style:
+                        width: 26px
+                        height: 38px
+                        line-height: 38px
+                        text-align: center
+                        border-radius: 3px
+                        background: 'linear-gradient(#050505, #2b2b2e 28%, #2b2b2e 72%, #050505)'
+                        color: '#ffffff'
+                        font-weight: '700'
+                        font-size: 24px
+                        font-variant-numeric: tabular-nums
+                  - component: Label
+                    config:
+                      text: =('0000000000' + Math.floor(((Number(items[props.prefix + '_energy_total'].numericState) || 0)
+                        * 1))).slice(-5).charAt(3)
+                      style:
+                        width: 26px
+                        height: 38px
+                        line-height: 38px
+                        text-align: center
+                        border-radius: 3px
+                        background: 'linear-gradient(#050505, #2b2b2e 28%, #2b2b2e 72%, #050505)'
+                        color: '#ffffff'
+                        font-weight: '700'
+                        font-size: 24px
+                        font-variant-numeric: tabular-nums
+                  - component: Label
+                    config:
+                      text: =('0000000000' + Math.floor(((Number(items[props.prefix + '_energy_total'].numericState) || 0)
+                        * 1))).slice(-5).charAt(4)
+                      style:
+                        width: 26px
+                        height: 38px
+                        line-height: 38px
+                        text-align: center
+                        border-radius: 3px
+                        background: 'linear-gradient(#050505, #2b2b2e 28%, #2b2b2e 72%, #050505)'
+                        color: '#ffffff'
+                        font-weight: '700'
+                        font-size: 24px
+                        font-variant-numeric: tabular-nums
+                  - component: div
+                    config:
+                      style:
+                        width: 3px
+                    slots:
+                      default: []
+                  - component: Label
+                    config:
+                      text: =(((Number(items[props.prefix + '_energy_total'].numericState) || 0) * 1) - Math.floor(((Number(items[props.prefix
+                        + '_energy_total'].numericState) || 0) * 1))).toFixed(1).slice(2).charAt(0)
+                      style:
+                        width: 26px
+                        height: 38px
+                        line-height: 38px
+                        text-align: center
+                        border-radius: 3px
+                        background: 'linear-gradient(#3a0606, #8e1b1b 28%, #8e1b1b 72%, #3a0606)'
+                        color: '#ffffff'
+                        font-weight: '700'
+                        font-size: 24px
+                        font-variant-numeric: tabular-nums
+              - component: Label
+                config:
+                  text: kWh
+                  style:
+                    font-size: 13px
+                    opacity: '0.7'
+          - component: oh-link
+            config:
+              action: popup
+              style:
+                position: absolute
+                inset: '0'
+                display: block
+                border-radius: 12px
+              actionModal: widget:item-popup
+              actionModalConfig:
+                item: =props.prefix + '_energy_total'
+                title: Energy total
+                color: '#5c6bc0'
+                kind: number
+      - component: div
+        config:
+          style:
+            position: relative
+            box-sizing: border-box
+            min-width: '0'
+            border-radius: 12px
+            padding: 10px 12px
+            background: rgba(127, 127, 127, 0.08)
+            overflow: hidden
+            grid-column: 1 / -1
+          visible: =Number(props.range) > 0
+        slots:
+          default:
+          - component: div
+            config:
+              style:
+                display: flex
+                align-items: center
+                gap: 8px
+            slots:
+              default:
+              - component: Label
+                config:
+                  text: Range of today's charge
+                  style:
+                    font-size: 12px
+                    opacity: '0.65'
+                    white-space: nowrap
+                    overflow: hidden
+                    text-overflow: ellipsis
+                    flex: 1 1 auto
+              - component: Label
+                config:
+                  text: =(Number(props.range) || 20) + ' kWh / 100 km'
+                  style:
+                    font-size: 11px
+                    font-weight: '600'
+                    padding: 2px 8px
+                    border-radius: 9px
+                    white-space: nowrap
+                    width: fit-content
+                    color: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
+                      ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
+                      ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[''neutral''] || (({good: [''#2e7d32'', ''#81c784''],
+                      ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''],
+                      bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark
+                      === ''dark'') ? 1 : 0]'
+                    background: '=''color-mix(in srgb, '' + ((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''],
+                      caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''],
+                      info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[''neutral''] || (({good: [''#2e7d32'',
+                      ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'',
+                      ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'',
+                      ''#c7c7cc'']})).neutral)[(themeOptions.dark === ''dark'') ? 1 : 0] + '' 16%, transparent)'''
+          - component: Label
+            config:
+              text: ='≈ ' + Math.round(((Number(items[props.prefix + '_energy_today'].numericState) || 0) / (Number(props.range)
+                || 20) * 100)) + ' km'
+              style:
+                font-size: 20px
+                font-weight: '700'
+                line-height: '1.3'
+                white-space: nowrap
+                color: '#26a69a'
+          - component: svg
+            config:
+              viewBox: 0 0 300 58
+              style:
+                display: block
+                width: 100%
+                height: auto
+                max-width: 460px
+                margin-top: 4px
+            slots:
+              default:
+              - component: line
+                config:
+                  x1: 12
+                  y1: 38
+                  x2: 288
+                  y2: 38
+                  stroke: currentColor
+                  stroke-opacity: '0.14'
+                  stroke-width: '6'
+                  stroke-linecap: round
+              - component: line
+                config:
+                  x1: 12
+                  y1: 38
+                  x2: =(12 + 276 * Math.max(0, Math.min(1, (((Number(items[props.prefix + '_energy_today'].numericState) ||
+                    0) / (Number(props.range) || 20) * 100)) / Math.max(50, Math.ceil(((Number(items[props.prefix + '_energy_today'].numericState)
+                    || 0) / (Number(props.range) || 20) * 100) * 1.25 / 50) * 50)))).toFixed(1)
+                  y2: 38
+                  stroke: '#26a69a'
+                  stroke-width: '6'
+                  stroke-linecap: round
+              - component: line
+                config:
+                  x1: 16
+                  y1: 38
+                  x2: =Math.max(16, (12 + 276 * Math.max(0, Math.min(1, (((Number(items[props.prefix + '_energy_today'].numericState)
+                    || 0) / (Number(props.range) || 20) * 100)) / Math.max(50, Math.ceil(((Number(items[props.prefix + '_energy_today'].numericState)
+                    || 0) / (Number(props.range) || 20) * 100) * 1.25 / 50) * 50)))) - 4).toFixed(1)
+                  y2: 38
+                  style:
+                    stroke: 'var(--f7-card-bg-color, #fff)'
+                  stroke-width: '1.5'
+                  stroke-dasharray: 6 6
+              - component: g
+                config:
+                  transform: ='translate(' + Math.max(28, (12 + 276 * Math.max(0, Math.min(1, (((Number(items[props.prefix
+                    + '_energy_today'].numericState) || 0) / (Number(props.range) || 20) * 100)) / Math.max(50, Math.ceil(((Number(items[props.prefix
+                    + '_energy_today'].numericState) || 0) / (Number(props.range) || 20) * 100) * 1.25 / 50) * 50))))).toFixed(1)
+                    + ' 30)'
+                slots:
+                  default:
+                  - component: path
+                    config:
+                      d: M-9 -9 L-5 -16 H6 L10 -9 Z
+                      fill: '#26a69a'
+                      stroke: '#26a69a'
+                      fill-opacity: '0.35'
+                      stroke-width: '1.4'
+                      stroke-linejoin: round
+                  - component: rect
+                    config:
+                      x: -16
+                      y: -9.5
+                      width: 32
+                      height: 9
+                      rx: 3
+                      fill: '#26a69a'
+                  - component: circle
+                    config:
+                      cx: -9
+                      cy: 0
+                      r: 3.6
+                      fill: '#26a69a'
+                      style:
+                        stroke: 'var(--f7-card-bg-color, #fff)'
+                      stroke-width: '1.6'
+                  - component: circle
+                    config:
+                      cx: 9
+                      cy: 0
+                      r: 3.6
+                      fill: '#26a69a'
+                      style:
+                        stroke: 'var(--f7-card-bg-color, #fff)'
+                      stroke-width: '1.6'
+              - component: text
+                config:
+                  x: =(12 + 276 * Math.max(0, Math.min(1, (Math.max(50, Math.ceil(((Number(items[props.prefix + '_energy_today'].numericState)
+                    || 0) / (Number(props.range) || 20) * 100) * 1.25 / 50) * 50) * 0 / 5) / Math.max(50, Math.ceil(((Number(items[props.prefix
+                    + '_energy_today'].numericState) || 0) / (Number(props.range) || 20) * 100) * 1.25 / 50) * 50)))).toFixed(1)
+                  y: 54
+                  content: '=Math.round(Math.max(50, Math.ceil(((Number(items[props.prefix + ''_energy_today''].numericState)
+                    || 0) / (Number(props.range) || 20) * 100) * 1.25 / 50) * 50) * 0 / 5) + (0 === 5 ? '' km'' : '''')'
+                  fill: currentColor
+                  font-size: 10
+                  font-weight: normal
+                  text-anchor: start
+                  opacity: '0.55'
+              - component: text
+                config:
+                  x: =(12 + 276 * Math.max(0, Math.min(1, (Math.max(50, Math.ceil(((Number(items[props.prefix + '_energy_today'].numericState)
+                    || 0) / (Number(props.range) || 20) * 100) * 1.25 / 50) * 50) * 1 / 5) / Math.max(50, Math.ceil(((Number(items[props.prefix
+                    + '_energy_today'].numericState) || 0) / (Number(props.range) || 20) * 100) * 1.25 / 50) * 50)))).toFixed(1)
+                  y: 54
+                  content: '=Math.round(Math.max(50, Math.ceil(((Number(items[props.prefix + ''_energy_today''].numericState)
+                    || 0) / (Number(props.range) || 20) * 100) * 1.25 / 50) * 50) * 1 / 5) + (1 === 5 ? '' km'' : '''')'
+                  fill: currentColor
+                  font-size: 10
+                  font-weight: normal
+                  text-anchor: middle
+                  opacity: '0.55'
+              - component: text
+                config:
+                  x: =(12 + 276 * Math.max(0, Math.min(1, (Math.max(50, Math.ceil(((Number(items[props.prefix + '_energy_today'].numericState)
+                    || 0) / (Number(props.range) || 20) * 100) * 1.25 / 50) * 50) * 2 / 5) / Math.max(50, Math.ceil(((Number(items[props.prefix
+                    + '_energy_today'].numericState) || 0) / (Number(props.range) || 20) * 100) * 1.25 / 50) * 50)))).toFixed(1)
+                  y: 54
+                  content: '=Math.round(Math.max(50, Math.ceil(((Number(items[props.prefix + ''_energy_today''].numericState)
+                    || 0) / (Number(props.range) || 20) * 100) * 1.25 / 50) * 50) * 2 / 5) + (2 === 5 ? '' km'' : '''')'
+                  fill: currentColor
+                  font-size: 10
+                  font-weight: normal
+                  text-anchor: middle
+                  opacity: '0.55'
+              - component: text
+                config:
+                  x: =(12 + 276 * Math.max(0, Math.min(1, (Math.max(50, Math.ceil(((Number(items[props.prefix + '_energy_today'].numericState)
+                    || 0) / (Number(props.range) || 20) * 100) * 1.25 / 50) * 50) * 3 / 5) / Math.max(50, Math.ceil(((Number(items[props.prefix
+                    + '_energy_today'].numericState) || 0) / (Number(props.range) || 20) * 100) * 1.25 / 50) * 50)))).toFixed(1)
+                  y: 54
+                  content: '=Math.round(Math.max(50, Math.ceil(((Number(items[props.prefix + ''_energy_today''].numericState)
+                    || 0) / (Number(props.range) || 20) * 100) * 1.25 / 50) * 50) * 3 / 5) + (3 === 5 ? '' km'' : '''')'
+                  fill: currentColor
+                  font-size: 10
+                  font-weight: normal
+                  text-anchor: middle
+                  opacity: '0.55'
+              - component: text
+                config:
+                  x: =(12 + 276 * Math.max(0, Math.min(1, (Math.max(50, Math.ceil(((Number(items[props.prefix + '_energy_today'].numericState)
+                    || 0) / (Number(props.range) || 20) * 100) * 1.25 / 50) * 50) * 4 / 5) / Math.max(50, Math.ceil(((Number(items[props.prefix
+                    + '_energy_today'].numericState) || 0) / (Number(props.range) || 20) * 100) * 1.25 / 50) * 50)))).toFixed(1)
+                  y: 54
+                  content: '=Math.round(Math.max(50, Math.ceil(((Number(items[props.prefix + ''_energy_today''].numericState)
+                    || 0) / (Number(props.range) || 20) * 100) * 1.25 / 50) * 50) * 4 / 5) + (4 === 5 ? '' km'' : '''')'
+                  fill: currentColor
+                  font-size: 10
+                  font-weight: normal
+                  text-anchor: middle
+                  opacity: '0.55'
+              - component: text
+                config:
+                  x: =(12 + 276 * Math.max(0, Math.min(1, (Math.max(50, Math.ceil(((Number(items[props.prefix + '_energy_today'].numericState)
+                    || 0) / (Number(props.range) || 20) * 100) * 1.25 / 50) * 50) * 5 / 5) / Math.max(50, Math.ceil(((Number(items[props.prefix
+                    + '_energy_today'].numericState) || 0) / (Number(props.range) || 20) * 100) * 1.25 / 50) * 50)))).toFixed(1)
+                  y: 54
+                  content: '=Math.round(Math.max(50, Math.ceil(((Number(items[props.prefix + ''_energy_today''].numericState)
+                    || 0) / (Number(props.range) || 20) * 100) * 1.25 / 50) * 50) * 5 / 5) + (5 === 5 ? '' km'' : '''')'
+                  fill: currentColor
+                  font-size: 10
+                  font-weight: normal
+                  text-anchor: end
+                  opacity: '0.55'
+          - component: Label
+            config:
+              text: ='since the meter started ' + ((Number(items[props.prefix + '_energy_total'].numericState) || 0)).toFixed(0)
+                + ' kWh ≈ ' + Math.round(((Number(items[props.prefix + '_energy_total'].numericState) || 0) / (Number(props.range)
+                || 20) * 100)).toLocaleString('de-DE') + ' km'
+              style:
+                font-size: 11px
+                opacity: '0.65'
+                margin-top: 4px
   - component: Label
     config:
       text: =props.note

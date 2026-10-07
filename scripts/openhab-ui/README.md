@@ -15,13 +15,20 @@ on its own:
 - the controls: `state-bar`, every segmented bar; `pill-switch`, `power-pill` and `boost-pill`, the switches as pills; `pill-slider`, the slider of every setpoint, offset, power and timer;
   `switch-row`, every row with a switch outside the overview's tiles; and `switch-tile`, the switch cards under the
   energy flow;
-- the energy flow: `flow-link`, `flow-node` and `flow-share-ring`, its lines, nodes and rings; the heat pump card's
+- the energy flow: `flow-link` and `flow-node`, its lines and nodes; the heat pump card's
   outdoor unit is a `flow-node` too;
 - the appliances: `appliance-tile` and `appliance-icon`, which the Miele machines' pages show too;
 - the weather: `weather-icon`, the weather drawn from a WMO code, in the weather bar and in the weather page's days;
+- the heat pump card's compact popups (`QUICK_PANELS`): one `heatpump-*-quick`, `upper-floor-quick` or
+  `ground-floor-quick` per tile, node and figure of its drawing;
 - four parametrised plug cards used by every metered device page (`plug-card`, `plug-power-card`,
   `plug-energy-days-card`, `plug-electric-card`), `item-popup`, the popup every tile of the device pages opens, and
-  `value-tile`, the tile itself: title and value over a large pale icon.
+  `value-tile`, the tile itself: title and value over a large pale icon. On the device pages, in the energy
+  flow's popups and in the plug widgets `value_grid()` swaps a tile for the form that fits its value
+  (`VALUE_RENDER`: comparisons with yesterday, courses, ratings in words, setpoint bars, rings, donuts,
+  flow bands, phase pictures, rollers and more); the history these read comes from the rule
+  `tile_history`, set up by `applied/tile_history.py apply` from `tile_history_track()`, again whenever
+  the tiles read the history of other items.
 
 A widget that places another takes the other's items from its own props: `role_widget()` builds a widget with
 its items and turns them into role props (`item_prop()`), `ITEM_PARAMS` names the props of a widget that take an

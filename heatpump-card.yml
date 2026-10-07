@@ -9,15 +9,111 @@ props:
     type: TEXT
     required: true
     context: item
+  - name: heatpumpEnergyToday
+    label: ESPAltherma Energy Today
+    description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpElectricalPowerSpace
+    label: ESPAltherma Electrical Power Space
+    description: Number:Power item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpElectricalPowerDhw
+    label: ESPAltherma Electrical Power DHW
+    description: Number:Power item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpElectricalPowerStandby
+    label: ESPAltherma Electrical Power Standby
+    description: Number:Power item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpEnergySpaceToday
+    label: ESPAltherma Energy Space Today
+    description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpEnergyDhwToday
+    label: ESPAltherma Energy DHW Today
+    description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpEnergyStandbyToday
+    label: ESPAltherma Energy Standby Today
+    description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
   - name: heatpumpHeatPower
     label: ESPAltherma Heating Power
     description: Number:Power item
     type: TEXT
     required: true
     context: item
+  - name: heatpumpHeatingEnergyToday
+    label: ESPAltherma Heating Energy Today
+    description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpHeatingPowerSpace
+    label: ESPAltherma Heating Power Space
+    description: Number:Power item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpHeatingPowerDhw
+    label: ESPAltherma Heating Power DHW
+    description: Number:Power item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpHeatingEnergySpaceToday
+    label: ESPAltherma Heating Energy Space Today
+    description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpHeatingEnergyDhwToday
+    label: ESPAltherma Heating Energy DHW Today
+    description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
   - name: heatpumpCop
     label: ESPAltherma COP
     description: Number item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpDcop
+    label: ESPAltherma DCOP
+    description: Number item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpDcopSpace
+    label: ESPAltherma DCOP Space
+    description: Number item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpDcopDhw
+    label: ESPAltherma DCOP DHW
+    description: Number item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpExtAmbientTemp
+    label: ESPAltherma External Ambient Temperature
+    description: Number:Temperature item
     type: TEXT
     required: true
     context: item
@@ -84,12 +180,6 @@ props:
   - name: heatpumpCircuitPower
     label: Heatpump Power
     description: Number:Power item
-    type: TEXT
-    required: true
-    context: item
-  - name: heatpumpExtAmbientTemp
-    label: ESPAltherma External Ambient Temperature
-    description: Number:Temperature item
     type: TEXT
     required: true
     context: item
@@ -213,8 +303,50 @@ props:
     type: TEXT
     required: true
     context: item
+  - name: heatpumpDhwTempHeating
+    label: Pyaltherma DHW Temp Heating
+    description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpDhwManagement
+    label: Heatpump DHW Management
+    description: Switch item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpLeavingWaterTempOffsetHeating
+    label: Pyaltherma Leaving Water Temp Offset Heating
+    description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpLeavingWaterSetpoint
+    label: ESPAltherma Leaving Water Setpoint
+    description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpOutdoorAirTemp
+    label: ESPAltherma Outdoor Air Temperature
+    description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpTargetDischargeTemp
+    label: ESPAltherma Target Discharge Temperature
+    description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpWaterPumpSignal
+    label: ESPAltherma Water Pump Signal
+    description: Number:Dimensionless item
+    type: TEXT
+    required: true
+    context: item
   parameterGroups: []
-timestamp: Oct 5, 2026, 9:12:34 PM
+timestamp: Oct 7, 2026, 2:25:52 AM
 component: oh-card
 config:
   title: Heat Pump
@@ -262,7 +394,16 @@ slots:
               - component: oh-link
                 config:
                   action: popup
-                  actionModal: page:heatpump
+                  actionModal: widget:heatpump-electric-quick
+                  actionModalConfig:
+                    heatpumpPower: =props.heatpumpPower
+                    heatpumpEnergyToday: =props.heatpumpEnergyToday
+                    heatpumpElectricalPowerSpace: =props.heatpumpElectricalPowerSpace
+                    heatpumpElectricalPowerDhw: =props.heatpumpElectricalPowerDhw
+                    heatpumpElectricalPowerStandby: =props.heatpumpElectricalPowerStandby
+                    heatpumpEnergySpaceToday: =props.heatpumpEnergySpaceToday
+                    heatpumpEnergyDhwToday: =props.heatpumpEnergyDhwToday
+                    heatpumpEnergyStandbyToday: =props.heatpumpEnergyStandbyToday
                   style:
                     position: absolute
                     inset: '0'
@@ -286,7 +427,14 @@ slots:
               - component: oh-link
                 config:
                   action: popup
-                  actionModal: page:heatpump
+                  actionModal: widget:heatpump-heat-quick
+                  actionModalConfig:
+                    heatpumpHeatPower: =props.heatpumpHeatPower
+                    heatpumpHeatingEnergyToday: =props.heatpumpHeatingEnergyToday
+                    heatpumpHeatingPowerSpace: =props.heatpumpHeatingPowerSpace
+                    heatpumpHeatingPowerDhw: =props.heatpumpHeatingPowerDhw
+                    heatpumpHeatingEnergySpaceToday: =props.heatpumpHeatingEnergySpaceToday
+                    heatpumpHeatingEnergyDhwToday: =props.heatpumpHeatingEnergyDhwToday
                   style:
                     position: absolute
                     inset: '0'
@@ -310,7 +458,17 @@ slots:
               - component: oh-link
                 config:
                   action: popup
-                  actionModal: page:heatpump
+                  actionModal: widget:heatpump-cop-quick
+                  actionModalConfig:
+                    heatpumpCop: =props.heatpumpCop
+                    heatpumpDcop: =props.heatpumpDcop
+                    heatpumpHeatPower: =props.heatpumpHeatPower
+                    heatpumpPower: =props.heatpumpPower
+                    heatpumpDcopSpace: =props.heatpumpDcopSpace
+                    heatpumpDcopDhw: =props.heatpumpDcopDhw
+                    heatpumpHeatingEnergyToday: =props.heatpumpHeatingEnergyToday
+                    heatpumpEnergyToday: =props.heatpumpEnergyToday
+                    heatpumpExtAmbientTemp: =props.heatpumpExtAmbientTemp
                   style:
                     position: absolute
                     inset: '0'
@@ -3371,7 +3529,18 @@ slots:
           - component: oh-link
             config:
               action: popup
-              actionModal: page:heatpump
+              actionModal: widget:heatpump-control-quick
+              actionModalConfig:
+                heatpumpClimateControlPower: =props.heatpumpClimateControlPower
+                heatpumpDhwPower: =props.heatpumpDhwPower
+                heatpumpSmartGrid: =props.heatpumpSmartGrid
+                heatpumpManagement: =props.heatpumpManagement
+                heatpumpDhwTempHeating: =props.heatpumpDhwTempHeating
+                heatpumpDhwTankTemp: =props.heatpumpDhwTankTemp
+                heatpumpDhwManagement: =props.heatpumpDhwManagement
+                heatpumpDhwBoost: =props.heatpumpDhwBoost
+                heatpumpLeavingWaterTempOffsetHeating: =props.heatpumpLeavingWaterTempOffsetHeating
+                heatpumpLeavingWaterSetpoint: =props.heatpumpLeavingWaterSetpoint
               style:
                 position: absolute
                 display: block
@@ -3383,7 +3552,13 @@ slots:
           - component: oh-link
             config:
               action: popup
-              actionModal: page:heatpump
+              actionModal: widget:heatpump-outdoor-quick
+              actionModalConfig:
+                heatpumpCircuitPower: =props.heatpumpCircuitPower
+                heatpumpInvFrequency: =props.heatpumpInvFrequency
+                heatpumpExtAmbientTemp: =props.heatpumpExtAmbientTemp
+                heatpumpHeatExchangerMidTemp: =props.heatpumpHeatExchangerMidTemp
+                heatpumpOutdoorAirTemp: =props.heatpumpOutdoorAirTemp
               style:
                 position: absolute
                 display: block
@@ -3395,7 +3570,13 @@ slots:
           - component: oh-link
             config:
               action: popup
-              actionModal: page:heatpump
+              actionModal: widget:heatpump-refrigerant-quick
+              actionModalConfig:
+                heatpumpDischargePipeTemp: =props.heatpumpDischargePipeTemp
+                heatpumpRefrigerantPressure: =props.heatpumpRefrigerantPressure
+                heatpumpTargetDischargeTemp: =props.heatpumpTargetDischargeTemp
+                heatpumpRefrigerantTemp: =props.heatpumpRefrigerantTemp
+                heatpumpHeatExchangerMidTemp: =props.heatpumpHeatExchangerMidTemp
               style:
                 position: absolute
                 display: block
@@ -3407,7 +3588,14 @@ slots:
           - component: oh-link
             config:
               action: popup
-              actionModal: page:heatpump
+              actionModal: widget:heatpump-circuit-quick
+              actionModalConfig:
+                heatpumpLeavingWaterTempAfterBuh: =props.heatpumpLeavingWaterTempAfterBuh
+                heatpumpInletWaterTemp: =props.heatpumpInletWaterTemp
+                heatpumpLeavingWaterTempOffsetHeating: =props.heatpumpLeavingWaterTempOffsetHeating
+                heatpumpLeavingWaterSetpoint: =props.heatpumpLeavingWaterSetpoint
+                heatpumpClimateControlPower: =props.heatpumpClimateControlPower
+                heatpumpHeatingPowerAfterBuh: =props.heatpumpHeatingPowerAfterBuh
               style:
                 position: absolute
                 display: block
@@ -3419,7 +3607,10 @@ slots:
           - component: oh-link
             config:
               action: popup
-              actionModal: page:air_conditioning
+              actionModal: widget:upper-floor-quick
+              actionModalConfig:
+                acTemperature: =props.acTemperature
+                tadoHumidity: =props.tadoHumidity
               style:
                 position: absolute
                 display: block
@@ -3431,7 +3622,11 @@ slots:
           - component: oh-link
             config:
               action: popup
-              actionModal: page:netatmo
+              actionModal: widget:ground-floor-quick
+              actionModalConfig:
+                heatpumpIndoorAmbientTemp: =props.heatpumpIndoorAmbientTemp
+                netatmoWeatherstationAtmosphericHumidity: =props.netatmoWeatherstationAtmosphericHumidity
+                netatmoWeatherstationCo2: =props.netatmoWeatherstationCo2
               style:
                 position: absolute
                 display: block
@@ -3443,7 +3638,13 @@ slots:
           - component: oh-link
             config:
               action: popup
-              actionModal: page:heatpump
+              actionModal: widget:heatpump-indoor-quick
+              actionModalConfig:
+                heatpumpCircuitPower: =props.heatpumpCircuitPower
+                heatpumpBuhPower: =props.heatpumpBuhPower
+                heatpumpFlowSensor: =props.heatpumpFlowSensor
+                heatpumpWaterPressure: =props.heatpumpWaterPressure
+                heatpumpWaterPumpSignal: =props.heatpumpWaterPumpSignal
               style:
                 position: absolute
                 display: block
@@ -3455,7 +3656,12 @@ slots:
           - component: oh-link
             config:
               action: popup
-              actionModal: page:heatpump
+              actionModal: widget:heatpump-tank-quick
+              actionModalConfig:
+                heatpumpDhwTankTemp: =props.heatpumpDhwTankTemp
+                heatpumpDhwSetpoint: =props.heatpumpDhwSetpoint
+                heatpumpBshMode: =props.heatpumpBshMode
+                heatpumpBshPower: =props.heatpumpBshPower
               style:
                 position: absolute
                 display: block
@@ -3467,7 +3673,13 @@ slots:
           - component: oh-link
             config:
               action: popup
-              actionModal: page:heatpump
+              actionModal: widget:heatpump-indoor-quick
+              actionModalConfig:
+                heatpumpCircuitPower: =props.heatpumpCircuitPower
+                heatpumpBuhPower: =props.heatpumpBuhPower
+                heatpumpFlowSensor: =props.heatpumpFlowSensor
+                heatpumpWaterPressure: =props.heatpumpWaterPressure
+                heatpumpWaterPumpSignal: =props.heatpumpWaterPumpSignal
               style:
                 position: absolute
                 display: block
@@ -3479,7 +3691,13 @@ slots:
           - component: oh-link
             config:
               action: popup
-              actionModal: page:heatpump
+              actionModal: widget:heatpump-outdoor-quick
+              actionModalConfig:
+                heatpumpCircuitPower: =props.heatpumpCircuitPower
+                heatpumpInvFrequency: =props.heatpumpInvFrequency
+                heatpumpExtAmbientTemp: =props.heatpumpExtAmbientTemp
+                heatpumpHeatExchangerMidTemp: =props.heatpumpHeatExchangerMidTemp
+                heatpumpOutdoorAirTemp: =props.heatpumpOutdoorAirTemp
               style:
                 position: absolute
                 display: block
@@ -3491,7 +3709,12 @@ slots:
           - component: oh-link
             config:
               action: popup
-              actionModal: page:heatpump
+              actionModal: widget:heatpump-tank-quick
+              actionModalConfig:
+                heatpumpDhwTankTemp: =props.heatpumpDhwTankTemp
+                heatpumpDhwSetpoint: =props.heatpumpDhwSetpoint
+                heatpumpBshMode: =props.heatpumpBshMode
+                heatpumpBshPower: =props.heatpumpBshPower
               style:
                 position: absolute
                 display: block
@@ -3503,7 +3726,9 @@ slots:
           - component: oh-link
             config:
               action: popup
-              actionModal: page:heatpump
+              actionModal: widget:heatpump-valve-quick
+              actionModalConfig:
+                heatpumpValve: =props.heatpumpValve
               style:
                 position: absolute
                 display: block

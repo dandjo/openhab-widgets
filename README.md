@@ -1,7 +1,7 @@
 # openHAB Widgets
 
 MainUI widgets from my openHAB 5 installation: the cards of an energy and home dashboard and the parts they are built
-from, which work on their own too: pills, bars and sliders, the nodes and lines of the
+from, which work on their own too: the quick popups they open, pills, bars and sliders, the nodes and lines of the
 energy flow, appliance icons and tiles, a weather drawing; besides them a set of cards for every metered plug, a popup
 for any item and the tile their values stand in. The UI texts are English, numbers use a decimal point; my own
 installation runs the same widgets in German, as the generator builds them, and
@@ -44,17 +44,27 @@ number formats come from the items.
 | `consumption-card` | – |
 | `electricity-price-card` | – |
 | `energy-days-card` | – |
-| `energy-flow-card` | `flow-link`, `flow-node`, `flow-share-ring` |
+| `energy-flow-card` | `flow-link`, `flow-node` |
 | `flow-link` | – |
 | `flow-node` | – |
-| `flow-share-ring` | – |
+| `ground-floor-quick` | – |
 | `heating-card` | `flow-node` |
-| `heatpump-card` | `flow-node`, `item-popup`, `value-tile` |
+| `heatpump-card` | `boost-pill`, `flow-node`, `ground-floor-quick`, `heatpump-circuit-quick`, `heatpump-control-quick`, `heatpump-cop-quick`, `heatpump-electric-quick`, `heatpump-heat-quick`, `heatpump-indoor-quick`, `heatpump-outdoor-quick`, `heatpump-refrigerant-quick`, `heatpump-tank-quick`, `heatpump-valve-quick`, `item-popup`, `pill-slider`, `pill-switch`, `state-bar`, `upper-floor-quick`, `value-tile` |
+| `heatpump-circuit-quick` | `pill-slider` |
+| `heatpump-control-quick` | `boost-pill`, `pill-slider`, `pill-switch`, `state-bar` |
+| `heatpump-cop-quick` | – |
+| `heatpump-electric-quick` | – |
+| `heatpump-heat-quick` | – |
+| `heatpump-indoor-quick` | – |
+| `heatpump-outdoor-quick` | – |
+| `heatpump-refrigerant-quick` | – |
+| `heatpump-tank-quick` | – |
+| `heatpump-valve-quick` | – |
 | `item-popup` | – |
 | `pill-slider` | – |
 | `pill-switch` | – |
-| `plug-card` | `appliance-icon`, `flow-node`, `item-popup`, `power-pill`, `value-tile` |
-| `plug-electric-card` | `item-popup`, `value-tile` |
+| `plug-card` | `appliance-icon`, `flow-node`, `item-popup`, `power-pill` |
+| `plug-electric-card` | `item-popup` |
 | `plug-energy-days-card` | – |
 | `plug-power-card` | – |
 | `power-pill` | – |
@@ -64,6 +74,7 @@ number formats come from the items.
 | `switch-tile` | – |
 | `switches-card` | `switch-tile` |
 | `temperatures-card` | – |
+| `upper-floor-quick` | – |
 | `value-tile` | `item-popup` |
 | `weather-card` | `weather-icon` |
 | `weather-icon` | – |
@@ -73,7 +84,8 @@ number formats come from the items.
 The cards of my overview page. Each takes the items it shows as props; the prop names say what an item is. Most
 elements open a page of my installation as a popup when tapped: the page of their device (`page:heatpump`,
 `page:weather` …), or for the energy flow's house and appliances a popup of its own (`page:flow_home`,
-`page:flow_appliances`). The pages are not part of this repository.
+`page:flow_appliances`). The pages are not part of this repository; the quick popups the heat pump card opens are
+(see [Quick popups](#quick-popups)).
 
 ### Weather: `weather-card`
 
@@ -134,18 +146,19 @@ battery's ring is filled with its state of charge, and the heat pump's, while it
 expected end; beside such an arc the rest of the ring pulses softly and, while the node works, the arc pulses in step
 with it, brightest and widest with it. A tap on a node opens its device's page of my installation, on the house and the
 appliances a popup of their own. Under the star three tiles with large pale icons: the house as its node inside the pie
-of what the consumers draw, as large as the rings beside it, with its power and today's energy, and today's
-self-consumption and self-sufficiency as rings. The card places its lines, nodes and rings as `flow-link`, `flow-node`
-and `flow-share-ring`. The recording and the dark screenshot show it with demo values.
+of what the consumers draw, as large as the rings beside it, with its power and today's energy against yesterday's at
+this time in a pill, and today's self-consumption and self-sufficiency as rings, each with yesterday's whole day in a
+pill, green while today's share is higher, orange while lower. The card places its lines and nodes as `flow-link` and
+`flow-node`. The recording and the dark screenshot show it with demo values.
 
-Needs `flow-link`, `flow-node`, `flow-share-ring`.
+Needs `flow-link`, `flow-node`.
 
 ![Energy flow](screenshots/energy-flow-card.gif)
 
 ![Energy flow in dark mode](screenshots/energy-flow-card-dark.gif)
 
 <details>
-<summary>42 props</summary>
+<summary>44 props</summary>
 
 | Prop | Item | Item type |
 |---|---|---|
@@ -178,6 +191,7 @@ Needs `flow-link`, `flow-node`, `flow-share-ring`.
 | `acMode` | Faikout Perfera Mode | String |
 | `ventilationLevel` | ESPLyfterl Level | String |
 | `pvEnergyToday` | Huawei Inverter E-Day | Number:Energy |
+| `ventilationEnergyToday` | Ventilation Energy Today | Number:Energy |
 | `gridImportToday` | Huawei Inverter Power Meter Ec-Day | Number:Energy |
 | `gridExportToday` | Huawei Inverter Power Meter Ep-Day | Number:Energy |
 | `heatpumpEnergyToday` | ESPAltherma Energy Today | Number:Energy |
@@ -190,6 +204,7 @@ Needs `flow-link`, `flow-node`, `flow-share-ring`.
 | `batteryDischargeToday` | Huawei Inverter Energy Storage Day Discharge | Number:Energy |
 | `batteryChargeToday` | Huawei Inverter Energy Storage Day Charge | Number:Energy |
 | `homeEnergyToday` | Home Energy Day | Number:Energy |
+| `tileHistory` | Tile history | String |
 | `pvSelfUseToday` | Photovoltaics Own Ec-Day | Number:Energy |
 
 </details>
@@ -278,9 +293,11 @@ a hot-water charge, while the setpoint pill gives way to the time left, as a Mie
 Each tile's pill holds the temperature, the tank's and the leaving water's, filled in the tile's colour while hot water
 or heating is switched on, outlined while off, beside a tinted pill with the setpoint and a small target icon; a tap
 opens the heat pump's page of my installation. Below them today's electricity and heat of the heat pump split into space
-heating, DHW and standby as bars (hovering a part lifts it everywhere), and today's COPs of space heating, DHW and in
-total in one row as rings like the energy flow's self-consumption. While the tank charges or the heating runs, a line
-under its tile says since when. The screenshots show it with the heat pump card's demo values.
+heating, DHW and standby as bars (hovering a part lifts it everywhere), each with today against yesterday at this time
+in a pill in the middle of its title, and today's COPs of space heating, DHW and in total in one row as rings like the
+energy flow's self-consumption, each with today against yesterday at this time in a pill under its title. While the tank
+charges or the heating runs, a line under its tile says since when. The screenshots show it with the heat pump card's
+demo values.
 
 Needs `flow-node`.
 
@@ -289,7 +306,7 @@ Needs `flow-node`.
 ![Heating and hot water in dark mode](screenshots/heating-card-dark.png)
 
 <details>
-<summary>29 props</summary>
+<summary>30 props</summary>
 
 | Prop | Item | Item type |
 |---|---|---|
@@ -300,10 +317,10 @@ Needs `flow-node`.
 | `heatpumpBshMode` | ESPAltherma Booster Heater (BSH) Mode | Switch |
 | `heatpumpInvFrequency` | ESPAltherma Inverter Frequency | Number:Frequency |
 | `heatpumpDhwPower` | Pyaltherma DHW Power | Switch |
-| `heatpumpDhwSetpoint` | ESPAltherma DHW Setpoint | Number:Temperature |
-| `heatpumpDhwSince` | Heatpump DHW Charging Since | DateTime |
-| `heatpumpPower` | ESPAltherma Electrical Power | Number:Power |
 | `heatpumpDhwEta` | Heatpump DHW Done At | DateTime |
+| `heatpumpDhwSince` | Heatpump DHW Charging Since | DateTime |
+| `heatpumpDhwSetpoint` | ESPAltherma DHW Setpoint | Number:Temperature |
+| `heatpumpPower` | ESPAltherma Electrical Power | Number:Power |
 | `heatpumpBuhStep1Mode` | ESPAltherma Backup Heater (BUH) Step 1 Mode | Switch |
 | `heatpumpBuhStep2Mode` | ESPAltherma Backup Heater (BUH) Step 2 Mode | Switch |
 | `heatpumpCircuitPower` | Heatpump Power | Number:Power |
@@ -312,6 +329,7 @@ Needs `flow-node`.
 | `heatpumpClimateControlPower` | Pyaltherma Climate Control Power | Switch |
 | `heatpumpLeavingWaterSetpoint` | ESPAltherma Leaving Water Setpoint | Number:Temperature |
 | `heatpumpHeatingSince` | Heatpump Heating Running Since | DateTime |
+| `tileHistory` | Tile history | String |
 | `heatpumpEnergyToday` | ESPAltherma Energy Today | Number:Energy |
 | `heatpumpEnergySpaceToday` | ESPAltherma Energy Space Today | Number:Energy |
 | `heatpumpEnergyDhwToday` | ESPAltherma Energy DHW Today | Number:Energy |
@@ -362,28 +380,46 @@ heat comes from; grey while their device rests. Tiles in the style of the switch
 unit, the control (heating, hot water, Smart Grid, automation), the refrigerant, the heating circuit, the climate of the
 two floors, the tank with its booster heater and the indoor unit with its own power (the measured circuit plus the
 backup heater), each tinted in its colour while what it shows is at work. A tap on a tile, the wall unit, the outdoor
-unit, the tank or the valve opens the heat pump's page of my installation, on a floor the page of the device that
-measures its air. At the card's top, across its whole width as the energy flow's tiles, the electrical power, the heat
-and the COP as a row of value tiles that open the heat pump's page too (today's split and COPs are in the heating card).
-On a phone the drawing takes the card's width; everywhere else it stands at its own size, as the energy flow does, so
-their texts keep the UI's sizes and their rings come out the same and never shrink, reaching into the card's padding
-where the card is a little narrower, and in the middle of the height the card is given. The recordings show it with demo
-values (a space heating run).
+unit, the tank or the valve opens its quick popup (see [Quick popups](#quick-popups)). At the card's top, across its
+whole width as the energy flow's tiles, the electrical power, the heat and the COP as a row of value tiles that open
+their quick popups too (today's split and COPs are in the heating card). On a phone the drawing takes the card's width;
+everywhere else it stands at its own size, as the energy flow does, so their texts keep the UI's sizes and their rings
+come out the same and never shrink, reaching into the card's padding where the card is a little narrower, and in the
+middle of the height the card is given. The recordings show it with demo values (a space heating run).
 
-Needs `flow-node`, `item-popup`, `value-tile`.
+Needs `boost-pill`, `flow-node`, `ground-floor-quick`, `heatpump-circuit-quick`, `heatpump-control-quick`,
+`heatpump-cop-quick`, `heatpump-electric-quick`, `heatpump-heat-quick`, `heatpump-indoor-quick`,
+`heatpump-outdoor-quick`, `heatpump-refrigerant-quick`, `heatpump-tank-quick`, `heatpump-valve-quick`, `item-popup`,
+`pill-slider`, `pill-switch`, `state-bar`, `upper-floor-quick`, `value-tile`.
 
 ![Heat pump](screenshots/heatpump-card.gif)
 
 ![Heat pump in dark mode](screenshots/heatpump-card-dark.gif)
 
 <details>
-<summary>35 props</summary>
+<summary>57 props</summary>
 
 | Prop | Item | Item type |
 |---|---|---|
 | `heatpumpPower` | ESPAltherma Electrical Power | Number:Power |
+| `heatpumpEnergyToday` | ESPAltherma Energy Today | Number:Energy |
+| `heatpumpElectricalPowerSpace` | ESPAltherma Electrical Power Space | Number:Power |
+| `heatpumpElectricalPowerDhw` | ESPAltherma Electrical Power DHW | Number:Power |
+| `heatpumpElectricalPowerStandby` | ESPAltherma Electrical Power Standby | Number:Power |
+| `heatpumpEnergySpaceToday` | ESPAltherma Energy Space Today | Number:Energy |
+| `heatpumpEnergyDhwToday` | ESPAltherma Energy DHW Today | Number:Energy |
+| `heatpumpEnergyStandbyToday` | ESPAltherma Energy Standby Today | Number:Energy |
 | `heatpumpHeatPower` | ESPAltherma Heating Power | Number:Power |
+| `heatpumpHeatingEnergyToday` | ESPAltherma Heating Energy Today | Number:Energy |
+| `heatpumpHeatingPowerSpace` | ESPAltherma Heating Power Space | Number:Power |
+| `heatpumpHeatingPowerDhw` | ESPAltherma Heating Power DHW | Number:Power |
+| `heatpumpHeatingEnergySpaceToday` | ESPAltherma Heating Energy Space Today | Number:Energy |
+| `heatpumpHeatingEnergyDhwToday` | ESPAltherma Heating Energy DHW Today | Number:Energy |
 | `heatpumpCop` | ESPAltherma COP | Number |
+| `heatpumpDcop` | ESPAltherma DCOP | Number |
+| `heatpumpDcopSpace` | ESPAltherma DCOP Space | Number |
+| `heatpumpDcopDhw` | ESPAltherma DCOP DHW | Number |
+| `heatpumpExtAmbientTemp` | ESPAltherma External Ambient Temperature | Number:Temperature |
 | `heatpumpDhwTankTemp` | ESPAltherma DHW Tank Temperature | Number:Temperature |
 | `heatpumpInvFrequency` | ESPAltherma Inverter Frequency | Number:Frequency |
 | `heatpumpDefrostOperaton` | ESPAltherma Defrost Operation | Switch |
@@ -395,7 +431,6 @@ Needs `flow-node`, `item-popup`, `value-tile`.
 | `heatpumpBshMode` | ESPAltherma Booster Heater (BSH) Mode | Switch |
 | `heatpumpLeavingWaterTempAfterBuh` | ESPAltherma Leaving Water Temperature After BUH | Number:Temperature |
 | `heatpumpCircuitPower` | Heatpump Power | Number:Power |
-| `heatpumpExtAmbientTemp` | ESPAltherma External Ambient Temperature | Number:Temperature |
 | `heatpumpHeatExchangerMidTemp` | ESPAltherma Heat Exchanger Mid Temperature | Number:Temperature |
 | `heatpumpSmartGrid` | ESPAltherma Smart Grid | String |
 | `heatpumpClimateControlPower` | Pyaltherma Climate Control Power | Switch |
@@ -416,23 +451,33 @@ Needs `flow-node`, `item-popup`, `value-tile`.
 | `heatpumpBshPower` | ESPAltherma Electrical Power Booster Heater | Number:Power |
 | `heatpumpBuhPower` | ESPAltherma Electrical Power Backup Heater | Number:Power |
 | `heatpumpWaterPressure` | ESPAltherma Water Pressure | Number:Pressure |
+| `heatpumpDhwTempHeating` | Pyaltherma DHW Temp Heating | Number:Temperature |
+| `heatpumpDhwManagement` | Heatpump DHW Management | Switch |
+| `heatpumpLeavingWaterTempOffsetHeating` | Pyaltherma Leaving Water Temp Offset Heating | Number:Temperature |
+| `heatpumpLeavingWaterSetpoint` | ESPAltherma Leaving Water Setpoint | Number:Temperature |
+| `heatpumpOutdoorAirTemp` | ESPAltherma Outdoor Air Temperature | Number:Temperature |
+| `heatpumpTargetDischargeTemp` | ESPAltherma Target Discharge Temperature | Number:Temperature |
+| `heatpumpWaterPumpSignal` | ESPAltherma Water Pump Signal | Number:Dimensionless |
 
 </details>
 
 ### Consumption today: `consumption-card`
 
-Today's consumption as one bar split by source (PV, grid) and by consumer, with a legend in two columns; hovering a part
-lifts it everywhere. The screenshot shows it with demo values.
+Today's consumption as one bar split by source (PV, grid), the total against yesterday at this time in a pill between
+the two shares, and as one bar split by consumer, with a legend in two columns that gives each consumer's energy and how
+many kWh more (orange) or fewer (green) it drew than yesterday until this time; hovering a part lifts it everywhere. The
+screenshot shows it with demo values.
 
 ![Consumption today](screenshots/consumption-card.png)
 
 <details>
-<summary>20 props</summary>
+<summary>21 props</summary>
 
 | Prop | Item | Item type |
 |---|---|---|
 | `homeEnergyToday` | Home Energy Day | Number:Energy |
 | `pvSelfUseToday` | Photovoltaics Own Ec-Day | Number:Energy |
+| `tileHistory` | Tile history | String |
 | `gridImportToday` | Huawei Inverter Power Meter Ec-Day | Number:Energy |
 | `heatpumpEnergyToday` | ESPAltherma Energy Today | Number:Energy |
 | `ecarEnergyToday` | E-Car Energy Today | Number:Energy |
@@ -490,25 +535,250 @@ half-years instead of the year.
 
 ### Temperatures: `temperatures-card`
 
-Indoor and outdoor temperature now, the day's minimum and maximum, and the last day as a chart from 15-minute means.
+Indoor and outdoor temperature now, each with its change over the last hour in a pill beside it and under that indoors
+the room's climate in a word (from the humidity), outdoors whether airing dries or dampens the rooms (from both airs'
+absolute humidity); the day's minimum and maximum, and the last day as a chart from 15-minute means.
 
 ![Temperatures](screenshots/temperatures-card.png)
 
 <details>
-<summary>4 props</summary>
+<summary>9 props</summary>
 
 | Prop | Item | Item type |
 |---|---|---|
 | `heatpumpIndoorAmbientTemp` | ESPAltherma Indoor Ambient Temperature | Number:Temperature |
+| `tileHistory` | Tile history | String |
+| `netatmoWeatherstationAtmosphericHumidity` | Netatmo Weatherstation Atmospheric Humidity | Number:Dimensionless |
 | `heatpumpExtAmbientTemp` | ESPAltherma External Ambient Temperature | Number:Temperature |
+| `netatmoOutdoorTemperature` | Netatmo Outdoor Temperature | Number:Temperature |
+| `netatmoOutdoorAtmosphericHumidity` | Netatmo Outdoor Atmospheric Humidity | Number:Dimensionless |
+| `netatmoWeatherstationTemperature` | Netatmo Weatherstation Temperature | Number:Temperature |
 | `temperatureIndoor15min` | Temperature Indoor 15 min | Number:Temperature |
 | `temperatureOutdoor15min` | Temperature Outdoor 15 min | Number:Temperature |
 
 </details>
 
+## Quick popups
+
+Compact popups the heat pump card opens: the heat pump's controls or the values and charts of one of its parts, under
+a small head with its state and above *All details*, which opens the heat pump's page of my installation. Each is a
+widget that takes its items as props; open it from a link with `action: popup`, `actionModal: widget:<uid>` and its
+items in `actionModalConfig`, as the card does:
+
+```yaml
+action: popup
+actionModal: widget:heatpump-tank-quick
+actionModalConfig:
+  heatpumpDhwTankTemp: espaltherma_dhw_tank_temp
+  heatpumpDhwSetpoint: espaltherma_dhw_setpoint
+  heatpumpBshMode: espaltherma_bsh_mode
+  heatpumpBshPower: espaltherma_electrical_power_bsh
+```
+
+It opens 420 px wide, on a phone full screen; its values stand two abreast on top, its charts start below their period
+buttons, and a closed period menu takes no room. The card's tiles, wall unit, outdoor unit, tank and valve and the
+three figures at its top open them:
+
+- `heatpump-control-quick`, control: all the heat pump's controls: the Smart Grid, heating, hot water and automation,
+  the DHW setpoint, the hot-water boost and the leaving water offset.
+- `heatpump-indoor-quick`, indoor unit: the circulation pump as a ring with the water's flow and the water pressure
+  rated in words on top; its power without the backup heater, the flow, the pressure and the backup heater over the day.
+- `heatpump-outdoor-quick`, outdoor unit: the compressor's frequency as a ring and the outdoor air beside the heat
+  exchanger on top; its power, the compressor, the outdoor temperature with its heat exchanger's and the outdoor air
+  sensor over the day.
+- `heatpump-refrigerant-quick`, refrigerant: the hot gas against its target as a setpoint bar on top; hot gas with its
+  target, liquid, heat exchanger and pressure over the day.
+- `heatpump-circuit-quick`, heating circuit: the leaving water offset, the leaving and inlet water's spread and the
+  leaving water against its setpoint on top; leaving with inlet water and the heat over the day.
+- `heatpump-tank-quick`, DHW tank: the tank in layers with its temperature against the setpoint on top; its temperature
+  with its setpoint and its booster heater's on and off as a band over the day.
+- `heatpump-valve-quick`, three-way valve: its position over the day as a band, space heating and DHW in turn.
+- `upper-floor-quick`, upper floor: the humidity rated in words on top; temperature and humidity over the day.
+- `ground-floor-quick`, ground floor: humidity and CO₂ rated in words on top; temperature, humidity and CO₂ over the
+  day.
+- `heatpump-electric-quick`, electricity: the split by purpose now and today as bars on top; the power of space heating,
+  DHW and standby over the day, their energy per day of the month.
+- `heatpump-heat-quick`, heat: the split by purpose now and today as bars on top; the heat of space heating and DHW over
+  the day, per day of the month.
+- `heatpump-cop-quick`, COP: electricity plus ambient heat becoming heat as flow bands, now while the compressor runs
+  and for the day with the COPs by purpose; the COP and the outdoor temperature over the day, the daily COPs of the
+  month.
+
+| | | |
+|---|---|---|
+| ![Control](screenshots/heatpump-control-quick.png) | ![Indoor unit](screenshots/heatpump-indoor-quick.png) | ![Outdoor unit](screenshots/heatpump-outdoor-quick.png) |
+| ![Refrigerant](screenshots/heatpump-refrigerant-quick.png) | ![Heating circuit](screenshots/heatpump-circuit-quick.png) | ![DHW tank](screenshots/heatpump-tank-quick.png) |
+| ![Three-way valve](screenshots/heatpump-valve-quick.png) | ![Upper floor](screenshots/upper-floor-quick.png) | ![Ground floor](screenshots/ground-floor-quick.png) |
+| ![Electricity](screenshots/heatpump-electric-quick.png) | ![Heat](screenshots/heatpump-heat-quick.png) | ![COP](screenshots/heatpump-cop-quick.png) |
+
+`heatpump-control-quick` needs `boost-pill`, `pill-slider`, `pill-switch`, `state-bar`.
+
+<details>
+<summary><code>heatpump-control-quick</code>: 10 props</summary>
+
+| Prop | Item | Item type |
+|---|---|---|
+| `heatpumpClimateControlPower` | Pyaltherma Climate Control Power | Switch |
+| `heatpumpDhwPower` | Pyaltherma DHW Power | Switch |
+| `heatpumpSmartGrid` | ESPAltherma Smart Grid | String |
+| `heatpumpManagement` | Heatpump Management | Group |
+| `heatpumpDhwTempHeating` | Pyaltherma DHW Temp Heating | Number:Temperature |
+| `heatpumpDhwTankTemp` | ESPAltherma DHW Tank Temperature | Number:Temperature |
+| `heatpumpDhwManagement` | Heatpump DHW Management | Switch |
+| `heatpumpDhwBoost` | Pyaltherma DHW Powerful | Switch |
+| `heatpumpLeavingWaterTempOffsetHeating` | Pyaltherma Leaving Water Temp Offset Heating | Number:Temperature |
+| `heatpumpLeavingWaterSetpoint` | ESPAltherma Leaving Water Setpoint | Number:Temperature |
+
+</details>
+
+<details>
+<summary><code>heatpump-indoor-quick</code>: 5 props</summary>
+
+| Prop | Item | Item type |
+|---|---|---|
+| `heatpumpCircuitPower` | Heatpump Power | Number:Power |
+| `heatpumpBuhPower` | ESPAltherma Electrical Power Backup Heater | Number:Power |
+| `heatpumpFlowSensor` | ESPAltherma Flow Sensor (l/min) | Number:VolumetricFlowRate |
+| `heatpumpWaterPressure` | ESPAltherma Water Pressure | Number:Pressure |
+| `heatpumpWaterPumpSignal` | ESPAltherma Water Pump Signal | Number:Dimensionless |
+
+</details>
+
+<details>
+<summary><code>heatpump-outdoor-quick</code>: 5 props</summary>
+
+| Prop | Item | Item type |
+|---|---|---|
+| `heatpumpCircuitPower` | Heatpump Power | Number:Power |
+| `heatpumpInvFrequency` | ESPAltherma Inverter Frequency | Number:Frequency |
+| `heatpumpExtAmbientTemp` | ESPAltherma External Ambient Temperature | Number:Temperature |
+| `heatpumpHeatExchangerMidTemp` | ESPAltherma Heat Exchanger Mid Temperature | Number:Temperature |
+| `heatpumpOutdoorAirTemp` | ESPAltherma Outdoor Air Temperature | Number:Temperature |
+
+</details>
+
+<details>
+<summary><code>heatpump-refrigerant-quick</code>: 5 props</summary>
+
+| Prop | Item | Item type |
+|---|---|---|
+| `heatpumpDischargePipeTemp` | ESPAltherma Discharge Pipe Temperature | Number:Temperature |
+| `heatpumpRefrigerantPressure` | ESPAltherma Refrigerant Pressure Sensor | Number:Pressure |
+| `heatpumpTargetDischargeTemp` | ESPAltherma Target Discharge Temperature | Number:Temperature |
+| `heatpumpRefrigerantTemp` | ESPAltherma Refrigerant Temperature Liquid Side | Number:Temperature |
+| `heatpumpHeatExchangerMidTemp` | ESPAltherma Heat Exchanger Mid Temperature | Number:Temperature |
+
+</details>
+
+`heatpump-circuit-quick` needs `pill-slider`.
+
+<details>
+<summary><code>heatpump-circuit-quick</code>: 6 props</summary>
+
+| Prop | Item | Item type |
+|---|---|---|
+| `heatpumpLeavingWaterTempAfterBuh` | ESPAltherma Leaving Water Temperature After BUH | Number:Temperature |
+| `heatpumpInletWaterTemp` | ESPAltherma Inlet Water Temperature | Number:Temperature |
+| `heatpumpLeavingWaterTempOffsetHeating` | Pyaltherma Leaving Water Temp Offset Heating | Number:Temperature |
+| `heatpumpLeavingWaterSetpoint` | ESPAltherma Leaving Water Setpoint | Number:Temperature |
+| `heatpumpClimateControlPower` | Pyaltherma Climate Control Power | Switch |
+| `heatpumpHeatingPowerAfterBuh` | ESPAltherma Heating Power After BUH | Number:Power |
+
+</details>
+
+<details>
+<summary><code>heatpump-tank-quick</code>: 4 props</summary>
+
+| Prop | Item | Item type |
+|---|---|---|
+| `heatpumpDhwTankTemp` | ESPAltherma DHW Tank Temperature | Number:Temperature |
+| `heatpumpDhwSetpoint` | ESPAltherma DHW Setpoint | Number:Temperature |
+| `heatpumpBshMode` | ESPAltherma Booster Heater (BSH) Mode | Switch |
+| `heatpumpBshPower` | ESPAltherma Electrical Power Booster Heater | Number:Power |
+
+</details>
+
+<details>
+<summary><code>heatpump-valve-quick</code>: 1 props</summary>
+
+| Prop | Item | Item type |
+|---|---|---|
+| `heatpumpValve` | ESPAltherma 3-Way Valve Mode | String |
+
+</details>
+
+<details>
+<summary><code>upper-floor-quick</code>: 2 props</summary>
+
+| Prop | Item | Item type |
+|---|---|---|
+| `acTemperature` | Faikout Perfera Temperature | Number:Temperature |
+| `tadoHumidity` | Tado Humidity | Number:Dimensionless |
+
+</details>
+
+<details>
+<summary><code>ground-floor-quick</code>: 3 props</summary>
+
+| Prop | Item | Item type |
+|---|---|---|
+| `heatpumpIndoorAmbientTemp` | ESPAltherma Indoor Ambient Temperature | Number:Temperature |
+| `netatmoWeatherstationAtmosphericHumidity` | Netatmo Weatherstation Atmospheric Humidity | Number:Dimensionless |
+| `netatmoWeatherstationCo2` | Netatmo Weatherstation CO2 | Number:Dimensionless |
+
+</details>
+
+<details>
+<summary><code>heatpump-electric-quick</code>: 8 props</summary>
+
+| Prop | Item | Item type |
+|---|---|---|
+| `heatpumpPower` | ESPAltherma Electrical Power | Number:Power |
+| `heatpumpEnergyToday` | ESPAltherma Energy Today | Number:Energy |
+| `heatpumpElectricalPowerSpace` | ESPAltherma Electrical Power Space | Number:Power |
+| `heatpumpElectricalPowerDhw` | ESPAltherma Electrical Power DHW | Number:Power |
+| `heatpumpElectricalPowerStandby` | ESPAltherma Electrical Power Standby | Number:Power |
+| `heatpumpEnergySpaceToday` | ESPAltherma Energy Space Today | Number:Energy |
+| `heatpumpEnergyDhwToday` | ESPAltherma Energy DHW Today | Number:Energy |
+| `heatpumpEnergyStandbyToday` | ESPAltherma Energy Standby Today | Number:Energy |
+
+</details>
+
+<details>
+<summary><code>heatpump-heat-quick</code>: 6 props</summary>
+
+| Prop | Item | Item type |
+|---|---|---|
+| `heatpumpHeatPower` | ESPAltherma Heating Power | Number:Power |
+| `heatpumpHeatingEnergyToday` | ESPAltherma Heating Energy Today | Number:Energy |
+| `heatpumpHeatingPowerSpace` | ESPAltherma Heating Power Space | Number:Power |
+| `heatpumpHeatingPowerDhw` | ESPAltherma Heating Power DHW | Number:Power |
+| `heatpumpHeatingEnergySpaceToday` | ESPAltherma Heating Energy Space Today | Number:Energy |
+| `heatpumpHeatingEnergyDhwToday` | ESPAltherma Heating Energy DHW Today | Number:Energy |
+
+</details>
+
+<details>
+<summary><code>heatpump-cop-quick</code>: 9 props</summary>
+
+| Prop | Item | Item type |
+|---|---|---|
+| `heatpumpCop` | ESPAltherma COP | Number |
+| `heatpumpDcop` | ESPAltherma DCOP | Number |
+| `heatpumpHeatPower` | ESPAltherma Heating Power | Number:Power |
+| `heatpumpPower` | ESPAltherma Electrical Power | Number:Power |
+| `heatpumpDcopSpace` | ESPAltherma DCOP Space | Number |
+| `heatpumpDcopDhw` | ESPAltherma DCOP DHW | Number |
+| `heatpumpHeatingEnergyToday` | ESPAltherma Heating Energy Today | Number:Energy |
+| `heatpumpEnergyToday` | ESPAltherma Energy Today | Number:Energy |
+| `heatpumpExtAmbientTemp` | ESPAltherma External Ambient Temperature | Number:Temperature |
+
+</details>
+
+
 ## Controls
 
-The parts of my device pages' controls.
+The parts of the quick popups and of my device pages' controls.
 
 
 ### Segmented bar: `state-bar`
@@ -792,31 +1062,6 @@ fades. The dots run a dot radius past both ends, so they slide out from under on
 | `forward` | The dots run from (x1, y1) to (x2, y2) while it holds, else back; usually an expression | BOOLEAN |  |
 | `threshold` | The power in W above which the dots run | DECIMAL | `10` |
 
-### Share ring: `flow-share-ring`
-
-A ring around (`x`, `y`) filled to `part` / `whole`, the percentage inside and `title` with *today* beside it; the
-energy flow shows today's self-consumption and self-sufficiency with it.
-
-![Share rings](screenshots/flow-share-rings.png)
-
-```yaml
-component: widget:flow-share-ring
-config:
-  x: 40
-  y: 40
-  title: Self-consumption
-  part: =Number(items.photovoltaics_own_ec_day.numericState) || 0
-  whole: =Number(items.huawei_inverter_e_day.numericState) || 0
-```
-
-| Prop | Description | Type | Default |
-|---|---|---|---|
-| `x` | Centre's x in the flow's viewBox | DECIMAL |  |
-| `y` | Centre's y in the flow's viewBox | DECIMAL |  |
-| `title` | Text beside the ring, e.g. Self-consumption | TEXT |  |
-| `part` | The part, e.g. today's PV energy used at home; usually an expression | TEXT |  |
-| `whole` | The whole, e.g. today's PV energy; usually an expression | TEXT |  |
-
 ## Appliances
 
 The appliances card's parts.
@@ -947,7 +1192,7 @@ Every value tile carries a large pale icon of what it shows.
 
 ### `plug-card`
 
-Now: the device's icon large in a ring, pulsing while it works (its energy-flow node or appliance icon, else its icon), power, on/off pill, energy today and total. Needs `appliance-icon`, `flow-node`, `item-popup`, `power-pill`, `value-tile`.
+Now: the device's icon large in a ring, pulsing while it works (its energy-flow node or appliance icon, else its icon), power, on/off pill, today's energy against yesterday at this time and the mean of the last 7 days, the total on rollers like a meter's; with `range` (kWh per 100 km) a road with the car where today's charge would take it. Needs `appliance-icon`, `flow-node`, `item-popup`, `power-pill`.
 
 | Prop | Description | Type | Default |
 |---|---|---|---|
@@ -963,6 +1208,8 @@ Now: the device's icon large in a ring, pulsing while it works (its energy-flow 
 | `active` | Whether the device works, instead of the threshold; usually an expression | BOOLEAN |  |
 | `frequency` | The heat pump's compressor frequency, turning its drawing's fan; usually an expression | DECIMAL |  |
 | `progress` | An appliance's programme progress in %, filling its ring; usually an expression | DECIMAL |  |
+| `range` | kWh per 100 km of a car: today's charge shown as the kilometres it drives | DECIMAL |  |
+| `history` | The String item the rule tile_history writes the tiles' history into (comparison with yesterday) | Item |  |
 
 ### `plug-power-card`
 
@@ -984,7 +1231,7 @@ Energy per day of the month.
 
 ### `plug-electric-card`
 
-Voltage, current, power factor, apparent and reactive power. Needs `item-popup`, `value-tile`.
+Voltage in its band of 230 V ± 10 %, current against the socket's 16 A, active, reactive and apparent power as a triangle with the power factor rated. Needs `item-popup`.
 
 | Prop | Description | Type | Default |
 |---|---|---|---|
@@ -1019,11 +1266,13 @@ actionModalConfig:
 
 ## Value tile: `value-tile`
 
-The tile every value of my popups, device pages, plug cards and heat pump card stands in: a title, the value, and a
-large pale icon in the lower right corner, behind them. Pass the value as an expression; it is evaluated where the
-tile is placed. With `item` a tap opens the item popup. The tile's lengths are em of its font size, 14 px unless
-`fontSize` sets another, so `fontSize: 1.1em` makes it a tenth larger and lets it grow with a card that scales its
-font. `wrap` lets a long text wrap across the whole row of a grid.
+The plain tile for a value: a title, the value, and a large pale icon in the lower right corner, behind them. My
+device pages and popups give most values a form of their own now (a scale, a rating, a course); the tile stays for
+states, texts and counters, and in the heat pump card. The screenshot shows it with the air conditioner's values.
+Pass the value as an expression; it is evaluated where the tile is placed. With `item` a tap opens the item popup.
+The tile's lengths are em of its font size, 14 px unless `fontSize` sets another, so `fontSize: 1.1em` makes it a
+tenth larger and lets it grow with a card that scales its font. `wrap` lets a long text wrap across the whole row of
+a grid.
 
 ```yaml
 component: widget:value-tile

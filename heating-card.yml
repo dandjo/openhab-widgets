@@ -45,9 +45,9 @@ props:
     type: TEXT
     required: true
     context: item
-  - name: heatpumpDhwSetpoint
-    label: ESPAltherma DHW Setpoint
-    description: Number:Temperature item
+  - name: heatpumpDhwEta
+    label: Heatpump DHW Done At
+    description: DateTime item
     type: TEXT
     required: true
     context: item
@@ -57,15 +57,15 @@ props:
     type: TEXT
     required: true
     context: item
-  - name: heatpumpPower
-    label: ESPAltherma Electrical Power
-    description: Number:Power item
+  - name: heatpumpDhwSetpoint
+    label: ESPAltherma DHW Setpoint
+    description: Number:Temperature item
     type: TEXT
     required: true
     context: item
-  - name: heatpumpDhwEta
-    label: Heatpump DHW Done At
-    description: DateTime item
+  - name: heatpumpPower
+    label: ESPAltherma Electrical Power
+    description: Number:Power item
     type: TEXT
     required: true
     context: item
@@ -114,6 +114,12 @@ props:
   - name: heatpumpHeatingSince
     label: Heatpump Heating Running Since
     description: DateTime item
+    type: TEXT
+    required: true
+    context: item
+  - name: tileHistory
+    label: Tile history
+    description: String item
     type: TEXT
     required: true
     context: item
@@ -178,7 +184,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 5, 2026, 9:12:34 PM
+timestamp: Oct 7, 2026, 2:25:52 AM
 component: oh-card
 config:
   title: Heating & Hot Water
@@ -609,6 +615,10 @@ slots:
                         font-size: 12px
                         font-weight: '600'
                         white-space: nowrap
+                      visible: =!(((items[props.heatpumpDhwEta].state !== 'UNDEF' && items[props.heatpumpDhwEta].state !==
+                        'NULL' && items[props.heatpumpDhwSince].state !== 'UNDEF' && items[props.heatpumpDhwSince].state !==
+                        'NULL') && (items[props.heatpumpBshMode].state === 'ON' && !(items[props.heatpumpValve].state ===
+                        'DHW'))))
                     slots:
                       default:
                       - component: f7-icon
@@ -619,18 +629,66 @@ slots:
                         config:
                           text: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpDhwSetpoint].state) ? ''–'' : (items[props.heatpumpDhwSetpoint].displayState
                             || items[props.heatpumpDhwSetpoint].state))'
-              - component: Label
+                  - component: div
+                    config:
+                      style:
+                        display: inline-flex
+                        align-items: center
+                        gap: 4px
+                        color: '=themeOptions.dark === ''dark'' ? ''#e57373'' : ''#c62828'''
+                        background: rgba(229, 115, 115, 0.16)
+                        border-radius: 10px
+                        padding: 2px 8px
+                        font-size: 12px
+                        font-weight: '600'
+                        white-space: nowrap
+                      visible: =((items[props.heatpumpDhwEta].state !== 'UNDEF' && items[props.heatpumpDhwEta].state !== 'NULL'
+                        && items[props.heatpumpDhwSince].state !== 'UNDEF' && items[props.heatpumpDhwSince].state !== 'NULL')
+                        && (items[props.heatpumpBshMode].state === 'ON' && !(items[props.heatpumpValve].state === 'DHW')))
+                    slots:
+                      default:
+                      - component: f7-icon
+                        config:
+                          f7: timer
+                          size: 13
+                      - component: Label
+                        config:
+                          text: '=((Math.max(0, dayjs(items[props.heatpumpDhwEta].state).diff(dayjs(), ''minute'', true)))
+                            * 60 >= 3600 ? Math.floor((Math.max(0, dayjs(items[props.heatpumpDhwEta].state).diff(dayjs(),
+                            ''minute'', true))) * 60 / 3600) + '':'' + (''0'' + Math.floor((Math.max(0, dayjs(items[props.heatpumpDhwEta].state).diff(dayjs(),
+                            ''minute'', true))) * 60 % 3600 / 60)).slice(-2) + '' h'' : Math.ceil((Math.max(0, dayjs(items[props.heatpumpDhwEta].state).diff(dayjs(),
+                            ''minute'', true))) * 60 / 60) + '' min'')'
+              - component: div
                 config:
-                  text: '=(items[props.heatpumpBshMode].state === ''ON'' ? ''Booster heater'' : ''Charging'') + '' since ''
-                    + dayjs(items[props.heatpumpDhwSince].state).format(''HH:mm'') + '' · '' + (dayjs().diff(dayjs(items[props.heatpumpDhwSince].state),
-                    ''minute'') >= 60 ? Math.floor(dayjs().diff(dayjs(items[props.heatpumpDhwSince].state), ''minute'') /
-                    60) + '':'' + (Math.floor(dayjs().diff(dayjs(items[props.heatpumpDhwSince].state), ''minute'') % 60) <
-                    10 ? ''0'' : '''') + Math.floor(dayjs().diff(dayjs(items[props.heatpumpDhwSince].state), ''minute'') %
-                    60) + '' h'' : Math.round(dayjs().diff(dayjs(items[props.heatpumpDhwSince].state), ''minute'')) + '' min'')'
-                  visible: =(items[props.heatpumpDhwSince].state !== 'UNDEF' && items[props.heatpumpDhwSince].state !== 'NULL')
                   style:
+                    display: flex
+                    flex-direction: column
                     font-size: 12px
+                    line-height: '1.35'
                     opacity: '0.75'
+                  visible: =((items[props.heatpumpDhwSince].state !== 'UNDEF' && items[props.heatpumpDhwSince].state !== 'NULL'))
+                    || (((items[props.heatpumpDhwEta].state !== 'UNDEF' && items[props.heatpumpDhwEta].state !== 'NULL' &&
+                    items[props.heatpumpDhwSince].state !== 'UNDEF' && items[props.heatpumpDhwSince].state !== 'NULL') &&
+                    (items[props.heatpumpBshMode].state === 'ON' && !(items[props.heatpumpValve].state === 'DHW'))))
+                slots:
+                  default:
+                  - component: Label
+                    config:
+                      text: '=(items[props.heatpumpBshMode].state === ''ON'' ? ''Booster heater'' : ''Charging'') + '' since
+                        '' + dayjs(items[props.heatpumpDhwSince].state).format(''HH:mm'') + '' · '' + (dayjs().diff(dayjs(items[props.heatpumpDhwSince].state),
+                        ''minute'') >= 60 ? Math.floor(dayjs().diff(dayjs(items[props.heatpumpDhwSince].state), ''minute'')
+                        / 60) + '':'' + (Math.floor(dayjs().diff(dayjs(items[props.heatpumpDhwSince].state), ''minute'') %
+                        60) < 10 ? ''0'' : '''') + Math.floor(dayjs().diff(dayjs(items[props.heatpumpDhwSince].state), ''minute'')
+                        % 60) + '' h'' : Math.round(dayjs().diff(dayjs(items[props.heatpumpDhwSince].state), ''minute''))
+                        + '' min'')'
+                      visible: =(items[props.heatpumpDhwSince].state !== 'UNDEF' && items[props.heatpumpDhwSince].state !==
+                        'NULL')
+                  - component: Label
+                    config:
+                      text: ='Hot water charge · done at ' + dayjs(items[props.heatpumpDhwEta].state).format('HH:mm')
+                      visible: =((items[props.heatpumpDhwEta].state !== 'UNDEF' && items[props.heatpumpDhwEta].state !== 'NULL'
+                        && items[props.heatpumpDhwSince].state !== 'UNDEF' && items[props.heatpumpDhwSince].state !== 'NULL')
+                        && (items[props.heatpumpBshMode].state === 'ON' && !(items[props.heatpumpValve].state === 'DHW')))
               - component: oh-link
                 config:
                   action: popup
@@ -944,9 +1002,10 @@ slots:
                         font-size: 12px
                         font-weight: '600'
                         white-space: nowrap
-                      visible: =!((items[props.heatpumpDhwEta].state !== 'UNDEF' && items[props.heatpumpDhwEta].state !==
+                      visible: =!(((items[props.heatpumpDhwEta].state !== 'UNDEF' && items[props.heatpumpDhwEta].state !==
                         'NULL' && items[props.heatpumpDhwSince].state !== 'UNDEF' && items[props.heatpumpDhwSince].state !==
-                        'NULL'))
+                        'NULL') && !(items[props.heatpumpBshMode].state === 'ON' && !(items[props.heatpumpValve].state ===
+                        'DHW'))))
                     slots:
                       default:
                       - component: f7-icon
@@ -970,8 +1029,9 @@ slots:
                         font-size: 12px
                         font-weight: '600'
                         white-space: nowrap
-                      visible: =(items[props.heatpumpDhwEta].state !== 'UNDEF' && items[props.heatpumpDhwEta].state !== 'NULL'
+                      visible: =((items[props.heatpumpDhwEta].state !== 'UNDEF' && items[props.heatpumpDhwEta].state !== 'NULL'
                         && items[props.heatpumpDhwSince].state !== 'UNDEF' && items[props.heatpumpDhwSince].state !== 'NULL')
+                        && !(items[props.heatpumpBshMode].state === 'ON' && !(items[props.heatpumpValve].state === 'DHW')))
                     slots:
                       default:
                       - component: f7-icon
@@ -985,27 +1045,36 @@ slots:
                             ''minute'', true))) * 60 / 3600) + '':'' + (''0'' + Math.floor((Math.max(0, dayjs(items[props.heatpumpDhwEta].state).diff(dayjs(),
                             ''minute'', true))) * 60 % 3600 / 60)).slice(-2) + '' h'' : Math.ceil((Math.max(0, dayjs(items[props.heatpumpDhwEta].state).diff(dayjs(),
                             ''minute'', true))) * 60 / 60) + '' min'')'
-              - component: Label
+              - component: div
                 config:
-                  text: '=''Heating'' + '' since '' + dayjs(items[props.heatpumpHeatingSince].state).format(''HH:mm'') + ''
-                    · '' + (dayjs().diff(dayjs(items[props.heatpumpHeatingSince].state), ''minute'') >= 60 ? Math.floor(dayjs().diff(dayjs(items[props.heatpumpHeatingSince].state),
-                    ''minute'') / 60) + '':'' + (Math.floor(dayjs().diff(dayjs(items[props.heatpumpHeatingSince].state), ''minute'')
-                    % 60) < 10 ? ''0'' : '''') + Math.floor(dayjs().diff(dayjs(items[props.heatpumpHeatingSince].state), ''minute'')
-                    % 60) + '' h'' : Math.round(dayjs().diff(dayjs(items[props.heatpumpHeatingSince].state), ''minute''))
-                    + '' min'')'
-                  visible: =(items[props.heatpumpHeatingSince].state !== 'UNDEF' && items[props.heatpumpHeatingSince].state
-                    !== 'NULL')
                   style:
+                    display: flex
+                    flex-direction: column
                     font-size: 12px
+                    line-height: '1.35'
                     opacity: '0.75'
-              - component: Label
-                config:
-                  text: ='Hot water charge · done at ' + dayjs(items[props.heatpumpDhwEta].state).format('HH:mm')
-                  visible: =(items[props.heatpumpDhwEta].state !== 'UNDEF' && items[props.heatpumpDhwEta].state !== 'NULL'
-                    && items[props.heatpumpDhwSince].state !== 'UNDEF' && items[props.heatpumpDhwSince].state !== 'NULL')
-                  style:
-                    font-size: 12px
-                    opacity: '0.75'
+                  visible: =((items[props.heatpumpHeatingSince].state !== 'UNDEF' && items[props.heatpumpHeatingSince].state
+                    !== 'NULL')) || (((items[props.heatpumpDhwEta].state !== 'UNDEF' && items[props.heatpumpDhwEta].state
+                    !== 'NULL' && items[props.heatpumpDhwSince].state !== 'UNDEF' && items[props.heatpumpDhwSince].state !==
+                    'NULL') && !(items[props.heatpumpBshMode].state === 'ON' && !(items[props.heatpumpValve].state === 'DHW'))))
+                slots:
+                  default:
+                  - component: Label
+                    config:
+                      text: '=''Heating'' + '' since '' + dayjs(items[props.heatpumpHeatingSince].state).format(''HH:mm'')
+                        + '' · '' + (dayjs().diff(dayjs(items[props.heatpumpHeatingSince].state), ''minute'') >= 60 ? Math.floor(dayjs().diff(dayjs(items[props.heatpumpHeatingSince].state),
+                        ''minute'') / 60) + '':'' + (Math.floor(dayjs().diff(dayjs(items[props.heatpumpHeatingSince].state),
+                        ''minute'') % 60) < 10 ? ''0'' : '''') + Math.floor(dayjs().diff(dayjs(items[props.heatpumpHeatingSince].state),
+                        ''minute'') % 60) + '' h'' : Math.round(dayjs().diff(dayjs(items[props.heatpumpHeatingSince].state),
+                        ''minute'')) + '' min'')'
+                      visible: =(items[props.heatpumpHeatingSince].state !== 'UNDEF' && items[props.heatpumpHeatingSince].state
+                        !== 'NULL')
+                  - component: Label
+                    config:
+                      text: ='Hot water charge · done at ' + dayjs(items[props.heatpumpDhwEta].state).format('HH:mm')
+                      visible: =((items[props.heatpumpDhwEta].state !== 'UNDEF' && items[props.heatpumpDhwEta].state !== 'NULL'
+                        && items[props.heatpumpDhwSince].state !== 'UNDEF' && items[props.heatpumpDhwSince].state !== 'NULL')
+                        && !(items[props.heatpumpBshMode].state === 'ON' && !(items[props.heatpumpValve].state === 'DHW')))
               - component: oh-link
                 config:
                   action: popup
@@ -1053,8 +1122,10 @@ slots:
               - component: div
                 config:
                   style:
-                    display: flex
-                    justify-content: space-between
+                    display: grid
+                    grid-template-columns: 1fr auto 1fr
+                    align-items: center
+                    gap: 8px
                     margin-bottom: 4px
                 slots:
                   default:
@@ -1065,9 +1136,95 @@ slots:
                         opacity: '0.7'
                   - component: Label
                     config:
+                      text: '=((((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                        : {}))[props.heatpumpEnergyToday] || {}).y) !== undefined && ((((((items[props.tileHistory].state)
+                        || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpEnergyToday]
+                        || {}).y) !== null) && Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ?
+                        JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpEnergyToday] || {}).y)) >= Math.max(0.05,
+                        0.05 * (Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                        : {}))[props.heatpumpEnergyToday] || {}).d)) || 0))) ? ((((Number(items[props.heatpumpEnergyToday].numericState)
+                        || 0) - Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                        : {}))[props.heatpumpEnergyToday] || {}).y))) / Number(((((((items[props.tileHistory].state) || '''').charAt(0)
+                        === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpEnergyToday] || {}).y))
+                        * 100) >= 300 ? ''×'' + ((Number(items[props.heatpumpEnergyToday].numericState) || 0) / Number(((((((items[props.tileHistory].state)
+                        || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpEnergyToday]
+                        || {}).y))).toFixed(0) + '' vs. yesterday'' : (Math.abs((((Number(items[props.heatpumpEnergyToday].numericState)
+                        || 0) - Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                        : {}))[props.heatpumpEnergyToday] || {}).y))) / Number(((((((items[props.tileHistory].state) || '''').charAt(0)
+                        === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpEnergyToday] || {}).y))
+                        * 100)) < 0.5 ? ''±0'' : ((((Number(items[props.heatpumpEnergyToday].numericState) || 0) - Number(((((((items[props.tileHistory].state)
+                        || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpEnergyToday]
+                        || {}).y))) / Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                        : {}))[props.heatpumpEnergyToday] || {}).y)) * 100) > 0 ? ''+'' : ''−'') + Math.round(Math.abs((((Number(items[props.heatpumpEnergyToday].numericState)
+                        || 0) - Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                        : {}))[props.heatpumpEnergyToday] || {}).y))) / Number(((((((items[props.tileHistory].state) || '''').charAt(0)
+                        === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpEnergyToday] || {}).y))
+                        * 100)))) + '' % vs. yesterday'') : ((Math.abs(((Number(items[props.heatpumpEnergyToday].numericState)
+                        || 0) - Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                        : {}))[props.heatpumpEnergyToday] || {}).y)))) < 0.005 ? ''±0'' : (((Number(items[props.heatpumpEnergyToday].numericState)
+                        || 0) - Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                        : {}))[props.heatpumpEnergyToday] || {}).y))) > 0 ? ''+'' : ''−'') + (Math.abs(((Number(items[props.heatpumpEnergyToday].numericState)
+                        || 0) - Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                        : {}))[props.heatpumpEnergyToday] || {}).y))))).toFixed(2)) + '' kWh vs. yesterday'')'
+                      style:
+                        font-size: 11px
+                        font-weight: '600'
+                        padding: 2px 8px
+                        border-radius: 9px
+                        white-space: nowrap
+                        width: fit-content
+                        color: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
+                          ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
+                          ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[(!((((((((items[props.tileHistory].state) ||
+                          '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpEnergyToday]
+                          || {}).y) !== undefined && ((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ?
+                          JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpEnergyToday] || {}).y) !== null)
+                          && Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                          : {}))[props.heatpumpEnergyToday] || {}).y)) >= Math.max(0.05, 0.05 * (Number(((((((items[props.tileHistory].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpEnergyToday]
+                          || {}).d)) || 0))) || Math.abs((((Number(items[props.heatpumpEnergyToday].numericState) || 0) -
+                          Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                          : {}))[props.heatpumpEnergyToday] || {}).y))) / Number(((((((items[props.tileHistory].state) ||
+                          '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpEnergyToday]
+                          || {}).y)) * 100)) < 3 ? ''neutral'' : ((((Number(items[props.heatpumpEnergyToday].numericState)
+                          || 0) - Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                          : {}))[props.heatpumpEnergyToday] || {}).y))) / Number(((((((items[props.tileHistory].state) ||
+                          '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpEnergyToday]
+                          || {}).y)) * 100) > 0) === false ? ''good'' : ''warn'')] || (({good: [''#2e7d32'', ''#81c784''],
+                          ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''],
+                          bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark
+                          === ''dark'') ? 1 : 0]'
+                        background: '=''color-mix(in srgb, '' + ((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''],
+                          caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''],
+                          info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[(!((((((((items[props.tileHistory].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpEnergyToday]
+                          || {}).y) !== undefined && ((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ?
+                          JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpEnergyToday] || {}).y) !== null)
+                          && Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                          : {}))[props.heatpumpEnergyToday] || {}).y)) >= Math.max(0.05, 0.05 * (Number(((((((items[props.tileHistory].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpEnergyToday]
+                          || {}).d)) || 0))) || Math.abs((((Number(items[props.heatpumpEnergyToday].numericState) || 0) -
+                          Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                          : {}))[props.heatpumpEnergyToday] || {}).y))) / Number(((((((items[props.tileHistory].state) ||
+                          '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpEnergyToday]
+                          || {}).y)) * 100)) < 3 ? ''neutral'' : ((((Number(items[props.heatpumpEnergyToday].numericState)
+                          || 0) - Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                          : {}))[props.heatpumpEnergyToday] || {}).y))) / Number(((((((items[props.tileHistory].state) ||
+                          '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpEnergyToday]
+                          || {}).y)) * 100) > 0) === false ? ''good'' : ''warn'')] || (({good: [''#2e7d32'', ''#81c784''],
+                          ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''],
+                          bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark
+                          === ''dark'') ? 1 : 0] + '' 16%, transparent)'''
+                      visible: '=(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                        : {}))[props.heatpumpEnergyToday] || {}).y) !== undefined && ((((((items[props.tileHistory].state)
+                        || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpEnergyToday]
+                        || {}).y) !== null)'
+                  - component: Label
+                    config:
                       text: =((Number(items[props.heatpumpEnergyToday].numericState) || 0)).toFixed(1) + ' kWh'
                       style:
                         font-weight: '700'
+                        justify-self: end
               - component: div
                 config:
                   style:
@@ -1127,8 +1284,10 @@ slots:
               - component: div
                 config:
                   style:
-                    display: flex
-                    justify-content: space-between
+                    display: grid
+                    grid-template-columns: 1fr auto 1fr
+                    align-items: center
+                    gap: 8px
                     margin-bottom: 4px
                 slots:
                   default:
@@ -1139,9 +1298,96 @@ slots:
                         opacity: '0.7'
                   - component: Label
                     config:
+                      text: '=((((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                        : {}))[props.heatpumpHeatingEnergyToday] || {}).y) !== undefined && ((((((items[props.tileHistory].state)
+                        || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpHeatingEnergyToday]
+                        || {}).y) !== null) && Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ?
+                        JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpHeatingEnergyToday] || {}).y)) >=
+                        Math.max(0.05, 0.05 * (Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ?
+                        JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpHeatingEnergyToday] || {}).d)) ||
+                        0))) ? ((((Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0) - Number(((((((items[props.tileHistory].state)
+                        || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpHeatingEnergyToday]
+                        || {}).y))) / Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                        : {}))[props.heatpumpHeatingEnergyToday] || {}).y)) * 100) >= 300 ? ''×'' + ((Number(items[props.heatpumpHeatingEnergyToday].numericState)
+                        || 0) / Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                        : {}))[props.heatpumpHeatingEnergyToday] || {}).y))).toFixed(0) + '' vs. yesterday'' : (Math.abs((((Number(items[props.heatpumpHeatingEnergyToday].numericState)
+                        || 0) - Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                        : {}))[props.heatpumpHeatingEnergyToday] || {}).y))) / Number(((((((items[props.tileHistory].state)
+                        || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpHeatingEnergyToday]
+                        || {}).y)) * 100)) < 0.5 ? ''±0'' : ((((Number(items[props.heatpumpHeatingEnergyToday].numericState)
+                        || 0) - Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                        : {}))[props.heatpumpHeatingEnergyToday] || {}).y))) / Number(((((((items[props.tileHistory].state)
+                        || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpHeatingEnergyToday]
+                        || {}).y)) * 100) > 0 ? ''+'' : ''−'') + Math.round(Math.abs((((Number(items[props.heatpumpHeatingEnergyToday].numericState)
+                        || 0) - Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                        : {}))[props.heatpumpHeatingEnergyToday] || {}).y))) / Number(((((((items[props.tileHistory].state)
+                        || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpHeatingEnergyToday]
+                        || {}).y)) * 100)))) + '' % vs. yesterday'') : ((Math.abs(((Number(items[props.heatpumpHeatingEnergyToday].numericState)
+                        || 0) - Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                        : {}))[props.heatpumpHeatingEnergyToday] || {}).y)))) < 0.005 ? ''±0'' : (((Number(items[props.heatpumpHeatingEnergyToday].numericState)
+                        || 0) - Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                        : {}))[props.heatpumpHeatingEnergyToday] || {}).y))) > 0 ? ''+'' : ''−'') + (Math.abs(((Number(items[props.heatpumpHeatingEnergyToday].numericState)
+                        || 0) - Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                        : {}))[props.heatpumpHeatingEnergyToday] || {}).y))))).toFixed(2)) + '' kWh vs. yesterday'')'
+                      style:
+                        font-size: 11px
+                        font-weight: '600'
+                        padding: 2px 8px
+                        border-radius: 9px
+                        white-space: nowrap
+                        width: fit-content
+                        color: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
+                          ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
+                          ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[(!((((((((items[props.tileHistory].state) ||
+                          '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpHeatingEnergyToday]
+                          || {}).y) !== undefined && ((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ?
+                          JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpHeatingEnergyToday] || {}).y) !==
+                          null) && Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                          : {}))[props.heatpumpHeatingEnergyToday] || {}).y)) >= Math.max(0.05, 0.05 * (Number(((((((items[props.tileHistory].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpHeatingEnergyToday]
+                          || {}).d)) || 0))) || Math.abs((((Number(items[props.heatpumpHeatingEnergyToday].numericState) ||
+                          0) - Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                          : {}))[props.heatpumpHeatingEnergyToday] || {}).y))) / Number(((((((items[props.tileHistory].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpHeatingEnergyToday]
+                          || {}).y)) * 100)) < 3 ? ''neutral'' : ((((Number(items[props.heatpumpHeatingEnergyToday].numericState)
+                          || 0) - Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                          : {}))[props.heatpumpHeatingEnergyToday] || {}).y))) / Number(((((((items[props.tileHistory].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpHeatingEnergyToday]
+                          || {}).y)) * 100) > 0) === true ? ''good'' : ''warn'')] || (({good: [''#2e7d32'', ''#81c784''],
+                          ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''],
+                          bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark
+                          === ''dark'') ? 1 : 0]'
+                        background: '=''color-mix(in srgb, '' + ((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''],
+                          caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''],
+                          info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[(!((((((((items[props.tileHistory].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpHeatingEnergyToday]
+                          || {}).y) !== undefined && ((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ?
+                          JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpHeatingEnergyToday] || {}).y) !==
+                          null) && Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                          : {}))[props.heatpumpHeatingEnergyToday] || {}).y)) >= Math.max(0.05, 0.05 * (Number(((((((items[props.tileHistory].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpHeatingEnergyToday]
+                          || {}).d)) || 0))) || Math.abs((((Number(items[props.heatpumpHeatingEnergyToday].numericState) ||
+                          0) - Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                          : {}))[props.heatpumpHeatingEnergyToday] || {}).y))) / Number(((((((items[props.tileHistory].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpHeatingEnergyToday]
+                          || {}).y)) * 100)) < 3 ? ''neutral'' : ((((Number(items[props.heatpumpHeatingEnergyToday].numericState)
+                          || 0) - Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                          : {}))[props.heatpumpHeatingEnergyToday] || {}).y))) / Number(((((((items[props.tileHistory].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpHeatingEnergyToday]
+                          || {}).y)) * 100) > 0) === true ? ''good'' : ''warn'')] || (({good: [''#2e7d32'', ''#81c784''],
+                          ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''],
+                          bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark
+                          === ''dark'') ? 1 : 0] + '' 16%, transparent)'''
+                      visible: '=(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                        : {}))[props.heatpumpHeatingEnergyToday] || {}).y) !== undefined && ((((((items[props.tileHistory].state)
+                        || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpHeatingEnergyToday]
+                        || {}).y) !== null)'
+                  - component: Label
+                    config:
                       text: =((Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0)).toFixed(1) + ' kWh'
                       style:
                         font-weight: '700'
+                        justify-self: end
               - component: div
                 config:
                   style:
@@ -1345,7 +1591,7 @@ slots:
                       - component: text
                         config:
                           x: 56
-                          y: 23
+                          y: 13
                           content: COP heating
                           fill: currentColor
                           font-size: 12
@@ -1355,13 +1601,78 @@ slots:
                       - component: text
                         config:
                           x: 56
-                          y: 39
+                          y: 29
                           content: today
                           fill: currentColor
                           font-size: 11
                           font-weight: normal
                           text-anchor: start
                           opacity: '0.5'
+                      - component: g
+                        config:
+                          visible: '=(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                            : {}))[props.heatpumpDcopSpace] || {}).y) !== undefined && ((((((items[props.tileHistory].state)
+                            || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpDcopSpace]
+                            || {}).y) !== null) && Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{''
+                            ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpDcopSpace] || {}).y)) > 0 &&
+                            ((((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                            : {}))[props.heatpumpEnergySpaceToday] || {}).y) !== undefined && ((((((items[props.tileHistory].state)
+                            || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpEnergySpaceToday]
+                            || {}).y) !== null) && Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{''
+                            ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpEnergySpaceToday] || {}).y))
+                            >= Math.max(0.05, 0.05 * (Number(((((((items[props.tileHistory].state) || '''').charAt(0) ===
+                            ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpEnergySpaceToday] || {}).d))
+                            || 0))) && (Number(items[props.heatpumpEnergySpaceToday].numericState) || 0) >= 0.05'
+                        slots:
+                          default:
+                          - component: rect
+                            config:
+                              x: 56
+                              y: 34
+                              height: 13
+                              rx: 6.5
+                              width: '=(((Math.abs(((Number(items[props.heatpumpDcopSpace].numericState) || 0) - Number(((((((items[props.tileHistory].state)
+                                || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpDcopSpace]
+                                || {}).y)))) < 0.05 ? ''±0'' : (((Number(items[props.heatpumpDcopSpace].numericState) || 0)
+                                - Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                                : {}))[props.heatpumpDcopSpace] || {}).y))) > 0 ? ''+'' : ''−'') + (Math.abs(((Number(items[props.heatpumpDcopSpace].numericState)
+                                || 0) - Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                                : {}))[props.heatpumpDcopSpace] || {}).y))))).toFixed(1)) + '' vs. yesterday'').length * 5.2
+                                + 12).toFixed(1)'
+                              fill: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
+                                ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
+                                ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[(Math.abs(((Number(items[props.heatpumpDcopSpace].numericState)
+                                || 0) - Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                                : {}))[props.heatpumpDcopSpace] || {}).y)))) < 0.1 ? ''neutral'' : ((Number(items[props.heatpumpDcopSpace].numericState)
+                                || 0) - Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                                : {}))[props.heatpumpDcopSpace] || {}).y))) > 0 ? ''good'' : ''warn'')] || (({good: [''#2e7d32'',
+                                ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'',
+                                ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''], neutral:
+                                [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark === ''dark'') ? 1 : 0]'
+                              fill-opacity: '0.16'
+                          - component: text
+                            config:
+                              x: 62
+                              y: 43.3
+                              content: '=(Math.abs(((Number(items[props.heatpumpDcopSpace].numericState) || 0) - Number(((((((items[props.tileHistory].state)
+                                || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpDcopSpace]
+                                || {}).y)))) < 0.05 ? ''±0'' : (((Number(items[props.heatpumpDcopSpace].numericState) || 0)
+                                - Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                                : {}))[props.heatpumpDcopSpace] || {}).y))) > 0 ? ''+'' : ''−'') + (Math.abs(((Number(items[props.heatpumpDcopSpace].numericState)
+                                || 0) - Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                                : {}))[props.heatpumpDcopSpace] || {}).y))))).toFixed(1)) + '' vs. yesterday'''
+                              fill: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
+                                ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
+                                ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[(Math.abs(((Number(items[props.heatpumpDcopSpace].numericState)
+                                || 0) - Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                                : {}))[props.heatpumpDcopSpace] || {}).y)))) < 0.1 ? ''neutral'' : ((Number(items[props.heatpumpDcopSpace].numericState)
+                                || 0) - Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                                : {}))[props.heatpumpDcopSpace] || {}).y))) > 0 ? ''good'' : ''warn'')] || (({good: [''#2e7d32'',
+                                ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'',
+                                ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''], neutral:
+                                [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark === ''dark'') ? 1 : 0]'
+                              font-size: '9.5'
+                              font-weight: '600'
               - component: oh-link
                 config:
                   action: popup
@@ -1450,7 +1761,7 @@ slots:
                       - component: text
                         config:
                           x: 56
-                          y: 23
+                          y: 13
                           content: COP DHW
                           fill: currentColor
                           font-size: 12
@@ -1460,13 +1771,77 @@ slots:
                       - component: text
                         config:
                           x: 56
-                          y: 39
+                          y: 29
                           content: today
                           fill: currentColor
                           font-size: 11
                           font-weight: normal
                           text-anchor: start
                           opacity: '0.5'
+                      - component: g
+                        config:
+                          visible: '=(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                            : {}))[props.heatpumpDcopDhw] || {}).y) !== undefined && ((((((items[props.tileHistory].state)
+                            || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpDcopDhw]
+                            || {}).y) !== null) && Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{''
+                            ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpDcopDhw] || {}).y)) > 0 && ((((((((items[props.tileHistory].state)
+                            || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpEnergyDhwToday]
+                            || {}).y) !== undefined && ((((((items[props.tileHistory].state) || '''').charAt(0) === ''{''
+                            ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpEnergyDhwToday] || {}).y) !==
+                            null) && Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                            : {}))[props.heatpumpEnergyDhwToday] || {}).y)) >= Math.max(0.05, 0.05 * (Number(((((((items[props.tileHistory].state)
+                            || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpEnergyDhwToday]
+                            || {}).d)) || 0))) && (Number(items[props.heatpumpEnergyDhwToday].numericState) || 0) >= 0.05'
+                        slots:
+                          default:
+                          - component: rect
+                            config:
+                              x: 56
+                              y: 34
+                              height: 13
+                              rx: 6.5
+                              width: '=(((Math.abs(((Number(items[props.heatpumpDcopDhw].numericState) || 0) - Number(((((((items[props.tileHistory].state)
+                                || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpDcopDhw]
+                                || {}).y)))) < 0.05 ? ''±0'' : (((Number(items[props.heatpumpDcopDhw].numericState) || 0)
+                                - Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                                : {}))[props.heatpumpDcopDhw] || {}).y))) > 0 ? ''+'' : ''−'') + (Math.abs(((Number(items[props.heatpumpDcopDhw].numericState)
+                                || 0) - Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                                : {}))[props.heatpumpDcopDhw] || {}).y))))).toFixed(1)) + '' vs. yesterday'').length * 5.2
+                                + 12).toFixed(1)'
+                              fill: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
+                                ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
+                                ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[(Math.abs(((Number(items[props.heatpumpDcopDhw].numericState)
+                                || 0) - Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                                : {}))[props.heatpumpDcopDhw] || {}).y)))) < 0.1 ? ''neutral'' : ((Number(items[props.heatpumpDcopDhw].numericState)
+                                || 0) - Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                                : {}))[props.heatpumpDcopDhw] || {}).y))) > 0 ? ''good'' : ''warn'')] || (({good: [''#2e7d32'',
+                                ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'',
+                                ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''], neutral:
+                                [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark === ''dark'') ? 1 : 0]'
+                              fill-opacity: '0.16'
+                          - component: text
+                            config:
+                              x: 62
+                              y: 43.3
+                              content: '=(Math.abs(((Number(items[props.heatpumpDcopDhw].numericState) || 0) - Number(((((((items[props.tileHistory].state)
+                                || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpDcopDhw]
+                                || {}).y)))) < 0.05 ? ''±0'' : (((Number(items[props.heatpumpDcopDhw].numericState) || 0)
+                                - Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                                : {}))[props.heatpumpDcopDhw] || {}).y))) > 0 ? ''+'' : ''−'') + (Math.abs(((Number(items[props.heatpumpDcopDhw].numericState)
+                                || 0) - Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                                : {}))[props.heatpumpDcopDhw] || {}).y))))).toFixed(1)) + '' vs. yesterday'''
+                              fill: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
+                                ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
+                                ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[(Math.abs(((Number(items[props.heatpumpDcopDhw].numericState)
+                                || 0) - Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                                : {}))[props.heatpumpDcopDhw] || {}).y)))) < 0.1 ? ''neutral'' : ((Number(items[props.heatpumpDcopDhw].numericState)
+                                || 0) - Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                                : {}))[props.heatpumpDcopDhw] || {}).y))) > 0 ? ''good'' : ''warn'')] || (({good: [''#2e7d32'',
+                                ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'',
+                                ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''], neutral:
+                                [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark === ''dark'') ? 1 : 0]'
+                              font-size: '9.5'
+                              font-weight: '600'
               - component: oh-link
                 config:
                   action: popup
@@ -1556,7 +1931,7 @@ slots:
                       - component: text
                         config:
                           x: 56
-                          y: 23
+                          y: 13
                           content: COP total
                           fill: currentColor
                           font-size: 12
@@ -1566,13 +1941,77 @@ slots:
                       - component: text
                         config:
                           x: 56
-                          y: 39
+                          y: 29
                           content: today
                           fill: currentColor
                           font-size: 11
                           font-weight: normal
                           text-anchor: start
                           opacity: '0.5'
+                      - component: g
+                        config:
+                          visible: '=(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                            : {}))[props.heatpumpDcop] || {}).y) !== undefined && ((((((items[props.tileHistory].state) ||
+                            '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpDcop]
+                            || {}).y) !== null) && Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{''
+                            ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpDcop] || {}).y)) > 0 && ((((((((items[props.tileHistory].state)
+                            || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpEnergyToday]
+                            || {}).y) !== undefined && ((((((items[props.tileHistory].state) || '''').charAt(0) === ''{''
+                            ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpEnergyToday] || {}).y) !== null)
+                            && Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                            : {}))[props.heatpumpEnergyToday] || {}).y)) >= Math.max(0.05, 0.05 * (Number(((((((items[props.tileHistory].state)
+                            || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpEnergyToday]
+                            || {}).d)) || 0))) && (Number(items[props.heatpumpEnergyToday].numericState) || 0) >= 0.05'
+                        slots:
+                          default:
+                          - component: rect
+                            config:
+                              x: 56
+                              y: 34
+                              height: 13
+                              rx: 6.5
+                              width: '=(((Math.abs(((Number(items[props.heatpumpDcop].numericState) || 0) - Number(((((((items[props.tileHistory].state)
+                                || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpDcop]
+                                || {}).y)))) < 0.05 ? ''±0'' : (((Number(items[props.heatpumpDcop].numericState) || 0) - Number(((((((items[props.tileHistory].state)
+                                || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpDcop]
+                                || {}).y))) > 0 ? ''+'' : ''−'') + (Math.abs(((Number(items[props.heatpumpDcop].numericState)
+                                || 0) - Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                                : {}))[props.heatpumpDcop] || {}).y))))).toFixed(1)) + '' vs. yesterday'').length * 5.2 +
+                                12).toFixed(1)'
+                              fill: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
+                                ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
+                                ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[(Math.abs(((Number(items[props.heatpumpDcop].numericState)
+                                || 0) - Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                                : {}))[props.heatpumpDcop] || {}).y)))) < 0.1 ? ''neutral'' : ((Number(items[props.heatpumpDcop].numericState)
+                                || 0) - Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                                : {}))[props.heatpumpDcop] || {}).y))) > 0 ? ''good'' : ''warn'')] || (({good: [''#2e7d32'',
+                                ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'',
+                                ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''], neutral:
+                                [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark === ''dark'') ? 1 : 0]'
+                              fill-opacity: '0.16'
+                          - component: text
+                            config:
+                              x: 62
+                              y: 43.3
+                              content: '=(Math.abs(((Number(items[props.heatpumpDcop].numericState) || 0) - Number(((((((items[props.tileHistory].state)
+                                || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpDcop]
+                                || {}).y)))) < 0.05 ? ''±0'' : (((Number(items[props.heatpumpDcop].numericState) || 0) - Number(((((((items[props.tileHistory].state)
+                                || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpDcop]
+                                || {}).y))) > 0 ? ''+'' : ''−'') + (Math.abs(((Number(items[props.heatpumpDcop].numericState)
+                                || 0) - Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                                : {}))[props.heatpumpDcop] || {}).y))))).toFixed(1)) + '' vs. yesterday'''
+                              fill: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
+                                ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
+                                ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[(Math.abs(((Number(items[props.heatpumpDcop].numericState)
+                                || 0) - Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                                : {}))[props.heatpumpDcop] || {}).y)))) < 0.1 ? ''neutral'' : ((Number(items[props.heatpumpDcop].numericState)
+                                || 0) - Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                                : {}))[props.heatpumpDcop] || {}).y))) > 0 ? ''good'' : ''warn'')] || (({good: [''#2e7d32'',
+                                ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'',
+                                ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''], neutral:
+                                [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark === ''dark'') ? 1 : 0]'
+                              font-size: '9.5'
+                              font-weight: '600'
               - component: oh-link
                 config:
                   action: popup
