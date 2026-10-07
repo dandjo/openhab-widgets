@@ -6021,6 +6021,23 @@ def split_legend(parts, digits=2):
                   "margin-top": "6px"})
 
 
+def bars_tile(title, item, rows, value_expr, color=None, digits=2, least=1):
+    """Values beside each other as horizontal bars on one scale (rows: (name, expr, colour)), as long as the largest
+    and at least least; a value of 0 or less as a dash."""
+    top = f"(Math.max({least}, {', '.join(e for _, e, _ in rows)}) * 1.08)"
+    cells = []
+    for name, expr, colour in rows:
+        cells += [label(name, **{"font-size": "11px", "opacity": "0.65"}),
+                  div([div([], **{"height": "8px", "border-radius": "4px", "background": colour,
+                                  "width": f"={vt_clamp(f'Math.max(0, {expr}) / {top} * 100')} + '%'"})],
+                      **{"height": "8px", "border-radius": "4px", "background": "rgba(127, 127, 127, 0.1)"}),
+                  label(f"={expr} > 0 ? {fixed(expr, digits)} : '–'",
+                        **{"font-size": "11px", "font-weight": "600", "text-align": "right", "white-space": "nowrap"})]
+    grid = div(cells, **{"display": "grid", "grid-template-columns": "74px minmax(0, 1fr) auto", "align-items": "center",
+                         "gap": "6px 8px", "margin-top": "8px"})
+    return vt_tile([vt_title(title), vt_value(value_expr, color), grid], item, title, color)
+
+
 def split_tile(title, item, parts, total_expr, value_expr, color=None, right=None):
     return vt_tile([vt_head(title, right), vt_value(value_expr, color), split_bar(parts, total_expr), split_legend(parts)],
                 item, title, color)
@@ -6078,9 +6095,40 @@ def spread_tile(title, hot, cold, hot_name, cold_name, color_hot="#e57373", colo
     return vt_tile(kids, hot, title)
 
 
+def pair_points(a, b, span, w=196, x0=2, top=6, bottom=40):
+    """The 24 hourly means of two items as two lists of 'x y' points on one scale, at least span wide (no spread
+    syntax: MainUI's expressions do not know it)."""
+    pts = (f"s.map((v, i) => v === null ? null : ({x0} + {w} * i / Math.max(1, s.length - 1)).toFixed(1) + ' ' + "
+           f"({bottom} - {bottom - top} * (v - L) / R).toFixed(1)).filter((p) => p !== null)")
+    return (f"((ss) => ((f) => ((lo, hi) => ((L, R) => ss.map((s) => {pts}))"
+            f"((lo + hi) / 2 - Math.max({span}, hi - lo) / 2, Math.max({span}, hi - lo)))"
+            f"(f.reduce((x, y) => Math.min(x, y), 1e12), f.reduce((x, y) => Math.max(x, y), -1e12)))"
+            f"(ss[0].concat(ss[1]).filter((v) => v !== null)))"
+            f"([(({vt_hv(a, 's')}) || []), (({vt_hv(b, 's')}) || [])])")
+
+
+def pair_sparkline(a, b, a_color, b_color, span):
+    """Two items' course over the day as two lines on one scale, in their values' colours, their last points marked."""
+    track_history(a, s=True)
+    track_history(b, s=True)
+    pts = pair_points(a, b, span)
+    kids = []
+    for k, color in ((0, a_color), (1, b_color)):
+        p = f"({pts})[{k}]"
+        kids += [svg("path", d=f"=((p) => p.length > 1 ? 'M' + p.join(' L') : '')({p})", fill="none", stroke=color,
+                     **{"stroke-width": "1.6", "stroke-linejoin": "round", "stroke-linecap": "round"}),
+                 svg("circle", cx=f"=((p) => p.length ? p[p.length - 1].split(' ')[0] : -10)({p})",
+                     cy=f"=((p) => p.length ? p[p.length - 1].split(' ')[1] : -10)({p})", r=2.8, fill=color,
+                     style={"stroke": "var(--f7-card-bg-color, #fff)"}, **{"stroke-width": "1.5"})]
+    return svg("svg", kids, viewBox="0 0 200 46", style={"display": "block", "width": "100%", "height": "auto",
+                                                        "margin-top": "6px"},
+               visible=f"=((({vt_hv(a, 's')}) || []).length > 1 || (({vt_hv(b, 's')}) || []).length > 1)")
+
+
 def pair_tile(title, a, b, a_name, b_name, digits=1, unit="K", a_color=None, b_color=None, delta_text=None,
-         a_expr=None, b_expr=None, sub=None, value_unit=""):
-    """Two values that belong together side by side, their difference as a chip beside the title."""
+         a_expr=None, b_expr=None, sub=None, value_unit="", spark=None):
+    """Two values that belong together side by side, their difference as a chip beside the title; with spark (the
+    least span of its scale) both values' course over the day under them, in their colours (user, 2026-10-07)."""
     av, bv = a_expr or num(a), b_expr or num(b)
     d = f"({av} - {bv})"
     def side(name, item, expr, color, align):
@@ -6094,6 +6142,8 @@ def pair_tile(title, a, b, a_name, b_name, digits=1, unit="K", a_color=None, b_c
                    "margin-top": "4px"})]
     if sub:
         kids.append(label(sub, **{**VT_SUB, "margin-top": "4px"}))
+    if spark:
+        kids.append(pair_sparkline(a, b, a_color, b_color, spark))
     return vt_tile(kids, a, title)
 
 
@@ -6987,18 +7037,39 @@ def hp_heat(title, item):
 
 
 def hp_split_power(title, item):
-    parts = [("Heizung", num("espaltherma_electrical_power_space"), SPACE_C),
-             ("Warmwasser", num("espaltherma_electrical_power_dhw"), DHW_C),
-             ("Standby", num("espaltherma_electrical_power_standby"), STANDBY_C)]
+    # the parts in kW as the total above them (they read 22,70 for 22.7 W before)
+    parts = [("Heizung", f"{num('espaltherma_electrical_power_space')} / 1000", SPACE_C),
+             ("Warmwasser", f"{num('espaltherma_electrical_power_dhw')} / 1000", DHW_C),
+             ("Standby", f"{num('espaltherma_electrical_power_standby')} / 1000", STANDBY_C)]
     total = " + ".join(e for _, e, _ in parts)
-    return split_tile("Strom nach Zweck jetzt", item, parts, total, f"={fixed(f'({total}) / 1000', 2)} + ' kW'")
+    return split_tile("Strom nach Zweck jetzt", item, parts, total, f"={fixed(f'({total})', 2)} + ' kW'")
 
 
 def hp_split_heat(title, item):
-    parts = [("Heizung", num("espaltherma_heating_power_space"), SPACE_C),
-             ("Warmwasser", num("espaltherma_heating_power_dhw"), DHW_C)]
+    parts = [("Heizung", f"{num('espaltherma_heating_power_space')} / 1000", SPACE_C),
+             ("Warmwasser", f"{num('espaltherma_heating_power_dhw')} / 1000", DHW_C)]
     total = " + ".join(e for _, e, _ in parts)
-    return split_tile("Wärme nach Zweck jetzt", item, parts, total, f"={fixed(f'({total}) / 1000', 2)} + ' kW'", "#e53935")
+    return split_tile("Wärme nach Zweck jetzt", item, parts, total, f"={fixed(f'({total})', 2)} + ' kW'", "#e53935")
+
+
+def hp_heat_source(title, item):
+    """The water's heat now by its source, as the purposes beside it (user, 2026-10-07): the backup heater's, what it
+    adds between the two sensors while it runs (else the sensors' noise read as some 0.2 kW), and the heat pump's, the
+    rest; a defrost's negative heat counts as none."""
+    water = num("espaltherma_heating_power_after_buh")
+    after = f"Math.max(0, {water})"
+    heater = f"({num(HPX['buh_power'])} > 0 ? Math.min({after}, Math.max(0, {after} - {num(item)})) : 0)"
+    parts = [("Wärmepumpe", f"({after} - {heater}) / 1000", HP_ORANGE), ("Heizstab", f"{heater} / 1000", HEATER_RED)]
+    total = " + ".join(e for _, e, _ in parts)
+    return split_tile("Wärme nach Quelle jetzt", item, parts, total, f"={fixed(f'{water} / 1000', 2)} + ' kW'", "#e53935")
+
+
+def hp_cop_split(title, item):
+    """The COPs of space heating and hot water now as bars on one scale, the total large (user, 2026-10-07)."""
+    cop = num(HPX["cop"])
+    return bars_tile("COP nach Zweck jetzt", item, [("Heizung", num(item), SPACE_C),
+                                                    ("Warmwasser", num("espaltherma_cop_dhw"), DHW_C)],
+                     f"={cop} > 0 ? {fixed(cop, 2)} : '–'", COP_C, least=5)
 
 
 def pump_tile(title, item):
@@ -7141,22 +7212,15 @@ VALUE_RENDER = {
     "espaltherma_electrical_power_space": vt_r(hp_split_power, "espaltherma_electrical_power_dhw",
                                             "espaltherma_electrical_power_standby"),
     "espaltherma_heating_power_space": vt_r(hp_split_heat, "espaltherma_heating_power_dhw"),
-    "espaltherma_heating_power_before_buh": vt_r(lambda t, i: pair_tile("Heizleistung vor · nach Heizstab", i,
-                                                                "espaltherma_heating_power_after_buh", "vor",
-                                                                "nach", digits=2, unit="kW",
-                                                                a_expr=f"{num(i)} / 1000",
-                                                                b_expr=f"{num('espaltherma_heating_power_after_buh')} / 1000",
-                                                                delta_text=f"'Heizstab ' + {fixed(f'Math.max(0, {num('espaltherma_heating_power_after_buh')} - {num(i)}) / 1000', 2)} + ' kW'",
-                                                                value_unit=" kW"),
-                                              "espaltherma_heating_power_after_buh"),
-    "espaltherma_cop_space": vt_r(lambda t, i: pair_tile("COP Heizung · Warmwasser", i, "espaltherma_cop_dhw", "Heizung",
-                                                 "Warmwasser", digits=2, unit="",
-                                                 delta_text=False), "espaltherma_cop_dhw"),
+    "espaltherma_heating_power_before_buh": vt_r(hp_heat_source, "espaltherma_heating_power_after_buh"),
+    "espaltherma_cop_space": vt_r(hp_cop_split, "espaltherma_cop_dhw"),
     HPX["indoor"]: vt_r(lambda t, i: spark_tile(t, i, "#ff8a65", "K", 1, span=2)),
     "espaltherma_outdoor_air_temp": vt_r(lambda t, i: pair_tile("Außen · zwei Fühler", HPX["outdoor"], i, "Außentemperatur",
-                                                        "Außenluft", digits=1, unit="K"), HPX["outdoor"]),
+                                                        "Außenluft", digits=1, unit="K", a_color="#26a69a",
+                                                        b_color="#90a4ae", spark=4), HPX["outdoor"]),
     "espaltherma_leaving_water_temp_before_buh": vt_r(lambda t, i: pair_tile("Vorlauf vor · nach Heizstab", i, HPX["supply"],
                                                                      "vor", "nach", digits=1, unit="K",
+                                                                     a_color="#ffb74d", b_color=SUPPLY, spark=4,
                                                                      delta_text=f"'Heizstab ' + {vt_signed(f'{num(HPX['supply'])} - {num(i)}', 1, 'K')}"),
                                                    HPX["supply"]),
     HPX["return"]: vt_r(lambda t, i: spark_tile(t, i, "#64b5f6", "K", 1, span=4)),
