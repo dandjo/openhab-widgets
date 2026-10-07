@@ -7230,8 +7230,10 @@ VALUE_RENDER = {
                                                              18, 26, "#ff8a65", tol=0.5)),
     HPX["tank_set"]: vt_r(lambda t, i: setpoint_tile("Warmwasser gegen Soll", HPX["tank"], num(i), dash(disp(i)), 20, 60,
                                             "#ef5350", tol=2)),
+    # the target spread in K as the measured one: its item is a temperature in °C (as K, openHAB would convert it as an
+    # absolute temperature), whose formatted state read "3 °C" beside "0,9 K"
     "espaltherma_target_delta_t_heating": vt_r(lambda t, i: pair_tile("Spreizung Soll · Ist", i, None, "Soll", "Ist",
-                                                              digits=1, unit="K",
+                                                              digits=1, unit="K", a_expr=num(i),
                                                               b_expr=f"({num(HPX['supply'])} - {num(HPX['return'])})",
                                                               value_unit=" K")),
     "espaltherma_target_discharge_temp": vt_r(lambda t, i: setpoint_tile("Heißgas gegen Soll", HPX["hot_gas"], num(i),
