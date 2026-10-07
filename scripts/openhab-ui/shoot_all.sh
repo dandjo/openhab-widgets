@@ -4,8 +4,8 @@
 # browser the English widgets and pages (given demo_day.py's output, at the end of a past day, as right after midnight
 # every today reads close to nothing); needs the page widget_gallery (widget_gallery.py writes it, to be POSTed to
 # ui:page). The energy flow, the
-# heat pump card, the heating card, the consumption card and the weather page's warnings are shot with demo values (demo_flow.js,
-# demo_heatpump.js, demo_consumption.js, demo_weather.js), set in the browser only
+# heat pump card, the heating card and the weather page's warnings are shot with demo values (demo_flow.js: powers and
+# states only, demo_heatpump.js, demo_weather.js), set in the browser only
 set -u
 B=${BASE:-http://127.0.0.1:18081}/page
 O=shots/v4; R=$O/repo; mkdir -p $O $R
@@ -24,7 +24,7 @@ cp $(shot ov consumption-today*) $R/consumption-card.png; cp $(shot ov energy-pe
 cp $(shot ov pv-yield*) $R/pv-days-card.png; cp $(shot ov temperatures) $R/temperatures-card.png
 cp $O/ov-0-card.png $R/weather-card.png; cp $O/ovd-0-card.png $R/weather-card-dark.png
 # 1600 px, where the consumers list shows each consumer's share beside its energy
-python3 cdp_cards_js.py $B/overview $O/ovcons 1600 light "$(cat demo_consumption.js)" >/dev/null
+python3 cdp_cards.py $B/overview $O/ovcons 1600 >/dev/null
 cp $(shot ovcons consumption-today*) $R/consumption-card.png
 # every animated GIF also in dark mode, animated as well (user, 2026-10-04)
 step flow; PRE_JS=demo_flow.js FPS=20 python3 cdp_gif.py $B/overview 1 1400 $R/energy-flow-card.gif 6 light 1.5

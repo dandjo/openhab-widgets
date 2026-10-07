@@ -268,7 +268,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 7, 2026, 12:51:17 PM
+timestamp: Oct 7, 2026, 3:15:18 PM
 component: oh-card
 config:
   title: Energy Flow
@@ -3419,54 +3419,20 @@ slots:
                               y: 34
                               height: 13
                               rx: 6.5
-                              width: '=((false ? ((((Number(items[props.homeEnergyToday].numericState) || 0) - Number(((h)
+                              width: '=(((Math.abs(((Number(items[props.homeEnergyToday].numericState) || 0) - Number(((h)
                                 => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y +
                                 (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
                                 || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.homeEnergyToday]
-                                || {})))) / Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y ===
-                                undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1,
-                                h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
-                                : {}))[props.homeEnergyToday] || {}))) * 100) >= 300 ? ''×'' + ((Number(items[props.homeEnergyToday].numericState)
-                                || 0) / Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
-                                ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1,
-                                h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
-                                : {}))[props.homeEnergyToday] || {})))).toFixed(0) + '' vs. yesterday'' : (Math.abs((((Number(items[props.homeEnergyToday].numericState)
-                                || 0) - Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
-                                ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1,
-                                h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
-                                : {}))[props.homeEnergyToday] || {})))) / Number(((h) => h.y2 === undefined || h.y2 === null
-                                || h.y === null || h.y === undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0,
-                                (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0)
-                                === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.homeEnergyToday] || {})))
-                                * 100)) < 0.5 ? ''±0'' : ((((Number(items[props.homeEnergyToday].numericState) || 0) - Number(((h)
-                                => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y +
-                                (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
+                                || {}))))) < 0.005 ? ''±0'' : (((Number(items[props.homeEnergyToday].numericState) || 0) -
+                                Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined ?
+                                h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
                                 || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.homeEnergyToday]
-                                || {})))) / Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y ===
-                                undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1,
-                                h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
-                                : {}))[props.homeEnergyToday] || {}))) * 100) > 0 ? ''+'' : ''−'') + Math.round(Math.abs((((Number(items[props.homeEnergyToday].numericState)
+                                || {})))) > 0 ? ''+'' : ''−'') + (Math.abs(((Number(items[props.homeEnergyToday].numericState)
                                 || 0) - Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
                                 ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1,
                                 h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
-                                : {}))[props.homeEnergyToday] || {})))) / Number(((h) => h.y2 === undefined || h.y2 === null
-                                || h.y === null || h.y === undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0,
-                                (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0)
-                                === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.homeEnergyToday] || {})))
-                                * 100)))) + '' % vs. yesterday'') : ((Math.abs(((Number(items[props.homeEnergyToday].numericState)
-                                || 0) - Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
-                                ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1,
-                                h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
-                                : {}))[props.homeEnergyToday] || {}))))) < 0.005 ? ''±0'' : (((Number(items[props.homeEnergyToday].numericState)
-                                || 0) - Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
-                                ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1,
-                                h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
-                                : {}))[props.homeEnergyToday] || {})))) > 0 ? ''+'' : ''−'') + (Math.abs(((Number(items[props.homeEnergyToday].numericState)
-                                || 0) - Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
-                                ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1,
-                                h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
-                                : {}))[props.homeEnergyToday] || {})))))).toFixed(2)) + '' vs. yesterday'')).length * 5.2
-                                + 12).toFixed(1)'
+                                : {}))[props.homeEnergyToday] || {})))))).toFixed(2)) + '' vs. yesterday'').length * 5.2 +
+                                12).toFixed(1)'
                               fill: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
                                 ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
                                 ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[(Math.abs(((Number(items[props.homeEnergyToday].numericState)
@@ -3486,53 +3452,19 @@ slots:
                             config:
                               x: 62
                               y: 43.3
-                              content: '=false ? ((((Number(items[props.homeEnergyToday].numericState) || 0) - Number(((h)
+                              content: '=(Math.abs(((Number(items[props.homeEnergyToday].numericState) || 0) - Number(((h)
                                 => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y +
                                 (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
                                 || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.homeEnergyToday]
-                                || {})))) / Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y ===
-                                undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1,
-                                h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
-                                : {}))[props.homeEnergyToday] || {}))) * 100) >= 300 ? ''×'' + ((Number(items[props.homeEnergyToday].numericState)
-                                || 0) / Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
-                                ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1,
-                                h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
-                                : {}))[props.homeEnergyToday] || {})))).toFixed(0) + '' vs. yesterday'' : (Math.abs((((Number(items[props.homeEnergyToday].numericState)
-                                || 0) - Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
-                                ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1,
-                                h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
-                                : {}))[props.homeEnergyToday] || {})))) / Number(((h) => h.y2 === undefined || h.y2 === null
-                                || h.y === null || h.y === undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0,
-                                (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0)
-                                === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.homeEnergyToday] || {})))
-                                * 100)) < 0.5 ? ''±0'' : ((((Number(items[props.homeEnergyToday].numericState) || 0) - Number(((h)
-                                => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y +
-                                (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
+                                || {}))))) < 0.005 ? ''±0'' : (((Number(items[props.homeEnergyToday].numericState) || 0) -
+                                Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined ?
+                                h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
                                 || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.homeEnergyToday]
-                                || {})))) / Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y ===
-                                undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1,
-                                h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
-                                : {}))[props.homeEnergyToday] || {}))) * 100) > 0 ? ''+'' : ''−'') + Math.round(Math.abs((((Number(items[props.homeEnergyToday].numericState)
+                                || {})))) > 0 ? ''+'' : ''−'') + (Math.abs(((Number(items[props.homeEnergyToday].numericState)
                                 || 0) - Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
                                 ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1,
                                 h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
-                                : {}))[props.homeEnergyToday] || {})))) / Number(((h) => h.y2 === undefined || h.y2 === null
-                                || h.y === null || h.y === undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0,
-                                (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0)
-                                === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.homeEnergyToday] || {})))
-                                * 100)))) + '' % vs. yesterday'') : ((Math.abs(((Number(items[props.homeEnergyToday].numericState)
-                                || 0) - Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
-                                ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1,
-                                h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
-                                : {}))[props.homeEnergyToday] || {}))))) < 0.005 ? ''±0'' : (((Number(items[props.homeEnergyToday].numericState)
-                                || 0) - Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
-                                ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1,
-                                h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
-                                : {}))[props.homeEnergyToday] || {})))) > 0 ? ''+'' : ''−'') + (Math.abs(((Number(items[props.homeEnergyToday].numericState)
-                                || 0) - Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
-                                ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1,
-                                h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
-                                : {}))[props.homeEnergyToday] || {})))))).toFixed(2)) + '' vs. yesterday'')'
+                                : {}))[props.homeEnergyToday] || {})))))).toFixed(2)) + '' vs. yesterday'''
                               fill: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
                                 ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
                                 ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[(Math.abs(((Number(items[props.homeEnergyToday].numericState)
