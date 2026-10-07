@@ -97,7 +97,8 @@ insertion in their sorted order. `OPENHAB_JSONDB` points them at another directo
   - `export_widgets.py` writes the generated widgets from a copy of `uicomponents_ui_widget.json` as YAML, and
     `make_readme.py` builds the README of the GitHub repository from them, with its props tables;
     `cdp_cards.py` takes the screenshots of every card of a page, light or dark, at any width (`cdp_cards_js.py`
-    after running a script in the page first), `cdp_elems.py` of any elements a script finds, and `cdp_tap.py`
+    after running a script in the page first), `cdp_rows.py` of every grid row of a page at twice the pixels,
+    `cdp_elems.py` of any elements a script finds, and `cdp_tap.py`
     taps the tile whose text contains a text and saves the popup it opens. `cdp_gif.py` records a card as an animated GIF,
     stepping its SVG animations frame by frame; `demo_flow.js` gives the energy flow demo values in that browser
     only, by stopping MainUI's state tracking, `demo_heatpump.js` the heat pump card (a space heating run). `widget_gallery.py OUTDIR` writes the page `widget_gallery` with
