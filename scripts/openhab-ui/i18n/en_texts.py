@@ -191,7 +191,9 @@ EN.update({"auffällig": "elevated", "außerhalb": "outside", "behaglich": "comf
            "Leistung je Phase": "Power per phase", "Leistung je String": "Power per string", "Netz heute": "Grid today",
            "Saldo": "Balance", "Spitze heute": "Peak today", "Strom je Phase": "Current per phase",
            "Wirkungsgrad": "Efficiency", "erhöht": "raised", "keine Leistung": "no power", "Spitze": "Peak",
-           "Ertrag gesamt": "Yield total", "Ertrag pro Tag": "Yield per day", "Netz (AC": "Grid (AC"})
+           "Ertrag gesamt": "Yield total", "Ertrag pro Tag": "Yield per day", "Netz (AC": "Grid (AC",
+           "Durchfluss heute": "Flow today", "Verbrauch": "Consumption", "Verbrauch pro Tag": "Consumption per day",
+           "Zählerbild": "Meter picture", "Zählerstand": "Meter reading"})
 
     # installation texts the screenshots show (Miele programs and phases), for ui_proxy.py
 EN.update({"Pflegeleicht": "Easy care", "Baumwolle": "Cottons", "Waschen": "Washing", "Trocknen": "Drying",

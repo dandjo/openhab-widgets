@@ -99,6 +99,18 @@ props:
     type: TEXT
     required: true
     context: item
+  - name: heatpumpCopSpace
+    label: ESPAltherma COP Space
+    description: Number item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpCopDhw
+    label: ESPAltherma COP DHW
+    description: Number item
+    type: TEXT
+    required: true
+    context: item
   - name: heatpumpDcopSpace
     label: ESPAltherma DCOP Space
     description: Number item
@@ -346,7 +358,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 7, 2026, 2:25:52 AM
+timestamp: Oct 7, 2026, 12:51:17 PM
 component: oh-card
 config:
   title: Heat Pump
@@ -464,10 +476,12 @@ slots:
                     heatpumpDcop: =props.heatpumpDcop
                     heatpumpHeatPower: =props.heatpumpHeatPower
                     heatpumpPower: =props.heatpumpPower
-                    heatpumpDcopSpace: =props.heatpumpDcopSpace
-                    heatpumpDcopDhw: =props.heatpumpDcopDhw
+                    heatpumpCopSpace: =props.heatpumpCopSpace
+                    heatpumpCopDhw: =props.heatpumpCopDhw
                     heatpumpHeatingEnergyToday: =props.heatpumpHeatingEnergyToday
                     heatpumpEnergyToday: =props.heatpumpEnergyToday
+                    heatpumpDcopSpace: =props.heatpumpDcopSpace
+                    heatpumpDcopDhw: =props.heatpumpDcopDhw
                     heatpumpExtAmbientTemp: =props.heatpumpExtAmbientTemp
                   style:
                     position: absolute

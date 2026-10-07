@@ -199,6 +199,15 @@ for name, want in track.items():
         xs = [x for x in xs if x is not None]
         r["a"] = round(sum(xs) / len(xs), 3) if xs else None
         r["d"] = fnum(at(name, T.replace(hour=0, minute=0, second=0, microsecond=0) - datetime.timedelta(seconds=1)))
+        # dt seconds later too, as the rule writes them for the tiles' interpolation (within the day)
+        midnight = T.replace(hour=0, minute=0, second=0, microsecond=0) + datetime.timedelta(days=1)
+        dt = max(1, min(600, int((midnight - T).total_seconds()) - 1))
+        later = datetime.timedelta(seconds=dt)
+        r["y2"] = fnum(at(name, T - datetime.timedelta(days=1) + later))
+        xs2 = [fnum(at(name, T - datetime.timedelta(days=k) + later)) for k in range(1, 8)]
+        xs2 = [x for x in xs2 if x is not None]
+        r["a2"] = round(sum(xs2) / len(xs2), 3) if xs2 else None
+        r["t"], r["dt"] = int(T.timestamp()), dt
     if want.get("t"):
         r["h"] = fnum(at(name, T - datetime.timedelta(hours=want["t"])))
     if want.get("s"):

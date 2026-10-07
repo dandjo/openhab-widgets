@@ -37,7 +37,7 @@ OVERVIEW = [
      "a node opens its device's page of my installation, on the house and the appliances a popup of their own. "
      "Under the star three tiles with large pale icons: the house as its node inside the pie of what the consumers "
      "draw, as large as the rings beside it, with its power and today's energy against yesterday's at this time "
-     "in a pill, and today's self-consumption and self-sufficiency as rings, each with yesterday's whole day in a "
+     "in a pill (the difference in kWh), and today's self-consumption and self-sufficiency as rings, each with yesterday's whole day in a "
      "pill, green while today's share is higher, orange while lower. The card places its lines and nodes as "
      "`flow-link` and `flow-node`. The recording and the dark screenshot show it with demo values."),
     ("switches-card", "Switches", "The switchable plugs under the energy flow as `switch-tile`s, five abreast, three "
@@ -59,7 +59,8 @@ OVERVIEW = [
      "hot water or heating is switched on, outlined while off, beside a tinted pill with the setpoint and a small "
      "target icon; a tap opens the heat pump's page of my installation. Below them "
      "today's electricity and heat of the heat pump split into space heating, DHW and standby as bars (hovering a "
-     "part lifts it everywhere), each with today against yesterday at this time in a pill in the middle of its title, "
+     "part lifts it everywhere), each with today against yesterday at this time in a pill in the middle of its title "
+     "(the difference in kWh), "
      "and today's COPs of space heating, DHW and in total in one row as rings like the energy "
      "flow's self-consumption, each with today against yesterday at this time in a pill under its title. "
      "While the tank charges or the heating runs, a line under its tile says since when. The screenshots show it with the heat pump card's demo values."),
@@ -88,7 +89,8 @@ OVERVIEW = [
      "is a little narrower, and in the middle of the height the card is given. The recordings show it with demo "
      "values (a space heating run)."),
     ("consumption-card", "Consumption today", "Today's consumption as one bar split by source (PV, grid), the "
-     "total against yesterday at this time in a pill between the two shares, and as one bar split by consumer, with "
+     "total against yesterday at this time in a pill between the two shares (the difference in kWh), and as one bar "
+     "split by consumer, with "
      "a legend in two columns that gives each consumer's energy and how many kWh more (orange) or fewer (green) it "
      "drew than yesterday until this time; hovering a part lifts it everywhere. The screenshot shows it with demo "
      "values."),
@@ -140,7 +142,7 @@ QUICK = [
     ("heatpump-heat-quick", "Heat", "the split by purpose now and today as bars on top; the heat of space heating and "
      "DHW over the day, per day of the month"),
     ("heatpump-cop-quick", "COP", "electricity plus ambient heat becoming heat as flow bands, now while the compressor "
-     "runs and for the day with the COPs by purpose; the COP and the outdoor temperature over the day, the daily COPs "
+     "runs and for the day, each over a row of rings with the COP in total, of space heating and of DHW; the COP and the outdoor temperature over the day, the daily COPs "
      "of the month")]
 
 
@@ -551,6 +553,11 @@ Four cards for a metered plug, built from one item prefix: `<prefix>_power`, `_s
 provides them. On a device page they stand two by two. `plug-card` also covers devices that are not plugs: give it
 the device's `title`, hide the switch with `controllable: false`, or take the switch from another item with `switch`.
 Every value tile carries a large pale icon of what it shows.
+
+The comparisons with yesterday and the last 7 days come from one String item, `history`, which the rule in
+[`scripts/openhab-ui/applied/tile_history.py`](scripts/openhab-ui/applied/tile_history.py) writes every ten minutes:
+for each item its value yesterday and the mean of the last 7 days at this time, and the same ten minutes later, between
+which the cards interpolate to the current minute; so no widget queries persistence for a comparison.
 
 ![Plug cards](screenshots/plug-cards.png)
 """)

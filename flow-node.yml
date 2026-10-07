@@ -70,7 +70,7 @@ props:
     type: DECIMAL
     required: false
   parameterGroups: []
-timestamp: Oct 5, 2026, 9:12:34 PM
+timestamp: Oct 7, 2026, 12:51:17 PM
 component: g
 config:
   transform: ='translate(' + props.x + ' ' + props.y + ')'
@@ -2520,199 +2520,59 @@ slots:
               fill-opacity: '0.12'
       - component: rect
         config:
-          x: -20
-          y: -14
-          width: 40
-          height: 27
-          rx: 1.5
+          x: -17
+          y: -13
+          width: 34
+          height: 26
+          rx: 2
           stroke: currentColor
           stroke-width: 1.6
           stroke-linecap: round
           fill: '#37474f'
           fill-opacity: '0.85'
-      - component: line
-        config:
-          x1: -16.5
-          y1: -12
-          x2: -16.5
-          y2: 11
-          stroke: '#b0bec5'
-          stroke-width: 1.2
-          stroke-linecap: round
-          fill: none
-      - component: line
-        config:
-          x1: 16.5
-          y1: -12
-          x2: 16.5
-          y2: 11
-          stroke: '#b0bec5'
-          stroke-width: 1.2
-          stroke-linecap: round
-          fill: none
       - component: rect
         config:
-          x: -15.5
-          y: -11.1
-          width: 31
-          height: 2.87
-          rx: 0.5
+          x: -13.5
+          y: -9.5
+          width: 27
+          height: 5.4
+          rx: 0.8
           stroke: currentColor
-          stroke-width: 0.9
+          stroke-width: 1
           stroke-linecap: round
           fill: '#cfd8dc'
           fill-opacity: '0.9'
       - component: rect
         config:
-          x: -13.5
-          y: -10.2
-          width: 1.6
-          height: 1.2
+          x: -10.5
+          y: -7.8
+          width: 2.4
+          height: 2
+          rx: 0.3
           fill: '#263238'
       - component: rect
         config:
-          x: -11.2
-          y: -10.2
-          width: 1.6
-          height: 1.2
+          x: -6.9
+          y: -7.8
+          width: 2.4
+          height: 2
+          rx: 0.3
           fill: '#263238'
       - component: rect
         config:
-          x: -8.9
-          y: -10.2
-          width: 1.6
-          height: 1.2
-          fill: '#263238'
-      - component: rect
-        config:
-          x: -6.6
-          y: -10.2
-          width: 1.6
-          height: 1.2
-          fill: '#263238'
-      - component: rect
-        config:
-          x: -4.3
-          y: -10.2
-          width: 1.6
-          height: 1.2
-          fill: '#263238'
-      - component: rect
-        config:
-          x: -2.0
-          y: -10.2
-          width: 1.6
-          height: 1.2
+          x: -3.3
+          y: -7.8
+          width: 2.4
+          height: 2
+          rx: 0.3
           fill: '#263238'
       - component: rect
         config:
           x: 0.3
-          y: -10.2
-          width: 1.6
-          height: 1.2
-          fill: '#263238'
-      - component: rect
-        config:
-          x: 2.6
-          y: -10.2
-          width: 1.6
-          height: 1.2
-          fill: '#263238'
-      - component: rect
-        config:
-          x: 4.9
-          y: -10.2
-          width: 1.6
-          height: 1.2
-          fill: '#263238'
-      - component: rect
-        config:
-          x: 7.2
-          y: -10.2
-          width: 1.6
-          height: 1.2
-          fill: '#263238'
-      - component: rect
-        config:
-          x: 9.5
-          y: -10.2
-          width: 1.6
-          height: 1.2
-          fill: '#263238'
-      - component: rect
-        config:
-          x: 11.8
-          y: -10.2
-          width: 1.6
-          height: 1.2
-          fill: '#263238'
-      - component: rect
-        config:
-          x: -15.5
-          y: -7.43
-          width: 31
-          height: 2.87
-          rx: 0.5
-          stroke: currentColor
-          stroke-width: 0.9
-          stroke-linecap: round
-          fill: '#cfd8dc'
-          fill-opacity: '0.9'
-      - component: rect
-        config:
-          x: -13.5
-          y: -6.53
-          width: 1.6
-          height: 1.2
-          fill: '#263238'
-      - component: rect
-        config:
-          x: -11.2
-          y: -6.53
-          width: 1.6
-          height: 1.2
-          fill: '#263238'
-      - component: rect
-        config:
-          x: -8.9
-          y: -6.53
-          width: 1.6
-          height: 1.2
-          fill: '#263238'
-      - component: rect
-        config:
-          x: -6.6
-          y: -6.53
-          width: 1.6
-          height: 1.2
-          fill: '#263238'
-      - component: rect
-        config:
-          x: -4.3
-          y: -6.53
-          width: 1.6
-          height: 1.2
-          fill: '#263238'
-      - component: rect
-        config:
-          x: -2.0
-          y: -6.53
-          width: 1.6
-          height: 1.2
-          fill: '#263238'
-      - component: rect
-        config:
-          x: 0.3
-          y: -6.53
-          width: 1.6
-          height: 1.2
-          fill: '#263238'
-      - component: rect
-        config:
-          x: 2.6
-          y: -6.53
-          width: 1.6
-          height: 1.2
+          y: -7.8
+          width: 2.4
+          height: 2
+          rx: 0.3
           fill: '#263238'
       - component: g
         config:
@@ -2721,15 +2581,9 @@ slots:
           default:
           - component: circle
             config:
-              cx: 6.5
-              cy: -6.0
-              r: 0.95
-              fill: '#69f0ae'
-          - component: circle
-            config:
-              cx: 9
-              cy: -6.0
-              r: 0.95
+              cx: 7
+              cy: -6.8
+              r: 1.1
               fill: '#69f0ae'
           - component: animate
             config:
@@ -2745,15 +2599,9 @@ slots:
           default:
           - component: circle
             config:
-              cx: 11.5
-              cy: -6.0
-              r: 0.95
-              fill: '#69f0ae'
-          - component: circle
-            config:
-              cx: 14
-              cy: -6.0
-              r: 0.95
+              cx: 10.5
+              cy: -6.8
+              r: 1.1
               fill: '#69f0ae'
           - component: animate
             config:
@@ -2764,65 +2612,31 @@ slots:
               visible: =Math.abs(Number(props.power)) > 10
       - component: rect
         config:
-          x: -15.5
-          y: -3.77
-          width: 31
-          height: 2.87
-          rx: 0.5
+          x: -13.5
+          y: -2.7
+          width: 27
+          height: 5.4
+          rx: 0.8
           stroke: currentColor
-          stroke-width: 0.9
-          stroke-linecap: round
-          fill: '#263238'
-      - component: line
-        config:
-          x1: -13
-          y1: -2.34
-          x2: 13
-          y2: -2.34
-          stroke: '#b0bec5'
-          stroke-width: 0.8
-          stroke-linecap: round
-          fill: none
-          opacity: '0.7'
-      - component: rect
-        config:
-          x: -15.5
-          y: -0.1
-          width: 31
-          height: 2.87
-          rx: 0.5
-          stroke: currentColor
-          stroke-width: 0.9
+          stroke-width: 1
           stroke-linecap: round
           fill: '#cfd8dc'
           fill-opacity: '0.9'
       - component: rect
         config:
-          x: -13.5
-          y: 0.8
-          width: 1.6
-          height: 1.2
+          x: -10.5
+          y: -1.0
+          width: 2.4
+          height: 2
+          rx: 0.3
           fill: '#263238'
       - component: rect
         config:
-          x: -11.2
-          y: 0.8
-          width: 1.6
-          height: 1.2
-          fill: '#263238'
-      - component: rect
-        config:
-          x: -8.9
-          y: 0.8
-          width: 1.6
-          height: 1.2
-          fill: '#263238'
-      - component: rect
-        config:
-          x: -6.6
-          y: 0.8
-          width: 1.6
-          height: 1.2
+          x: -6.9
+          y: -1.0
+          width: 2.4
+          height: 2
+          rx: 0.3
           fill: '#263238'
       - component: g
         config:
@@ -2831,9 +2645,9 @@ slots:
           default:
           - component: circle
             config:
-              cx: 12.5
-              cy: 1.33
-              r: 0.95
+              cx: 10.5
+              cy: 0.0
+              r: 1.1
               fill: '#69f0ae'
           - component: animate
             config:
@@ -2842,61 +2656,33 @@ slots:
               dur: 2s
               repeatCount: indefinite
               visible: =Math.abs(Number(props.power)) > 10
-      - component: line
+      - component: rect
         config:
-          x1: -15.5
-          y1: 6.63
-          x2: 15.5
-          y2: 6.63
-          stroke: '#b0bec5'
+          x: -13.5
+          y: 4.1
+          width: 27
+          height: 5.4
+          rx: 0.8
+          stroke: currentColor
           stroke-width: 1
           stroke-linecap: round
-          fill: none
-      - component: rect
-        config:
-          x: -12
-          y: 3.77
-          width: 11
-          height: 2.67
-          rx: 0.6
-          stroke: currentColor
-          stroke-width: 0.8
-          stroke-linecap: round
-          fill: '#cfd8dc'
-          fill-opacity: '0.9'
-      - component: rect
-        config:
-          x: -15.5
-          y: 7.23
-          width: 31
-          height: 2.87
-          rx: 0.5
-          stroke: currentColor
-          stroke-width: 0.9
-          stroke-linecap: round
           fill: '#cfd8dc'
           fill-opacity: '0.9'
       - component: circle
         config:
-          cx: -9
-          cy: 8.66
-          r: 1
+          cx: -6
+          cy: 6.8
+          r: 1.2
           fill: '#263238'
       - component: circle
         config:
-          cx: -3
-          cy: 8.66
-          r: 1
+          cx: 0
+          cy: 6.8
+          r: 1.2
           fill: '#263238'
       - component: circle
         config:
-          cx: 3
-          cy: 8.66
-          r: 1
-          fill: '#263238'
-      - component: circle
-        config:
-          cx: 9
-          cy: 8.66
-          r: 1
+          cx: 6
+          cy: 6.8
+          r: 1.2
           fill: '#263238'
