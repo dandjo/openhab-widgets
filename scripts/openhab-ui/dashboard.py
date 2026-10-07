@@ -5425,19 +5425,40 @@ def track_history(item, **want):
     TRACK.setdefault(item, {}).update(want)
 
 
-def solar_noon_utc():
-    """The solar noon at openHAB's location in minutes after midnight UTC (from its longitude, without the equation of
-    time, a few minutes), read from openHAB's own configuration, so the location stands in no script; noon UTC
-    plus one hour where it cannot be read."""
+def openhab_location():
+    """openHAB's location as (latitude, longitude), read from its own configuration, so the location stands in no
+    script; None where it cannot be read."""
     try:
         with open("/var/lib/openhab/config/org/openhab/i18n.config", encoding="utf-8") as f:
-            location = re.search(r'location="([^"]*)"', f.read()).group(1)
-        return round(720 - 4 * float(location.split(",")[1]))
-    except (OSError, AttributeError, IndexError, ValueError):
-        return 660
+            lat, lon = re.search(r'location="([^"]*)"', f.read()).group(1).split(",")[:2]
+        return float(lat), float(lon)
+    except (OSError, AttributeError, ValueError):
+        return None
+
+
+def solar_noon_utc():
+    """The solar noon at openHAB's location in minutes after midnight UTC (from its longitude, without the equation of
+    time, a few minutes); noon UTC plus one hour where the location cannot be read."""
+    loc = openhab_location()
+    return round(720 - 4 * loc[1]) if loc else 660
 
 
 SOLAR_NOON_UTC = solar_noon_utc()
+
+
+def sun_scale():
+    """The sun arc's time scale in local minutes: the longest day at openHAB's location (summer solstice, in summer
+    time) from sunrise to sunset, 10 % of it wider on each side, so every day's inverter start and end and their
+    labels fit (user, 2026-10-07: not 0 to 24 h; 10 % in all left the labels of the longest day outside)."""
+    loc = openhab_location()
+    lat = math.radians(loc[0] if loc else 48.2)
+    half = math.degrees(math.acos(-math.tan(lat) * math.tan(math.radians(23.44)))) * 4  # minutes, 15° an hour
+    summer = datetime.datetime(datetime.date.today().year, 6, 21, 12).astimezone().utcoffset().total_seconds() / 60
+    noon, pad = SOLAR_NOON_UTC + summer, 0.2 * half
+    return round(noon - half - pad), round(noon + half + pad)
+
+
+SUN_LO, SUN_HI = sun_scale()
 
 # ---------------------------------------------------------------- expression helpers
 
@@ -6387,15 +6408,19 @@ def sun_tile(title, start, stop, peak, power_item):
     noon = f"({SOLAR_NOON_UTC} + dayjs().utcOffset())"
     t1 = f"({ok(stop)} ? {mins(f'dayjs(items.{stop}.state)')} : 2 * {noon} - {t0})"
     now = mins("dayjs()")
-    X = lambda m: f"(14 + 432 * ({m}) / 1440)"
+    X = lambda m: f"(14 + 432 * (({m}) - {SUN_LO}) / {SUN_HI - SUN_LO})"
     cx, rx = f"(({X(t0)} + {X(t1)}) / 2)", f"(({X(t1)} - {X(t0)}) / 2)"
     xn = f"Math.max({X(t0)}, Math.min({X(t1)}, {X(now)}))"
     yn = f"(96 - 64 * Math.sqrt(Math.max(0, 1 - Math.pow(({xn} - {cx}) / {rx}, 2))))"
     f1 = lambda e: f"({e}).toFixed(1)"
     done = f"'M' + {f1(X(t0))} + ' 96 A' + {f1(rx)} + ' 64 0 0 1 ' + {f1(xn)} + ' ' + {f1(yn)}"
     rest = f"='M' + {f1(xn)} + ' ' + {f1(yn)} + ' A' + {f1(rx)} + ' 64 0 0 1 ' + {f1(X(t1))} + ' 96'"
-    hm_ = lambda m: f"(Math.floor(({m}) / 60) + ':' + ('0' + Math.round(({m}) % 60)).slice(-2))"
+    # whole minutes first: an estimated end (mirrored round the solar noon) is fractional and read 18:60
+    hm_ = lambda m: f"((r) => Math.floor(r / 60) + ':' + ('0' + r % 60).slice(-2))(Math.round({m}))"
     up = f"({ok(start)} && {now} < {t1})"
+    hours = list(range(-(-SUN_LO // 180) * 3, SUN_HI // 60 + 1, 3))  # every 3 h within the scale
+    # start and end 20 off the arc's feet, kept inside the drawing (0..470)
+    sx, ex = f"Math.max(32, {X(t0)} - 20)", f"Math.min(428, {X(t1)} + 20)"
     right_side = f"({xn} > 300)"
     kids = [svg("path", d=f"={done} + ' L' + {f1(xn)} + ' 96 Z'", fill="#ffb300", **{"fill-opacity": "0.12"},
                 visible=f"={ok(start)}"),
@@ -6405,11 +6430,17 @@ def sun_tile(title, start, stop, peak, power_item):
                 **{"stroke-opacity": "0.5", "stroke-width": "2", "stroke-dasharray": "3 4"}, visible=f"={ok(start)}"),
             svg("line", x1=14, y1=96, x2=446, y2=96, stroke="currentColor", **{"stroke-opacity": "0.2",
                                                                              "stroke-width": "1.5"}),
-            *[svg_text(14 + 108 * k, 114, f"{6 * k}" + (" Uhr" if k == 4 else ""), 11, opacity="0.5",
-                         anchor="start" if k == 0 else "end" if k == 4 else "middle") for k in range(5)],
-            svg_text(f"={f1(f'{X(t0)} + 4')}", 90, f"='Start ' + {hm_(t0)}", 12, anchor="start", opacity="0.85"),
-            svg_text(f"={f1(f'{X(t1)} - 4')}", 90, f"=({ok(stop)} ? 'Ende ' : 'Ende ≈ ') + {hm_(t1)}", 12,
-                       anchor="end", opacity="0.7"),
+            *[svg_text(round(14 + 432 * (h * 60 - SUN_LO) / (SUN_HI - SUN_LO), 1), 114,
+                       f"{h}" + (" Uhr" if h == hours[-1] else ""), 11, opacity="0.5") for h in hours],
+            # start and end outside the arc's feet, the word over the time: inside them the steep curve crossed
+            # the text (user, 2026-10-07); 20 off the feet, as the sun's halo (r 13) reached the text in the last
+            # minutes before the end and the first after the start
+            svg_text(f"={f1(sx)}", 81, "Start", 11, anchor="end", opacity="0.6"),
+            svg_text(f"={f1(sx)}", 94, f"={hm_(t0)}", 12.5, weight="700", anchor="end", opacity="0.9"),
+            svg_text(f"={f1(ex)}", 81, f"={ok(stop)} ? 'Ende' : 'Ende ≈'", 11, anchor="start",
+                     opacity="0.6"),
+            svg_text(f"={f1(ex)}", 94, f"={hm_(t1)}", 12.5, weight="700", anchor="start",
+                     opacity=f"={ok(stop)} ? '0.9' : '0.7'"),
             svg("circle", cx=f"={f1(xn)}", cy=f"={f1(yn)}", r=13, fill="#ffb300", **{"fill-opacity": "0.22"},
                 visible=f"={up}"),
             svg("circle", cx=f"={f1(xn)}", cy=f"={f1(yn)}", r=8, fill="#ffb300", visible=f"={up}"),
@@ -6417,7 +6448,7 @@ def sun_tile(title, start, stop, peak, power_item):
                        f"={dash(disp(power_item))}", 13, weight="700", anchor=f"={right_side} ? 'end' : 'start'")]
     kids[-1]["config"]["visible"] = f"={up}"
     word = vt_chip(f"='Spitze ' + {dash(disp(peak))}", "'neutral'")
-    return vt_tile([vt_head(title, word), svg("svg", kids, viewBox="0 0 460 118",
+    return vt_tile([vt_head(title, word), svg("svg", kids, viewBox="0 0 470 118",
                                         style={"display": "block", "width": "100%", "height": "auto",
                                                "max-width": "560px", "margin": "4px auto 0"})], start, title, wide=True)
 
