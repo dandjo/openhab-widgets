@@ -4,9 +4,11 @@ that hands the browser every widget and page translated by i18n/en.py, the items
 texts they had before the German ones (i18n/labels_export.json), state events with those option texts, and an English
 locale; everything else passes through unchanged, server-sent events streamed.
 With DEMO_JSON (demo_day.py's output) the browser sees a past moment instead, so no screenshot shows the day's
-counters just reset: its clock set back to it (charts load that day) and every persisted item's state at it in the
-items and the state events; the weather page stays live, its forecast looks ahead.
+counters just reset: its clock set back to it (charts load that day), every persisted item's state at it in the
+items and the state events, and the history up to it; the weather page stays live, its forecast looks ahead. GERMAN=1 leaves homepi's own
+German texts and locale as they are, for German shots of a past day (cdp_rows.py, the social-media ones).
 Usage: ui_proxy.py ITEMS_JSON [PORT] [UPSTREAM] [DEMO_JSON]   (defaults 18081 and http://127.0.0.1:18080)"""
+import datetime
 import http.client
 import json
 import os
@@ -23,6 +25,7 @@ en.load_item_labels(sys.argv[1])
 PORT = int(sys.argv[2]) if len(sys.argv) > 2 else 18081
 UP = urllib.parse.urlparse(sys.argv[3] if len(sys.argv) > 3 else "http://127.0.0.1:18080")
 DEMO = json.load(open(sys.argv[4])) if len(sys.argv) > 4 else None
+GERMAN = os.environ.get("GERMAN") == "1"
 LIVE_PAGES = ("/page/weather",)
 # MainUI's clock set back to the demo's moment, before any of its scripts runs
 CLOCK_JS = """<script>(() => {
@@ -127,6 +130,22 @@ def english_states(payload):
     return payload
 
 
+# the items persisted ahead (strategy forecast, group influxdb_forecast, the aWATTar prices): their future stays
+FORECAST = {name for name, e in json.load(open(sys.argv[1])).items()
+            if "influxdb_forecast" in (e.get("value", e).get("groupNames") or [])}
+
+
+def demo_history(path, body):
+    """A persisted series as it stood on the demo's day: nothing after that day's end (a day's total is stamped at
+    its 23:59:59), so a month's chart ends on that day and no live state comes in; a forecast as it is."""
+    data = json.loads(body)
+    if rest_path(path).rsplit("/", 1)[-1] not in FORECAST:
+        day = datetime.datetime.fromtimestamp(DEMO["time_ms"] / 1000).replace(hour=0, minute=0, second=0, microsecond=0)
+        end = (day + datetime.timedelta(days=1)).timestamp() * 1000
+        data["data"] = [p for p in data.get("data") or [] if int(p["time"]) < end]
+    return json.dumps(data, ensure_ascii=False).encode()
+
+
 def rest_path(path):
     """The path as MainUI means it: it asks for ui%3Awidget as often as for ui:widget."""
     return urllib.parse.unquote(urllib.parse.urlparse(path).path).rstrip("/")
@@ -137,7 +156,9 @@ def rewrite(path, body, demo=False):
     data = json.loads(body)
     if demo and p.startswith("/rest/items"):
         data = [demo_item(i) for i in data] if isinstance(data, list) else demo_item(data)
-    if p == "/rest":
+    if GERMAN:
+        pass
+    elif p == "/rest":
         data["locale"] = "en_GB"
     elif p.startswith("/rest/ui/components/ui:"):
         if isinstance(data, list):
@@ -199,7 +220,8 @@ class Proxy(BaseHTTPRequestHandler):
                             if isinstance(payload, dict) and demo:
                                 payload = {k: dict(DEMO["states"].get(k, v)) for k, v in payload.items()}
                             if isinstance(payload, dict):
-                                line = b"data: " + json.dumps(english_states(payload), ensure_ascii=False).encode() + b"\n"
+                                line = b"data: " + json.dumps(payload if GERMAN else english_states(payload),
+                                                              ensure_ascii=False).encode() + b"\n"
                         except ValueError:
                             pass
                     self.wfile.write(line)
@@ -210,6 +232,11 @@ class Proxy(BaseHTTPRequestHandler):
                 try:
                     data = rewrite(self.path, data, demo)
                 except ValueError:
+                    pass
+            elif r.status == 200 and demo and "json" in ctype and rest_path(self.path).startswith("/rest/persistence/items/"):
+                try:
+                    data = demo_history(self.path, data)
+                except (ValueError, KeyError):
                     pass
             elif r.status == 200 and demo and "text/html" in ctype and b"<head>" in data:
                 data = data.replace(b"<head>", b"<head>" + (CLOCK_JS % DEMO["time_ms"]).encode(), 1)

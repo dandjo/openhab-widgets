@@ -10,7 +10,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 7, 2026, 2:25:52 AM
+timestamp: Oct 7, 2026, 6:36:33 PM
 component: div
 config:
   style:
@@ -128,7 +128,7 @@ slots:
               item: =props.heatpumpValve
               yValue: 0
               yHeight: 1
-              mapState: '=(s) => s === ''DHW'' ? ''​'' : ''UNDEF'''
+              mapState: '=(s) => s === ''DHW'' || s === ''​'' ? ''​'' : ''UNDEF'''
               stateColor:
                 ​: '#e57373'
               tooltip:

@@ -43,7 +43,25 @@ if (time.Duration.between(time.toZDT('00:00'), time.toZDT()).toMinutes() >= 2) {
       items.getItem(target).persistence.persist(endOfDay, state, 'influxdb');
     }
   });
+  // the day's shares in per cent, as Grafana's panel "PV-Eigenverbrauch pro Tag" computed them: of the yield used in
+  // the house (self-consumption ratio) and of the house's consumption that PV covered (self-sufficiency)
+  const own = items.getItem('photovoltaics_own_ec_day').numericState;
+  [['huawei_inverter_e_day', 'energy_daily_self_use_share'], ['home_ec_day', 'energy_daily_self_sufficiency']]
+    .forEach(([whole, target]) => {
+      const w = items.getItem(whole).numericState;
+      if (own !== null && w !== null && w > 0) {
+        const state = Quantity(Math.min(100, Math.max(0, own / w * 100)).toFixed(1) + ' %');
+        items.getItem(target).postUpdate(state);
+        items.getItem(target).persistence.persist(endOfDay, state, 'influxdb');
+      }
+    });
 }"""
+# the day's shares the rule writes beside the totals: item, label, numerator over denominator
+DAILY_SHARES = [
+    ("energy_daily_self_use_share", "Energie täglich Eigenverbrauchsquote", "photovoltaics_own_ec_day",
+     "huawei_inverter_e_day"),
+    ("energy_daily_self_sufficiency", "Energie täglich Autarkiegrad", "photovoltaics_own_ec_day", "home_ec_day"),
+]
 
 
 # ---------------------------------------------------------------- helpers
@@ -3276,9 +3294,11 @@ def band_panel(title, item, active, rest, extra=(), in_tooltip=False, display=No
     smart formatter would read a bar's start as its value and a part of its id as its unit ("NaN" and a long number)."""
     # MainUI draws every bar's state as text in it and leaves out UNDEF and NULL only: the rest becomes UNDEF, so
     # nothing is drawn there, an active state a run of zero-width spaces, a key of its own for its colour that writes
-    # nothing; a bar's tooltip names it in words where the band stands alone (state_band())
+    # nothing; a bar's tooltip names it in words where the band stands alone (state_band()). MainUI (5.3) writes the
+    # mapped states over the fetched ones and maps them again whenever it rebuilds the chart (a resize, a period
+    # change), so a key maps to itself: else the second pass made every bar UNDEF and the band empty (2026-10-07)
     keys = {v: "\u200b" * (k + 1) for k, (v, _, _) in enumerate(active)}
-    names = " : ".join(f"s === '{v}' ? '{keys[v]}'" for v, _, _ in active)
+    names = " : ".join(f"s === '{v}' || s === '{keys[v]}' ? '{keys[v]}'" for v, _, _ in active)
     words = " : ".join(f"p.value[3] === '{keys[v]}' ? '{t}'" for v, t, _ in active)
     tip = (f"=(p) => p.seriesName + '<br/>' + p.marker + ({words} : '{rest}') + ' \u00b7 ' + "
            f"{hm('((p.value[2] - p.value[1]) / 60000)')}")
@@ -3315,9 +3335,8 @@ def hp_valve_band():
                       display=[("Auf Warmwasser", DHW_C)])
 
 
-def hp_operation_panels():
-    """How the heat pump heats over the day: the valve's position and the defrosts as bands, the compressor, the
-    water's flow, leaving and inlet water, the water's heat and the two electric heaters."""
+def hp_bands():
+    """The valve's position and the defrosts as bands."""
     # the bands' states reach the tooltip by numeric mirrors (rule heatpump_state_numbers), as ECharts leaves a band
     # out of a shared tooltip; the valve's position for the heating circuits, its rest, stays an empty track
     return [band_panel("Ventil", HPX["valve"], [("DHW", "Warmwasser", DHW_C)], "Heizung",
@@ -3325,7 +3344,13 @@ def hp_operation_panels():
                                                 [(0, "Heizung"), (1, "Warmwasser")])],
                        display=[("Ventil auf Warmwasser", DHW_C)]),
             band_panel("Abtauen", HPX["defrost"], [("ON", "An", "#4fc3f7")], "Aus",
-                       extra=[state_text_series("Abtauen", "heatpump_defrost_value", "#4fc3f7", [(0, "Aus"), (1, "An")])]),
+                       extra=[state_text_series("Abtauen", "heatpump_defrost_value", "#4fc3f7", [(0, "Aus"), (1, "An")])])]
+
+
+def hp_operation_panels():
+    """How the heat pump heats over the day: the valve's position and the defrosts as bands, the compressor, the
+    water's flow, leaving and inlet water, the water's heat and the two electric heaters."""
+    return hp_bands() + [
             ("Verdichter", [line("Verdichter", HPX["hz"], "#78909c")], value_axis("Hz", min=0)),
             ("Durchfluss", [area("Durchfluss", HPX["flow"], "#64b5f6")], value_axis("l/min", min=0)),
             ([("Vorlauf", SUPPLY), ("Rücklauf", RETURN)],
@@ -3342,14 +3367,15 @@ def hp_cop_panels():
             ("Außentemperatur", [line("Außen", HPX["outdoor"], "#26a69a")], span_axis("°C"))]
 
 
-def hp_cop_month():
-    """The day's COPs per day of the month: space heating and hot water as columns, the total, their mix, as a line."""
+def hp_cop_month(total=True):
+    """The day's COPs per day of the month: space heating and hot water as columns, the total, their mix, as a line
+    (total: False leaves it to Wärmepumpe pro Tag)."""
     return month_chart([daily("Heizung", "espaltherma_dcop_space", SPACE_C,
                               itemStyle={"color": SPACE_C, "borderRadius": [3, 3, 0, 0]}),
                         daily("Warmwasser", "espaltherma_dcop_dhw", DHW_C,
-                              itemStyle={"color": DHW_C, "borderRadius": [3, 3, 0, 0]}),
-                        daily("Gesamt", "espaltherma_dcop", COP_C, type="line", symbol="circle", symbolSize=5,
-                              lineStyle={"width": 2, "color": COP_C})], "COP")
+                              itemStyle={"color": DHW_C, "borderRadius": [3, 3, 0, 0]})]
+                       + [daily("Gesamt", "espaltherma_dcop", COP_C, type="line", symbol="circle", symbolSize=5,
+                                lineStyle={"width": 2, "color": COP_C})] * total, "COP")
 
 
 def hp_split_charts(part_power, part_energy, parts):
@@ -7300,15 +7326,37 @@ def miele_page(uid, title, front, p, plug, extra, icon, color):
 # ---- the individual devices
 
 
-# Heizbetrieb heute as high as the outdoor unit over the tank beside it (two cards of 640 and 420 px charts)
-HP_OPERATION_H = 1150
+# Heizbetrieb heute as high as Temperaturen heute over Kältemittel heute beside it (two cards of 420 px charts)
+HP_RUN_H, HP_SIDE_H = 930, 420
 
 
-def split_month(spec):
-    """Electricity or heat by purpose per day of the month, two of them as high as the COP card beside them."""
-    month = hp_split_charts(*spec)[1]
-    month["config"]["height"] = "298px"
-    return month
+def hp_run_panels():
+    """The heat pump's day on the page, every value once (user, 2026-10-07): the valve and the defrosts as bands,
+    electricity against heat, whose gap the COP under them puts in a number, the compressor, the water's flow and the
+    two electric heaters."""
+    return hp_bands() + [
+        ([("Strom", ELECTRIC_C), ("Wärme", "#e53935")],
+         [area("Wärme", HPX["heat"], "#e53935"), area("Strom", HPX["power"], ELECTRIC_C)], value_axis("W")),
+        ("COP", [area("COP", HPX["cop"], COP_C)], value_axis("COP", min=0)),
+        ("Verdichter", [line("Verdichter", HPX["hz"], "#78909c")], value_axis("Hz", min=0)),
+        ("Durchfluss", [area("Durchfluss", HPX["flow"], "#64b5f6")], value_axis("l/min", min=0)),
+        ([("Heizstab", HEATER_RED), ("Zusatzheizung", HP_ORANGE)],
+         [area("Heizstab", HPX["buh_power"], HEATER_RED), area("Zusatzheizung", HPX["bsh_power"], HP_ORANGE)],
+         value_axis("W", min=0))]
+
+
+def hp_temp_panels():
+    """The water's and the air's temperatures on the page, each with what it is read against: leaving and inlet
+    water, the tank and its setpoint, the outdoor air and the heat exchanger drawing heat from it."""
+    return [([("Vorlauf", SUPPLY), ("Rücklauf", RETURN)],
+             [line("Vorlauf", HPX["supply"], SUPPLY), line("Rücklauf", HPX["return"], RETURN)], span_axis("°C")),
+            ([("Warmwasser", DHW_C), ("Soll gestrichelt", DHW_C)],
+             [line("Warmwasser", HPX["tank"], DHW_C), line("Soll", HPX["tank_set"], DHW_C, dashed=True)],
+             span_axis("°C")),
+            ([("Außen", "#26a69a"), ("Wärmetauscher", "#4fc3f7")],
+             [line("Außen", HPX["outdoor"], "#26a69a"), line("Wärmetauscher", HPX["exchanger"], "#4fc3f7")],
+             span_axis("°C"))]
+
 
 
 def heatpump_blocks():
@@ -7339,14 +7387,6 @@ def heatpump_blocks():
                       vtile("Verdichterfrequenz", P["hz"]), vtile("Inverter Strom", "espaltherma_inv_primary_current"),
                       vtile("Durchfluss", P["flow"]), vtile("Umwälzpumpe Signal", "espaltherma_water_pump_signal"),
                       vtile("Wasserdruck", "espaltherma_water_pressure")])]
-    # one value per grid, leaving and inlet water together, as their spread is what counts
-    power_chart_ = stacked_chart([("Elektrisch", [area("Elektrisch", P["power"], "#fb8c00")], value_axis("W")),
-                                  ("Heizleistung", [area("Heizleistung", P["heat"], "#e53935")], value_axis("W"))], 520)
-    temps_chart = stacked_chart([([("Vorlauf", "#e53935"), ("Rücklauf", "#1e88e5")],
-                                  [line("Vorlauf", P["supply"], "#e53935"), line("Rücklauf", P["return"], "#1e88e5")],
-                                  span_axis("°C")),
-                                 ("Warmwasser", [line("Warmwasser", P["tank"], "#ab47bc")], span_axis("°C")),
-                                 ("Außen", [line("Außen", P["outdoor"], "#26a69a")], span_axis("°C"))], 520)
     today = value_grid([vtile("Elektrisch heute", "espaltherma_energy_today"),
                        vtile("Heizung", "espaltherma_energy_space_today"),
                        vtile("Warmwasser", "espaltherma_energy_dhw_today"),
@@ -7395,7 +7435,7 @@ def heatpump_blocks():
     operation = value_grid([vtile("Außengerät Betrieb", "espaltherma_operation_mode"),
                            vtile("Innengerät Betrieb", "espaltherma_i_u_operation_mode"),
                            vtile("3-Wege-Ventil", P["valve"]), vtile("Fehlercode", "espaltherma_error_code")])
-    plug, power, days, electric = plug_refs("heatpump", "material:heat_pump", "#fb8c00", title="Shelly EM",
+    plug, _, _, electric = plug_refs("heatpump", "material:heat_pump", "#fb8c00", title="Shelly EM",
                                             kind="heat-pump-split", active=flowing(num(HP), HP_ON),
                                             frequency=num(P["hz"]))
     # the cards of values on top, the full charts below, the cards paired by height so none stands with much empty
@@ -7407,20 +7447,19 @@ def heatpump_blocks():
             two(card("Temperaturen", [temps]), card("Sollwerte", [setpoints])),
             two(plug, card("Kältemittel", [refrigerant])),
             one(card("Modi", [modes])),
-            two(card("Leistung heute", [power_chart_]), card("Temperaturen heute", [temps_chart])),
-            # how it heats: valve, defrost, compressor, flow, water and heaters on one time pointer (user, 2026-10-04),
-            # half the width beside the outdoor unit over the tank, then the charts of the heat pump card's popups
-            # device by device (user, 2026-10-04); without the valve's and the heating circuit's charts and the split
-            # powers, which Heizbetrieb heute and Leistung heute already show (user, 2026-10-05)
-            two(card("Heizbetrieb heute", [stacked_chart(hp_operation_panels(), HP_OPERATION_H)]),
-                stack(card("Außengerät heute", [stacked_chart(hp_outdoor_panels(), 640)]),
-                      card("Warmwasserspeicher heute", [stacked_chart(hp_tank_panels(), 420)]))),
-            two(card("Innengerät heute", [stacked_chart(hp_indoor_panels(), 640)]),
-                card("Kältemittel heute", [stacked_chart(hp_refrigerant_panels(), 640)])),
-            two(card("COP", [stacked_chart(hp_cop_panels(), 420), titled(hp_cop_month(), "COP pro Tag")]),
-                stack(card("Strom nach Zweck", [titled(split_month(HP_ELECTRIC), "Energie pro Tag")]),
-                      card("Wärme nach Zweck", [titled(split_month(HP_HEAT), "Energie pro Tag")]))),
-            two(power, days)]
+            # few charts, every value once (user, 2026-10-07): how it ran on one time pointer beside the temperatures
+            # over the refrigerant; electricity and COP by purpose per day, as columns, since a day without heating
+            # has a COP of 0, which a line would plunge to (a purpose's heat is the two multiplied); last the day's
+            # totals. The Shelly EM's power and energy per day, the outdoor air sensor and the water pressure are left
+            # out: Heizbetrieb heute and Wärmepumpe pro Tag show the electricity with the heaters, every value tile
+            # opens its own history
+            two(card("Heizbetrieb heute", [stacked_chart(hp_run_panels(), HP_RUN_H)]),
+                stack(card("Temperaturen heute", [stacked_chart(hp_temp_panels(), HP_SIDE_H)]),
+                      card("Kältemittel heute", [stacked_chart(
+                          [pn for pn in hp_refrigerant_panels() if pn[0] != "Wärmetauscher"], HP_SIDE_H)]))),
+            two(card("Strom nach Zweck pro Tag", [hp_split_charts(*HP_ELECTRIC)[1]]),
+                card("COP nach Zweck pro Tag", [hp_cop_month(total=False)])),
+            one(card("Wärmepumpe pro Tag", [hp_days()]))]
 
 
 def air_conditioning_blocks():
@@ -7608,6 +7647,43 @@ def energy_storage_blocks():
                 card("Einheit 1", [unit]))]
 
 
+def month_combo(bars, lines, left, right, right_axis=None):
+    """Values per day of the current month: bars (name, item, colour) on the left axis in left, lines (name, item,
+    colour) on an axis on the right in right; the arrows page through months. Grafana's per-day panels rebuilt (user,
+    2026-10-07: rebuilt, not embedded)."""
+
+    def line(name, item, color):
+        return daily(name, item, color, type="line", yAxisIndex=1, symbol="circle", symbolSize=5,
+                     lineStyle={"width": 2, "color": color})
+    return chart({"chartType": "month", "periodVisible": True, "height": "300px"},
+                 grid=[comp("oh-chart-grid", {"top": "40", "bottom": "70", "left": "45", "right": "50"})],
+                 # a blank axis name: Tag stood right of the right axis's 0 and read "0 Tag", and without a name
+                 # MainUI writes "day" there
+                 xAxis=[comp("oh-category-axis", {"gridIndex": 0, "categoryType": "month", "name": " ",
+                                                  "axisTick": {"show": False}})],
+                 yAxis=[value_axis(left), value_axis(right, position="right", nameTextStyle=RIGHT_AXIS_NAME,
+                                                     splitLine={"show": False}, **(right_axis or {}))],
+                 series=[daily(name, item, color, itemStyle={"color": color, "borderRadius": [4, 4, 0, 0]})
+                         for name, item, color in bars] + [line(*spec) for spec in lines],
+                 tooltip=tooltip(trigger="axis", smartFormatter=True), legend=legend())
+
+
+def self_use_days():
+    """PV self-consumption per day of the month as bars, the self-consumption ratio (of the yield) and the
+    self-sufficiency (of the house) as lines in per cent (Grafana's "PV-Eigenverbrauch pro Tag")."""
+    return month_combo([("PV-Eigenverbrauch", "energy_daily_self_use", SELF_C)],
+                       [("Eigenverbrauchsquote", "energy_daily_self_use_share", "#64b5f6"),
+                        ("Autarkiegrad", "energy_daily_self_sufficiency", "#ba68c8")], "kWh", "%", {"min": 0, "max": 100})
+
+
+def hp_days():
+    """The heat pump's electricity and heat per day of the month as bars beside each other, the day's COP as a line
+    (Grafana's "Wärmepumpe pro Tag"), in the heat pump card's colours."""
+    return month_combo([("Strom", "espaltherma_energy_today", ELECTRIC_C),
+                        ("Wärme", "espaltherma_heating_energy_today", "#e53935")],
+                       [("COP", "espaltherma_dcop", COP_C)], "kWh", "COP", {"min": 0})
+
+
 def photovoltaics_blocks():
     now = [hero("material:solar_power", "#ffb300", "Eingangsleistung", kwc(PV),
                 picture=node_icon("pv", "#ffb300", flowing(num(PV), 10), power=num(PV))),
@@ -7619,13 +7695,15 @@ def photovoltaics_blocks():
                       vtile("Energie heute", "huawei_inverter_e_day", color="#ffb300"),
                       vtile("Eigenverbrauch heute", "photovoltaics_own_ec_day", color="#43a047"),
                       vtile("Energie gesamt", "huawei_inverter_e_total")])]
-    # the two strings under the inverter's input and output, so a shaded string shows (user, 2026-10-04)
-    chart_ = stacked_chart([("Eingang", [area("Eingang", PV, "#ffb300")], value_axis("W")),
-                            ("Wirkleistung", [area("Wirkleistung", "huawei_inverter_active_power", "#5c6bc0")],
+    # input and output overlapping in one panel, the two strings in the other, so a shaded string shows (user,
+    # 2026-10-04); two panels, not four, as four were too low to read (user, 2026-10-07)
+    chart_ = stacked_chart([((("Eingang", "#ffb300"), ("Wirkleistung", "#5c6bc0")),
+                             [area("Eingang", PV, "#ffb300"), area("Wirkleistung", "huawei_inverter_active_power", "#5c6bc0")],
                              value_axis("W")),
-                            ("String PV1", [area("PV1", "huawei_inverter_pv1_power", "#ffca28")], value_axis("W")),
-                            ("String PV2", [area("PV2", "huawei_inverter_pv2_power", "#ff8f00")], value_axis("W"))],
-                           470)  # as high as the inverter's card beside it
+                            ((("PV1", "#ffca28"), ("PV2", "#ff8f00")),
+                             [area("PV1", "huawei_inverter_pv1_power", "#ffca28"),
+                              area("PV2", "huawei_inverter_pv2_power", "#ff8f00")], value_axis("W"))],
+                           520)  # as high as the inverter's card beside it
     strings = phase_table(["PV1", "PV2"], [("Leistung", ["huawei_inverter_pv1_power", "huawei_inverter_pv2_power"]),
                                            ("Spannung", ["huawei_inverter_pv1_voltage", "huawei_inverter_pv2_voltage"]),
                                            ("Strom", ["huawei_inverter_pv1_current", "huawei_inverter_pv2_current"])])
@@ -7644,7 +7722,9 @@ def photovoltaics_blocks():
     # the day's power as high as the inverter beside it (user, 2026-10-06: no empty card space, the grid kept)
     return [two(card("Jetzt", now), stack(card("Strings (DC)", [strings]), card("Netz (AC)", [grid_]),
                                           card("Ertrag pro Tag", [fill_chart(days, "180px")], fill=True))),
-            two(card("Leistung heute", [chart_]), card("Wechselrichter", [inverter]))]
+            # the inverter first, the day's power beside it (user, 2026-10-07)
+            two(card("Wechselrichter", [inverter]), card("Leistung heute", [chart_])),
+            one(card("PV-Eigenverbrauch pro Tag", [self_use_days()]))]
 
 
 def meter_blocks(title_item, color_expr, today, phases, heads, extra, chart_item):
