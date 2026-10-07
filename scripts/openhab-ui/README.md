@@ -104,6 +104,6 @@ insertion in their sorted order. `OPENHAB_JSONDB` points them at another directo
     the energy flow's and the appliances' widgets on demo values and the controls' small widgets, for the
     screenshots, as the body to POST to `/rest/ui/components/ui:page`; delete it afterwards, the generator's next run
     removes it too. `shoot_all.sh` takes every screenshot of the GitHub repository with
-    these tools and the element scripts in `screenshot-js/`, the energy flow, the heat pump card, the consumption
-    card and the weather page's warnings on demo values (`demo_flow.js`, `demo_heatpump.js`, `demo_consumption.js`,
-    `demo_weather.js`), while the gallery is up.
+    these tools and the element scripts in `screenshot-js/`, the energy flow (demo powers, `demo_flow.js`), the heat
+    pump card and the weather page's warnings on demo values (`demo_heatpump.js`, `demo_weather.js`), while the
+    gallery is up.

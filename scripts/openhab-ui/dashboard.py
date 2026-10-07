@@ -1535,7 +1535,7 @@ def house_tiles():
                      svg_text(56, 13, f"={kw(HOME)}", 13, "700", anchor="start"),
                      svg_text(56, 29, kwh(num("home_ec_day")), 11, anchor="start", opacity="0.5"),
                      # without its unit, the line above names kWh: "+0,03 kWh zu gestern" did not fit the tile
-                     svg_pill(56, 34, *day_change("home_ec_day", "less", unit="", absolute=True))])
+                     svg_pill(56, 34, *day_change("home_ec_day", "less", unit=""))])
     # on a phone its tile spans the row: the drawing as wide as in a tile of half the row, so the rings match there too
     home["config"]["style"]["width"] = f"={NARROW} ? 'calc(50% - 14px)' : '100%'"
 
@@ -2570,11 +2570,11 @@ def hp_day_split():
                     [("Heizung", "espaltherma_energy_space_today", SPACE_C),
                      ("Warmwasser", "espaltherma_energy_dhw_today", DHW_C),
                      ("Standby", "espaltherma_energy_standby_today", STANDBY_C)],
-                    vt_chip(*day_change("espaltherma_energy_today", "less", absolute=True))),
+                    vt_chip(*day_change("espaltherma_energy_today", "less"))),
         stacked_bar("Heat Today", num("espaltherma_heating_energy_today"),
                     [("Heizung", "espaltherma_heating_energy_space_today", SPACE_C),
                      ("Warmwasser", "espaltherma_heating_energy_dhw_today", DHW_C)],
-                    vt_chip(*day_change("espaltherma_heating_energy_today", "more", absolute=True))),
+                    vt_chip(*day_change("espaltherma_heating_energy_today", "more"))),
         div([legend_dot("Heizung", SPACE_C), legend_dot("Warmwasser", DHW_C), legend_dot("Standby", STANDBY_C)],
             **{"display": "flex", "gap": "14px", "margin": "-4px 0 14px"})],
         [("heizung", SPACE_C), ("warmwasser", DHW_C), ("standby", STANDBY_C)])]
@@ -3679,7 +3679,7 @@ def consumption_content():
     """Today's consumption card: from PV and from the grid with the total's change against yesterday in their middle,
     the consumers' bar and list, each with its change (user, 2026-10-06)."""
     # in kWh, as the consumers' column beside it (user, 2026-10-07)
-    total = vt_chip(*day_change("home_ec_day", "less", absolute=True))
+    total = vt_chip(*day_change("home_ec_day", "less"))
     total["config"]["style"]["justify-self"] = "center"
     return [div([
     hover_group([div([source_head("pv", FROM_PV, "aus PV", "#43a047", "left"), total,
@@ -5507,14 +5507,14 @@ def vt_icon_chip(icon, text, cls_expr="'neutral'", visible=None):
                **{**style, "display": "inline-flex", "align-items": "center", "gap": "3px", "padding": "1px 8px 1px 6px"})
 
 
-# a comparison with yesterday in per cent or points needs a base: yesterday's value at this time at least this share of
-# yesterday's whole day and this much in the item's unit (kWh, m³); right after midnight a day counter's few watt
-# hours would read +99 % or +100 points (user, 2026-10-07)
+# a day's COP against yesterday needs a base: yesterday's electricity at this time at least this share of its whole
+# day and this much (kWh); right after midnight a few watt hours made wild COPs; DAY_BASE_MIN also keeps a pill
+# against yesterday neutral below it
 DAY_BASE_SHARE, DAY_BASE_MIN = 0.05, 0.05
 
 
 def day_base_ok(item):
-    """Whether yesterday's value of a day counter at this time is base enough for a comparison in per cent or points
+    """Whether yesterday's value of a day counter at this time is base enough for a day's COP against yesterday
     (DAY_BASE_SHARE of yesterday's whole day, d in the history, and DAY_BASE_MIN)."""
     track_history(item, c=True)
     y, d = vt_hv(item, "y"), vt_hv(item, "d")
@@ -5522,35 +5522,31 @@ def day_base_ok(item):
             f"{DAY_BASE_SHARE} * (Number({d}) || 0)))")
 
 
-def change_text(now, then, ok, unit, digits):
-    """A pill's text against yesterday: in per cent, past +300 % as a factor, where yesterday's value is base enough
-    (ok, day_base_ok()); else the difference itself in unit, as right after midnight a share of a few watt hours says
-    nothing (user, 2026-10-07: rather that than no pill at all)."""
-    d = f"(({now} - {then}) / {then} * 100)"
+def change_text(now, then, unit, digits):
+    """A pill's text against yesterday: the difference itself in unit (user, 2026-10-07: kWh, not per cent, on every
+    comparison; right after midnight a share of a few watt hours said nothing, and kWh read plainer all day)."""
     a = f"({now} - {then})"
-    pct = (f"({d} >= 300 ? '×' + {fixed(f'{now} / {then}', 0)} + ' zu gestern' : (Math.abs({d}) < 0.5 ? '±0' : "
-           f"({d} > 0 ? '+' : '−') + Math.round(Math.abs({d}))) + ' % zu gestern')")
-    absolute = (f"((Math.abs({a}) < {0.5 * 10 ** -digits} ? '±0' : ({a} > 0 ? '+' : '−') + "
-                f"{fixed(f'Math.abs({a})', digits)}) + '{' ' + unit if unit else ''} zu gestern')")
-    return f"={ok} ? {pct} : {absolute}"
+    return (f"=(Math.abs({a}) < {0.5 * 10 ** -digits} ? '±0' : ({a} > 0 ? '+' : '−') + "
+            f"{fixed(f'Math.abs({a})', digits)}) + '{' ' + unit if unit else ''} zu gestern'")
 
 
-def day_change(item, better="less", unit="kWh", digits=2, absolute=False):
-    """A day counter today against yesterday at this time, as (text, class, visible) for a pill: in per cent, green
-    where it moved the good way (better: 'less' or 'more'), past +300 % as a factor; on too small a base the
-    difference in unit, neutral (change_text()). absolute: always the difference in unit, coloured once it reaches
-    DAY_BASE_MIN."""
+def change_class(now, then, better, least):
+    """A pill's colour against yesterday: neutral without a better direction or below least, green where it moved
+    the good way (better: 'less' or 'more'), orange the other."""
+    if better is None:
+        return "'neutral'"
+    a = f"({now} - {then})"
+    good = "false" if better == "less" else "true"
+    return f"(Math.abs({a}) < {least} ? 'neutral' : ({a} > 0) === {good} ? 'good' : 'warn')"
+
+
+def day_change(item, better="less", unit="kWh", digits=2):
+    """A day counter today against yesterday at this time, as (text, class, visible) for a pill: the difference in
+    unit (change_text()), coloured once it reaches DAY_BASE_MIN."""
     track_history(item, c=True)
     y = f"Number({vt_hv(item, 'y')})"
-    d = f"(({num(item)} - {y}) / {y} * 100)"
-    ok = "false" if absolute else day_base_ok(item)
-    good = "false" if better == "less" else "true"
-    if absolute:
-        a = f"({num(item)} - {y})"
-        cls = f"(Math.abs({a}) < {DAY_BASE_MIN} ? 'neutral' : ({a} > 0) === {good} ? 'good' : 'warn')"
-    else:
-        cls = f"(!{ok} || Math.abs({d}) < 3 ? 'neutral' : ({d} > 0) === {good} ? 'good' : 'warn')"
-    return change_text(num(item), y, ok, unit, digits), cls, f"={vt_has(vt_hv(item, 'y'))}"
+    return (change_text(num(item), y, unit, digits), change_class(num(item), y, better, DAY_BASE_MIN),
+            f"={vt_has(vt_hv(item, 'y'))}")
 
 
 def value_change(item, digits=1, unit="", base=None):
@@ -5677,12 +5673,8 @@ def compare_tile(title, item, color, better=None, digits=2, unit="kWh", factor=1
     v = f"({num(item)} * {factor})"
     y, a = f"(Number({vt_hv(item, 'y')}) * {factor})", f"(Number({vt_hv(item, 'a')}) * {factor})"
     top = f"(Math.max({v}, {vt_has(vt_hv(item, 'y'))} ? {y} : 0, {vt_has(vt_hv(item, 'a'))} ? {a} : 0) * 1.08 || 1)"
-    d = f"(({v} - {y}) / {y} * 100)"
-    ok = day_base_ok(item)
-    cls = ("'neutral'" if better is None else
-           f"(!{ok} || Math.abs({d}) < 3 ? 'neutral' : ({d} > 0) === {'true' if better == 'more' else 'false'} ? "
-           f"'good' : 'warn')")
-    diff = vt_chip(change_text(v, y, ok, unit, digits), cls, visible=f"={vt_has(vt_hv(item, 'y'))}")
+    diff = vt_chip(change_text(v, y, unit, digits), change_class(v, y, better, DAY_BASE_MIN * factor),
+                   visible=f"={vt_has(vt_hv(item, 'y'))}")
     rows = []
     for name, expr, color_, dashed, known in (("heute", v, color, False, "true"),
                                              ("gestern", y, "rgba(127, 127, 127, 0.55)", False, vt_has(vt_hv(item, 'y'))),

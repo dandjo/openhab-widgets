@@ -39,7 +39,8 @@ OVERVIEW = [
      "draw, as large as the rings beside it, with its power and today's energy against yesterday's at this time "
      "in a pill (the difference in kWh), and today's self-consumption and self-sufficiency as rings, each with yesterday's whole day in a "
      "pill, green while today's share is higher, orange while lower. The card places its lines and nodes as "
-     "`flow-link` and `flow-node`. The recording and the dark screenshot show it with demo values."),
+     "`flow-link` and `flow-node`. The recording and the dark screenshot show it with demo powers; today's energies "
+     "and the comparisons are those of the moment shown."),
     ("switches-card", "Switches", "The switchable plugs under the energy flow as `switch-tile`s, five abreast, three "
      "on a phone: icon, *On* or *Off*, name, power and today's energy; a tap anywhere switches, and while on a tile is "
      "tinted and outlined in its colour."),

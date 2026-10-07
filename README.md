@@ -149,7 +149,8 @@ appliances a popup of their own. Under the star three tiles with large pale icon
 of what the consumers draw, as large as the rings beside it, with its power and today's energy against yesterday's at
 this time in a pill (the difference in kWh), and today's self-consumption and self-sufficiency as rings, each with
 yesterday's whole day in a pill, green while today's share is higher, orange while lower. The card places its lines and
-nodes as `flow-link` and `flow-node`. The recording and the dark screenshot show it with demo values.
+nodes as `flow-link` and `flow-node`. The recording and the dark screenshot show it with demo powers; today's energies
+and the comparisons are those of the moment shown.
 
 Needs `flow-link`, `flow-node`.
 
