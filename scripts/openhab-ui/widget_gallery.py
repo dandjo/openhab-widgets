@@ -61,12 +61,6 @@ def links_card():
         g.svg_text(car[0], 97, "2,0 kW", 16, "700")], 440, 110, 560)])
 
 
-def rings_card():
-    return g.card("flow-share-ring", [drawing([g.flow_share_ring((40, 40), "Self-consumption", "72", "100"),
-                                               g.flow_share_ring((230, 40), "Self-sufficiency", "41", "100")],
-                                              360, 80, 480)])
-
-
 def appliance_icons_card():
     demo = [("washer", True, 45, "läuft · 45 %"), ("dryer", True, 70, "läuft · 70 %"),
             ("dish-washer", True, None, "läuft, ohne Fortschritt"), ("washer", False, None, "aus")]
@@ -101,9 +95,25 @@ def tiles_card():
     return g.card("switch-tile", [g.div([g.switch_tiles()], **{"padding": "4px 16px 14px"})])
 
 
+def value_tiles_card():
+    """value-tile itself, with the air conditioner's values as its page listed them before value_grid() gave most
+    values a form of their own."""
+    tiles = [g.vtile("Geräteleistung", "air_conditioning_unit_power", color=g.AC_BLUE),
+             g.vtile("Außengerät", "faikout_perfera_power"),
+             g.vtile("Außentemperatur", "faikout_perfera_outdoor_temperature"),
+             g.vtile("Flüssigkeitstemperatur", "faikout_perfera_liquid_temperature"),
+             g.vtile("Solltemperatur", "faikout_perfera_temperature_setpoint"),
+             g.vtile("Lüfterdrehzahl", "faikout_perfera_fan_speed"),
+             g.vtile("Verdichterfrequenz", "faikout_perfera_compressor_frequency")]
+    return g.card("value-tile", [g.div(tiles, **{"display": "grid", "grid-template-columns": "repeat(2, minmax(0, 1fr))",
+                                                 "gap": "10px", "padding": "4px 16px 16px"})])
+
+
 def gallery_page(now):
-    blocks = [g.two(nodes_card(), links_card()), g.two(rings_card(), appliance_icons_card()),
-              g.two(pills_card(), bars_card()), g.one(tiles_card())]
+    # card order is what shoot_all.sh counts by: 0 nodes, 1 links, 2 appliance icons, 3 state bars, 4 pills,
+    # 5 switch tiles, 6 value tiles
+    blocks = [g.two(nodes_card(), links_card()), g.two(appliance_icons_card(), bars_card()),
+              g.one(pills_card()), g.one(tiles_card()), g.two(value_tiles_card(), g.div([]))]
     return g.layout_page(UID, {"label": "Widget-Galerie", "sidebar": False}, blocks, now)
 
 

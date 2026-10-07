@@ -1,0 +1,478 @@
+uid: heatpump-tank-quick
+tags:
+- controls
+props:
+  parameters:
+  - name: heatpumpDhwTankTemp
+    label: ESPAltherma DHW Tank Temperature
+    description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpDhwSetpoint
+    label: ESPAltherma DHW Setpoint
+    description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpBshMode
+    label: ESPAltherma Booster Heater (BSH) Mode
+    description: Switch item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpBshPower
+    label: ESPAltherma Electrical Power Booster Heater
+    description: Number:Power item
+    type: TEXT
+    required: true
+    context: item
+  parameterGroups: []
+timestamp: Oct 7, 2026, 2:25:52 AM
+component: div
+config:
+  style:
+    --quick-popup: panel
+  label: Hot Water Tank
+  stylesheet: ':root .popup:has(> .oh-popup[style*="--quick-popup"]) { --f7-popup-tablet-width: 420px; --f7-popup-tablet-height:
+    min(660px, calc(100vh - 64px)); }
+
+    .menu-item-dropdown:not(.menu-item-dropdown-opened) .menu-dropdown { display: none; }
+
+    .oh-chart-container > .menu.padding { padding-top: 6px !important; }'
+slots:
+  default:
+  - component: div
+    config:
+      style:
+        display: flex
+        flex-direction: column
+        gap: 6px
+        padding: 12px 14px
+    slots:
+      default:
+      - component: div
+        config:
+          style:
+            display: flex
+            align-items: center
+            gap: 10px
+            padding-bottom: 4px
+        slots:
+          default:
+          - component: div
+            config:
+              style:
+                width: 34px
+                height: 34px
+                flex: 0 0 auto
+                border-radius: 50%
+                display: flex
+                align-items: center
+                justify-content: center
+                background: 'color-mix(in srgb, #e57373 22%, transparent)'
+            slots:
+              default:
+              - component: oh-icon
+                config:
+                  icon: material:propane_tank
+                  width: 20
+                  height: 20
+          - component: div
+            config:
+              style:
+                display: flex
+                flex-direction: column
+                min-width: '0'
+            slots:
+              default:
+              - component: Label
+                config:
+                  text: Hot Water Tank
+                  style:
+                    font-size: 15px
+                    font-weight: '600'
+              - component: Label
+                config:
+                  text: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpDhwTankTemp].state) ? ''–'' : (items[props.heatpumpDhwTankTemp].displayState
+                    || items[props.heatpumpDhwTankTemp].state)) + '' · Target '' + ([''NULL'', ''UNDEF''].includes(items[props.heatpumpDhwSetpoint].state)
+                    ? ''–'' : (items[props.heatpumpDhwSetpoint].displayState || items[props.heatpumpDhwSetpoint].state)) +
+                    '' · Booster heater '' + (items[props.heatpumpBshMode].state === ''ON'' ? ''on'' : ''off'')'
+                  style:
+                    font-size: 12px
+                    opacity: '0.7'
+                    white-space: nowrap
+                    overflow: hidden
+                    text-overflow: ellipsis
+      - component: div
+        config:
+          style:
+            display: grid
+            grid-template-columns: repeat(auto-fill, minmax(170px, 1fr))
+            gap: 8px
+        slots:
+          default:
+          - component: div
+            config:
+              style:
+                position: relative
+                box-sizing: border-box
+                min-width: '0'
+                border-radius: 12px
+                padding: 10px 12px
+                background: rgba(127, 127, 127, 0.08)
+                overflow: hidden
+                grid-column: 1 / -1
+            slots:
+              default:
+              - component: div
+                config:
+                  style:
+                    display: flex
+                    align-items: center
+                    gap: 14px
+                slots:
+                  default:
+                  - component: svg
+                    config:
+                      viewBox: 0 0 70 120
+                      style:
+                        width: 44px
+                        height: auto
+                        flex: 0 0 auto
+                    slots:
+                      default:
+                      - component: defs
+                        config: {}
+                        slots:
+                          default:
+                          - component: linearGradient
+                            config:
+                              id: tk-c4688982
+                              x1: '0'
+                              x2: '0'
+                              y1: '0'
+                              y2: '1'
+                            slots:
+                              default:
+                              - component: stop
+                                config:
+                                  offset: '0'
+                                  stop-color: '=((Number(items[props.heatpumpDhwTankTemp].numericState) || 0) > 50 ? ''#e57373''
+                                    : (Number(items[props.heatpumpDhwTankTemp].numericState) || 0) >= 40 ? ''#fb8c00'' : (Number(items[props.heatpumpDhwTankTemp].numericState)
+                                    || 0) >= 35 ? ''#fbc02d'' : ''#64b5f6'')'
+                              - component: stop
+                                config:
+                                  offset: '0.52'
+                                  stop-color: '=((Number(items[props.heatpumpDhwTankTemp].numericState) || 0) > 50 ? ''#e57373''
+                                    : (Number(items[props.heatpumpDhwTankTemp].numericState) || 0) >= 40 ? ''#fb8c00'' : (Number(items[props.heatpumpDhwTankTemp].numericState)
+                                    || 0) >= 35 ? ''#fbc02d'' : ''#64b5f6'')'
+                              - component: stop
+                                config:
+                                  offset: '0.52'
+                                  stop-color: '#ffcc80'
+                              - component: stop
+                                config:
+                                  offset: '0.76'
+                                  stop-color: '#ffcc80'
+                              - component: stop
+                                config:
+                                  offset: '0.76'
+                                  stop-color: '#bbdefb'
+                              - component: stop
+                                config:
+                                  offset: '1'
+                                  stop-color: '#bbdefb'
+                      - component: rect
+                        config:
+                          x: 8
+                          y: 6
+                          width: 54
+                          height: 108
+                          rx: 16
+                          fill: url(#tk-c4688982)
+                          stroke: currentColor
+                          fill-opacity: '0.85'
+                          stroke-opacity: '0.3'
+                          stroke-width: '1.5'
+                  - component: div
+                    config:
+                      style:
+                        min-width: '0'
+                    slots:
+                      default:
+                      - component: Label
+                        config:
+                          text: Temperature at the top
+                          style:
+                            font-size: 12px
+                            opacity: '0.65'
+                            white-space: nowrap
+                            overflow: hidden
+                            text-overflow: ellipsis
+                      - component: Label
+                        config:
+                          text: '=(([''NULL'', ''UNDEF''].includes(items[props.heatpumpDhwTankTemp].state) ? ''–'' : (items[props.heatpumpDhwTankTemp].displayState
+                            || items[props.heatpumpDhwTankTemp].state)) || ''–'')'
+                          style:
+                            font-size: 20px
+                            font-weight: '700'
+                            line-height: '1.3'
+                            white-space: nowrap
+                      - component: Label
+                        config:
+                          text: '=''Target '' + (([''NULL'', ''UNDEF''].includes(items[props.heatpumpDhwSetpoint].state) ?
+                            ''–'' : (items[props.heatpumpDhwSetpoint].displayState || items[props.heatpumpDhwSetpoint].state))
+                            || ''–'') + '' · '' + ((((Number(items[props.heatpumpDhwTankTemp].numericState) || 0) - (Number(items[props.heatpumpDhwSetpoint].numericState)
+                            || 0))) >= 0 ? ''+'' : ''−'') + (Math.abs(((Number(items[props.heatpumpDhwTankTemp].numericState)
+                            || 0) - (Number(items[props.heatpumpDhwSetpoint].numericState) || 0)))).toFixed(1) + '' K'''
+                          style:
+                            font-size: 11px
+                            opacity: '0.65'
+                      - component: div
+                        config:
+                          style:
+                            margin-top: 6px
+                        slots:
+                          default:
+                          - component: Label
+                            config:
+                              text: '=((Number(items[props.heatpumpDhwTankTemp].numericState) || 0) - (Number(items[props.heatpumpDhwSetpoint].numericState)
+                                || 0)) >= 0 ? ''above target'' : ''below target'''
+                              style:
+                                font-size: 11px
+                                font-weight: '600'
+                                padding: 2px 8px
+                                border-radius: 9px
+                                white-space: nowrap
+                                width: fit-content
+                                color: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
+                                  ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
+                                  ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[((Number(items[props.heatpumpDhwTankTemp].numericState)
+                                  || 0) - (Number(items[props.heatpumpDhwSetpoint].numericState) || 0)) >= 0 ? ''good'' :
+                                  ''warn''] || (({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution:
+                                  [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''],
+                                  info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark
+                                  === ''dark'') ? 1 : 0]'
+                                background: '=''color-mix(in srgb, '' + ((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'',
+                                  ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad:
+                                  [''#c62828'', ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[((Number(items[props.heatpumpDhwTankTemp].numericState)
+                                  || 0) - (Number(items[props.heatpumpDhwSetpoint].numericState) || 0)) >= 0 ? ''good'' :
+                                  ''warn''] || (({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution:
+                                  [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''],
+                                  info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark
+                                  === ''dark'') ? 1 : 0] + '' 16%, transparent)'''
+      - component: oh-chart
+        config:
+          chartType: ''
+          periodVisible: true
+          period: D
+          height: 288px
+          options:
+            backgroundColor: transparent
+            axisPointer:
+              link:
+              - xAxisIndex: all
+        slots:
+          grid:
+          - component: oh-chart-grid
+            config:
+              top: 62
+              height: 140
+              left: '50'
+              right: '20'
+          - component: oh-chart-grid
+            config:
+              top: 242
+              height: 16
+              left: '50'
+              right: '20'
+              show: true
+              backgroundColor: rgba(127, 127, 127, 0.13)
+              borderWidth: 0
+          xAxis:
+          - component: oh-time-axis
+            config:
+              gridIndex: 0
+              axisPointer:
+                snap: false
+                label:
+                  show: false
+              axisLabel:
+                show: false
+          - component: oh-time-axis
+            config:
+              gridIndex: 0
+              axisPointer:
+                snap: false
+                label:
+                  show: false
+              show: false
+          - component: oh-time-axis
+            config:
+              gridIndex: 1
+              axisPointer:
+                snap: false
+                label:
+                  show: false
+          - component: oh-time-axis
+            config:
+              gridIndex: 1
+              axisPointer:
+                snap: false
+                label:
+                  show: false
+              show: false
+          yAxis:
+          - component: oh-value-axis
+            config:
+              gridIndex: 0
+              name: °C
+              nameGap: 14
+              nameTextStyle:
+                align: right
+                padding:
+                - 0
+                - 8
+                - 0
+                - 0
+              splitLine:
+                lineStyle:
+                  type: dashed
+                  opacity: 0.4
+              scale: true
+              min: =(v) => Math.floor(Math.min(v.min, (v.min + v.max - 4) / 2))
+              max: =(v) => Math.ceil(Math.max(v.max, (v.min + v.max + 4) / 2))
+          - component: oh-category-axis
+            config:
+              categoryType: values
+              data:
+              - Booster heater
+              show: false
+              gridIndex: 1
+          - component: oh-value-axis
+            config:
+              gridIndex: 1
+              show: false
+          series:
+          - component: oh-time-series
+            config:
+              name: Temperature
+              gridIndex: 0
+              xAxisIndex: 0
+              yAxisIndex: 0
+              type: line
+              item: =props.heatpumpDhwTankTemp
+              symbol: none
+              lineStyle:
+                width: 2
+                color: '#e57373'
+              itemStyle:
+                color: '#e57373'
+          - component: oh-time-series
+            config:
+              name: Target
+              gridIndex: 0
+              xAxisIndex: 1
+              yAxisIndex: 0
+              type: line
+              item: =props.heatpumpDhwSetpoint
+              symbol: none
+              lineStyle:
+                width: 1.5
+                type: dashed
+                color: '#e57373'
+              itemStyle:
+                color: '#e57373'
+          - component: oh-state-series
+            config:
+              name: Booster heater
+              item: =props.heatpumpBshMode
+              yValue: 0
+              yHeight: 1
+              mapState: '=(s) => s === ''ON'' ? ''​'' : ''UNDEF'''
+              stateColor:
+                ​: '#fb8c00'
+              tooltip:
+                show: false
+              xAxisIndex: 2
+              yAxisIndex: 1
+              gridIndex: 1
+          - component: oh-time-series
+            config:
+              name: Booster heater
+              gridIndex: 1
+              xAxisIndex: 3
+              yAxisIndex: 2
+              type: line
+              item: =props.heatpumpBshPower
+              symbol: none
+              lineStyle:
+                opacity: 0
+              itemStyle:
+                color: '#fb8c00'
+          title:
+          - component: oh-chart-title
+            config:
+              show: true
+              text: '{s0|Temperature} · {s1|Target dashed}'
+              left: 10
+              top: 15
+              textStyle:
+                fontSize: 13
+                fontWeight: 600
+                rich:
+                  s0:
+                    fontSize: 13
+                    fontWeight: 600
+                    color: '#e57373'
+                  s1:
+                    fontSize: 13
+                    fontWeight: 600
+                    color: '#e57373'
+          - component: oh-chart-title
+            config:
+              show: true
+              text: '{s0|Booster heater}'
+              left: 10
+              top: 210
+              textStyle:
+                fontSize: 13
+                fontWeight: 600
+                rich:
+                  s0:
+                    fontSize: 13
+                    fontWeight: 600
+                    color: '#fb8c00'
+          tooltip:
+          - component: oh-chart-tooltip
+            config:
+              show: true
+              confine: true
+              trigger: axis
+              smartFormatter: false
+              formatter: '=(ps) => ''<div>'' + dayjs(ps[0].axisValue).format(''llll'') + ''</div>'' + ps.filter((p) => p.seriesId
+                && (p.seriesId.indexOf(''oh-time-series'') === 0) && (!(p.seriesName === ''Booster heater'') || Math.abs(p.value[0]
+                - ps[0].axisValue) <= 960000)).map((p) => p.marker + '' '' + p.seriesName + ''<span style="float: right; margin-left:
+                20px"><b>'' + ((v) => p.seriesName === ''Booster heater'' ? (v > 0 ? ''On'' : ''Off'') : v.toLocaleString(''en-GB'')
+                + '' '' + p.seriesId.split(''#'')[2])(Number(p.value[1])) + ''</b></span><br/>'').join('''')'
+      - component: div
+        config:
+          style:
+            display: flex
+            justify-content: flex-end
+            padding-top: 4px
+        slots:
+          default:
+          - component: oh-button
+            config:
+              text: All details
+              action: popup
+              actionModal: page:heatpump
+              outline: true
+              small: true
+              style:
+                color: '#e57373'
+                border-color: '#e57373'
+                width: auto
+                padding: 0 12px

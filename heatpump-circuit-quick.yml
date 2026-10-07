@@ -1,0 +1,649 @@
+uid: heatpump-circuit-quick
+tags:
+- controls
+props:
+  parameters:
+  - name: heatpumpLeavingWaterTempAfterBuh
+    label: ESPAltherma Leaving Water Temperature After BUH
+    description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpInletWaterTemp
+    label: ESPAltherma Inlet Water Temperature
+    description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpLeavingWaterTempOffsetHeating
+    label: Pyaltherma Leaving Water Temp Offset Heating
+    description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpLeavingWaterSetpoint
+    label: ESPAltherma Leaving Water Setpoint
+    description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpClimateControlPower
+    label: Pyaltherma Climate Control Power
+    description: Switch item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpHeatingPowerAfterBuh
+    label: ESPAltherma Heating Power After BUH
+    description: Number:Power item
+    type: TEXT
+    required: true
+    context: item
+  parameterGroups: []
+timestamp: Oct 7, 2026, 2:25:52 AM
+component: div
+config:
+  style:
+    --quick-popup: panel
+  label: Heating Circuit
+  stylesheet: ':root .popup:has(> .oh-popup[style*="--quick-popup"]) { --f7-popup-tablet-width: 420px; --f7-popup-tablet-height:
+    min(660px, calc(100vh - 64px)); }
+
+    .menu-item-dropdown:not(.menu-item-dropdown-opened) .menu-dropdown { display: none; }
+
+    .oh-chart-container > .menu.padding { padding-top: 6px !important; }'
+slots:
+  default:
+  - component: div
+    config:
+      style:
+        display: flex
+        flex-direction: column
+        gap: 6px
+        padding: 12px 14px
+    slots:
+      default:
+      - component: div
+        config:
+          style:
+            display: flex
+            align-items: center
+            gap: 10px
+            padding-bottom: 4px
+        slots:
+          default:
+          - component: div
+            config:
+              style:
+                width: 34px
+                height: 34px
+                flex: 0 0 auto
+                border-radius: 50%
+                display: flex
+                align-items: center
+                justify-content: center
+                background: 'color-mix(in srgb, #e57373 22%, transparent)'
+            slots:
+              default:
+              - component: oh-icon
+                config:
+                  icon: material:waves
+                  width: 20
+                  height: 20
+          - component: div
+            config:
+              style:
+                display: flex
+                flex-direction: column
+                min-width: '0'
+            slots:
+              default:
+              - component: Label
+                config:
+                  text: Heating Circuit
+                  style:
+                    font-size: 15px
+                    font-weight: '600'
+              - component: Label
+                config:
+                  text: '=''Flow '' + ([''NULL'', ''UNDEF''].includes(items[props.heatpumpLeavingWaterTempAfterBuh].state)
+                    ? ''–'' : (items[props.heatpumpLeavingWaterTempAfterBuh].displayState || items[props.heatpumpLeavingWaterTempAfterBuh].state))
+                    + '' · Return '' + ([''NULL'', ''UNDEF''].includes(items[props.heatpumpInletWaterTemp].state) ? ''–''
+                    : (items[props.heatpumpInletWaterTemp].displayState || items[props.heatpumpInletWaterTemp].state))'
+                  style:
+                    font-size: 12px
+                    opacity: '0.7'
+                    white-space: nowrap
+                    overflow: hidden
+                    text-overflow: ellipsis
+      - component: widget:pill-slider
+        config:
+          item: =props.heatpumpLeavingWaterTempOffsetHeating
+          color: '#fb8c00'
+          min: -10
+          max: 10
+          step: 1
+          unit: °C
+          title: Flow offset
+          value: '=(Math.round((Number(items[props.heatpumpLeavingWaterTempOffsetHeating].numericState) || 0)) > 0 ? ''+''
+            : '''') + Math.round((Number(items[props.heatpumpLeavingWaterTempOffsetHeating].numericState) || 0)) + '' °C'''
+          context: '=''Flow target '' + ([''NULL'', ''UNDEF''].includes(items[props.heatpumpLeavingWaterSetpoint].state) ?
+            ''–'' : (items[props.heatpumpLeavingWaterSetpoint].displayState || items[props.heatpumpLeavingWaterSetpoint].state))
+            + (items[props.heatpumpClimateControlPower].state === ''ON'' ? '''' : '' · Heating off'')'
+          marks: -10=−10 °C;-5=−5;0=0;5=+5;10=+10 °C
+          icon: material:tune
+          row: true
+      - component: div
+        config:
+          style:
+            display: grid
+            grid-template-columns: repeat(auto-fill, minmax(170px, 1fr))
+            gap: 8px
+        slots:
+          default:
+          - component: div
+            config:
+              style:
+                position: relative
+                box-sizing: border-box
+                min-width: '0'
+                border-radius: 12px
+                padding: 10px 12px
+                background: rgba(127, 127, 127, 0.08)
+                overflow: hidden
+            slots:
+              default:
+              - component: div
+                config:
+                  style:
+                    display: flex
+                    align-items: center
+                    gap: 8px
+                slots:
+                  default:
+                  - component: div
+                    config:
+                      style:
+                        font-size: 12px
+                        opacity: '0.65'
+                        white-space: nowrap
+                        overflow: hidden
+                        text-overflow: ellipsis
+                        display: flex
+                        align-items: center
+                        gap: 3px
+                        flex: 1 1 auto
+                    slots:
+                      default:
+                      - component: Label
+                        config:
+                          text: Flow
+                      - component: oh-icon
+                        config:
+                          icon: material:arrow_forward
+                          width: 12
+                          height: 12
+                          style:
+                            width: 12px
+                            height: 12px
+                            flex: 0 0 auto
+                      - component: Label
+                        config:
+                          text: Return
+                  - component: Label
+                    config:
+                      text: ='ΔT ' + (((Number(items[props.heatpumpLeavingWaterTempAfterBuh].numericState) || 0) - (Number(items[props.heatpumpInletWaterTemp].numericState)
+                        || 0))).toFixed(1) + ' K'
+                      style:
+                        font-size: 11px
+                        font-weight: '600'
+                        padding: 2px 8px
+                        border-radius: 9px
+                        white-space: nowrap
+                        width: fit-content
+                        color: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
+                          ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
+                          ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[''neutral''] || (({good: [''#2e7d32'', ''#81c784''],
+                          ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''],
+                          bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark
+                          === ''dark'') ? 1 : 0]'
+                        background: '=''color-mix(in srgb, '' + ((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''],
+                          caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''],
+                          info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[''neutral''] || (({good:
+                          [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''],
+                          warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''],
+                          neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark === ''dark'') ? 1 : 0] + '' 16%,
+                          transparent)'''
+              - component: div
+                config:
+                  style:
+                    display: flex
+                    justify-content: space-between
+                    gap: 8px
+                    margin-top: 4px
+                slots:
+                  default:
+                  - component: div
+                    config:
+                      style:
+                        min-width: '0'
+                    slots:
+                      default:
+                      - component: Label
+                        config:
+                          text: Flow
+                          style:
+                            font-size: 11px
+                            opacity: '0.65'
+                      - component: Label
+                        config:
+                          text: =((Number(items[props.heatpumpLeavingWaterTempAfterBuh].numericState) || 0)).toFixed(1) +
+                            ' °C'
+                          style:
+                            font-size: 20px
+                            font-weight: '700'
+                            line-height: '1.3'
+                            white-space: nowrap
+                            color: '#e57373'
+                            text-align: left
+                  - component: div
+                    config:
+                      style:
+                        min-width: '0'
+                    slots:
+                      default:
+                      - component: Label
+                        config:
+                          text: Return
+                          style:
+                            font-size: 11px
+                            opacity: '0.65'
+                      - component: Label
+                        config:
+                          text: =((Number(items[props.heatpumpInletWaterTemp].numericState) || 0)).toFixed(1) + ' °C'
+                          style:
+                            font-size: 20px
+                            font-weight: '700'
+                            line-height: '1.3'
+                            white-space: nowrap
+                            color: '#64b5f6'
+                            text-align: right
+              - component: div
+                config:
+                  style:
+                    display: flex
+                    justify-content: space-around
+                    align-items: center
+                    color: '#ffffff'
+                    height: 10px
+                    border-radius: 5px
+                    margin-top: 8px
+                    overflow: hidden
+                    background: 'linear-gradient(90deg, #e57373, #64b5f6)'
+                slots:
+                  default:
+                  - component: oh-icon
+                    config:
+                      icon: material:chevron_right
+                      width: 12
+                      height: 12
+                      style:
+                        width: 12px
+                        height: 12px
+                        flex: 0 0 auto
+                  - component: oh-icon
+                    config:
+                      icon: material:chevron_right
+                      width: 12
+                      height: 12
+                      style:
+                        width: 12px
+                        height: 12px
+                        flex: 0 0 auto
+                  - component: oh-icon
+                    config:
+                      icon: material:chevron_right
+                      width: 12
+                      height: 12
+                      style:
+                        width: 12px
+                        height: 12px
+                        flex: 0 0 auto
+          - component: div
+            config:
+              style:
+                position: relative
+                box-sizing: border-box
+                min-width: '0'
+                border-radius: 12px
+                padding: 10px 12px
+                background: rgba(127, 127, 127, 0.08)
+                overflow: hidden
+            slots:
+              default:
+              - component: Label
+                config:
+                  text: Flow vs. target
+                  style:
+                    font-size: 12px
+                    opacity: '0.65'
+                    white-space: nowrap
+                    overflow: hidden
+                    text-overflow: ellipsis
+              - component: div
+                config:
+                  style:
+                    display: flex
+                    flex-wrap: wrap
+                    align-items: center
+                    justify-content: space-between
+                    gap: 2px 8px
+                slots:
+                  default:
+                  - component: Label
+                    config:
+                      text: '=(([''NULL'', ''UNDEF''].includes(items[props.heatpumpLeavingWaterTempAfterBuh].state) ? ''–''
+                        : (items[props.heatpumpLeavingWaterTempAfterBuh].displayState || items[props.heatpumpLeavingWaterTempAfterBuh].state))
+                        || ''–'')'
+                      style:
+                        font-size: 20px
+                        font-weight: '700'
+                        line-height: '1.3'
+                        white-space: nowrap
+                  - component: Label
+                    config:
+                      text: '=((((Number(items[props.heatpumpLeavingWaterTempAfterBuh].numericState) || 0) - (Number(items[props.heatpumpLeavingWaterSetpoint].numericState)
+                        || 0))) >= 0 ? ''+'' : ''−'') + (Math.abs(((Number(items[props.heatpumpLeavingWaterTempAfterBuh].numericState)
+                        || 0) - (Number(items[props.heatpumpLeavingWaterSetpoint].numericState) || 0)))).toFixed(1) + '' K'''
+                      style:
+                        font-size: 14px
+                        font-weight: '700'
+                        color: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
+                          ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
+                          ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[(Math.abs(((Number(items[props.heatpumpLeavingWaterTempAfterBuh].numericState)
+                          || 0) - (Number(items[props.heatpumpLeavingWaterSetpoint].numericState) || 0))) <= 1 ? ''good''
+                          : ''warn'')] || (({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
+                          ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
+                          ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark === ''dark'') ?
+                          1 : 0]'
+                        white-space: nowrap
+                      visible: =true
+              - component: div
+                config:
+                  style:
+                    position: relative
+                    height: 8px
+                    margin: 14px 0 4px
+                slots:
+                  default:
+                  - component: div
+                    config:
+                      style:
+                        position: absolute
+                        inset: '0'
+                        border-radius: 4px
+                        background: rgba(127, 127, 127, 0.18)
+                    slots:
+                      default: []
+                  - component: div
+                    config:
+                      style:
+                        position: absolute
+                        left: '0'
+                        top: '0'
+                        height: 8px
+                        border-radius: 4px
+                        background: '#e57373'
+                        width: =Math.max(0, Math.min(100, (((Number(items[props.heatpumpLeavingWaterTempAfterBuh].numericState)
+                          || 0)) - (20)) / ((50) - (20)) * 100)) + '%'
+                        opacity: '=true ? 0.45 : 1'
+                    slots:
+                      default: []
+                  - component: div
+                    config:
+                      style:
+                        position: absolute
+                        left: '0'
+                        top: '0'
+                        height: 8px
+                        border-radius: 4px
+                        background: '#e57373'
+                        width: =Math.min(Math.max(0, Math.min(100, (((Number(items[props.heatpumpLeavingWaterTempAfterBuh].numericState)
+                          || 0)) - (20)) / ((50) - (20)) * 100)), Math.max(0, Math.min(100, (((Number(items[props.heatpumpLeavingWaterSetpoint].numericState)
+                          || 0)) - (20)) / ((50) - (20)) * 100))) + '%'
+                      visible: =true
+                    slots:
+                      default: []
+                  - component: div
+                    config:
+                      style:
+                        position: absolute
+                        top: -6px
+                        height: 20px
+                        width: 2px
+                        margin-left: -1px
+                        border-radius: 1px
+                        background: currentColor
+                        left: =Math.max(0, Math.min(100, (((Number(items[props.heatpumpLeavingWaterSetpoint].numericState)
+                          || 0)) - (20)) / ((50) - (20)) * 100)) + '%'
+                      visible: =true
+                    slots:
+                      default: []
+              - component: div
+                config:
+                  style:
+                    display: flex
+                    justify-content: space-between
+                    font-size: 11px
+                    opacity: '0.65'
+                    margin-top: 6px
+                slots:
+                  default:
+                  - component: Label
+                    config:
+                      text: '20'
+                  - component: Label
+                    config:
+                      text: '=true ? ''Target '' + (([''NULL'', ''UNDEF''].includes(items[props.heatpumpLeavingWaterSetpoint].state)
+                        ? ''–'' : (items[props.heatpumpLeavingWaterSetpoint].displayState || items[props.heatpumpLeavingWaterSetpoint].state))
+                        || ''–'') : ''no target'''
+                  - component: Label
+                    config:
+                      text: '50'
+      - component: oh-chart
+        config:
+          chartType: ''
+          periodVisible: true
+          period: D
+          height: 392px
+          options:
+            backgroundColor: transparent
+            axisPointer:
+              link:
+              - xAxisIndex: all
+        slots:
+          grid:
+          - component: oh-chart-grid
+            config:
+              top: 62
+              height: 120
+              left: '50'
+              right: '20'
+          - component: oh-chart-grid
+            config:
+              top: 242
+              height: 120
+              left: '50'
+              right: '20'
+          xAxis:
+          - component: oh-time-axis
+            config:
+              gridIndex: 0
+              axisPointer:
+                snap: false
+                label:
+                  show: false
+              axisLabel:
+                show: false
+          - component: oh-time-axis
+            config:
+              gridIndex: 0
+              axisPointer:
+                snap: false
+                label:
+                  show: false
+              show: false
+          - component: oh-time-axis
+            config:
+              gridIndex: 1
+              axisPointer:
+                snap: false
+                label:
+                  show: false
+          yAxis:
+          - component: oh-value-axis
+            config:
+              gridIndex: 0
+              name: °C
+              nameGap: 14
+              nameTextStyle:
+                align: right
+                padding:
+                - 0
+                - 8
+                - 0
+                - 0
+              splitLine:
+                lineStyle:
+                  type: dashed
+                  opacity: 0.4
+              scale: true
+              min: =(v) => Math.floor(Math.min(v.min, (v.min + v.max - 4) / 2))
+              max: =(v) => Math.ceil(Math.max(v.max, (v.min + v.max + 4) / 2))
+          - component: oh-value-axis
+            config:
+              gridIndex: 1
+              name: W
+              nameGap: 14
+              nameTextStyle:
+                align: right
+                padding:
+                - 0
+                - 8
+                - 0
+                - 0
+              splitLine:
+                lineStyle:
+                  type: dashed
+                  opacity: 0.4
+          series:
+          - component: oh-time-series
+            config:
+              name: Flow
+              gridIndex: 0
+              xAxisIndex: 0
+              yAxisIndex: 0
+              type: line
+              item: =props.heatpumpLeavingWaterTempAfterBuh
+              symbol: none
+              lineStyle:
+                width: 2
+                color: '#e57373'
+              itemStyle:
+                color: '#e57373'
+          - component: oh-time-series
+            config:
+              name: Return
+              gridIndex: 0
+              xAxisIndex: 1
+              yAxisIndex: 0
+              type: line
+              item: =props.heatpumpInletWaterTemp
+              symbol: none
+              lineStyle:
+                width: 2
+                color: '#64b5f6'
+              itemStyle:
+                color: '#64b5f6'
+          - component: oh-time-series
+            config:
+              name: Heat
+              gridIndex: 1
+              xAxisIndex: 2
+              yAxisIndex: 1
+              type: line
+              item: =props.heatpumpHeatingPowerAfterBuh
+              symbol: none
+              sampling: lttb
+              lineStyle:
+                width: 1.5
+                color: '#fb8c00'
+              itemStyle:
+                color: '#fb8c00'
+              areaStyle:
+                color:
+                  type: linear
+                  x: 0
+                  y: 0
+                  x2: 0
+                  y2: 1
+                  colorStops:
+                  - offset: 0
+                    color: rgba(251, 140, 0, 0.45)
+                  - offset: 1
+                    color: rgba(251, 140, 0, 0.02)
+          title:
+          - component: oh-chart-title
+            config:
+              show: true
+              text: '{s0|Flow} · {s1|Return}'
+              left: 10
+              top: 15
+              textStyle:
+                fontSize: 13
+                fontWeight: 600
+                rich:
+                  s0:
+                    fontSize: 13
+                    fontWeight: 600
+                    color: '#e57373'
+                  s1:
+                    fontSize: 13
+                    fontWeight: 600
+                    color: '#64b5f6'
+          - component: oh-chart-title
+            config:
+              show: true
+              text: Heat
+              left: 10
+              top: 190
+              textStyle:
+                fontSize: 13
+                fontWeight: 600
+          tooltip:
+          - component: oh-chart-tooltip
+            config:
+              show: true
+              confine: true
+              trigger: axis
+              smartFormatter: true
+      - component: div
+        config:
+          style:
+            display: flex
+            justify-content: flex-end
+            padding-top: 4px
+        slots:
+          default:
+          - component: oh-button
+            config:
+              text: All details
+              action: popup
+              actionModal: page:heatpump
+              outline: true
+              small: true
+              style:
+                color: '#e57373'
+                border-color: '#e57373'
+                width: auto
+                padding: 0 12px

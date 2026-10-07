@@ -36,9 +36,10 @@ OVERVIEW = [
      "widest with it. A tap on "
      "a node opens its device's page of my installation, on the house and the appliances a popup of their own. "
      "Under the star three tiles with large pale icons: the house as its node inside the pie of what the consumers "
-     "draw, as large as the rings beside it, with its power and today's energy, and today's self-consumption and "
-     "self-sufficiency as rings. The card places its lines, nodes and rings as `flow-link`, `flow-node` and "
-     "`flow-share-ring`. The recording and the dark screenshot show it with demo values."),
+     "draw, as large as the rings beside it, with its power and today's energy against yesterday's at this time "
+     "in a pill, and today's self-consumption and self-sufficiency as rings, each with yesterday's whole day in a "
+     "pill, green while today's share is higher, orange while lower. The card places its lines and nodes as "
+     "`flow-link` and `flow-node`. The recording and the dark screenshot show it with demo values."),
     ("switches-card", "Switches", "The switchable plugs under the energy flow as `switch-tile`s, five abreast, three "
      "on a phone: icon, *On* or *Off*, name, power and today's energy; a tap anywhere switches, and while on a tile is "
      "tinted and outlined in its colour."),
@@ -58,8 +59,10 @@ OVERVIEW = [
      "hot water or heating is switched on, outlined while off, beside a tinted pill with the setpoint and a small "
      "target icon; a tap opens the heat pump's page of my installation. Below them "
      "today's electricity and heat of the heat pump split into space heating, DHW and standby as bars (hovering a "
-     "part lifts it everywhere), and today's COPs of space heating, DHW and in total in one row as rings like the energy "
-     "flow's self-consumption. While the tank charges or the heating runs, a line under its tile says since when. The screenshots show it with the heat pump card's demo values."),
+     "part lifts it everywhere), each with today against yesterday at this time in a pill in the middle of its title, "
+     "and today's COPs of space heating, DHW and in total in one row as rings like the energy "
+     "flow's self-consumption, each with today against yesterday at this time in a pill under its title. "
+     "While the tank charges or the heating runs, a line under its tile says since when. The screenshots show it with the heat pump card's demo values."),
     ("electricity-price-card", "Electricity price", "The all-in price, the cheapest and priciest hour, and the prices "
      "12 hours back and 36 hours ahead, coloured green, orange and red by price."),
     ("heatpump-card", "Heat pump", "A section through the house: the outdoor unit on the roof (the energy flow's "
@@ -77,29 +80,70 @@ OVERVIEW = [
      "automation), the refrigerant, the heating circuit, the climate of the two floors, the tank with its booster "
      "heater and the indoor unit with its own power (the measured circuit plus the backup heater), each tinted in its "
      "colour while what it shows is at work. A tap on a tile, the wall unit, the outdoor unit, "
-     "the tank or the valve opens the heat pump's page of my installation, on a floor the page of the device that "
-     "measures its air. At the card's top, across its whole width as the energy "
-     "flow's tiles, the electrical power, the heat and the COP as a row of value tiles that open the heat pump's page "
-     "too (today's split and COPs are in the heating card). On a phone the drawing takes "
+     "the tank or the valve opens its quick popup (see [Quick popups](#quick-popups)). At the card's top, across its "
+     "whole width as the energy flow's tiles, the electrical power, the heat and the COP as a row of value tiles that "
+     "open their quick popups too (today's split and COPs are in the heating card). On a phone the drawing takes "
      "the card's width; everywhere else it stands at its own size, as the energy flow does, so their texts keep the "
      "UI's sizes and their rings come out the same and never shrink, reaching into the card's padding where the card "
      "is a little narrower, and in the middle of the height the card is given. The recordings show it with demo "
      "values (a space heating run)."),
-    ("consumption-card", "Consumption today", "Today's consumption as one bar split by source (PV, grid) and by "
-     "consumer, with a legend in two columns; hovering a part lifts it everywhere. The screenshot shows it with demo "
+    ("consumption-card", "Consumption today", "Today's consumption as one bar split by source (PV, grid), the "
+     "total against yesterday at this time in a pill between the two shares, and as one bar split by consumer, with "
+     "a legend in two columns that gives each consumer's energy and how many kWh more (orange) or fewer (green) it "
+     "drew than yesterday until this time; hovering a part lifts it everywhere. The screenshot shows it with demo "
      "values."),
     ("energy-days-card", "Energy per day", "The month's daily home consumption as stacked bars: from PV and from the "
      "grid, with PV production beside it."),
     ("pv-days-card", "PV production per day", "The daily PV yield of a year in four views a bar switches: a "
      "calendar heatmap of the year, two half-years, twelve month calendars and the months' sums as bars; a wider "
      "screen gets the year, the month calendars and the bars, a phone the half-years instead of the year."),
-    ("temperatures-card", "Temperatures", "Indoor and outdoor temperature now, the day's minimum and maximum, and the "
-     "last day as a chart from 15-minute means."),
+    ("temperatures-card", "Temperatures", "Indoor and outdoor temperature now, each with its change over the last "
+     "hour in a pill beside it and under that indoors the room's climate in a word (from the humidity), outdoors "
+     "whether airing dries or dampens the rooms (from both airs' absolute humidity); the day's minimum and maximum, "
+     "and the last day as a chart from 15-minute means."),
 ]
 PLUG = [("plug-card", "Now: the device's icon large in a ring, pulsing while it works (its energy-flow node or "
-                       "appliance icon, else its icon), power, on/off pill, energy today and total"), ("plug-power-card", "Power over the day"),
-        ("plug-energy-days-card", "Energy per day of the month"), ("plug-electric-card", "Voltage, current, power factor, "
-                                                                                      "apparent and reactive power")]
+                       "appliance icon, else its icon), power, on/off pill, today's energy against yesterday at this "
+                       "time and the mean of the last 7 days, the total on rollers like a meter's; with `range` (kWh per "
+                       "100 km) a road with the car where today's charge would take it"),
+        ("plug-power-card", "Power over the day"),
+        ("plug-energy-days-card", "Energy per day of the month"), ("plug-electric-card", "Voltage in its band of 230 V "
+                                                                                      "± 10 %, current against the "
+                                                                                      "socket's 16 A, active, reactive "
+                                                                                      "and apparent power as a "
+                                                                                      "triangle with the power factor "
+                                                                                      "rated")]
+# uid, title, what it holds; all open from the heat pump card: its tiles, wall unit, outdoor unit, tank and valve and the
+# figures at its top. Values on top in the forms of my device pages, the charts below hold one value each, two only
+# where they belong together
+QUICK = [
+    ("heatpump-control-quick", "Control", "all the heat pump's controls: the Smart Grid, heating, hot water and "
+     "automation, the DHW setpoint, the hot-water boost and the leaving water offset"),
+    ("heatpump-indoor-quick", "Indoor unit", "the circulation pump as a ring with the water's flow and the water "
+     "pressure rated in words on top; its power without the backup heater, the flow, the pressure and the backup heater "
+     "over the day"),
+    ("heatpump-outdoor-quick", "Outdoor unit", "the compressor's frequency as a ring and the outdoor air beside the "
+     "heat exchanger on top; its power, the compressor, the outdoor temperature with its heat exchanger's and the "
+     "outdoor air sensor over the day"),
+    ("heatpump-refrigerant-quick", "Refrigerant", "the hot gas against its target as a setpoint bar on top; hot gas "
+     "with its target, liquid, heat exchanger and pressure over the day"),
+    ("heatpump-circuit-quick", "Heating circuit", "the leaving water offset, the leaving and inlet water's spread and "
+     "the leaving water against its setpoint on top; leaving with inlet water and the heat over the day"),
+    ("heatpump-tank-quick", "DHW tank", "the tank in layers with its temperature against the setpoint on top; its "
+     "temperature with its setpoint and its booster heater's on and off as a band over the day"),
+    ("heatpump-valve-quick", "Three-way valve", "its position over the day as a band, space heating and DHW in turn"),
+    ("upper-floor-quick", "Upper floor", "the humidity rated in words on top; temperature and humidity over the day"),
+    ("ground-floor-quick", "Ground floor", "humidity and CO₂ rated in words on top; temperature, humidity and "
+     "CO₂ over the day"),
+    ("heatpump-electric-quick", "Electricity", "the split by purpose now and today as bars on top; the power of space "
+     "heating, DHW and standby over the day, their energy per day of the month"),
+    ("heatpump-heat-quick", "Heat", "the split by purpose now and today as bars on top; the heat of space heating and "
+     "DHW over the day, per day of the month"),
+    ("heatpump-cop-quick", "COP", "electricity plus ambient heat becoming heat as flow bands, now while the compressor "
+     "runs and for the day with the COPs by purpose; the COP and the outdoor temperature over the day, the daily COPs "
+     "of the month")]
+
+
 def fill(text, indent=""):
     """A paragraph wrapped at 120 characters."""
     return textwrap.fill(" ".join(text.split()), 120, subsequent_indent=indent, break_long_words=False,
@@ -169,10 +213,47 @@ def gifs(name, alt):
     return img(f"{name}.gif", alt) + "\n\n" + img(f"{name}-dark.gif", f"{alt} in dark mode")
 
 
+def quick_popups():
+    """The quick popups: what each holds, their screenshots three abreast and their props."""
+    rows = ["""## Quick popups
+
+Compact popups the heat pump card opens: the heat pump's controls or the values and charts of one of its parts, under
+a small head with its state and above *All details*, which opens the heat pump's page of my installation. Each is a
+widget that takes its items as props; open it from a link with `action: popup`, `actionModal: widget:<uid>` and its
+items in `actionModalConfig`, as the card does:
+
+```yaml
+action: popup
+actionModal: widget:heatpump-tank-quick
+actionModalConfig:
+  heatpumpDhwTankTemp: espaltherma_dhw_tank_temp
+  heatpumpDhwSetpoint: espaltherma_dhw_setpoint
+  heatpumpBshMode: espaltherma_bsh_mode
+  heatpumpBshPower: espaltherma_electrical_power_bsh
+```
+
+It opens 420 px wide, on a phone full screen; its values stand two abreast on top, its charts start below their period
+buttons, and a closed period menu takes no room. The card's tiles, wall unit, outdoor unit, tank and valve and the
+three figures at its top open them:
+"""]
+    rows += [fill(f"- `{u}`, {t if t[:2].isupper() else t[0].lower() + t[1:]}: {w}.", "  ") for u, t, w in QUICK]
+    rows += ["", "| | | |", "|---|---|---|"]
+    for i in range(0, len(QUICK), 3):
+        group = QUICK[i:i + 3] + [None] * (3 - len(QUICK[i:i + 3]))
+        rows.append("| " + " | ".join(img(f"{q[0]}.png", q[1]) if q else "" for q in group) + " |")
+    rows.append("")
+    for u, _, _ in QUICK:
+        deps = needs(u)
+        if deps:
+            rows += [f"`{u}` needs " + ", ".join(f"`{d}`" for d in sorted(deps)) + ".", ""]
+        rows += [details(u).replace("<summary>", f"<summary><code>{u}</code>: "), ""]
+    return "\n".join(rows)
+
+
 md = ["""# openHAB Widgets
 
 MainUI widgets from my openHAB 5 installation: the cards of an energy and home dashboard and the parts they are built
-from, which work on their own too: pills, bars and sliders, the nodes and lines of the
+from, which work on their own too: the quick popups they open, pills, bars and sliders, the nodes and lines of the
 energy flow, appliance icons and tiles, a weather drawing; besides them a set of cards for every metered plug, a popup
 for any item and the tile their values stand in. The UI texts are English, numbers use a decimal point; my own
 installation runs the same widgets in German, as the generator builds them, and
@@ -218,7 +299,8 @@ md.append("""## Dashboard cards
 The cards of my overview page. Each takes the items it shows as props; the prop names say what an item is. Most
 elements open a page of my installation as a popup when tapped: the page of their device (`page:heatpump`,
 `page:weather` …), or for the energy flow's house and appliances a popup of its own (`page:flow_home`,
-`page:flow_appliances`). The pages are not part of this repository.
+`page:flow_appliances`). The pages are not part of this repository; the quick popups the heat pump card opens are
+(see [Quick popups](#quick-popups)).
 """)
 for uid, title, what in OVERVIEW:
     shots = []
@@ -230,9 +312,10 @@ for uid, title, what in OVERVIEW:
     need = ("\n\n" + fill("Needs " + ", ".join(f"`{d}`" for d in sorted(deps)) + ".")) if deps else ""
     md.append(f"### {title}: `{uid}`\n\n{fill(what)}{need}\n\n" + "\n\n".join(shots) + f"\n\n{details(uid)}\n")
 
+md.append(quick_popups() + "\n")
 md.append("""## Controls
 
-The parts of my device pages' controls.
+The parts of the quick popups and of my device pages' controls.
 
 """)
 md.append(section("Segmented bar", "state-bar", """The states of one item as the segments of a bar, the current one
@@ -395,17 +478,6 @@ md.append(section("Line", "flow-link", """A line from (`x1`, `y1`) to (`x2`, `y2
 four speeds by the power; below the threshold the line fades. The dots run a dot radius past both ends, so they slide
 out from under one node's rim and back under the other's. `color` and `forward` may be expressions, e.g. the grid's
 line green and outward while it exports.""", shot=gifs("flow-link", "Flow lines between three nodes")))
-md.append(section("Share ring", "flow-share-ring", """A ring around (`x`, `y`) filled to `part` / `whole`, the
-percentage inside and `title` with *today* beside it; the energy flow shows today's self-consumption and
-self-sufficiency with it.""", """
-component: widget:flow-share-ring
-config:
-  x: 40
-  y: 40
-  title: Self-consumption
-  part: =Number(items.photovoltaics_own_ec_day.numericState) || 0
-  whole: =Number(items.huawei_inverter_e_day.numericState) || 0
-""", img("flow-share-rings.png", "Share rings")))
 md.append("""## Appliances
 
 The appliances card's parts.
@@ -507,11 +579,13 @@ actionModalConfig:
 """ + table("item-popup") + "\n")
 md.append("""## Value tile: `value-tile`
 
-The tile every value of my popups, device pages, plug cards and heat pump card stands in: a title, the value, and a
-large pale icon in the lower right corner, behind them. Pass the value as an expression; it is evaluated where the
-tile is placed. With `item` a tap opens the item popup. The tile's lengths are em of its font size, 14 px unless
-`fontSize` sets another, so `fontSize: 1.1em` makes it a tenth larger and lets it grow with a card that scales its
-font. `wrap` lets a long text wrap across the whole row of a grid.
+The plain tile for a value: a title, the value, and a large pale icon in the lower right corner, behind them. My
+device pages and popups give most values a form of their own now (a scale, a rating, a course); the tile stays for
+states, texts and counters, and in the heat pump card. The screenshot shows it with the air conditioner's values.
+Pass the value as an expression; it is evaluated where the tile is placed. With `item` a tap opens the item popup.
+The tile's lengths are em of its font size, 14 px unless `fontSize` sets another, so `fontSize: 1.1em` makes it a
+tenth larger and lets it grow with a card that scales its font. `wrap` lets a long text wrap across the whole row of
+a grid.
 
 ```yaml
 component: widget:value-tile

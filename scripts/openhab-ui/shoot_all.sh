@@ -1,7 +1,8 @@
 #!/bin/bash
 # every screenshot of the widget repository, into shots/v4/repo under the repository's names, in English as the
 # repository publishes the widgets: through ui_proxy.py on 18081 (in front of the SSH tunnel on 18080), which hands the
-# browser the English widgets and pages; needs the page widget_gallery (widget_gallery.py writes it, to be POSTed to
+# browser the English widgets and pages (given demo_day.py's output, at the end of a past day, as right after midnight
+# every today reads close to nothing); needs the page widget_gallery (widget_gallery.py writes it, to be POSTed to
 # ui:page). The energy flow, the
 # heat pump card, the heating card, the consumption card and the weather page's warnings are shot with demo values (demo_flow.js,
 # demo_heatpump.js, demo_consumption.js, demo_weather.js), set in the browser only
@@ -34,12 +35,24 @@ python3 cdp_cards_js.py $B/overview $O/ovhp-dark 1400 dark "$(cat demo_heatpump.
 # the heating card on the heat pump card's demo values: a space heating run, the tank not charging
 python3 cdp_cards_js.py $B/overview $O/ovhp 1400 light "$(cat demo_heatpump.js)" >/dev/null
 cp $(shot ovhp heating-hot-water) $R/heating-card.png; cp $(shot ovhp-dark heating-hot-water) $R/heating-card-dark.png
+# the quick popups as the heat pump card's tiles and figures open them, each as tall as its content
+step popups
+for spec in "Heat Pump|Control|heatpump-control-quick" "Heat Pump|Indoor Unit|heatpump-indoor-quick" \
+            "Heat Pump|Outdoor Unit|heatpump-outdoor-quick" "Heat Pump|Refrigerant|heatpump-refrigerant-quick" \
+            "Heat Pump|Heating Circuit|heatpump-circuit-quick" "Heat Pump|Hot Water Tank|heatpump-tank-quick" \
+            "Heat Pump|3-Way Valve|heatpump-valve-quick" "Heat Pump|Upper Floor|upper-floor-quick" \
+            "Heat Pump|Ground Floor|ground-floor-quick" "Heat Pump|Electrical|heatpump-electric-quick" \
+            "Heat Pump|Heat|heatpump-heat-quick" "Heat Pump|COP|heatpump-cop-quick"; do
+  IFS='|' read -r card title name <<< "$spec"
+  python3 cdp_elems.py $B/overview 1400 $O/quick "$(cat screenshot-js/quick_rect.js)('$name')" \
+    "$(cat screenshot-js/quick.js)('$card', '$title', false)" >/dev/null
+  cp $O/quick/$name.png $R/
+done
 step crops; python3 cdp_elems.py $B/heatpump 1400 $O/crops "$(cat screenshot-js/crops_hp.js)" >/dev/null
 python3 cdp_elems.py $B/air_conditioning 1400 $O/crops "$(cat screenshot-js/crops_ac.js)" >/dev/null
 python3 cdp_elems.py $B/heatpump 1400 $O/crops "$(cat screenshot-js/sliders.js)" >/dev/null
 python3 cdp_elems.py $B/coffee_machine 1400 $O/crops "$(cat screenshot-js/plugcards.js)" >/dev/null
-python3 cdp_elems.py $B/air_conditioning 1400 $O/crops "$(cat screenshot-js/tiles.js)" >/dev/null
-for c in pill-switches power-pill switch-rows plug-cards value-tiles; do cp $O/crops/$c.png $R/; done
+for c in pill-switches power-pill switch-rows plug-cards; do cp $O/crops/$c.png $R/; done
 # the switch rows' crop ends above the restart button below them
 python3 -c "from PIL import Image; s = Image.open('$R/switch-rows.png'); s.crop((0, 0, s.size[0], s.size[1] - 10)).save('$R/switch-rows.png')"
 python3 -c "
@@ -55,13 +68,13 @@ python3 cdp_elems.py $B/weather 390 $O/weather-dark "$(cat screenshot-js/forecas
 cp $O/weather/weather-forecast.png $R/; cp $O/weather-dark/weather-forecast.png $R/weather-forecast-dark.png
 if [ "${GALLERY:-1}" = 1 ]; then  # GALLERY=0 leaves the gallery's shots as they are
 step gallery; python3 cdp_cards.py $B/widget_gallery $O/g900 900 >/dev/null
-cp $O/g900-2-flow-share-ring.png $R/flow-share-rings.png; cp $O/g900-5-state-bar.png $R/state-bars.png
-cp $O/g900-6-switch-tile.png $R/switch-tiles.png
+cp $O/g900-3-state-bar.png $R/state-bars.png; cp $O/g900-5-switch-tile.png $R/switch-tiles.png
+cp $O/g900-6-value-tile.png $R/value-tiles.png
 FPS=20 python3 cdp_gif.py $B/widget_gallery 0 900 $R/flow-node.gif 6 light 1.5
 FPS=20 python3 cdp_gif.py $B/widget_gallery 1 900 $R/flow-link.gif 6 light 1.5
-FPS=20 python3 cdp_gif.py $B/widget_gallery 3 900 $R/appliance-icon.gif 4 light 1.5
+FPS=20 python3 cdp_gif.py $B/widget_gallery 2 900 $R/appliance-icon.gif 4 light 1.5
 FPS=20 python3 cdp_gif.py $B/widget_gallery 0 900 $R/flow-node-dark.gif 6 dark 1.5
 FPS=20 python3 cdp_gif.py $B/widget_gallery 1 900 $R/flow-link-dark.gif 6 dark 1.5
-FPS=20 python3 cdp_gif.py $B/widget_gallery 3 900 $R/appliance-icon-dark.gif 4 dark 1.5
+FPS=20 python3 cdp_gif.py $B/widget_gallery 2 900 $R/appliance-icon-dark.gif 4 dark 1.5
 fi
 step done; ls $R | wc -l
