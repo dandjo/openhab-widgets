@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 """The history the device pages' value tiles show and no item holds (user, 2026-10-06): the rule tile_history writes
-it every 10 minutes as JSON into the String item tile_history, which is not persisted. Per item it keeps what the
+it every 10 minutes and right after openHAB starts as JSON into the String item tile_history, which is not
+persisted. Per item it keeps what the
 tiles need (dashboard.py, tile_history_track()): y its value yesterday at this time and a the mean of the last 7 days
-at this time (comparison with yesterday), d its value at yesterday's end (yesterday's whole day, the base a
+at this time (comparison with yesterday) and both again dt seconds later (y2, a2, with the run's time t: the tiles
+interpolate to the minute shown, as the rule runs every 10 minutes), d its value at yesterday's end (yesterday's whole day, the base a
 comparison needs), h its value some hours ago (trend), s 24 hourly means up to now (day's
 course), f [unix, value] of the hours behind and ahead (the price strip). Finished hours stay in the rule's private
 cache, so a run queries only the current hour anew.
@@ -26,7 +28,8 @@ BASE = "http://127.0.0.1:8080/rest"
 TOKEN = open(os.path.expanduser("~/.openhab_token")).read().strip()
 ITEM = RULE_UID = ns["TILE_HISTORY"]
 SCRIPT = """// the history the device pages' value tiles show, as JSON in tile_history: per item y = its value yesterday at this
-// time, a = the mean of the last 7 days at this time, d = its value at yesterday's end, h = its value some hours ago, s = 24 hourly means up to now,
+// time, a = the mean of the last 7 days at this time, y2/a2 = both dt seconds later (t = this run, the tiles
+// interpolate to the minute shown), d = its value at yesterday's end, h = its value some hours ago, s = 24 hourly means up to now,
 // f = [unix, value] of the hours behind and ahead; the items and what to keep of them come from the UI generator
 const TRACK = __TRACK__;
 const svc = 'influxdb';
@@ -38,6 +41,10 @@ const store = cache.private.get('hourly', () => ({}));
 const midnight = now.withHour(0).withMinute(0).withSecond(0).withNano(0);
 const ends = cache.private.get('day_ends', () => ({}));
 if (ends.day !== midnight.toEpochSecond()) { ends.day = midnight.toEpochSecond(); ends.v = {}; }
+// the next run's minute: up to it the tiles interpolate between now and dt later, within the day (before midnight
+// dt shrinks, else yesterday's later value would be the reset counter of the next day)
+const dt = Math.max(1, Math.min(600, midnight.plusDays(1).toEpochSecond() - now.toEpochSecond() - 1));
+const mean = (xs) => xs.length ? Math.round(xs.reduce((a, b) => a + b, 0) / xs.length * 1000) / 1000 : null;
 const val = (s) => (s === null || s === undefined || s.numericState === null || s.numericState === undefined) ?
   null : Math.round(s.numericState * 1000) / 1000;
 const out = {};
@@ -49,12 +56,18 @@ for (const name of Object.keys(TRACK)) {
   try {
     if (want.c) {
       r.y = val(p.persistedState(now.minusDays(1), svc));
-      const xs = [];
+      r.y2 = val(p.persistedState(now.minusDays(1).plusSeconds(dt), svc));
+      const xs = [], xs2 = [];
       for (let k = 1; k <= 7; k++) {
         const v = val(p.persistedState(now.minusDays(k), svc));
         if (v !== null) xs.push(v);
+        const v2 = val(p.persistedState(now.minusDays(k).plusSeconds(dt), svc));
+        if (v2 !== null) xs2.push(v2);
       }
-      r.a = xs.length ? Math.round(xs.reduce((a, b) => a + b, 0) / xs.length * 1000) / 1000 : null;
+      r.a = mean(xs);
+      r.a2 = mean(xs2);
+      r.t = now.toEpochSecond();
+      r.dt = dt;
       if (ends.v[name] === undefined || ends.v[name] === null) ends.v[name] = val(p.persistedState(midnight.minusSeconds(1), svc));
       r.d = ends.v[name];
     }
@@ -107,14 +120,16 @@ def main():
     rule = {
         "uid": RULE_UID,
         "name": "Kachel-Verlauf",
-        "description": "Schreibt alle 10 Minuten in tile_history, was die Werte-Kacheln der Geräteseiten an Verlauf "
+        "description": "Schreibt alle 10 Minuten und nach dem Start in tile_history, was die Werte-Kacheln der Geräteseiten an Verlauf "
                        "zeigen: Wert gestern um diese Zeit, Ø der letzten 7 Tage um diese Zeit, Wert am Ende von "
                        "gestern, Wert vor einigen "
                        "Stunden, 24 Stundenmittel und die Preise der kommenden Stunden (applied/tile_history.py, "
                        "Liste aus dem UI-Generator).",
         "tags": [],
         "triggers": [{"id": "1", "type": "timer.GenericCronTrigger",
-                      "configuration": {"cronExpression": "0 0/10 * * * ? *"}}],
+                      "configuration": {"cronExpression": "0 0/10 * * * ? *"}},
+                     # right after a start too: the item is not persisted and would stay NULL until the next run
+                     {"id": "3", "type": "core.SystemStartlevelTrigger", "configuration": {"startlevel": 100}}],
         "conditions": [],
         "actions": [{"id": "2", "type": "script.ScriptAction",
                      "configuration": {"type": "application/javascript",

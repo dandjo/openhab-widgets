@@ -683,31 +683,35 @@ def water_meter_parts(color, rate, value, digits=True):
     lpm = f"({rate} * 1000)"
     active = f"{rate} > 0"
     parts = [ring(0, 0, color)]
+    # pipe and nut end to end (overlapping, their lines crossed); the pipe runs under the body, which an opaque disc
+    # hides, as its translucent fill let the pipe's lines show through (user, 2026-10-07)
     for side in (-1, 1):
-        x = -24 if side < 0 else 15
-        parts += [svg("rect", x=x, y=-3, width=9, height=6, rx=1, **stroke(1.4, fill="#ffb300", **{"fill-opacity": "0.35"})),
+        parts += [svg("rect", x=-20.5 if side < 0 else 15, y=-3, width=5.5, height=6, rx=1,
+                      **stroke(1.4, fill="#ffb300", **{"fill-opacity": "0.35"})),
                   svg("rect", x=-24.5 if side < 0 else 20.5, y=-4.5, width=4, height=9, rx=1,
                       **stroke(1.4, fill="#ffb300", **{"fill-opacity": "0.35"}))]
-    parts += [svg("circle", cx=0, cy=0, r=16.5, **stroke(1.6, fill=color, **{"fill-opacity": "0.35"})),
+    parts += [svg("circle", cx=0, cy=0, r=17.3, style=CARD_BG),
+              svg("circle", cx=0, cy=0, r=16.5, **stroke(1.6, fill=color, **{"fill-opacity": "0.35"})),
               svg("circle", cx=0, cy=0, r=12.5, style=CARD_BG),
               svg("circle", cx=0, cy=0, r=12.5, **stroke(1.1, fill="#e3f2fd", **{"fill-opacity": "0.5"}))]
     cells = []
+    # narrower and lower than before, its corners clear of the dial's edge (user, 2026-10-07)
     for k in range(5):
-        x = -8 + k * 3.2
-        cells.append(svg("rect", x=x, y=-9, width=3.2, height=5, fill="#37474f" if k < 3 else "#e53935"))
+        x = round(-7 + k * 2.8, 2)
+        cells.append(svg("rect", x=x, y=-7.5, width=2.8, height=4.5, fill="#37474f" if k < 3 else "#e53935"))
         if digits:
             ch = f"=('00000' + Math.floor({value} * 100)).slice(-5).slice({k}, {k + 1})"
-            cells.append(svg("text", x=round(x + 1.6, 2), y=-5.1, content=ch, fill="#ffffff",
-                             **{"font-size": 4.4, "font-weight": "700", "text-anchor": "middle"}))
-    parts += [svg("g", cells), svg("rect", x=-8, y=-9, width=16, height=5, rx=0.6, **stroke(0.9))]
-    dial = (-2.5, 4)
+            cells.append(svg("text", x=round(x + 1.4, 2), y=-4, content=ch, fill="#ffffff",
+                             **{"font-size": 4, "font-weight": "700", "text-anchor": "middle"}))
+    parts += [svg("g", cells), svg("rect", x=-7, y=-7.5, width=14, height=4.5, rx=0.6, **stroke(0.9))]
+    dial = (-2.5, 4.6)
     ticks = [svg("line", x1=round(dial[0] + 4.4 * math.cos(a), 2), y1=round(dial[1] + 4.4 * math.sin(a), 2),
                  x2=round(dial[0] + 5.4 * math.cos(a), 2), y2=round(dial[1] + 5.4 * math.sin(a), 2),
                  **stroke(0.7, opacity="0.7")) for a in (math.radians(36 * k) for k in range(10))]
     pointer = svg("g", [svg("path", d=f"M{dial[0] - 1},{dial[1]} L{dial[0]},{dial[1] - 4.6} L{dial[0] + 1},{dial[1]} Z",
                             fill="#e53935"),
                         spin(*dial, steps(lpm, [3, 10], ["4s", "2s", "1s"]), active)])
-    star_c = (6.5, 3.5)
+    star_c = (6.5, 4.2)
     star = svg("g", [svg("path", d=sparkle(*star_c, 2.6), fill="#e53935"),
                      spin(*star_c, steps(lpm, [3, 10], ["1.2s", "0.6s", "0.3s"]), active)])
     parts += [svg("circle", cx=dial[0], cy=dial[1], r=5.4, **stroke(0.9)), *ticks, pointer,
@@ -952,38 +956,28 @@ def price_coin(color):
 
 
 def rack_node(cx, cy, power):
-    """The network's 6U wall rack from the front: the cabinet with its rails, from the top a patch panel, the switch
-    with its link lights, a brush panel, the gateway, a shelf with a box on it and the power strip; the lights
-    flicker while the network draws."""
+    """The network's wall rack, schematic (user, 2026-10-07: the 6U rack with every port was too detailed): the
+    cabinet with three large units, a switch with four ports and two link lights, the router with two ports and one
+    light, a power strip with three sockets; the lights flicker while the network draws."""
     on = f"Math.abs({power}) > 10"
-    x0, x1, y0, y1 = cx - 20, cx + 20, cy - 14, cy + 13
-    u = (y1 - y0 - 5) / 6  # one height unit inside the cabinet
-    top = lambda k: round(y0 + 2.5 + k * u, 2)
-    unit = lambda k, **kw: svg("rect", x=cx - 15.5, y=round(top(k) + 0.4, 2), width=31, height=round(u - 0.8, 2), rx=0.5,
-                               **stroke(0.9, **kw))
-    ports = lambda k, n, x, gap: [svg("rect", x=round(x + i * gap, 2), y=round(top(k) + 1.3, 2), width=1.6, height=1.2,
-                                      fill="#263238") for i in range(n)]
+    h = 5.4  # a unit's height, 6.8 apart
+    top = lambda k: round(cy - 9.5 + k * 6.8, 2)
+    mid = lambda k: round(top(k) + h / 2, 2)
+    light = {"fill": "#cfd8dc", "fill-opacity": "0.9"}
+    unit = lambda k: svg("rect", x=cx - 13.5, y=top(k), width=27, height=h, rx=0.8, **stroke(1, **light))
+    ports = lambda k, n: [svg("rect", x=round(cx - 10.5 + i * 3.6, 2), y=round(mid(k) - 1, 2), width=2.4, height=2,
+                              rx=0.3, fill="#263238") for i in range(n)]
 
     def lights(k, xs, values, dur):
-        return svg("g", [svg("circle", cx=x, cy=round(top(k) + u / 2, 2), r=0.95, fill="#69f0ae") for x in xs] +
+        return svg("g", [svg("circle", cx=round(cx + x, 2), cy=mid(k), r=1.1, fill="#69f0ae") for x in xs] +
                    [svg("animate", attributeName="opacity", values=values, dur=dur, repeatCount="indefinite",
                         visible=f"={on}")], opacity=f"={on} ? '1' : '0.3'")
-    light = {"fill": "#cfd8dc", "fill-opacity": "0.9"}
     return [ring(cx, cy, "#5c6bc0"),
-            svg("rect", x=x0, y=y0, width=x1 - x0, height=y1 - y0, rx=1.5, **stroke(1.6, fill="#37474f",
-                                                                                   **{"fill-opacity": "0.85"})),
-            *[svg("line", x1=x, y1=y0 + 2, x2=x, y2=y1 - 2, **stroke(1.2, STEEL)) for x in (cx - 16.5, cx + 16.5)],
-            unit(0, **light), *ports(0, 12, cx - 13.5, 2.3),
-            unit(1, **light), *ports(1, 8, cx - 13.5, 2.3),
-            lights(1, [cx + 6.5, cx + 9], "1;0.25;1", "0.9s"), lights(1, [cx + 11.5, cx + 14], "0.25;1;0.25", "1.3s"),
-            unit(2, fill="#263238"), svg("line", x1=cx - 13, y1=round(top(2) + u / 2, 2), x2=cx + 13,
-                                         y2=round(top(2) + u / 2, 2), **stroke(0.8, STEEL, opacity="0.7")),
-            unit(3, **light), *ports(3, 4, cx - 13.5, 2.3),
-            lights(3, [cx + 12.5], "1;0.4;1", "2s"),
-            svg("line", x1=cx - 15.5, y1=round(top(5) - 0.2, 2), x2=cx + 15.5, y2=round(top(5) - 0.2, 2), **stroke(1, STEEL)),
-            svg("rect", x=cx - 12, y=round(top(4) + 0.6, 2), width=11, height=round(u - 1, 2), rx=0.6, **stroke(0.8, **light)),
-            unit(5, **light),
-            *[svg("circle", cx=x, cy=round(top(5) + u / 2, 2), r=1, fill="#263238") for x in (cx - 9, cx - 3, cx + 3, cx + 9)]]
+            svg("rect", x=cx - 17, y=cy - 13, width=34, height=26, rx=2, **stroke(1.6, fill="#37474f",
+                                                                                 **{"fill-opacity": "0.85"})),
+            unit(0), *ports(0, 4), lights(0, [7], "1;0.25;1", "0.9s"), lights(0, [10.5], "0.25;1;0.25", "1.3s"),
+            unit(1), *ports(1, 2), lights(1, [10.5], "1;0.4;1", "2s"),
+            unit(2), *[svg("circle", cx=cx + x, cy=mid(2), r=1.2, fill="#263238") for x in (-6, 0, 6)]]
 
 
 PV = "huawei_inverter_input_power"
@@ -1207,7 +1201,7 @@ FLOW_KINDS = {  # kind: (builder of the drawing around (0, 0) from the power exp
     "terrace-light": (lambda p: pergola_node(0, 0, p),
                       "terrace light: a pergola seen from a corner, the lights along its front sides glowing while on"),
     "e-bike": (lambda p: ebike_node(0, 0, p), "E-Bike: a trekking bike whose battery fills up green while it charges"),
-    "network-rack": (lambda p: rack_node(0, 0, p), "network rack: a 6U rack whose link lights flicker while it draws"),
+    "network-rack": (lambda p: rack_node(0, 0, p), "network rack: a rack with switch, router and power strip whose link lights flicker while it draws"),
 }
 
 
@@ -1540,7 +1534,8 @@ def house_tiles():
                          transform=f"translate(24 25) scale({(r - w / 2) / (ORBIT - RING_MAX / 2):.3f})"),
                      svg_text(56, 13, f"={kw(HOME)}", 13, "700", anchor="start"),
                      svg_text(56, 29, kwh(num("home_ec_day")), 11, anchor="start", opacity="0.5"),
-                     svg_pill(56, 34, *day_change("home_ec_day", "less"))])
+                     # without its unit, the line above names kWh: "+0,03 kWh zu gestern" did not fit the tile
+                     svg_pill(56, 34, *day_change("home_ec_day", "less", unit="", absolute=True))])
     # on a phone its tile spans the row: the drawing as wide as in a tile of half the row, so the rings match there too
     home["config"]["style"]["width"] = f"={NARROW} ? 'calc(50% - 14px)' : '100%'"
 
@@ -2569,16 +2564,17 @@ def hp_day_split():
     """Today's electricity and heat of the heat pump, each a bar split into space heating, hot water and standby, titled
     with "heute" (no heading over them, it saves height), with their legend; hovering a part lifts it, the same part
     in the other bar and its legend entry, as in Consumption Today."""
+    # the chips against yesterday in kWh, as Verbrauch heute (user, 2026-10-07)
     return [hover_group([
         stacked_bar("Electricity Today", num("espaltherma_energy_today"),
                     [("Heizung", "espaltherma_energy_space_today", SPACE_C),
                      ("Warmwasser", "espaltherma_energy_dhw_today", DHW_C),
                      ("Standby", "espaltherma_energy_standby_today", STANDBY_C)],
-                    vt_chip(*day_change("espaltherma_energy_today", "less"))),
+                    vt_chip(*day_change("espaltherma_energy_today", "less", absolute=True))),
         stacked_bar("Heat Today", num("espaltherma_heating_energy_today"),
                     [("Heizung", "espaltherma_heating_energy_space_today", SPACE_C),
                      ("Warmwasser", "espaltherma_heating_energy_dhw_today", DHW_C)],
-                    vt_chip(*day_change("espaltherma_heating_energy_today", "more"))),
+                    vt_chip(*day_change("espaltherma_heating_energy_today", "more", absolute=True))),
         div([legend_dot("Heizung", SPACE_C), legend_dot("Warmwasser", DHW_C), legend_dot("Standby", STANDBY_C)],
             **{"display": "flex", "gap": "14px", "margin": "-4px 0 14px"})],
         [("heizung", SPACE_C), ("warmwasser", DHW_C), ("standby", STANDBY_C)])]
@@ -3682,7 +3678,8 @@ def source_head(key, value, title, color, align):
 def consumption_content():
     """Today's consumption card: from PV and from the grid with the total's change against yesterday in their middle,
     the consumers' bar and list, each with its change (user, 2026-10-06)."""
-    total = vt_chip(*day_change("home_ec_day", "less"))
+    # in kWh, as the consumers' column beside it (user, 2026-10-07)
+    total = vt_chip(*day_change("home_ec_day", "less", absolute=True))
     total["config"]["style"]["justify-self"] = "center"
     return [div([
     hover_group([div([source_head("pv", FROM_PV, "aus PV", "#43a047", "left"), total,
@@ -5454,8 +5451,15 @@ def vt_hist():
 
 
 def vt_hv(item, key):
-    """A value of the history JSON, undefined where it has none."""
-    return f"((({vt_hist()})['{item}'] || {{}}).{key})"
+    """A value of the history JSON, undefined where it has none. y and a (yesterday, 7 days at this time) interpolated
+    to the minute shown between the rule's run (t) and dt seconds later (y2, a2), as the rule runs every 10 minutes and
+    yesterday lagged behind today's live value (user, 2026-10-07); in a function, so the JSON is read once."""
+    h = f"(({vt_hist()})['{item}'] || {{}})"
+    if key not in ("y", "a"):
+        return f"({h}.{key})"
+    return (f"((h) => h.{key}2 === undefined || h.{key}2 === null || h.{key} === null || h.{key} === undefined ? "
+            f"h.{key} : h.{key} + (h.{key}2 - h.{key}) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / "
+            f"Math.max(1, h.dt))))({h})")
 
 
 def vt_has(expr):
@@ -5527,20 +5531,25 @@ def change_text(now, then, ok, unit, digits):
     pct = (f"({d} >= 300 ? '×' + {fixed(f'{now} / {then}', 0)} + ' zu gestern' : (Math.abs({d}) < 0.5 ? '±0' : "
            f"({d} > 0 ? '+' : '−') + Math.round(Math.abs({d}))) + ' % zu gestern')")
     absolute = (f"((Math.abs({a}) < {0.5 * 10 ** -digits} ? '±0' : ({a} > 0 ? '+' : '−') + "
-                f"{fixed(f'Math.abs({a})', digits)}) + ' {unit} zu gestern')")
+                f"{fixed(f'Math.abs({a})', digits)}) + '{' ' + unit if unit else ''} zu gestern')")
     return f"={ok} ? {pct} : {absolute}"
 
 
-def day_change(item, better="less", unit="kWh", digits=2):
+def day_change(item, better="less", unit="kWh", digits=2, absolute=False):
     """A day counter today against yesterday at this time, as (text, class, visible) for a pill: in per cent, green
     where it moved the good way (better: 'less' or 'more'), past +300 % as a factor; on too small a base the
-    difference in unit, neutral (change_text())."""
+    difference in unit, neutral (change_text()). absolute: always the difference in unit, coloured once it reaches
+    DAY_BASE_MIN."""
     track_history(item, c=True)
     y = f"Number({vt_hv(item, 'y')})"
     d = f"(({num(item)} - {y}) / {y} * 100)"
-    ok = day_base_ok(item)
+    ok = "false" if absolute else day_base_ok(item)
     good = "false" if better == "less" else "true"
-    cls = f"(!{ok} || Math.abs({d}) < 3 ? 'neutral' : ({d} > 0) === {good} ? 'good' : 'warn')"
+    if absolute:
+        a = f"({num(item)} - {y})"
+        cls = f"(Math.abs({a}) < {DAY_BASE_MIN} ? 'neutral' : ({a} > 0) === {good} ? 'good' : 'warn')"
+    else:
+        cls = f"(!{ok} || Math.abs({d}) < 3 ? 'neutral' : ({d} > 0) === {good} ? 'good' : 'warn')"
     return change_text(num(item), y, ok, unit, digits), cls, f"={vt_has(vt_hv(item, 'y'))}"
 
 
@@ -6119,10 +6128,10 @@ def strings_tile(title, items_, names, volts, amps, colors):
 # ---------------------------------------------------------------- 08 · flow bands
 
 
-def flow_cop(title, power, heat, cop_expr, unit="kW", factor=0.001, digits=2, footer=None, still="steht",
-             hide_idle=False, side=None, cop_large=True):
+def flow_cop(title, power, heat, cop_expr=None, unit="kW", factor=0.001, digits=2, footer=None, still="steht",
+             hide_idle=False):
     """Electricity plus ambient heat become heat: band widths by amount, the electricity's share of the heat's
-    height, so the widening is the COP."""
+    height, so the widening is the COP; cop_expr the COP beside the title, None where a footer shows the COPs."""
     e, h = f"({num(power)} * {factor})", f"({num(heat)} * {factor})"
     hs = f"({vt_clamp(f'{e} / Math.max({h}, {e}, 0.0001) * 92', 6, 92)})"
     f1 = lambda e_: f"({e_}).toFixed(1)"
@@ -6131,13 +6140,15 @@ def flow_cop(title, power, heat, cop_expr, unit="kW", factor=0.001, digits=2, fo
     umwelt = (f"='M70 ' + {f1(f'24 + {hs}')} + ' C160 ' + {f1(f'24 + {hs}')} + ' 160 ' + {f1(f'17 + {hs}')} + "
               f"' 250 ' + {f1(f'17 + {hs}')} + ' L250 109 C160 109 160 116 70 116 Z'")
     amb = f"Math.max(0, {h} - {e})"
+    # the ambient labels' middle, kept inside the drawing when the band is thin at its bottom (COP near 1)
+    amb_mid = f"Math.min(108, 24 + {hs} + (92 - {hs}) / 2)"
     texts = [svg("text", x=56, y=f"={f1(f'10 + {hs} / 2 - 1')}", content="Strom", fill="currentColor",
                  **{"font-size": "10.5", "text-anchor": "end", "opacity": "0.65"}),
              svg("text", x=56, y=f"={f1(f'10 + {hs} / 2 + 12')}", content=f"={fixed(e, digits)}", fill="#ffb74d",
                  **{"font-size": "13", "font-weight": "700", "text-anchor": "end"}),
-             svg("text", x=56, y=f"={f1(f'24 + {hs} + (92 - {hs}) / 2 - 3')}", content="Umwelt", fill="currentColor",
+             svg("text", x=56, y=f"={f1(f'{amb_mid} - 3')}", content="Umwelt", fill="currentColor",
                  **{"font-size": "10.5", "text-anchor": "end", "opacity": "0.65"}),
-             svg("text", x=56, y=f"={f1(f'24 + {hs} + (92 - {hs}) / 2 + 11')}", content=f"={fixed(amb, digits)}",
+             svg("text", x=56, y=f"={f1(f'{amb_mid} + 11')}", content=f"={fixed(amb, digits)}",
                  fill="#4db6ac", **{"font-size": "13", "font-weight": "700", "text-anchor": "end"}),
              svg_text(264, 58, "Wärme", 10.5, anchor="start", opacity="0.65"),
              svg("text", x=264, y=72, content=f"={fixed(h, digits)} + ' {unit}'", fill="#ef5350",
@@ -6152,17 +6163,11 @@ def flow_cop(title, power, heat, cop_expr, unit="kW", factor=0.001, digits=2, fo
                                                 "max-width": "460px", "margin-top": "4px"},
                   visible=f"={h} > {e} && {e} > 0")
     idle = label(still, visible=f"=!({h} > {e} && {e} > 0)", **{**VT_SUB, "margin": "18px 0", "text-align": "center"})
-    right = label(f"='COP ' + {cop_expr}", **{"font-size": "15px", "font-weight": "700", "white-space": "nowrap"})
-    if side is not None:  # the title over the COP large, the parts' COPs beside them at the top right
-        left = [vt_title(title)]
-        if cop_large:
-            left.append(vt_value(f"='COP ' + {cop_expr}", **{"font-size": "18px"}))
-        top_ = div([div(left, **{"min-width": "0"}), side],
-                   **{"display": "flex", "justify-content": "space-between", "align-items": "flex-start", "gap": "8px"})
-    else:
-        top_ = vt_head(title, right)
+    top_ = vt_head(title, None if cop_expr is None else
+                   label(f"='COP ' + {cop_expr}", **{"font-size": "15px", "font-weight": "700", "white-space": "nowrap"}))
     kids = [top_, drawing] + ([] if hide_idle else [idle])
     if footer:
+        footer["config"]["visible"] = f"={h} > {e} && {e} > 0"
         kids.append(footer)
     return vt_tile(kids, heat, title, "#e53935", wide=True,
                 visible=f"={h} > {e} && {e} > 0" if hide_idle else None)
@@ -6179,6 +6184,8 @@ def flow_split(title, item, parts, unit="kWh", digits=2, source_name="", source_
     band_b = (f"='M70 ' + {f1(f'17 + {ha}')} + ' C160 ' + {f1(f'17 + {ha}')} + ' 160 ' + {f1(f'24 + {ha}')} + "
               f"' 250 ' + {f1(f'24 + {ha}')} + ' L250 114 C160 114 160 107 70 107 Z'")
     pct_ = lambda e_: f"Math.round({e_} / {total} * 100) + ' %'"
+    # the lower part's labels' middle at most 104 of 124: a near-full upper part pushed its value under the edge
+    b_mid = f"Math.min(104, 24 + {ha} + (90 - {ha}) / 2)"
     texts = [svg_text(56, 58, source_name, 10.5, anchor="end", opacity="0.65"),
              svg("text", x=56, y=72, content=f"={fixed(f'{ae} + {be}', digits)}", fill=source_color,
                  **{"font-size": "13", "font-weight": "700", "text-anchor": "end"}),
@@ -6186,9 +6193,9 @@ def flow_split(title, item, parts, unit="kWh", digits=2, source_name="", source_
                  **{"font-size": "10.5", "opacity": "0.65"}),
              svg("text", x=264, y=f"={f1(f'10 + {ha} / 2 + 13')}", content=f"={fixed(ae, digits)} + ' {unit}'",
                  fill=ac, **{"font-size": "13", "font-weight": "700"}),
-             svg("text", x=264, y=f"={f1(f'24 + {ha} + (90 - {ha}) / 2 - 1')}", content=f"='{bn} · ' + {pct_(be)}",
+             svg("text", x=264, y=f"={f1(f'{b_mid} - 1')}", content=f"='{bn} · ' + {pct_(be)}",
                  fill="currentColor", **{"font-size": "10.5", "opacity": "0.65"}),
-             svg("text", x=264, y=f"={f1(f'24 + {ha} + (90 - {ha}) / 2 + 13')}",
+             svg("text", x=264, y=f"={f1(f'{b_mid} + 13')}",
                  content=f"={fixed(be, digits)} + ' {unit}'", fill=bc, **{"font-size": "13", "font-weight": "700"})]
     drawing = svg("svg", [svg("path", d=band_a, fill=ac, **{"fill-opacity": "0.45"}),
                           svg("path", d=band_b, fill=bc, **{"fill-opacity": "0.45"}),
@@ -6876,10 +6883,20 @@ def price_now(title, item):
     return rating_tile("Strompreis jetzt", PRICE, "price", value_expr=f"={fixed(num(PRICE), 3)} + ' €/kWh'")
 
 
+def cop_row(total, space, dhw):
+    """The COPs in one line under a conversion's bands, each with its ring and icon: total (the heating card's green
+    with its leaf), heating, hot water (user, 2026-10-07: under the drawing, not beside the title)."""
+    return div([cop_badge("COP gesamt", total, COP_C, "material:eco"),
+                cop_badge("COP Heizung", space, SPACE_C, "material:local_fire_department"),
+                cop_badge("COP WW", dhw, DHW_C, "material:water_drop")],
+               **{"display": "flex", "flex-wrap": "wrap", "justify-content": "space-around", "gap": "6px 14px",
+                  "margin-top": "8px"})
+
+
 def hp_flow(title, item):
     # only while it runs: the day's conversion stands right under Jetzt anyway
-    return flow_cop("Strom → Wärme jetzt", HP_POWER_ALL, HPX["heat"],
-                    f"({num(HPX['cop'])} > 0 ? {fixed(num(HPX['cop']), 2)} : '–')", hide_idle=True)
+    return flow_cop("Strom → Wärme jetzt", HP_POWER_ALL, HPX["heat"], hide_idle=True,
+                    footer=cop_row(HPX["cop"], "espaltherma_cop_space", "espaltherma_cop_dhw"))
 
 
 def cop_badge(name, item, color, icon, full=6):
@@ -6895,15 +6912,9 @@ def cop_badge(name, item, color, icon, full=6):
 
 
 def hp_day_flow(title, item):
-    # the purposes' COPs at the top right, one under the other, each with a ring filled by its value (user, 2026-10-06)
-    # the total over them, in the heating card's green with its leaf (user, 2026-10-06)
-    side = div([cop_badge("COP gesamt", "espaltherma_dcop", COP_C, "material:eco"),
-                cop_badge("COP Heizung", "espaltherma_dcop_space", SPACE_C, "material:local_fire_department"),
-                cop_badge("COP WW", "espaltherma_dcop_dhw", DHW_C, "material:water_drop")],
-               **{"display": "flex", "flex-direction": "column", "gap": "4px", "align-items": "flex-start"})
-    return flow_cop("Strom → Wärme heute", "espaltherma_energy_today", "espaltherma_heating_energy_today",
-                    dash(disp("espaltherma_dcop")), unit="kWh", factor=1, still="noch kein Betrieb heute", side=side,
-                    cop_large=False)
+    return flow_cop("Strom → Wärme heute", "espaltherma_energy_today", "espaltherma_heating_energy_today", unit="kWh",
+                    factor=1, still="noch kein Betrieb heute",
+                    footer=cop_row("espaltherma_dcop", "espaltherma_dcop_space", "espaltherma_dcop_dhw"))
 
 
 def hp_heat_flow():

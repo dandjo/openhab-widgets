@@ -147,9 +147,9 @@ expected end; beside such an arc the rest of the ring pulses softly and, while t
 with it, brightest and widest with it. A tap on a node opens its device's page of my installation, on the house and the
 appliances a popup of their own. Under the star three tiles with large pale icons: the house as its node inside the pie
 of what the consumers draw, as large as the rings beside it, with its power and today's energy against yesterday's at
-this time in a pill, and today's self-consumption and self-sufficiency as rings, each with yesterday's whole day in a
-pill, green while today's share is higher, orange while lower. The card places its lines and nodes as `flow-link` and
-`flow-node`. The recording and the dark screenshot show it with demo values.
+this time in a pill (the difference in kWh), and today's self-consumption and self-sufficiency as rings, each with
+yesterday's whole day in a pill, green while today's share is higher, orange while lower. The card places its lines and
+nodes as `flow-link` and `flow-node`. The recording and the dark screenshot show it with demo values.
 
 Needs `flow-link`, `flow-node`.
 
@@ -294,10 +294,10 @@ Each tile's pill holds the temperature, the tank's and the leaving water's, fill
 or heating is switched on, outlined while off, beside a tinted pill with the setpoint and a small target icon; a tap
 opens the heat pump's page of my installation. Below them today's electricity and heat of the heat pump split into space
 heating, DHW and standby as bars (hovering a part lifts it everywhere), each with today against yesterday at this time
-in a pill in the middle of its title, and today's COPs of space heating, DHW and in total in one row as rings like the
-energy flow's self-consumption, each with today against yesterday at this time in a pill under its title. While the tank
-charges or the heating runs, a line under its tile says since when. The screenshots show it with the heat pump card's
-demo values.
+in a pill in the middle of its title (the difference in kWh), and today's COPs of space heating, DHW and in total in one
+row as rings like the energy flow's self-consumption, each with today against yesterday at this time in a pill under its
+title. While the tank charges or the heating runs, a line under its tile says since when. The screenshots show it with
+the heat pump card's demo values.
 
 Needs `flow-node`.
 
@@ -329,8 +329,8 @@ Needs `flow-node`.
 | `heatpumpClimateControlPower` | Pyaltherma Climate Control Power | Switch |
 | `heatpumpLeavingWaterSetpoint` | ESPAltherma Leaving Water Setpoint | Number:Temperature |
 | `heatpumpHeatingSince` | Heatpump Heating Running Since | DateTime |
-| `tileHistory` | Tile history | String |
 | `heatpumpEnergyToday` | ESPAltherma Energy Today | Number:Energy |
+| `tileHistory` | Tile history | String |
 | `heatpumpEnergySpaceToday` | ESPAltherma Energy Space Today | Number:Energy |
 | `heatpumpEnergyDhwToday` | ESPAltherma Energy DHW Today | Number:Energy |
 | `heatpumpEnergyStandbyToday` | ESPAltherma Energy Standby Today | Number:Energy |
@@ -397,7 +397,7 @@ Needs `boost-pill`, `flow-node`, `ground-floor-quick`, `heatpump-circuit-quick`,
 ![Heat pump in dark mode](screenshots/heatpump-card-dark.gif)
 
 <details>
-<summary>57 props</summary>
+<summary>59 props</summary>
 
 | Prop | Item | Item type |
 |---|---|---|
@@ -417,6 +417,8 @@ Needs `boost-pill`, `flow-node`, `ground-floor-quick`, `heatpump-circuit-quick`,
 | `heatpumpHeatingEnergyDhwToday` | ESPAltherma Heating Energy DHW Today | Number:Energy |
 | `heatpumpCop` | ESPAltherma COP | Number |
 | `heatpumpDcop` | ESPAltherma DCOP | Number |
+| `heatpumpCopSpace` | ESPAltherma COP Space | Number |
+| `heatpumpCopDhw` | ESPAltherma COP DHW | Number |
 | `heatpumpDcopSpace` | ESPAltherma DCOP Space | Number |
 | `heatpumpDcopDhw` | ESPAltherma DCOP DHW | Number |
 | `heatpumpExtAmbientTemp` | ESPAltherma External Ambient Temperature | Number:Temperature |
@@ -464,9 +466,9 @@ Needs `boost-pill`, `flow-node`, `ground-floor-quick`, `heatpump-circuit-quick`,
 ### Consumption today: `consumption-card`
 
 Today's consumption as one bar split by source (PV, grid), the total against yesterday at this time in a pill between
-the two shares, and as one bar split by consumer, with a legend in two columns that gives each consumer's energy and how
-many kWh more (orange) or fewer (green) it drew than yesterday until this time; hovering a part lifts it everywhere. The
-screenshot shows it with demo values.
+the two shares (the difference in kWh), and as one bar split by consumer, with a legend in two columns that gives each
+consumer's energy and how many kWh more (orange) or fewer (green) it drew than yesterday until this time; hovering a
+part lifts it everywhere. The screenshot shows it with demo values.
 
 ![Consumption today](screenshots/consumption-card.png)
 
@@ -601,8 +603,8 @@ three figures at its top open them:
 - `heatpump-heat-quick`, heat: the split by purpose now and today as bars on top; the heat of space heating and DHW over
   the day, per day of the month.
 - `heatpump-cop-quick`, COP: electricity plus ambient heat becoming heat as flow bands, now while the compressor runs
-  and for the day with the COPs by purpose; the COP and the outdoor temperature over the day, the daily COPs of the
-  month.
+  and for the day, each over a row of rings with the COP in total, of space heating and of DHW; the COP and the outdoor
+  temperature over the day, the daily COPs of the month.
 
 | | | |
 |---|---|---|
@@ -759,7 +761,7 @@ three figures at its top open them:
 </details>
 
 <details>
-<summary><code>heatpump-cop-quick</code>: 9 props</summary>
+<summary><code>heatpump-cop-quick</code>: 11 props</summary>
 
 | Prop | Item | Item type |
 |---|---|---|
@@ -767,10 +769,12 @@ three figures at its top open them:
 | `heatpumpDcop` | ESPAltherma DCOP | Number |
 | `heatpumpHeatPower` | ESPAltherma Heating Power | Number:Power |
 | `heatpumpPower` | ESPAltherma Electrical Power | Number:Power |
-| `heatpumpDcopSpace` | ESPAltherma DCOP Space | Number |
-| `heatpumpDcopDhw` | ESPAltherma DCOP DHW | Number |
+| `heatpumpCopSpace` | ESPAltherma COP Space | Number |
+| `heatpumpCopDhw` | ESPAltherma COP DHW | Number |
 | `heatpumpHeatingEnergyToday` | ESPAltherma Heating Energy Today | Number:Energy |
 | `heatpumpEnergyToday` | ESPAltherma Energy Today | Number:Energy |
+| `heatpumpDcopSpace` | ESPAltherma DCOP Space | Number |
+| `heatpumpDcopDhw` | ESPAltherma DCOP DHW | Number |
 | `heatpumpExtAmbientTemp` | ESPAltherma External Ambient Temperature | Number:Temperature |
 
 </details>
@@ -1187,6 +1191,11 @@ Four cards for a metered plug, built from one item prefix: `<prefix>_power`, `_s
 provides them. On a device page they stand two by two. `plug-card` also covers devices that are not plugs: give it
 the device's `title`, hide the switch with `controllable: false`, or take the switch from another item with `switch`.
 Every value tile carries a large pale icon of what it shows.
+
+The comparisons with yesterday and the last 7 days come from one String item, `history`, which the rule in
+[`scripts/openhab-ui/applied/tile_history.py`](scripts/openhab-ui/applied/tile_history.py) writes every ten minutes:
+for each item its value yesterday and the mean of the last 7 days at this time, and the same ten minutes later, between
+which the cards interpolate to the current minute; so no widget queries persistence for a comparison.
 
 ![Plug cards](screenshots/plug-cards.png)
 
