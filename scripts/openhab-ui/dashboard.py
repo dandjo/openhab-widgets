@@ -2074,7 +2074,8 @@ WX_ROW = {"display": "grid", "align-items": "center",
 def weather_forecast_card():
     # the days first, the chart of the next hours below them, a gap between the last day and the chart
     # from today on: after midnight a run that failed would leave yesterday first
-    upcoming = f"{wx_json(WX_DAILY)}.filter((d) => d.t * 1000 >= dayjs().startOf('day').valueOf()).slice(0, 5)"
+    upcoming = (f"{wx_json(WX_DAILY)}.filter((d) => d.t * 1000 >= dayjs().startOf('day').valueOf())"
+                f".slice(0, {WX_FORECAST_DAYS})")
     days = div([comp("oh-repeater", {"for": "day", "sourceType": "array", "in": f"={upcoming}",
                                      "fragment": True}, default=[wx_day_row()])],
                **{"padding-top": "2px", "margin-bottom": "12px"})
@@ -2088,11 +2089,18 @@ WX_DAY_WIDGET = "widget:weather-day"
 WX_WEEKDAYS_LONG = "['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag']"
 WX_MONTHS = ("['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', "
              "'November', 'Dezember']")
-WX_DATE = "Number(props.date)"  # the day's midnight in epoch seconds, as weather_daily gives it
+# the day shown: the midnight the popup opened with (props.date, epoch seconds, as weather_daily gives it), moved
+# by the days its arrows have stepped (wxShift, in its oh-context); and that day counted from today
+WX_DATE = "dayjs(Number(props.date) * 1000).add(vars.wxShift || 0, 'day').unix()"
+WX_DAY_INDEX = f"Math.round(({WX_DATE} * 1000 - dayjs().startOf('day').valueOf()) / 86400000)"
+WX_FORECAST_DAYS = 5  # the forecast's days from today, the ones its popup steps through
 # the popup a little wider than Framework7's 630 px and nearly as tall as the window, for the 24 hours and the chart;
-# ":root" keeps the rule unscoped while the popup is open
+# its content without a stacking context of its own (Framework7 gives it z-index 1), so the day arrows, fixed in the
+# navbar's place, stand above the navbar (z-index 500) and not under it; ":root" keeps the rules unscoped while the
+# popup is open
 WX_DAY_POPUP = (':root .popup:has(> .oh-popup[style*="--day-popup"]) { --f7-popup-tablet-width: min(760px, '
-                'calc(100vw - 64px)); --f7-popup-tablet-height: calc(100vh - 64px); }')
+                'calc(100vw - 64px)); --f7-popup-tablet-height: calc(100vh - 64px); }\n'
+                ':root .oh-popup[style*="--day-popup"] > .page-content { z-index: auto; }')
 
 
 def wx_of_day(item):
@@ -2185,15 +2193,33 @@ def weather_day_chart():
                         markPoint=wx_wind_arrows(quarters, every, near=8))]
     # MainUI's day chart shows a whole day: today with future 0, each day after with one more
     return chart({"chartType": "day", "period": "D", "height": "480px",
-                  "future": f"=Math.round(({WX_DATE} * 1000 - dayjs().startOf('day').valueOf()) / 86400000)",
+                  "future": f"={WX_DAY_INDEX}",
                   "options": {"axisPointer": {"link": [{"xAxisIndex": "all"}]}}},
                  grid=grids, xAxis=x_axes, yAxis=y_axes, series=series,
                  tooltip=tooltip(trigger="axis", smartFormatter=True), legend=legend())
 
 
+def wx_day_arrows():
+    """The day before and the day after, as two chevrons at the right of the popup's navbar (user, 2026-10-08; no
+    words, as Zurück at its left closes the popup): fixed, so the popup, whose transform makes it their containing
+    block, holds them in its navbar's place while the day scrolls below; each pale and inert where the forecast's days
+    end. A step moves wxShift in the popup's oh-context, which starts at 0 whenever the popup opens."""
+    def arrow(icon, step, enabled):
+        return comp("oh-link", {"iconF7": icon, "iconSize": 22, "action": "variable", "actionVariable": "wxShift",
+                                "actionVariableValue": f"=(vars.wxShift || 0) + ({step})",
+                                "style": {"display": "flex", "align-items": "center", "height": "100%",
+                                          "padding": "0 10px", "opacity": f"=({enabled}) ? 1 : 0.3",
+                                          "pointer-events": f"=({enabled}) ? 'auto' : 'none'"}})
+    return div([arrow("chevron_left", -1, f"{WX_DAY_INDEX} > 0"),
+                arrow("chevron_right", 1, f"{WX_DAY_INDEX} < {WX_FORECAST_DAYS - 1}")],
+               **{"position": "fixed", "top": "var(--f7-safe-area-top, 0px)", "right": "4px",
+                  "height": "var(--f7-navbar-height)", "display": "flex", "z-index": "600"})
+
+
 def weather_day_popup():
     """The day a tap on a forecast day opens (prop date: its midnight in epoch seconds): its quarter hours in a chart
-    at the top, its hours below (user, 2026-10-08); a note while the rule has not written the day yet."""
+    at the top, its hours below (user, 2026-10-08), both titled with the day; a note while the rule has not written
+    the day yet. Arrows at the top right step to the day before or after."""
     d = f"dayjs({WX_DATE} * 1000)"
     name = (f"({d}.isSame(dayjs(), 'day') ? 'Heute' : {WX_WEEKDAYS_LONG}[{d}.day()]) + ', ' + {d}.date() + '. ' + "
             f"{WX_MONTHS}[{d}.month()]")
@@ -2203,11 +2229,13 @@ def weather_day_popup():
     empty = label("Für diesen Tag liegen noch keine Stunden vor.", f"={wx_of_day(WX_HOURS)}.length === 0",
                   **{"font-size": "13px", "opacity": "0.7", "padding": "4px 16px 14px"})
     table = card(f"='Stunden · ' + {name}", [hours, empty])
-    course = card("Verlauf in Viertelstunden", [div([weather_day_chart()], **{"padding": "0 4px 6px"})])
+    course = card(f"='Verlauf in Viertelstunden · ' + {name}",
+                  [div([weather_day_chart()], **{"padding": "0 4px 6px"})])
     note = label("Viertelstunden von GeoSphere AROME Austria für etwa zweieinhalb Tage, danach aus dem Best Match von "
                  "Open-Meteo, aus seinen Stunden gemittelt; die Regenwahrscheinlichkeit aus dem Best Match.",
                  **{"font-size": "12px", "opacity": "0.6", "padding": "0 16px 10px"})
-    root = div([course, table, note], **{"padding": "8px 6px"})
+    root = div([comp("oh-context", {"variables": {"wxShift": 0}}, default=[wx_day_arrows(), course, table, note])],
+               **{"padding": "8px 6px"})
     root["config"].update({"label": "Wetter", "style": {"--day-popup": "wide"},
                            "stylesheet": "\n".join([WX_DAY_POPUP, CARD_STYLE, PERIOD_MENU])})
     return root
@@ -2425,10 +2453,10 @@ def reversed_path(d):
     return "M" + " L".join(f"{px:g},{py:g}" for px, py in reversed(path_points(d)))
 
 
-# every pipe's dots keep the same spacing, so a long pipe has more of them, not further apart ones; the short pipes
-# between wall unit, valve and tank in the basement carry two (user, 2026-10-04: one looked lost there). They all run
-# at the same speed, which follows the water's flow on the water pipes and the compressor's frequency on the
-# refrigerant's, in steps, as a changed duration restarts the animation
+# every pipe's dots keep the same spacing, so a long pipe has more of them, not further apart ones, a short one at
+# least one (user, 2026-10-08: the basement's short pipes no longer carry two). They all run at the same speed, which
+# follows the water's flow on the water pipes and the compressor's frequency on the refrigerant's, in steps, as a
+# changed duration restarts the animation
 DOT_SPACING = 40  # units between two dots
 HP_ORBIT = ORBIT  # the ring round every device, as in the energy flow
 DOT_SPEEDS = [20, 35, 50, 65, 80]  # units per second, one per step
@@ -2475,8 +2503,9 @@ def rounded_polygon(points, r):
 
 # vertical layout: eaves 162 (ridge 137, a flat pitch), upper/ground floor at 270, ground level at 386; the floors'
 # nodes sit in the middle of their level, the basement's below the radiators' branch that runs across its top.
-# The house runs from 100 to 610 and bounds the drawing: the outdoor unit sits on the right slope of the roof
-# with its values to its left, the refrigerant runs down inside the right wall to the wall unit.
+# The house runs from 100 to 550 and bounds the drawing: the outdoor unit sits on the right slope of the roof
+# with its values to its left, the refrigerant runs down inside the right wall to the wall unit. 450 units wide, as
+# narrow as the floors' tiles and nodes allow, so a phone shows it larger (user, 2026-10-08).
 EAVE, RIDGE, FLOOR_1, GROUND_LEVEL = 162, 137, 270, 386
 UPPER_Y, GROUND_Y = (EAVE + FLOOR_1) // 2, (FLOOR_1 + GROUND_LEVEL) // 2
 # the basement from the top: the radiators' branch with its dots (4.5) 10 units under the ground level's line, the
@@ -2484,18 +2513,23 @@ UPPER_Y, GROUND_Y = (EAVE + FLOOR_1) // 2, (FLOOR_1 + GROUND_LEVEL) // 2
 BRANCH_Y = GROUND_LEVEL + 16
 BASEMENT_Y = BRANCH_Y + 54
 BOTTOM = BASEMENT_Y + 50
-LEFT, RIGHT = 100, 610
+LEFT, RIGHT = 100, 550
+# the house's outer edges, its outline 2 wide: the drawing's edges, and the outer edges of the tiles flush with its
+# walls (user, 2026-10-08: they line up with the figures' tiles above it on a phone)
+OUTER_LEFT, OUTER_RIGHT = LEFT - 1, RIGHT + 1
+# the outdoor unit on the right slope of the roof (its badge may stand out over the edge); the refrigerant down inside
+# the right wall from the unit's ring
+OUT = (RIGHT - 35, 102)
+REFRIGERANT_X = RIGHT - 22
+REFRIGERANT_START = round(math.sqrt(ORBIT ** 2 - (REFRIGERANT_X - OUT[0]) ** 2))  # below the unit, on its ring
 # the basement's four devices evenly spaced from the radiators to the wall unit beside the refrigerant line, the
 # radiators' ring as far from the left wall as the wall unit's from the right one; the floor loops above, left of the
-# riser
-WALL_X = 532
+# riser, 28 units of pipe from it
+WALL_X = REFRIGERANT_X - 56
 RADIATORS_X = LEFT + RIGHT - WALL_X
 RADIATORS, TANK, VALVE, WALL = ((round(RADIATORS_X + (WALL_X - RADIATORS_X) * k / 3), BASEMENT_Y) for k in range(4))
-# the outdoor unit on the right slope of the roof, the refrigerant down inside the right wall from it
-OUT, GROUND_FH, UPPER_FH = (575, 102), (337, GROUND_Y), (337, UPPER_Y)
-REFRIGERANT_X = 588
+GROUND_FH, UPPER_FH = (VALVE[0] - 60, GROUND_Y), (VALVE[0] - 60, UPPER_Y)
 HOUSE = 0.4  # outline opacity
-HP_VB = (92, 15, 526, BOTTOM + 121 - 15)  # viewBox: x, y, width, height; 7 units beside the house on both sides
 
 # the heating water's pressure outside the range of 1 to 2,5 bar (no value is not out of range)
 WATER_PRESSURE_BAD = (f"(!['NULL', 'UNDEF'].includes(items.{HPX['water_pressure']}.state) && "
@@ -2505,10 +2539,10 @@ ROOM_X = (VALVE[0] + REFRIGERANT_X) / 2  # the middle of the room right of the r
 # green ground level (3 wide)
 GROUND_MID = (FLOOR_1 + 0.7 + GROUND_LEVEL - 1.5) / 2
 TILE_ROW = 17  # from one row of a tile to the next
-# the floors' tiles, 170 wide, stand as far from the outer wall as the ground floor's (three rows) from its floor
-# and ceiling lines, about 14; their floor loops 14 right of them
-FLOOR_TILE_W = 170
+# the floors' tiles stand as far from the outer wall as the ground floor's (three rows) from its floor and ceiling
+# lines, about 14, and reach to 14 units before their floor loops' rings: 153 wide, room for Luftfeuchtigkeit 100 %
 FLOOR_TILE_X = round(LEFT + 1 + ((GROUND_LEVEL - 1.5) - (FLOOR_1 + 0.7) - (35 + 3 * TILE_ROW)) / 2)
+FLOOR_TILE_W = round(UPPER_FH[0] - ORBIT - RING_MAX / 2 - 14 - FLOOR_TILE_X)
 
 
 def percent(item):
@@ -2530,13 +2564,17 @@ def roof_y(x):
 
 OUTDOOR_TILE = (OUTDOOR_RIGHT - 176 / 2,
                 round(roof_y(OUTDOOR_RIGHT - 176) - TILE_GAP - (35 + 4 * TILE_ROW)), 176)
-CONTROL_TILE = (LEFT + 176 / 2, OUTDOOR_TILE[1], 176)
-REFRIGERANT_TILE = (ROOM_X, 170, 136)
-CIRCUIT_TILE = (ROOM_X, round(GROUND_MID - (35 + 3 * TILE_ROW) / 2), 136)
+CONTROL_TILE = (OUTER_LEFT + 176 / 2, OUTDOOR_TILE[1], 176)
+# the room's tiles 128 wide, 13 from the riser and from the refrigerant line
+REFRIGERANT_TILE = (ROOM_X, 170, 128)
+CIRCUIT_TILE = (ROOM_X, round(GROUND_MID - (35 + 3 * TILE_ROW) / 2), 128)
 UPPER_TILE = (FLOOR_TILE_X + FLOOR_TILE_W / 2, round(UPPER_Y - (35 + 2 * TILE_ROW) / 2), FLOOR_TILE_W)
 GROUND_TILE = (FLOOR_TILE_X + FLOOR_TILE_W / 2, round(GROUND_MID - (35 + 3 * TILE_ROW) / 2), FLOOR_TILE_W)
-TANK_TILE = (LEFT + 214 / 2, BOTTOM + 12, 214)
-INDOOR_TILE = (RIGHT - 156 / 2, BOTTOM + 12, 156)
+TANK_TILE = (OUTER_LEFT + 214 / 2, BOTTOM + 12, 214)
+INDOOR_TILE = (OUTER_RIGHT - 156 / 2, BOTTOM + 12, 156)
+# viewBox: x, y, width, height; from the house's outer edge on the left to the one on the right, 7 units above the
+# upper tiles, 6 below the lower
+HP_VB = (OUTER_LEFT, OUTDOOR_TILE[1] - 7, OUTER_RIGHT - OUTER_LEFT, BOTTOM + 121 - (OUTDOOR_TILE[1] - 7))
 
 
 def hp_tile(cx, y, w, title, icon, color, on, rows, state=None):
@@ -2582,12 +2620,10 @@ hp_svg = svg("svg", [
     svg("line", x1=LEFT + 2, y1=GROUND_LEVEL, x2=RIGHT - 2, y2=GROUND_LEVEL, **stroke(3, "#a5d6a7")),
     # pipes, drawn in flow direction: refrigerant from the roof down inside the wall, supply riser with one
     # branch per level; during a defrost the dots run back, as the heat goes from the water to the outdoor unit
-    *hp_route(f"M{REFRIGERANT_X},{OUT[1] + 27} V{WALL[1]} H{WALL[0] + 30}", REFRIGERANT, COMPRESSOR, reverse=DEFROSTING,
-              pace=(num(HPX["hz"]), FREQUENCY_STEPS)),
-    *hp_route(f"M{WALL[0] - 30},{WALL[1]} H{VALVE[0] + 30}", SUPPLY, PUMP_ON, reverse=DEFROSTING, pace=WATER_PACE,
-              least=2),
-    *hp_route(f"M{VALVE[0] - 30},{VALVE[1]} H{TANK[0] + 30}", SUPPLY, TANK_FLOW, reverse=DEFROSTING, pace=WATER_PACE,
-              least=2),
+    *hp_route(f"M{REFRIGERANT_X},{OUT[1] + REFRIGERANT_START} V{WALL[1]} H{WALL[0] + 30}", REFRIGERANT, COMPRESSOR,
+              reverse=DEFROSTING, pace=(num(HPX["hz"]), FREQUENCY_STEPS)),
+    *hp_route(f"M{WALL[0] - 30},{WALL[1]} H{VALVE[0] + 30}", SUPPLY, PUMP_ON, reverse=DEFROSTING, pace=WATER_PACE),
+    *hp_route(f"M{VALVE[0] - 30},{VALVE[1]} H{TANK[0] + 30}", SUPPLY, TANK_FLOW, reverse=DEFROSTING, pace=WATER_PACE),
     *hp_route(f"M{VALVE[0]},{VALVE[1] - 30} V{UPPER_FH[1]} H{UPPER_FH[0] + 30}", SUPPLY, HEATING_FLOW,
               reverse=DEFROSTING, pace=WATER_PACE),
     *hp_route(f"M{VALVE[0]},{GROUND_FH[1]} H{GROUND_FH[0] + 30}", SUPPLY, HEATING_FLOW, reverse=DEFROSTING,
@@ -2811,14 +2847,15 @@ def heatpump_content():
     return [div([hp_stats()], **{"padding": f"={NARROW} ? '8px 16px 0' : '12px 16px 0'"}),
             div([drawing],
                 # at its own size outside a phone, so its circles never shrink there (user, 2026-10-05: below 1500 px
-                # the card is narrower than the drawing); centred, reaching into the card's padding, whose edge the
-                # house stays 7 units clear of
-                # its padding inside its width, so on a phone the drawing keeps 8 px to both edges of the card, as
-                # the energy flow's (user, 2026-10-05: it reached the right edge)
+                # the card was narrower than the drawing, which since 2026-10-08 fits even the narrowest card, 522 px);
+                # centred
+                # on a phone its padding inside its width, 16 px to both edges of the card as the figures' tiles
+                # above it, so the house and its outer tiles line up with them (user, 2026-10-08)
                 **{"display": "flex", "flex-direction": "column", "gap": "12px", "box-sizing": "border-box",
-                   "width": f"={NARROW} ? '100%' : '{HP_VB[2]}px'", "max-width": f"={NARROW} ? '{HP_VB[2]}px' : 'none'",
+                   "width": f"={NARROW} ? '100%' : '{HP_VB[2]}px'",
+                   "max-width": f"={NARROW} ? '{HP_VB[2] + 32}px' : 'none'",
                    "margin": f"={NARROW} ? 'auto' : 'auto calc((100% - {HP_VB[2]}px) / 2)'",
-                   "padding": f"={NARROW} ? '8px 4px 12px' : '8px 0 16px'"})]
+                   "padding": f"={NARROW} ? '8px 16px 12px' : '8px 0 16px'"})]
 
 # ---------------------------------------------------------------- 3. price
 
