@@ -13,20 +13,9 @@ props:
     description: The text to show, usually an expression on an item
     type: TEXT
     required: true
-  - name: icon
-    label: Icon
-    description: The pale icon, e.g. material:thermostat
-    type: TEXT
-    required: false
-    default: material:info
   - name: color
     label: Colour
-    description: 'Colour of the value and the icon as #rrggbb; empty: the text colour'
-    type: TEXT
-    required: false
-  - name: iconColor
-    label: Icon colour
-    description: 'Colour of the icon where the value keeps the text colour, as #rrggbb'
+    description: 'Colour of the item popup''s course as #rrggbb'
     type: TEXT
     required: false
   - name: item
@@ -63,7 +52,7 @@ props:
     type: TEXT
     required: false
   parameterGroups: []
-timestamp: Sep 27, 2026, 8:52:40 PM
+timestamp: Oct 8, 2026, 3:48:44 AM
 component: div
 config:
   style:
@@ -76,22 +65,9 @@ config:
     padding: 0.7143em 0.8571em
     border-radius: 0.8571em
     grid-column: '=props.wrap ? ''1 / -1'' : ''auto'''
-    background: rgba(127, 127, 127, 0.08)
+    background: color-mix(in srgb, var(--f7-text-color) 6%, transparent)
 slots:
   default:
-  - component: oh-icon
-    config:
-      icon: =props.icon || 'material:info'
-      width: 4.143em
-      height: 4.143em
-      style:
-        width: 1em
-        height: 1em
-        position: absolute
-        right: -0.1034em
-        bottom: -0.1724em
-        opacity: '0.16'
-        color: =props.iconColor || props.color || '#78909c'
   - component: div
     config:
       style:
@@ -115,7 +91,6 @@ slots:
             overflow: hidden
             text-overflow: '=props.wrap ? ''clip'' : ''ellipsis'''
             overflow-wrap: anywhere
-            color: =props.color || ''
   - component: oh-link
     config:
       visible: =!!props.item

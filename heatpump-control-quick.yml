@@ -64,18 +64,21 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 7, 2026, 2:25:52 AM
+timestamp: Oct 8, 2026, 3:48:44 AM
 component: div
 config:
   style:
     --quick-popup: panel
   label: Control
-  stylesheet: ':root .popup:has(> .oh-popup[style*="--quick-popup"]) { --f7-popup-tablet-width: 420px; --f7-popup-tablet-height:
-    min(660px, calc(100vh - 64px)); }
-
-    .menu-item-dropdown:not(.menu-item-dropdown-opened) .menu-dropdown { display: none; }
-
-    .oh-chart-container > .menu.padding { padding-top: 6px !important; }'
+  stylesheet: ":root .popup:has(> .oh-popup[style*=\"--quick-popup\"]) { --f7-popup-tablet-width: 420px; --f7-popup-tablet-height:\
+    \ min(660px, calc(100vh - 64px)); }\n.card { border-radius: 14px; box-shadow: 0 0 0 1px color-mix(in srgb, var(--f7-text-color)\
+    \ 8%, transparent); }\n.card-header { justify-content: flex-start; min-height: 0; font-size: 13px; font-weight: 600;\n\
+    \  padding: 16px 16px 4px; opacity: 0.6; letter-spacing: 0.02em; }\n.card-header::after { display: none !important; }\n\
+    .oh-chart-container > .menu .menu-item { background: color-mix(in srgb, var(--f7-text-color) 8%, transparent);\n  color:\
+    \ inherit; border-radius: 6px; min-width: 32px; }\n.oh-chart-container > .menu .menu-item + .menu-item { margin-left:\
+    \ 6px; }\n.segmented-strong { border-radius: 10px; background: color-mix(in srgb, var(--f7-text-color) 8%, transparent);\
+    \ }\n.segmented-strong .button, .segmented-strong .segmented-highlight { border-radius: 8px !important; }\n.menu-item-dropdown:not(.menu-item-dropdown-opened)\
+    \ .menu-dropdown { display: none; }\n.oh-chart-container > .menu.padding { padding-top: 6px !important; }"
 slots:
   default:
   - component: div

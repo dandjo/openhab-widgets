@@ -66,6 +66,12 @@ step popup; python3 cdp_tap.py $B/coffee_machine $R/item-popup.png "Energy today
 step weather; python3 cdp_elems.py $B/weather 390 $O/weather "$(cat screenshot-js/forecast.js)" "$(cat demo_weather.js)" >/dev/null
 python3 cdp_elems.py $B/weather 390 $O/weather-dark "$(cat screenshot-js/forecast.js)" "$(cat demo_weather.js)" dark >/dev/null
 cp $O/weather/weather-forecast.png $R/; cp $O/weather-dark/weather-forecast.png $R/weather-forecast-dark.png
+# a day of the forecast hour by hour, the popup tomorrow's row opens, as wide as on a wider screen
+python3 cdp_elems.py $B/weather 1400 $O/wxday "$(cat screenshot-js/quick_rect.js)('weather-day')" \
+  "$(cat screenshot-js/day_popup.js)(1)" >/dev/null
+python3 cdp_elems.py $B/weather 1400 $O/wxday-dark "$(cat screenshot-js/quick_rect.js)('weather-day')" \
+  "$(cat screenshot-js/day_popup.js)(1)" dark >/dev/null
+cp $O/wxday/weather-day.png $R/; cp $O/wxday-dark/weather-day.png $R/weather-day-dark.png
 if [ "${GALLERY:-1}" = 1 ]; then  # GALLERY=0 leaves the gallery's shots as they are
 step gallery; python3 cdp_cards.py $B/widget_gallery $O/g900 900 >/dev/null
 cp $O/g900-3-state-bar.png $R/state-bars.png; cp $O/g900-5-switch-tile.png $R/switch-tiles.png

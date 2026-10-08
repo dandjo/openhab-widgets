@@ -40,7 +40,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 5, 2026, 2:14:59 AM
+timestamp: Oct 8, 2026, 3:48:44 AM
 component: oh-card
 config:
   title: Electricity Price
@@ -72,8 +72,10 @@ slots:
           text: '=([''NULL'', ''UNDEF''].includes(items[props.priceTotalGross].state) ? ''–'' : (items[props.priceTotalGross].displayState
             || items[props.priceTotalGross].state))'
           style:
-            font-size: 32px
+            font-size: '=screen.width < 600 ? ''26px'' : ''28px'''
             font-weight: '700'
+            line-height: '=screen.width < 600 ? ''32px'' : ''34px'''
+            letter-spacing: -0.01em
             color: '=(Number(items[props.priceTotalGross].numericState) || 0) < 0.2 ? ''#43a047'' : (Number(items[props.priceTotalGross].numericState)
               || 0) < 0.3 ? ''#fb8c00'' : ''#e53935'''
       - component: Label

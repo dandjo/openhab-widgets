@@ -76,7 +76,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 4, 2026, 11:05:34 PM
+timestamp: Oct 8, 2026, 3:48:44 AM
 component: oh-card
 config:
   contentStyle:
@@ -135,7 +135,7 @@ slots:
                 display: flex
                 align-items: center
                 gap: 4px
-                border-radius: 14px
+                border-radius: 6px
                 padding: '=screen.width >= 600 ? ''0 10px 0 0'' : ''0'''
                 background: '=screen.width >= 600 ? ''color-mix(in srgb, '' + ([''#9e9e9e'', ''#fdd835'', ''#fb8c00'', ''#e53935''][Number(items[props.weatherWarningLevel].state)]
                   || ''#9e9e9e'') + '' 16%, transparent)'' : ''transparent'''

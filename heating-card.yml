@@ -184,7 +184,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 7, 2026, 3:15:18 PM
+timestamp: Oct 8, 2026, 3:48:44 AM
 component: oh-card
 config:
   title: Heating & Hot Water
@@ -220,7 +220,7 @@ slots:
                 padding: 12px 8px
                 border-radius: 12px
                 text-align: center
-                background: rgba(127, 127, 127, 0.08)
+                background: color-mix(in srgb, var(--f7-text-color) 6%, transparent)
             slots:
               default:
               - component: svg
@@ -597,7 +597,7 @@ slots:
                         background: '=items[props.heatpumpDhwPower].state === ''ON'' ? ''#e57373'' : ''transparent'''
                         color: '=items[props.heatpumpDhwPower].state === ''ON'' ? ''#ffffff'' : ''#e57373'''
                         border: '1.5px solid #e57373'
-                        border-radius: 10px
+                        border-radius: 6px
                         padding: 0.5px 8.5px
                         font-size: 12px
                         font-weight: '600'
@@ -610,7 +610,7 @@ slots:
                         gap: 4px
                         color: '=themeOptions.dark === ''dark'' ? ''#e57373'' : ''#c62828'''
                         background: rgba(229, 115, 115, 0.16)
-                        border-radius: 10px
+                        border-radius: 6px
                         padding: 2px 8px
                         font-size: 12px
                         font-weight: '600'
@@ -637,7 +637,7 @@ slots:
                         gap: 4px
                         color: '=themeOptions.dark === ''dark'' ? ''#e57373'' : ''#c62828'''
                         background: rgba(229, 115, 115, 0.16)
-                        border-radius: 10px
+                        border-radius: 6px
                         padding: 2px 8px
                         font-size: 12px
                         font-weight: '600'
@@ -710,7 +710,7 @@ slots:
                 padding: 12px 8px
                 border-radius: 12px
                 text-align: center
-                background: rgba(127, 127, 127, 0.08)
+                background: color-mix(in srgb, var(--f7-text-color) 6%, transparent)
             slots:
               default:
               - component: svg
@@ -984,7 +984,7 @@ slots:
                         background: '=items[props.heatpumpClimateControlPower].state === ''ON'' ? ''#ffb74d'' : ''transparent'''
                         color: '=items[props.heatpumpClimateControlPower].state === ''ON'' ? ''#ffffff'' : ''#ffb74d'''
                         border: '1.5px solid #ffb74d'
-                        border-radius: 10px
+                        border-radius: 6px
                         padding: 0.5px 8.5px
                         font-size: 12px
                         font-weight: '600'
@@ -997,7 +997,7 @@ slots:
                         gap: 4px
                         color: '=themeOptions.dark === ''dark'' ? ''#ffb74d'' : ''#e65100'''
                         background: rgba(255, 183, 77, 0.16)
-                        border-radius: 10px
+                        border-radius: 6px
                         padding: 2px 8px
                         font-size: 12px
                         font-weight: '600'
@@ -1024,7 +1024,7 @@ slots:
                         gap: 4px
                         color: '=themeOptions.dark === ''dark'' ? ''#ffb74d'' : ''#e65100'''
                         background: rgba(255, 183, 77, 0.16)
-                        border-radius: 10px
+                        border-radius: 6px
                         padding: 2px 8px
                         font-size: 12px
                         font-weight: '600'
@@ -1153,7 +1153,7 @@ slots:
                         font-size: 11px
                         font-weight: '600'
                         padding: 2px 8px
-                        border-radius: 9px
+                        border-radius: 6px
                         white-space: nowrap
                         width: fit-content
                         color: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
@@ -1287,7 +1287,7 @@ slots:
                         font-size: 11px
                         font-weight: '600'
                         padding: 2px 8px
-                        border-radius: 9px
+                        border-radius: 6px
                         white-space: nowrap
                         width: fit-content
                         color: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
@@ -1462,23 +1462,12 @@ slots:
                 overflow: hidden
                 padding: 8px 10px
                 border-radius: 12px
-                background: rgba(127, 127, 127, 0.08)
+                background: color-mix(in srgb, var(--f7-text-color) 6%, transparent)
                 min-width: '0'
                 display: flex
                 align-items: center
             slots:
               default:
-              - component: oh-icon
-                config:
-                  icon: material:local_fire_department
-                  width: 58
-                  height: 58
-                  style:
-                    position: absolute
-                    right: -6px
-                    bottom: -10px
-                    opacity: '0.16'
-                    color: '#ffb74d'
               - component: div
                 config:
                   style:
@@ -1583,7 +1572,7 @@ slots:
                               x: 56
                               y: 34
                               height: 13
-                              rx: 6.5
+                              rx: 4
                               width: '=(((Math.abs(((Number(items[props.heatpumpDcopSpace].numericState) || 0) - Number(((h)
                                 => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y +
                                 (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
@@ -1662,23 +1651,12 @@ slots:
                 overflow: hidden
                 padding: 8px 10px
                 border-radius: 12px
-                background: rgba(127, 127, 127, 0.08)
+                background: color-mix(in srgb, var(--f7-text-color) 6%, transparent)
                 min-width: '0'
                 display: flex
                 align-items: center
             slots:
               default:
-              - component: oh-icon
-                config:
-                  icon: material:shower
-                  width: 58
-                  height: 58
-                  style:
-                    position: absolute
-                    right: -6px
-                    bottom: -10px
-                    opacity: '0.16'
-                    color: '#e57373'
               - component: div
                 config:
                   style:
@@ -1783,7 +1761,7 @@ slots:
                               x: 56
                               y: 34
                               height: 13
-                              rx: 6.5
+                              rx: 4
                               width: '=(((Math.abs(((Number(items[props.heatpumpDcopDhw].numericState) || 0) - Number(((h)
                                 => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y +
                                 (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
@@ -1862,24 +1840,13 @@ slots:
                 overflow: hidden
                 padding: 8px 10px
                 border-radius: 12px
-                background: rgba(127, 127, 127, 0.08)
+                background: color-mix(in srgb, var(--f7-text-color) 6%, transparent)
                 min-width: '0'
                 display: flex
                 align-items: center
                 grid-column: '=screen.width < 600 ? ''1 / -1'' : ''auto'''
             slots:
               default:
-              - component: oh-icon
-                config:
-                  icon: material:eco
-                  width: 58
-                  height: 58
-                  style:
-                    position: absolute
-                    right: -6px
-                    bottom: -10px
-                    opacity: '0.16'
-                    color: '#66bb6a'
               - component: div
                 config:
                   style:
@@ -1984,7 +1951,7 @@ slots:
                               x: 56
                               y: 34
                               height: 13
-                              rx: 6.5
+                              rx: 4
                               width: '=(((Math.abs(((Number(items[props.heatpumpDcop].numericState) || 0) - Number(((h) =>
                                 h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y + (h.y2
                                 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)

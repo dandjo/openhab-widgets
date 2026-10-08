@@ -358,7 +358,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 7, 2026, 12:51:17 PM
+timestamp: Oct 8, 2026, 3:48:44 AM
 component: oh-card
 config:
   title: Heat Pump
@@ -2706,8 +2706,9 @@ slots:
                   width: 176
                   height: 103
                   rx: 12
-                  fill: '=(Number(items[props.heatpumpInvFrequency].numericState) || 0) > 0 ? ''rgba(251, 140, 0, 0.2)'' :
-                    ''rgba(127, 127, 127, 0.08)'''
+                  style:
+                    fill: '=(Number(items[props.heatpumpInvFrequency].numericState) || 0) > 0 ? ''rgba(251, 140, 0, 0.2)''
+                      : ''color-mix(in srgb, var(--f7-text-color) 6%, transparent)'''
                   stroke: '=(Number(items[props.heatpumpInvFrequency].numericState) || 0) > 0 ? ''rgba(251, 140, 0, 0.6)''
                     : ''none'''
                   stroke-width: 1.5
@@ -2834,8 +2835,9 @@ slots:
                   width: 176
                   height: 103
                   rx: 12
-                  fill: '=items[props.heatpumpSmartGrid].state !== ''0'' ? ''rgba(251, 140, 0, 0.2)'' : ''rgba(127, 127, 127,
-                    0.08)'''
+                  style:
+                    fill: '=items[props.heatpumpSmartGrid].state !== ''0'' ? ''rgba(251, 140, 0, 0.2)'' : ''color-mix(in srgb,
+                      var(--f7-text-color) 6%, transparent)'''
                   stroke: '=items[props.heatpumpSmartGrid].state !== ''0'' ? ''rgba(251, 140, 0, 0.6)'' : ''none'''
                   stroke-width: 1.5
               - component: text
@@ -2949,8 +2951,9 @@ slots:
                   width: 136
                   height: 86
                   rx: 12
-                  fill: '=(Number(items[props.heatpumpInvFrequency].numericState) || 0) > 0 ? ''rgba(186, 104, 200, 0.2)''
-                    : ''rgba(127, 127, 127, 0.08)'''
+                  style:
+                    fill: '=(Number(items[props.heatpumpInvFrequency].numericState) || 0) > 0 ? ''rgba(186, 104, 200, 0.2)''
+                      : ''color-mix(in srgb, var(--f7-text-color) 6%, transparent)'''
                   stroke: '=(Number(items[props.heatpumpInvFrequency].numericState) || 0) > 0 ? ''rgba(186, 104, 200, 0.6)''
                     : ''none'''
                   stroke-width: 1.5
@@ -3046,9 +3049,10 @@ slots:
                   width: 136
                   height: 86
                   rx: 12
-                  fill: '=((items[props.heatpumpWaterPumpOperation].state === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState)
-                    || 0) > 0) && !(items[props.heatpumpValve].state === ''DHW'')) ? ''rgba(229, 115, 115, 0.2)'' : ''rgba(127,
-                    127, 127, 0.08)'''
+                  style:
+                    fill: '=((items[props.heatpumpWaterPumpOperation].state === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState)
+                      || 0) > 0) && !(items[props.heatpumpValve].state === ''DHW'')) ? ''rgba(229, 115, 115, 0.2)'' : ''color-mix(in
+                      srgb, var(--f7-text-color) 6%, transparent)'''
                   stroke: '=((items[props.heatpumpWaterPumpOperation].state === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState)
                     || 0) > 0) && !(items[props.heatpumpValve].state === ''DHW'')) ? ''rgba(229, 115, 115, 0.6)'' : ''none'''
                   stroke-width: 1.5
@@ -3145,9 +3149,10 @@ slots:
                   width: 170
                   height: 69
                   rx: 12
-                  fill: '=((items[props.heatpumpWaterPumpOperation].state === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState)
-                    || 0) > 0) && !(items[props.heatpumpValve].state === ''DHW'')) ? ''rgba(244, 143, 177, 0.2)'' : ''rgba(127,
-                    127, 127, 0.08)'''
+                  style:
+                    fill: '=((items[props.heatpumpWaterPumpOperation].state === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState)
+                      || 0) > 0) && !(items[props.heatpumpValve].state === ''DHW'')) ? ''rgba(244, 143, 177, 0.2)'' : ''color-mix(in
+                      srgb, var(--f7-text-color) 6%, transparent)'''
                   stroke: '=((items[props.heatpumpWaterPumpOperation].state === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState)
                     || 0) > 0) && !(items[props.heatpumpValve].state === ''DHW'')) ? ''rgba(244, 143, 177, 0.6)'' : ''none'''
                   stroke-width: 1.5
@@ -3223,9 +3228,10 @@ slots:
                   width: 170
                   height: 86
                   rx: 12
-                  fill: '=((items[props.heatpumpWaterPumpOperation].state === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState)
-                    || 0) > 0) && !(items[props.heatpumpValve].state === ''DHW'')) ? ''rgba(244, 143, 177, 0.2)'' : ''rgba(127,
-                    127, 127, 0.08)'''
+                  style:
+                    fill: '=((items[props.heatpumpWaterPumpOperation].state === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState)
+                      || 0) > 0) && !(items[props.heatpumpValve].state === ''DHW'')) ? ''rgba(244, 143, 177, 0.2)'' : ''color-mix(in
+                      srgb, var(--f7-text-color) 6%, transparent)'''
                   stroke: '=((items[props.heatpumpWaterPumpOperation].state === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState)
                     || 0) > 0) && !(items[props.heatpumpValve].state === ''DHW'')) ? ''rgba(244, 143, 177, 0.6)'' : ''none'''
                   stroke-width: 1.5
@@ -3323,9 +3329,10 @@ slots:
                   width: 214
                   height: 86
                   rx: 12
-                  fill: '=(((items[props.heatpumpWaterPumpOperation].state === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState)
-                    || 0) > 0) && (items[props.heatpumpValve].state === ''DHW'')) || items[props.heatpumpBshMode].state ===
-                    ''ON'') ? ''rgba(229, 115, 115, 0.2)'' : ''rgba(127, 127, 127, 0.08)'''
+                  style:
+                    fill: '=(((items[props.heatpumpWaterPumpOperation].state === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState)
+                      || 0) > 0) && (items[props.heatpumpValve].state === ''DHW'')) || items[props.heatpumpBshMode].state
+                      === ''ON'') ? ''rgba(229, 115, 115, 0.2)'' : ''color-mix(in srgb, var(--f7-text-color) 6%, transparent)'''
                   stroke: '=(((items[props.heatpumpWaterPumpOperation].state === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState)
                     || 0) > 0) && (items[props.heatpumpValve].state === ''DHW'')) || items[props.heatpumpBshMode].state ===
                     ''ON'') ? ''rgba(229, 115, 115, 0.6)'' : ''none'''
@@ -3426,8 +3433,9 @@ slots:
                   width: 156
                   height: 103
                   rx: 12
-                  fill: '=(items[props.heatpumpWaterPumpOperation].state === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState)
-                    || 0) > 0) ? ''rgba(100, 181, 246, 0.2)'' : ''rgba(127, 127, 127, 0.08)'''
+                  style:
+                    fill: '=(items[props.heatpumpWaterPumpOperation].state === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState)
+                      || 0) > 0) ? ''rgba(100, 181, 246, 0.2)'' : ''color-mix(in srgb, var(--f7-text-color) 6%, transparent)'''
                   stroke: '=(items[props.heatpumpWaterPumpOperation].state === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState)
                     || 0) > 0) ? ''rgba(100, 181, 246, 0.6)'' : ''none'''
                   stroke-width: 1.5

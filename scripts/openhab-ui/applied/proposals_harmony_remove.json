@@ -1,0 +1,30 @@
+{
+ "ui:page": {
+  "harmony_a": null,
+  "harmony_b": null,
+  "harmony_c": null,
+  "harmony_d": null,
+  "harmony_e": null,
+  "harmony_b2": null
+ },
+ "ui:widget": {
+  "harmony-appliance-icon": null,
+  "harmony-appliance-tile": null,
+  "harmony-appliances-card": null,
+  "harmony-consumption-card": null,
+  "harmony-electricity-price-card": null,
+  "harmony-energy-days-card": null,
+  "harmony-energy-flow-card": null,
+  "harmony-flow-link": null,
+  "harmony-flow-node": null,
+  "harmony-heating-card": null,
+  "harmony-heatpump-card": null,
+  "harmony-pv-days-card": null,
+  "harmony-switch-tile": null,
+  "harmony-switches-card": null,
+  "harmony-temperatures-card": null,
+  "harmony-value-tile": null,
+  "harmony-weather-card": null,
+  "harmony-weather-icon": null
+ }
+}

@@ -27,7 +27,7 @@ props:
     required: false
     default: '#78909c'
   parameterGroups: []
-timestamp: Sep 27, 2026, 11:33:43 PM
+timestamp: Oct 8, 2026, 3:48:44 AM
 component: div
 config:
   style:
@@ -37,7 +37,7 @@ config:
     align-items: center
     height: 34px
     min-width: '0'
-    border-radius: 17px
+    border-radius: 10px
     background: '=items[props.item].state === ''ON'' ? ''var(--pill-color)'' : ''rgba(127, 127, 127, 0.18)'''
     transition: background 0.25s ease
 slots:
@@ -65,7 +65,7 @@ slots:
         left: '=items[props.item].state === ''ON'' ? ''calc(100% - 30px)'' : ''4px'''
         width: 26px
         height: 26px
-        border-radius: 50%
+        border-radius: 6px
         display: flex
         align-items: center
         justify-content: center
@@ -90,4 +90,4 @@ slots:
         position: absolute
         inset: '0'
         display: block
-        border-radius: 17px
+        border-radius: 10px

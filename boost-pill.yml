@@ -34,7 +34,7 @@ props:
     required: false
     default: running
   parameterGroups: []
-timestamp: Oct 4, 2026, 11:05:34 PM
+timestamp: Oct 8, 2026, 3:48:44 AM
 component: div
 config:
   style:
@@ -44,7 +44,7 @@ config:
     align-items: center
     gap: 10px
     padding: 6px 10px 6px 6px
-    border-radius: 26px
+    border-radius: 10px
     background: '=items[props.item].state === ''ON'' ? ''linear-gradient(135deg, var(--boost-color), color-mix(in srgb, var(--boost-color)
       75%, transparent))'' : ''rgba(127, 127, 127, 0.1)'''
     color: '=items[props.item].state === ''ON'' ? ''#ffffff'' : '''''
@@ -163,7 +163,7 @@ slots:
       style:
         flex: 0 0 auto
         padding: 3px 12px
-        border-radius: 999px
+        border-radius: 6px
         font-size: 12px
         font-weight: '700'
         border: '=(items[props.item].state === ''ON'' ? ''1.5px solid #ffffff'' : ''1.5px solid var(--boost-color)'')'
@@ -178,4 +178,4 @@ slots:
         position: absolute
         inset: '0'
         display: block
-        border-radius: 26px
+        border-radius: 10px

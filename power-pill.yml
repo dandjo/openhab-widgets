@@ -22,7 +22,7 @@ props:
     required: false
     default: 'On'
   parameterGroups: []
-timestamp: Oct 4, 2026, 11:05:34 PM
+timestamp: Oct 8, 2026, 3:48:44 AM
 component: div
 config:
   style:
@@ -31,7 +31,7 @@ config:
     display: flex
     align-items: center
     height: 40px
-    border-radius: 20px
+    border-radius: 10px
     flex: 0 0 auto
     background: '=items[props.item].state === ''ON'' ? ''var(--power-color)'' : ''rgba(127, 127, 127, 0.18)'''
     transition: background 0.25s ease
@@ -58,7 +58,7 @@ slots:
         left: '=items[props.item].state === ''ON'' ? ''calc(100% - 36px)'' : ''4px'''
         width: 32px
         height: 32px
-        border-radius: 50%
+        border-radius: 6px
         display: flex
         align-items: center
         justify-content: center
@@ -83,4 +83,4 @@ slots:
         position: absolute
         inset: '0'
         display: block
-        border-radius: 20px
+        border-radius: 10px

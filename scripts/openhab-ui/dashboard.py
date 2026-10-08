@@ -1034,6 +1034,30 @@ signed_kw = f"{fixed(f'{num(GRID)} / 1000', 3)} + ' kW'"
 
 NARROW = "screen.width < 600"
 
+# ---- the look (user, 2026-10-08: proposal B2 of the overview, on every page and popup): cards with a hairline
+# instead of a shadow and quiet titles without a divider, tiles filled grey without an outline, every pill with the
+# same squarer corners and the controls a touch rounder, no watermark icons, one size for a card's large figures
+TILE_BG = "color-mix(in srgb, var(--f7-text-color) 6%, transparent)"  # a tile, in either theme
+PILL_R = "6px"  # chips and pills, the charts' period buttons
+# the controls a touch rounder, nearer the cards' 14 px (user, 2026-10-08): switch pills, the An/Aus and boost
+# pills, sliders and segmented bars; what sits inside them (knob, segment) concentric with their corners
+SWITCH_R, KNOB_R = "10px", "6px"
+TOGGLE_R = "8px"  # the small toggle of a switch row, 24 px high; its knob KNOB_R
+SVG_PILL_RX = {18: 6, 14: 4, 13: 4}  # the same corners for pills drawn in SVG, by their height
+HERO = {"font-size": f"={NARROW} ? '26px' : '28px'", "font-weight": "700",
+        "line-height": f"={NARROW} ? '32px' : '34px'", "letter-spacing": "-0.01em"}
+# the cards' shell, every page's and popup's stylesheet; before PHONE_EDGES, whose title padding wins on a phone
+CARD_STYLE = "\n".join([
+    ".card { border-radius: 14px; box-shadow: 0 0 0 1px color-mix(in srgb, var(--f7-text-color) 8%, transparent); }",
+    ".card-header { justify-content: flex-start; min-height: 0; font-size: 13px; font-weight: 600;",
+    "  padding: 16px 16px 4px; opacity: 0.6; letter-spacing: 0.02em; }",
+    ".card-header::after { display: none !important; }",
+    ".oh-chart-container > .menu .menu-item { background: color-mix(in srgb, var(--f7-text-color) 8%, transparent);",
+    f"  color: inherit; border-radius: {PILL_R}; min-width: 32px; }}",
+    ".oh-chart-container > .menu .menu-item + .menu-item { margin-left: 6px; }",
+    f".segmented-strong {{ border-radius: {SWITCH_R}; background: color-mix(in srgb, var(--f7-text-color) 8%, transparent); }}",
+    ".segmented-strong .button, .segmented-strong .segmented-highlight { border-radius: 8px !important; }"])
+
 
 def share_ring(cx, cy, title, part, whole, r=22, visible=None, lift=0):
     """Ring filled to part / whole of today, with the percentage inside and the title beside it; lift raises the
@@ -1391,7 +1415,7 @@ def share_pill(node, power, threshold, color):
     cx, cy = round(hx + r * (nx - hx) / d, 1), round(hy + r * (ny - hy) / d, 1)
     on = flowing(power, threshold)
     w, h = 40, 18
-    box = {"x": round(cx - w / 2, 1), "y": round(cy - h / 2, 1), "width": w, "height": h, "rx": h / 2}
+    box = {"x": round(cx - w / 2, 1), "y": round(cy - h / 2, 1), "width": w, "height": h, "rx": SVG_PILL_RX[h]}
     text = f"=((v) => v > 0 && v < 1 ? '<1 %' : Math.round(v) + ' %')({house_share(power)})"
     return svg("g", [svg("rect", **box, style={"fill": "var(--f7-card-bg-color, #fff)"}),
                      svg("rect", **box, fill=f"={on} ? '{color}' : 'rgba(158, 158, 158, 0.18)'",
@@ -1526,13 +1550,11 @@ def energy_flow():
     return [star, strip]
 
 
-TILE_BG = "rgba(127, 127, 127, 0.08)"
-
 
 def house_tiles():
     """The house's power and energy today, today's self-consumption and self-sufficiency, as three small cards under
     the star, each opening its popup with a tap anywhere on it: three abreast, on a phone the house above the two
-    rings. Each has a large pale icon at its lower right, as the value tiles have."""
+    rings."""
     # a pill under the texts with today against yesterday at this time, flush with them (user, 2026-10-06); the texts
     # rise by 10, so texts and pill stand as one block in the ring's vertical middle, and the ring in the tile's
     ring_svg = lambda parts: svg("svg", parts, viewBox="0 0 150 50", width="100%",
@@ -1557,23 +1579,20 @@ def house_tiles():
     # on a phone its tile spans the row: the drawing as wide as in a tile of half the row, so the rings match there too
     home["config"]["style"]["width"] = f"={NARROW} ? 'calc(50% - 14px)' : '100%'"
 
-    def tile(child, popup, icon, color, **extra):
-        # the value tiles' watermark: 58 px, 6 px past the right edge and 10 past the bottom, at 16 %
-        mark = comp("oh-icon", {"icon": f"material:{icon}", "width": 58, "height": 58, "style": {
-            "position": "absolute", "right": "-6px", "bottom": "-10px", "opacity": "0.16", "color": color}})
+    def tile(child, popup, **extra):
         link = comp("oh-link", {"action": "popup", "actionModal": f"page:{popup}",
                                 "style": {"position": "absolute", "inset": "0", "display": "block",
                                           "border-radius": "12px"}})
-        return div([mark, div([child], **{"position": "relative", "min-width": "0", "flex": "1 1 auto"}), link],
+        return div([div([child], **{"position": "relative", "min-width": "0", "flex": "1 1 auto"}), link],
                    **{"position": "relative", "overflow": "hidden", "padding": "8px 10px", "border-radius": "12px",
                       "background": TILE_BG, "min-width": "0", "display": "flex", "align-items": "center", **extra})
-    return div([tile(home, "flow_home", "home", "#1e88e5", **{"grid-column": f"={NARROW} ? '1 / -1' : 'auto'"}),
+    return div([tile(home, "flow_home", **{"grid-column": f"={NARROW} ? '1 / -1' : 'auto'"}),
                 tile(share(SELF_CONSUMPTION, svg_pill(56, 34, *points_change("photovoltaics_own_ec_day",
                                                                              "huawei_inverter_e_day"))),
-                     "flow_self_consumption", "solar_power", "#43a047"),
+                     "flow_self_consumption"),
                 tile(share(SELF_SUFFICIENCY, svg_pill(56, 34, *points_change("photovoltaics_own_ec_day",
                                                                              "home_ec_day"))),
-                     "flow_self_sufficiency", "energy_savings_leaf", "#43a047")],
+                     "flow_self_sufficiency")],
                **{"display": "grid", "gap": "8px",
                   "grid-template-columns": f"={NARROW} ? 'repeat(2, minmax(0, 1fr))' : 'repeat(3, minmax(0, 1fr))'"})
 
@@ -1763,7 +1782,7 @@ def wx_teaser():
     text = label(f"=items.{WX_WARNING_TEXT}.state", visible=f"={wide}",
                  **{"font-size": "12px", "font-weight": "600", "white-space": "nowrap"})
     return div([badge, text], visible=f"=Number({level}) > 0",
-               **{"display": "flex", "align-items": "center", "gap": "4px", "border-radius": "14px",
+               **{"display": "flex", "align-items": "center", "gap": "4px", "border-radius": PILL_R,
                   "padding": f"={wide} ? '0 10px 0 0' : '0'",
                   "background": f"={wide} ? 'color-mix(in srgb, ' + {color} + ' 16%, transparent)' : 'transparent'"})
 
@@ -1841,7 +1860,7 @@ def weather_warnings_card():
     w = "loop.warning"
     color = f"({WX_LEVEL_COLORS}[{w}.level] || '#9e9e9e')"
     chip = label(f"='Warnstufe ' + {w}.level + ' von 3'", **{
-        "background": f"={color}", "color": f"={w}.level === 1 ? '#212121' : '#ffffff'", "border-radius": "10px",
+        "background": f"={color}", "color": f"={w}.level === 1 ? '#212121' : '#ffffff'", "border-radius": PILL_R,
         "padding": "1px 9px", "font-size": "12px", "font-weight": "600", "white-space": "nowrap"})
     head = div([wx_alert(f"{w}.level", 20), label(f"={w}.type", **{"font-size": "15px", "font-weight": "700"}), chip],
                **{"display": "flex", "align-items": "center", "gap": "8px"})
@@ -1850,7 +1869,7 @@ def weather_warnings_card():
     text = label(f"={w}.text", visible=f"=!!{w}.text",
                  **{"font-size": "13px", "line-height": "1.4", "margin-top": "6px", "overflow-wrap": "anywhere"})
     one = div([head, period, text], **{
-        "border-left": f"=('4px solid ' + {color})", "background": f"='color-mix(in srgb, ' + {color} + ' 14%, transparent)'",
+        "border-left": f"=('2px solid ' + {color})", "background": f"='color-mix(in srgb, ' + {color} + ' 14%, transparent)'",
         "border-radius": "8px", "padding": "8px 12px", "margin": "0 12px 8px"})
     listed = div([comp("oh-repeater", {"for": "warning", "sourceType": "array", "in": f"={wx_json(WX_WARNINGS)}",
                                        "fragment": True}, default=[one])], **{"padding-top": "4px", "padding-bottom": "4px"})
@@ -1877,17 +1896,20 @@ def wx_wind_arrow(deg, size, visible):
                viewBox="0 0 24 24", width=size, height=size, visible=visible, style={"display": "block", "flex": "0 0 auto"})
 
 
-def wx_wind_arrows():
+def wx_wind_arrows(rows=None, every=None, near=2):
     """The wind's direction along its line, every three hours, every four on a phone: arrows a little above it. Each
     stands over the strongest wind from two hours before to two after, as wide as an arrow is on the time axis, so
-    a steep line beside it never touches it."""
-    every = f"({NARROW} ? 4 : 3)"
-    shown = f"r[3] != null && r[4] != null && dayjs(r[0] * 1000).hour() % {every} === 0"
-    peak = "a.slice(Math.max(0, i - 2), i + 3).reduce((m, x) => Math.max(m, x[3] || 0), 0)"
+    a steep line beside it never touches it. rows: an expression of the rows ([time, …, wind, direction]), the next
+    hours by default; every: the hours between arrows; near: the rows on each side that count as two hours."""
+    rows = rows or wx_json(WX_HOURLY)
+    every = every or f"({NARROW} ? 4 : 3)"
+    shown = (f"r[3] != null && r[4] != null && dayjs(r[0] * 1000).minute() === 0 && dayjs(r[0] * 1000).hour() % "
+             f"{every} === 0") if near != 2 else f"r[3] != null && r[4] != null && dayjs(r[0] * 1000).hour() % {every} === 0"
+    peak = f"a.slice(Math.max(0, i - {near}), i + {near + 1}).reduce((m, x) => Math.max(m, x[3] || 0), 0)"
     return {"symbol": f"path://{WX_ARROW}", "symbolSize": 11, "symbolKeepAspect": True, "symbolOffset": [0, -13],
             "silent": True, "label": {"show": False}, "itemStyle": {"color": WX_ARROW_COLOR},
             # ECharts turns a symbol counter-clockwise
-            "data": f"={wx_json(WX_HOURLY)}.map((r, i, a) => {shown} ? ({{coord: [r[0] * 1000, {peak}], "
+            "data": f"={rows}.map((r, i, a) => {shown} ? ({{coord: [r[0] * 1000, {peak}], "
                     f"symbolRotate: -(r[4] + 180)}}) : null).filter((p) => p)"}
 
 
@@ -1897,11 +1919,13 @@ WX_SYMBOL = 24
 WX_SYMBOL_NARROW = 20
 
 
-def wx_weather_symbols():
+def wx_weather_symbols(rows=None, every=None):
     """The weather along the temperature's line, as the wind's arrows along the wind's: every three hours, every four
     on a phone, a little above the warmest hour from two hours before to two after, drawn as the widget weather-icon
-    draws it, standing still."""
-    every = f"({NARROW} ? 4 : 3)"
+    draws it, standing still. rows: an expression of hourly rows, the next hours by default; every: the hours
+    between drawings."""
+    rows = rows or wx_json(WX_HOURLY)
+    every = every or f"({NARROW} ? 4 : 3)"
     shown = f"r[1] != null && S[r[5]] && dayjs(r[0] * 1000).hour() % {every} === 0"
     peak = "a.slice(Math.max(0, i - 2), i + 3).reduce((m, x) => (x[1] == null ? m : Math.max(m, x[1])), r[1])"
     symbols = "{" + ", ".join(f"{k}: '{v}'" for k, v in wx_symbols().items()) + "}"
@@ -1909,19 +1933,19 @@ def wx_weather_symbols():
     # smaller on a phone, where four hours are 15 to 17 px
     return {"symbolSize": f"={NARROW} ? {WX_SYMBOL_NARROW} : {WX_SYMBOL}",
             "symbolOffset": f"={NARROW} ? [0, -10] : [0, -12]", "silent": True, "label": {"show": False},
-            "data": f"=((S) => {wx_json(WX_HOURLY)}.map((r, i, a) => {shown} ? ({{coord: [r[0] * 1000, {peak}], "
+            "data": f"=((S) => {rows}.map((r, i, a) => {shown} ? ({{coord: [r[0] * 1000, {peak}], "
                     f"symbol: {symbol}}}) : null).filter((p) => p))({symbols})"}
 
 
-def wx_hourly(index):
-    """One column of the hourly forecast as chart data, [time in ms, value]."""
-    return f"={wx_json(WX_HOURLY)}.map((r) => [r[0] * 1000, r[{index}]])"
+def wx_hourly(index, rows=None):
+    """One column of the hourly forecast (or of rows, an expression) as chart data, [time in ms, value]."""
+    return f"={rows or wx_json(WX_HOURLY)}.map((r) => [r[0] * 1000, r[{index}]])"
 
 
-def wx_series(name, unit, index, color, x, y, **cfg):
+def wx_series(name, unit, index, color, x, y, rows=None, **cfg):
     # the id carries the unit, which the chart's tooltip appends to the value, as for an item's series
     return comp("oh-data-series", {"id": f"oh-data-series#{index}#{unit}", "name": name, "xAxisIndex": x,
-                                   "yAxisIndex": y, "data": wx_hourly(index),
+                                   "yAxisIndex": y, "data": wx_hourly(index, rows),
                                    "itemStyle": {"color": color}, **cfg})
 
 
@@ -2032,11 +2056,19 @@ def wx_day_row():
                               "visible": f"={d}.wd == null", "style": {"color": WX_WIND_COLOR, "flex": "0 0 auto"}}),
              pair(f"({d}.w == null ? '–' : {d}.w) + ' km/h'", wx_compass(d + '.wd'), f"={d}.wd != null")],
             **{**cell, "justify-content": "flex-end"}),
-    ], **{"display": "grid", "align-items": "center",
-          # fixed columns but the precipitation's, so the days' cells stand under each other
-          "grid-template-columns": f"={n} ? '38px 28px 30px 52px 1fr auto' : '40px 32px 30px 58px 1fr auto'",
-          "column-gap": f"={n} ? '5px' : '8px'", "min-height": "40px", "padding": f"={n} ? '4px 12px' : '4px 16px'",
-          "border-top": "1px solid rgba(127, 127, 127, 0.15)"})
+        # a tap opens the day hour by hour (user, 2026-10-08)
+        comp("oh-link", {"action": "popup", "actionModal": WX_DAY_WIDGET,
+                         "actionModalConfig": {**weather_day_ref()["config"], "date": f"={d}.t"},
+                         "style": {"position": "absolute", "inset": "0", "display": "block"}}),
+    ], **{**WX_ROW, "position": "relative"})
+
+
+# a row of the day table and of a day's hours: fixed columns but the precipitation's, so the cells stand under each
+# other
+WX_ROW = {"display": "grid", "align-items": "center",
+          "grid-template-columns": f"={NARROW} ? '38px 28px 30px 52px 1fr auto' : '40px 32px 30px 58px 1fr auto'",
+          "column-gap": f"={NARROW} ? '5px' : '8px'", "min-height": "40px",
+          "padding": f"={NARROW} ? '4px 12px' : '4px 16px'", "border-top": "1px solid rgba(127, 127, 127, 0.15)"}
 
 
 def weather_forecast_card():
@@ -2047,6 +2079,148 @@ def weather_forecast_card():
                                      "fragment": True}, default=[wx_day_row()])],
                **{"padding-top": "2px", "margin-bottom": "12px"})
     return card("Vorhersage", [days, div([weather_forecast_chart()], **{"padding": "0 4px 6px"})])
+
+
+# ---- a day hour by hour: the popup a day of the forecast opens (user, 2026-10-08), every hour in the day table's
+# columns, the quarter hours in a chart below; the rule weather_forecast fills both items for the five days
+WX_HOURS, WX_QUARTERS = "weather_hourly_days", "weather_quarter_hours"
+WX_DAY_WIDGET = "widget:weather-day"
+WX_WEEKDAYS_LONG = "['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag']"
+WX_MONTHS = ("['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', "
+             "'November', 'Dezember']")
+WX_DATE = "Number(props.date)"  # the day's midnight in epoch seconds, as weather_daily gives it
+# the popup a little wider than Framework7's 630 px and nearly as tall as the window, for the 24 hours and the chart;
+# ":root" keeps the rule unscoped while the popup is open
+WX_DAY_POPUP = (':root .popup:has(> .oh-popup[style*="--day-popup"]) { --f7-popup-tablet-width: min(760px, '
+                'calc(100vw - 64px)); --f7-popup-tablet-height: calc(100vh - 64px); }')
+
+
+def wx_of_day(item):
+    """The rows of a JSON list item that fall on the popup's day, from its midnight to the next (25 hours when the
+    clocks go back)."""
+    return (f"{wx_json(item)}.filter((r) => r[0] >= {WX_DATE} && r[0] < "
+            f"dayjs({WX_DATE} * 1000).add(1, 'day').unix())")
+
+
+def wx_hour_row():
+    """An hour of the day in the day table's columns: the time, the weather drawn, the temperature, the minutes of
+    sunshine (a dash by night), precipitation with its probability under it, the wind with an arrow of its direction
+    and its compass point under it. The present hour stands on a grey band, the hours gone by are pale."""
+    h = "loop.hour"
+    n = NARROW
+    hour = "dayjs().startOf('hour').unix()"
+    icon_size = f"={n} ? 13 : 15"
+    small_icon = lambda icon, color: comp("oh-icon", {"icon": icon, "width": icon_size, "height": icon_size,
+                                                      "style": {"color": color, "flex": "0 0 auto"}})
+    cell = {"display": "flex", "align-items": "center", "gap": f"={n} ? '4px' : '5px'",
+            "font-size": f"={n} ? '12px' : '13px'", "white-space": "nowrap"}
+    sub = {"font-size": "11px", "opacity": "0.65", "line-height": "13px"}
+
+    def pair(first, second, second_visible):
+        return div([label(f"={first}", **{"line-height": "16px"}), label(f"={second}", visible=second_visible, **sub)],
+                   **{"display": "flex", "flex-direction": "column"})
+    night = f"{h}[6] === 0"
+    sun = f"({night} || {h}[8] == null ? '–' : {h}[8] + ' min')"
+    rain = f"({h}[2] == null ? '–' : {h}[2] < 0.05 ? '0 mm' : {fixed(h + '[2]', 1)} + ' mm')"
+    return div([
+        label(f"=dayjs({h}[0] * 1000).format('HH:mm')", **{"font-size": f"={n} ? '12px' : '13px'", "font-weight": "600"}),
+        weather_icon(f"{h}[5]", f"{h}[6] !== 0", f"={n} ? 28 : 32"),
+        label(f"={h}[1] == null ? '–' : Math.round({h}[1]) + '°'", **{"font-size": "14px", "font-weight": "700",
+                                                                      "white-space": "nowrap"}),
+        div([small_icon("material:wb_sunny", WX_SUN_COLOR), pair(sun, "''", "=false")],
+            **{**cell, "opacity": f"=({night} || !{h}[8]) ? '0.55' : '1'"}),
+        div([small_icon("material:water_drop", WX_RAIN_COLOR), pair(rain, f"{h}[7] + ' %'", f"={h}[7] != null")],
+            **{**cell, "opacity": f"=({h}[2] || 0) < 0.05 ? '0.55' : '1'"}),
+        div([wx_wind_arrow(f"{h}[4]", icon_size, f"={h}[4] != null"),
+             comp("oh-icon", {"icon": "material:air", "width": icon_size, "height": icon_size,
+                              "visible": f"={h}[4] == null", "style": {"color": WX_WIND_COLOR, "flex": "0 0 auto"}}),
+             pair(f"({h}[3] == null ? '–' : {h}[3]) + ' km/h'", wx_compass(h + '[4]'), f"={h}[4] != null")],
+            **{**cell, "justify-content": "flex-end"}),
+    ], **{**WX_ROW, "opacity": f"={h}[0] < {hour} ? '0.55' : '1'",
+          "background": f"={h}[0] === {hour} ? 'color-mix(in srgb, var(--f7-text-color) 6%, transparent)' : 'transparent'"})
+
+
+# the day chart's time labels every sixth hour; ECharts ticks a day every second hour
+WX_DAY_TIME_LABEL = "=(v) => dayjs(v).minute() === 0 && dayjs(v).hour() % 6 === 0 ? dayjs(v).format('HH:mm') : ''"
+# a quarter hour's precipitation as WX_RAIN_BAR draws an hour's: two thirds of a quarter hour wide, 4 px at most
+WX_QUARTER_BAR = WX_RAIN_BAR.replace("Math.min(6, api.size([3600000, 0])[0] * 0.68)",
+                                     "Math.min(4, api.size([900000, 0])[0] * 0.68)")
+
+
+def weather_day_chart():
+    """The popup's day in quarter hours, as the weather page's chart draws the next hours: temperature with the weather
+    drawn above it every two hours (three on a phone), the precipitation of each quarter hour as bars, the wind with
+    arrows of its direction; from the day's midnight to the next, the present marked on a day that has one."""
+    quarters, hours = wx_of_day(WX_QUARTERS), wx_of_day(WX_HOURS)
+    every = f"({NARROW} ? 3 : 2)"
+    now_line = {"symbol": ["none", "none"], "silent": True, "label": {"show": False},
+                "lineStyle": {"color": "#888", "type": "dashed", "opacity": 0.6},
+                "data": [{"xAxis": "=dayjs().valueOf()"}]}
+    grids = [comp("oh-chart-grid", {"top": "35", "height": "140", "left": "45", "right": "20"}),
+             comp("oh-chart-grid", {"top": "230", "height": "60", "left": "45", "right": "20"}),
+             comp("oh-chart-grid", {"top": "345", "bottom": "60", "left": "45", "right": "20"})]
+    x_axes = [comp("oh-time-axis", {"gridIndex": 0, "axisLabel": {"show": False}}),
+              comp("oh-time-axis", {"gridIndex": 1, "axisLabel": {"show": False}}),
+              comp("oh-time-axis", {"gridIndex": 2, "axisLabel": {"formatter": WX_DAY_TIME_LABEL}})]
+    dashed = {"splitLine": {"lineStyle": {"type": "dashed", "opacity": 0.4}}}
+    y_axes = [value_axis("°C", scale=True, minInterval=1,
+                         max="=(v) => Math.ceil(v.max + Math.max(1, (v.max - v.min) * 0.25))",
+                         axisLabel={"showMaxLabel": False}),
+              # a quarter hour's precipitation is a quarter of an hour's: up to half a millimetre at least
+              comp("oh-value-axis", {"gridIndex": 1, "name": "mm", "nameGap": 10, "nameTextStyle": AXIS_NAME, "min": 0,
+                                     "max": "=(v) => Math.max(0.5, Math.ceil(v.max * 2) / 2)", "splitNumber": 2,
+                                     **dashed}),
+              comp("oh-value-axis", {"gridIndex": 2, "name": "km/h", "nameGap": 10, "nameTextStyle": AXIS_NAME,
+                                     "min": 0, "max": "=(v) => Math.max(20, Math.ceil(v.max / 20) * 20)", "splitNumber": 2,
+                                     **dashed})]
+    series = [wx_series("Temperatur", "°C", 1, WX_TEMP_COLOR, 0, 0, rows=quarters, type="line", smooth=0.5,
+                        symbol="none", lineStyle={"width": 2.5, "color": WX_TEMP_COLOR}, markLine=now_line,
+                        markPoint=wx_weather_symbols(hours, every), z=3),
+              wx_series("Niederschlag", "mm", 2, WX_RAIN_COLOR, 1, 1, rows=quarters, type="custom",
+                        renderItem=WX_QUARTER_BAR, encode={"x": 0, "y": 1}, clip=True,
+                        itemStyle={"color": WX_RAIN_COLOR}, markLine=now_line),
+              wx_series("Wind", "km/h", 3, WX_WIND_COLOR, 2, 2, rows=quarters, type="line", smooth=0.5, symbol="none",
+                        lineStyle={"width": 2, "color": WX_WIND_COLOR},
+                        areaStyle={"color": gradient(rgb_of(WX_WIND_COLOR))}, markLine=now_line,
+                        markPoint=wx_wind_arrows(quarters, every, near=8))]
+    # MainUI's day chart shows a whole day: today with future 0, each day after with one more
+    return chart({"chartType": "day", "period": "D", "height": "480px",
+                  "future": f"=Math.round(({WX_DATE} * 1000 - dayjs().startOf('day').valueOf()) / 86400000)",
+                  "options": {"axisPointer": {"link": [{"xAxisIndex": "all"}]}}},
+                 grid=grids, xAxis=x_axes, yAxis=y_axes, series=series,
+                 tooltip=tooltip(trigger="axis", smartFormatter=True), legend=legend())
+
+
+def weather_day_popup():
+    """The day a tap on a forecast day opens (prop date: its midnight in epoch seconds): its quarter hours in a chart
+    at the top, its hours below (user, 2026-10-08); a note while the rule has not written the day yet."""
+    d = f"dayjs({WX_DATE} * 1000)"
+    name = (f"({d}.isSame(dayjs(), 'day') ? 'Heute' : {WX_WEEKDAYS_LONG}[{d}.day()]) + ', ' + {d}.date() + '. ' + "
+            f"{WX_MONTHS}[{d}.month()]")
+    hours = div([comp("oh-repeater", {"for": "hour", "sourceType": "array", "in": f"={wx_of_day(WX_HOURS)}",
+                                      "fragment": True}, default=[wx_hour_row()])],
+                **{"padding-top": "2px", "padding-bottom": "6px"})
+    empty = label("Für diesen Tag liegen noch keine Stunden vor.", f"={wx_of_day(WX_HOURS)}.length === 0",
+                  **{"font-size": "13px", "opacity": "0.7", "padding": "4px 16px 14px"})
+    table = card(f"='Stunden · ' + {name}", [hours, empty])
+    course = card("Verlauf in Viertelstunden", [div([weather_day_chart()], **{"padding": "0 4px 6px"})])
+    note = label("Viertelstunden von GeoSphere AROME Austria für etwa zweieinhalb Tage, danach aus dem Best Match von "
+                 "Open-Meteo, aus seinen Stunden gemittelt; die Regenwahrscheinlichkeit aus dem Best Match.",
+                 **{"font-size": "12px", "opacity": "0.6", "padding": "0 16px 10px"})
+    root = div([course, table, note], **{"padding": "8px 6px"})
+    root["config"].update({"label": "Wetter", "style": {"--day-popup": "wide"},
+                           "stylesheet": "\n".join([WX_DAY_POPUP, CARD_STYLE, PERIOD_MENU])})
+    return root
+
+
+_WX_DAY = {}
+
+
+def weather_day_ref():
+    """The day popup widget as a role widget with its items (built once); a day row's link opens it with them."""
+    if not _WX_DAY:
+        _WX_DAY["ref"] = role_widget("weather-day", weather_day_popup)
+    return _WX_DAY["ref"]
 
 
 def weather_cards():
@@ -2373,7 +2547,7 @@ def hp_tile(cx, y, w, title, icon, color, on, rows, state=None):
     expression, stands at the top right where given."""
     x = cx - w / 2
     out = [svg("rect", x=x, y=y, width=w, height=35 + TILE_ROW * len(rows), rx=12,
-               fill=f"={on} ? '{rgba(color, 0.2)}' : 'rgba(127, 127, 127, 0.08)'",
+               style={"fill": f"={on} ? '{rgba(color, 0.2)}' : '{TILE_BG}'"},
                stroke=f"={on} ? '{rgba(color, 0.6)}' : 'none'", **{"stroke-width": 1.5}),
            glyph(x + 19, y + 16, icon, 18, f"={on} ? '{color}' : 'currentColor'"),
            hp_text(x + 34, y + 21, title, 13, "600", anchor="start"),
@@ -2537,10 +2711,10 @@ COP_BASE = {"espaltherma_dcop": "espaltherma_energy_today", "espaltherma_dcop_sp
             "espaltherma_dcop_dhw": "espaltherma_energy_dhw_today"}
 
 
-def cop_tile(title, item, color, icon, width="100%", popup=None):
+def cop_tile(title, item, color, width="100%", popup=None):
     """A day's COP as Eigenverbrauch and Autarkie stand under the energy flow, the ring the same size at the same
-    width: a small card with a ring filled up to 6, the value inside, the title and heute beside it, a large pale icon
-    at its lower right; width is the drawing's width in the card; a tap opens the page named by popup, if given."""
+    width: a small card with a ring filled up to 6, the value inside, the title and heute beside it; width is the
+    drawing's width in the card; a tap opens the page named by popup, if given."""
     value = num(item)
     length = round(2 * math.pi * 22, 2)
     ring = svg("svg", [svg("circle", cx=24, cy=25, r=22, **stroke(5, "#9e9e9e", **{"stroke-opacity": "0.25"})),
@@ -2555,11 +2729,9 @@ def cop_tile(title, item, color, icon, width="100%", popup=None):
                        svg_pill(56, 34, *value_change(item, 1, base=COP_BASE.get(item)))],
                viewBox="0 0 150 50", width="100%", style={"display": "block", "overflow": "visible", "max-width": "170px",
                                                           "width": width})
-    mark = comp("oh-icon", {"icon": f"material:{icon}", "width": 58, "height": 58, "style": {
-        "position": "absolute", "right": "-6px", "bottom": "-10px", "opacity": "0.16", "color": color}})
     link = [page_link({"position": "absolute", "inset": "0", "display": "block", "border-radius": "12px"},
                       popup)] if popup else []
-    return div([mark, div([ring], **{"position": "relative", "min-width": "0", "flex": "1 1 auto"}), *link],
+    return div([div([ring], **{"position": "relative", "min-width": "0", "flex": "1 1 auto"}), *link],
                **{"position": "relative", "overflow": "hidden", "padding": "8px 10px", "border-radius": "12px",
                   "background": TILE_BG, "min-width": "0", "display": "flex", "align-items": "center"})
 
@@ -2651,7 +2823,7 @@ def heatpump_content():
 # ---------------------------------------------------------------- 3. price
 
 price = [
-    div([label(f"={disp(PRICE)}", **{"font-size": "32px", "font-weight": "700", "color": price_color}),
+    div([label(f"={disp(PRICE)}", **{**HERO, "color": price_color}),
          label("per kWh all-in", **{"opacity": "0.7"})],
         **{"display": "flex", "flex-wrap": "wrap", "align-items": "baseline", "column-gap": "8px", "padding": "0 16px"}),
     label("='Günstigste ' + items.epex_spot_awattar_cheapest_hour.displayState + ' · teuerste ' + "
@@ -2691,10 +2863,10 @@ def switch_row_widget():
                    "background": f"={on} ? 'color-mix(in srgb, var(--switch-color) 22%, transparent)' : "
                                  "'rgba(127, 127, 127, 0.12)'"})
     knob = div([], **{"position": "absolute", "top": "2px", "left": f"={on} ? '20px' : '2px'", "width": "20px",
-                      "height": "20px", "border-radius": "50%", "background": "#ffffff",
+                      "height": "20px", "border-radius": KNOB_R, "background": "#ffffff",
                       "box-shadow": "0 1px 3px rgba(0, 0, 0, 0.3)", "transition": "left 0.2s ease"})
     track = div([knob], **{"position": "relative", "width": "42px", "height": "24px", "flex": "0 0 auto",
-                           "border-radius": "12px", "transition": "background 0.2s ease",
+                           "border-radius": TOGGLE_R, "transition": "background 0.2s ease",
                            "background": f"={on} ? 'var(--switch-color)' : 'rgba(127, 127, 127, 0.35)'"})
     link = comp("oh-link", {"action": "toggle", "actionItem": "=props.item", "actionCommand": "ON",
                             "actionCommandAlt": "OFF",
@@ -2806,7 +2978,7 @@ def power_pill_widget():
     on = "items[props.item].state === 'ON'"
     knob = div([comp("oh-icon", {"icon": "material:power_settings_new", "width": 20, "height": 20})],
                **{"position": "absolute", "top": "4px", "left": f"={on} ? 'calc(100% - 36px)' : '4px'",
-                  "width": "32px", "height": "32px", "border-radius": "50%", "display": "flex",
+                  "width": "32px", "height": "32px", "border-radius": KNOB_R, "display": "flex",
                   "align-items": "center", "justify-content": "center", "background": "#ffffff",
                   "color": f"={on} ? 'var(--power-color)' : '#9e9e9e'", "box-shadow": "0 1px 3px rgba(0, 0, 0, 0.3)",
                   "transition": "left 0.25s ease, color 0.25s ease"})
@@ -2814,9 +2986,9 @@ def power_pill_widget():
                  **{"width": "100%", "text-align": "center", "padding": "0 44px", "font-size": "14px",
                     "font-weight": "600", "white-space": "nowrap", "overflow": "hidden", "text-overflow": "ellipsis",
                     "color": f"={on} ? '#ffffff' : ''"})
-    return div([text, knob, toggle_link("=props.item", "20px")],
+    return div([text, knob, toggle_link("=props.item", SWITCH_R)],
                **{"--power-color": "=props.color || '#78909c'", "position": "relative", "display": "flex",
-                  "align-items": "center", "height": "40px", "border-radius": "20px", "flex": "0 0 auto",
+                  "align-items": "center", "height": "40px", "border-radius": SWITCH_R, "flex": "0 0 auto",
                   "background": f"={on} ? 'var(--power-color)' : 'rgba(127, 127, 127, 0.18)'",
                   "transition": "background 0.25s ease"})
 
@@ -2834,7 +3006,7 @@ def pill_switch_widget():
     on = "items[props.item].state === 'ON'"
     knob = div([comp("oh-icon", {"icon": "=props.icon || 'material:power_settings_new'", "width": 16, "height": 16})],
                **{"position": "absolute", "top": "4px", "left": f"={on} ? 'calc(100% - 30px)' : '4px'",
-                  "width": "26px", "height": "26px", "border-radius": "50%", "display": "flex",
+                  "width": "26px", "height": "26px", "border-radius": KNOB_R, "display": "flex",
                   "align-items": "center", "justify-content": "center", "background": "#ffffff",
                   "color": f"={on} ? 'var(--pill-color)' : '#9e9e9e'", "box-shadow": "0 1px 3px rgba(0, 0, 0, 0.3)",
                   "transition": "left 0.25s ease, color 0.25s ease"})
@@ -2845,10 +3017,10 @@ def pill_switch_widget():
         "color": f"={on} ? '#ffffff' : ''", "transition": "padding 0.25s ease"})
     link = comp("oh-link", {"action": "toggle", "actionItem": "=props.item", "actionCommand": "ON",
                             "actionCommandAlt": "OFF",
-                            "style": {"position": "absolute", "inset": "0", "display": "block", "border-radius": "17px"}})
+                            "style": {"position": "absolute", "inset": "0", "display": "block", "border-radius": SWITCH_R}})
     return div([text, knob, link],
                **{"--pill-color": "=props.color || '#78909c'", "position": "relative", "display": "flex",
-                  "align-items": "center", "height": "34px", "min-width": "0", "border-radius": "17px",
+                  "align-items": "center", "height": "34px", "min-width": "0", "border-radius": SWITCH_R,
                   "background": f"={on} ? 'var(--pill-color)' : 'rgba(127, 127, 127, 0.18)'",
                   "transition": "background 0.25s ease"})
 
@@ -2905,13 +3077,13 @@ def boost_pill_widget():
                           "overflow": "hidden", "text-overflow": "ellipsis"})],
                 **{"flex": "1", "min-width": "0", "display": "flex", "flex-direction": "column"})
     action = label(f"={on} ? 'Stoppen' : 'Starten'",
-                   **{"flex": "0 0 auto", "padding": "3px 12px", "border-radius": "999px", "font-size": "12px",
+                   **{"flex": "0 0 auto", "padding": "3px 12px", "border-radius": PILL_R, "font-size": "12px",
                       "font-weight": "700",
                       "border": f"=({on} ? '1.5px solid #ffffff' : '1.5px solid var(--boost-color)')",
                       "color": f"={on} ? '#ffffff' : 'var(--boost-color)'"})
-    return div([badge_, texts, action, toggle_link("=props.item", "26px")],
+    return div([badge_, texts, action, toggle_link("=props.item", SWITCH_R)],
                **{"--boost-color": "=props.color || '#fb8c00'", "position": "relative", "display": "flex",
-                  "align-items": "center", "gap": "10px", "padding": "6px 10px 6px 6px", "border-radius": "26px",
+                  "align-items": "center", "gap": "10px", "padding": "6px 10px 6px 6px", "border-radius": SWITCH_R,
                   "background": f"={on} ? 'linear-gradient(135deg, var(--boost-color), "
                                 "color-mix(in srgb, var(--boost-color) 75%, transparent))' : "
                                 "'rgba(127, 127, 127, 0.1)'",
@@ -3045,18 +3217,19 @@ def pill_slider_widget():
     marks = div([comp("oh-repeater", {"for": "mark", "sourceType": "array", "in": "=(props.marks || '').split(';')",
                                       "fragment": True}, default=[mark])], **{"position": "relative", "height": "13px"})
     css = "\n".join([
-        ".range-slider { --f7-range-size: 32px; --f7-range-bar-size: 32px; --f7-range-bar-border-radius: 16px;",
+        f".range-slider {{ --f7-range-size: 32px; --f7-range-bar-size: 32px; --f7-range-bar-border-radius: {SWITCH_R};",
         "  --f7-range-bar-bg-color: color-mix(in srgb, var(--pill-color) 18%, transparent);",
         "  --f7-range-bar-active-bg-color: var(--pill-color); --f7-range-knob-size: 28px; --f7-range-knob-color: #ffffff;",
         "  --f7-range-knob-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35); --f7-range-label-bg-color: var(--pill-color);",
         "  --f7-range-label-text-color: #ffffff; margin: 0; }",
+        f".range-knob {{ border-radius: {KNOB_R} !important; }}",
         ".range-bar-active { background: linear-gradient(90deg, color-mix(in srgb, var(--pill-color) 55%, transparent),",
         "  var(--pill-color)) !important; }",
         # the value while dragging: Framework7's md pin is 26 px with 10 px type and sits right above the knob, under
         # the finger on a phone; instead a label as wide as its text, well above the knob
         ".range-knob-label { width: auto !important; min-width: 0 !important; height: auto !important;",
         "  line-height: 20px !important; margin: 0 0 34px 0 !important; padding: 6px 12px !important; font-size: 16px !important;",
-        "  font-weight: 700 !important; border-radius: 12px !important; white-space: nowrap;",
+        f"  font-weight: 700 !important; border-radius: {PILL_R} !important; white-space: nowrap;",
         "  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35); transform: translate(-50%, 100%) scale(0) !important;",
         "  transform-origin: 50% 100%; }",
         ".range-knob-label:before { display: none !important; }",
@@ -3214,7 +3387,7 @@ def quick(icon, title, color, state, children, page):
                     **{"display": "flex", "flex-direction": "column", "gap": "6px", "padding": "12px 14px"})])
     # a chart's closed period menu would stretch the popup by its full length, as on the pages (PERIOD_MENU)
     root["config"].update({"label": title, "style": {"--quick-popup": "panel"},
-                           "stylesheet": "\n".join([QUICK_POPUP, PERIOD_MENU])})
+                           "stylesheet": "\n".join([QUICK_POPUP, CARD_STYLE, PERIOD_MENU])})
     return root
 
 
@@ -3577,8 +3750,7 @@ def switch_tile_widget():
                 toggle_link("=props.item", "12px")],
                **{"--tile-color": "=props.color || '#78909c'", "position": "relative", "padding": "8px 9px",
                   "border-radius": "12px", "min-width": "0", "display": "flex", "flex-direction": "column",
-                  "background": f"={on} ? 'color-mix(in srgb, var(--tile-color) 20%, transparent)' : "
-                                "'rgba(127, 127, 127, 0.08)'",
+                  "background": f"={on} ? 'color-mix(in srgb, var(--tile-color) 20%, transparent)' : '{TILE_BG}'",
                   "box-shadow": f"={on} ? 'inset 0 0 0 1.5px color-mix(in srgb, var(--tile-color) 60%, transparent)' : "
                                 "'none'"})
 
@@ -3695,8 +3867,7 @@ def legend_row(key, name, value, color, items_=None):
 
 def source_head(key, value, title, color, align):
     return keyed(f"item k k-{key}", [
-        label(f"={share(value)} + ' %'", **{"font-size": "26px", "font-weight": "700", "color": color,
-                                            "line-height": "30px"}),
+        label(f"={share(value)} + ' %'", **{**HERO, "color": color}),
         label(f"='{title} · ' + {fixed(value, 1)} + ' kWh'", **{"font-size": "12px", "opacity": "0.7"})],
         style={"text-align": align})
 
@@ -3730,6 +3901,7 @@ def consumption_content():
 # ---------------------------------------------------------------- 6. energy per day
 
 SELF_C, IMPORT_C, PV_C = "#81c784", "#e57373", "#ffa000"
+PV_AMBER = "#ffb300"  # the PV calendar's view bar and the monthly PV line
 
 
 def daily(name, item, color, **extra):
@@ -3948,7 +4120,7 @@ def pv_view_bar():
                                   **({"visible": f"=!({NARROW})"} if view == "year" else
                                      {"visible": f"={NARROW}"} if view == "halves" else {}),
                                   "style": {"font-size": "12px", "flex": "1 1 auto", "width": "auto", "padding": "0 6px",
-                                            "background-color": f"=({active.format(view)}) ? '{PV_C}' : ''",
+                                            "background-color": f"=({active.format(view)}) ? '{PV_AMBER}' : ''",
                                             "color": f"=({active.format(view)}) ? '#ffffff' : ''"}})
                for view, text in PV_VIEWS]
     bar = comp("f7-segmented", {"strong": True, "stylesheet": BY_TEXT_BAR,
@@ -3978,15 +4150,14 @@ def temp_stat(title, item, color, sub, pills=(), detail=None):
     kids = [label(title, **{"font-size": "13px", "opacity": "0.7"}),
             # the pills one over the other right beside the value, the trend on top: side by side they did not fit
             # beside it in the overview's column and wrapped under it
-            div([label(f"={disp(item)}", **{"font-size": "30px", "font-weight": "700", "line-height": "36px",
-                                             "white-space": "nowrap"}),
+            div([label(f"={disp(item)}", **{**HERO, "white-space": "nowrap"}),
                  div([trend_chip(item, 1, "K"), *pills],
                      **{"display": "flex", "flex-direction": "column", "align-items": "flex-start", "gap": "3px"})],
                 **{"display": "flex", "align-items": "center", "gap": "4px 10px", "flex-wrap": "wrap"}),
             label(sub, **{"font-size": "12px", "opacity": "0.6"})]
     if detail is not None:
         kids.append(detail)
-    return div(kids, **{"border-left": f"4px solid {color}", "padding": "4px 12px", "min-width": "0"})
+    return div(kids, **{"border-left": f"2px solid {color}", "padding": "4px 12px", "min-width": "0"})
 
 
 INDOOR, OUTDOOR = "espaltherma_indoor_ambient_temp", "espaltherma_ext_ambient_temp"
@@ -4117,7 +4288,7 @@ def appliance_icon(front_kind, running, progress=None, size=72):
 
 
 def chip(text, color):
-    return comp("Label", {"text": text, "style": {"background": color, "color": "#ffffff", "border-radius": "10px",
+    return comp("Label", {"text": text, "style": {"background": color, "color": "#ffffff", "border-radius": PILL_R,
                                                   "padding": "2px 10px", "font-size": "12px", "font-weight": "600",
                                                   "white-space": "nowrap"}})
 
@@ -4141,7 +4312,7 @@ def timer_chip(text, visible, icon="timer", tint="#1e88e5"):
     color = f"=themeOptions.dark === 'dark' ? '{dark}' : '{light}'"
     return div([comp("f7-icon", {"f7": icon, "size": 13}), label(text)], visible=visible,
                **{"display": "inline-flex", "align-items": "center", "gap": "4px", "color": color,
-                  "background": rgba(tint, 0.16), "border-radius": "10px", "padding": "2px 8px",
+                  "background": rgba(tint, 0.16), "border-radius": PILL_R, "padding": "2px 8px",
                   "font-size": "12px", "font-weight": "600", "white-space": "nowrap"})
 
 
@@ -4171,7 +4342,7 @@ def tile(children, popup, link=None):
                                      "align-items": "center", "justify-content": "center", "gap": "6px",
                                      "padding": "12px 8px",
                                      "border-radius": "12px", "text-align": "center",
-                                     "background": "rgba(127, 127, 127, 0.08)"})
+                                     "background": TILE_BG})
 
 
 APPLIANCE_FRONTS = [("washer", washer_front), ("dryer", dryer_front), ("dish-washer", dishwasher_front)]
@@ -4303,11 +4474,11 @@ def heat_tile(icon, title, on, color, value, setpoint, dark, light, runtime=None
     pump's page, as in the energy flow."""
     temperature = label(value, **{"background": f"={on} ? '{color}' : 'transparent'",
                                   "color": f"={on} ? '#ffffff' : '{color}'", "border": f"1.5px solid {color}",
-                                  "border-radius": "10px", "padding": "0.5px 8.5px", "font-size": "12px",
+                                  "border-radius": PILL_R, "padding": "0.5px 8.5px", "font-size": "12px",
                                   "font-weight": "600", "white-space": "nowrap"})
     pill = {"display": "inline-flex", "align-items": "center", "gap": "4px",
             "color": f"=themeOptions.dark === 'dark' ? '{dark}' : '{light}'", "background": rgba(color, 0.16),
-            "border-radius": "10px", "padding": "2px 8px", "font-size": "12px", "font-weight": "600",
+            "border-radius": PILL_R, "padding": "2px 8px", "font-size": "12px", "font-weight": "600",
             "white-space": "nowrap"}
     target = div([comp("f7-icon", {"f7": "scope", "size": 13}), label(setpoint)], **pill)
     pills = [temperature, target]
@@ -4373,10 +4544,10 @@ def heating(tile=heat_tile):
     # Eigenverbrauch's and Autarkie's under the energy flow, which stand three abreast on a desktop and two on a phone;
     # on a phone space heating and DHW side by side over the total, its drawing half its width less 14 px
     pop = "heatpump"  # a tap on any of them opens the heat pump's page, as the heat pump card's COP tile does
-    total = cop_tile("COP gesamt", "espaltherma_dcop", COP_C, "eco", f"={NARROW} ? 'calc(50% - 14px)' : '100%'", pop)
+    total = cop_tile("COP gesamt", "espaltherma_dcop", COP_C, f"={NARROW} ? 'calc(50% - 14px)' : '100%'", pop)
     total["config"]["style"]["grid-column"] = f"={NARROW} ? '1 / -1' : 'auto'"
-    cops = div([cop_tile("COP Heizung", "espaltherma_dcop_space", SPACE_C, "local_fire_department", "100%", pop),
-                cop_tile("COP WW", "espaltherma_dcop_dhw", DHW_C, "shower", "100%", pop), total],
+    cops = div([cop_tile("COP Heizung", "espaltherma_dcop_space", SPACE_C, "100%", pop),
+                cop_tile("COP WW", "espaltherma_dcop_dhw", DHW_C, "100%", pop), total],
                **{"display": "grid", "gap": "8px",
                   "grid-template-columns": f"={NARROW} ? 'repeat(2, minmax(0, 1fr))' : 'repeat(3, minmax(0, 1fr))'"})
     content = div([tiles, *hp_day_split(), cops], **{"padding": "12px 16px 16px", "font-size": "14px"})
@@ -4385,219 +4556,19 @@ def heating(tile=heat_tile):
 # ---------------------------------------------------------------- 8b. appliance pages
 
 
-# ---- watermark icons of the value tiles
-
-# The item types of the items the value tiles show, read from Item.json, the plug widgets' placeholder items
-# (zzpfx_*) typed like a real plug's. A tile whose item is missing here gets its icon from the keywords alone.
-TILE_ITEM_TYPES = {
-    "DateTime": ("epex_spot_awattar_cheapest_hour epex_spot_awattar_priciest_hour huawei_inverter_shutdown_time "
-                 "huawei_inverter_startup_time miele_dishwasher_g7465_delayed_start_time_absolute "
-                 "miele_dishwasher_g7465_program_finished_time "
-                 "miele_tumble_dryer_twc560wp_delayed_start_time_absolute "
-                 "miele_tumble_dryer_twc560wp_program_finished_time "
-                 "miele_washing_machine_wwg360_delayed_start_time_absolute "
-                 "miele_washing_machine_wwg360_program_finished_time netatmo_outdoor_last_seen "
-                 "netatmo_outdoor_measures_timestamp netatmo_weatherstation_last_seen "
-                 "netatmo_weatherstation_measures_timestamp water_meter_timestamp"),
-    "Dimensionless": ("espaltherma_water_pump_signal huawei_inverter_efficiency huawei_inverter_energy_storage_soc "
-                      "huawei_inverter_energy_storage_unit_1_soc miele_dishwasher_g7465_program_progress "
-                      "miele_tumble_dryer_twc560wp_program_progress miele_washing_machine_wwg360_program_progress "
-                      "netatmo_outdoor_atmospheric_humidity netatmo_outdoor_battery_level "
-                      "netatmo_weatherstation_atmospheric_humidity netatmo_weatherstation_co2"),
-    "ElectricCurrent": ("e_car_current espaltherma_inv_primary_current huawei_inverter_energy_storage_bus_current "
-                        "huawei_inverter_energy_storage_unit_1_bus_current smartpi_i4 zzpfx_current"),
-    "ElectricPotential": ("e_car_voltage huawei_inverter_energy_storage_bus_voltage "
-                          "huawei_inverter_energy_storage_unit_1_bus_voltage zzpfx_voltage"),
-    "Energy": ("dishwasher_energy_today dishwasher_energy_total e_car_energy_today e_car_energy_total "
-               "espaltherma_energy_dhw_today espaltherma_energy_space_today espaltherma_energy_standby_today "
-               "espaltherma_energy_today espaltherma_heating_energy_dhw_today espaltherma_heating_energy_space_today "
-               "espaltherma_heating_energy_today home_ec_day huawei_inverter_e_day huawei_inverter_e_total "
-               "huawei_inverter_energy_storage_day_charge huawei_inverter_energy_storage_day_discharge "
-               "huawei_inverter_energy_storage_total_charge huawei_inverter_energy_storage_total_discharge "
-               "huawei_inverter_energy_storage_unit_1_day_charge huawei_inverter_energy_storage_unit_1_day_discharge "
-               "huawei_inverter_energy_storage_unit_1_total_charge "
-               "huawei_inverter_energy_storage_unit_1_total_discharge huawei_inverter_power_meter_ec_day "
-               "huawei_inverter_power_meter_ep_day miele_dishwasher_g7465_current_energy_consumption "
-               "miele_tumble_dryer_twc560wp_current_energy_consumption "
-               "miele_washing_machine_wwg360_current_energy_consumption photovoltaics_own_ec_day smartpi_ecday "
-               "smartpi_epday tumble_dryer_energy_today tumble_dryer_energy_total washing_machine_1_energy_today "
-               "washing_machine_1_energy_total washing_machine_2_energy_today washing_machine_2_energy_total "
-               "ventilation_energy_today zzpfx_energy_today zzpfx_energy_total"),
-    "EnergyPrice": ("epex_spot_awattar epex_spot_awattar_cheapest epex_spot_awattar_market_gross "
-                    "epex_spot_awattar_priciest epex_spot_awattar_total_gross epex_spot_awattar_total_net"),
-    "Frequency": ("espaltherma_inv_frequency faikout_perfera_compressor_frequency faikout_perfera_fan_speed "
-                  "huawei_inverter_power_meter_frequency miele_washing_machine_wwg360_spinning_speed"),
-    "Number": ("espaltherma_cop espaltherma_cop_dhw espaltherma_cop_space espaltherma_dcop espaltherma_dcop_dhw "
-               "espaltherma_dcop_space huawei_inverter_device_status huawei_inverter_energy_storage_forcible_status "
-               "huawei_inverter_energy_storage_running_status huawei_inverter_energy_storage_unit_1_running_status "
-               "huawei_inverter_error_code huawei_inverter_optimizers_online huawei_inverter_optimizers_total "
-               "huawei_inverter_power_meter_power_factor miele_dishwasher_g7465_program_elapsed_time "
-               "miele_dishwasher_g7465_program_remaining_time miele_tumble_dryer_twc560wp_program_elapsed_time "
-               "miele_tumble_dryer_twc560wp_program_remaining_time miele_washing_machine_wwg360_program_elapsed_time "
-               "miele_washing_machine_wwg360_program_remaining_time netatmo_outdoor_signal_strength "
-               "netatmo_weatherstation_noise netatmo_weatherstation_signal_strength zzpfx_power_factor"),
-    "Power": ("air_conditioning_unit_power dishwasher_power e_car_power espaltherma_electrical_power heatpump_power "
-              "espaltherma_electrical_power_dhw espaltherma_electrical_power_space "
-              "espaltherma_electrical_power_standby espaltherma_heating_power espaltherma_heating_power_after_buh "
-              "espaltherma_heating_power_before_buh espaltherma_heating_power_dhw espaltherma_heating_power_space "
-              "faikout_perfera_power home_active_power huawei_inverter_active_peak_of_current_day "
-              "huawei_inverter_active_power huawei_inverter_energy_storage_power "
-              "huawei_inverter_energy_storage_unit_1_power huawei_inverter_input_power "
-              "huawei_inverter_power_meter_active_power huawei_inverter_power_meter_l1_active_power "
-              "huawei_inverter_power_meter_l2_active_power huawei_inverter_power_meter_l3_active_power "
-              "huawei_inverter_power_meter_reactive_power huawei_inverter_pv1_power huawei_inverter_pv2_power "
-              "huawei_inverter_reactive_power netatmo_outdoor_signal netatmo_weatherstation_signal tumble_dryer_power "
-              "ventilation_power washing_machine_1_power washing_machine_2_power zzpfx_apparent_power "
-              "zzpfx_reactive_power"),
-    "Pressure": ("espaltherma_refrigerant_pressure_sensor espaltherma_water_pressure "
-                 "netatmo_weatherstation_absolute_pressure netatmo_weatherstation_barometric_pressure"),
-    "String": ("espaltherma_3way_valve_mode espaltherma_error_code espaltherma_i_u_operation_mode "
-               "espaltherma_operation_mode miele_dishwasher_g7465_active_program "
-               "miele_dishwasher_g7465_operation_state miele_dishwasher_g7465_power_state "
-               "miele_dishwasher_g7465_program_phase miele_tumble_dryer_twc560wp_active_program "
-               "miele_tumble_dryer_twc560wp_drying_target miele_tumble_dryer_twc560wp_operation_state "
-               "miele_tumble_dryer_twc560wp_power_state miele_tumble_dryer_twc560wp_program_phase "
-               "miele_washing_machine_wwg360_active_program miele_washing_machine_wwg360_operation_state "
-               "miele_washing_machine_wwg360_power_state miele_washing_machine_wwg360_program_phase vuuno4k_channel "
-               "vuuno4k_description vuuno4k_title water_meter_error water_meter_status"),
-    "Switch": ("espaltherma_bsh_mode espaltherma_buh_step1_mode espaltherma_defrost_operaton "
-               "espaltherma_powerful_dhw_operation espaltherma_reheat espaltherma_space_heating_operation "
-               "espaltherma_storage_eco_mode espaltherma_water_pump_operation"),
-    "Temperature": ("espaltherma_dhw_setpoint espaltherma_dhw_tank_temp espaltherma_discharge_pipe_temp "
-                    "espaltherma_ext_ambient_temp espaltherma_heat_exchanger_mid_temp espaltherma_indoor_ambient_temp "
-                    "espaltherma_inlet_water_temp espaltherma_leaving_water_setpoint "
-                    "espaltherma_leaving_water_setpoint_add espaltherma_leaving_water_temp_after_buh "
-                    "espaltherma_leaving_water_temp_before_buh espaltherma_outdoor_air_temp "
-                    "espaltherma_pressure_sensor_temp espaltherma_refrig_temp_liquid_side "
-                    "espaltherma_room_temp_setpoint espaltherma_target_delta_t_heating "
-                    "espaltherma_target_discharge_temp faikout_perfera_liquid_temperature "
-                    "faikout_perfera_outdoor_temperature faikout_perfera_temperature "
-                    "faikout_perfera_temperature_setpoint huawei_inverter_energy_storage_unit_1_temperature "
-                    "huawei_inverter_internal_temperature miele_washing_machine_wwg360_target_temperature "
-                    "netatmo_outdoor_dewpoint netatmo_outdoor_heat_index netatmo_outdoor_max_temp "
-                    "netatmo_outdoor_min_temp netatmo_weatherstation_dewpoint netatmo_weatherstation_heat_index "
-                    "netatmo_weatherstation_max_temp netatmo_weatherstation_min_temp"),
-    "Volume": ("miele_dishwasher_g7465_current_water_consumption "
-               "miele_washing_machine_wwg360_current_water_consumption water_meter_value"),
-    "VolumetricFlowRate": ("espaltherma_flow_sensor water_meter_rate"),
-}
-ITEM_DIMENSION = {item: dim for dim, names in TILE_ITEM_TYPES.items() for item in names.split()}
-TEMP_C, POWER_C, ENERGY_C, PV_C, BATTERY_C = "#ff7043", "#fb8c00", "#ffa726", "#ffb300", "#7cb342"
-STATE_C, TIME_C, WATER_C, PRESSURE_C, GREEN, RED = "#78909c", "#7e57c2", "#42a5f5", "#5c6bc0", "#43a047", "#e53935"
-# Every value tile carries a large pale icon; the first rule whose dimension (None: any) and keyword pattern (None:
-# any) fit its item wins. The pattern is searched in the item name and the tile title, lower case; the colour
-# serves tiles without one of their own.
-TILE_ICONS = [
-    (None, r"self-consumption|self-sufficiency", "pie_chart", GREEN),
-    (None, r"d?cop(_|\b)", "eco", GREEN),
-    (None, r"error", "report_problem", RED),
-    (None, r"cheapest", "trending_down", GREEN),
-    (None, r"priciest", "trending_up", RED),
-    ("Temperature", r"leaving_water", "thermostat", SUPPLY),
-    ("Temperature", r"inlet_water", "thermostat", RETURN),
-    ("Temperature", r"dhw", "water_drop", "#ef5350"),
-    ("Temperature", r"dewpoint", "grain", "#4fc3f7"),
-    ("Temperature", r"outdoor|ext_ambient", "device_thermostat", "#26a69a"),
-    ("Temperature", r"indoor_ambient|room_temp|perfera_temperature", "home", "#ff8a65"),
-    ("Temperature", r"discharge|refrig|liquid|heat_exchanger|pressure_sensor", "thermostat", REFRIGERANT),
-    ("Temperature", None, "thermostat", TEMP_C),
-    ("Power", r"heating_power", "local_fire_department", RED),
-    ("Power", r"reactive|apparent", "bolt", "#90a4ae"),
-    ("Power", r"signal", "signal_cellular_alt", STATE_C),
-    ("Power", r"pv\d|input_power|huawei_inverter_active", "solar_power", PV_C),
-    ("Power", r"power_meter|smartpi", "electric_meter", POWER_C),
-    ("Power", r"energy_storage", "battery_charging_full", BATTERY_C),
-    ("Power", None, "bolt", POWER_C),
-    ("Energy", r"heating_energy", "local_fire_department", RED),
-    ("Energy", r"power_meter_ec|smartpi_ec", "download", RED),
-    ("Energy", r"power_meter_ep|smartpi_ep", "upload", GREEN),
-    ("Energy", r"own_ec", "solar_power", GREEN),
-    ("Energy", r"inverter_e_", "solar_power", PV_C),
-    ("Energy", r"discharge", "battery_full", BATTERY_C),
-    ("Energy", r"charge", "battery_charging_full", BATTERY_C),
-    ("Energy", r"home_ec", "home", "#1e88e5"),
-    ("Energy", None, "offline_bolt", ENERGY_C),
-    ("EnergyPrice", None, "euro", "#ffa000"),
-    ("Pressure", r"refrigerant", "compress", REFRIGERANT),
-    ("Pressure", None, "compress", PRESSURE_C),
-    ("VolumetricFlowRate", None, "waves", WATER_C),
-    ("Volume", None, "water", WATER_C),
-    ("Frequency", r"fan_speed", "air", "#4dd0e1"),
-    ("Frequency", r"spinning", "autorenew", TIME_C),
-    ("Frequency", r"power_meter", "graphic_eq", TIME_C),
-    ("Frequency", None, "speed", "#8d6e63"),
-    ("ElectricCurrent", None, "cable", "#ffa000"),
-    ("ElectricPotential", None, "power_input", "#ffa000"),
-    (None, r"soc\b", "battery_5_bar", BATTERY_C),
-    (None, r"battery_level", "battery_std", STATE_C),
-    (None, r"humidity", "opacity", "#4fc3f7"),
-    (None, r"co2", "co2", STATE_C),
-    (None, r"noise", "volume_up", TIME_C),
-    (None, r"progress", "donut_large", TIME_C),
-    (None, r"efficiency", "insights", GREEN),
-    (None, r"power_factor", "functions", "#90a4ae"),
-    (None, r"water_pump|pump_operation", "sync", WATER_C),
-    (None, r"signal", "signal_cellular_alt", STATE_C),
-    (None, r"optimizers", "developer_board", STATE_C),
-    (None, r"remaining_time", "hourglass_bottom", TIME_C),
-    (None, r"elapsed_time", "timer", TIME_C),
-    (None, r"finished_time", "event_available", GREEN),
-    (None, r"delayed_start", "alarm", TIME_C),
-    (None, r"startup_time", "wb_sunny", PV_C),
-    (None, r"shutdown_time", "nights_stay", PRESSURE_C),
-    (None, r"timestamp|last_seen", "schedule", STATE_C),
-    (None, r"valve", "call_split", SPACE_C),
-    (None, r"program_phase", "timelapse", TIME_C),
-    (None, r"active_program", "list_alt", TIME_C),
-    (None, r"drying_target", "dry", TIME_C),
-    (None, r"power_state", "power_settings_new", STATE_C),
-    (None, r"channel", "tv", STATE_C),
-    (None, r"vuuno4k", "subtitles", STATE_C),
-    (None, r"defrost", "ac_unit", "#4fc3f7"),
-    (None, r"buh|bsh", "whatshot", "#ff8a65"),
-    (None, r"powerful", "rocket_launch", "#ef5350"),
-    (None, r"reheat", "replay", "#ef5350"),
-    (None, r"space_heating", "heat_pump", SPACE_C),
-    (None, r"storage_eco", "eco", GREEN),
-    (None, r"status|state|operation", "info", STATE_C),
-    ("Dimensionless", None, "percent", STATE_C),
-    ("DateTime", None, "schedule", STATE_C),
-    ("Switch", None, "toggle_on", STATE_C),
-    ("Number", None, "numbers", STATE_C),
-    (None, None, "info", STATE_C),
-]
-TILE_ICON_DEFAULTS = set()  # tiles left with the last rule, listed by the dry run
-
-
-def tile_icon(title, value):
-    """Icon and colour of a value tile's watermark: its item comes from the value expression, the rules pick them."""
-    item = (re.findall(r"items\.(\w+)", value) or [""])[0]
-    text, dim = f"{item} {title}".lower(), ITEM_DIMENSION.get(item)
-    rule = next(r for r in TILE_ICONS if r[0] in (None, dim) and (r[1] is None or re.search(r[1], text)))
-    if rule is TILE_ICONS[-1]:
-        TILE_ICON_DEFAULTS.add(f"{title} [{item}]")
-    return rule[2:]
-
-
 def value_tile_widget():
-    """The widget every value tile is an instance of: title and value over a large pale icon, a tap opening the item's
+    """The widget every value tile is an instance of: title and value in the text colour, a tap opening the item's
     popup where an item is given. Its lengths are em of its font size, 14 px unless fontSize sets another, so a tile
     in a card that grows grows with it; wrap lets a long text wrap across the whole row of the grid."""
     return div([
-        # Framework7 sets the icon's font size, width and height from one value; in em of the tile that is right for
-        # the font size (58 px at 14 px), but width and height are em of the icon's own font size, so the style
-        # sets them to 1em, and the offsets, 6 and 10 of its 58 px, are em of that size too
-        comp("oh-icon", {"icon": "=props.icon || 'material:info'", "width": "4.143em", "height": "4.143em", "style": {
-            "width": "1em", "height": "1em", "position": "absolute", "right": "-0.1034em", "bottom": "-0.1724em",
-            "opacity": "0.16", "color": "=props.iconColor || props.color || '#78909c'"}}),
-        # the texts stand above the icon in their own positioned box, the link above both
+        # the texts in their own positioned box, the link above them
         div([label("=props.title", **{"font-size": "0.8571em", "opacity": "0.65"}),
              label("=props.value", **{"font-size": "=props.wrap ? '1em' : '1.429em'",
                                       "font-weight": "=props.wrap ? 600 : 700",
                                       "line-height": "=props.wrap ? '1.357' : '1.3'",
                                       "white-space": "=props.wrap ? 'normal' : 'nowrap'",
                                       "overflow": "hidden", "text-overflow": "=props.wrap ? 'clip' : 'ellipsis'",
-                                      "overflow-wrap": "anywhere", "color": "=props.color || ''"})],
+                                      "overflow-wrap": "anywhere"})],
             **{"position": "relative"}),
         comp("oh-link", {"visible": "=!!props.item", "action": "=props.action || 'popup'", "actionItem": "=props.item",
                          "actionModal": "widget:item-popup",
@@ -4609,14 +4580,12 @@ def value_tile_widget():
         **{"position": "relative", "overflow": "hidden", "box-sizing": "border-box", "height": "100%",
            "min-width": "0", "font-size": "=props.fontSize || '14px'", "padding": "0.7143em 0.8571em",
            "border-radius": "0.8571em", "grid-column": "=props.wrap ? '1 / -1' : 'auto'",
-           "background": "rgba(127, 127, 127, 0.08)"})
+           "background": TILE_BG})
 
 
 def value_tile(title, value, visible=None, color=None):
-    """An instance of the value tile widget; the rules pick its icon, and its colour where it has none of its own."""
-    icon, fallback = tile_icon(title, value)
-    cfg = {"title": title, "value": value, "icon": f"material:{icon}"}
-    cfg.update({"color": color} if color else {"iconColor": fallback})
+    """An instance of the value tile widget; color is its item popup's."""
+    cfg = {"title": title, "value": value, **({"color": color} if color else {})}
     if visible:
         cfg["visible"] = visible
     return comp("widget:value-tile", cfg)
@@ -5109,8 +5078,8 @@ def home_blocks():
     months = month_sums([("From PV", "energy_daily_self_use", SELF_C, {"stack": "home"}),
                          ("From Grid", "energy_daily_grid_import", IMPORT_C,
                           {"stack": "home", "itemStyle": {"color": IMPORT_C, "borderRadius": [4, 4, 0, 0]}}),
-                         ("PV Production", "energy_daily_pv", PV_C,
-                          {"type": "line", "symbol": "circle", "symbolSize": 7, "lineStyle": {"width": 2.5, "color": PV_C},
+                         ("PV Production", "energy_daily_pv", PV_AMBER,
+                          {"type": "line", "symbol": "circle", "symbolSize": 7, "lineStyle": {"width": 2.5, "color": PV_AMBER},
                            "z": 3})])
     # Heute under Jetzt, where Jetzt left space beside the day's power (user, 2026-10-05), and the consumers of the
     # day under them, so the four grids of power beside keep their height; per day beside per month below
@@ -5234,22 +5203,28 @@ def kw_signed(item):
 
 
 POPUP_COLOR = "#5c6bc0"  # the course in an item popup, where the tile has no colour of its own
+POPUP_COLOR2 = "#78909c"  # a second item's, where the tile gives it none
 
 
-def item_modal(item, title, color=None):
-    """The props of the item popup for one item: what it shows depends on the item's type and state options."""
+def item_modal(item, title, color=None, second=None):
+    """The props of the item popup for one item: what it shows depends on the item's type and state options. second:
+    a tile of two values, {item2, name, name2, color, color2}, the popup then shows both."""
     kind, states = item_kind(item)
     props = {"item": item, "title": title, "color": color or POPUP_COLOR, "kind": kind}
     if states:
         props["states"] = states
+    if second:
+        props.update({"item2": second["item2"], "name": second["name"], "name2": second["name2"],
+                      "color": second.get("color") or color or POPUP_COLOR,
+                      "color2": second.get("color2") or POPUP_COLOR2})
     return {"action": "popup", "actionModal": "widget:item-popup", "actionModalConfig": props}
 
 
-def link_over(item, action="popup", radius="12px", title="", color=None):
+def link_over(item, action="popup", radius="12px", title="", color=None, second=None):
     """Transparent link over a tile: a tap opens the item's popup (or the item's options)."""
     cfg = {"action": action, "style": {"position": "absolute", "inset": "0", "display": "block", "border-radius": radius}}
     if action == "popup":
-        cfg.update(item_modal(item, title, color))
+        cfg.update(item_modal(item, title, color, second))
     else:
         cfg["actionItem"] = item
     return comp("oh-link", cfg)
@@ -5284,7 +5259,7 @@ def status_tile(title, item, color="#fb8c00"):
                                 "overflow": "hidden", "text-overflow": "ellipsis"}),
                 chip(f"={on} ? 'An' : 'Aus'", f"={on} ? '{color}' : '#9e9e9e'"), link_over(item, title=title, color=color)],
                **{"position": "relative", "display": "flex", "align-items": "center", "gap": "8px",
-                  "padding": "8px 12px", "border-radius": "12px", "background": "rgba(127, 127, 127, 0.08)"})
+                  "padding": "8px 12px", "border-radius": "12px", "background": TILE_BG})
 
 
 def status_grid(tiles):
@@ -5327,7 +5302,7 @@ def glyph_icon(icon, color, active="false"):
 def hero(icon, color, caption, value, extra=(), value_color=None, picture=None):
     """Head of a device card: its icon large in a ring (picture, by default the Material icon at rest), the main value
     large beside it, chips below."""
-    big = {"font-size": "30px", "font-weight": "700", "line-height": "34px", "white-space": "nowrap"}
+    big = {**HERO, "white-space": "nowrap"}
     if value_color:
         big["color"] = value_color
     return div([picture or glyph_icon(icon, color),
@@ -5529,7 +5504,7 @@ def cls_color(cls_expr):
 
 
 VT_TILE = {"position": "relative", "box-sizing": "border-box", "min-width": "0", "border-radius": "12px",
-        "padding": "10px 12px", "background": "rgba(127, 127, 127, 0.08)", "overflow": "hidden"}
+        "padding": "10px 12px", "background": TILE_BG, "overflow": "hidden"}
 VT_TITLE = {"font-size": "12px", "opacity": "0.65", "white-space": "nowrap", "overflow": "hidden",
          "text-overflow": "ellipsis"}
 VT_VALUE = {"font-size": "20px", "font-weight": "700", "line-height": "1.3", "white-space": "nowrap"}
@@ -5540,7 +5515,7 @@ VT_WIDE = {"grid-column": "1 / -1"}
 def vt_chip(text, cls_expr="'neutral'", visible=None):
     color = cls_color(cls_expr)
     return label(text, visible, **{"font-size": "11px", "font-weight": "600", "padding": "2px 8px",
-                                   "border-radius": "9px", "white-space": "nowrap", "width": "fit-content", "color": "=" + color,
+                                   "border-radius": PILL_R, "white-space": "nowrap", "width": "fit-content", "color": "=" + color,
                                    "background": f"='color-mix(in srgb, ' + {color} + ' 16%, transparent)'"})
 
 
@@ -5632,7 +5607,7 @@ def svg_pill(x, y, text, cls_expr, visible=None):
     9.5), its text in the class's colour on its tint."""
     color = "=" + cls_color(cls_expr)
     w = f"(({text[1:]}).length * 5.2 + 12)"
-    return svg("g", [svg("rect", x=x, y=y, height=13, rx=6.5, width=f"={w}.toFixed(1)", fill=color,
+    return svg("g", [svg("rect", x=x, y=y, height=13, rx=SVG_PILL_RX[13], width=f"={w}.toFixed(1)", fill=color,
                          **{"fill-opacity": "0.16"}),
                      svg("text", x=x + 6, y=round(y + 9.3, 1), content=text, fill=color,
                          **{"font-size": "9.5", "font-weight": "600"})], visible=visible)
@@ -5661,16 +5636,17 @@ def vt_head(title, right=None):
     return div(kids, **{"display": "flex", "align-items": "center", "gap": "8px"})
 
 
-def vt_tile(children, item=None, title="", color=None, wide=False, visible=None, **style):
+def vt_tile(children, item=None, title="", color=None, wide=False, visible=None, second=None, **style):
     kids = list(children)
     if item:
-        kids.append(link_over(item, title=title, color=color))
+        kids.append(link_over(item, title=title, color=color, second=second))
     return div(kids, visible, **{**VT_TILE, **(VT_WIDE if wide else {}), **style})
 
 
-def vt_value(expr, color=None, right=None, **style):
-    """A tile's value large; with right a chip beside it at the row's end."""
-    lbl = label(expr, **{**VT_VALUE, **({"color": color} if color else {}), **style})
+def vt_value(expr, color=None, right=None, ident=False, **style):
+    """A tile's value large, in the text colour as the value tiles' (user, 2026-10-08); color only where it tells the
+    two values of a tile apart (ident); with right a chip beside it at the row's end."""
+    lbl = label(expr, **{**VT_VALUE, **({"color": color} if color and ident else {}), **style})
     if right is None:
         return lbl
     # where both do not fit beside each other, the chip goes below the value
@@ -6001,12 +5977,13 @@ def donut_tile(title, item, parts, total_expr, center_expr, unit, color=None, fo
 
 
 def split_bar(parts, total_expr, height=16):
-    """Parts of a whole as one bar of segments, each with its share inside where it fits."""
+    """Parts of a whole as one bar of segments, each with its share inside where it fits; a part of 0 % is left out,
+    so a part of 100 % fills the bar to both rounded ends."""
     total = f"(Math.max({total_expr}, 0.0001))"
     segs = []
     for name, expr, colour in parts:
         share = vt_clamp(f"({expr}) / {total} * 100")
-        segs.append(div([label(f"={share} >= 14 ? Math.round({share}) + ' %' : ''")],
+        segs.append(div([label(f"={share} >= 14 ? Math.round({share}) + ' %' : ''")], f"={share} > 0",
                         **{"flex": f"=({share}).toFixed(2) + ' 1 0'", "background": colour, "text-align": "center",
                            "font-size": "10px", "font-weight": "700", "color": "#1a1a1a",
                            "line-height": f"{height}px", "overflow": "hidden"}))
@@ -6076,23 +6053,35 @@ def balance_tile(title, item, left, right, unit="kWh", digits=2, net_words=("ein
 
 
 def spread_tile(title, hot, cold, hot_name, cold_name, color_hot="#e57373", color_cold="#64b5f6", sub=None):
-    """Two temperatures of one flow, the hot on the left, the cold on the right, a pipe shading from one into the
-    other below them, the difference beside the title."""
+    """Two temperatures of one flow, the hot on the left, the cold on the right, their difference in the middle
+    between them (user, 2026-10-08), a pipe shading from one into the other below them."""
     d = f"({num(hot)} - {num(cold)})"
-    side = lambda name, item, color, align: div([label(name, **VT_SUB),
-                                                 vt_value(f"={fixed(num(item), 1)} + ' °C'", color,
+    side = lambda name, item, color, align: div([label(name, **{**VT_SUB, "text-align": align}),
+                                                 vt_value(f"={fixed(num(item), 1)} + ' °C'", color, ident=True,
                                                        **{"text-align": align})], **{"min-width": "0"})
     pipe = div([vt_icon("chevron_right", 12) for _ in range(3)],
                **{"display": "flex", "justify-content": "space-around", "align-items": "center", "color": "#ffffff",
                   "height": "10px", "border-radius": "5px", "margin-top": "8px", "overflow": "hidden",
                   "background": f"linear-gradient(90deg, {color_hot}, {color_cold})"})
-    kids = [vt_head(title, vt_chip(f"='ΔT ' + {fixed(d, 1)} + ' K'")),
-            div([side(hot_name, hot, color_hot, "left"), side(cold_name, cold, color_cold, "right")],
-                **{"display": "flex", "justify-content": "space-between", "gap": "8px", "margin-top": "4px"}),
-            pipe]
+    # the chip centred on the values' line: the grid's middle column, at the row's foot, raised to the value's middle;
+    # in a narrow tile (a quick popup's, a phone's) it moves under the two values, centred (container query on the row)
+    delta = vt_chip(f"='ΔT ' + {fixed(d, 1)} + ' K'")
+    delta["config"]["style"].update({"justify-self": "center", "margin-bottom": "4px"})
+    delta["config"]["class"] = "spread-delta"
+    row_ = div([side(hot_name, hot, color_hot, "left"), delta, side(cold_name, cold, color_cold, "right")],
+               **{"display": "grid", "grid-template-columns": "1fr auto 1fr", "align-items": "end", "gap": "4px 8px",
+                  "margin-top": "4px"})
+    row_["config"]["class"] = "spread-row"
+    narrow = div([row_], **{"container-type": "inline-size"})
+    narrow["config"]["stylesheet"] = (
+        "@container (max-width: 235px) { .spread-row { grid-template-columns: 1fr 1fr !important; }\n"
+        "  .spread-delta { grid-column: 1 / -1; grid-row: 2; margin: 0 !important; } }")
+    kids = [vt_head(title), narrow, pipe]
     if sub:
         kids.append(label(sub, **{**VT_SUB, "margin-top": "6px"}))
-    return vt_tile(kids, hot, title)
+    # a tap shows both temperatures and their courses as two lines (user, 2026-10-08)
+    return vt_tile(kids, hot, title, second={"item2": cold, "name": hot_name, "name2": cold_name, "color": color_hot,
+                                            "color2": color_cold})
 
 
 def pair_points(a, b, span, w=196, x0=2, top=6, bottom=40):
@@ -6134,7 +6123,7 @@ def pair_tile(title, a, b, a_name, b_name, digits=1, unit="K", a_color=None, b_c
     def side(name, item, expr, color, align):
         shown = f"={dash(disp(item))}" if item and not expr else f"={fixed(expr, digits)} + '{value_unit}'"
         return div([label(name, **{**VT_SUB, "text-align": align}),
-                    vt_value(shown, color, **{"font-size": "18px", "text-align": align})], **{"min-width": "0"})
+                    vt_value(shown, color, ident=True, **{"font-size": "18px", "text-align": align})], **{"min-width": "0"})
     right = None if delta_text is False else vt_chip(f"={delta_text or vt_signed(d, digits, unit)}")
     kids = [vt_head(title, right),
             div([side(a_name, a, a_expr, a_color, "left"), side(b_name, b, b_expr, b_color, "right")],
@@ -6144,7 +6133,9 @@ def pair_tile(title, a, b, a_name, b_name, digits=1, unit="K", a_color=None, b_c
         kids.append(label(sub, **{**VT_SUB, "margin-top": "4px"}))
     if spark:
         kids.append(pair_sparkline(a, b, a_color, b_color, spark))
-    return vt_tile(kids, a, title)
+    # a tap shows both values and their courses, where the second is an item of its own
+    second = {"item2": b, "name": a_name, "name2": b_name, "color": a_color, "color2": b_color} if b and a else None
+    return vt_tile(kids, a, title, second=second)
 
 
 def inout_tile(title, inside, outside, in_color="#fb8c00", out_color="#29b6f6", in_name="innen", out_name="außen"):
@@ -6708,7 +6699,7 @@ def pill_text(x, y, text, fill="#48484a", color="#ffffff", weight="normal"):
     """A value in a dark grey pill: the pill as wide as its text (about 5.5 units a character at 10)."""
     w = f"((({text}).length * 5.5 + 12))"
     return svg("g", [svg("rect", x=f"=({x} - {w} / 2).toFixed(1)", y=round(y - 10.5, 1), width=f"={w}.toFixed(1)",
-                         height=14, rx=7, fill=fill),
+                         height=14, rx=SVG_PILL_RX[14], fill=fill),
                      svg("text", x=x, y=y, fill=color, content=f"={text}",
                          **{"font-size": "10", "font-weight": weight, "text-anchor": "middle"})])
 
@@ -8094,7 +8085,8 @@ def layout_page(uid, config, blocks, now):
     germanize(blocks, MISSING_DE)
     if config.get("label") in GEN_DE:
         config = {**config, "label": GEN_DE[config["label"]]}
-    config = {**config, "stylesheet": "\n".join(filter(None, [config.get("stylesheet"), PHONE_EDGES, PERIOD_MENU]))}
+    config = {**config, "stylesheet": "\n".join(filter(None, [config.get("stylesheet"), CARD_STYLE, PHONE_EDGES,
+                                                              PERIOD_MENU]))}
     return {
         "class": "org.openhab.core.ui.components.RootUIComponent",
         "value": {"uid": uid, "tags": [], "props": {"parameters": [], "parameterGroups": []},
@@ -8181,14 +8173,18 @@ def page(now):
 # The plug widgets are built by the same card builders from placeholders, then every placeholder becomes an
 # expression on the widget's props; the colour's rgba shades are worked out from props.color in the widget.
 PLUG_PLACEHOLDERS = {"prefix": "zzpfx", "icon": "zzicon", "color": "#010203", "title": "zztitle", "note": "zznote",
-                     "switch": "zzswitch", "item": "zzitem", "history": "zzhist"}
+                     "switch": "zzswitch", "item": "zzitem", "history": "zzhist",
+                     # the item popup's second item, for a tile of two values
+                     "item2": "zzsecond", "name": "zzname1", "name2": "zzname2", "color2": "#040506"}
 SWITCH_JS = "(props.switch || props.prefix + '_switch')"  # the switch item: its own prop, else the prefix's
 PROPS_RGB = ("Number.parseInt(props.color.slice(1, 3), 16) + ', ' + Number.parseInt(props.color.slice(3, 5), 16)"
              " + ', ' + Number.parseInt(props.color.slice(5, 7), 16)")
 PLACEHOLDER_JS = [("rgba(1, 2, 3, ", "rgba(' + " + PROPS_RGB + " + ', "), ("#010203", "' + props.color + '"),
                   ("zzicon", "' + props.icon + '"), ("zztitle", "' + props.title + '"), ("zznote", "' + props.note + '"),
                   ("zzswitch", "' + " + SWITCH_JS + " + '"), ("zzitem", "' + props.item + '"),
-                  ("zzhist", "' + props.history + '"),
+                  ("zzhist", "' + props.history + '"), ("#040506", "' + props.color2 + '"),
+                  ("zzsecond", "' + props.item2 + '"), ("zzname1", "' + (props.name || props.title) + '"),
+                  ("zzname2", "' + props.name2 + '"),
                   ("zzpfx", "' + props.prefix + '")]
 
 
@@ -8222,6 +8218,7 @@ def templated(v):
         if v.startswith("="):
             expr = re.sub(r"items\.zzpfx_(\w+)", r"items[props.prefix + '_\1']", v[1:])
             expr = expr.replace("items.zzswitch", "items[" + SWITCH_JS + "]").replace("items.zzitem", "items[props.item]")
+            expr = expr.replace("items.zzsecond", "items[props.item2]")
             expr = expr.replace("items.zzhist", "items[props.history]")
             for token, js in PLACEHOLDER_JS:  # what is left sits inside string literals
                 expr = expr.replace(token, js)
@@ -8237,12 +8234,25 @@ STATE_LABEL = ("=(s) => ((props.states || 'ON=An,OFF=Aus').split(',').map((o) =>
 
 def item_popup():
     """The popup a tile of a device page opens: the item's value large, its course over the day as a line, or as a
-    band of its states for switches, texts and numbers with state options."""
-    item, title, color = PLUG_PLACEHOLDERS["item"], PLUG_PLACEHOLDERS["title"], PLUG_PLACEHOLDERS["color"]
-    now = card(title, [label(f"={dash(disp(item))}", **{"font-size": "30px", "font-weight": "700", "line-height": "36px",
-                                                        "overflow-wrap": "anywhere", "padding": "4px 16px 18px"})])
-    line = card("Verlauf", [day_chart([area(title, item, color)], [value_axis("")])])
-    line["config"]["visible"] = "=!props.kind || props.kind === 'number'"
+    band of its states for switches, texts and numbers with state options. With a second item (a tile of two values,
+    such as Vorlauf and Rücklauf; user, 2026-10-08) both values side by side under their names, in their colours, and
+    their courses as two lines of one chart."""
+    ph = PLUG_PLACEHOLDERS
+    item, title, color = ph["item"], ph["title"], ph["color"]
+    item2, name, name2, color2 = ph["item2"], ph["name"], ph["name2"], ph["color2"]
+    one, two = "=!props.item2", "=!!props.item2"
+    side = lambda n, it, c, align: div([label(n, **{**VT_SUB, "text-align": align}),
+                                       label(f"={dash(disp(it))}", **{**HERO, "color": c, "white-space": "nowrap",
+                                                                     "text-align": align})], **{"min-width": "0"})
+    now = card(title, [label(f"={dash(disp(item))}", one, **{**HERO, "overflow-wrap": "anywhere",
+                                                            "padding": "4px 16px 18px"}),
+                       div([side(name, item, color, "left"), side(name2, item2, color2, "right")], two,
+                           **{"display": "flex", "justify-content": "space-between", "align-items": "flex-end",
+                              "gap": "12px", "padding": "4px 16px 18px"})])
+    course = card("Verlauf", [day_chart([area(title, item, color)], [value_axis("")])])
+    course["config"]["visible"] = "=!props.item2 && (!props.kind || props.kind === 'number')"
+    courses = card("Verlauf", [day_chart([line(name, item, color), line(name2, item2, color2)], [value_axis("")])])
+    courses["config"]["visible"] = two
     band = card("Verlauf", [chart({"period": "D", "periodVisible": True, "height": "150px"},
                                   grid=[comp("oh-chart-grid", {"top": "35", "bottom": "35", "left": "20", "right": "20"})],
                                   xAxis=[comp("oh-time-axis", {"gridIndex": 0})],
@@ -8252,8 +8262,8 @@ def item_popup():
                                                                    "yAxisIndex": 0, "yValue": 0, "mapState": STATE_LABEL})],
                                   tooltip=[comp("oh-chart-tooltip", {"show": True, "confine": True})])])
     band["config"]["visible"] = "=props.kind === 'state'"
-    root = div([now, line, band], **{"padding": "8px 6px"})
-    root["config"]["stylesheet"] = PERIOD_MENU  # the chart's period menu, out of the layout while closed
+    root = div([now, course, courses, band], **{"padding": "8px 6px"})
+    root["config"]["stylesheet"] = "\n".join([CARD_STYLE, PERIOD_MENU])  # the cards' look; the chart's period menu, out of the layout while closed
     return root
 
 
@@ -8337,14 +8347,16 @@ ITEM_POPUP_PARAMS = [
     param("color", "Colour", "Colour of the course as #rrggbb", default=POPUP_COLOR),
     param("kind", "Kind", "number: its course as a line; state: a band of its states; none: only the value",
           default="number"),
-    param("states", "State labels", "value=label pairs, comma-separated, for the band of states")]
+    param("states", "State labels", "value=label pairs, comma-separated, for the band of states"),
+    dict(param("item2", "Second item", "A second item, shown beside the first and as a second line"), context="item"),
+    param("name", "Name", "The first item's name beside a second item; empty: the title"),
+    param("name2", "Second name", "The second item's name"),
+    param("color2", "Second colour", "Colour of the second item's value and line as #rrggbb", default=POPUP_COLOR2)]
 
 VALUE_TILE_PARAMS = [
     param("title", "Title", "Title above the value", required=True),
     param("value", "Value", "The text to show, usually an expression on an item", required=True),
-    param("icon", "Icon", "The pale icon, e.g. material:thermostat", default="material:info"),
-    param("color", "Colour", "Colour of the value and the icon as #rrggbb; empty: the text colour"),
-    param("iconColor", "Icon colour", "Colour of the icon where the value keeps the text colour, as #rrggbb"),
+    param("color", "Colour", "Colour of the item popup's course as #rrggbb"),
     dict(param("item", "Item", "The item whose popup a tap opens; empty: no tap"), context="item"),
     param("action", "Action", "popup: the item popup (widget item-popup); options: the item's command options",
           default="popup"),
@@ -8494,6 +8506,7 @@ def widgets():
     out["appliance-icon"] = (appliance_icon_widget(), APPLIANCE_ICON_PARAMS, ["appliance"])
     out["appliance-tile"] = (appliance_tile_widget(), APPLIANCE_TILE_PARAMS, ["appliance"])
     out["weather-icon"] = (weather_icon_widget(), WEATHER_ICON_PARAMS, ["weather"])
+    weather_day_ref()  # the forecast's day popup, a role widget like the quick popups
     for uid, (tree, props) in ROLE_WIDGETS.items():
         params = [dict(param(p, names.get(i, (p, ""))[0], f"{names.get(i, ('', 'Item'))[1]} item", required=True),
                        context="item") for i, p in props.items()]
@@ -8550,6 +8563,8 @@ def migrate_widgets(d):
 OBSOLETE_PAGES = ["dashboard",  # became the overview page
                   "flow_water_meter",  # the water meter left the energy flow
                   "proposals",  # control variants, decided
+                  # overview design proposals, B2 adopted on every page (2026-10-08)
+                  "harmony_a", "harmony_b", "harmony_b2", "harmony_c", "harmony_d", "harmony_e",
                   "widget_gallery",  # the widget repository's screenshots, put up by widget_gallery.py while they are taken
                   "dashboard_smart_meter", "dashboard_battery", "dashboard_hot_water", "dashboard_pv", "dashboard_home",
                   "dashboard_power_meter", "dashboard_energy_storage", "dashboard_pv_days", "dashboard_energy_days",
@@ -8640,8 +8655,6 @@ def main():
         data, enc = m.detect(m.DB + name)
         results[name] = m.encode(fn(data), *enc)
         print(f"{name}: encoder html={enc[0]} newline={enc[1]} ok")
-    if TILE_ICON_DEFAULTS:
-        print("value tiles with the default icon:", ", ".join(sorted(TILE_ICON_DEFAULTS)))
     if sys.argv[1] not in ("apply", "update-apply"):
         return
     for name, text in results.items():

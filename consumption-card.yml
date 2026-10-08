@@ -130,7 +130,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 7, 2026, 3:15:18 PM
+timestamp: Oct 8, 2026, 3:48:44 AM
 component: oh-card
 config:
   title: '=''Consumption Today · '' + ([''NULL'', ''UNDEF''].includes(items[props.homeEnergyToday].state) ? ''–'' : (items[props.homeEnergyToday].displayState
@@ -189,10 +189,11 @@ slots:
                       text: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? Math.round(100 * (Number(items[props.pvSelfUseToday].numericState)
                         || 0) / (Number(items[props.homeEnergyToday].numericState) || 0)) : 0) + '' %'''
                       style:
-                        font-size: 26px
+                        font-size: '=screen.width < 600 ? ''26px'' : ''28px'''
                         font-weight: '700'
+                        line-height: '=screen.width < 600 ? ''32px'' : ''34px'''
+                        letter-spacing: -0.01em
                         color: '#43a047'
-                        line-height: 30px
                   - component: Label
                     config:
                       text: ='from PV · ' + ((Number(items[props.pvSelfUseToday].numericState) || 0)).toFixed(1) + ' kWh'
@@ -218,7 +219,7 @@ slots:
                     font-size: 11px
                     font-weight: '600'
                     padding: 2px 8px
-                    border-radius: 9px
+                    border-radius: 6px
                     white-space: nowrap
                     width: fit-content
                     color: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
@@ -269,10 +270,11 @@ slots:
                       text: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? Math.round(100 * (Number(items[props.gridImportToday].numericState)
                         || 0) / (Number(items[props.homeEnergyToday].numericState) || 0)) : 0) + '' %'''
                       style:
-                        font-size: 26px
+                        font-size: '=screen.width < 600 ? ''26px'' : ''28px'''
                         font-weight: '700'
+                        line-height: '=screen.width < 600 ? ''32px'' : ''34px'''
+                        letter-spacing: -0.01em
                         color: '#e53935'
-                        line-height: 30px
                   - component: Label
                     config:
                       text: ='from the grid · ' + ((Number(items[props.gridImportToday].numericState) || 0)).toFixed(1) +

@@ -35,7 +35,7 @@ OVERVIEW = [
      "the rest of the ring pulses softly and, while the node works, the arc pulses in step with it, brightest and "
      "widest with it. A tap on "
      "a node opens its device's page of my installation, on the house and the appliances a popup of their own. "
-     "Under the star three tiles with large pale icons: the house as its node inside the pie of what the consumers "
+     "Under the star three tiles: the house as its node inside the pie of what the consumers "
      "draw, as large as the rings beside it, with its power and today's energy against yesterday's at this time "
      "in a pill (the difference in kWh), and today's self-consumption and self-sufficiency as rings, each with yesterday's whole day in a "
      "pill, green while today's share is higher, orange while lower. The card places its lines and nodes as "
@@ -546,14 +546,30 @@ config:
   day: =items.weather_is_day.state !== 'OFF'
   size: 36
 """, "| Light | Dark |\n|---|---|\n| " + img("weather-forecast.png", "Weather page: warnings, days and chart") + " | "
-      + img("weather-forecast-dark.png", "Weather page in dark mode") + " |"))
+      + img("weather-forecast-dark.png", "Weather page in dark mode") + " |")
+          + "\n" + section("Weather day", "weather-day", """The popup a day of my weather page opens: at the top the day in
+quarter hours as the page's chart draws the next hours, from midnight to midnight (MainUI's day chart, `chartType:
+day`, its `future` the days from today); below it the day hour by hour in the columns of the page's day rows (the time,
+the weather drawn with `weather-icon`, the temperature, the minutes of sunshine, the precipitation with its
+probability, the wind with an arrow of its direction and its compass point), the present hour on a grey band and the
+hours gone by pale. It reads two String items my weather rule writes as JSON for the five days of the forecast: the
+hours (`[time, temperature, precipitation, wind, direction, symbol, day, probability, sunshine minutes]`) and the
+quarter hours (`[time, temperature, precipitation, wind, direction]`); `date` is the day's midnight in epoch seconds.
+Open it from a link:""", """
+action: popup
+actionModal: widget:weather-day
+actionModalConfig:
+  date: =loop.day.t
+  weatherHourlyDays: weather_hourly_days
+  weatherQuarterHours: weather_quarter_hours
+""", "| Light | Dark |\n|---|---|\n| " + img("weather-day.png", "A day hour by hour") + " | "
+      + img("weather-day-dark.png", "A day hour by hour in dark mode") + " |"))
 md.append("""## Plug cards
 
 Four cards for a metered plug, built from one item prefix: `<prefix>_power`, `_switch`, `_energy_today`,
 `_energy_total`, `_voltage`, `_current`, `_power_factor`, `_apparent_power` and `_reactive_power`, as a Tasmota plug
 provides them. On a device page they stand two by two. `plug-card` also covers devices that are not plugs: give it
 the device's `title`, hide the switch with `controllable: false`, or take the switch from another item with `switch`.
-Every value tile carries a large pale icon of what it shows.
 
 The comparisons with yesterday and the last 7 days come from one String item, `history`, which the rule in
 [`scripts/openhab-ui/applied/tile_history.py`](scripts/openhab-ui/applied/tile_history.py) writes every ten minutes:
@@ -570,8 +586,10 @@ md.append("""## Item popup: `item-popup`
 
 The popup every tile of my device pages opens, in place of the analyzer: the item's value large and its course over
 the day with arrows for earlier days, as a line for measurements or as a band of states for switches, texts and
-numbers with state options (labelled from the `states` prop), or the value alone for dates. Open it from any link
-with `action: popup`, `actionModal: widget:item-popup` and its props in `actionModalConfig`:
+numbers with state options (labelled from the `states` prop), or the value alone for dates. Given a second item
+(`item2`, with `name`, `name2` and `color2`), it shows both values side by side and their courses as two lines, as my
+tiles of two values (flow and return) open it. Open it from any link with `action: popup`, `actionModal:
+widget:item-popup` and its props in `actionModalConfig`:
 
 ```yaml
 action: popup
@@ -587,7 +605,7 @@ actionModalConfig:
 """ + table("item-popup") + "\n")
 md.append("""## Value tile: `value-tile`
 
-The plain tile for a value: a title, the value, and a large pale icon in the lower right corner, behind them. My
+The plain tile for a value: a title over the value, in the text colour. My
 device pages and popups give most values a form of their own now (a scale, a rating, a course); the tile stays for
 states, texts and counters, and in the heat pump card. The screenshot shows it with the air conditioner's values.
 Pass the value as an expression; it is evaluated where the tile is placed. With `item` a tap opens the item popup.
@@ -600,7 +618,6 @@ component: widget:value-tile
 config:
   title: Flow
   value: =items.espaltherma_leaving_water_temp_after_buh.displayState
-  icon: material:thermostat
   color: "#e57373"
   item: espaltherma_leaving_water_temp_after_buh
 ```
