@@ -36,7 +36,7 @@ props:
     type: TEXT
     required: false
   parameterGroups: []
-timestamp: Oct 4, 2026, 11:05:34 PM
+timestamp: Oct 8, 2026, 3:48:44 AM
 component: div
 config:
   style:
@@ -47,8 +47,8 @@ config:
     min-width: '0'
     display: flex
     flex-direction: column
-    background: '=items[props.item].state === ''ON'' ? ''color-mix(in srgb, var(--tile-color) 20%, transparent)'' : ''rgba(127,
-      127, 127, 0.08)'''
+    background: '=items[props.item].state === ''ON'' ? ''color-mix(in srgb, var(--tile-color) 20%, transparent)'' : ''color-mix(in
+      srgb, var(--f7-text-color) 6%, transparent)'''
     box-shadow: '=items[props.item].state === ''ON'' ? ''inset 0 0 0 1.5px color-mix(in srgb, var(--tile-color) 60%, transparent)''
       : ''none'''
 slots:

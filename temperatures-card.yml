@@ -58,7 +58,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 7, 2026, 2:25:52 AM
+timestamp: Oct 8, 2026, 3:48:44 AM
 component: oh-card
 config:
   title: Temperatures
@@ -81,7 +81,7 @@ slots:
       - component: div
         config:
           style:
-            border-left: '4px solid #fb8c00'
+            border-left: '2px solid #fb8c00'
             padding: 4px 12px
             min-width: '0'
         slots:
@@ -106,9 +106,10 @@ slots:
                   text: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpIndoorAmbientTemp].state) ? ''–'' : (items[props.heatpumpIndoorAmbientTemp].displayState
                     || items[props.heatpumpIndoorAmbientTemp].state))'
                   style:
-                    font-size: 30px
+                    font-size: '=screen.width < 600 ? ''26px'' : ''28px'''
                     font-weight: '700'
-                    line-height: 36px
+                    line-height: '=screen.width < 600 ? ''32px'' : ''34px'''
+                    letter-spacing: -0.01em
                     white-space: nowrap
               - component: div
                 config:
@@ -125,7 +126,7 @@ slots:
                         font-size: 11px
                         font-weight: '600'
                         padding: 1px 8px 1px 6px
-                        border-radius: 9px
+                        border-radius: 6px
                         white-space: nowrap
                         width: fit-content
                         color: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
@@ -179,7 +180,7 @@ slots:
                         font-size: 11px
                         font-weight: '600'
                         padding: 2px 8px
-                        border-radius: 9px
+                        border-radius: 6px
                         white-space: nowrap
                         width: fit-content
                         color: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
@@ -220,7 +221,7 @@ slots:
       - component: div
         config:
           style:
-            border-left: '4px solid #29b6f6'
+            border-left: '2px solid #29b6f6'
             padding: 4px 12px
             min-width: '0'
         slots:
@@ -245,9 +246,10 @@ slots:
                   text: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpExtAmbientTemp].state) ? ''–'' : (items[props.heatpumpExtAmbientTemp].displayState
                     || items[props.heatpumpExtAmbientTemp].state))'
                   style:
-                    font-size: 30px
+                    font-size: '=screen.width < 600 ? ''26px'' : ''28px'''
                     font-weight: '700'
-                    line-height: 36px
+                    line-height: '=screen.width < 600 ? ''32px'' : ''34px'''
+                    letter-spacing: -0.01em
                     white-space: nowrap
               - component: div
                 config:
@@ -264,7 +266,7 @@ slots:
                         font-size: 11px
                         font-weight: '600'
                         padding: 1px 8px 1px 6px
-                        border-radius: 9px
+                        border-radius: 6px
                         white-space: nowrap
                         width: fit-content
                         color: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
@@ -326,7 +328,7 @@ slots:
                         font-size: 11px
                         font-weight: '600'
                         padding: 2px 8px
-                        border-radius: 9px
+                        border-radius: 6px
                         white-space: nowrap
                         width: fit-content
                         color: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',

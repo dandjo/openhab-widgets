@@ -31,15 +31,42 @@ props:
     description: value=label pairs, comma-separated, for the band of states
     type: TEXT
     required: false
+  - name: item2
+    label: Second item
+    description: A second item, shown beside the first and as a second line
+    type: TEXT
+    required: false
+    context: item
+  - name: name
+    label: Name
+    description: 'The first item''s name beside a second item; empty: the title'
+    type: TEXT
+    required: false
+  - name: name2
+    label: Second name
+    description: The second item's name
+    type: TEXT
+    required: false
+  - name: color2
+    label: Second colour
+    description: 'Colour of the second item''s value and line as #rrggbb'
+    type: TEXT
+    required: false
+    default: '#78909c'
   parameterGroups: []
-timestamp: Oct 5, 2026, 2:14:59 AM
+timestamp: Oct 8, 2026, 3:48:44 AM
 component: div
 config:
   style:
     padding: 8px 6px
-  stylesheet: '.menu-item-dropdown:not(.menu-item-dropdown-opened) .menu-dropdown { display: none; }
-
-    .oh-chart-container > .menu.padding { padding-top: 6px !important; }'
+  stylesheet: ".card { border-radius: 14px; box-shadow: 0 0 0 1px color-mix(in srgb, var(--f7-text-color) 8%, transparent);\
+    \ }\n.card-header { justify-content: flex-start; min-height: 0; font-size: 13px; font-weight: 600;\n  padding: 16px 16px\
+    \ 4px; opacity: 0.6; letter-spacing: 0.02em; }\n.card-header::after { display: none !important; }\n.oh-chart-container\
+    \ > .menu .menu-item { background: color-mix(in srgb, var(--f7-text-color) 8%, transparent);\n  color: inherit; border-radius:\
+    \ 6px; min-width: 32px; }\n.oh-chart-container > .menu .menu-item + .menu-item { margin-left: 6px; }\n.segmented-strong\
+    \ { border-radius: 10px; background: color-mix(in srgb, var(--f7-text-color) 8%, transparent); }\n.segmented-strong .button,\
+    \ .segmented-strong .segmented-highlight { border-radius: 8px !important; }\n.menu-item-dropdown:not(.menu-item-dropdown-opened)\
+    \ .menu-dropdown { display: none; }\n.oh-chart-container > .menu.padding { padding-top: 6px !important; }"
 slots:
   default:
   - component: oh-card
@@ -54,17 +81,80 @@ slots:
           text: '=(([''NULL'', ''UNDEF''].includes(items[props.item].state) ? ''–'' : (items[props.item].displayState || items[props.item].state))
             || ''–'')'
           style:
-            font-size: 30px
+            font-size: '=screen.width < 600 ? ''26px'' : ''28px'''
             font-weight: '700'
-            line-height: 36px
+            line-height: '=screen.width < 600 ? ''32px'' : ''34px'''
+            letter-spacing: -0.01em
             overflow-wrap: anywhere
             padding: 4px 16px 18px
+          visible: =!props.item2
+      - component: div
+        config:
+          style:
+            display: flex
+            justify-content: space-between
+            align-items: flex-end
+            gap: 12px
+            padding: 4px 16px 18px
+          visible: =!!props.item2
+        slots:
+          default:
+          - component: div
+            config:
+              style:
+                min-width: '0'
+            slots:
+              default:
+              - component: Label
+                config:
+                  text: ='' + (props.name || props.title) + ''
+                  style:
+                    font-size: 11px
+                    opacity: '0.65'
+                    text-align: left
+              - component: Label
+                config:
+                  text: '=(([''NULL'', ''UNDEF''].includes(items[props.item].state) ? ''–'' : (items[props.item].displayState
+                    || items[props.item].state)) || ''–'')'
+                  style:
+                    font-size: '=screen.width < 600 ? ''26px'' : ''28px'''
+                    font-weight: '700'
+                    line-height: '=screen.width < 600 ? ''32px'' : ''34px'''
+                    letter-spacing: -0.01em
+                    color: =props.color
+                    white-space: nowrap
+                    text-align: left
+          - component: div
+            config:
+              style:
+                min-width: '0'
+            slots:
+              default:
+              - component: Label
+                config:
+                  text: =props.name2
+                  style:
+                    font-size: 11px
+                    opacity: '0.65'
+                    text-align: right
+              - component: Label
+                config:
+                  text: '=(([''NULL'', ''UNDEF''].includes(items[props.item2].state) ? ''–'' : (items[props.item2].displayState
+                    || items[props.item2].state)) || ''–'')'
+                  style:
+                    font-size: '=screen.width < 600 ? ''26px'' : ''28px'''
+                    font-weight: '700'
+                    line-height: '=screen.width < 600 ? ''32px'' : ''34px'''
+                    letter-spacing: -0.01em
+                    color: =props.color2
+                    white-space: nowrap
+                    text-align: right
   - component: oh-card
     config:
       title: History
       style:
         height: calc(100% - 2 * var(--f7-card-margin-vertical))
-      visible: =!props.kind || props.kind === 'number'
+      visible: =!props.item2 && (!props.kind || props.kind === 'number')
     slots:
       content:
       - component: oh-chart
@@ -141,6 +231,108 @@ slots:
               confine: true
               trigger: axis
               smartFormatter: true
+  - component: oh-card
+    config:
+      title: History
+      style:
+        height: calc(100% - 2 * var(--f7-card-margin-vertical))
+      visible: =!!props.item2
+    slots:
+      content:
+      - component: oh-chart
+        config:
+          chartType: ''
+          periodVisible: true
+          period: D
+          height: 260px
+          options:
+            backgroundColor: transparent
+            axisPointer:
+              link:
+              - xAxisIndex: all
+        slots:
+          grid:
+          - component: oh-chart-grid
+            config:
+              top: '62'
+              bottom: '60'
+              left: '50'
+              right: '20'
+          xAxis:
+          - component: oh-time-axis
+            config:
+              gridIndex: 0
+              axisPointer:
+                snap: false
+                label:
+                  show: false
+          - component: oh-time-axis
+            config:
+              gridIndex: 0
+              show: false
+              axisPointer:
+                snap: false
+                label:
+                  show: false
+          yAxis:
+          - component: oh-value-axis
+            config:
+              gridIndex: 0
+              name: ''
+              nameGap: 14
+              nameTextStyle:
+                align: right
+                padding:
+                - 0
+                - 8
+                - 0
+                - 0
+              splitLine:
+                lineStyle:
+                  type: dashed
+                  opacity: 0.4
+          series:
+          - component: oh-time-series
+            config:
+              name: ='' + (props.name || props.title) + ''
+              gridIndex: 0
+              xAxisIndex: 0
+              yAxisIndex: 0
+              type: line
+              item: =props.item
+              symbol: none
+              lineStyle:
+                width: 2
+                color: =props.color
+              itemStyle:
+                color: =props.color
+          - component: oh-time-series
+            config:
+              name: =props.name2
+              gridIndex: 0
+              xAxisIndex: 1
+              yAxisIndex: 0
+              type: line
+              item: =props.item2
+              symbol: none
+              lineStyle:
+                width: 2
+                color: =props.color2
+              itemStyle:
+                color: =props.color2
+          tooltip:
+          - component: oh-chart-tooltip
+            config:
+              show: true
+              confine: true
+              trigger: axis
+              smartFormatter: true
+          legend:
+          - component: oh-chart-legend
+            config:
+              show: true
+              bottom: '0'
+              type: scroll
   - component: oh-card
     config:
       title: History

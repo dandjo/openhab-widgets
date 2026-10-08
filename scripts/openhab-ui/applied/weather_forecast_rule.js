@@ -27,11 +27,18 @@
 //                  pp: probability of precipitation % (best match) or null, w: maximum wind km/h,
 //                  wd: the day's dominant wind direction °, s: sunshine h,
 //                  sp: sunshine in % of the daylight, the most the sun could shine}, ...]
+// For the weather page's day popups, every hour and every quarter of an hour of the five days from today's midnight:
+// weather_hourly_days: [[the seven fields of weather_hourly, probability of precipitation % (best match) or null,
+//                        minutes of sunshine in the hour], ...]
+// weather_quarter_hours: [[epoch seconds, temperature °C, precipitation of the quarter before in mm, wind km/h,
+//                          wind direction °], ...]; AROME has its own quarter hours for about two and a half days,
+//                          the best match's later ones are interpolated from its hours by Open-Meteo
 const BASE = 'https://api.open-meteo.com/v1/forecast?latitude=48.21&longitude=16.37&timezone=Europe%2FVienna'
   + '&forecast_days=5&timeformat=unixtime'
   + '&current=weather_code,is_day,precipitation,cloud_cover_low,cloud_cover_mid,cloud_cover_high'
   + '&hourly=temperature_2m,precipitation,wind_speed_10m,wind_direction_10m,weather_code,is_day'
-  + ',cloud_cover_low,cloud_cover_mid,cloud_cover_high';
+  + ',cloud_cover_low,cloud_cover_mid,cloud_cover_high,precipitation_probability,sunshine_duration'
+  + '&minutely_15=temperature_2m,precipitation,wind_speed_10m,wind_direction_10m';
 const DAILY = '&daily=weather_code,temperature_2m_min,temperature_2m_max,precipitation_sum,wind_speed_10m_max'
   + ',wind_direction_10m_dominant,sunshine_duration,daylight_duration';
 const HOURS = 61;
@@ -212,17 +219,47 @@ if (current) {
   items.weather_is_day.postUpdate(current.is_day ? 'ON' : 'OFF');
 }
 
+// the times of a part (hourly, minutely_15) that either model gives, sorted
+function timesOf(part) {
+  const all = new Set();
+  models.forEach((model) => ((model && model[part] && model[part].time) || []).forEach((t) => all.add(t)));
+  return [...all].sort((a, b) => a - b);
+}
+
+// an hour's row: the seven fields of weather_hourly, then the probability of precipitation and the minutes of sunshine;
+// null without a temperature
+function hourRow(t) {
+  const temp = value(models, 'hourly', 'temperature_2m', t);
+  if (temp == null) {
+    return null;
+  }
+  const [symbol, isDay] = hourSky(models, t);
+  const sunshine = value(models, 'hourly', 'sunshine_duration', t);
+  return [t, round(temp, 1), round(value(models, 'hourly', 'precipitation', t), 1),
+          round(value(models, 'hourly', 'wind_speed_10m', t), 0),
+          round(value(models, 'hourly', 'wind_direction_10m', t), 0), symbol, isDay,
+          value([best], 'hourly', 'precipitation_probability', t), sunshine == null ? null : Math.round(sunshine / 60)];
+}
+
+// a quarter hour's row, null without a temperature
+function quarterRow(t) {
+  const temp = value(models, 'minutely_15', 'temperature_2m', t);
+  return temp == null ? null : [t, round(temp, 1), round(value(models, 'minutely_15', 'precipitation', t), 2),
+                                round(value(models, 'minutely_15', 'wind_speed_10m', t), 0),
+                                round(value(models, 'minutely_15', 'wind_direction_10m', t), 0)];
+}
+
 if (arome || best) {
+  // the days from today's midnight, as the answer gives it
+  const times = ((best && best.daily) || arome.daily).time.slice(0, DAYS);
+  const today = times[0];
+
   const hour = Math.floor(Date.now() / 3600000) * 3600;
   const fresh = [];
   for (let k = 0; k < HOURS; k++) {
-    const t = hour + k * 3600;
-    const temp = value(models, 'hourly', 'temperature_2m', t);
-    if (temp != null) {
-      const [symbol, isDay] = hourSky(models, t);
-      fresh.push([t, round(temp, 1), round(value(models, 'hourly', 'precipitation', t), 1),
-                  round(value(models, 'hourly', 'wind_speed_10m', t), 0),
-                  round(value(models, 'hourly', 'wind_direction_10m', t), 0), symbol, isDay]);
+    const row = hourRow(hour + k * 3600);
+    if (row) {
+      fresh.push(row.slice(0, 7));
     }
   }
   const hourly = merged(fresh, last('weather_hourly'), (h) => h[0], hour, HOURS);
@@ -230,9 +267,18 @@ if (arome || best) {
     items.weather_hourly.postUpdate(JSON.stringify(hourly));
   }
 
-  // the days from today's midnight, as the answer gives it
-  const times = ((best && best.daily) || arome.daily).time.slice(0, DAYS);
-  const today = times[0];
+  // every hour and quarter hour of the five days; a day of 25 hours when the clocks go back
+  const days = merged(timesOf('hourly').filter((t) => t >= today).map(hourRow).filter((r) => r),
+                      last('weather_hourly_days'), (h) => h[0], today, DAYS * 25);
+  if (days.length) {
+    items.weather_hourly_days.postUpdate(JSON.stringify(days));
+  }
+  const quarters = merged(timesOf('minutely_15').filter((t) => t >= today).map(quarterRow).filter((r) => r),
+                          last('weather_quarter_hours'), (q) => q[0], today, DAYS * 100);
+  if (quarters.length) {
+    items.weather_quarter_hours.postUpdate(JSON.stringify(quarters));
+  }
+
   const daily = merged(times.map((t) => day(arome, best, t)).filter((d) => d), last('weather_daily'), (d) => d.t,
                        today, DAYS);
   if (daily.length) {

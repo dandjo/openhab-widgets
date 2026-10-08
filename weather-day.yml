@@ -1,0 +1,542 @@
+uid: weather-day
+tags:
+- controls
+props:
+  parameters:
+  - name: weatherQuarterHours
+    label: Weather Quarter Hours of the Five Days
+    description: String item
+    type: TEXT
+    required: true
+    context: item
+  - name: weatherHourlyDays
+    label: Weather Hours of the Five Days
+    description: String item
+    type: TEXT
+    required: true
+    context: item
+  parameterGroups: []
+timestamp: Oct 8, 2026, 3:48:44 AM
+component: div
+config:
+  style:
+    --day-popup: wide
+  label: Weather
+  stylesheet: ":root .popup:has(> .oh-popup[style*=\"--day-popup\"]) { --f7-popup-tablet-width: min(760px, calc(100vw - 64px));\
+    \ --f7-popup-tablet-height: calc(100vh - 64px); }\n.card { border-radius: 14px; box-shadow: 0 0 0 1px color-mix(in srgb,\
+    \ var(--f7-text-color) 8%, transparent); }\n.card-header { justify-content: flex-start; min-height: 0; font-size: 13px;\
+    \ font-weight: 600;\n  padding: 16px 16px 4px; opacity: 0.6; letter-spacing: 0.02em; }\n.card-header::after { display:\
+    \ none !important; }\n.oh-chart-container > .menu .menu-item { background: color-mix(in srgb, var(--f7-text-color) 8%,\
+    \ transparent);\n  color: inherit; border-radius: 6px; min-width: 32px; }\n.oh-chart-container > .menu .menu-item + .menu-item\
+    \ { margin-left: 6px; }\n.segmented-strong { border-radius: 10px; background: color-mix(in srgb, var(--f7-text-color)\
+    \ 8%, transparent); }\n.segmented-strong .button, .segmented-strong .segmented-highlight { border-radius: 8px !important;\
+    \ }\n.menu-item-dropdown:not(.menu-item-dropdown-opened) .menu-dropdown { display: none; }\n.oh-chart-container > .menu.padding\
+    \ { padding-top: 6px !important; }"
+slots:
+  default:
+  - component: oh-card
+    config:
+      title: Quarter hours
+      style:
+        height: calc(100% - 2 * var(--f7-card-margin-vertical))
+    slots:
+      content:
+      - component: div
+        config:
+          style:
+            padding: 0 4px 6px
+        slots:
+          default:
+          - component: oh-chart
+            config:
+              chartType: day
+              periodVisible: false
+              period: D
+              height: 480px
+              future: =Math.round((Number(props.date) * 1000 - dayjs().startOf('day').valueOf()) / 86400000)
+              options:
+                backgroundColor: transparent
+                axisPointer:
+                  link:
+                  - xAxisIndex: all
+            slots:
+              grid:
+              - component: oh-chart-grid
+                config:
+                  top: '35'
+                  height: '140'
+                  left: '45'
+                  right: '20'
+              - component: oh-chart-grid
+                config:
+                  top: '230'
+                  height: '60'
+                  left: '45'
+                  right: '20'
+              - component: oh-chart-grid
+                config:
+                  top: '345'
+                  bottom: '60'
+                  left: '45'
+                  right: '20'
+              xAxis:
+              - component: oh-time-axis
+                config:
+                  gridIndex: 0
+                  axisLabel:
+                    show: false
+              - component: oh-time-axis
+                config:
+                  gridIndex: 1
+                  axisLabel:
+                    show: false
+              - component: oh-time-axis
+                config:
+                  gridIndex: 2
+                  axisLabel:
+                    formatter: '=(v) => dayjs(v).minute() === 0 && dayjs(v).hour() % 6 === 0 ? dayjs(v).format(''HH:mm'')
+                      : '''''
+              yAxis:
+              - component: oh-value-axis
+                config:
+                  gridIndex: 0
+                  name: °C
+                  nameGap: 14
+                  nameTextStyle:
+                    align: right
+                    padding:
+                    - 0
+                    - 8
+                    - 0
+                    - 0
+                  splitLine:
+                    lineStyle:
+                      type: dashed
+                      opacity: 0.4
+                  scale: true
+                  minInterval: 1
+                  max: =(v) => Math.ceil(v.max + Math.max(1, (v.max - v.min) * 0.25))
+                  axisLabel:
+                    showMaxLabel: false
+              - component: oh-value-axis
+                config:
+                  gridIndex: 1
+                  name: mm
+                  nameGap: 10
+                  nameTextStyle:
+                    align: right
+                    padding:
+                    - 0
+                    - 8
+                    - 0
+                    - 0
+                  min: 0
+                  max: =(v) => Math.max(0.5, Math.ceil(v.max * 2) / 2)
+                  splitNumber: 2
+                  splitLine:
+                    lineStyle:
+                      type: dashed
+                      opacity: 0.4
+              - component: oh-value-axis
+                config:
+                  gridIndex: 2
+                  name: km/h
+                  nameGap: 10
+                  nameTextStyle:
+                    align: right
+                    padding:
+                    - 0
+                    - 8
+                    - 0
+                    - 0
+                  min: 0
+                  max: =(v) => Math.max(20, Math.ceil(v.max / 20) * 20)
+                  splitNumber: 2
+                  splitLine:
+                    lineStyle:
+                      type: dashed
+                      opacity: 0.4
+              series:
+              - component: oh-data-series
+                config:
+                  id: oh-data-series#1#°C
+                  name: Temperature
+                  xAxisIndex: 0
+                  yAxisIndex: 0
+                  data: '=(('''' + items[props.weatherQuarterHours].state).startsWith(''['') ? JSON.parse(items[props.weatherQuarterHours].state)
+                    : []).filter((r) => r[0] >= Number(props.date) && r[0] < dayjs(Number(props.date) * 1000).add(1, ''day'').unix()).map((r)
+                    => [r[0] * 1000, r[1]])'
+                  itemStyle:
+                    color: '#f4511e'
+                  type: line
+                  smooth: 0.5
+                  symbol: none
+                  lineStyle:
+                    width: 2.5
+                    color: '#f4511e'
+                  markLine:
+                    symbol:
+                    - none
+                    - none
+                    silent: true
+                    label:
+                      show: false
+                    lineStyle:
+                      color: '#888'
+                      type: dashed
+                      opacity: 0.6
+                    data:
+                    - xAxis: =dayjs().valueOf()
+                  markPoint:
+                    symbolSize: '=screen.width < 600 ? 20 : 24'
+                    symbolOffset: '=screen.width < 600 ? [0, -10] : [0, -12]'
+                    silent: true
+                    label:
+                      show: false
+                    data: '=((S) => (('''' + items[props.weatherHourlyDays].state).startsWith(''['') ? JSON.parse(items[props.weatherHourlyDays].state)
+                      : []).filter((r) => r[0] >= Number(props.date) && r[0] < dayjs(Number(props.date) * 1000).add(1, ''day'').unix()).map((r,
+                      i, a) => r[1] != null && S[r[5]] && dayjs(r[0] * 1000).hour() % (screen.width < 600 ? 3 : 2) === 0 ?
+                      ({coord: [r[0] * 1000, a.slice(Math.max(0, i - 2), i + 3).reduce((m, x) => (x[1] == null ? m : Math.max(m,
+                      x[1])), r[1])], symbol: (r[6] === 0 && S[r[5] + ''_night'']) || S[r[5]]}) : null).filter((p) => p))({clear:
+                      ''image://data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OCA0OCIgd2lkdGg9IjQ4IiBoZWlnaHQ9IjQ4Ij48Zz48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgyNCAyNCkgc2NhbGUoMSkgdHJhbnNsYXRlKC0yNCAtMjQpIj48Zz48bGluZSB4MT0iMzQuNSIgeTE9IjI0LjAiIHgyPSIzOC41IiB5Mj0iMjQuMCIgc3Ryb2tlPSIjZmZiMzAwIiBzdHJva2Utd2lkdGg9IjIuMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBmaWxsPSJub25lIj48L2xpbmU+PGxpbmUgeDE9IjMxLjQyIiB5MT0iMzEuNDIiIHgyPSIzNC4yNSIgeTI9IjM0LjI1IiBzdHJva2U9IiNmZmIzMDAiIHN0cm9rZS13aWR0aD0iMi4yIiBzdHJva2UtbGluZWNhcD0icm91bmQiIGZpbGw9Im5vbmUiPjwvbGluZT48bGluZSB4MT0iMjQuMCIgeTE9IjM0LjUiIHgyPSIyNC4wIiB5Mj0iMzguNSIgc3Ryb2tlPSIjZmZiMzAwIiBzdHJva2Utd2lkdGg9IjIuMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBmaWxsPSJub25lIj48L2xpbmU+PGxpbmUgeDE9IjE2LjU4IiB5MT0iMzEuNDIiIHgyPSIxMy43NSIgeTI9IjM0LjI1IiBzdHJva2U9IiNmZmIzMDAiIHN0cm9rZS13aWR0aD0iMi4yIiBzdHJva2UtbGluZWNhcD0icm91bmQiIGZpbGw9Im5vbmUiPjwvbGluZT48bGluZSB4MT0iMTMuNSIgeTE9IjI0LjAiIHgyPSI5LjUiIHkyPSIyNC4wIiBzdHJva2U9IiNmZmIzMDAiIHN0cm9rZS13aWR0aD0iMi4yIiBzdHJva2UtbGluZWNhcD0icm91bmQiIGZpbGw9Im5vbmUiPjwvbGluZT48bGluZSB4MT0iMTYuNTgiIHkxPSIxNi41OCIgeDI9IjEzLjc1IiB5Mj0iMTMuNzUiIHN0cm9rZT0iI2ZmYjMwMCIgc3Ryb2tlLXdpZHRoPSIyLjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgZmlsbD0ibm9uZSI+PC9saW5lPjxsaW5lIHgxPSIyNC4wIiB5MT0iMTMuNSIgeDI9IjI0LjAiIHkyPSI5LjUiIHN0cm9rZT0iI2ZmYjMwMCIgc3Ryb2tlLXdpZHRoPSIyLjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgZmlsbD0ibm9uZSI+PC9saW5lPjxsaW5lIHgxPSIzMS40MiIgeTE9IjE2LjU4IiB4Mj0iMzQuMjUiIHkyPSIxMy43NSIgc3Ryb2tlPSIjZmZiMzAwIiBzdHJva2Utd2lkdGg9IjIuMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBmaWxsPSJub25lIj48L2xpbmU+PC9nPjxjaXJjbGUgY3g9IjI0IiBjeT0iMjQiIHI9IjciIGZpbGw9IiNmZmIzMDAiPjwvY2lyY2xlPjwvZz48L2c+PC9zdmc+'',
+                      fair: ''image://data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OCA0OCIgd2lkdGg9IjQ4IiBoZWlnaHQ9IjQ4Ij48Zz48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgyMSAyMSkgc2NhbGUoMC44NSkgdHJhbnNsYXRlKC0yNCAtMjQpIj48Zz48bGluZSB4MT0iMzQuNSIgeTE9IjI0LjAiIHgyPSIzOC41IiB5Mj0iMjQuMCIgc3Ryb2tlPSIjZmZiMzAwIiBzdHJva2Utd2lkdGg9IjIuMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBmaWxsPSJub25lIj48L2xpbmU+PGxpbmUgeDE9IjMxLjQyIiB5MT0iMzEuNDIiIHgyPSIzNC4yNSIgeTI9IjM0LjI1IiBzdHJva2U9IiNmZmIzMDAiIHN0cm9rZS13aWR0aD0iMi4yIiBzdHJva2UtbGluZWNhcD0icm91bmQiIGZpbGw9Im5vbmUiPjwvbGluZT48bGluZSB4MT0iMjQuMCIgeTE9IjM0LjUiIHgyPSIyNC4wIiB5Mj0iMzguNSIgc3Ryb2tlPSIjZmZiMzAwIiBzdHJva2Utd2lkdGg9IjIuMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBmaWxsPSJub25lIj48L2xpbmU+PGxpbmUgeDE9IjE2LjU4IiB5MT0iMzEuNDIiIHgyPSIxMy43NSIgeTI9IjM0LjI1IiBzdHJva2U9IiNmZmIzMDAiIHN0cm9rZS13aWR0aD0iMi4yIiBzdHJva2UtbGluZWNhcD0icm91bmQiIGZpbGw9Im5vbmUiPjwvbGluZT48bGluZSB4MT0iMTMuNSIgeTE9IjI0LjAiIHgyPSI5LjUiIHkyPSIyNC4wIiBzdHJva2U9IiNmZmIzMDAiIHN0cm9rZS13aWR0aD0iMi4yIiBzdHJva2UtbGluZWNhcD0icm91bmQiIGZpbGw9Im5vbmUiPjwvbGluZT48bGluZSB4MT0iMTYuNTgiIHkxPSIxNi41OCIgeDI9IjEzLjc1IiB5Mj0iMTMuNzUiIHN0cm9rZT0iI2ZmYjMwMCIgc3Ryb2tlLXdpZHRoPSIyLjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgZmlsbD0ibm9uZSI+PC9saW5lPjxsaW5lIHgxPSIyNC4wIiB5MT0iMTMuNSIgeDI9IjI0LjAiIHkyPSI5LjUiIHN0cm9rZT0iI2ZmYjMwMCIgc3Ryb2tlLXdpZHRoPSIyLjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgZmlsbD0ibm9uZSI+PC9saW5lPjxsaW5lIHgxPSIzMS40MiIgeTE9IjE2LjU4IiB4Mj0iMzQuMjUiIHkyPSIxMy43NSIgc3Ryb2tlPSIjZmZiMzAwIiBzdHJva2Utd2lkdGg9IjIuMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBmaWxsPSJub25lIj48L2xpbmU+PC9nPjxjaXJjbGUgY3g9IjI0IiBjeT0iMjQiIHI9IjciIGZpbGw9IiNmZmIzMDAiPjwvY2lyY2xlPjwvZz48L2c+PGc+PHBhdGggZD0iTTE0LDM4IEgzNCBBNiw2IDAgMCwwIDM1LjUsMjYuMiBBOSw5IDAgMCwwIDE4LjYsMjQuNCBBNyw3IDAgMCwwIDE0LDM4IFoiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDM0IDM3KSBzY2FsZSgwLjU1KSB0cmFuc2xhdGUoLTI3IC0zMSkiIHN0cm9rZT0iIzkwYTRhZSIgc3Ryb2tlLXdpZHRoPSIxLjYiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgZmlsbD0iI2NmZDhkYyIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PC9wYXRoPjwvZz48L3N2Zz4='',
+                      partly: ''image://data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OCA0OCIgd2lkdGg9IjQ4IiBoZWlnaHQ9IjQ4Ij48Zz48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxNyAxNykgc2NhbGUoMC43MikgdHJhbnNsYXRlKC0yNCAtMjQpIj48Zz48bGluZSB4MT0iMzQuNSIgeTE9IjI0LjAiIHgyPSIzOC41IiB5Mj0iMjQuMCIgc3Ryb2tlPSIjZmZiMzAwIiBzdHJva2Utd2lkdGg9IjIuMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBmaWxsPSJub25lIj48L2xpbmU+PGxpbmUgeDE9IjMxLjQyIiB5MT0iMzEuNDIiIHgyPSIzNC4yNSIgeTI9IjM0LjI1IiBzdHJva2U9IiNmZmIzMDAiIHN0cm9rZS13aWR0aD0iMi4yIiBzdHJva2UtbGluZWNhcD0icm91bmQiIGZpbGw9Im5vbmUiPjwvbGluZT48bGluZSB4MT0iMjQuMCIgeTE9IjM0LjUiIHgyPSIyNC4wIiB5Mj0iMzguNSIgc3Ryb2tlPSIjZmZiMzAwIiBzdHJva2Utd2lkdGg9IjIuMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBmaWxsPSJub25lIj48L2xpbmU+PGxpbmUgeDE9IjE2LjU4IiB5MT0iMzEuNDIiIHgyPSIxMy43NSIgeTI9IjM0LjI1IiBzdHJva2U9IiNmZmIzMDAiIHN0cm9rZS13aWR0aD0iMi4yIiBzdHJva2UtbGluZWNhcD0icm91bmQiIGZpbGw9Im5vbmUiPjwvbGluZT48bGluZSB4MT0iMTMuNSIgeTE9IjI0LjAiIHgyPSI5LjUiIHkyPSIyNC4wIiBzdHJva2U9IiNmZmIzMDAiIHN0cm9rZS13aWR0aD0iMi4yIiBzdHJva2UtbGluZWNhcD0icm91bmQiIGZpbGw9Im5vbmUiPjwvbGluZT48bGluZSB4MT0iMTYuNTgiIHkxPSIxNi41OCIgeDI9IjEzLjc1IiB5Mj0iMTMuNzUiIHN0cm9rZT0iI2ZmYjMwMCIgc3Ryb2tlLXdpZHRoPSIyLjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgZmlsbD0ibm9uZSI+PC9saW5lPjxsaW5lIHgxPSIyNC4wIiB5MT0iMTMuNSIgeDI9IjI0LjAiIHkyPSI5LjUiIHN0cm9rZT0iI2ZmYjMwMCIgc3Ryb2tlLXdpZHRoPSIyLjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgZmlsbD0ibm9uZSI+PC9saW5lPjxsaW5lIHgxPSIzMS40MiIgeTE9IjE2LjU4IiB4Mj0iMzQuMjUiIHkyPSIxMy43NSIgc3Ryb2tlPSIjZmZiMzAwIiBzdHJva2Utd2lkdGg9IjIuMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBmaWxsPSJub25lIj48L2xpbmU+PC9nPjxjaXJjbGUgY3g9IjI0IiBjeT0iMjQiIHI9IjciIGZpbGw9IiNmZmIzMDAiPjwvY2lyY2xlPjwvZz48L2c+PGc+PHBhdGggZD0iTTE0LDM4IEgzNCBBNiw2IDAgMCwwIDM1LjUsMjYuMiBBOSw5IDAgMCwwIDE4LjYsMjQuNCBBNyw3IDAgMCwwIDE0LDM4IFoiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDI3IDM0KSBzY2FsZSgwLjkpIHRyYW5zbGF0ZSgtMjcgLTMxKSIgc3Ryb2tlPSIjOTBhNGFlIiBzdHJva2Utd2lkdGg9IjEuNiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBmaWxsPSIjY2ZkOGRjIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48L3BhdGg+PC9nPjwvc3ZnPg=='',
+                      mostly: ''image://data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OCA0OCIgd2lkdGg9IjQ4IiBoZWlnaHQ9IjQ4Ij48Zz48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxNCAxMykgc2NhbGUoMC41OCkgdHJhbnNsYXRlKC0yNCAtMjQpIj48Zz48bGluZSB4MT0iMzQuNSIgeTE9IjI0LjAiIHgyPSIzOC41IiB5Mj0iMjQuMCIgc3Ryb2tlPSIjZmZiMzAwIiBzdHJva2Utd2lkdGg9IjIuMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBmaWxsPSJub25lIj48L2xpbmU+PGxpbmUgeDE9IjMxLjQyIiB5MT0iMzEuNDIiIHgyPSIzNC4yNSIgeTI9IjM0LjI1IiBzdHJva2U9IiNmZmIzMDAiIHN0cm9rZS13aWR0aD0iMi4yIiBzdHJva2UtbGluZWNhcD0icm91bmQiIGZpbGw9Im5vbmUiPjwvbGluZT48bGluZSB4MT0iMjQuMCIgeTE9IjM0LjUiIHgyPSIyNC4wIiB5Mj0iMzguNSIgc3Ryb2tlPSIjZmZiMzAwIiBzdHJva2Utd2lkdGg9IjIuMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBmaWxsPSJub25lIj48L2xpbmU+PGxpbmUgeDE9IjE2LjU4IiB5MT0iMzEuNDIiIHgyPSIxMy43NSIgeTI9IjM0LjI1IiBzdHJva2U9IiNmZmIzMDAiIHN0cm9rZS13aWR0aD0iMi4yIiBzdHJva2UtbGluZWNhcD0icm91bmQiIGZpbGw9Im5vbmUiPjwvbGluZT48bGluZSB4MT0iMTMuNSIgeTE9IjI0LjAiIHgyPSI5LjUiIHkyPSIyNC4wIiBzdHJva2U9IiNmZmIzMDAiIHN0cm9rZS13aWR0aD0iMi4yIiBzdHJva2UtbGluZWNhcD0icm91bmQiIGZpbGw9Im5vbmUiPjwvbGluZT48bGluZSB4MT0iMTYuNTgiIHkxPSIxNi41OCIgeDI9IjEzLjc1IiB5Mj0iMTMuNzUiIHN0cm9rZT0iI2ZmYjMwMCIgc3Ryb2tlLXdpZHRoPSIyLjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgZmlsbD0ibm9uZSI+PC9saW5lPjxsaW5lIHgxPSIyNC4wIiB5MT0iMTMuNSIgeDI9IjI0LjAiIHkyPSI5LjUiIHN0cm9rZT0iI2ZmYjMwMCIgc3Ryb2tlLXdpZHRoPSIyLjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgZmlsbD0ibm9uZSI+PC9saW5lPjxsaW5lIHgxPSIzMS40MiIgeTE9IjE2LjU4IiB4Mj0iMzQuMjUiIHkyPSIxMy43NSIgc3Ryb2tlPSIjZmZiMzAwIiBzdHJva2Utd2lkdGg9IjIuMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBmaWxsPSJub25lIj48L2xpbmU+PC9nPjxjaXJjbGUgY3g9IjI0IiBjeT0iMjQiIHI9IjciIGZpbGw9IiNmZmIzMDAiPjwvY2lyY2xlPjwvZz48L2c+PGc+PHBhdGggZD0iTTE0LDM4IEgzNCBBNiw2IDAgMCwwIDM1LjUsMjYuMiBBOSw5IDAgMCwwIDE4LjYsMjQuNCBBNyw3IDAgMCwwIDE0LDM4IFoiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDMzIDI2KSBzY2FsZSgwLjcyKSB0cmFuc2xhdGUoLTI3IC0zMSkiIHN0cm9rZT0iIzc4OTA5YyIgc3Ryb2tlLXdpZHRoPSIxLjYiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgZmlsbD0iI2IwYmVjNSIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PC9wYXRoPjxwYXRoIGQ9Ik0xNCwzOCBIMzQgQTYsNiAwIDAsMCAzNS41LDI2LjIgQTksOSAwIDAsMCAxOC42LDI0LjQgQTcsNyAwIDAsMCAxNCwzOCBaIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgyNCAzNSkgc2NhbGUoMC45NSkgdHJhbnNsYXRlKC0yNyAtMzEpIiBzdHJva2U9IiM5MGE0YWUiIHN0cm9rZS13aWR0aD0iMS42IiBzdHJva2UtbGluZWNhcD0icm91bmQiIGZpbGw9IiNjZmQ4ZGMiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjwvcGF0aD48L2c+PC9zdmc+'',
+                      overcast: ''image://data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OCA0OCIgd2lkdGg9IjQ4IiBoZWlnaHQ9IjQ4Ij48Zz48cGF0aCBkPSJNMTQsMzggSDM0IEE2LDYgMCAwLDAgMzUuNSwyNi4yIEE5LDkgMCAwLDAgMTguNiwyNC40IEE3LDcgMCAwLDAgMTQsMzggWiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMzIgMjUpIHNjYWxlKDAuNzgpIHRyYW5zbGF0ZSgtMjcgLTMxKSIgc3Ryb2tlPSIjNzg5MDljIiBzdHJva2Utd2lkdGg9IjEuNiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBmaWxsPSIjYjBiZWM1IiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48L3BhdGg+PHBhdGggZD0iTTE0LDM4IEgzNCBBNiw2IDAgMCwwIDM1LjUsMjYuMiBBOSw5IDAgMCwwIDE4LjYsMjQuNCBBNyw3IDAgMCwwIDE0LDM4IFoiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDIyIDM1KSBzY2FsZSgwLjk1KSB0cmFuc2xhdGUoLTI3IC0zMSkiIHN0cm9rZT0iIzkwYTRhZSIgc3Ryb2tlLXdpZHRoPSIxLjYiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgZmlsbD0iI2NmZDhkYyIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PC9wYXRoPjwvZz48L3N2Zz4='',
+                      veil: ''image://data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OCA0OCIgd2lkdGg9IjQ4IiBoZWlnaHQ9IjQ4Ij48Zz48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgyNCAyMSkgc2NhbGUoMC45NSkgdHJhbnNsYXRlKC0yNCAtMjQpIj48Zz48bGluZSB4MT0iMzQuNSIgeTE9IjI0LjAiIHgyPSIzOC41IiB5Mj0iMjQuMCIgc3Ryb2tlPSIjZmZiMzAwIiBzdHJva2Utd2lkdGg9IjIuMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBmaWxsPSJub25lIj48L2xpbmU+PGxpbmUgeDE9IjMxLjQyIiB5MT0iMzEuNDIiIHgyPSIzNC4yNSIgeTI9IjM0LjI1IiBzdHJva2U9IiNmZmIzMDAiIHN0cm9rZS13aWR0aD0iMi4yIiBzdHJva2UtbGluZWNhcD0icm91bmQiIGZpbGw9Im5vbmUiPjwvbGluZT48bGluZSB4MT0iMjQuMCIgeTE9IjM0LjUiIHgyPSIyNC4wIiB5Mj0iMzguNSIgc3Ryb2tlPSIjZmZiMzAwIiBzdHJva2Utd2lkdGg9IjIuMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBmaWxsPSJub25lIj48L2xpbmU+PGxpbmUgeDE9IjE2LjU4IiB5MT0iMzEuNDIiIHgyPSIxMy43NSIgeTI9IjM0LjI1IiBzdHJva2U9IiNmZmIzMDAiIHN0cm9rZS13aWR0aD0iMi4yIiBzdHJva2UtbGluZWNhcD0icm91bmQiIGZpbGw9Im5vbmUiPjwvbGluZT48bGluZSB4MT0iMTMuNSIgeTE9IjI0LjAiIHgyPSI5LjUiIHkyPSIyNC4wIiBzdHJva2U9IiNmZmIzMDAiIHN0cm9rZS13aWR0aD0iMi4yIiBzdHJva2UtbGluZWNhcD0icm91bmQiIGZpbGw9Im5vbmUiPjwvbGluZT48bGluZSB4MT0iMTYuNTgiIHkxPSIxNi41OCIgeDI9IjEzLjc1IiB5Mj0iMTMuNzUiIHN0cm9rZT0iI2ZmYjMwMCIgc3Ryb2tlLXdpZHRoPSIyLjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgZmlsbD0ibm9uZSI+PC9saW5lPjxsaW5lIHgxPSIyNC4wIiB5MT0iMTMuNSIgeDI9IjI0LjAiIHkyPSI5LjUiIHN0cm9rZT0iI2ZmYjMwMCIgc3Ryb2tlLXdpZHRoPSIyLjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgZmlsbD0ibm9uZSI+PC9saW5lPjxsaW5lIHgxPSIzMS40MiIgeTE9IjE2LjU4IiB4Mj0iMzQuMjUiIHkyPSIxMy43NSIgc3Ryb2tlPSIjZmZiMzAwIiBzdHJva2Utd2lkdGg9IjIuMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBmaWxsPSJub25lIj48L2xpbmU+PC9nPjxjaXJjbGUgY3g9IjI0IiBjeT0iMjQiIHI9IjciIGZpbGw9IiNmZmIzMDAiPjwvY2lyY2xlPjwvZz48L2c+PGc+PGxpbmUgeDE9IjgiIHkxPSIyNyIgeDI9IjMwIiB5Mj0iMjciIG9wYWNpdHk9IjAuOTUiIHN0cm9rZT0iI2IwYmVjNSIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIGZpbGw9Im5vbmUiPjwvbGluZT48bGluZSB4MT0iMTYiIHkxPSIzMiIgeDI9IjQwIiB5Mj0iMzIiIG9wYWNpdHk9IjAuOTUiIHN0cm9rZT0iI2IwYmVjNSIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIGZpbGw9Im5vbmUiPjwvbGluZT48bGluZSB4MT0iMTAiIHkxPSIzNyIgeDI9IjMyIiB5Mj0iMzciIG9wYWNpdHk9IjAuOTUiIHN0cm9rZT0iI2IwYmVjNSIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIGZpbGw9Im5vbmUiPjwvbGluZT48L2c+PC9zdmc+'',
+                      fog: ''image://data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OCA0OCIgd2lkdGg9IjQ4IiBoZWlnaHQ9IjQ4Ij48Zz48cGF0aCBkPSJNMTQsMzggSDM0IEE2LDYgMCAwLDAgMzUuNSwyNi4yIEE5LDkgMCAwLDAgMTguNiwyNC40IEE3LDcgMCAwLDAgMTQsMzggWiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjQgMjMpIHNjYWxlKDAuOSkgdHJhbnNsYXRlKC0yNCAtMzEpIiBzdHJva2U9IiM5MGE0YWUiIHN0cm9rZS13aWR0aD0iMS42IiBzdHJva2UtbGluZWNhcD0icm91bmQiIGZpbGw9IiNjZmQ4ZGMiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjwvcGF0aD48bGluZSB4MT0iMTIiIHkxPSIzNyIgeDI9IjM2IiB5Mj0iMzciIHN0cm9rZT0iIzkwYTRhZSIgc3Ryb2tlLXdpZHRoPSIyLjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgZmlsbD0ibm9uZSI+PC9saW5lPjxsaW5lIHgxPSIxNSIgeTE9IjQyIiB4Mj0iMzMiIHkyPSI0MiIgc3Ryb2tlPSIjOTBhNGFlIiBzdHJva2Utd2lkdGg9IjIuMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBmaWxsPSJub25lIj48L2xpbmU+PC9nPjwvc3ZnPg=='',
+                      rain: ''image://data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OCA0OCIgd2lkdGg9IjQ4IiBoZWlnaHQ9IjQ4Ij48Zz48cGF0aCBkPSJNMTQsMzggSDM0IEE2LDYgMCAwLDAgMzUuNSwyNi4yIEE5LDkgMCAwLDAgMTguNiwyNC40IEE3LDcgMCAwLDAgMTQsMzggWiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjcgMjUpIHNjYWxlKDEuMCkgdHJhbnNsYXRlKC0yNyAtMzEpIiBzdHJva2U9IiM5MGE0YWUiIHN0cm9rZS13aWR0aD0iMS42IiBzdHJva2UtbGluZWNhcD0icm91bmQiIGZpbGw9IiNjZmQ4ZGMiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjwvcGF0aD48bGluZSB4MT0iMTgiIHkxPSIzNiIgeDI9IjE2IiB5Mj0iNDIiIHN0cm9rZT0iIzQyYTVmNSIgc3Ryb2tlLXdpZHRoPSIyLjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgZmlsbD0ibm9uZSIgc3Ryb2tlLWRhc2hhcnJheT0iMyAzIj48L2xpbmU+PGxpbmUgeDE9IjI1IiB5MT0iMzYiIHgyPSIyMyIgeTI9IjQyIiBzdHJva2U9IiM0MmE1ZjUiIHN0cm9rZS13aWR0aD0iMi4yIiBzdHJva2UtbGluZWNhcD0icm91bmQiIGZpbGw9Im5vbmUiIHN0cm9rZS1kYXNoYXJyYXk9IjMgMyI+PC9saW5lPjxsaW5lIHgxPSIzMiIgeTE9IjM2IiB4Mj0iMzAiIHkyPSI0MiIgc3Ryb2tlPSIjNDJhNWY1IiBzdHJva2Utd2lkdGg9IjIuMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBmaWxsPSJub25lIiBzdHJva2UtZGFzaGFycmF5PSIzIDMiPjwvbGluZT48L2c+PC9zdmc+'',
+                      snow: ''image://data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OCA0OCIgd2lkdGg9IjQ4IiBoZWlnaHQ9IjQ4Ij48Zz48cGF0aCBkPSJNMTQsMzggSDM0IEE2LDYgMCAwLDAgMzUuNSwyNi4yIEE5LDkgMCAwLDAgMTguNiwyNC40IEE3LDcgMCAwLDAgMTQsMzggWiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjcgMjUpIHNjYWxlKDEuMCkgdHJhbnNsYXRlKC0yNyAtMzEpIiBzdHJva2U9IiM5MGE0YWUiIHN0cm9rZS13aWR0aD0iMS42IiBzdHJva2UtbGluZWNhcD0icm91bmQiIGZpbGw9IiNjZmQ4ZGMiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjwvcGF0aD48Y2lyY2xlIGN4PSIxOCIgY3k9IjM4LjUiIHI9IjIuNiIgZmlsbD0iI2ZmZmZmZiIgc3Ryb2tlPSIjOTBhNGFlIiBzdHJva2Utd2lkdGg9IjEiPjwvY2lyY2xlPjxjaXJjbGUgY3g9IjI1LjUiIGN5PSI0MiIgcj0iMi42IiBmaWxsPSIjZmZmZmZmIiBzdHJva2U9IiM5MGE0YWUiIHN0cm9rZS13aWR0aD0iMSI+PC9jaXJjbGU+PGNpcmNsZSBjeD0iMzMiIGN5PSIzOC41IiByPSIyLjYiIGZpbGw9IiNmZmZmZmYiIHN0cm9rZT0iIzkwYTRhZSIgc3Ryb2tlLXdpZHRoPSIxIj48L2NpcmNsZT48L2c+PC9zdmc+'',
+                      thunder: ''image://data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OCA0OCIgd2lkdGg9IjQ4IiBoZWlnaHQ9IjQ4Ij48Zz48cGF0aCBkPSJNMTQsMzggSDM0IEE2LDYgMCAwLDAgMzUuNSwyNi4yIEE5LDkgMCAwLDAgMTguNiwyNC40IEE3LDcgMCAwLDAgMTQsMzggWiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjcgMjMpIHNjYWxlKDEuMCkgdHJhbnNsYXRlKC0yNyAtMzEpIiBzdHJva2U9IiM5MGE0YWUiIHN0cm9rZS13aWR0aD0iMS42IiBzdHJva2UtbGluZWNhcD0icm91bmQiIGZpbGw9IiNjZmQ4ZGMiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjwvcGF0aD48cG9seWdvbiBwb2ludHM9IjI2LDMxIDIwLDQwIDI0LjUsNDAgMjIsNDcgMzAsMzcgMjUuNSwzNyAyOCwzMSIgZmlsbD0iI2ZmY2EyOCIgc3Ryb2tlPSIjZjlhODI1IiBzdHJva2Utd2lkdGg9IjAuOCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PC9wb2x5Z29uPjwvZz48L3N2Zz4='',
+                      rain_sun: ''image://data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OCA0OCIgd2lkdGg9IjQ4IiBoZWlnaHQ9IjQ4Ij48Zz48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxNCAxMikgc2NhbGUoMC42KSB0cmFuc2xhdGUoLTI0IC0yNCkiPjxnPjxsaW5lIHgxPSIzNC41IiB5MT0iMjQuMCIgeDI9IjM4LjUiIHkyPSIyNC4wIiBzdHJva2U9IiNmZmIzMDAiIHN0cm9rZS13aWR0aD0iMi4yIiBzdHJva2UtbGluZWNhcD0icm91bmQiIGZpbGw9Im5vbmUiPjwvbGluZT48bGluZSB4MT0iMzEuNDIiIHkxPSIzMS40MiIgeDI9IjM0LjI1IiB5Mj0iMzQuMjUiIHN0cm9rZT0iI2ZmYjMwMCIgc3Ryb2tlLXdpZHRoPSIyLjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgZmlsbD0ibm9uZSI+PC9saW5lPjxsaW5lIHgxPSIyNC4wIiB5MT0iMzQuNSIgeDI9IjI0LjAiIHkyPSIzOC41IiBzdHJva2U9IiNmZmIzMDAiIHN0cm9rZS13aWR0aD0iMi4yIiBzdHJva2UtbGluZWNhcD0icm91bmQiIGZpbGw9Im5vbmUiPjwvbGluZT48bGluZSB4MT0iMTYuNTgiIHkxPSIzMS40MiIgeDI9IjEzLjc1IiB5Mj0iMzQuMjUiIHN0cm9rZT0iI2ZmYjMwMCIgc3Ryb2tlLXdpZHRoPSIyLjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgZmlsbD0ibm9uZSI+PC9saW5lPjxsaW5lIHgxPSIxMy41IiB5MT0iMjQuMCIgeDI9IjkuNSIgeTI9IjI0LjAiIHN0cm9rZT0iI2ZmYjMwMCIgc3Ryb2tlLXdpZHRoPSIyLjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgZmlsbD0ibm9uZSI+PC9saW5lPjxsaW5lIHgxPSIxNi41OCIgeTE9IjE2LjU4IiB4Mj0iMTMuNzUiIHkyPSIxMy43NSIgc3Ryb2tlPSIjZmZiMzAwIiBzdHJva2Utd2lkdGg9IjIuMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBmaWxsPSJub25lIj48L2xpbmU+PGxpbmUgeDE9IjI0LjAiIHkxPSIxMy41IiB4Mj0iMjQuMCIgeTI9IjkuNSIgc3Ryb2tlPSIjZmZiMzAwIiBzdHJva2Utd2lkdGg9IjIuMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBmaWxsPSJub25lIj48L2xpbmU+PGxpbmUgeDE9IjMxLjQyIiB5MT0iMTYuNTgiIHgyPSIzNC4yNSIgeTI9IjEzLjc1IiBzdHJva2U9IiNmZmIzMDAiIHN0cm9rZS13aWR0aD0iMi4yIiBzdHJva2UtbGluZWNhcD0icm91bmQiIGZpbGw9Im5vbmUiPjwvbGluZT48L2c+PGNpcmNsZSBjeD0iMjQiIGN5PSIyNCIgcj0iNyIgZmlsbD0iI2ZmYjMwMCI+PC9jaXJjbGU+PC9nPjwvZz48Zz48cGF0aCBkPSJNMTQsMzggSDM0IEE2LDYgMCAwLDAgMzUuNSwyNi4yIEE5LDkgMCAwLDAgMTguNiwyNC40IEE3LDcgMCAwLDAgMTQsMzggWiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjcgMjUpIHNjYWxlKDEuMCkgdHJhbnNsYXRlKC0yNyAtMzEpIiBzdHJva2U9IiM5MGE0YWUiIHN0cm9rZS13aWR0aD0iMS42IiBzdHJva2UtbGluZWNhcD0icm91bmQiIGZpbGw9IiNjZmQ4ZGMiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjwvcGF0aD48bGluZSB4MT0iMTgiIHkxPSIzNiIgeDI9IjE2IiB5Mj0iNDIiIHN0cm9rZT0iIzQyYTVmNSIgc3Ryb2tlLXdpZHRoPSIyLjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgZmlsbD0ibm9uZSIgc3Ryb2tlLWRhc2hhcnJheT0iMyAzIj48L2xpbmU+PGxpbmUgeDE9IjI1IiB5MT0iMzYiIHgyPSIyMyIgeTI9IjQyIiBzdHJva2U9IiM0MmE1ZjUiIHN0cm9rZS13aWR0aD0iMi4yIiBzdHJva2UtbGluZWNhcD0icm91bmQiIGZpbGw9Im5vbmUiIHN0cm9rZS1kYXNoYXJyYXk9IjMgMyI+PC9saW5lPjxsaW5lIHgxPSIzMiIgeTE9IjM2IiB4Mj0iMzAiIHkyPSI0MiIgc3Ryb2tlPSIjNDJhNWY1IiBzdHJva2Utd2lkdGg9IjIuMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBmaWxsPSJub25lIiBzdHJva2UtZGFzaGFycmF5PSIzIDMiPjwvbGluZT48L2c+PC9zdmc+'',
+                      snow_sun: ''image://data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OCA0OCIgd2lkdGg9IjQ4IiBoZWlnaHQ9IjQ4Ij48Zz48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxNCAxMikgc2NhbGUoMC42KSB0cmFuc2xhdGUoLTI0IC0yNCkiPjxnPjxsaW5lIHgxPSIzNC41IiB5MT0iMjQuMCIgeDI9IjM4LjUiIHkyPSIyNC4wIiBzdHJva2U9IiNmZmIzMDAiIHN0cm9rZS13aWR0aD0iMi4yIiBzdHJva2UtbGluZWNhcD0icm91bmQiIGZpbGw9Im5vbmUiPjwvbGluZT48bGluZSB4MT0iMzEuNDIiIHkxPSIzMS40MiIgeDI9IjM0LjI1IiB5Mj0iMzQuMjUiIHN0cm9rZT0iI2ZmYjMwMCIgc3Ryb2tlLXdpZHRoPSIyLjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgZmlsbD0ibm9uZSI+PC9saW5lPjxsaW5lIHgxPSIyNC4wIiB5MT0iMzQuNSIgeDI9IjI0LjAiIHkyPSIzOC41IiBzdHJva2U9IiNmZmIzMDAiIHN0cm9rZS13aWR0aD0iMi4yIiBzdHJva2UtbGluZWNhcD0icm91bmQiIGZpbGw9Im5vbmUiPjwvbGluZT48bGluZSB4MT0iMTYuNTgiIHkxPSIzMS40MiIgeDI9IjEzLjc1IiB5Mj0iMzQuMjUiIHN0cm9rZT0iI2ZmYjMwMCIgc3Ryb2tlLXdpZHRoPSIyLjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgZmlsbD0ibm9uZSI+PC9saW5lPjxsaW5lIHgxPSIxMy41IiB5MT0iMjQuMCIgeDI9IjkuNSIgeTI9IjI0LjAiIHN0cm9rZT0iI2ZmYjMwMCIgc3Ryb2tlLXdpZHRoPSIyLjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgZmlsbD0ibm9uZSI+PC9saW5lPjxsaW5lIHgxPSIxNi41OCIgeTE9IjE2LjU4IiB4Mj0iMTMuNzUiIHkyPSIxMy43NSIgc3Ryb2tlPSIjZmZiMzAwIiBzdHJva2Utd2lkdGg9IjIuMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBmaWxsPSJub25lIj48L2xpbmU+PGxpbmUgeDE9IjI0LjAiIHkxPSIxMy41IiB4Mj0iMjQuMCIgeTI9IjkuNSIgc3Ryb2tlPSIjZmZiMzAwIiBzdHJva2Utd2lkdGg9IjIuMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBmaWxsPSJub25lIj48L2xpbmU+PGxpbmUgeDE9IjMxLjQyIiB5MT0iMTYuNTgiIHgyPSIzNC4yNSIgeTI9IjEzLjc1IiBzdHJva2U9IiNmZmIzMDAiIHN0cm9rZS13aWR0aD0iMi4yIiBzdHJva2UtbGluZWNhcD0icm91bmQiIGZpbGw9Im5vbmUiPjwvbGluZT48L2c+PGNpcmNsZSBjeD0iMjQiIGN5PSIyNCIgcj0iNyIgZmlsbD0iI2ZmYjMwMCI+PC9jaXJjbGU+PC9nPjwvZz48Zz48cGF0aCBkPSJNMTQsMzggSDM0IEE2LDYgMCAwLDAgMzUuNSwyNi4yIEE5LDkgMCAwLDAgMTguNiwyNC40IEE3LDcgMCAwLDAgMTQsMzggWiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjcgMjUpIHNjYWxlKDEuMCkgdHJhbnNsYXRlKC0yNyAtMzEpIiBzdHJva2U9IiM5MGE0YWUiIHN0cm9rZS13aWR0aD0iMS42IiBzdHJva2UtbGluZWNhcD0icm91bmQiIGZpbGw9IiNjZmQ4ZGMiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjwvcGF0aD48Y2lyY2xlIGN4PSIxOCIgY3k9IjM4LjUiIHI9IjIuNiIgZmlsbD0iI2ZmZmZmZiIgc3Ryb2tlPSIjOTBhNGFlIiBzdHJva2Utd2lkdGg9IjEiPjwvY2lyY2xlPjxjaXJjbGUgY3g9IjI1LjUiIGN5PSI0MiIgcj0iMi42IiBmaWxsPSIjZmZmZmZmIiBzdHJva2U9IiM5MGE0YWUiIHN0cm9rZS13aWR0aD0iMSI+PC9jaXJjbGU+PGNpcmNsZSBjeD0iMzMiIGN5PSIzOC41IiByPSIyLjYiIGZpbGw9IiNmZmZmZmYiIHN0cm9rZT0iIzkwYTRhZSIgc3Ryb2tlLXdpZHRoPSIxIj48L2NpcmNsZT48L2c+PC9zdmc+'',
+                      thunder_sun: ''image://data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OCA0OCIgd2lkdGg9IjQ4IiBoZWlnaHQ9IjQ4Ij48Zz48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxNCAxMikgc2NhbGUoMC42KSB0cmFuc2xhdGUoLTI0IC0yNCkiPjxnPjxsaW5lIHgxPSIzNC41IiB5MT0iMjQuMCIgeDI9IjM4LjUiIHkyPSIyNC4wIiBzdHJva2U9IiNmZmIzMDAiIHN0cm9rZS13aWR0aD0iMi4yIiBzdHJva2UtbGluZWNhcD0icm91bmQiIGZpbGw9Im5vbmUiPjwvbGluZT48bGluZSB4MT0iMzEuNDIiIHkxPSIzMS40MiIgeDI9IjM0LjI1IiB5Mj0iMzQuMjUiIHN0cm9rZT0iI2ZmYjMwMCIgc3Ryb2tlLXdpZHRoPSIyLjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgZmlsbD0ibm9uZSI+PC9saW5lPjxsaW5lIHgxPSIyNC4wIiB5MT0iMzQuNSIgeDI9IjI0LjAiIHkyPSIzOC41IiBzdHJva2U9IiNmZmIzMDAiIHN0cm9rZS13aWR0aD0iMi4yIiBzdHJva2UtbGluZWNhcD0icm91bmQiIGZpbGw9Im5vbmUiPjwvbGluZT48bGluZSB4MT0iMTYuNTgiIHkxPSIzMS40MiIgeDI9IjEzLjc1IiB5Mj0iMzQuMjUiIHN0cm9rZT0iI2ZmYjMwMCIgc3Ryb2tlLXdpZHRoPSIyLjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgZmlsbD0ibm9uZSI+PC9saW5lPjxsaW5lIHgxPSIxMy41IiB5MT0iMjQuMCIgeDI9IjkuNSIgeTI9IjI0LjAiIHN0cm9rZT0iI2ZmYjMwMCIgc3Ryb2tlLXdpZHRoPSIyLjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgZmlsbD0ibm9uZSI+PC9saW5lPjxsaW5lIHgxPSIxNi41OCIgeTE9IjE2LjU4IiB4Mj0iMTMuNzUiIHkyPSIxMy43NSIgc3Ryb2tlPSIjZmZiMzAwIiBzdHJva2Utd2lkdGg9IjIuMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBmaWxsPSJub25lIj48L2xpbmU+PGxpbmUgeDE9IjI0LjAiIHkxPSIxMy41IiB4Mj0iMjQuMCIgeTI9IjkuNSIgc3Ryb2tlPSIjZmZiMzAwIiBzdHJva2Utd2lkdGg9IjIuMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBmaWxsPSJub25lIj48L2xpbmU+PGxpbmUgeDE9IjMxLjQyIiB5MT0iMTYuNTgiIHgyPSIzNC4yNSIgeTI9IjEzLjc1IiBzdHJva2U9IiNmZmIzMDAiIHN0cm9rZS13aWR0aD0iMi4yIiBzdHJva2UtbGluZWNhcD0icm91bmQiIGZpbGw9Im5vbmUiPjwvbGluZT48L2c+PGNpcmNsZSBjeD0iMjQiIGN5PSIyNCIgcj0iNyIgZmlsbD0iI2ZmYjMwMCI+PC9jaXJjbGU+PC9nPjwvZz48Zz48cGF0aCBkPSJNMTQsMzggSDM0IEE2LDYgMCAwLDAgMzUuNSwyNi4yIEE5LDkgMCAwLDAgMTguNiwyNC40IEE3LDcgMCAwLDAgMTQsMzggWiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjcgMjMpIHNjYWxlKDEuMCkgdHJhbnNsYXRlKC0yNyAtMzEpIiBzdHJva2U9IiM5MGE0YWUiIHN0cm9rZS13aWR0aD0iMS42IiBzdHJva2UtbGluZWNhcD0icm91bmQiIGZpbGw9IiNjZmQ4ZGMiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjwvcGF0aD48cG9seWdvbiBwb2ludHM9IjI2LDMxIDIwLDQwIDI0LjUsNDAgMjIsNDcgMzAsMzcgMjUuNSwzNyAyOCwzMSIgZmlsbD0iI2ZmY2EyOCIgc3Ryb2tlPSIjZjlhODI1IiBzdHJva2Utd2lkdGg9IjAuOCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PC9wb2x5Z29uPjwvZz48L3N2Zz4='',
+                      clear_night: ''image://data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OCA0OCIgd2lkdGg9IjQ4IiBoZWlnaHQ9IjQ4Ij48Zz48cGF0aCBkPSJNMjIuMTksMTQuMTcgQTEwLDEwIDAgMSwwIDMzLjgzLDI1LjgxIEE4LjUsOC41IDAgMSwxIDIyLjE5LDE0LjE3IFoiIGZpbGw9IiM5ZmE4ZGEiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDI0IDI0KSBzY2FsZSgxKSB0cmFuc2xhdGUoLTI0IC0yNCkiPjwvcGF0aD48L2c+PC9zdmc+'',
+                      fair_night: ''image://data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OCA0OCIgd2lkdGg9IjQ4IiBoZWlnaHQ9IjQ4Ij48Zz48cGF0aCBkPSJNMjIuMTksMTQuMTcgQTEwLDEwIDAgMSwwIDMzLjgzLDI1LjgxIEE4LjUsOC41IDAgMSwxIDIyLjE5LDE0LjE3IFoiIGZpbGw9IiM5ZmE4ZGEiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDIxIDIwKSBzY2FsZSgwLjgyKSB0cmFuc2xhdGUoLTI0IC0yNCkiPjwvcGF0aD48L2c+PGc+PHBhdGggZD0iTTE0LDM4IEgzNCBBNiw2IDAgMCwwIDM1LjUsMjYuMiBBOSw5IDAgMCwwIDE4LjYsMjQuNCBBNyw3IDAgMCwwIDE0LDM4IFoiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDM0IDM3KSBzY2FsZSgwLjU1KSB0cmFuc2xhdGUoLTI3IC0zMSkiIHN0cm9rZT0iIzkwYTRhZSIgc3Ryb2tlLXdpZHRoPSIxLjYiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgZmlsbD0iI2NmZDhkYyIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PC9wYXRoPjwvZz48L3N2Zz4='',
+                      partly_night: ''image://data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OCA0OCIgd2lkdGg9IjQ4IiBoZWlnaHQ9IjQ4Ij48Zz48cGF0aCBkPSJNMjIuMTksMTQuMTcgQTEwLDEwIDAgMSwwIDMzLjgzLDI1LjgxIEE4LjUsOC41IDAgMSwxIDIyLjE5LDE0LjE3IFoiIGZpbGw9IiM5ZmE4ZGEiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDE3IDE2KSBzY2FsZSgwLjcpIHRyYW5zbGF0ZSgtMjQgLTI0KSI+PC9wYXRoPjwvZz48Zz48cGF0aCBkPSJNMTQsMzggSDM0IEE2LDYgMCAwLDAgMzUuNSwyNi4yIEE5LDkgMCAwLDAgMTguNiwyNC40IEE3LDcgMCAwLDAgMTQsMzggWiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjcgMzQpIHNjYWxlKDAuOSkgdHJhbnNsYXRlKC0yNyAtMzEpIiBzdHJva2U9IiM5MGE0YWUiIHN0cm9rZS13aWR0aD0iMS42IiBzdHJva2UtbGluZWNhcD0icm91bmQiIGZpbGw9IiNjZmQ4ZGMiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjwvcGF0aD48L2c+PC9zdmc+'',
+                      mostly_night: ''image://data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OCA0OCIgd2lkdGg9IjQ4IiBoZWlnaHQ9IjQ4Ij48Zz48cGF0aCBkPSJNMjIuMTksMTQuMTcgQTEwLDEwIDAgMSwwIDMzLjgzLDI1LjgxIEE4LjUsOC41IDAgMSwxIDIyLjE5LDE0LjE3IFoiIGZpbGw9IiM5ZmE4ZGEiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDE0IDEyKSBzY2FsZSgwLjU1KSB0cmFuc2xhdGUoLTI0IC0yNCkiPjwvcGF0aD48L2c+PGc+PHBhdGggZD0iTTE0LDM4IEgzNCBBNiw2IDAgMCwwIDM1LjUsMjYuMiBBOSw5IDAgMCwwIDE4LjYsMjQuNCBBNyw3IDAgMCwwIDE0LDM4IFoiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDMzIDI2KSBzY2FsZSgwLjcyKSB0cmFuc2xhdGUoLTI3IC0zMSkiIHN0cm9rZT0iIzc4OTA5YyIgc3Ryb2tlLXdpZHRoPSIxLjYiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgZmlsbD0iI2IwYmVjNSIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PC9wYXRoPjxwYXRoIGQ9Ik0xNCwzOCBIMzQgQTYsNiAwIDAsMCAzNS41LDI2LjIgQTksOSAwIDAsMCAxOC42LDI0LjQgQTcsNyAwIDAsMCAxNCwzOCBaIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgyNCAzNSkgc2NhbGUoMC45NSkgdHJhbnNsYXRlKC0yNyAtMzEpIiBzdHJva2U9IiM5MGE0YWUiIHN0cm9rZS13aWR0aD0iMS42IiBzdHJva2UtbGluZWNhcD0icm91bmQiIGZpbGw9IiNjZmQ4ZGMiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjwvcGF0aD48L2c+PC9zdmc+'',
+                      veil_night: ''image://data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OCA0OCIgd2lkdGg9IjQ4IiBoZWlnaHQ9IjQ4Ij48Zz48cGF0aCBkPSJNMjIuMTksMTQuMTcgQTEwLDEwIDAgMSwwIDMzLjgzLDI1LjgxIEE4LjUsOC41IDAgMSwxIDIyLjE5LDE0LjE3IFoiIGZpbGw9IiM5ZmE4ZGEiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDI0IDIxKSBzY2FsZSgwLjk1KSB0cmFuc2xhdGUoLTI0IC0yNCkiPjwvcGF0aD48L2c+PGc+PGxpbmUgeDE9IjgiIHkxPSIyNyIgeDI9IjMwIiB5Mj0iMjciIG9wYWNpdHk9IjAuOTUiIHN0cm9rZT0iI2IwYmVjNSIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIGZpbGw9Im5vbmUiPjwvbGluZT48bGluZSB4MT0iMTYiIHkxPSIzMiIgeDI9IjQwIiB5Mj0iMzIiIG9wYWNpdHk9IjAuOTUiIHN0cm9rZT0iI2IwYmVjNSIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIGZpbGw9Im5vbmUiPjwvbGluZT48bGluZSB4MT0iMTAiIHkxPSIzNyIgeDI9IjMyIiB5Mj0iMzciIG9wYWNpdHk9IjAuOTUiIHN0cm9rZT0iI2IwYmVjNSIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIGZpbGw9Im5vbmUiPjwvbGluZT48L2c+PC9zdmc+'',
+                      rain_sun_night: ''image://data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OCA0OCIgd2lkdGg9IjQ4IiBoZWlnaHQ9IjQ4Ij48Zz48cGF0aCBkPSJNMjIuMTksMTQuMTcgQTEwLDEwIDAgMSwwIDMzLjgzLDI1LjgxIEE4LjUsOC41IDAgMSwxIDIyLjE5LDE0LjE3IFoiIGZpbGw9IiM5ZmE4ZGEiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDE0IDExKSBzY2FsZSgwLjU4KSB0cmFuc2xhdGUoLTI0IC0yNCkiPjwvcGF0aD48L2c+PGc+PHBhdGggZD0iTTE0LDM4IEgzNCBBNiw2IDAgMCwwIDM1LjUsMjYuMiBBOSw5IDAgMCwwIDE4LjYsMjQuNCBBNyw3IDAgMCwwIDE0LDM4IFoiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDI3IDI1KSBzY2FsZSgxLjApIHRyYW5zbGF0ZSgtMjcgLTMxKSIgc3Ryb2tlPSIjOTBhNGFlIiBzdHJva2Utd2lkdGg9IjEuNiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBmaWxsPSIjY2ZkOGRjIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48L3BhdGg+PGxpbmUgeDE9IjE4IiB5MT0iMzYiIHgyPSIxNiIgeTI9IjQyIiBzdHJva2U9IiM0MmE1ZjUiIHN0cm9rZS13aWR0aD0iMi4yIiBzdHJva2UtbGluZWNhcD0icm91bmQiIGZpbGw9Im5vbmUiIHN0cm9rZS1kYXNoYXJyYXk9IjMgMyI+PC9saW5lPjxsaW5lIHgxPSIyNSIgeTE9IjM2IiB4Mj0iMjMiIHkyPSI0MiIgc3Ryb2tlPSIjNDJhNWY1IiBzdHJva2Utd2lkdGg9IjIuMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBmaWxsPSJub25lIiBzdHJva2UtZGFzaGFycmF5PSIzIDMiPjwvbGluZT48bGluZSB4MT0iMzIiIHkxPSIzNiIgeDI9IjMwIiB5Mj0iNDIiIHN0cm9rZT0iIzQyYTVmNSIgc3Ryb2tlLXdpZHRoPSIyLjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgZmlsbD0ibm9uZSIgc3Ryb2tlLWRhc2hhcnJheT0iMyAzIj48L2xpbmU+PC9nPjwvc3ZnPg=='',
+                      snow_sun_night: ''image://data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OCA0OCIgd2lkdGg9IjQ4IiBoZWlnaHQ9IjQ4Ij48Zz48cGF0aCBkPSJNMjIuMTksMTQuMTcgQTEwLDEwIDAgMSwwIDMzLjgzLDI1LjgxIEE4LjUsOC41IDAgMSwxIDIyLjE5LDE0LjE3IFoiIGZpbGw9IiM5ZmE4ZGEiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDE0IDExKSBzY2FsZSgwLjU4KSB0cmFuc2xhdGUoLTI0IC0yNCkiPjwvcGF0aD48L2c+PGc+PHBhdGggZD0iTTE0LDM4IEgzNCBBNiw2IDAgMCwwIDM1LjUsMjYuMiBBOSw5IDAgMCwwIDE4LjYsMjQuNCBBNyw3IDAgMCwwIDE0LDM4IFoiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDI3IDI1KSBzY2FsZSgxLjApIHRyYW5zbGF0ZSgtMjcgLTMxKSIgc3Ryb2tlPSIjOTBhNGFlIiBzdHJva2Utd2lkdGg9IjEuNiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBmaWxsPSIjY2ZkOGRjIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48L3BhdGg+PGNpcmNsZSBjeD0iMTgiIGN5PSIzOC41IiByPSIyLjYiIGZpbGw9IiNmZmZmZmYiIHN0cm9rZT0iIzkwYTRhZSIgc3Ryb2tlLXdpZHRoPSIxIj48L2NpcmNsZT48Y2lyY2xlIGN4PSIyNS41IiBjeT0iNDIiIHI9IjIuNiIgZmlsbD0iI2ZmZmZmZiIgc3Ryb2tlPSIjOTBhNGFlIiBzdHJva2Utd2lkdGg9IjEiPjwvY2lyY2xlPjxjaXJjbGUgY3g9IjMzIiBjeT0iMzguNSIgcj0iMi42IiBmaWxsPSIjZmZmZmZmIiBzdHJva2U9IiM5MGE0YWUiIHN0cm9rZS13aWR0aD0iMSI+PC9jaXJjbGU+PC9nPjwvc3ZnPg=='',
+                      thunder_sun_night: ''image://data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OCA0OCIgd2lkdGg9IjQ4IiBoZWlnaHQ9IjQ4Ij48Zz48cGF0aCBkPSJNMjIuMTksMTQuMTcgQTEwLDEwIDAgMSwwIDMzLjgzLDI1LjgxIEE4LjUsOC41IDAgMSwxIDIyLjE5LDE0LjE3IFoiIGZpbGw9IiM5ZmE4ZGEiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDE0IDExKSBzY2FsZSgwLjU4KSB0cmFuc2xhdGUoLTI0IC0yNCkiPjwvcGF0aD48L2c+PGc+PHBhdGggZD0iTTE0LDM4IEgzNCBBNiw2IDAgMCwwIDM1LjUsMjYuMiBBOSw5IDAgMCwwIDE4LjYsMjQuNCBBNyw3IDAgMCwwIDE0LDM4IFoiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDI3IDIzKSBzY2FsZSgxLjApIHRyYW5zbGF0ZSgtMjcgLTMxKSIgc3Ryb2tlPSIjOTBhNGFlIiBzdHJva2Utd2lkdGg9IjEuNiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBmaWxsPSIjY2ZkOGRjIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48L3BhdGg+PHBvbHlnb24gcG9pbnRzPSIyNiwzMSAyMCw0MCAyNC41LDQwIDIyLDQ3IDMwLDM3IDI1LjUsMzcgMjgsMzEiIGZpbGw9IiNmZmNhMjgiIHN0cm9rZT0iI2Y5YTgyNSIgc3Ryb2tlLXdpZHRoPSIwLjgiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjwvcG9seWdvbj48L2c+PC9zdmc+''})'
+                  z: 3
+              - component: oh-data-series
+                config:
+                  id: oh-data-series#2#mm
+                  name: Precipitation
+                  xAxisIndex: 1
+                  yAxisIndex: 1
+                  data: '=(('''' + items[props.weatherQuarterHours].state).startsWith(''['') ? JSON.parse(items[props.weatherQuarterHours].state)
+                    : []).filter((r) => r[0] >= Number(props.date) && r[0] < dayjs(Number(props.date) * 1000).add(1, ''day'').unix()).map((r)
+                    => [r[0] * 1000, r[2]])'
+                  itemStyle:
+                    color: '#42a5f5'
+                  type: custom
+                  renderItem: '=(params, api) => api.value(1) > 0 ? ((w, top, base) => ({type: ''rect'', shape: {x: top[0]
+                    - w / 2, y: top[1], width: w, height: base[1] - top[1], r: [2, 2, 0, 0]}, style: {fill: ''#42a5f5''}}))(Math.min(4,
+                    api.size([900000, 0])[0] * 0.68), api.coord([api.value(0), api.value(1)]), api.coord([api.value(0), 0]))
+                    : null'
+                  encode:
+                    x: 0
+                    y: 1
+                  clip: true
+                  markLine:
+                    symbol:
+                    - none
+                    - none
+                    silent: true
+                    label:
+                      show: false
+                    lineStyle:
+                      color: '#888'
+                      type: dashed
+                      opacity: 0.6
+                    data:
+                    - xAxis: =dayjs().valueOf()
+              - component: oh-data-series
+                config:
+                  id: oh-data-series#3#km/h
+                  name: Wind
+                  xAxisIndex: 2
+                  yAxisIndex: 2
+                  data: '=(('''' + items[props.weatherQuarterHours].state).startsWith(''['') ? JSON.parse(items[props.weatherQuarterHours].state)
+                    : []).filter((r) => r[0] >= Number(props.date) && r[0] < dayjs(Number(props.date) * 1000).add(1, ''day'').unix()).map((r)
+                    => [r[0] * 1000, r[3]])'
+                  itemStyle:
+                    color: '#78909c'
+                  type: line
+                  smooth: 0.5
+                  symbol: none
+                  lineStyle:
+                    width: 2
+                    color: '#78909c'
+                  areaStyle:
+                    color:
+                      type: linear
+                      x: 0
+                      y: 0
+                      x2: 0
+                      y2: 1
+                      colorStops:
+                      - offset: 0
+                        color: rgba(120, 144, 156, 0.45)
+                      - offset: 1
+                        color: rgba(120, 144, 156, 0.02)
+                  markLine:
+                    symbol:
+                    - none
+                    - none
+                    silent: true
+                    label:
+                      show: false
+                    lineStyle:
+                      color: '#888'
+                      type: dashed
+                      opacity: 0.6
+                    data:
+                    - xAxis: =dayjs().valueOf()
+                  markPoint:
+                    symbol: path://M12,3 L18.5,19.5 L12,15.5 L5.5,19.5 Z
+                    symbolSize: 11
+                    symbolKeepAspect: true
+                    symbolOffset:
+                    - 0
+                    - -13
+                    silent: true
+                    label:
+                      show: false
+                    itemStyle:
+                      color: '=themeOptions.dark === ''dark'' ? ''#b0bec5'' : ''#546e7a'''
+                    data: '=(('''' + items[props.weatherQuarterHours].state).startsWith(''['') ? JSON.parse(items[props.weatherQuarterHours].state)
+                      : []).filter((r) => r[0] >= Number(props.date) && r[0] < dayjs(Number(props.date) * 1000).add(1, ''day'').unix()).map((r,
+                      i, a) => r[3] != null && r[4] != null && dayjs(r[0] * 1000).minute() === 0 && dayjs(r[0] * 1000).hour()
+                      % (screen.width < 600 ? 3 : 2) === 0 ? ({coord: [r[0] * 1000, a.slice(Math.max(0, i - 8), i + 9).reduce((m,
+                      x) => Math.max(m, x[3] || 0), 0)], symbolRotate: -(r[4] + 180)}) : null).filter((p) => p)'
+              tooltip:
+              - component: oh-chart-tooltip
+                config:
+                  show: true
+                  confine: true
+                  trigger: axis
+                  smartFormatter: true
+              legend:
+              - component: oh-chart-legend
+                config:
+                  show: true
+                  bottom: '0'
+                  type: scroll
+  - component: oh-card
+    config:
+      title: '=''Hours · '' + (dayjs(Number(props.date) * 1000).isSame(dayjs(), ''day'') ? ''Today'' : [''Sunday'', ''Monday'',
+        ''Tuesday'', ''Wednesday'', ''Thursday'', ''Friday'', ''Saturday''][dayjs(Number(props.date) * 1000).day()]) + '',
+        '' + dayjs(Number(props.date) * 1000).date() + ''. '' + [''January'', ''February'', ''March'', ''April'', ''May'',
+        ''June'', ''July'', ''August'', ''September'', ''October'', ''November'', ''December''][dayjs(Number(props.date) *
+        1000).month()]'
+      style:
+        height: calc(100% - 2 * var(--f7-card-margin-vertical))
+    slots:
+      content:
+      - component: div
+        config:
+          style:
+            padding-top: 2px
+            padding-bottom: 6px
+        slots:
+          default:
+          - component: oh-repeater
+            config:
+              for: hour
+              sourceType: array
+              in: '=(('''' + items[props.weatherHourlyDays].state).startsWith(''['') ? JSON.parse(items[props.weatherHourlyDays].state)
+                : []).filter((r) => r[0] >= Number(props.date) && r[0] < dayjs(Number(props.date) * 1000).add(1, ''day'').unix())'
+              fragment: true
+            slots:
+              default:
+              - component: div
+                config:
+                  style:
+                    display: grid
+                    align-items: center
+                    grid-template-columns: '=screen.width < 600 ? ''38px 28px 30px 52px 1fr auto'' : ''40px 32px 30px 58px
+                      1fr auto'''
+                    column-gap: '=screen.width < 600 ? ''5px'' : ''8px'''
+                    min-height: 40px
+                    padding: '=screen.width < 600 ? ''4px 12px'' : ''4px 16px'''
+                    border-top: 1px solid rgba(127, 127, 127, 0.15)
+                    opacity: '=loop.hour[0] < dayjs().startOf(''hour'').unix() ? ''0.55'' : ''1'''
+                    background: '=loop.hour[0] === dayjs().startOf(''hour'').unix() ? ''color-mix(in srgb, var(--f7-text-color)
+                      6%, transparent)'' : ''transparent'''
+                slots:
+                  default:
+                  - component: Label
+                    config:
+                      text: =dayjs(loop.hour[0] * 1000).format('HH:mm')
+                      style:
+                        font-size: '=screen.width < 600 ? ''12px'' : ''13px'''
+                        font-weight: '600'
+                  - component: widget:weather-icon
+                    config:
+                      symbol: =loop.hour[5]
+                      day: =loop.hour[6] !== 0
+                      size: '=screen.width < 600 ? 28 : 32'
+                  - component: Label
+                    config:
+                      text: '=loop.hour[1] == null ? ''–'' : Math.round(loop.hour[1]) + ''°'''
+                      style:
+                        font-size: 14px
+                        font-weight: '700'
+                        white-space: nowrap
+                  - component: div
+                    config:
+                      style:
+                        display: flex
+                        align-items: center
+                        gap: '=screen.width < 600 ? ''4px'' : ''5px'''
+                        font-size: '=screen.width < 600 ? ''12px'' : ''13px'''
+                        white-space: nowrap
+                        opacity: '=(loop.hour[6] === 0 || !loop.hour[8]) ? ''0.55'' : ''1'''
+                    slots:
+                      default:
+                      - component: oh-icon
+                        config:
+                          icon: material:wb_sunny
+                          width: '=screen.width < 600 ? 13 : 15'
+                          height: '=screen.width < 600 ? 13 : 15'
+                          style:
+                            color: '#ffb300'
+                            flex: 0 0 auto
+                      - component: div
+                        config:
+                          style:
+                            display: flex
+                            flex-direction: column
+                        slots:
+                          default:
+                          - component: Label
+                            config:
+                              text: '=(loop.hour[6] === 0 || loop.hour[8] == null ? ''–'' : loop.hour[8] + '' min'')'
+                              style:
+                                line-height: 16px
+                          - component: Label
+                            config:
+                              text: =''
+                              style:
+                                font-size: 11px
+                                opacity: '0.65'
+                                line-height: 13px
+                              visible: =false
+                  - component: div
+                    config:
+                      style:
+                        display: flex
+                        align-items: center
+                        gap: '=screen.width < 600 ? ''4px'' : ''5px'''
+                        font-size: '=screen.width < 600 ? ''12px'' : ''13px'''
+                        white-space: nowrap
+                        opacity: '=(loop.hour[2] || 0) < 0.05 ? ''0.55'' : ''1'''
+                    slots:
+                      default:
+                      - component: oh-icon
+                        config:
+                          icon: material:water_drop
+                          width: '=screen.width < 600 ? 13 : 15'
+                          height: '=screen.width < 600 ? 13 : 15'
+                          style:
+                            color: '#42a5f5'
+                            flex: 0 0 auto
+                      - component: div
+                        config:
+                          style:
+                            display: flex
+                            flex-direction: column
+                        slots:
+                          default:
+                          - component: Label
+                            config:
+                              text: '=(loop.hour[2] == null ? ''–'' : loop.hour[2] < 0.05 ? ''0 mm'' : (loop.hour[2]).toFixed(1)
+                                + '' mm'')'
+                              style:
+                                line-height: 16px
+                          - component: Label
+                            config:
+                              text: =loop.hour[7] + ' %'
+                              style:
+                                font-size: 11px
+                                opacity: '0.65'
+                                line-height: 13px
+                              visible: =loop.hour[7] != null
+                  - component: div
+                    config:
+                      style:
+                        display: flex
+                        align-items: center
+                        gap: '=screen.width < 600 ? ''4px'' : ''5px'''
+                        font-size: '=screen.width < 600 ? ''12px'' : ''13px'''
+                        white-space: nowrap
+                        justify-content: flex-end
+                    slots:
+                      default:
+                      - component: svg
+                        config:
+                          viewBox: 0 0 24 24
+                          width: '=screen.width < 600 ? 13 : 15'
+                          height: '=screen.width < 600 ? 13 : 15'
+                          style:
+                            display: block
+                            flex: 0 0 auto
+                          visible: =loop.hour[4] != null
+                        slots:
+                          default:
+                          - component: path
+                            config:
+                              d: M12,3 L18.5,19.5 L12,15.5 L5.5,19.5 Z
+                              fill: '=themeOptions.dark === ''dark'' ? ''#b0bec5'' : ''#546e7a'''
+                              transform: ='rotate(' + (loop.hour[4] + 180) + ' 12 12)'
+                      - component: oh-icon
+                        config:
+                          icon: material:air
+                          width: '=screen.width < 600 ? 13 : 15'
+                          height: '=screen.width < 600 ? 13 : 15'
+                          visible: =loop.hour[4] == null
+                          style:
+                            color: '#78909c'
+                            flex: 0 0 auto
+                      - component: div
+                        config:
+                          style:
+                            display: flex
+                            flex-direction: column
+                        slots:
+                          default:
+                          - component: Label
+                            config:
+                              text: '=(loop.hour[3] == null ? ''–'' : loop.hour[3]) + '' km/h'''
+                              style:
+                                line-height: 16px
+                          - component: Label
+                            config:
+                              text: =['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW',
+                                'NW', 'NNW'][Math.round(loop.hour[4] / 22.5) % 16]
+                              style:
+                                font-size: 11px
+                                opacity: '0.65'
+                                line-height: 13px
+                              visible: =loop.hour[4] != null
+      - component: Label
+        config:
+          text: No hours for this day yet.
+          style:
+            font-size: 13px
+            opacity: '0.7'
+            padding: 4px 16px 14px
+          visible: '=(('''' + items[props.weatherHourlyDays].state).startsWith(''['') ? JSON.parse(items[props.weatherHourlyDays].state)
+            : []).filter((r) => r[0] >= Number(props.date) && r[0] < dayjs(Number(props.date) * 1000).add(1, ''day'').unix()).length
+            === 0'
+  - component: Label
+    config:
+      text: Quarter hours from GeoSphere AROME Austria for about two and a half days, then from Open-Meteo's best match, interpolated
+        from its hours; the probability of precipitation from the best match.
+      style:
+        font-size: 12px
+        opacity: '0.6'
+        padding: 0 16px 10px

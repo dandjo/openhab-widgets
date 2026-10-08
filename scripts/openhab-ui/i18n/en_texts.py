@@ -13,6 +13,13 @@ EN = {
     "Wäsche & Geschirr": "Laundry & Dishes", "Terrasse & Fahrräder": "Terrace & Bicycles", "Terrasse": "Terrace",
     "Büros": "Offices", "Kaffee": "Coffee", "Verbraucher": "Consumers", "Sollwerte": "Setpoints", "Modi": "Modes",
     "Verlauf": "History", "Vorhersage": "Forecast", "Warnungen": "Warnings", "Weitere Quellen": "More sources",
+    # the weather page's day popup
+    "Stunden": "Hours", "Verlauf in Viertelstunden": "Quarter hours",
+    "Für diesen Tag liegen noch keine Stunden vor.": "No hours for this day yet.",
+    "Viertelstunden von GeoSphere AROME Austria für etwa zweieinhalb Tage, danach aus dem Best Match von Open-Meteo, "
+    "aus seinen Stunden gemittelt; die Regenwahrscheinlichkeit aus dem Best Match.":
+        "Quarter hours from GeoSphere AROME Austria for about two and a half days, then from Open-Meteo's best match, "
+        "interpolated from its hours; the probability of precipitation from the best match.",
     "Alle Details": "All details", "Öffnen": "Open",
     # energy flow
     "Eigenverbrauch": "Self-consumption", "Autarkie": "Self-sufficiency", "heute": "today", "kWh heute": "kWh today",
@@ -149,6 +156,8 @@ EN = {
     "Klimaanlage Timer eingestellt": "Air Conditioning Timer Set", "Lüftung Timer eingestellt": "Ventilation Timer Set",
     "Waschmaschine 2 läuft seit": "Washing Machine 2 Running Since", "Wetter": "Weather",
     "Wetter Stundenprognose": "Weather Hourly Forecast", "Wetter Tag": "Weather Day",
+    "Wetter Stunden der fünf Tage": "Weather Hours of the Five Days",
+    "Wetter Viertelstunden der fünf Tage": "Weather Quarter Hours of the Five Days",
     "Wetter Tagesprognose": "Weather Daily Forecast", "Wetter aktuell": "Weather Current",
     "Wetter heute Max.": "Weather Today Max.", "Wetter heute Min.": "Weather Today Min.",
     "Wetter morgen Max.": "Weather Tomorrow Max.", "Wetter morgen Min.": "Weather Tomorrow Min.",
@@ -209,6 +218,11 @@ LISTS = {
     "['N', 'NNO', 'NO', 'ONO', 'O', 'OSO', 'SO', 'SSO', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW']":
         "['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW']",
     "['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa']": "['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']",
+    "['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag']":
+        "['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']",
+    "['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', "
+    "'Dezember']": "['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', "
+    "'October', 'November', 'December']",
     "['M', 'D', 'M', 'D', 'F', 'S', 'S']": "['M', 'T', 'W', 'T', 'F', 'S', 'S']",
     "['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez']":
         "['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']",

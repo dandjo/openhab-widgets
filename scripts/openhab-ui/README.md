@@ -19,11 +19,12 @@ on its own:
   outdoor unit is a `flow-node` too;
 - the appliances: `appliance-tile` and `appliance-icon`, which the Miele machines' pages show too;
 - the weather: `weather-icon`, the weather drawn from a WMO code, in the weather bar and in the weather page's days;
+  `weather-day`, the popup a day of the weather page's forecast opens: its hours and its quarter hours;
 - the heat pump card's compact popups (`QUICK_PANELS`): one `heatpump-*-quick`, `upper-floor-quick` or
   `ground-floor-quick` per tile, node and figure of its drawing;
 - four parametrised plug cards used by every metered device page (`plug-card`, `plug-power-card`,
   `plug-energy-days-card`, `plug-electric-card`), `item-popup`, the popup every tile of the device pages opens, and
-  `value-tile`, the tile itself: title and value over a large pale icon. On the device pages, in the energy
+  `value-tile`, the tile itself: its title over its value. On the device pages, in the energy
   flow's popups and in the plug widgets `value_grid()` swaps a tile for the form that fits its value
   (`VALUE_RENDER`: comparisons with yesterday, courses, ratings in words, setpoint bars, rings, donuts,
   flow bands, phase pictures, rollers and more); the history these read comes from the rule
@@ -43,8 +44,6 @@ GitHub repository `dandjo/openhab-widgets`.
 A dry run encodes both files and checks them, without writing:
 
     sudo python3 dashboard.py update
-
-It also names the value tiles for which no rule of `TILE_ICONS` found an icon; they carry the neutral default.
 
 To apply, with openHAB stopped:
 

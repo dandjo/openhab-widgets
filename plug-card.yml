@@ -124,7 +124,7 @@ props:
     required: false
     context: item
   parameterGroups: []
-timestamp: Oct 7, 2026, 3:15:18 PM
+timestamp: Oct 8, 2026, 3:48:44 AM
 component: oh-card
 config:
   title: =props.title
@@ -319,9 +319,10 @@ slots:
               text: '=([''NULL'', ''UNDEF''].includes(items[props.prefix + ''_power''].state) ? ''–'' : (items[props.prefix
                 + ''_power''].displayState || items[props.prefix + ''_power''].state))'
               style:
-                font-size: 30px
+                font-size: '=screen.width < 600 ? ''26px'' : ''28px'''
                 font-weight: '700'
-                line-height: 34px
+                line-height: '=screen.width < 600 ? ''32px'' : ''34px'''
+                letter-spacing: -0.01em
                 white-space: nowrap
           - component: Label
             config:
@@ -329,7 +330,7 @@ slots:
               style:
                 background: '=items[(props.switch || props.prefix + ''_switch'')].state === ''ON'' ? props.color : ''#9e9e9e'''
                 color: '#ffffff'
-                border-radius: 10px
+                border-radius: 6px
                 padding: 2px 10px
                 font-size: 12px
                 font-weight: '600'
@@ -363,7 +364,7 @@ slots:
             min-width: '0'
             border-radius: 12px
             padding: 10px 12px
-            background: rgba(127, 127, 127, 0.08)
+            background: color-mix(in srgb, var(--f7-text-color) 6%, transparent)
             overflow: hidden
         slots:
           default:
@@ -395,7 +396,6 @@ slots:
                     font-weight: '700'
                     line-height: '1.3'
                     white-space: nowrap
-                    color: '#ffa726'
               - component: Label
                 config:
                   text: '=(Math.abs((((Number(items[props.prefix + ''_energy_today''].numericState) || 0) * 1) - (Number(((h)
@@ -415,7 +415,7 @@ slots:
                     font-size: 11px
                     font-weight: '600'
                     padding: 2px 8px
-                    border-radius: 9px
+                    border-radius: 6px
                     white-space: nowrap
                     width: fit-content
                     color: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
@@ -666,7 +666,7 @@ slots:
             min-width: '0'
             border-radius: 12px
             padding: 10px 12px
-            background: rgba(127, 127, 127, 0.08)
+            background: color-mix(in srgb, var(--f7-text-color) 6%, transparent)
             overflow: hidden
         slots:
           default:
@@ -824,7 +824,7 @@ slots:
             min-width: '0'
             border-radius: 12px
             padding: 10px 12px
-            background: rgba(127, 127, 127, 0.08)
+            background: color-mix(in srgb, var(--f7-text-color) 6%, transparent)
             overflow: hidden
             grid-column: 1 / -1
           visible: =Number(props.range) > 0
@@ -855,7 +855,7 @@ slots:
                     font-size: 11px
                     font-weight: '600'
                     padding: 2px 8px
-                    border-radius: 9px
+                    border-radius: 6px
                     white-space: nowrap
                     width: fit-content
                     color: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
@@ -879,7 +879,6 @@ slots:
                 font-weight: '700'
                 line-height: '1.3'
                 white-space: nowrap
-                color: '#26a69a'
           - component: svg
             config:
               viewBox: 0 0 300 58
