@@ -1221,7 +1221,10 @@ Needs `weather-icon`.
 
 Four cards for a metered plug, built from one item prefix: `<prefix>_power`, `_switch`, `_energy_today`,
 `_energy_total`, `_voltage`, `_current`, `_power_factor`, `_apparent_power` and `_reactive_power`, as a Tasmota plug
-provides them. On a device page they stand two by two. `plug-card` also covers devices that are not plugs: give it
+provides them. On a device page they stand two by two: the plug card beside the electrical card, titled after the
+meter (`Electrical · Nous Plug`, `Electrical · Shelly EM`), and the power over the day beside the energy per day; where
+the plug card is far taller (a car with `range` and a note), the two stand one above the other, and the power over the
+day takes the height beside them. `plug-card` also covers devices that are not plugs: give it
 the device's `title`, hide the switch with `controllable: false`, or take the switch from another item with `switch`.
 
 The comparisons with yesterday and the last 7 days come from one String item, `history`, which the rule in
@@ -1272,7 +1275,7 @@ Energy per day of the month.
 
 ### `plug-electric-card`
 
-Voltage in its band of 230 V ± 10 %, current against the socket's 16 A, active, reactive and apparent power as a triangle with the power factor rated. Needs `item-popup`.
+Voltage in its band of 230 V ± 10 %, current against the socket's 16 A, active, reactive and apparent power as a triangle with the power factor rated; the triangle's tile takes the height a taller card beside it leaves, the triangle in its middle, and keeps its size without load. Needs `item-popup`.
 
 | Prop | Description | Type | Default |
 |---|---|---|---|

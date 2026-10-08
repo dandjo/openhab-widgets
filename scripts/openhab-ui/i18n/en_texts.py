@@ -71,6 +71,7 @@ EN = {
     "Wärme Warmwasser": "Heat hot water", "Elektrisch Heizung": "Electrical heating",
     "Elektrisch Warmwasser": "Electrical hot water", "Elektrisch Standby": "Electrical standby",
     "Elektrisch heute": "Electrical today", "Elektrisch · Shelly EM": "Electrical · Shelly EM",
+    "Elektrisch · Nous Steckdose": "Electrical · Nous Plug",
     "Heizbetrieb": "Space heating", "Heizbetrieb heute": "Space heating today", "Heizkreis heute": "Heating circuit today",
     "Außengerät heute": "Outdoor unit today", "Außengerät Betrieb": "Outdoor unit operation",
     "Innengerät heute": "Indoor unit today", "Innengerät Betrieb": "Indoor unit operation",

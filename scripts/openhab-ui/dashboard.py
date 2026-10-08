@@ -5387,10 +5387,19 @@ def plug_days_card(prefix, color):
 
 
 def plug_electric_card(prefix, title="Elektrisch"):
-    return card(title, [value_grid([
+    """Voltage and current, under them the power triangle, whose tile takes the height a taller plug card beside the
+    card leaves (user, 2026-10-08: the two side by side without empty space); on a phone the card keeps its own."""
+    grid_ = value_grid([
         vtile("Spannung", f"{prefix}_voltage"), vtile("Stromstärke", f"{prefix}_current"),
         vtile("Leistungsfaktor", f"{prefix}_power_factor"), vtile("Scheinleistung", f"{prefix}_apparent_power"),
-        vtile("Blindleistung", f"{prefix}_reactive_power")])])
+        vtile("Blindleistung", f"{prefix}_reactive_power")])
+    *values, triangle = grid_["slots"]["default"]
+    assert len(values) == 2, "the electrical card expects voltage, current and the power triangle"
+    grid_["slots"]["default"] = values
+    grid_["config"]["style"]["padding-bottom"] = "10px"  # the grid's gap to the triangle below it
+    triangle["config"]["style"]["flex"] = "1 1 auto"
+    rest = div([triangle], **{"flex": "1 1 auto", "display": "flex", "flex-direction": "column", "padding": "0 16px 16px"})
+    return card(title, [grid_, rest], fill=True)
 
 
 # ---------------------------------------------------------------- 9b. value tiles of the device pages
@@ -6843,15 +6852,22 @@ def triangle_tile(title, prefix):
                        f"='S ' + {fixed(S, 0)} + ' VA'", 11, anchor="end", opacity="0.8")]
     lo, hi, segs = VT_SCALES["power_factor"]
     word, _ = rating_parts(f"Math.abs({pf})", lo, hi, segs)
-    drawing = svg("svg", kids, viewBox="0 0 280 94", style={"display": "block", "width": "100%", "height": "auto",
-                                                           "max-width": "380px", "margin": "4px auto 0"},
-                  visible=f"={loaded}")
+    # without load the drawing's place stays, "keine Last" in its middle, so the electrical card keeps its height
+    # beside the plug card whether the device draws or not (user, 2026-10-08: the two side by side)
+    drawing = div([svg("svg", kids, viewBox="0 0 280 94", style={"display": "block", "width": "100%", "height": "auto"},
+                       visible=f"={loaded}"),
+                   label("keine Last", visible=f"=!{loaded}",
+                         **{**VT_SUB, "position": "absolute", "inset": "0", "display": "flex",
+                            "align-items": "center", "justify-content": "center"})],
+                  **{"position": "relative", "width": "100%", "max-width": "380px", "aspect-ratio": "280 / 94"})
     # without load cos φ is 0 and no rating applies: the head keeps its title only (2026-10-07)
     head = div([label(f"='cos φ ' + {fixed(f'Math.abs({pf})', 2)}", **{"font-size": "13px", "font-weight": "700"}),
                 word], f"={loaded}", **{"display": "flex", "align-items": "center", "gap": "8px"})
+    # where the tile is given more height than it needs (plug_electric_card()), the drawing stands in its middle
     return vt_tile([vt_head(title, head),
-                 drawing, label("keine Last", visible=f"=!{loaded}", **{**VT_SUB, "margin": "12px 0"})],
-                f"{prefix}_power_factor", title, wide=True)
+                    div([drawing], **{"flex": "1 1 auto", "display": "flex", "align-items": "center",
+                                      "justify-content": "center", "padding-top": "4px"})],
+                   f"{prefix}_power_factor", title, wide=True, **{"display": "flex", "flex-direction": "column"})
 
 
 # ---------------------------------------------------------------- the grids
@@ -7302,10 +7318,11 @@ def range_tile(prefix):
 
 
 def plug_refs(prefix, icon, color, title="Nous Steckdose", controllable=True, note=None, switch=None,
-              electric_prefix=None, electric_title=None, kind=None, threshold=None, active=None, frequency=None,
+              electric_prefix=None, meter=None, kind=None, threshold=None, active=None, frequency=None,
               progress=None, range_=None):
     """The cards every metered plug gets, as widgets: now with switch, power today, energy per day, electrical.
-    A device behind a shared meter takes its switch and its electrical values from the meter's items. kind,
+    A device behind a shared meter takes its switch and its electrical values from the meter's items. meter: what
+    measures, where the title names the device instead (the E-Auto's, a Shelly EM's derived values). kind,
     threshold, active, frequency, progress: the device's drawing and when it works (plug_icon(); active, frequency
     and progress expressions, as the energy flow or the device's head has them); range_: kWh per 100 km of a car.
     Returns (now, power, energy per day, electrical)."""
@@ -7328,18 +7345,23 @@ def plug_refs(prefix, icon, color, title="Nous Steckdose", controllable=True, no
         now["switch"] = switch
     if range_:
         now["range"] = range_
-    electric = {"prefix": electric_prefix or prefix}
-    if electric_title:
-        electric["title"] = electric_title
+    # the electrical values are titled after the meter too, "Elektrisch · Nous Steckdose" (user, 2026-10-08: as the
+    # air conditioner's "Elektrisch · Shelly EM" everywhere)
+    electric = {"prefix": electric_prefix or prefix, "title": f"Elektrisch · {meter or title}"}
     return (widget_ref("plug-card", **now), widget_ref("plug-power-card", prefix=prefix, color=color),
             widget_ref("plug-energy-days-card", prefix=prefix, color=color), widget_ref("plug-electric-card", **electric))
 
 
 def plug_cards(*args, **kw):
-    """The plug's cards in their usual two rows: now beside the day's power, the energy per day beside the electrical
-    values."""
+    """The plug's cards in two rows: the plug now beside its electrical values, which belong together (user,
+    2026-10-08: side by side where that leaves little empty space, else one above the other, on a phone always so),
+    the day's power beside the energy per day. A plug card with a note or a car's range is far taller than the
+    electrical values: there the two stand one above the other, the day's power taking the height that leaves over
+    the energy per day."""
     now, power, days, electric = plug_refs(*args, **kw)
-    return [two(now, power), two(days, electric)]
+    if kw.get("note") or kw.get("range_"):
+        return [two(widget_stack(now, electric), widget_stack(power, days, grow=1))]
+    return [two(now, electric), two(power, days)]
 
 
 # from how many watts a metered device counts as working, its icon's ring pulsing (plug_icon(); 10 W otherwise),
@@ -7497,12 +7519,13 @@ def heatpump_blocks():
                                             frequency=num(P["hz"]))
     # the cards of values on top, the full charts below, the cards paired by height so none stands with much empty
     # space (user, 2026-10-06): Jetzt beside the controls over the operation, today's energies with their conversion
-    # beside the split over the plug's electrical values, temperatures beside setpoints, the plug beside the
-    # refrigerant, the modes
+    # beside the split over the refrigerant, temperatures beside setpoints, the Shelly EM beside its electrical
+    # values (user, 2026-10-08: they belong together), the modes
     return [two(stack(card("Steuerung", [controls]), card("Betrieb", [operation])), card("Jetzt", now)),
-            two(card("Energie heute", [today]), widget_stack(card("Leistung aufgeteilt", [split]), electric)),
+            two(card("Energie heute", [today]),
+                stack(card("Leistung aufgeteilt", [split]), card("Kältemittel", [refrigerant]))),
             two(card("Temperaturen", [temps]), card("Sollwerte", [setpoints])),
-            two(plug, card("Kältemittel", [refrigerant])),
+            two(plug, electric),
             one(card("Modi", [modes])),
             # few charts, every value once (user, 2026-10-07): how it ran on one time pointer beside the temperatures
             # over the refrigerant; electricity and COP by purpose per day, as columns, since a day without heating
@@ -7561,16 +7584,17 @@ def air_conditioning_blocks():
          [line("Raum", "faikout_perfera_temperature", "#fb8c00"),
           line("Außen", "faikout_perfera_outdoor_temperature", "#26a69a")], span_axis("°C")),
         ("Flüssigkeit", [line("Flüssigkeit", "faikout_perfera_liquid_temperature", "#29b6f6")], span_axis("°C"))],
-        720)  # as high as the plug card over the electrical values beside it
+        720)  # the power of the day beside it takes what its energy per day leaves of this height
     plug, power, days, electric = plug_refs("air_conditioning_unit", "material:ac_unit", AC_BLUE, title="Shelly EM",
                                             switch="air_conditioning_switch", electric_prefix="air_conditioning",
-                                            electric_title="Elektrisch · Shelly EM", kind="air-conditioner",
+                                            kind="air-conditioner",
                                             active=flowing(AC_FLOW, AC_ON))
-    # in its two-column grid without empty card space (user, 2026-10-06): the controls beside Jetzt, the day's
-    # operation beside the plug over the electrical values, the plug's power of the day beside its energy per day
+    # in its two-column grid without empty card space (user, 2026-10-06): the controls beside Jetzt, the Shelly EM
+    # beside its electrical values (user, 2026-10-08: they belong together), the day's operation beside the plug's
+    # power of the day, which takes the height left over its energy per day
     return [two(card("Steuerung", [controls]), card("Jetzt", now)),
-            two(card("Betrieb heute", [temps]), widget_stack(plug, electric)),
-            two(power, days)]
+            two(plug, electric),
+            two(card("Betrieb heute", [temps]), widget_stack(power, days, grow=1))]
 
 
 VENT_LEVELS = [("1", "Niedrig"), ("2", "Mittel"), ("3", "Hoch")]
@@ -7931,8 +7955,8 @@ DEVICE_PAGES = {
                                  ("Frequenz", "huawei_inverter_power_meter_frequency")], GRID),
     "photovoltaics": photovoltaics_blocks,
     "energy_storage": energy_storage_blocks,
-    "e_car": plug_page("e_car", "material:electric_car", ECAR_COLOR, title="E-Auto", controllable=False, range_=20,
-                       kind="e-car", threshold=ECAR_ON,
+    "e_car": plug_page("e_car", "material:electric_car", ECAR_COLOR, title="E-Auto", meter="Shelly EM",
+                       controllable=False, range_=20, kind="e-car", threshold=ECAR_ON,
                        note=ECAR_CALC + " Der Schalter spiegelt nur das Relais des Shelly EM, das mit nichts "
                                         "verbunden ist."),
     "air_conditioning": air_conditioning_blocks,
