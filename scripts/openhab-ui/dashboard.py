@@ -6390,8 +6390,9 @@ def tubs(liters_expr, per=150, n=6):
                                                   "max-width": "360px", "margin-top": "8px"})
 
 
-def counter_tile(title, item, ints, decs, unit, factor=1, sub=None, size=24, wide=False):
-    """A meter's reading on rollers, black for the whole, red for the fraction."""
+def counter_tile(title, item, ints, decs, unit, factor=1, sub=None, size=24, wide=False, below=()):
+    """A meter's reading on rollers, black for the whole, red for the fraction (none with decs 0); below: parts
+    under the rollers."""
     v = f"({num(item)} * {factor})"
     whole = f"('0000000000' + Math.floor({v})).slice(-{ints})"
     frac = f"({v} - Math.floor({v})).toFixed({decs}).slice(2)"
@@ -6403,17 +6404,45 @@ def counter_tile(title, item, ints, decs, unit, factor=1, sub=None, size=24, wid
                               "border-radius": "3px", "background": bg, "color": "#ffffff", "font-weight": "700",
                               "font-size": f"{size}px", "font-variant-numeric": "tabular-nums"})
     rollers = [roller(f"={whole}.charAt({k})", False) for k in range(ints)]
-    rollers.append(div([], **{"width": "3px"}))
-    rollers += [roller(f"={frac}.charAt({k})", True) for k in range(decs)]
+    if decs:
+        rollers.append(div([], **{"width": "3px"}))
+        rollers += [roller(f"={frac}.charAt({k})", True) for k in range(decs)]
     meter = div([div(rollers, **{"display": "inline-flex", "gap": "3px", "padding": "5px", "background": "#0b0b0c",
                                  "border-radius": "8px", "border": "1px solid rgba(127, 127, 127, 0.35)"}),
                  label(unit, **{"font-size": "13px", "opacity": "0.7"})],
                 **{"display": "flex", "align-items": "center", "gap": "8px", "margin-top": "8px", "flex-wrap": "wrap"})
-    kids = [vt_title(title), meter]
+    kids = [vt_title(title), meter, *below]
     if sub:
         kids.append(label(sub, **{**VT_SUB, "margin-top": "6px"}))
     # wider than a column of about 200 px: the whole row
     return vt_tile(kids, item, title, wide=wide or (ints + decs) * (w + 3) + 16 > 200)
+
+
+def meter_dials(value, decs):
+    """A meter's fraction as its red pointers, one dial per decimal (0,1 to 0,0001 m³ on the water meter, left to
+    right): white faces numbered 0 to 9 clockwise from the top, each pointer turned to its place of the reading as
+    the gearing turns it, so it stands between two numbers (user, 2026-10-08: as on the meter picture)."""
+    step, r, cy = 50, 20, 34
+    parts = []
+    for k in range(1, decs + 1):
+        cx = step * (k - 1) + step // 2
+        place = f"((({value} * {10 ** k}) % 10 + 10) % 10)"
+        numbers = [svg("text", x=round(cx + 13 * math.sin(math.radians(36 * d)), 2),
+                       y=round(cy - 13 * math.cos(math.radians(36 * d)) + 2.4, 2), content=str(d), fill="#263238",
+                       **{"font-size": 6.6, "font-weight": "700", "text-anchor": "middle"}) for d in range(10)]
+        ticks = [svg("line", x1=round(cx + 17.6 * math.sin(a), 2), y1=round(cy - 17.6 * math.cos(a), 2),
+                     x2=round(cx + 19.4 * math.sin(a), 2), y2=round(cy - 19.4 * math.cos(a), 2),
+                     **stroke(0.9, "#263238")) for a in (math.radians(36 * d) for d in range(10))]
+        pointer = svg("path", d=f"M{cx - 3.4},{cy} L{cx},{cy - 18} L{cx + 3.4},{cy} L{cx},{cy + 4.5} Z",
+                      fill="#e53935", **{"fill-opacity": "0.9",
+                                         "transform": f"='rotate(' + ({place} * 36).toFixed(1) + ' {cx} {cy})'"})
+        parts += [svg_text(cx, 8, f"×0,{'0' * (k - 1)}1", 8.5, opacity="0.65"),
+                  svg("circle", cx=cx, cy=cy, r=r, fill="#fafafa", stroke="rgba(127, 127, 127, 0.45)",
+                      **{"stroke-width": 1.2}),
+                  *ticks, *numbers, pointer, svg("circle", cx=cx, cy=cy, r=2, fill="#263238")]
+    return svg("svg", parts, viewBox=f"0 0 {step * decs} {cy + r + 1}",
+               style={"display": "block", "width": "100%", "height": "auto", "max-width": f"{step * decs * 1.3:g}px",
+                      "margin-top": "10px"})
 
 
 def counters_tile(title, a, b, a_name, b_name, ints, decs, unit, sub):
@@ -7084,9 +7113,6 @@ def pump_tile(title, item):
                 value_expr=f"={dash(disp(item))}", sub=f"='Signal ' + {dash(disp('espaltherma_water_pump_signal'))}")
 
 
-WATER_RATE_L = f"({num('water_meter_rate')} * 1000)"
-
-
 def water_today(title, item):
     liters = f"({num('water_meter_value_day')} * 1000)"
     return compare_tile("Verbrauch heute", "water_meter_value_day", "#42a5f5", factor=1000, digits=0, unit="l",
@@ -7254,8 +7280,9 @@ VALUE_RENDER = {
     "ventilation_energy_today": vt_r(lambda t, i: compare_tile("Energie heute", i, VENT_TEAL)),
     # water meter
     "water_meter_value": vt_r(lambda t, i: [water_today(t, i),
-                                         counter_tile("Zählerstand", i, 5, 3, "m³",
-                                                 sub=f"='Durchfluss ' + {fixed(WATER_RATE_L, 1)} + ' l/min'")]),
+                                         # black rollers, the fraction on the meter's four red pointers, the
+                                         # flow left out, as its own tile stands beside (user, 2026-10-08)
+                                         counter_tile("Zählerstand", i, 5, 0, "m³", below=[meter_dials(num(i), 4)])]),
     "water_meter_rate": vt_r(lambda t, i: spark_tile("Durchfluss", i, "#42a5f5", "l/min", 1, span=2, factor=1000,
                                              value_expr=f"={fixed(f'{num(i)} * 1000', 1)} + ' l/min'")),
     "water_meter_timestamp": vt_r(lambda t, i: age_tile("Letzte Ablesung", i, 5)),
