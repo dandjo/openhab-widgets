@@ -374,20 +374,21 @@ Every device is one grey ring like the energy flow's nodes, pulsing while it wor
 value, which pulses in step with it; the outdoor unit's fan turns while the compressor runs and its ring is filled by
 the compressor's frequency, the wall unit's by its own draw, the measured circuit (full and red while the backup heater
 runs; the tank's booster heater does not count), the tank's by its temperature, radiators and floor loops by the leaving
-water while they carry it. Dots run along the pipes, as many as a pipe is long, two at least on the short ones between
-wall unit, valve and tank, faster with the water's flow or the compressor's frequency, and all of them backwards during
-a defrost. The valve shows its position in its icon. Badges just outside three rings say what the outdoor unit's ring
-shows (*Hz*) and the wall unit's (water while it flows, a red bolt while the backup heater runs) and where the tank's
-heat comes from; grey while their device rests. Tiles in the style of the switch tiles hold the figures: the outdoor
-unit, the control (heating, hot water, Smart Grid, automation), the refrigerant, the heating circuit, the climate of the
-two floors, the tank with its booster heater and the indoor unit with its own power (the measured circuit plus the
-backup heater), each tinted in its colour while what it shows is at work. A tap on a tile, the wall unit, the outdoor
-unit, the tank or the valve opens its quick popup (see [Quick popups](#quick-popups)). At the card's top, across its
-whole width as the energy flow's tiles, the electrical power, the heat and the COP as a row of value tiles that open
-their quick popups too (today's split and COPs are in the heating card). On a phone the drawing takes the card's width;
-everywhere else it stands at its own size, as the energy flow does, so their texts keep the UI's sizes and their rings
-come out the same and never shrink, reaching into the card's padding where the card is a little narrower, and in the
-middle of the height the card is given. The recordings show it with demo values (a space heating run).
+water while they carry it. Dots run along the pipes, as many as a pipe is long, one at least, faster with the water's
+flow or the compressor's frequency, and all of them backwards during a defrost. The valve shows its position in its
+icon. Badges just outside three rings say what the outdoor unit's ring shows (*Hz*) and the wall unit's (water while it
+flows, a red bolt while the backup heater runs) and where the tank's heat comes from; grey while their device rests.
+Tiles in the style of the switch tiles hold the figures: the outdoor unit, the control (heating, hot water, Smart Grid,
+automation), the refrigerant, the heating circuit, the climate of the two floors, the tank with its booster heater and
+the indoor unit with its own power (the measured circuit plus the backup heater), each tinted in its colour while what
+it shows is at work. A tap on a tile, the wall unit, the outdoor unit, the tank or the valve opens its quick popup (see
+[Quick popups](#quick-popups)). At the card's top, across its whole width as the energy flow's tiles, the electrical
+power, the heat and the COP as a row of value tiles that open their quick popups too (today's split and COPs are in the
+heating card). The drawing ends at the house's walls, and the tiles beside them end flush with the walls; on a phone it
+takes the card's width inside the same padding as the value tiles above it, so the house and its outer tiles line up
+with them. Everywhere else it stands at its own size, as the energy flow does, so their texts keep the UI's sizes and
+their rings come out the same and never shrink, centred and in the middle of the height the card is given. The
+recordings show it with demo values (a space heating run).
 
 Needs `boost-pill`, `flow-node`, `ground-floor-quick`, `heatpump-circuit-quick`, `heatpump-control-quick`,
 `heatpump-cop-quick`, `heatpump-electric-quick`, `heatpump-heat-quick`, `heatpump-indoor-quick`,
@@ -1192,10 +1193,13 @@ The popup a day of my weather page opens: at the top the day in quarter hours as
 from midnight to midnight (MainUI's day chart, `chartType: day`, its `future` the days from today); below it the day
 hour by hour in the columns of the page's day rows (the time, the weather drawn with `weather-icon`, the temperature,
 the minutes of sunshine, the precipitation with its probability, the wind with an arrow of its direction and its compass
-point), the present hour on a grey band and the hours gone by pale. It reads two String items my weather rule writes as
-JSON for the five days of the forecast: the hours (`[time, temperature, precipitation, wind, direction, symbol, day,
-probability, sunshine minutes]`) and the quarter hours (`[time, temperature, precipitation, wind, direction]`); `date`
-is the day's midnight in epoch seconds. Open it from a link:
+point), the present hour on a grey band and the hours gone by pale. Both titles name the day. Two chevrons at the right
+of the popup's navbar step to the day before or after, within the forecast's five days from today: they set a variable
+of an `oh-context` around the content, and they stand fixed in the navbar's place (the popup's transform makes it their
+containing block; a global rule takes the popup content's `z-index` away, so the navbar does not cover them). It reads
+two String items my weather rule writes as JSON for the five days of the forecast: the hours (`[time, temperature,
+precipitation, wind, direction, symbol, day, probability, sunshine minutes]`) and the quarter hours (`[time,
+temperature, precipitation, wind, direction]`); `date` is the day's midnight in epoch seconds. Open it from a link:
 
 | Light | Dark |
 |---|---|
