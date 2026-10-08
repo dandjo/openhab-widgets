@@ -51,7 +51,8 @@ done
 step crops; python3 cdp_elems.py $B/heatpump 1400 $O/crops "$(cat screenshot-js/crops_hp.js)" >/dev/null
 python3 cdp_elems.py $B/air_conditioning 1400 $O/crops "$(cat screenshot-js/crops_ac.js)" >/dev/null
 python3 cdp_elems.py $B/heatpump 1400 $O/crops "$(cat screenshot-js/sliders.js)" >/dev/null
-python3 cdp_elems.py $B/coffee_machine 1400 $O/crops "$(cat screenshot-js/plugcards.js)" >/dev/null
+# the plug cards on the network's page: it draws ~100 W all day, so the power triangle shows at any moment
+python3 cdp_elems.py $B/network 1400 $O/crops "$(cat screenshot-js/plugcards.js)" >/dev/null
 for c in pill-switches power-pill switch-rows plug-cards; do cp $O/crops/$c.png $R/; done
 # the switch rows' crop ends above the restart button below them
 python3 -c "from PIL import Image; s = Image.open('$R/switch-rows.png'); s.crop((0, 0, s.size[0], s.size[1] - 10)).save('$R/switch-rows.png')"

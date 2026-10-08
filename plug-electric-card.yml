@@ -16,12 +16,18 @@ props:
     required: false
     default: Electrical
   parameterGroups: []
-timestamp: Oct 8, 2026, 3:48:44 AM
+timestamp: Oct 8, 2026, 5:13:48 AM
 component: oh-card
 config:
   title: =props.title
   style:
     height: calc(100% - 2 * var(--f7-card-margin-vertical))
+    display: flex
+    flex-direction: column
+  contentStyle:
+    flex: 1 1 auto
+    display: flex
+    flex-direction: column
 slots:
   content:
   - component: div
@@ -31,6 +37,7 @@ slots:
         grid-template-columns: repeat(auto-fill, minmax(220px, 1fr))
         gap: 10px
         padding: 4px 16px 16px
+        padding-bottom: 10px
     slots:
       default:
       - component: div
@@ -307,6 +314,15 @@ slots:
                 title: Current
                 color: '#5c6bc0'
                 kind: number
+  - component: div
+    config:
+      style:
+        flex: 1 1 auto
+        display: flex
+        flex-direction: column
+        padding: 0 16px 16px
+    slots:
+      default:
       - component: div
         config:
           style:
@@ -318,6 +334,9 @@ slots:
             background: color-mix(in srgb, var(--f7-text-color) 6%, transparent)
             overflow: hidden
             grid-column: 1 / -1
+            display: flex
+            flex-direction: column
+            flex: 1 1 auto
         slots:
           default:
           - component: div
@@ -382,157 +401,193 @@ slots:
                           ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
                           ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark === ''dark'') ?
                           1 : 0] + '' 16%, transparent)'''
-          - component: svg
+          - component: div
             config:
-              viewBox: 0 0 280 94
               style:
-                display: block
-                width: 100%
-                height: auto
-                max-width: 380px
-                margin: 4px auto 0
-              visible: =((Number(items[props.prefix + '_apparent_power'].numericState) || 0) > 1)
+                flex: 1 1 auto
+                display: flex
+                align-items: center
+                justify-content: center
+                padding-top: 4px
             slots:
               default:
-              - component: path
+              - component: div
                 config:
-                  d: ='M' + ((140 - (Math.min(200 / Math.max(Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix
-                    + '_power_factor'].numericState) || 0)))))), 0.05), 58 / Math.max(Math.sin(Math.acos(Math.max(0, Math.min(1,
-                    Math.abs((Number(items[props.prefix + '_power_factor'].numericState) || 0)))))), 0.05)) * Math.cos(Math.acos(Math.max(0,
-                    Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState) || 0))))))) / 2)).toFixed(1)
-                    + ' 72 L' + (((140 - (Math.min(200 / Math.max(Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix
-                    + '_power_factor'].numericState) || 0)))))), 0.05), 58 / Math.max(Math.sin(Math.acos(Math.max(0, Math.min(1,
-                    Math.abs((Number(items[props.prefix + '_power_factor'].numericState) || 0)))))), 0.05)) * Math.cos(Math.acos(Math.max(0,
-                    Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState) || 0))))))) / 2) + (Math.min(200
-                    / Math.max(Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState)
-                    || 0)))))), 0.05), 58 / Math.max(Math.sin(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix
-                    + '_power_factor'].numericState) || 0)))))), 0.05)) * Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix
-                    + '_power_factor'].numericState) || 0))))))))).toFixed(1) + ' 72 L' + (((140 - (Math.min(200 / Math.max(Math.cos(Math.acos(Math.max(0,
-                    Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState) || 0)))))), 0.05), 58
-                    / Math.max(Math.sin(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState)
-                    || 0)))))), 0.05)) * Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix +
-                    '_power_factor'].numericState) || 0))))))) / 2) + (Math.min(200 / Math.max(Math.cos(Math.acos(Math.max(0,
-                    Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState) || 0)))))), 0.05), 58
-                    / Math.max(Math.sin(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState)
-                    || 0)))))), 0.05)) * Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix +
-                    '_power_factor'].numericState) || 0))))))))).toFixed(1) + ' ' + ((72 - (Math.min(200 / Math.max(Math.cos(Math.acos(Math.max(0,
-                    Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState) || 0)))))), 0.05), 58
-                    / Math.max(Math.sin(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState)
-                    || 0)))))), 0.05)) * Math.sin(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix +
-                    '_power_factor'].numericState) || 0))))))))).toFixed(1) + ' Z'
-                  fill: '#7986cb'
-                  stroke: '#9fa8da'
-                  fill-opacity: '0.2'
-                  stroke-width: '1.6'
-                  stroke-linejoin: round
-              - component: line
-                config:
-                  x1: =((140 - (Math.min(200 / Math.max(Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix
-                    + '_power_factor'].numericState) || 0)))))), 0.05), 58 / Math.max(Math.sin(Math.acos(Math.max(0, Math.min(1,
-                    Math.abs((Number(items[props.prefix + '_power_factor'].numericState) || 0)))))), 0.05)) * Math.cos(Math.acos(Math.max(0,
-                    Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState) || 0))))))) / 2)).toFixed(1)
-                  y1: 72
-                  x2: =(((140 - (Math.min(200 / Math.max(Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix
-                    + '_power_factor'].numericState) || 0)))))), 0.05), 58 / Math.max(Math.sin(Math.acos(Math.max(0, Math.min(1,
-                    Math.abs((Number(items[props.prefix + '_power_factor'].numericState) || 0)))))), 0.05)) * Math.cos(Math.acos(Math.max(0,
-                    Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState) || 0))))))) / 2) + (Math.min(200
-                    / Math.max(Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState)
-                    || 0)))))), 0.05), 58 / Math.max(Math.sin(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix
-                    + '_power_factor'].numericState) || 0)))))), 0.05)) * Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix
-                    + '_power_factor'].numericState) || 0))))))))).toFixed(1)
-                  y2: 72
-                  stroke: '#fb8c00'
-                  stroke-width: '3'
-              - component: line
-                config:
-                  x1: =(((140 - (Math.min(200 / Math.max(Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix
-                    + '_power_factor'].numericState) || 0)))))), 0.05), 58 / Math.max(Math.sin(Math.acos(Math.max(0, Math.min(1,
-                    Math.abs((Number(items[props.prefix + '_power_factor'].numericState) || 0)))))), 0.05)) * Math.cos(Math.acos(Math.max(0,
-                    Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState) || 0))))))) / 2) + (Math.min(200
-                    / Math.max(Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState)
-                    || 0)))))), 0.05), 58 / Math.max(Math.sin(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix
-                    + '_power_factor'].numericState) || 0)))))), 0.05)) * Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix
-                    + '_power_factor'].numericState) || 0))))))))).toFixed(1)
-                  y1: 72
-                  x2: =(((140 - (Math.min(200 / Math.max(Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix
-                    + '_power_factor'].numericState) || 0)))))), 0.05), 58 / Math.max(Math.sin(Math.acos(Math.max(0, Math.min(1,
-                    Math.abs((Number(items[props.prefix + '_power_factor'].numericState) || 0)))))), 0.05)) * Math.cos(Math.acos(Math.max(0,
-                    Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState) || 0))))))) / 2) + (Math.min(200
-                    / Math.max(Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState)
-                    || 0)))))), 0.05), 58 / Math.max(Math.sin(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix
-                    + '_power_factor'].numericState) || 0)))))), 0.05)) * Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix
-                    + '_power_factor'].numericState) || 0))))))))).toFixed(1)
-                  y2: =((72 - (Math.min(200 / Math.max(Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix
-                    + '_power_factor'].numericState) || 0)))))), 0.05), 58 / Math.max(Math.sin(Math.acos(Math.max(0, Math.min(1,
-                    Math.abs((Number(items[props.prefix + '_power_factor'].numericState) || 0)))))), 0.05)) * Math.sin(Math.acos(Math.max(0,
-                    Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState) || 0))))))))).toFixed(1)
-                  stroke: '#90a4ae'
-                  stroke-width: '3'
-              - component: text
-                config:
-                  x: =((140 - (Math.min(200 / Math.max(Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix
-                    + '_power_factor'].numericState) || 0)))))), 0.05), 58 / Math.max(Math.sin(Math.acos(Math.max(0, Math.min(1,
-                    Math.abs((Number(items[props.prefix + '_power_factor'].numericState) || 0)))))), 0.05)) * Math.cos(Math.acos(Math.max(0,
-                    Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState) || 0))))))) / 2) + (Math.min(200
-                    / Math.max(Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState)
-                    || 0)))))), 0.05), 58 / Math.max(Math.sin(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix
-                    + '_power_factor'].numericState) || 0)))))), 0.05)) * Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix
-                    + '_power_factor'].numericState) || 0))))))) / 2).toFixed(1)
-                  y: 88
-                  content: ='P ' + ((Number(items[props.prefix + '_power'].numericState) || 0)).toFixed(0) + ' W'
-                  fill: currentColor
-                  font-size: 11
-                  font-weight: '700'
-                  text-anchor: middle
-                  opacity: '1'
-              - component: text
-                config:
-                  x: =(((140 - (Math.min(200 / Math.max(Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix
-                    + '_power_factor'].numericState) || 0)))))), 0.05), 58 / Math.max(Math.sin(Math.acos(Math.max(0, Math.min(1,
-                    Math.abs((Number(items[props.prefix + '_power_factor'].numericState) || 0)))))), 0.05)) * Math.cos(Math.acos(Math.max(0,
-                    Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState) || 0))))))) / 2) + (Math.min(200
-                    / Math.max(Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState)
-                    || 0)))))), 0.05), 58 / Math.max(Math.sin(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix
-                    + '_power_factor'].numericState) || 0)))))), 0.05)) * Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix
-                    + '_power_factor'].numericState) || 0)))))))) + 7).toFixed(1)
-                  y: =(72 - (Math.min(200 / Math.max(Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix
-                    + '_power_factor'].numericState) || 0)))))), 0.05), 58 / Math.max(Math.sin(Math.acos(Math.max(0, Math.min(1,
-                    Math.abs((Number(items[props.prefix + '_power_factor'].numericState) || 0)))))), 0.05)) * Math.sin(Math.acos(Math.max(0,
-                    Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState) || 0))))))) / 2 + 4).toFixed(1)
-                  content: ='Q ' + ((Number(items[props.prefix + '_reactive_power'].numericState) || 0)).toFixed(0) + ' var'
-                  fill: currentColor
-                  font-size: 11
-                  font-weight: normal
-                  text-anchor: start
-                  opacity: '1'
-              - component: text
-                config:
-                  x: =((140 - (Math.min(200 / Math.max(Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix
-                    + '_power_factor'].numericState) || 0)))))), 0.05), 58 / Math.max(Math.sin(Math.acos(Math.max(0, Math.min(1,
-                    Math.abs((Number(items[props.prefix + '_power_factor'].numericState) || 0)))))), 0.05)) * Math.cos(Math.acos(Math.max(0,
-                    Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState) || 0))))))) / 2) + (Math.min(200
-                    / Math.max(Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState)
-                    || 0)))))), 0.05), 58 / Math.max(Math.sin(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix
-                    + '_power_factor'].numericState) || 0)))))), 0.05)) * Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix
-                    + '_power_factor'].numericState) || 0))))))) / 2 - 8).toFixed(1)
-                  y: =(72 - (Math.min(200 / Math.max(Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix
-                    + '_power_factor'].numericState) || 0)))))), 0.05), 58 / Math.max(Math.sin(Math.acos(Math.max(0, Math.min(1,
-                    Math.abs((Number(items[props.prefix + '_power_factor'].numericState) || 0)))))), 0.05)) * Math.sin(Math.acos(Math.max(0,
-                    Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState) || 0))))))) / 2 - 4).toFixed(1)
-                  content: ='S ' + ((Number(items[props.prefix + '_apparent_power'].numericState) || 0)).toFixed(0) + ' VA'
-                  fill: currentColor
-                  font-size: 11
-                  font-weight: normal
-                  text-anchor: end
-                  opacity: '0.8'
-          - component: Label
-            config:
-              text: no load
-              style:
-                font-size: 11px
-                opacity: '0.65'
-                margin: 12px 0
-              visible: =!((Number(items[props.prefix + '_apparent_power'].numericState) || 0) > 1)
+                  style:
+                    position: relative
+                    width: 100%
+                    max-width: 380px
+                    aspect-ratio: 280 / 94
+                slots:
+                  default:
+                  - component: svg
+                    config:
+                      viewBox: 0 0 280 94
+                      style:
+                        display: block
+                        width: 100%
+                        height: auto
+                      visible: =((Number(items[props.prefix + '_apparent_power'].numericState) || 0) > 1)
+                    slots:
+                      default:
+                      - component: path
+                        config:
+                          d: ='M' + ((140 - (Math.min(200 / Math.max(Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix
+                            + '_power_factor'].numericState) || 0)))))), 0.05), 58 / Math.max(Math.sin(Math.acos(Math.max(0,
+                            Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState) || 0)))))), 0.05))
+                            * Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState)
+                            || 0))))))) / 2)).toFixed(1) + ' 72 L' + (((140 - (Math.min(200 / Math.max(Math.cos(Math.acos(Math.max(0,
+                            Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState) || 0)))))), 0.05),
+                            58 / Math.max(Math.sin(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix +
+                            '_power_factor'].numericState) || 0)))))), 0.05)) * Math.cos(Math.acos(Math.max(0, Math.min(1,
+                            Math.abs((Number(items[props.prefix + '_power_factor'].numericState) || 0))))))) / 2) + (Math.min(200
+                            / Math.max(Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState)
+                            || 0)))))), 0.05), 58 / Math.max(Math.sin(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix
+                            + '_power_factor'].numericState) || 0)))))), 0.05)) * Math.cos(Math.acos(Math.max(0, Math.min(1,
+                            Math.abs((Number(items[props.prefix + '_power_factor'].numericState) || 0))))))))).toFixed(1)
+                            + ' 72 L' + (((140 - (Math.min(200 / Math.max(Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix
+                            + '_power_factor'].numericState) || 0)))))), 0.05), 58 / Math.max(Math.sin(Math.acos(Math.max(0,
+                            Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState) || 0)))))), 0.05))
+                            * Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState)
+                            || 0))))))) / 2) + (Math.min(200 / Math.max(Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix
+                            + '_power_factor'].numericState) || 0)))))), 0.05), 58 / Math.max(Math.sin(Math.acos(Math.max(0,
+                            Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState) || 0)))))), 0.05))
+                            * Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState)
+                            || 0))))))))).toFixed(1) + ' ' + ((72 - (Math.min(200 / Math.max(Math.cos(Math.acos(Math.max(0,
+                            Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState) || 0)))))), 0.05),
+                            58 / Math.max(Math.sin(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix +
+                            '_power_factor'].numericState) || 0)))))), 0.05)) * Math.sin(Math.acos(Math.max(0, Math.min(1,
+                            Math.abs((Number(items[props.prefix + '_power_factor'].numericState) || 0))))))))).toFixed(1)
+                            + ' Z'
+                          fill: '#7986cb'
+                          stroke: '#9fa8da'
+                          fill-opacity: '0.2'
+                          stroke-width: '1.6'
+                          stroke-linejoin: round
+                      - component: line
+                        config:
+                          x1: =((140 - (Math.min(200 / Math.max(Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix
+                            + '_power_factor'].numericState) || 0)))))), 0.05), 58 / Math.max(Math.sin(Math.acos(Math.max(0,
+                            Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState) || 0)))))), 0.05))
+                            * Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState)
+                            || 0))))))) / 2)).toFixed(1)
+                          y1: 72
+                          x2: =(((140 - (Math.min(200 / Math.max(Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix
+                            + '_power_factor'].numericState) || 0)))))), 0.05), 58 / Math.max(Math.sin(Math.acos(Math.max(0,
+                            Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState) || 0)))))), 0.05))
+                            * Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState)
+                            || 0))))))) / 2) + (Math.min(200 / Math.max(Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix
+                            + '_power_factor'].numericState) || 0)))))), 0.05), 58 / Math.max(Math.sin(Math.acos(Math.max(0,
+                            Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState) || 0)))))), 0.05))
+                            * Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState)
+                            || 0))))))))).toFixed(1)
+                          y2: 72
+                          stroke: '#fb8c00'
+                          stroke-width: '3'
+                      - component: line
+                        config:
+                          x1: =(((140 - (Math.min(200 / Math.max(Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix
+                            + '_power_factor'].numericState) || 0)))))), 0.05), 58 / Math.max(Math.sin(Math.acos(Math.max(0,
+                            Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState) || 0)))))), 0.05))
+                            * Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState)
+                            || 0))))))) / 2) + (Math.min(200 / Math.max(Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix
+                            + '_power_factor'].numericState) || 0)))))), 0.05), 58 / Math.max(Math.sin(Math.acos(Math.max(0,
+                            Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState) || 0)))))), 0.05))
+                            * Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState)
+                            || 0))))))))).toFixed(1)
+                          y1: 72
+                          x2: =(((140 - (Math.min(200 / Math.max(Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix
+                            + '_power_factor'].numericState) || 0)))))), 0.05), 58 / Math.max(Math.sin(Math.acos(Math.max(0,
+                            Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState) || 0)))))), 0.05))
+                            * Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState)
+                            || 0))))))) / 2) + (Math.min(200 / Math.max(Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix
+                            + '_power_factor'].numericState) || 0)))))), 0.05), 58 / Math.max(Math.sin(Math.acos(Math.max(0,
+                            Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState) || 0)))))), 0.05))
+                            * Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState)
+                            || 0))))))))).toFixed(1)
+                          y2: =((72 - (Math.min(200 / Math.max(Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix
+                            + '_power_factor'].numericState) || 0)))))), 0.05), 58 / Math.max(Math.sin(Math.acos(Math.max(0,
+                            Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState) || 0)))))), 0.05))
+                            * Math.sin(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState)
+                            || 0))))))))).toFixed(1)
+                          stroke: '#90a4ae'
+                          stroke-width: '3'
+                      - component: text
+                        config:
+                          x: =((140 - (Math.min(200 / Math.max(Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix
+                            + '_power_factor'].numericState) || 0)))))), 0.05), 58 / Math.max(Math.sin(Math.acos(Math.max(0,
+                            Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState) || 0)))))), 0.05))
+                            * Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState)
+                            || 0))))))) / 2) + (Math.min(200 / Math.max(Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix
+                            + '_power_factor'].numericState) || 0)))))), 0.05), 58 / Math.max(Math.sin(Math.acos(Math.max(0,
+                            Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState) || 0)))))), 0.05))
+                            * Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState)
+                            || 0))))))) / 2).toFixed(1)
+                          y: 88
+                          content: ='P ' + ((Number(items[props.prefix + '_power'].numericState) || 0)).toFixed(0) + ' W'
+                          fill: currentColor
+                          font-size: 11
+                          font-weight: '700'
+                          text-anchor: middle
+                          opacity: '1'
+                      - component: text
+                        config:
+                          x: =(((140 - (Math.min(200 / Math.max(Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix
+                            + '_power_factor'].numericState) || 0)))))), 0.05), 58 / Math.max(Math.sin(Math.acos(Math.max(0,
+                            Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState) || 0)))))), 0.05))
+                            * Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState)
+                            || 0))))))) / 2) + (Math.min(200 / Math.max(Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix
+                            + '_power_factor'].numericState) || 0)))))), 0.05), 58 / Math.max(Math.sin(Math.acos(Math.max(0,
+                            Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState) || 0)))))), 0.05))
+                            * Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState)
+                            || 0)))))))) + 7).toFixed(1)
+                          y: =(72 - (Math.min(200 / Math.max(Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix
+                            + '_power_factor'].numericState) || 0)))))), 0.05), 58 / Math.max(Math.sin(Math.acos(Math.max(0,
+                            Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState) || 0)))))), 0.05))
+                            * Math.sin(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState)
+                            || 0))))))) / 2 + 4).toFixed(1)
+                          content: ='Q ' + ((Number(items[props.prefix + '_reactive_power'].numericState) || 0)).toFixed(0)
+                            + ' var'
+                          fill: currentColor
+                          font-size: 11
+                          font-weight: normal
+                          text-anchor: start
+                          opacity: '1'
+                      - component: text
+                        config:
+                          x: =((140 - (Math.min(200 / Math.max(Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix
+                            + '_power_factor'].numericState) || 0)))))), 0.05), 58 / Math.max(Math.sin(Math.acos(Math.max(0,
+                            Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState) || 0)))))), 0.05))
+                            * Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState)
+                            || 0))))))) / 2) + (Math.min(200 / Math.max(Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix
+                            + '_power_factor'].numericState) || 0)))))), 0.05), 58 / Math.max(Math.sin(Math.acos(Math.max(0,
+                            Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState) || 0)))))), 0.05))
+                            * Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState)
+                            || 0))))))) / 2 - 8).toFixed(1)
+                          y: =(72 - (Math.min(200 / Math.max(Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix
+                            + '_power_factor'].numericState) || 0)))))), 0.05), 58 / Math.max(Math.sin(Math.acos(Math.max(0,
+                            Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState) || 0)))))), 0.05))
+                            * Math.sin(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState)
+                            || 0))))))) / 2 - 4).toFixed(1)
+                          content: ='S ' + ((Number(items[props.prefix + '_apparent_power'].numericState) || 0)).toFixed(0)
+                            + ' VA'
+                          fill: currentColor
+                          font-size: 11
+                          font-weight: normal
+                          text-anchor: end
+                          opacity: '0.8'
+                  - component: Label
+                    config:
+                      text: no load
+                      style:
+                        font-size: 11px
+                        opacity: '0.65'
+                        position: absolute
+                        inset: '0'
+                        display: flex
+                        align-items: center
+                        justify-content: center
+                      visible: =!((Number(items[props.prefix + '_apparent_power'].numericState) || 0) > 1)
           - component: oh-link
             config:
               action: popup
