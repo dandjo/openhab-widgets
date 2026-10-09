@@ -92,9 +92,13 @@ def tr(v, key=None):
         out = [tr(x, key) for x in v]
         texts = [x.get("style", {}).get("text") if isinstance(x, dict) and isinstance(x.get("style"), dict) else None
                  for x in out]
-        if texts == DAY_LETTERS[0]:
-            for x, letter in zip(out, DAY_LETTERS[1]):
-                x["style"]["text"] = letter
+        # the weekday letters as seven texts in a row, wherever they stand in the list (the PV half-years' lower
+        # calendar draws them after its masks)
+        n = len(DAY_LETTERS[0])
+        for i in range(len(texts) - n + 1):
+            if texts[i:i + n] == DAY_LETTERS[0]:
+                for x, letter in zip(out[i:i + n], DAY_LETTERS[1]):
+                    x["style"]["text"] = letter
         return out
     if isinstance(v, str):
         if v.startswith("="):
