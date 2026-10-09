@@ -53,8 +53,21 @@ props:
     type: TEXT
     required: false
     default: '#78909c'
+  - name: dashed2
+    label: Second dashed
+    description: Draw the second item's line dashed, for a reference such as the first one's mean
+    type: BOOLEAN
+    required: false
+    default: 'false'
+  - name: curve
+    label: Heating curve
+    description: A String item holding a learnt heating curve as JSON (rule heatpump_heating_curve), drawn as a chart on top
+      with item (outdoor) and item2 (setpoint) as the present point
+    type: TEXT
+    required: false
+    context: item
   parameterGroups: []
-timestamp: Oct 8, 2026, 3:48:44 AM
+timestamp: Oct 9, 2026, 6:08:33 PM
 component: div
 config:
   style:
@@ -71,7 +84,211 @@ slots:
   default:
   - component: oh-card
     config:
-      title: =props.title
+      title: Heating curve
+      style:
+        height: calc(100% - 2 * var(--f7-card-margin-vertical))
+      visible: =!!props.curve
+    slots:
+      content:
+      - component: oh-chart
+        config:
+          chartType: ''
+          periodVisible: false
+          height: 300px
+          options:
+            backgroundColor: transparent
+        slots:
+          grid:
+          - component: oh-chart-grid
+            config:
+              top: '35'
+              bottom: '75'
+              left: '45'
+              right: '20'
+          xAxis:
+          - component: oh-value-axis
+            config:
+              gridIndex: 0
+              name: °C outdoor
+              nameLocation: middle
+              nameGap: 26
+              min: =(v) => v.min
+              max: =(v) => v.max
+              interval: 5
+              splitLine:
+                lineStyle:
+                  type: dashed
+                  opacity: 0.4
+              axisLine:
+                onZero: false
+          yAxis:
+          - component: oh-value-axis
+            config:
+              gridIndex: 0
+              name: °C
+              nameGap: 14
+              nameTextStyle:
+                align: right
+                padding:
+                - 0
+                - 8
+                - 0
+                - 0
+              splitLine:
+                lineStyle:
+                  type: dashed
+                  opacity: 0.4
+              min: =(v) => Math.floor((v.min - 1) / 2) * 2
+              max: =(v) => Math.ceil((v.max + 1) / 2) * 2
+              interval: 2
+              axisLine:
+                onZero: false
+          series:
+          - component: oh-data-series
+            config:
+              name: Measured
+              type: scatter
+              symbolSize: 6
+              data: '=(((((s) => (s || '''').charAt(0) === ''{'' ? JSON.parse(s) : null)(props.curve ? items[props.curve].state
+                : ''''))) || {b: []}).b'
+              itemStyle:
+                color: rgba(127, 127, 127, 0.65)
+              xAxisIndex: 0
+              yAxisIndex: 0
+          - component: oh-data-series
+            config:
+              name: Heating curve
+              type: line
+              symbol: circle
+              symbolSize: 5
+              data: '=((c) => c ? c.p.slice(1, 5) : [])((((s) => (s || '''').charAt(0) === ''{'' ? JSON.parse(s) : null)(props.curve
+                ? items[props.curve].state : '''')))'
+              itemStyle:
+                color: =props.color2
+              lineStyle:
+                color: =props.color2
+                width: 2.5
+              silent: true
+              emphasis:
+                disabled: true
+              xAxisIndex: 0
+              yAxisIndex: 0
+          - component: oh-data-series
+            config:
+              name: Heating curve
+              data: '=((c) => c ? c.p.slice(0, 2) : [])((((s) => (s || '''').charAt(0) === ''{'' ? JSON.parse(s) : null)(props.curve
+                ? items[props.curve].state : '''')))'
+              type: line
+              symbol: none
+              itemStyle:
+                color: =props.color2
+              lineStyle:
+                color: =props.color2
+                width: 1.6
+                type: dashed
+                opacity: 0.7
+              silent: true
+              emphasis:
+                disabled: true
+              xAxisIndex: 0
+              yAxisIndex: 0
+          - component: oh-data-series
+            config:
+              name: Heating curve
+              data: '=((c) => c ? c.p.slice(4, 6) : [])((((s) => (s || '''').charAt(0) === ''{'' ? JSON.parse(s) : null)(props.curve
+                ? items[props.curve].state : '''')))'
+              type: line
+              symbol: none
+              itemStyle:
+                color: =props.color2
+              lineStyle:
+                color: =props.color2
+                width: 1.6
+                type: dashed
+                opacity: 0.7
+              silent: true
+              emphasis:
+                disabled: true
+              xAxisIndex: 0
+              yAxisIndex: 0
+          - component: oh-data-series
+            config:
+              name: Now
+              type: scatter
+              symbolSize: 12
+              z: 5
+              data: '=((x, y) => Number.isNaN(x) || Number.isNaN(y) ? [] : [[x, y]])(Number(items[props.item].numericState),
+                Number(items[props.item2].numericState))'
+              itemStyle:
+                color: =props.color
+                borderColor: '#ffffff'
+                borderWidth: 1.5
+              xAxisIndex: 0
+              yAxisIndex: 0
+          - component: oh-data-series
+            config:
+              name: Curve
+              type: line
+              data: '=((c) => c ? ((f) => '' ''.repeat(Math.round((c.p[5][0] - c.p[0][0]) * 10) + 1).split('''').map((s, i)
+                => ((x) => [x, Math.round(f(x) * 100) / 100, x < c.p[1][0] || x > c.p[4][0] ? 1 : 0])(Math.round(c.p[0][0]
+                * 10 + i) / 10)))((x) => c.p.reduce((y, q, i, a) => i > 0 && a[i - 1][0] < q[0] && x >= a[i - 1][0] && x <=
+                q[0] ? a[i - 1][1] + (x - a[i - 1][0]) * (q[1] - a[i - 1][1]) / (q[0] - a[i - 1][0]) : y, null)) : [])((((s)
+                => (s || '''').charAt(0) === ''{'' ? JSON.parse(s) : null)(props.curve ? items[props.curve].state : '''')))'
+              symbol: circle
+              showSymbol: false
+              symbolSize: 9
+              z: 4
+              itemStyle:
+                color: =props.color2
+              lineStyle:
+                opacity: 0
+                width: 0
+              xAxisIndex: 0
+              yAxisIndex: 0
+          tooltip:
+          - component: oh-chart-tooltip
+            config:
+              show: true
+              confine: true
+              trigger: axis
+              axisPointer:
+                type: line
+                snap: true
+              smartFormatter: false
+              formatter: '=((c, jx, jy) => (ps) => ((F, k) => k ? ((x, m) => ''<div>'' + F(x) + '' °C outdoor</div>'' + k.marker
+                + '' '' + (k.value[2] ? ''Heating curve (extrapolated)'' : ''Heating curve'') + ''<span style="float: right;
+                margin-left: 20px"><b>'' + F(k.value[1]) + '' °C</b></span><br/>'' + (m ? ''<span style="display:inline-block;margin-right:4px;border-radius:10px;width:10px;height:10px;background-color:rgba(127,
+                127, 127, 0.65);"></span>'' + '' '' + ''Measured ('' + Math.round(m[2] / 4) + '' h)'' + ''<span style="float:
+                right; margin-left: 20px"><b>'' + F(m[1]) + '' °C</b></span><br/>'' : '''') + (!Number.isNaN(jx) && !Number.isNaN(jy)
+                && Math.abs(jx - x) < 0.3 ? ''<span style="display:inline-block;margin-right:4px;border-radius:10px;width:10px;height:10px;background-color:''
+                + props.color + '';"></span>'' + '' '' + ''Now'' + ''<span style="float: right; margin-left: 20px"><b>'' +
+                F(jy) + '' °C</b></span><br/>'' : ''''))(k.value[0], ((c && c.b) || []).filter((b) => Math.abs(b[0] - k.value[0])
+                < 0.25)[0]) : '''')(((v) => v.toFixed(1).replace(''-'', ''−'')), ps.filter((p) => p.seriesName === ''Curve'')[0]))((((s)
+                => (s || '''').charAt(0) === ''{'' ? JSON.parse(s) : null)(props.curve ? items[props.curve].state : '''')),
+                Number(items[props.item].numericState), Number(items[props.item2].numericState))'
+          legend:
+          - component: oh-chart-legend
+            config:
+              show: true
+              bottom: '0'
+              type: scroll
+              data:
+              - Measured
+              - Heating curve
+              - Now
+      - component: Label
+        config:
+          text: '=((c) => c ? Math.round(c.n / 4).toLocaleString(''en-GB'') + '' heating hours, '' + dayjs(c.from).format(''DD/MM/YY'')
+            + ''–'' + dayjs(c.to).format(''DD/MM/YY'') + '' · mean deviation '' + c.rms.toFixed(2) + '' K'' : ''no heating
+            season recorded yet'')((((s) => (s || '''').charAt(0) === ''{'' ? JSON.parse(s) : null)(props.curve ? items[props.curve].state
+            : '''')))'
+          style:
+            font-size: 11px
+            opacity: '0.65'
+            padding: 0 16px 14px
+  - component: oh-card
+    config:
+      title: '=props.curve ? ''Now'' : props.title'
       style:
         height: calc(100% - 2 * var(--f7-card-margin-vertical))
     slots:
@@ -316,8 +533,9 @@ slots:
               item: =props.item2
               symbol: none
               lineStyle:
-                width: 2
+                width: '=props.dashed2 ? 1.5 : 2'
                 color: =props.color2
+                type: '=props.dashed2 ? ''dashed'' : ''solid'''
               itemStyle:
                 color: =props.color2
           tooltip:

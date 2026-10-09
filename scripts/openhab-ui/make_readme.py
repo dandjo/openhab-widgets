@@ -78,8 +78,9 @@ OVERVIEW = [
      "frequency, and all of them backwards during a defrost. The valve shows its position in its icon. Badges just "
      "outside three rings say what the outdoor unit's ring shows (*Hz*) and the wall unit's (water while it flows, a red "
      "bolt while the backup heater runs) and where the tank's heat comes from; grey while their device rests. Tiles in the "
-     "style of the switch tiles hold the figures: the outdoor unit, the control (heating, hot water, Smart Grid, "
-     "automation), the refrigerant, the heating circuit, the climate of the two floors, the tank with its booster "
+     "style of the switch tiles hold the figures: the outdoor unit (its power, the compressor, both outdoor sensors "
+     "and its heat exchanger), the control (heating, hot water, Smart Grid, automation and the outdoor mean its "
+     "heating curve works with), the refrigerant, the heating circuit, the climate of the two floors, the tank with its booster "
      "heater and the indoor unit with its own power (the measured circuit plus the backup heater), each tinted in its "
      "colour while what it shows is at work. A tap on a tile, the wall unit, the outdoor unit, "
      "the tank or the valve opens its quick popup (see [Quick popups](#quick-popups)). At the card's top, across its "
@@ -599,7 +600,10 @@ The popup every tile of my device pages opens, in place of the analyzer: the ite
 the day with arrows for earlier days, as a line for measurements or as a band of states for switches, texts and
 numbers with state options (labelled from the `states` prop), or the value alone for dates. Given a second item
 (`item2`, with `name`, `name2` and `color2`), it shows both values side by side and their courses as two lines, as my
-tiles of two values (flow and return) open it. Open it from any link with `action: popup`, `actionModal:
+tiles of two values (flow and return) open it; `dashed2` draws the second line dashed, for a reference such as the
+outdoor mean beside the outdoor temperature. Given `curve`, a String item holding the heating curve my rule
+`heatpump_heating_curve` learns (as JSON), it draws that curve as a chart on top, with the measured bins and the
+present point (`item` the outdoor mean, `item2` the setpoint). Open it from any link with `action: popup`, `actionModal:
 widget:item-popup` and its props in `actionModalConfig`:
 
 ```yaml

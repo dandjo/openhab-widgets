@@ -73,6 +73,7 @@ def tr_expr(expr):
     for de, en in LISTS.items():
         expr = expr.replace(de, en)
     expr = expr.replace(".replace('.', ',')", "").replace("toLocaleString('de-AT'", "toLocaleString('en-GB'")
+    expr = expr.replace("toLocaleString('de-DE'", "toLocaleString('en-GB'").replace("'DD.MM.YY'", "'DD/MM/YY'")
     expr = expr.replace(" + ' Uhr'", "").replace("' Uhr'", "''")
     return LITERAL.sub(lambda m: m.group(0) if "\\" in m.group(1) else "'" + tr_plain(m.group(1)) + "'", expr)
 

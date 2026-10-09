@@ -19,6 +19,7 @@
     espaltherma_cop: { state: "3.69", numericState: 3.69, displayState: "3,69", type: "Decimal" },
     espaltherma_leaving_water_temp_after_buh: q(33.5, "°C", 1), espaltherma_inlet_water_temp: q(29.1, "°C", 1),
     espaltherma_ext_ambient_temp: q(4.5, "°C", 1), espaltherma_heat_exchanger_mid_temp: q(-1.8, "°C", 1),
+    espaltherma_outdoor_air_temp: q(5.5, "°C", 1), espaltherma_ext_ambient_temp_avg: q(3.2, "°C", 1),
     espaltherma_discharge_pipe_temp: q(68.4, "°C", 1), espaltherma_refrig_temp_liquid_side: q(31.2, "°C", 1),
     espaltherma_refrigerant_pressure_sensor: q(19.8, "bar", 1), espaltherma_water_pressure: q(1.6, "bar", 1),
     espaltherma_dhw_tank_temp: q(47.5, "°C", 1), espaltherma_dhw_setpoint: q(50, "°C", 0),
