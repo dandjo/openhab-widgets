@@ -205,6 +205,13 @@ EN.update({"auffällig": "elevated", "außerhalb": "outside", "behaglich": "comf
            "Durchfluss heute": "Flow today", "Verbrauch": "Consumption", "Verbrauch pro Tag": "Consumption per day",
            "Zählerbild": "Meter picture", "Zählerstand": "Meter reading"})
 
+    # the heating curve and the outdoor mean it works with (2026-10-09)
+EN.update({"Heizkurve": "Heating curve", "Heizkurve (fortgesetzt": "Heating curve (extrapolated",
+           "Kurve": "Curve", "Gemessen": "Measured", "Heizstunden": "heating hours",
+           "mittlere Abweichung": "mean deviation", "noch keine Heizperiode erfasst": "no heating season recorded yet",
+           "°C außen": "°C outdoor", "°C außen</div>": "°C outdoor</div>", "Außen Ø 24 h": "Outdoor Ø 24 h",
+           "ESPAltherma Außentemperatur gemittelt": "ESPAltherma External Ambient Temperature Average"})
+
     # installation texts the screenshots show (Miele programs and phases), for ui_proxy.py
 EN.update({"Pflegeleicht": "Easy care", "Baumwolle": "Cottons", "Waschen": "Washing", "Trocknen": "Drying",
            "Spülen": "Rinsing", "Schleudern": "Spinning", "Hauptwäsche": "Main wash", "Vorwäsche": "Pre-wash",

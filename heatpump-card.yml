@@ -195,6 +195,12 @@ props:
     type: TEXT
     required: true
     context: item
+  - name: heatpumpOutdoorAirTemp
+    label: ESPAltherma Outdoor Air Temperature
+    description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
   - name: heatpumpHeatExchangerMidTemp
     label: ESPAltherma Heat Exchanger Mid Temperature
     description: Number:Temperature item
@@ -228,6 +234,12 @@ props:
   - name: heatpumpManagement
     label: Heatpump Management
     description: Group item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpExtAmbientTempAvg
+    label: ESPAltherma External Ambient Temperature Average
+    description: Number:Temperature item
     type: TEXT
     required: true
     context: item
@@ -339,12 +351,6 @@ props:
     type: TEXT
     required: true
     context: item
-  - name: heatpumpOutdoorAirTemp
-    label: ESPAltherma Outdoor Air Temperature
-    description: Number:Temperature item
-    type: TEXT
-    required: true
-    context: item
   - name: heatpumpTargetDischargeTemp
     label: ESPAltherma Target Discharge Temperature
     description: Number:Temperature item
@@ -358,7 +364,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 8, 2026, 11:30:29 PM
+timestamp: Oct 9, 2026, 6:08:33 PM
 component: oh-card
 config:
   title: Heat Pump
@@ -509,7 +515,7 @@ slots:
           default:
           - component: svg
             config:
-              viewBox: 99 18 452 609
+              viewBox: 99 1 452 626
               width: 100%
               style:
                 display: block
@@ -615,7 +621,7 @@ slots:
                   fill: none
               - component: path
                 config:
-                  d: M528,129 V456 H502
+                  d: M533.5,129 V456 H502
                   stroke: '#ba68c8'
                   stroke-width: 3
                   stroke-linecap: round
@@ -633,12 +639,12 @@ slots:
                   default:
                   - component: animateMotion
                     config:
-                      path: '=items[props.heatpumpDefrostOperaton].state === ''ON'' ? ''M502,456 L528,456 L528,129'' : ''M528,129
-                        V456 H502'''
-                      dur: '=Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 30 ? ''17.65s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState)
-                        || 0)) < 45 ? ''10.09s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0))
-                        < 60 ? ''7.06s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 75 ?
-                        ''5.43s'' : (''4.41s''))))'
+                      path: '=items[props.heatpumpDefrostOperaton].state === ''ON'' ? ''M502,456 L533.5,456 L533.5,129'' :
+                        ''M533.5,129 V456 H502'''
+                      dur: '=Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 30 ? ''17.93s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState)
+                        || 0)) < 45 ? ''10.24s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0))
+                        < 60 ? ''7.17s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 75 ?
+                        ''5.52s'' : (''4.48s''))))'
                       repeatCount: indefinite
                       calcMode: linear
                       keyPoints: 0;1
@@ -654,12 +660,12 @@ slots:
                   default:
                   - component: animateMotion
                     config:
-                      path: '=items[props.heatpumpDefrostOperaton].state === ''ON'' ? ''M502,456 L528,456 L528,129'' : ''M528,129
-                        V456 H502'''
-                      dur: '=Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 30 ? ''17.65s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState)
-                        || 0)) < 45 ? ''10.09s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0))
-                        < 60 ? ''7.06s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 75 ?
-                        ''5.43s'' : (''4.41s''))))'
+                      path: '=items[props.heatpumpDefrostOperaton].state === ''ON'' ? ''M502,456 L533.5,456 L533.5,129'' :
+                        ''M533.5,129 V456 H502'''
+                      dur: '=Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 30 ? ''17.93s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState)
+                        || 0)) < 45 ? ''10.24s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0))
+                        < 60 ? ''7.17s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 75 ?
+                        ''5.52s'' : (''4.48s''))))'
                       repeatCount: indefinite
                       calcMode: linear
                       keyPoints: 0.1111;1;0;0.1111
@@ -675,12 +681,12 @@ slots:
                   default:
                   - component: animateMotion
                     config:
-                      path: '=items[props.heatpumpDefrostOperaton].state === ''ON'' ? ''M502,456 L528,456 L528,129'' : ''M528,129
-                        V456 H502'''
-                      dur: '=Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 30 ? ''17.65s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState)
-                        || 0)) < 45 ? ''10.09s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0))
-                        < 60 ? ''7.06s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 75 ?
-                        ''5.43s'' : (''4.41s''))))'
+                      path: '=items[props.heatpumpDefrostOperaton].state === ''ON'' ? ''M502,456 L533.5,456 L533.5,129'' :
+                        ''M533.5,129 V456 H502'''
+                      dur: '=Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 30 ? ''17.93s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState)
+                        || 0)) < 45 ? ''10.24s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0))
+                        < 60 ? ''7.17s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 75 ?
+                        ''5.52s'' : (''4.48s''))))'
                       repeatCount: indefinite
                       calcMode: linear
                       keyPoints: 0.2222;1;0;0.2222
@@ -696,12 +702,12 @@ slots:
                   default:
                   - component: animateMotion
                     config:
-                      path: '=items[props.heatpumpDefrostOperaton].state === ''ON'' ? ''M502,456 L528,456 L528,129'' : ''M528,129
-                        V456 H502'''
-                      dur: '=Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 30 ? ''17.65s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState)
-                        || 0)) < 45 ? ''10.09s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0))
-                        < 60 ? ''7.06s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 75 ?
-                        ''5.43s'' : (''4.41s''))))'
+                      path: '=items[props.heatpumpDefrostOperaton].state === ''ON'' ? ''M502,456 L533.5,456 L533.5,129'' :
+                        ''M533.5,129 V456 H502'''
+                      dur: '=Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 30 ? ''17.93s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState)
+                        || 0)) < 45 ? ''10.24s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0))
+                        < 60 ? ''7.17s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 75 ?
+                        ''5.52s'' : (''4.48s''))))'
                       repeatCount: indefinite
                       calcMode: linear
                       keyPoints: 0.3333;1;0;0.3333
@@ -717,12 +723,12 @@ slots:
                   default:
                   - component: animateMotion
                     config:
-                      path: '=items[props.heatpumpDefrostOperaton].state === ''ON'' ? ''M502,456 L528,456 L528,129'' : ''M528,129
-                        V456 H502'''
-                      dur: '=Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 30 ? ''17.65s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState)
-                        || 0)) < 45 ? ''10.09s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0))
-                        < 60 ? ''7.06s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 75 ?
-                        ''5.43s'' : (''4.41s''))))'
+                      path: '=items[props.heatpumpDefrostOperaton].state === ''ON'' ? ''M502,456 L533.5,456 L533.5,129'' :
+                        ''M533.5,129 V456 H502'''
+                      dur: '=Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 30 ? ''17.93s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState)
+                        || 0)) < 45 ? ''10.24s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0))
+                        < 60 ? ''7.17s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 75 ?
+                        ''5.52s'' : (''4.48s''))))'
                       repeatCount: indefinite
                       calcMode: linear
                       keyPoints: 0.4444;1;0;0.4444
@@ -738,12 +744,12 @@ slots:
                   default:
                   - component: animateMotion
                     config:
-                      path: '=items[props.heatpumpDefrostOperaton].state === ''ON'' ? ''M502,456 L528,456 L528,129'' : ''M528,129
-                        V456 H502'''
-                      dur: '=Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 30 ? ''17.65s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState)
-                        || 0)) < 45 ? ''10.09s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0))
-                        < 60 ? ''7.06s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 75 ?
-                        ''5.43s'' : (''4.41s''))))'
+                      path: '=items[props.heatpumpDefrostOperaton].state === ''ON'' ? ''M502,456 L533.5,456 L533.5,129'' :
+                        ''M533.5,129 V456 H502'''
+                      dur: '=Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 30 ? ''17.93s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState)
+                        || 0)) < 45 ? ''10.24s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0))
+                        < 60 ? ''7.17s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 75 ?
+                        ''5.52s'' : (''4.48s''))))'
                       repeatCount: indefinite
                       calcMode: linear
                       keyPoints: 0.5556;1;0;0.5556
@@ -759,12 +765,12 @@ slots:
                   default:
                   - component: animateMotion
                     config:
-                      path: '=items[props.heatpumpDefrostOperaton].state === ''ON'' ? ''M502,456 L528,456 L528,129'' : ''M528,129
-                        V456 H502'''
-                      dur: '=Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 30 ? ''17.65s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState)
-                        || 0)) < 45 ? ''10.09s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0))
-                        < 60 ? ''7.06s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 75 ?
-                        ''5.43s'' : (''4.41s''))))'
+                      path: '=items[props.heatpumpDefrostOperaton].state === ''ON'' ? ''M502,456 L533.5,456 L533.5,129'' :
+                        ''M533.5,129 V456 H502'''
+                      dur: '=Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 30 ? ''17.93s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState)
+                        || 0)) < 45 ? ''10.24s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0))
+                        < 60 ? ''7.17s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 75 ?
+                        ''5.52s'' : (''4.48s''))))'
                       repeatCount: indefinite
                       calcMode: linear
                       keyPoints: 0.6667;1;0;0.6667
@@ -780,12 +786,12 @@ slots:
                   default:
                   - component: animateMotion
                     config:
-                      path: '=items[props.heatpumpDefrostOperaton].state === ''ON'' ? ''M502,456 L528,456 L528,129'' : ''M528,129
-                        V456 H502'''
-                      dur: '=Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 30 ? ''17.65s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState)
-                        || 0)) < 45 ? ''10.09s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0))
-                        < 60 ? ''7.06s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 75 ?
-                        ''5.43s'' : (''4.41s''))))'
+                      path: '=items[props.heatpumpDefrostOperaton].state === ''ON'' ? ''M502,456 L533.5,456 L533.5,129'' :
+                        ''M533.5,129 V456 H502'''
+                      dur: '=Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 30 ? ''17.93s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState)
+                        || 0)) < 45 ? ''10.24s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0))
+                        < 60 ? ''7.17s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 75 ?
+                        ''5.52s'' : (''4.48s''))))'
                       repeatCount: indefinite
                       calcMode: linear
                       keyPoints: 0.7778;1;0;0.7778
@@ -801,12 +807,12 @@ slots:
                   default:
                   - component: animateMotion
                     config:
-                      path: '=items[props.heatpumpDefrostOperaton].state === ''ON'' ? ''M502,456 L528,456 L528,129'' : ''M528,129
-                        V456 H502'''
-                      dur: '=Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 30 ? ''17.65s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState)
-                        || 0)) < 45 ? ''10.09s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0))
-                        < 60 ? ''7.06s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 75 ?
-                        ''5.43s'' : (''4.41s''))))'
+                      path: '=items[props.heatpumpDefrostOperaton].state === ''ON'' ? ''M502,456 L533.5,456 L533.5,129'' :
+                        ''M533.5,129 V456 H502'''
+                      dur: '=Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 30 ? ''17.93s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState)
+                        || 0)) < 45 ? ''10.24s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0))
+                        < 60 ? ''7.17s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 75 ?
+                        ''5.52s'' : (''4.48s''))))'
                       repeatCount: indefinite
                       calcMode: linear
                       keyPoints: 0.8889;1;0;0.8889
@@ -1194,14 +1200,14 @@ slots:
                   default:
                   - component: circle
                     config:
-                      cx: 515
+                      cx: 520.5
                       cy: 102
                       r: 32.25
                       style:
                         fill: 'var(--f7-card-bg-color, #fff)'
                   - component: circle
                     config:
-                      cx: 515
+                      cx: 520.5
                       cy: 102
                       r: 29.2
                       fill: none
@@ -1213,7 +1219,7 @@ slots:
                   default:
                   - component: circle
                     config:
-                      cx: 515
+                      cx: 520.5
                       cy: 102
                       r: 29.2
                       fill: none
@@ -1249,7 +1255,7 @@ slots:
                             || 0) / 74) > 0.01)
                   - component: circle
                     config:
-                      cx: 515
+                      cx: 520.5
                       cy: 102
                       r: 29.2
                       fill: none
@@ -1276,11 +1282,11 @@ slots:
                     config:
                       style:
                         stroke: 'var(--f7-card-bg-color, #fff)'
-                      cx: 515
+                      cx: 520.5
                       cy: 102
                       r: 29.2
                       fill: none
-                      transform: rotate(-90 515 102)
+                      transform: rotate(-90 520.5 102)
                       stroke-linecap: round
                       stroke-dasharray: =(Math.min(1, (Number(items[props.heatpumpInvFrequency].numericState) || 0) / 74)
                         * 100).toFixed(2) + ' 100'
@@ -1289,11 +1295,11 @@ slots:
                   - component: circle
                     config:
                       stroke: '#fb8c00'
-                      cx: 515
+                      cx: 520.5
                       cy: 102
                       r: 29.2
                       fill: none
-                      transform: rotate(-90 515 102)
+                      transform: rotate(-90 520.5 102)
                       stroke-linecap: round
                       stroke-dasharray: =(Math.min(1, (Number(items[props.heatpumpInvFrequency].numericState) || 0) / 74)
                         * 100).toFixed(2) + ' 100'
@@ -2171,7 +2177,7 @@ slots:
               - component: widget:flow-node
                 config:
                   kind: heat-pump
-                  x: 515
+                  x: 520.5
                   y: 102
                   power: =(Number(items[props.heatpumpCircuitPower].numericState) || 0)
                   frequency: =(Number(items[props.heatpumpInvFrequency].numericState) || 0)
@@ -2496,14 +2502,14 @@ slots:
                   default:
                   - component: circle
                     config:
-                      cx: 541.9
+                      cx: 547.4
                       cy: 75.1
                       r: 12
                       style:
                         fill: 'var(--f7-card-bg-color, #fff)'
                   - component: circle
                     config:
-                      cx: 541.9
+                      cx: 547.4
                       cy: 75.1
                       r: 12
                       fill: '=(Number(items[props.heatpumpInvFrequency].numericState) || 0) > 0 ? ''#fb8c00'' : ''rgba(158,
@@ -2512,7 +2518,7 @@ slots:
                       stroke-width: 2
                   - component: text
                     config:
-                      x: 541.9
+                      x: 547.4
                       y: 75.6
                       content: Hz
                       fill: '=(Number(items[props.heatpumpInvFrequency].numericState) || 0) > 0 ? ''#ffffff'' : ''#9e9e9e'''
@@ -2659,10 +2665,10 @@ slots:
                         font-feature-settings: '''liga'''
               - component: rect
                 config:
-                  x: 297.0
-                  y: 25
+                  x: 302.5
+                  y: 8
                   width: 176
-                  height: 103
+                  height: 120
                   rx: 12
                   style:
                     fill: '=(Number(items[props.heatpumpInvFrequency].numericState) || 0) > 0 ? ''rgba(251, 140, 0, 0.2)''
@@ -2672,8 +2678,8 @@ slots:
                   stroke-width: 1.5
               - component: text
                 config:
-                  x: 316.0
-                  y: 41
+                  x: 321.5
+                  y: 24
                   content: heat_pump
                   fill: '=(Number(items[props.heatpumpInvFrequency].numericState) || 0) > 0 ? ''#fb8c00'' : ''currentColor'''
                   font-size: 18
@@ -2684,8 +2690,8 @@ slots:
                     font-feature-settings: '''liga'''
               - component: text
                 config:
-                  x: 331.0
-                  y: 46
+                  x: 336.5
+                  y: 29
                   content: Outdoor Unit
                   fill: currentColor
                   font-size: 13
@@ -2694,8 +2700,8 @@ slots:
                   opacity: '1'
               - component: text
                 config:
-                  x: 463.0
-                  y: 46
+                  x: 468.5
+                  y: 29
                   content: '=items[props.heatpumpDefrostOperaton].state === ''ON'' ? ''Defrost'' : '''''
                   fill: currentColor
                   font-size: 11
@@ -2704,8 +2710,8 @@ slots:
                   opacity: '0.7'
               - component: text
                 config:
-                  x: 307.0
-                  y: 65.15
+                  x: 312.5
+                  y: 48.15
                   content: Power
                   fill: currentColor
                   font-size: 11
@@ -2714,8 +2720,8 @@ slots:
                   opacity: '0.7'
               - component: text
                 config:
-                  x: 463.0
-                  y: 67
+                  x: 468.5
+                  y: 50
                   content: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpCircuitPower].state) ? ''–'' : ((Number(items[props.heatpumpCircuitPower].numericState)
                     || 0) / 1000).toFixed(2) + '' kW'')'
                   fill: '#fb8c00'
@@ -2725,8 +2731,8 @@ slots:
                   opacity: '1'
               - component: text
                 config:
-                  x: 307.0
-                  y: 82.15
+                  x: 312.5
+                  y: 65.15
                   content: Compressor
                   fill: currentColor
                   font-size: 11
@@ -2735,8 +2741,8 @@ slots:
                   opacity: '0.7'
               - component: text
                 config:
-                  x: 463.0
-                  y: 84
+                  x: 468.5
+                  y: 67
                   content: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpInvFrequency].state) ? ''–'' : (items[props.heatpumpInvFrequency].displayState
                     || items[props.heatpumpInvFrequency].state))'
                   fill: currentColor
@@ -2746,8 +2752,8 @@ slots:
                   opacity: '1'
               - component: text
                 config:
-                  x: 307.0
-                  y: 99.15
+                  x: 312.5
+                  y: 82.15
                   content: Outdoor
                   fill: currentColor
                   font-size: 11
@@ -2756,8 +2762,8 @@ slots:
                   opacity: '0.7'
               - component: text
                 config:
-                  x: 463.0
-                  y: 101
+                  x: 468.5
+                  y: 84
                   content: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpExtAmbientTemp].state) ? ''–'' : (items[props.heatpumpExtAmbientTemp].displayState
                     || items[props.heatpumpExtAmbientTemp].state))'
                   fill: currentColor
@@ -2767,7 +2773,28 @@ slots:
                   opacity: '1'
               - component: text
                 config:
-                  x: 307.0
+                  x: 312.5
+                  y: 99.15
+                  content: Outdoor air
+                  fill: currentColor
+                  font-size: 11
+                  font-weight: normal
+                  text-anchor: start
+                  opacity: '0.7'
+              - component: text
+                config:
+                  x: 468.5
+                  y: 101
+                  content: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpOutdoorAirTemp].state) ? ''–'' : (items[props.heatpumpOutdoorAirTemp].displayState
+                    || items[props.heatpumpOutdoorAirTemp].state))'
+                  fill: currentColor
+                  font-size: 15
+                  font-weight: '700'
+                  text-anchor: end
+                  opacity: '1'
+              - component: text
+                config:
+                  x: 312.5
                   y: 116.15
                   content: Heat exchanger
                   fill: currentColor
@@ -2777,7 +2804,7 @@ slots:
                   opacity: '0.7'
               - component: text
                 config:
-                  x: 463.0
+                  x: 468.5
                   y: 118
                   content: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpHeatExchangerMidTemp].state) ? ''–'' : (items[props.heatpumpHeatExchangerMidTemp].displayState
                     || items[props.heatpumpHeatExchangerMidTemp].state))'
@@ -2789,9 +2816,9 @@ slots:
               - component: rect
                 config:
                   x: 99.0
-                  y: 25
+                  y: 8
                   width: 176
-                  height: 103
+                  height: 120
                   rx: 12
                   style:
                     fill: '=items[props.heatpumpSmartGrid].state !== ''0'' ? ''rgba(251, 140, 0, 0.2)'' : ''color-mix(in srgb,
@@ -2801,7 +2828,7 @@ slots:
               - component: text
                 config:
                   x: 118.0
-                  y: 41
+                  y: 24
                   content: tune
                   fill: '=items[props.heatpumpSmartGrid].state !== ''0'' ? ''#fb8c00'' : ''currentColor'''
                   font-size: 18
@@ -2813,7 +2840,7 @@ slots:
               - component: text
                 config:
                   x: 133.0
-                  y: 46
+                  y: 29
                   content: Control
                   fill: currentColor
                   font-size: 13
@@ -2823,7 +2850,7 @@ slots:
               - component: text
                 config:
                   x: 109.0
-                  y: 65.15
+                  y: 48.15
                   content: Heating
                   fill: currentColor
                   font-size: 11
@@ -2833,7 +2860,7 @@ slots:
               - component: text
                 config:
                   x: 265.0
-                  y: 67
+                  y: 50
                   content: '=items[props.heatpumpClimateControlPower].state === ''ON'' ? ''On'' : ''Off'''
                   fill: currentColor
                   font-size: 15
@@ -2843,7 +2870,7 @@ slots:
               - component: text
                 config:
                   x: 109.0
-                  y: 82.15
+                  y: 65.15
                   content: Hot water
                   fill: currentColor
                   font-size: 11
@@ -2853,7 +2880,7 @@ slots:
               - component: text
                 config:
                   x: 265.0
-                  y: 84
+                  y: 67
                   content: '=items[props.heatpumpDhwBoost].state === ''ON'' ? ''Boost'' : items[props.heatpumpDhwPower].state
                     === ''ON'' ? ''On'' : ''Off'''
                   fill: currentColor
@@ -2864,7 +2891,7 @@ slots:
               - component: text
                 config:
                   x: 109.0
-                  y: 99.15
+                  y: 82.15
                   content: Smart Grid
                   fill: currentColor
                   font-size: 11
@@ -2874,7 +2901,7 @@ slots:
               - component: text
                 config:
                   x: 265.0
-                  y: 101
+                  y: 84
                   content: '=(items[props.heatpumpSmartGrid].state === ''1'' ? ''Blocked'' : items[props.heatpumpSmartGrid].state
                     === ''2'' ? ''Recommended'' : items[props.heatpumpSmartGrid].state === ''3'' ? ''Command'' : ''Normal'')'
                   fill: currentColor
@@ -2885,7 +2912,7 @@ slots:
               - component: text
                 config:
                   x: 109.0
-                  y: 116.15
+                  y: 99.15
                   content: Automatic
                   fill: currentColor
                   font-size: 11
@@ -2895,8 +2922,29 @@ slots:
               - component: text
                 config:
                   x: 265.0
-                  y: 118
+                  y: 101
                   content: '=items[props.heatpumpManagement].state === ''ON'' ? ''On'' : ''Off'''
+                  fill: currentColor
+                  font-size: 15
+                  font-weight: '700'
+                  text-anchor: end
+                  opacity: '1'
+              - component: text
+                config:
+                  x: 109.0
+                  y: 116.15
+                  content: Outdoor Ø 24 h
+                  fill: currentColor
+                  font-size: 11
+                  font-weight: normal
+                  text-anchor: start
+                  opacity: '0.7'
+              - component: text
+                config:
+                  x: 265.0
+                  y: 118
+                  content: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpExtAmbientTempAvg].state) ? ''–'' : (items[props.heatpumpExtAmbientTempAvg].displayState
+                    || items[props.heatpumpExtAmbientTempAvg].state))'
                   fill: currentColor
                   font-size: 15
                   font-weight: '700'
@@ -2906,7 +2954,7 @@ slots:
                 config:
                   x: 387.0
                   y: 170
-                  width: 128
+                  width: 133.5
                   height: 86
                   rx: 12
                   style:
@@ -2949,7 +2997,7 @@ slots:
                   opacity: '0.7'
               - component: text
                 config:
-                  x: 505.0
+                  x: 510.5
                   y: 212
                   content: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpDischargePipeTemp].state) ? ''–'' : (items[props.heatpumpDischargePipeTemp].displayState
                     || items[props.heatpumpDischargePipeTemp].state))'
@@ -2970,7 +3018,7 @@ slots:
                   opacity: '0.7'
               - component: text
                 config:
-                  x: 505.0
+                  x: 510.5
                   y: 229
                   content: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpRefrigerantTemp].state) ? ''–'' : (items[props.heatpumpRefrigerantTemp].displayState
                     || items[props.heatpumpRefrigerantTemp].state))'
@@ -2991,7 +3039,7 @@ slots:
                   opacity: '0.7'
               - component: text
                 config:
-                  x: 505.0
+                  x: 510.5
                   y: 246
                   content: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpRefrigerantPressure].state) ? ''–'' : (items[props.heatpumpRefrigerantPressure].displayState
                     || items[props.heatpumpRefrigerantPressure].state))'
@@ -3004,7 +3052,7 @@ slots:
                 config:
                   x: 387.0
                   y: 285
-                  width: 128
+                  width: 133.5
                   height: 86
                   rx: 12
                   style:
@@ -3049,7 +3097,7 @@ slots:
                   opacity: '0.7'
               - component: text
                 config:
-                  x: 505.0
+                  x: 510.5
                   y: 327
                   content: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpHeatingPowerAfterBuh].state) ? ''–'' : ((Number(items[props.heatpumpHeatingPowerAfterBuh].numericState)
                     || 0) / 1000).toFixed(2) + '' kW'')'
@@ -3070,7 +3118,7 @@ slots:
                   opacity: '0.7'
               - component: text
                 config:
-                  x: 505.0
+                  x: 510.5
                   y: 344
                   content: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpLeavingWaterTempAfterBuh].state) ? ''–''
                     : (items[props.heatpumpLeavingWaterTempAfterBuh].displayState || items[props.heatpumpLeavingWaterTempAfterBuh].state))'
@@ -3091,7 +3139,7 @@ slots:
                   opacity: '0.7'
               - component: text
                 config:
-                  x: 505.0
+                  x: 510.5
                   y: 361
                   content: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpInletWaterTemp].state) ? ''–'' : (items[props.heatpumpInletWaterTemp].displayState
                     || items[props.heatpumpInletWaterTemp].state))'
@@ -3526,9 +3574,9 @@ slots:
                 display: block
                 border-radius: 12px
                 left: 0.00%
-                top: 1.15%
+                top: 1.12%
                 width: 38.94%
-                height: 16.91%
+                height: 19.17%
           - component: oh-link
             config:
               action: popup
@@ -3543,10 +3591,10 @@ slots:
                 position: absolute
                 display: block
                 border-radius: 12px
-                left: 43.81%
-                top: 1.15%
+                left: 45.02%
+                top: 1.12%
                 width: 38.94%
-                height: 16.91%
+                height: 19.17%
           - component: oh-link
             config:
               action: popup
@@ -3562,9 +3610,9 @@ slots:
                 display: block
                 border-radius: 12px
                 left: 63.72%
-                top: 24.96%
-                width: 28.32%
-                height: 14.12%
+                top: 27.00%
+                width: 29.54%
+                height: 13.74%
           - component: oh-link
             config:
               action: popup
@@ -3581,9 +3629,9 @@ slots:
                 display: block
                 border-radius: 12px
                 left: 63.72%
-                top: 43.84%
-                width: 28.32%
-                height: 14.12%
+                top: 45.37%
+                width: 29.54%
+                height: 13.74%
           - component: oh-link
             config:
               action: popup
@@ -3596,9 +3644,9 @@ slots:
                 display: block
                 border-radius: 12px
                 left: 3.54%
-                top: 26.93%
+                top: 28.91%
                 width: 33.85%
-                height: 11.33%
+                height: 11.02%
           - component: oh-link
             config:
               action: popup
@@ -3612,9 +3660,9 @@ slots:
                 display: block
                 border-radius: 12px
                 left: 3.54%
-                top: 43.84%
+                top: 45.37%
                 width: 33.85%
-                height: 14.12%
+                height: 13.74%
           - component: oh-link
             config:
               action: popup
@@ -3630,9 +3678,9 @@ slots:
                 display: block
                 border-radius: 12px
                 left: 65.49%
-                top: 82.10%
+                top: 82.59%
                 width: 34.51%
-                height: 16.91%
+                height: 16.45%
           - component: oh-link
             config:
               action: popup
@@ -3647,9 +3695,9 @@ slots:
                 display: block
                 border-radius: 12px
                 left: 0.00%
-                top: 82.10%
+                top: 82.59%
                 width: 47.35%
-                height: 14.12%
+                height: 13.74%
           - component: oh-link
             config:
               action: popup
@@ -3665,9 +3713,9 @@ slots:
                 display: block
                 border-radius: 50%
                 left: 75.88%
-                top: 67.00%
+                top: 67.89%
                 width: 13.27%
-                height: 9.85%
+                height: 9.58%
           - component: oh-link
             config:
               action: popup
@@ -3682,10 +3730,10 @@ slots:
                 position: absolute
                 display: block
                 border-radius: 50%
-                left: 85.40%
-                top: 8.87%
+                left: 86.62%
+                top: 11.34%
                 width: 13.27%
-                height: 9.85%
+                height: 9.58%
           - component: oh-link
             config:
               action: popup
@@ -3700,9 +3748,9 @@ slots:
                 display: block
                 border-radius: 50%
                 left: 32.52%
-                top: 67.00%
+                top: 67.89%
                 width: 13.27%
-                height: 9.85%
+                height: 9.58%
           - component: oh-link
             config:
               action: popup
@@ -3714,6 +3762,6 @@ slots:
                 display: block
                 border-radius: 50%
                 left: 54.20%
-                top: 67.00%
+                top: 67.89%
                 width: 13.27%
-                height: 9.85%
+                height: 9.58%

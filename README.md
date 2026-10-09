@@ -378,17 +378,18 @@ water while they carry it. Dots run along the pipes, as many as a pipe is long, 
 flow or the compressor's frequency, and all of them backwards during a defrost. The valve shows its position in its
 icon. Badges just outside three rings say what the outdoor unit's ring shows (*Hz*) and the wall unit's (water while it
 flows, a red bolt while the backup heater runs) and where the tank's heat comes from; grey while their device rests.
-Tiles in the style of the switch tiles hold the figures: the outdoor unit, the control (heating, hot water, Smart Grid,
-automation), the refrigerant, the heating circuit, the climate of the two floors, the tank with its booster heater and
-the indoor unit with its own power (the measured circuit plus the backup heater), each tinted in its colour while what
-it shows is at work. A tap on a tile, the wall unit, the outdoor unit, the tank or the valve opens its quick popup (see
-[Quick popups](#quick-popups)). At the card's top, across its whole width as the energy flow's tiles, the electrical
-power, the heat and the COP as a row of value tiles that open their quick popups too (today's split and COPs are in the
-heating card). The drawing ends at the house's walls, and the tiles beside them end flush with the walls; on a phone it
-takes the card's width inside the same padding as the value tiles above it, so the house and its outer tiles line up
-with them. Everywhere else it stands at its own size, as the energy flow does, so their texts keep the UI's sizes and
-their rings come out the same and never shrink, centred and in the middle of the height the card is given. The
-recordings show it with demo values (a space heating run).
+Tiles in the style of the switch tiles hold the figures: the outdoor unit (its power, the compressor, both outdoor
+sensors and its heat exchanger), the control (heating, hot water, Smart Grid, automation and the outdoor mean its
+heating curve works with), the refrigerant, the heating circuit, the climate of the two floors, the tank with its
+booster heater and the indoor unit with its own power (the measured circuit plus the backup heater), each tinted in its
+colour while what it shows is at work. A tap on a tile, the wall unit, the outdoor unit, the tank or the valve opens its
+quick popup (see [Quick popups](#quick-popups)). At the card's top, across its whole width as the energy flow's tiles,
+the electrical power, the heat and the COP as a row of value tiles that open their quick popups too (today's split and
+COPs are in the heating card). The drawing ends at the house's walls, and the tiles beside them end flush with the
+walls; on a phone it takes the card's width inside the same padding as the value tiles above it, so the house and its
+outer tiles line up with them. Everywhere else it stands at its own size, as the energy flow does, so their texts keep
+the UI's sizes and their rings come out the same and never shrink, centred and in the middle of the height the card is
+given. The recordings show it with demo values (a space heating run).
 
 Needs `boost-pill`, `flow-node`, `ground-floor-quick`, `heatpump-circuit-quick`, `heatpump-control-quick`,
 `heatpump-cop-quick`, `heatpump-electric-quick`, `heatpump-heat-quick`, `heatpump-indoor-quick`,
@@ -400,7 +401,7 @@ Needs `boost-pill`, `flow-node`, `ground-floor-quick`, `heatpump-circuit-quick`,
 ![Heat pump in dark mode](screenshots/heatpump-card-dark.gif)
 
 <details>
-<summary>59 props</summary>
+<summary>60 props</summary>
 
 | Prop | Item | Item type |
 |---|---|---|
@@ -436,12 +437,14 @@ Needs `boost-pill`, `flow-node`, `ground-floor-quick`, `heatpump-circuit-quick`,
 | `heatpumpBshMode` | ESPAltherma Booster Heater (BSH) Mode | Switch |
 | `heatpumpLeavingWaterTempAfterBuh` | ESPAltherma Leaving Water Temperature After BUH | Number:Temperature |
 | `heatpumpCircuitPower` | Heatpump Power | Number:Power |
+| `heatpumpOutdoorAirTemp` | ESPAltherma Outdoor Air Temperature | Number:Temperature |
 | `heatpumpHeatExchangerMidTemp` | ESPAltherma Heat Exchanger Mid Temperature | Number:Temperature |
 | `heatpumpSmartGrid` | ESPAltherma Smart Grid | String |
 | `heatpumpClimateControlPower` | Pyaltherma Climate Control Power | Switch |
 | `heatpumpDhwBoost` | Pyaltherma DHW Powerful | Switch |
 | `heatpumpDhwPower` | Pyaltherma DHW Power | Switch |
 | `heatpumpManagement` | Heatpump Management | Group |
+| `heatpumpExtAmbientTempAvg` | ESPAltherma External Ambient Temperature Average | Number:Temperature |
 | `heatpumpDischargePipeTemp` | ESPAltherma Discharge Pipe Temperature | Number:Temperature |
 | `heatpumpRefrigerantTemp` | ESPAltherma Refrigerant Temperature Liquid Side | Number:Temperature |
 | `heatpumpRefrigerantPressure` | ESPAltherma Refrigerant Pressure Sensor | Number:Pressure |
@@ -460,7 +463,6 @@ Needs `boost-pill`, `flow-node`, `ground-floor-quick`, `heatpump-circuit-quick`,
 | `heatpumpDhwManagement` | Heatpump DHW Management | Switch |
 | `heatpumpLeavingWaterTempOffsetHeating` | Pyaltherma Leaving Water Temp Offset Heating | Number:Temperature |
 | `heatpumpLeavingWaterSetpoint` | ESPAltherma Leaving Water Setpoint | Number:Temperature |
-| `heatpumpOutdoorAirTemp` | ESPAltherma Outdoor Air Temperature | Number:Temperature |
 | `heatpumpTargetDischargeTemp` | ESPAltherma Target Discharge Temperature | Number:Temperature |
 | `heatpumpWaterPumpSignal` | ESPAltherma Water Pump Signal | Number:Dimensionless |
 
@@ -1292,7 +1294,10 @@ The popup every tile of my device pages opens, in place of the analyzer: the ite
 the day with arrows for earlier days, as a line for measurements or as a band of states for switches, texts and
 numbers with state options (labelled from the `states` prop), or the value alone for dates. Given a second item
 (`item2`, with `name`, `name2` and `color2`), it shows both values side by side and their courses as two lines, as my
-tiles of two values (flow and return) open it. Open it from any link with `action: popup`, `actionModal:
+tiles of two values (flow and return) open it; `dashed2` draws the second line dashed, for a reference such as the
+outdoor mean beside the outdoor temperature. Given `curve`, a String item holding the heating curve my rule
+`heatpump_heating_curve` learns (as JSON), it draws that curve as a chart on top, with the measured bins and the
+present point (`item` the outdoor mean, `item2` the setpoint). Open it from any link with `action: popup`, `actionModal:
 widget:item-popup` and its props in `actionModalConfig`:
 
 ```yaml
@@ -1317,6 +1322,8 @@ actionModalConfig:
 | `name` | The first item's name beside a second item; empty: the title | TEXT |  |
 | `name2` | The second item's name | TEXT |  |
 | `color2` | Colour of the second item's value and line as #rrggbb | TEXT | `#78909c` |
+| `dashed2` | Draw the second item's line dashed, for a reference such as the first one's mean | BOOLEAN | `false` |
+| `curve` | A String item holding a learnt heating curve as JSON (rule heatpump_heating_curve), drawn as a chart on top with item (outdoor) and item2 (setpoint) as the present point | Item |  |
 
 ## Value tile: `value-tile`
 

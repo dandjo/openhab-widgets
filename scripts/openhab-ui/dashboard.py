@@ -2299,6 +2299,11 @@ HPX = {  # heat pump items
     "buh2": "espaltherma_buh_step2_mode", "bsh": "espaltherma_bsh_mode", "tank": "espaltherma_dhw_tank_temp",
     "tank_set": "espaltherma_dhw_setpoint", "water_pressure": "espaltherma_water_pressure", "supply": "espaltherma_leaving_water_temp_after_buh",
     "return": "espaltherma_inlet_water_temp", "outdoor": "espaltherma_ext_ambient_temp",
+    # the outdoor temperature the heating curve works with: the sensor smoothed as the controller does it (rule
+    # heatpump_outdoor_average, averaging time in the item's metadata 'averaging')
+    "outdoor_avg": "espaltherma_ext_ambient_temp_avg",
+    # the outdoor unit's second outdoor sensor, at its air intake
+    "outdoor_air": "espaltherma_outdoor_air_temp",
     "indoor": "espaltherma_indoor_ambient_temp", "power": "espaltherma_electrical_power",
     "heat": "espaltherma_heating_power", "cop": "espaltherma_cop", "defrost": "espaltherma_defrost_operaton",
     "refrigerant": "espaltherma_refrig_temp_liquid_side", "pressure": "espaltherma_refrigerant_pressure_sensor",
@@ -2312,7 +2317,22 @@ HPX = {  # heat pump items
     # the water's heat after the backup heater, what the pipe from the wall unit carries to the valve
     "water_heat": "espaltherma_heating_power_after_buh",
 }
-PUMP_ON = f"(items.{HPX['pump']}.state === 'ON' || {num(HPX['flow'])} > 0)"
+
+
+def averaging_hours(item, default=24.0):
+    """The hours an item's 'averaging' metadata names (the rule writing the item reads the same), from the JSONDB;
+    default where it cannot be read."""
+    try:
+        meta = m.json.load(open(m.DB + "org.openhab.core.items.Metadata.json"))
+        return float(meta[f"averaging:{item}"]["value"]["value"])
+    except (OSError, KeyError, ValueError):
+        return default
+
+
+# the smoothed outdoor temperature's name in the UI: the controller's averaging time, as its setting names it
+HP_AVG_HOURS = averaging_hours(HPX["outdoor_avg"])
+HP_AVG_NAME = f"Ø {HP_AVG_HOURS:g} h" if HP_AVG_HOURS > 0 else "Regelwert"
+PUMP_ON =f"(items.{HPX['pump']}.state === 'ON' || {num(HPX['flow'])} > 0)"
 # what fills a ring of the heat pump card: the compressor's top frequency, the water's flow (the pump delivers about
 # 24.5 l/min at its top; user, 2026-10-04), a hot tank, the highest leaving water the one heating circuit, floor
 # heating, is set to ([9-00] 40 °C; its heating curve reaches 35 °C at the coldest, [1-02]). The rings stay in the
@@ -2517,15 +2537,21 @@ LEFT, RIGHT = 100, 550
 # the house's outer edges, its outline 2 wide: the drawing's edges, and the outer edges of the tiles flush with its
 # walls (user, 2026-10-08: they line up with the figures' tiles above it on a phone)
 OUTER_LEFT, OUTER_RIGHT = LEFT - 1, RIGHT + 1
-# the outdoor unit on the right slope of the roof (its badge may stand out over the edge); the refrigerant down inside
-# the right wall from the unit's ring
-OUT = (RIGHT - 35, 102)
-REFRIGERANT_X = RIGHT - 22
+TILE_ROW = 17  # from one row of a tile to the next
+# the floors' tiles stand as far from the outer wall as the ground floor's (three rows) from its floor and ceiling
+# lines, about 14, and reach to 14 units before their floor loops' rings: 153 wide, room for Luftfeuchtigkeit 100 %
+FLOOR_TILE_X = round(LEFT + 1 + ((GROUND_LEVEL - 1.5) - (FLOOR_1 + 0.7) - (35 + 3 * TILE_ROW)) / 2)
+# the outdoor unit on the right slope of the roof, its ring at rest flush with the house's outer edge, to half a unit
+# (user, 2026-10-09; its badge stands out over the edge); the refrigerant down inside the right wall from the unit's
+# ring, its pipe (3 wide) as far from the wall's inner edge as the floors' tiles from the left one's (user,
+# 2026-10-09), so the room's tiles beside it grow
+OUT = (round(2 * (OUTER_RIGHT - RING_R - RING_W / 2)) / 2, 102)
+REFRIGERANT_X = RIGHT - 1 - (FLOOR_TILE_X - (LEFT + 1)) - 3 / 2
 REFRIGERANT_START = round(math.sqrt(ORBIT ** 2 - (REFRIGERANT_X - OUT[0]) ** 2))  # below the unit, on its ring
-# the basement's four devices evenly spaced from the radiators to the wall unit beside the refrigerant line, the
-# radiators' ring as far from the left wall as the wall unit's from the right one; the floor loops above, left of the
-# riser, 28 units of pipe from it
-WALL_X = REFRIGERANT_X - 56
+# the basement's four devices evenly spaced from the radiators to the wall unit, the radiators' ring as far from the
+# left wall as the wall unit's from the right one, 78 units in from it (where it stood beside the refrigerant line
+# before that moved out); the floor loops above, left of the riser, 28 units of pipe from it
+WALL_X = RIGHT - 78
 RADIATORS_X = LEFT + RIGHT - WALL_X
 RADIATORS, TANK, VALVE, WALL = ((round(RADIATORS_X + (WALL_X - RADIATORS_X) * k / 3), BASEMENT_Y) for k in range(4))
 GROUND_FH, UPPER_FH = (VALVE[0] - 60, GROUND_Y), (VALVE[0] - 60, UPPER_Y)
@@ -2535,13 +2561,11 @@ HOUSE = 0.4  # outline opacity
 WATER_PRESSURE_BAD = (f"(!['NULL', 'UNDEF'].includes(items.{HPX['water_pressure']}.state) && "
                       f"({num(HPX['water_pressure'])} < 1 || {num(HPX['water_pressure'])} > 2.5))")
 ROOM_X = (VALVE[0] + REFRIGERANT_X) / 2  # the middle of the room right of the riser, where its tiles sit
+ROOM_TILE_W = REFRIGERANT_X - VALVE[0] - 2 * 13  # those tiles 13 from the riser and from the refrigerant line
 # the ground floor's free middle, between the lower edge of its floor line (1.4 wide) and the upper edge of the
 # green ground level (3 wide)
 GROUND_MID = (FLOOR_1 + 0.7 + GROUND_LEVEL - 1.5) / 2
-TILE_ROW = 17  # from one row of a tile to the next
-# the floors' tiles stand as far from the outer wall as the ground floor's (three rows) from its floor and ceiling
-# lines, about 14, and reach to 14 units before their floor loops' rings: 153 wide, room for Luftfeuchtigkeit 100 %
-FLOOR_TILE_X = round(LEFT + 1 + ((GROUND_LEVEL - 1.5) - (FLOOR_1 + 0.7) - (35 + 3 * TILE_ROW)) / 2)
+# the floors' tiles up to 14 units before their floor loops' rings
 FLOOR_TILE_W = round(UPPER_FH[0] - ORBIT - RING_MAX / 2 - 14 - FLOOR_TILE_X)
 
 
@@ -2563,11 +2587,10 @@ def roof_y(x):
 
 
 OUTDOOR_TILE = (OUTDOOR_RIGHT - 176 / 2,
-                round(roof_y(OUTDOOR_RIGHT - 176) - TILE_GAP - (35 + 4 * TILE_ROW)), 176)
+                round(roof_y(OUTDOOR_RIGHT - 176) - TILE_GAP - (35 + 5 * TILE_ROW)), 176)
 CONTROL_TILE = (OUTER_LEFT + 176 / 2, OUTDOOR_TILE[1], 176)
-# the room's tiles 128 wide, 13 from the riser and from the refrigerant line
-REFRIGERANT_TILE = (ROOM_X, 170, 128)
-CIRCUIT_TILE = (ROOM_X, round(GROUND_MID - (35 + 3 * TILE_ROW) / 2), 128)
+REFRIGERANT_TILE = (ROOM_X, 170, ROOM_TILE_W)
+CIRCUIT_TILE = (ROOM_X, round(GROUND_MID - (35 + 3 * TILE_ROW) / 2), ROOM_TILE_W)
 UPPER_TILE = (FLOOR_TILE_X + FLOOR_TILE_W / 2, round(UPPER_Y - (35 + 2 * TILE_ROW) / 2), FLOOR_TILE_W)
 GROUND_TILE = (FLOOR_TILE_X + FLOOR_TILE_W / 2, round(GROUND_MID - (35 + 3 * TILE_ROW) / 2), FLOOR_TILE_W)
 TANK_TILE = (OUTER_LEFT + 214 / 2, BOTTOM + 12, 214)
@@ -2656,16 +2679,18 @@ hp_svg = svg("svg", [
           f"={BUH_ON}"),
     *tank_source_badge(*TANK),
     # the outdoor unit's tile in the sky left of it, clear of the roof: the power of its own circuit, the compressor's
-    # frequency, the outdoor temperature and the middle of its heat exchanger; Abtauen during a defrost. 176 wide, so
-    # Abtauen at its top right clears the title
+    # frequency, both its outdoor sensors (the one the control reads, its air sensor) and the middle of its heat
+    # exchanger; Abtauen during a defrost. 176 wide, so Abtauen at its top right clears the title
     *hp_tile(*OUTDOOR_TILE, "Außengerät", "heat_pump", "#fb8c00", COMPRESSOR, [
         ("Leistung", f"={kw2(HPX['circuit'])}", "#fb8c00"),
         ("Verdichter", f"={disp(HPX['hz'])}", "currentColor"),
         ("Außen", f"={disp(HPX['outdoor'])}", "currentColor"),
+        ("Außenluft", f"={disp(HPX['outdoor_air'])}", "currentColor"),
         ("Wärmetauscher", f"={disp(HPX['exchanger'])}", "currentColor")],
              state=f"=items.{HPX['defrost']}.state === 'ON' ? 'Abtauen' : ''"),
     # the control's tile flush with the left wall: whether heating and hot water are on (Boost while the powerful
-    # mode runs), the Smart Grid state and the automation; tinted while the grid asks for something
+    # mode runs), the Smart Grid state, the automation and the outdoor mean its heating curve works with (user,
+    # 2026-10-09); tinted while the grid asks for something
     *hp_tile(*CONTROL_TILE, "Regelung", "tune", "#fb8c00", "items.espaltherma_smart_grid.state !== '0'", [
         ("Heizung", "=items.pyaltherma_climate_control_power.state === 'ON' ? 'An' : 'Aus'", "currentColor"),
         ("Warmwasser", "=items.pyaltherma_dhw_powerful.state === 'ON' ? 'Boost' : "
@@ -2673,7 +2698,8 @@ hp_svg = svg("svg", [
         ("Smart Grid", "=(" + " : ".join(f"items.espaltherma_smart_grid.state === '{v}' ? '{t}'" for v, t in
                                           [("1", "Sperre"), ("2", "Empfehlung"), ("3", "Befehl")]) + " : 'Normal')",
          "currentColor"),
-        ("Automatik", "=items.heatpump_management.state === 'ON' ? 'An' : 'Aus'", "currentColor")]),
+        ("Automatik", "=items.heatpump_management.state === 'ON' ? 'An' : 'Aus'", "currentColor"),
+        (f"Außen {HP_AVG_NAME}", f"={disp(HPX['outdoor_avg'])}", "currentColor")]),
     # right of the riser, centred between it and the refrigerant line: the refrigerant in the upper floor, between
     # its sloping ceiling and its floor, the heating circuit in the ground floor
     *hp_tile(*REFRIGERANT_TILE, "Kältemittel", "severe_cold", REFRIGERANT, COMPRESSOR, [
@@ -2824,7 +2850,7 @@ def hp_popup_link(style, uid):
 # what a tap opens: a tile its popup, the wall unit, the outdoor unit, the tank and the valve theirs; radiators and floor
 # loops open nothing (user, 2026-10-06: the heat pump card keeps its own popups, which the rest of the UI gave up on
 # 2026-10-05 for the device pages)
-HP_TILE_POPUPS = [(CONTROL_TILE, 4, "heatpump-control-quick"), (OUTDOOR_TILE, 4, "heatpump-outdoor-quick"),
+HP_TILE_POPUPS = [(CONTROL_TILE, 5, "heatpump-control-quick"), (OUTDOOR_TILE, 5, "heatpump-outdoor-quick"),
                   (REFRIGERANT_TILE, 3, "heatpump-refrigerant-quick"),
                   (CIRCUIT_TILE, 3, "heatpump-circuit-quick"), (UPPER_TILE, 2, "upper-floor-quick"),
                   (GROUND_TILE, 3, "ground-floor-quick"), (INDOOR_TILE, 4, "heatpump-indoor-quick"),
@@ -5254,6 +5280,10 @@ def item_modal(item, title, color=None, second=None):
         props.update({"item2": second["item2"], "name": second["name"], "name2": second["name2"],
                       "color": second.get("color") or color or POPUP_COLOR,
                       "color2": second.get("color2") or POPUP_COLOR2})
+        if second.get("dashed2"):
+            props["dashed2"] = True
+        if second.get("curve"):
+            props["curve"] = second["curve"]
     return {"action": "popup", "actionModal": "widget:item-popup", "actionModalConfig": props}
 
 
@@ -5777,9 +5807,15 @@ def series_points(item, span, factor=1, w=196, x0=2, top=6, bottom=40):
             f"(s.filter((v) => v !== null).map((v) => v * {factor})))({s})"), s
 
 
-def sparkline(item, color, span, factor=1, threshold=None, threshold_label=None):
-    """The day's course as a line over its area, its last point marked; a dashed line at a threshold."""
+def sparkline(item, color, span, factor=1, threshold=None, threshold_label=None, ref=None):
+    """The day's course as a line over its area, its last point marked; a dashed line at a threshold; ref: a second
+    item's course as a dashed line in the same colour, both on one scale (user, 2026-10-09: the outdoor temperature's
+    mean the heating curve works with)."""
     pts, s = series_points(item, span, factor)
+    if ref:
+        assert factor == 1 and threshold is None, "a reference line shares the scale only unscaled, without threshold"
+        both = pair_points(item, ref, span)
+        pts, ref_pts = f"({both})[0]", f"({both})[1]"
     line_d = f"=((p) => p.length > 1 ? 'M' + p.join(' L') : '')({pts})"
     area_d = (f"=((p) => p.length > 1 ? 'M' + p[0].split(' ')[0] + ' 44 L' + p.join(' L') + ' L' + "
               f"p[p.length - 1].split(' ')[0] + ' 44 Z' : '')({pts})")
@@ -5800,6 +5836,9 @@ def sparkline(item, color, span, factor=1, threshold=None, threshold_label=None)
                 svg("text", x=3, y=f"=({y} - 2.5).toFixed(1)", content=threshold_label or str(threshold),
                     visible=f"={inside}", fill="currentColor", **{"font-size": "7", "opacity": "0.6"}),
                 *kids]
+    if ref:
+        kids.append(svg("path", d=f"=((p) => p.length > 1 ? 'M' + p.join(' L') : '')({ref_pts})", fill="none",
+                        stroke=color, **{"stroke-width": "1.4", "stroke-dasharray": "4 3", "stroke-linecap": "round"}))
     kids.append(svg("circle", cx=last_x, cy=last_y, r=2.8, fill=color, style={"stroke": "var(--f7-card-bg-color, #fff)"},
                     **{"stroke-width": "1.5"}))
     return svg("svg", kids, viewBox="0 0 200 46", style={"display": "block", "width": "100%", "height": "auto",
@@ -5824,14 +5863,31 @@ def minmax_line(item, digits, factor=1, unit=""):
                  visible=f"={s}.length > 1", **{**VT_SUB, "margin-top": "2px"})
 
 
+def ref_line(item, name, color, digits, unit):
+    """The legend of a sparkline's dashed reference: a dashed stroke, its name and its value."""
+    stroke = svg("svg", [svg("line", x1=1, x2=17, y1=3, y2=3, stroke=color,
+                             **{"stroke-width": "1.6", "stroke-dasharray": "4 3", "stroke-linecap": "round"})],
+                 viewBox="0 0 18 6", style={"width": "18px", "height": "6px", "flex": "0 0 auto"})
+    return div([stroke, label(f"='{name} ' + (['NULL', 'UNDEF'].includes(items.{item}.state) ? '–' : "
+                              f"{fixed(num(item), digits)} + ' {unit}')")],
+               **{"display": "flex", "align-items": "center", "gap": "6px", **VT_SUB, "margin-top": "2px"})
+
+
 def spark_tile(title, item, color, unit, digits=1, span=4, factor=1, trend_h=1, threshold=None, threshold_label=None,
-          value_expr=None, extra_top=(), wide=False):
+          value_expr=None, extra_top=(), wide=False, ref=None, ref_name=None, ref_unit="°C"):
+    """A value with its trend over the day as a sparkline; ref: a second item's course dashed on the same scale, its
+    name and value under the day's range, and in the popup a tap opens (user, 2026-10-09)."""
     track_history(item, s=True, t=trend_h)
+    if ref:
+        track_history(ref, s=True)
+    second = {"item2": ref, "name": title, "name2": ref_name, "color": color, "color2": color, "dashed2": True}
     return vt_tile([vt_title(title),
                  vt_value(value_expr or f"={dash(disp(item))}", None, trend_chip(item, digits, unit, trend_h, factor)),
                  *extra_top,
-                 sparkline(item, color, span, factor, threshold, threshold_label),
-                 minmax_line(item, digits, factor)], item, title, color, wide)
+                 sparkline(item, color, span, factor, threshold, threshold_label, ref),
+                 minmax_line(item, digits, factor),
+                 *([ref_line(ref, ref_name, color, digits, ref_unit)] if ref else [])], item, title, color, wide,
+                second=second if ref else None)
 
 
 # ---------------------------------------------------------------- 12 · rating in words
@@ -6161,9 +6217,10 @@ def pair_sparkline(a, b, a_color, b_color, span):
 
 
 def pair_tile(title, a, b, a_name, b_name, digits=1, unit="K", a_color=None, b_color=None, delta_text=None,
-         a_expr=None, b_expr=None, sub=None, value_unit="", spark=None):
+         a_expr=None, b_expr=None, sub=None, value_unit="", spark=None, below=(), popup=None):
     """Two values that belong together side by side, their difference as a chip beside the title; with spark (the
-    least span of its scale) both values' course over the day under them, in their colours (user, 2026-10-07)."""
+    least span of its scale) both values' course over the day under them, in their colours (user, 2026-10-07);
+    below: further content under them; popup: further props of the item popup a tap opens."""
     av, bv = a_expr or num(a), b_expr or num(b)
     d = f"({av} - {bv})"
     def side(name, item, expr, color, align):
@@ -6179,9 +6236,89 @@ def pair_tile(title, a, b, a_name, b_name, digits=1, unit="K", a_color=None, b_c
         kids.append(label(sub, **{**VT_SUB, "margin-top": "4px"}))
     if spark:
         kids.append(pair_sparkline(a, b, a_color, b_color, spark))
+    kids += list(below)
     # a tap shows both values and their courses, where the second is an item of its own
     second = {"item2": b, "name": a_name, "name2": b_name, "color": a_color, "color2": b_color} if b and a else None
+    if second and popup:
+        second.update(popup)
     return vt_tile(kids, a, title, second=second)
+
+
+# ---------------------------------------------------------------- the heating curve
+
+
+HEATING_CURVE = "heatpump_heating_curve"
+HC_BOX = (30, 210, 8, 112)  # the plot's left, right, top and bottom in the drawing (viewBox 0 0 220 128)
+
+
+def hc_expr(body, fallback="''"):
+    """An expression over the heating curve the rule heatpump_heating_curve learns (JSON: p its polyline of six points,
+    the first and last segment beyond the data, k its two knees, n, from, to); body sees c, the curve, X and Y, an
+    outdoor temperature and a setpoint as places in the drawing (clamped to it), and fallback stands while it has none."""
+    L, R, T, B = HC_BOX
+    s = f"items.{HEATING_CURVE}.state"
+    ys = "c.p.map((p) => p[1])"
+    lo = f"(Math.floor({ys}.reduce((a, b) => Math.min(a, b), 1e9)) - 1)"
+    hi = f"(Math.ceil({ys}.reduce((a, b) => Math.max(a, b), -1e9)) + 1)"
+    x = (f"(x) => ({L} + {R - L} * (Math.max(c.p[0][0], Math.min(c.p[5][0], x)) - c.p[0][0]) / "
+         f"(c.p[5][0] - c.p[0][0])).toFixed(1)")
+    y = f"(y) => ({B} - {B - T} * (Math.max(lo, Math.min(hi, y)) - lo) / (hi - lo)).toFixed(1)"
+    return (f"=((c) => c === null ? {fallback} : ((lo, hi) => ((X, Y) => {body})({x}, {y}))({lo}, {hi}))"
+            f"((({s}) || '').charAt(0) === '{{' ? JSON.parse({s}) : null)")
+
+
+def heating_curve_svg(x_item, y_item, x_color, y_color):
+    """The learnt heating curve drawn as the controller's display draws it: the leaving water setpoint over the outdoor
+    temperature, flat, sloping, flat, solid where the last year's heating went, dashed beyond; the knees' values on the
+    axes; the present point on it, its guides to the axes in the colours of its two values."""
+    L, R, T, B = HC_BOX
+    axis = {"stroke": "currentColor", "stroke-opacity": "0.5", "stroke-width": "1", "fill": "none",
+            "stroke-linecap": "round", "stroke-linejoin": "round"}
+    pt = lambda i: f"X(c.p[{i}][0]) + ' ' + Y(c.p[{i}][1])"
+    fmt = "((v) => (Math.round(v * 10) / 10).toString().replace('.', ',').replace('-', '−'))"
+    text = {"fill": "currentColor", "font-size": "8", "opacity": "0.7"}
+    kids = [svg("path", d=f"M{L} {B} L{L} {T - 4} M{L - 3} {T} L{L} {T - 4} L{L + 3} {T}", **axis),
+            svg("path", d=f"M{L} {B} L{R + 6} {B} M{R + 2} {B - 3} L{R + 6} {B} L{R + 2} {B + 3}", **axis)]
+    for a, b in ((0, 1), (4, 5)):
+        kids.append(svg("path", d=hc_expr(f"'M' + {pt(a)} + ' L' + {pt(b)}"), fill="none", stroke=y_color,
+                        **{"stroke-width": "1.6", "stroke-dasharray": "4 3", "stroke-opacity": "0.7"}))
+    kids.append(svg("path", d=hc_expr("'M' + [1, 2, 3, 4].map((i) => X(c.p[i][0]) + ' ' + Y(c.p[i][1])).join(' L')"),
+                    fill="none", stroke=y_color, **{"stroke-width": "2.2", "stroke-linejoin": "round",
+                                                    "stroke-linecap": "round"}))
+    for i in (0, 1):
+        kx, ky = f"X(c.k[{i}][0])", f"Y(c.k[{i}][1])"
+        kids += [svg("path", d=hc_expr(f"'M' + {kx} + ' {B} L' + {kx} + ' {B + 3} M{L - 3} ' + {ky} + ' L{L} ' + {ky}"),
+                     **axis),
+                 svg("text", x=hc_expr(kx, "-50"), y=B + 12, content=hc_expr(f"{fmt}(c.k[{i}][0])"),
+                     **{**text, "text-anchor": "middle"}),
+                 svg("text", x=L - 5, y=hc_expr(f"(Number({ky}) + 3).toFixed(1)", "-50"),
+                     content=hc_expr(f"{fmt}(c.k[{i}][1])"), **{**text, "text-anchor": "end"})]
+    # the present point: the mean the controller works with and the setpoint it made of it
+    px, py = f"X({num(x_item)})", f"Y({num(y_item)})"
+    known = f"!['NULL', 'UNDEF'].includes(items.{x_item}.state) && !['NULL', 'UNDEF'].includes(items.{y_item}.state)"
+    guide = {"stroke-width": "1", "stroke-dasharray": "2 2", "stroke-opacity": "0.8"}
+    kids += [svg("path", d=hc_expr(f"'M' + {px} + ' {B} L' + {px} + ' ' + {py}"), stroke=x_color, fill="none",
+                 visible=f"={known}", **guide),
+             svg("path", d=hc_expr(f"'M{L} ' + {py} + ' L' + {px} + ' ' + {py}"), stroke=y_color, fill="none",
+                 visible=f"={known}", **guide),
+             svg("circle", cx=hc_expr(px, "-10"), cy=hc_expr(py, "-10"), r=3.6, fill=y_color, visible=f"={known}",
+                 style={"stroke": "var(--f7-card-bg-color, #fff)"}, **{"stroke-width": "1.5"})]
+    return svg("svg", kids, viewBox="0 0 220 128", visible=hc_expr("true", "false"),
+               style={"display": "block", "width": "100%", "height": "auto", "margin-top": "8px",
+                      "overflow": "visible"})
+
+
+def heating_curve_tile(title, x_item, y_item, x_name, y_name, x_color, y_color):
+    """The heating curve learnt from the last year's heating (rule heatpump_heating_curve, daily) as a tile: the
+    outdoor mean the controller works with and the leaving water setpoint it made of it side by side, as in pair_tile,
+    the curve under them with the present point, and what it was learnt from (user, 2026-10-09)."""
+    learnt = label(hc_expr("Math.round(c.n / 4).toLocaleString('de-DE') + ' Heizstunden, ' + "
+                           "dayjs(c.from).format('DD.MM.YY') + '–' + dayjs(c.to).format('DD.MM.YY')",
+                           "'noch keine Heizperiode erfasst'"), **{**VT_SUB, "margin-top": "2px"})
+    # a tap opens the item popup with the curve as a chart on top (user, 2026-10-09)
+    return pair_tile(title, x_item, y_item, x_name, y_name, a_color=x_color, b_color=y_color, delta_text=False,
+                     below=[heating_curve_svg(x_item, y_item, x_color, y_color), learnt],
+                     popup={"curve": HEATING_CURVE})
 
 
 def inout_tile(title, inside, outside, in_color="#fb8c00", out_color="#29b6f6", in_name="innen", out_name="außen"):
@@ -7268,7 +7405,9 @@ VALUE_RENDER = {
     HPX["tank"]: [vt_r(lambda t, i: tank_tile("Warmwasserspeicher", i, HPX["tank_set"])),
                  vt_r(lambda t, i: spark_tile(t, i, "#ef5350", "K", 1, span=4, threshold=num(HPX["tank_set"]),
                                       threshold_label="Soll"))],
-    HPX["outdoor"]: vt_r(lambda t, i: spark_tile(t, i, "#26a69a", "K", 1, span=4)),
+    # with the mean the heating curve works with as a dashed line (user, 2026-10-09)
+    HPX["outdoor"]: vt_r(lambda t, i: spark_tile(t, i, "#26a69a", "K", 1, span=4, ref=HPX["outdoor_avg"],
+                                                 ref_name=HP_AVG_NAME)),
     HPX["hz"]: vt_r(lambda t, i: spark_tile(t, i, "#fb8c00", "Hz", 0, span=20)),
     HPX["flow"]: vt_r(pump_tile, "espaltherma_water_pump_signal"),
     "espaltherma_water_pressure": vt_r(lambda t, i: rating_tile(t, i, "pressure")),
@@ -7490,14 +7629,16 @@ def hp_run_panels():
 
 def hp_temp_panels():
     """The water's and the air's temperatures on the page, each with what it is read against: leaving and inlet
-    water, the tank and its setpoint, the outdoor air and the heat exchanger drawing heat from it."""
+    water, the tank and its setpoint, the outdoor air with the mean the heating curve works with and the heat exchanger
+    drawing heat from it."""
     return [([("Vorlauf", SUPPLY), ("Rücklauf", RETURN)],
              [line("Vorlauf", HPX["supply"], SUPPLY), line("Rücklauf", HPX["return"], RETURN)], span_axis("°C")),
             ([("Warmwasser", DHW_C), ("Soll gestrichelt", DHW_C)],
              [line("Warmwasser", HPX["tank"], DHW_C), line("Soll", HPX["tank_set"], DHW_C, dashed=True)],
              span_axis("°C")),
-            ([("Außen", "#26a69a"), ("Wärmetauscher", "#4fc3f7")],
-             [line("Außen", HPX["outdoor"], "#26a69a"), line("Wärmetauscher", HPX["exchanger"], "#4fc3f7")],
+            ([("Außen", "#26a69a"), (f"{HP_AVG_NAME} gestrichelt", "#26a69a"), ("Wärmetauscher", "#4fc3f7")],
+             [line("Außen", HPX["outdoor"], "#26a69a"), line(HP_AVG_NAME, HPX["outdoor_avg"], "#26a69a", dashed=True),
+              line("Wärmetauscher", HPX["exchanger"], "#4fc3f7")],
              span_axis("°C"))]
 
 
@@ -7551,7 +7692,11 @@ def heatpump_blocks():
                        vtile("Außentemperatur", P["outdoor"]), vtile("Warmwasser", P["tank"]),
                        vtile("Vorlauf vor Heizstab", "espaltherma_leaving_water_temp_before_buh"),
                        vtile("Vorlauf nach Heizstab", P["supply"]), vtile("Rücklauf", P["return"])])
-    setpoints = value_grid([vtile("Vorlauf Sollwert", "espaltherma_leaving_water_setpoint"),
+    # the heating curve learnt from the last year's heating, with its input and output now: the outdoor mean it works
+    # with, the leaving water setpoint it makes of it (user, 2026-10-09)
+    setpoints = value_grid([heating_curve_tile("Heizkurve", P["outdoor_avg"], "espaltherma_leaving_water_setpoint",
+                                               f"Außen {HP_AVG_NAME}", "Vorlauf-Soll", "#26a69a", SUPPLY),
+                           vtile("Vorlauf Sollwert", "espaltherma_leaving_water_setpoint"),
                            vtile("Vorlauf Sollwert (Zusatz)", "espaltherma_leaving_water_setpoint_add"),
                            vtile("Raum Sollwert", "espaltherma_room_temp_setpoint"),
                            vtile("Warmwasser Sollwert", P["tank_set"]),
@@ -8320,6 +8465,83 @@ STATE_LABEL = ("=(s) => ((props.states || 'ON=An,OFF=Aus').split(',').map((o) =>
                ".find((o) => o[0] === s) || [s, s])[1]")
 
 
+def heating_curve_card(color, now_color):
+    """The item popup's heating curve on top (prop curve, user 2026-10-09): the curve the rule heatpump_heating_curve
+    learnt as a chart, the setpoint over the outdoor mean in the setpoint's colour, solid where the year's heating
+    reached and dashed beyond, the bins it was fitted to as grey points, the present point (props item and item2) in
+    the outdoor mean's colour; under it what it was learnt from. The tooltip flows along the curve (user, 2026-10-09):
+    an unseen series samples it every 0.1 K, the axis pointer follows the mouse, a dot runs on the curve, and the
+    tooltip names the outdoor mean and the setpoint there, a fitted bin or the present point where they lie near."""
+    c = "(((s) => (s || '').charAt(0) === '{' ? JSON.parse(s) : null)(props.curve ? items[props.curve].state : ''))"
+    fmt = "((v) => (Math.round(v * 10) / 10).toString().replace('.', ',').replace('-', '−'))"
+    common = {"xAxisIndex": 0, "yAxisIndex": 0}
+    # the drawn series take no part in the tooltip and do not light up under the pointer
+    quiet = {"silent": True, "emphasis": {"disabled": True}, **common}
+    dashed = {"type": "line", "symbol": "none", "itemStyle": {"color": color},
+              "lineStyle": {"color": color, "width": 1.6, "type": "dashed", "opacity": 0.7}, **quiet}
+    # the curve every 0.1 K over the whole axis, [x, setpoint, 1 where beyond the data]: the polyline interpolated
+    # (MainUI's expressions know no Array, so a string of blanks gives the steps)
+    at = ("(x) => c.p.reduce((y, q, i, a) => i > 0 && a[i - 1][0] < q[0] && x >= a[i - 1][0] && x <= q[0] ? "
+          "a[i - 1][1] + (x - a[i - 1][0]) * (q[1] - a[i - 1][1]) / (q[0] - a[i - 1][0]) : y, null)")
+    samples = (f"=((c) => c ? ((f) => ' '.repeat(Math.round((c.p[5][0] - c.p[0][0]) * 10) + 1).split('').map((s, i) => "
+               f"((x) => [x, Math.round(f(x) * 100) / 100, x < c.p[1][0] || x > c.p[4][0] ? 1 : 0])"
+               f"(Math.round(c.p[0][0] * 10 + i) / 10)))({at}) : [])({c})")
+    series = [
+        comp("oh-data-series", {"name": "Gemessen", "type": "scatter", "symbolSize": 6, "data": f"=(({c}) || {{b: []}}).b",
+                                "itemStyle": {"color": "rgba(127, 127, 127, 0.65)"}, **common}),
+        comp("oh-data-series", {"name": "Heizkurve", "type": "line", "symbol": "circle", "symbolSize": 5,
+                                "data": f"=((c) => c ? c.p.slice(1, 5) : [])({c})", "itemStyle": {"color": color},
+                                "lineStyle": {"color": color, "width": 2.5}, **quiet}),
+        comp("oh-data-series", {"name": "Heizkurve", "data": f"=((c) => c ? c.p.slice(0, 2) : [])({c})", **dashed}),
+        comp("oh-data-series", {"name": "Heizkurve", "data": f"=((c) => c ? c.p.slice(4, 6) : [])({c})", **dashed}),
+        comp("oh-data-series", {"name": "Jetzt", "type": "scatter", "symbolSize": 12, "z": 5,
+                                "data": "=((x, y) => Number.isNaN(x) || Number.isNaN(y) ? [] : [[x, y]])"
+                                        "(Number(items[props.item].numericState), Number(items[props.item2].numericState))",
+                                "itemStyle": {"color": now_color, "borderColor": "#ffffff", "borderWidth": 1.5},
+                                **common}),
+        comp("oh-data-series", {"name": "Kurve", "type": "line", "data": samples, "symbol": "circle",
+                                "showSymbol": False, "symbolSize": 9, "z": 4, "itemStyle": {"color": color},
+                                "lineStyle": {"opacity": 0, "width": 0}, **common})]
+    # laid out as the other tooltips (texts_tooltip): the outdoor mean on top, then a row per series, its marker, its
+    # name and its value bold on the right. The bins and the present point are scatter series, which an axis tooltip
+    # leaves out: the formatter finds them itself, a bin within a quarter kelvin of the pointer, the present point
+    # within 0.3 K, and draws their markers as ECharts does
+    one = "((v) => v.toFixed(1).replace('.', ',').replace('-', '−'))"
+    dot = lambda col: ("'<span style=\"display:inline-block;margin-right:4px;border-radius:10px;width:10px;height:10px;"
+                       f"background-color:{col};\"></span>'")
+    row = lambda mark, name, value: (f"{mark} + ' ' + {name} + '<span style=\"float: right; margin-left: 20px\"><b>' + "
+                                     f"{value} + ' °C</b></span><br/>'")
+    tip = (f"=((c, jx, jy) => (ps) => ((F, k) => k ? ((x, m) => '<div>' + F(x) + ' °C außen</div>' + "
+           + row("k.marker", "(k.value[2] ? 'Heizkurve (fortgesetzt)' : 'Heizkurve')", "F(k.value[1])")
+           + " + (m ? " + row(dot("rgba(127, 127, 127, 0.65)"), "'Gemessen (' + Math.round(m[2] / 4) + ' h)'", "F(m[1])")
+           + " : '') + (!Number.isNaN(jx) && !Number.isNaN(jy) && Math.abs(jx - x) < 0.3 ? "
+           + row(dot(now_color), "'Jetzt'", "F(jy)") + " : ''))"
+           f"(k.value[0], ((c && c.b) || []).filter((b) => Math.abs(b[0] - k.value[0]) < 0.25)[0])"
+           f" : '')({one}, ps.filter((p) => p.seriesName === 'Kurve')[0]))"
+           f"({c}, Number(items[props.item].numericState), Number(items[props.item2].numericState))")
+    # the axes at the plot's edges, not crossing at 0 °C
+    split = {"splitLine": {"lineStyle": {"type": "dashed", "opacity": 0.4}}, "axisLine": {"onZero": False}}
+    chart_ = chart({"height": "300px"},
+                   grid=[comp("oh-chart-grid", {"top": "35", "bottom": "75", "left": "45", "right": "20"})],
+                   xAxis=[comp("oh-value-axis", {"gridIndex": 0, "name": "°C außen", "nameLocation": "middle",
+                                                 "nameGap": 26, "min": "=(v) => v.min", "max": "=(v) => v.max",
+                                                 "interval": 5, **split})],
+                   yAxis=[value_axis("°C", min="=(v) => Math.floor((v.min - 1) / 2) * 2",
+                                     max="=(v) => Math.ceil((v.max + 1) / 2) * 2", interval=2,
+                                     axisLine={"onZero": False})],
+                   # MainUI's smart formatter, on unless switched off, would override the formatter
+                   series=series, tooltip=tooltip(trigger="axis", axisPointer={"type": "line", "snap": True},
+                                                  smartFormatter=False, formatter=tip),
+                   legend=legend(data=["Gemessen", "Heizkurve", "Jetzt"]))
+    learnt = label(f"=((c) => c ? Math.round(c.n / 4).toLocaleString('de-DE') + ' Heizstunden, ' + "
+                   f"dayjs(c.from).format('DD.MM.YY') + '–' + dayjs(c.to).format('DD.MM.YY') + ' · mittlere Abweichung ' + "
+                   f"c.rms.toFixed(2).replace('.', ',') + ' K' : 'noch keine Heizperiode erfasst')({c})",
+                   **{**VT_SUB, "padding": "0 16px 14px"})
+    out = card("Heizkurve", [chart_, learnt])
+    out["config"]["visible"] = "=!!props.curve"
+    return out
+
+
 def item_popup():
     """The popup a tile of a device page opens: the item's value large, its course over the day as a line, or as a
     band of its states for switches, texts and numbers with state options. With a second item (a tile of two values,
@@ -8332,14 +8554,20 @@ def item_popup():
     side = lambda n, it, c, align: div([label(n, **{**VT_SUB, "text-align": align}),
                                        label(f"={dash(disp(it))}", **{**HERO, "color": c, "white-space": "nowrap",
                                                                      "text-align": align})], **{"min-width": "0"})
-    now = card(title, [label(f"={dash(disp(item))}", one, **{**HERO, "overflow-wrap": "anywhere",
+    # with a heating curve, the values' card is the present beside it
+    now = card(f"=props.curve ? 'Jetzt' : '{title}'", [label(f"={dash(disp(item))}", one, **{**HERO, "overflow-wrap": "anywhere",
                                                             "padding": "4px 16px 18px"}),
                        div([side(name, item, color, "left"), side(name2, item2, color2, "right")], two,
                            **{"display": "flex", "justify-content": "space-between", "align-items": "flex-end",
                               "gap": "12px", "padding": "4px 16px 18px"})])
     course = card("Verlauf", [day_chart([area(title, item, color)], [value_axis("")])])
     course["config"]["visible"] = "=!props.item2 && (!props.kind || props.kind === 'number')"
-    courses = card("Verlauf", [day_chart([line(name, item, color), line(name2, item2, color2)], [value_axis("")])])
+    # a second item that is a reference, such as the first one's mean, dashed as its tile draws it (prop dashed2;
+    # user, 2026-10-09)
+    second = line(name2, item2, color2)
+    second["config"]["lineStyle"].update({"type": "=props.dashed2 ? 'dashed' : 'solid'",
+                                          "width": "=props.dashed2 ? 1.5 : 2"})
+    courses = card("Verlauf", [day_chart([line(name, item, color), second], [value_axis("")])])
     courses["config"]["visible"] = two
     band = card("Verlauf", [chart({"period": "D", "periodVisible": True, "height": "150px"},
                                   grid=[comp("oh-chart-grid", {"top": "35", "bottom": "35", "left": "20", "right": "20"})],
@@ -8350,7 +8578,7 @@ def item_popup():
                                                                    "yAxisIndex": 0, "yValue": 0, "mapState": STATE_LABEL})],
                                   tooltip=[comp("oh-chart-tooltip", {"show": True, "confine": True})])])
     band["config"]["visible"] = "=props.kind === 'state'"
-    root = div([now, course, courses, band], **{"padding": "8px 6px"})
+    root = div([heating_curve_card(color2, color), now, course, courses, band], **{"padding": "8px 6px"})
     root["config"]["stylesheet"] = "\n".join([CARD_STYLE, PERIOD_MENU])  # the cards' look; the chart's period menu, out of the layout while closed
     return root
 
@@ -8439,7 +8667,12 @@ ITEM_POPUP_PARAMS = [
     dict(param("item2", "Second item", "A second item, shown beside the first and as a second line"), context="item"),
     param("name", "Name", "The first item's name beside a second item; empty: the title"),
     param("name2", "Second name", "The second item's name"),
-    param("color2", "Second colour", "Colour of the second item's value and line as #rrggbb", default=POPUP_COLOR2)]
+    param("color2", "Second colour", "Colour of the second item's value and line as #rrggbb", default=POPUP_COLOR2),
+    param("dashed2", "Second dashed", "Draw the second item's line dashed, for a reference such as the first one's "
+          "mean", "BOOLEAN", default="false"),
+    dict(param("curve", "Heating curve", "A String item holding a learnt heating curve as JSON (rule "
+               "heatpump_heating_curve), drawn as a chart on top with item (outdoor) and item2 (setpoint) as the "
+               "present point"), context="item")]
 
 VALUE_TILE_PARAMS = [
     param("title", "Title", "Title above the value", required=True),

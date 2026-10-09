@@ -124,7 +124,7 @@ props:
     required: false
     context: item
   parameterGroups: []
-timestamp: Oct 8, 2026, 3:48:44 AM
+timestamp: Oct 9, 2026, 6:08:33 PM
 component: oh-card
 config:
   title: =props.title
@@ -1047,7 +1047,7 @@ slots:
             config:
               text: ='since the meter started ' + ((Number(items[props.prefix + '_energy_total'].numericState) || 0)).toFixed(0)
                 + ' kWh ≈ ' + Math.round(((Number(items[props.prefix + '_energy_total'].numericState) || 0) / (Number(props.range)
-                || 20) * 100)).toLocaleString('de-DE') + ' km'
+                || 20) * 100)).toLocaleString('en-GB') + ' km'
               style:
                 font-size: 11px
                 opacity: '0.65'
