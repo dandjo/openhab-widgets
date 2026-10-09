@@ -10,7 +10,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 5, 2026, 2:14:59 AM
+timestamp: Oct 9, 2026, 6:35:13 PM
 component: oh-card
 config:
   title: PV Yield per Day
@@ -221,7 +221,7 @@ slots:
               z: 101
               silent: true
               style:
-                text: D
+                text: T
                 x: 23
                 y: 231.0
                 textAlign: right
@@ -232,7 +232,7 @@ slots:
               z: 101
               silent: true
               style:
-                text: M
+                text: W
                 x: 23
                 y: 245.0
                 textAlign: right
@@ -243,7 +243,7 @@ slots:
               z: 101
               silent: true
               style:
-                text: D
+                text: T
                 x: 23
                 y: 259.0
                 textAlign: right

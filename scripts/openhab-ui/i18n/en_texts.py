@@ -235,5 +235,5 @@ LISTS = {
     "['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez']":
         "['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']",
 }
-# the weekday letters of the PV calendar, as separate texts in this order
+# the weekday letters of the PV calendar, as seven separate texts in a row of a list, in this order
 DAY_LETTERS = (["M", "D", "M", "D", "F", "S", "S"], ["M", "T", "W", "T", "F", "S", "S"])
