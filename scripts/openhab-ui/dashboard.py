@@ -4813,6 +4813,31 @@ def tip_head(text, raw=None):
     return f"'<div' + {attr}' style=\"{TIP_HEAD}\">' + {text} + '</div>'"
 
 
+def tip_widths(box, n, key):
+    """A position function's step, as JS: the tooltip's boxes (box, a JS expression of a box's index i; n of them)
+    only ever widen while the pointer stays on the chart (user, 2026-10-10): their values and times differ in width
+    from reading to reading, and the boxes' far edges jumped with them. Each box is set to the widest it has been,
+    kept in an attribute of the tooltip (data-<key><i>: its style ECharts writes anew on every show, its content the
+    formatter), which a listener, added once, drops when the pointer leaves the chart. A hidden box is left alone."""
+    js = "[" + ",".join(str(i) for i in range(n)) + "]"
+    forget = (f"dom.hasAttribute('data-{key}') || [dom.parentNode.addEventListener('mouseleave', () => "
+              f"{js}.map((i) => dom.removeAttribute('data-{key}' + i))), dom.setAttribute('data-{key}', '')], ")
+    widen = (f"{js}.map((i) => ((b) => b.style.display === 'none' ? 0 : ((w) => [b.style.setProperty('box-sizing', "
+             f"'border-box'), b.style.setProperty('min-width', w + 'px'), dom.setAttribute('data-{key}' + i, w)])"
+             f"(Math.max(b.offsetWidth, Number(dom.getAttribute('data-{key}' + i)))))({box}))")
+    return forget + widen
+
+
+def tip_position():
+    """The position function of a tooltip that is a box itself (an item's, the heating curve's): ECharts' own
+    placement (20 px right of and below the pointer, left of or above it where it would run out of the chart),
+    with the box's width only growing (tip_widths())."""
+    return (f"=(pt, ps, dom, rect, size) => [{tip_widths('dom', 1, 'wt')}, ((w, h) => "
+            f"[pt[0] + w + {TIP_GAP} + 2 > size.viewSize[0] ? pt[0] - w - {TIP_GAP} : pt[0] + {TIP_GAP}, "
+            f"pt[1] + h + {TIP_GAP} > size.viewSize[1] ? pt[1] - h - {TIP_GAP} : pt[1] + {TIP_GAP}])"
+            "(dom.offsetWidth, dom.offsetHeight)][2]")
+
+
 def grid_boxes(chart_, texts=None, bands=False, value_formatter=None):
     """The tooltip of a chart over one or more grids, a box per grid, as Grafana's shared tooltip (user,
     2026-10-10): each grid's values in its box under the time (tip_head()), a state band's words in a box of its own.
@@ -4870,10 +4895,11 @@ def grid_boxes(chart_, texts=None, bands=False, value_formatter=None):
     place = (f"((f) => f(f, 0, 0))((f, i, y) => i < {len(tops)} ? ((b) => b.style.display === 'none' ? f(f, i + 1, y) "
              f": ((top) => [b.style.setProperty('margin-top', (top - y) + 'px'), f(f, i + 1, top + b.offsetHeight)][1])"
              f"(Math.max(y ? y + {BOX_GAP} : 0, i === h ? {hovered} : T[i])))(c.children[i]) : 0)")
-    # the column's width measured after the date is named, which widens it
+    # the boxes' widths and with them the column's measured after the date is named, which widens it
     position = ("=(pt, ps, dom, rect, size) => ((T, B) => ((c, left, h) => "
-                f"[{date}c.style.setProperty('align-items', left ? 'flex-end' : 'flex-start'), {place}, "
-                f"[left ? pt[0] - {TIP_GAP} - c.offsetWidth : pt[0] + {TIP_GAP}, 0]][{3 if date else 2}])"
+                f"[{date}c.style.setProperty('align-items', left ? 'flex-end' : 'flex-start'), "
+                f"{tip_widths('c.children[i]', len(tops), 'wb')}, {place}, "
+                f"[left ? pt[0] - {TIP_GAP} - c.offsetWidth : pt[0] + {TIP_GAP}, 0]][{5 if date else 4}])"
                 f"(dom.firstChild, pt[0] > size.viewSize[0] / 2, "
                 f"T.filter((t) => t <= pt[1]).length - 1))({js(tops)}, {js(bottoms)})")
     # no transition: with one, ECharts runs the position function at most every 50 ms but writes the content at once,
@@ -4910,8 +4936,8 @@ def tooltips_designed(tree):
     over grids by grid_boxes(), with the words stacked_chart() left on it (texts, bands) and the chart's
     valueFormatter; a calendar's by calendar_tooltip(); a state series' bars by state_tooltip() where they bring no
     formatter of their own (MainUI's would write the name over the state and its length as (00:45)); any other (the
-    heating curve's) has the head of its own formatter (tip_head()). None moves with a transition (see grid_boxes()).
-    In place."""
+    heating curve's) has the head of its own formatter (tip_head()). None moves with a transition (see grid_boxes()),
+    and none narrows while the pointer stays on its chart (tip_widths()). In place."""
     def fix(chart_):
         slots = chart_.get("slots", {})
         for one in slots.get("series", []):
@@ -4931,7 +4957,7 @@ def tooltips_designed(tree):
         if slots.get("calendar") and "formatter" not in cfg:
             # MainUI switches its smart formatter on for a calendar series, as for an aggregate one, over any formatter
             cfg.update(smartFormatter=False, formatter=calendar_tooltip())
-        cfg.update(transitionDuration=0, borderColor=TIP_BORDER)
+        cfg.update(transitionDuration=0, borderColor=TIP_BORDER, position=tip_position())
 
     def walk(v):
         if isinstance(v, dict):
