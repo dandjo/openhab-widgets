@@ -10,7 +10,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 8, 2026, 3:48:44 AM
+timestamp: Oct 10, 2026, 3:26:17 PM
 component: div
 config:
   style:
@@ -135,10 +135,14 @@ slots:
               stateColor:
                 ​: '#e57373'
               tooltip:
-                formatter: '=(p) => p.seriesName + ''<br/>'' + p.marker + (p.value[3] === ''​'' ? ''Hot water'' : ''Heating'')
-                  + '' · '' + (((p.value[2] - p.value[1]) / 60000) >= 60 ? Math.floor(((p.value[2] - p.value[1]) / 60000)
-                  / 60) + '':'' + (Math.floor(((p.value[2] - p.value[1]) / 60000) % 60) < 10 ? ''0'' : '''') + Math.floor(((p.value[2]
-                  - p.value[1]) / 60000) % 60) + '' h'' : Math.round(((p.value[2] - p.value[1]) / 60000)) + '' min'')'
+                formatter: '=(p) => p.value && p.value.length > 3 ? ''<div'' + '' style="font-size: 12px; line-height: 18px;
+                  margin: 0 -10px 6px; padding: 0 10px 6px; border-bottom: 1px solid; border-bottom-color: inherit">'' + dayjs(p.value[1]).format(''llll'')
+                  + '' – '' + dayjs(p.value[2]).format(dayjs(p.value[2]).isSame(p.value[1], ''day'') ? ''HH:mm'' : ''llll'')
+                  + ''</div>'' + p.marker + '' '' + p.seriesName + ''<span style="float: right; margin-left: 20px"><b>'' +
+                  (p.value[3] === ''​'' ? ''Hot water'' : ''Heating'') + '' · '' + (((p.value[2] - p.value[1]) / 60000) >=
+                  60 ? Math.floor(((p.value[2] - p.value[1]) / 60000) / 60) + '':'' + (Math.floor(((p.value[2] - p.value[1])
+                  / 60000) % 60) < 10 ? ''0'' : '''') + Math.floor(((p.value[2] - p.value[1]) / 60000) % 60) + '' h'' : Math.round(((p.value[2]
+                  - p.value[1]) / 60000)) + '' min'') + ''</b></span>'' : '''''
               xAxisIndex: 0
               yAxisIndex: 0
               gridIndex: 0
@@ -162,6 +166,8 @@ slots:
             config:
               show: true
               confine: true
+              transitionDuration: 0
+              borderColor: '=themeOptions.dark === ''dark'' ? ''rgb(91, 94, 100)'' : ''rgb(183, 185, 190)'''
       - component: div
         config:
           style:

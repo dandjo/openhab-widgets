@@ -1972,7 +1972,7 @@ WX_RAIN_BAR = ("=(params, api) => api.value(1) > 0 ? ((w, top, base) => ({type: 
 def weather_forecast_chart():
     """The next 60 hours, one value per grid (user, 2026-10-04): temperature as a line with the weather drawn above
     it, the precipitation of each hour as bars, the wind with arrows of its direction; their data share the hours,
-    so one tooltip lists all three."""
+    so the tooltip gives all three, a box per grid (grid_boxes())."""
     # 55 px between the grids, room for the next one's axis name and the wind's arrows above its line; 20 px on the
     # right as the other stacked charts', since no axis stands there (user, 2026-10-05: it ended too early)
     grids = [comp("oh-chart-grid", {"top": "35", "height": "140", "left": "45", "right": "20"}),
@@ -2010,7 +2010,7 @@ def weather_forecast_chart():
                         lineStyle={"width": 2, "color": WX_WIND_COLOR}, areaStyle={"color": gradient(rgb_of(WX_WIND_COLOR))},
                         markLine=wx_midnights(), markPoint=wx_wind_arrows())]
     return chart({"period": "60h", "future": 1, "height": "480px",
-                  # one tooltip for all grids
+                  # one pointer through all grids
                   "options": {"axisPointer": {"link": [{"xAxisIndex": "all"}]}}},
                  grid=grids, xAxis=x_axes, yAxis=y_axes, series=series,
                  tooltip=tooltip(trigger="axis", smartFormatter=True), legend=legend())
@@ -3536,8 +3536,7 @@ def band_panel(title, item, active, rest, extra=(), in_tooltip=False, display=No
     keys = {v: "\u200b" * (k + 1) for k, (v, _, _) in enumerate(active)}
     names = " : ".join(f"s === '{v}' || s === '{keys[v]}' ? '{keys[v]}'" for v, _, _ in active)
     words = " : ".join(f"p.value[3] === '{keys[v]}' ? '{t}'" for v, t, _ in active)
-    tip = (f"=(p) => p.seriesName + '<br/>' + p.marker + ({words} : '{rest}') + ' \u00b7 ' + "
-           f"{hm('((p.value[2] - p.value[1]) / 60000)')}")
+    tip = state_tooltip(f"({words} : '{rest}')")
     return (display or [(title, active[0][2])],
             [comp("oh-state-series", {"name": title, "item": item, "yValue": 0, "yHeight": 1,
                                       "mapState": f"=(s) => {names} : 'UNDEF'",
@@ -4750,8 +4749,8 @@ def day_chart(series, axes=None, height="260px", **slots):
 
 
 # several values over one period stacked in one chart, a grid each, as the weather's forecast: their time axes'
-# pointers are linked, so one tooltip lists every value at the time pointed at, each grid's nearest reading (user,
-# 2026-10-04); one set of period buttons pages them all
+# pointers are linked, so the tooltip gives every value at the time pointed at, each grid's nearest reading (user,
+# 2026-10-04), in a box per grid (grid_boxes(), 2026-10-10); one set of period buttons pages them all
 STACK_TOP, STACK_GAP, STACK_BOTTOM = 62, 60, 30  # the first plot below the period buttons; title and axis name between
 
 
@@ -4767,25 +4766,184 @@ def stack_title(title, top):
                                    "textStyle": {**style, **({"rich": rich} if rich else {})}})
 
 
-def texts_tooltip(texts, bands):
-    """A tooltip formatter as MainUI's smart one (the time, then each time series' marker, name and value with its
-    unit, from the series' id), but naming the series in texts by words: texts maps a series' name to a JS expression
-    of its value v; with bands, a state series' bar under the pointer by its state."""
+def tip_value(texts, bands, value_formatter=None):
+    """A tooltip's value of the series p, as a JS expression: its number with the unit from its id, as MainUI's smart
+    formatter writes it, or by the chart's own valueFormatter; by words for a series in texts, a JS expression of its
+    value v each (on_off_series(), text_values()); with bands a state series' bar by its state."""
     cases = "".join(f"p.seriesName === '{n}' ? {expr} : " for n, expr in texts.items())
     state = "p.seriesId.indexOf('oh-state-series') === 0 ? p.value[3] : " if bands else ""
     # MainUI's expressions know no Array (nor isNaN, parseFloat); a time series' value is [time, number]
-    value = (f"((v) => {state}{cases}v.toLocaleString('de-AT') + ' ' + p.seriesId.split('#')[2])"
-             f"(Number(p.value[1]))")
-    kinds = "p.seriesId.indexOf('oh-time-series') === 0" + (" || p.seriesId.indexOf('oh-state-series') === 0" if bands
-                                                             else "")
-    # a state named by words shows only where its series has a reading within 16 minutes of the pointer (they are
-    # persisted at least every 15): a mirror item's history starts when it was made, and before that its nearest
-    # reading would name today's state
+    if value_formatter:
+        # as ECharts hands it: the value itself, which may be missing (a month without data)
+        return f"((v) => {state}{cases}({value_formatter.lstrip('=')})(p.value[1]))(Number(p.value[1]))"
+    return (f"((v) => {state}{cases}v.toLocaleString('de-AT') + ' ' + p.seriesId.split('#')[2])"
+            f"(Number(p.value[1]))")
+
+
+def tip_fresh(texts):
+    """A state named by words shows only where its series has a reading within 16 minutes of the pointer (they are
+    persisted at least every 15): a mirror item's history starts when it was made, and before that its nearest
+    reading would name today's state. A JS condition on the series p to add to a tooltip's filter, '' without texts."""
     near = " || ".join(f"p.seriesName === '{n}'" for n in texts)
-    fresh = f" && (!({near}) || Math.abs(p.value[0] - ps[0].axisValue) <= 960000)" if texts else ""
-    return ("=(ps) => '<div>' + dayjs(ps[0].axisValue).format('llll') + '</div>' + ps.filter((p) => p.seriesId && "
-            f"({kinds}){fresh}).map((p) => p.marker + ' ' + p.seriesName + "
-            "'<span style=\"float: right; margin-left: 20px\"><b>' + " + value + " + '</b></span><br/>').join('')")
+    return f" && (!({near}) || Math.abs(p.value[0] - ps[0].axisValue) <= 960000)" if texts else ""
+
+
+# every tooltip looks like MainUI's own (ECharts' themes in MainUI 5.3, read off the page 2026-10-10); its head, the
+# time, 12 px against the values' 14, over a line from edge to edge in the box's border colour, as Grafana's (user,
+# 2026-10-10); the margin undoes the box's padding of 10 px
+TIP_HEAD = ("font-size: 12px; line-height: 18px; margin: 0 -10px 6px; padding: 0 10px 6px; border-bottom: 1px solid; "
+            "border-bottom-color: inherit")
+TIP_ROW = ("p.marker + ' ' + p.seriesName + '<span style=\"float: right; margin-left: 20px\"><b style=\"text-align: "
+           "right;\">' + {value} + '</b></span><br/>'")
+# the boxes of grid_boxes() take font and text colour from the tooltip, whose own ground they replace
+TIP_BOX = ("'border: 1px solid; border-radius: 4px; padding: 10px; box-shadow: rgba(0, 0, 0, 0.2) 1px 2px 10px; ' + "
+           "(themeOptions.dark === 'dark' ? 'background-color: rgb(58, 62, 68); border-color: rgb(91, 94, 100)' "
+           ": 'background-color: rgb(255, 255, 255); border-color: rgb(183, 185, 190)')")
+# the border of a tooltip that is a box itself: an item's tooltip (a calendar's day, a band's bar) would take its
+# colour from the series, and its head's line with it
+TIP_BORDER = "=themeOptions.dark === 'dark' ? 'rgb(91, 94, 100)' : 'rgb(183, 185, 190)'"
+TIP_GAP = 20  # between the pointer and a box, as ECharts leaves it
+BOX_GAP = 4  # between two boxes one above the other
+
+
+def tip_head(text, raw=None):
+    """A tooltip's head as JS: the text, a JS expression; raw, another, kept in its data-head attribute for
+    grid_boxes() to name a category's date by."""
+    attr = f"' data-head=\"' + {raw} + '\"' + " if raw else ""
+    return f"'<div' + {attr}' style=\"{TIP_HEAD}\">' + {text} + '</div>'"
+
+
+def grid_boxes(chart_, texts=None, bands=False, value_formatter=None):
+    """The tooltip of a chart over one or more grids, a box per grid, as Grafana's shared tooltip (user,
+    2026-10-10): each grid's values in its box under the time (tip_head()), a state band's words in a box of its own.
+    ECharts draws one tooltip per chart (several oh-chart-tooltip: only the first shows), so this one is
+    invisible and holds the boxes: its formatter writes them as a column of no height of its own, its position
+    function stands the column beside the pointer (left of it in the chart's right half, the boxes then flush right:
+    by the pointer alone, as a side chosen by the boxes' width flipped to and fro while their values changed) and
+    sets each box's top: the hovered grid's beside the pointer, a gap below it but inside its grid (instead of
+    ECharts' jump above the pointer near the bottom, which small grids made jerky), the others' level with their
+    grid's top, every box below the one before. A chart of one grid gets the same, so every tooltip over a grid looks
+    and moves alike. The rows are those of MainUI's smart formatter, or the chart's own valueFormatter's, with words
+    (tip_value()). The head is the time on a time axis; on a category axis of days (chartType month) or months (year)
+    the position function names the date, from the category and the period MainUI's period button shows ('5' and
+    'Okt. 2026' become 'Mo., 5. Okt. 2026'). A grid's top and height or bottom are taken as pixels; it runs last
+    (tooltips_designed()), once every grid stands where it stays. In place."""
+    slots = chart_["slots"]
+    # lists written without spaces: the generator takes "1, 2, 3" for its colour placeholder (PLACEHOLDER_JS)
+    js = lambda xs: "[" + ",".join(str(x) for x in xs) + "]"
+    px = lambda v: float(str(v).removesuffix("px"))
+    tops, bottoms = [], []
+    for g in slots["grid"]:
+        c = g["config"]
+        top = px(c.get("top", 60))  # ECharts' defaults
+        tops.append(round(top))
+        # a grid fixed by its bottom ends where the chart's height, known only in the browser, puts it
+        bottoms.append(round(top + px(c["height"])) if "height" in c else f"size.viewSize[1] - {round(px(c.get('bottom', 60)))}")
+    of_axis = js(int(x["config"].get("gridIndex", 0)) for x in slots["xAxis"])
+    texts = texts or {}
+    # a series as the smart formatter lists it: a time series without a fifth part in its id, any other with an id;
+    # a state series only where its bars name their state (bands)
+    keep = ("p.seriesId && (p.seriesId.indexOf('oh-time-series') === 0 ? !p.seriesId.split('#')[4] : "
+            + ("true" if bands else "p.seriesId.indexOf('oh-state-series') !== 0") + f"){tip_fresh(texts)}")
+    row = TIP_ROW.format(value=tip_value(texts, bands, value_formatter))
+    label = "(ps[0].axisType === 'xAxis.time' ? dayjs(ps[0].axisValue).format('llll') : ps[0].axisValueLabel)"
+    rows = f"ps.filter((p) => {of_axis}[p.axisIndex] === g && {keep}).map((p) => {row}).join('')"
+    # a grid without a value keeps its box, hidden, so the boxes stay in the grids' order
+    formatter = ("=(ps) => '<div style=\"display: flex; flex-direction: column; align-items: flex-start; height: 0\">'"
+                 f" + {js(range(len(tops)))}.map((g) => ((r) => '<div style=\"' + (r ? {TIP_BOX} : 'display: none')"
+                 f" + '\">' + (r ? {tip_head(label, label)} + r : '') + '</div>')({rows})).join('') + '</div>'")
+    # a category's date: the day of the month or the month, and the year, from the period button's text ('Okt. 2026'
+    # or '2026'); a month's short name is matched by dayjs' own, from the first of a month so no day runs over
+    chart_type = chart_["config"].get("chartType")
+    cat = any(x["component"] == "oh-category-axis" for x in slots["xAxis"])
+    named = {"month": ("((w) => ((k) => k === undefined ? 0 : hd.replaceChildren(dayjs().date(1).year(Number(w[1]))"
+                       ".month(k).date(Number(hd.getAttribute('data-head'))).format('ddd, ll')))"
+                       f"({js(range(12))}.filter((k) => dayjs().date(1).month(k).format('MMM') === w[0])[0]))"
+                       "(per.textContent.trim().split(' '))"),
+             "year": "hd.replaceChildren(hd.getAttribute('data-head') + ' ' + per.textContent.trim())"}.get(chart_type)
+    date = (f"((hd, per) => hd && per ? {named} : 0)(c.querySelector('[data-head]'), "
+            "(dom.closest('.oh-chart-container') || dom).querySelector('.menu-item-content:not(:has(i))')), "
+            if cat and named else "")
+    # a box's top: the hovered grid's (h) by the pointer, the others' at their grid's top, none above the bottom of
+    # the box before (y) and a gap; MainUI's expressions know no loop, f walks the boxes by calling itself
+    hovered = f"Math.max(T[i], Math.min(pt[1] + {TIP_GAP}, B[i] - b.offsetHeight))"
+    place = (f"((f) => f(f, 0, 0))((f, i, y) => i < {len(tops)} ? ((b) => b.style.display === 'none' ? f(f, i + 1, y) "
+             f": ((top) => [b.style.setProperty('margin-top', (top - y) + 'px'), f(f, i + 1, top + b.offsetHeight)][1])"
+             f"(Math.max(y ? y + {BOX_GAP} : 0, i === h ? {hovered} : T[i])))(c.children[i]) : 0)")
+    # the column's width measured after the date is named, which widens it
+    position = ("=(pt, ps, dom, rect, size) => ((T, B) => ((c, left, h) => "
+                f"[{date}c.style.setProperty('align-items', left ? 'flex-end' : 'flex-start'), {place}, "
+                f"[left ? pt[0] - {TIP_GAP} - c.offsetWidth : pt[0] + {TIP_GAP}, 0]][{3 if date else 2}])"
+                f"(dom.firstChild, pt[0] > size.viewSize[0] / 2, "
+                f"T.filter((t) => t <= pt[1]).length - 1))({js(tops)}, {js(bottoms)})")
+    # no transition: with one, ECharts runs the position function at most every 50 ms but writes the content at once,
+    # so the boxes of new content stood unplaced, at the column's top, for most frames (measured 2026-10-10: 332 of
+    # 431 frames of a sweep), which made the tooltip flicker; without, the boxes move with the pointer, as Grafana's
+    old = {k: v for k, v in slots["tooltip"][0]["config"].items()
+           if k not in ("show", "confine", "trigger", "smartFormatter", "formatter", "valueFormatter")} \
+        if slots.get("tooltip") else {}
+    slots["tooltip"] = tooltip(trigger="axis", **old, smartFormatter=False, formatter=formatter, position=position,
+                               backgroundColor="transparent", borderWidth=0, padding=0, transitionDuration=0,
+                               extraCssText="box-shadow: none;")
+    return chart_
+
+
+def state_tooltip(state="p.value[3]"):
+    """A state series' bar: its span as every tooltip's head (tip_head(), the end's time only on the start's day),
+    then the series' marker and name, the bar's state (state, a JS expression) and length bold on the right."""
+    span = ("dayjs(p.value[1]).format('llll') + ' – ' + dayjs(p.value[2]).format(dayjs(p.value[2]).isSame(p.value[1], "
+            "'day') ? 'HH:mm' : 'llll')")
+    return (f"=(p) => p.value && p.value.length > 3 ? {tip_head(span)} + p.marker + ' ' + p.seriesName + "
+            f"'<span style=\"float: right; margin-left: 20px\"><b>' + {state} + ' \u00b7 ' + "
+            f"{hm('((p.value[2] - p.value[1]) / 60000)')} + '</b></span>' : ''")
+
+
+def calendar_tooltip():
+    """A calendar's day: its date as every tooltip's head, then the series' marker, name and value with its unit."""
+    value = "Number(p.value[1]).toLocaleString('de-AT') + ' ' + p.seriesId.split('#')[2]"
+    return ("=(p) => p.seriesId && p.value ? " + tip_head("dayjs(p.value[0]).format('ddd, ll')") + " + "
+            + TIP_ROW.format(value=value) + " : ''")
+
+
+def tooltips_designed(tree):
+    """Every chart's tooltip in one design, the last step for every page and widget (user, 2026-10-10): a tooltip
+    over grids by grid_boxes(), with the words stacked_chart() left on it (texts, bands) and the chart's
+    valueFormatter; a calendar's by calendar_tooltip(); a state series' bars by state_tooltip() where they bring no
+    formatter of their own (MainUI's would write the name over the state and its length as (00:45)); any other (the
+    heating curve's) has the head of its own formatter (tip_head()). None moves with a transition (see grid_boxes()).
+    In place."""
+    def fix(chart_):
+        slots = chart_.get("slots", {})
+        for one in slots.get("series", []):
+            if one["component"] == "oh-state-series":
+                tip = one["config"].setdefault("tooltip", {})
+                if tip.get("show") is not False and "formatter" not in tip:
+                    tip["formatter"] = state_tooltip()
+        if not slots.get("tooltip"):
+            return
+        cfg = slots["tooltip"][0]["config"]
+        texts, bands = cfg.pop("texts", None), cfg.pop("bands", False)
+        if "position" in cfg:
+            return
+        if cfg.get("trigger") == "axis" and slots.get("grid") and "formatter" not in cfg:
+            grid_boxes(chart_, texts, bands, cfg.get("valueFormatter"))
+            return
+        if slots.get("calendar") and "formatter" not in cfg:
+            # MainUI switches its smart formatter on for a calendar series, as for an aggregate one, over any formatter
+            cfg.update(smartFormatter=False, formatter=calendar_tooltip())
+        cfg.update(transitionDuration=0, borderColor=TIP_BORDER)
+
+    def walk(v):
+        if isinstance(v, dict):
+            if v.get("component") == "oh-chart":
+                fix(v)
+            for x in v.values():
+                walk(x)
+        elif isinstance(v, list):
+            for x in v:
+                walk(x)
+    walk(tree)
+    return tree
 
 
 def on_off_series(name, item, color, on="An", off="Aus"):
@@ -4871,11 +5029,14 @@ def stacked_chart(panels, height, visual_map=None, **cfg):
         gap_before = BAND_GAP if i + 1 < len(panels) and is_band[i + 1] else STACK_GAP
         top += h + gap_before
     slots = {"visualMap": visual_map} if visual_map else {}
+    # the words stay on the tooltip for tooltips_designed(), which gives it its boxes once the grids stand where they
+    # stay (a filled card's chart moves its grid's bottom)
+    words = {"texts": texts} if texts else {}
     return chart({"period": "D", "periodVisible": True, "height": f"{height}px",
                   "options": {"axisPointer": {"link": [{"xAxisIndex": "all"}]}}, **cfg},
                  grid=grids, xAxis=xs, yAxis=ys, series=series, title=titles,
-                 tooltip=tooltip(trigger="axis", smartFormatter=False, formatter=texts_tooltip(texts, bands))
-                 if texts or bands else tooltip(trigger="axis", smartFormatter=True), **slots)
+                 tooltip=tooltip(trigger="axis", smartFormatter=True, **words, **({"bands": True} if bands else {})),
+                 **slots)
 
 
 def fill_stacked(chart_, min_height):
@@ -8314,7 +8475,7 @@ WIDE_POPUP = (':root .popup:has(> .oh-popup[style*="--page-popup"]) { --f7-popup
 
 
 def layout_page(uid, config, blocks, now):
-    blocks = own_time_axes(one_block(blocks))
+    blocks = tooltips_designed(own_time_axes(one_block(blocks)))
     germanize(blocks, MISSING_DE)
     if config.get("label") in GEN_DE:
         config = {**config, "label": GEN_DE[config["label"]]}
@@ -8502,8 +8663,8 @@ def heating_curve_card(color, now_color):
         comp("oh-data-series", {"name": "Kurve", "type": "line", "data": samples, "symbol": "circle",
                                 "showSymbol": False, "symbolSize": 9, "z": 4, "itemStyle": {"color": color},
                                 "lineStyle": {"opacity": 0, "width": 0}, **common})]
-    # laid out as the other tooltips (texts_tooltip): the outdoor mean on top, then a row per series, its marker, its
-    # name and its value bold on the right. The bins and the present point are scatter series, which an axis tooltip
+    # laid out as the other tooltips (grid_boxes()): the outdoor mean as the head, then a row per series, its marker,
+    # its name and its value bold on the right. The bins and the present point are scatter series, which an axis tooltip
     # leaves out: the formatter finds them itself, a bin within a quarter kelvin of the pointer, the present point
     # within 0.3 K, and draws their markers as ECharts does
     one = "((v) => v.toFixed(1).replace('.', ',').replace('-', '−'))"
@@ -8511,7 +8672,7 @@ def heating_curve_card(color, now_color):
                        f"background-color:{col};\"></span>'")
     row = lambda mark, name, value: (f"{mark} + ' ' + {name} + '<span style=\"float: right; margin-left: 20px\"><b>' + "
                                      f"{value} + ' °C</b></span><br/>'")
-    tip = (f"=((c, jx, jy) => (ps) => ((F, k) => k ? ((x, m) => '<div>' + F(x) + ' °C außen</div>' + "
+    tip = (f"=((c, jx, jy) => (ps) => ((F, k) => k ? ((x, m) => " + tip_head("F(x) + ' °C außen'") + " + "
            + row("k.marker", "(k.value[2] ? 'Heizkurve (fortgesetzt)' : 'Heizkurve')", "F(k.value[1])")
            + " + (m ? " + row(dot("rgba(127, 127, 127, 0.65)"), "'Gemessen (' + Math.round(m[2] / 4) + ' h)'", "F(m[1])")
            + " : '') + (!Number.isNaN(jx) && !Number.isNaN(jy) && Math.abs(jx - x) < 0.3 ? "
@@ -8858,7 +9019,7 @@ def has_chart(v):
 def widget_entries(now):
     entries = {}
     for uid, (card_, params, tags) in widgets().items():
-        tree = own_time_axes(copy.deepcopy(card_))
+        tree = tooltips_designed(own_time_axes(copy.deepcopy(card_)))
         germanize(tree, MISSING_DE)
         if has_chart(tree) and PERIOD_MENU not in tree["config"].get("stylesheet", ""):
             tree["config"]["stylesheet"] = "\n".join(filter(None, [tree["config"].get("stylesheet"), PERIOD_MENU]))
