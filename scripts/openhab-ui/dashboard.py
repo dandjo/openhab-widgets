@@ -5454,11 +5454,18 @@ def kw_signed(item):
 
 POPUP_COLOR = "#5c6bc0"  # the course in an item popup, where the tile has no colour of its own
 POPUP_COLOR2 = "#78909c"  # a second item's, where the tile gives it none
+# the phases in the popups of the phase tiles (2026-10-10), L1 to L3 in every one of them: the first three slots of
+# the dataviz reference palette in its dark-mode steps, which pass its all-pairs checks (colour vision deficiency,
+# normal vision, contrast) against both themes' cards; the neutral conductor, the item popup's fourth item without a
+# colour of its own, dashed in a grey of each theme that passes them beside the phases
+PHASE_COLORS = ["#3987e5", "#d95926", "#199e70"]
+NEUTRAL_LINE = "(themeOptions.dark === 'dark' ? '#a8a8a8' : '#5a5a5a')"
 
 
 def item_modal(item, title, color=None, second=None):
     """The props of the item popup for one item: what it shows depends on the item's type and state options. second:
-    a tile of two values, {item2, name, name2, color, color2}, the popup then shows both."""
+    a tile of two values, {item2, name, name2, color, color2}, the popup then shows both; of up to four, with item3,
+    name3, color3, item4, name4, color4 (phases_popup()), and abs or scale for how their chart draws them."""
     kind, states = item_kind(item)
     props = {"item": item, "title": title, "color": color or POPUP_COLOR, "kind": kind}
     if states:
@@ -5467,11 +5474,28 @@ def item_modal(item, title, color=None, second=None):
         props.update({"item2": second["item2"], "name": second["name"], "name2": second["name2"],
                       "color": second.get("color") or color or POPUP_COLOR,
                       "color2": second.get("color2") or POPUP_COLOR2})
-        if second.get("dashed2"):
-            props["dashed2"] = True
-        if second.get("curve"):
-            props["curve"] = second["curve"]
+        for k in ("dashed2", "curve", "item3", "name3", "color3", "item4", "name4", "color4", "dashed4", "abs", "scale"):
+            if second.get(k):
+                props[k] = second[k]
     return {"action": "popup", "actionModal": "widget:item-popup", "actionModalConfig": props}
+
+
+def phases_popup(items_, names, colors=None, neutral=None, abs_=False, scale=False):
+    """The item popup of a tile of several phases or strings (vt_tile()'s second; user, 2026-10-10: the popups showed
+    the first phase alone): every value beside the others under its name, their courses as lines of one chart, in
+    the phases' colours or the tile's own; the neutral conductor as a fourth, dashed in grey. abs_ draws amounts (a
+    line's load, whatever the direction its meter signs), scale an axis fitted to the values (voltages)."""
+    colors = colors or PHASE_COLORS
+    its, nms = list(items_) + ([neutral] if neutral else []), list(names) + (["N"] if neutral else [])
+    assert 2 <= len(its) <= 4 and (not neutral or len(its) == 4), its
+    props = {"name": nms[0], "color": colors[0], "item2": its[1], "name2": nms[1], "color2": colors[1]}
+    for k in range(2, len(its)):
+        props.update({f"item{k + 1}": its[k], f"name{k + 1}": nms[k]})
+        if k < len(colors) and not (neutral and k == 3):
+            props[f"color{k + 1}"] = colors[k]
+    if neutral:
+        props["dashed4"] = True
+    return {**props, **({"abs": True} if abs_ else {}), **({"scale": True} if scale else {})}
 
 
 def link_over(item, action="popup", radius="12px", title="", color=None, second=None):
@@ -6572,7 +6596,7 @@ def strings_tile(title, items_, names, volts, amps, colors):
                                   **{**VT_SUB, "margin-top": "-2px"}), label("")]
     return vt_tile([vt_head(title, word), div(rows, **{"display": "grid", "grid-template-columns": "40px minmax(0, 1fr) auto",
                                                 "align-items": "center", "gap": "4px 8px", "margin-top": "8px"})],
-                items_[0], title, wide=True)
+                items_[0], title, wide=True, second=phases_popup(items_, names, colors))
 
 
 # ---------------------------------------------------------------- 08 · flow bands
@@ -7038,7 +7062,7 @@ def phase_power(title, items_, names):
     top = f"(Math.max(50, {', '.join(f'Math.abs({v})' for v in vals)}) * 1.15)"
     total = " + ".join(vals)
     return vt_tile([vt_head(title, vt_chip(f"='Σ ' + {vt_signed(f'({total})', 0, 'W')}")), direction_words(),
-                 direction_rows(vals, names, top, "W", 0)], items_[0], title)
+                 direction_rows(vals, names, top, "W", 0)], items_[0], title, second=phases_popup(items_, names))
 
 
 def phase_volts(title, items_, names):
@@ -7063,7 +7087,7 @@ def phase_volts(title, items_, names):
     return vt_tile([vt_head(title, vt_chip(f"={inside} ? 'im Band ± 10 %' : 'außerhalb'", f"{inside} ? 'good' : 'bad'")),
                  svg("svg", kids, viewBox="0 0 140 126", style={"display": "block", "width": "100%", "height": "auto",
                                                                "max-width": "220px", "margin": "4px auto 0"})],
-                items_[0], title)
+                items_[0], title, second=phases_popup(items_, names, scale=True))
 
 
 def phase_amps(title, items_, names, neutral=None, powers=None):
@@ -7091,7 +7115,7 @@ def phase_amps(title, items_, names, neutral=None, powers=None):
     if foot:
         kids.append(div([label(t) for t in foot], **{"display": "flex", "justify-content": "space-between",
                                                      **VT_SUB, "margin-top": "8px"}))
-    return vt_tile(kids, items_[0], title)
+    return vt_tile(kids, items_[0], title, second=phases_popup(items_, names, neutral=neutral))
 
 
 def pill_text(x, y, text, fill="#48484a", color="#ffffff", weight="normal"):
@@ -7151,13 +7175,14 @@ def phase_load(title, items_, names, neutral=None):
         # the neutral's pill reaches down to cy + R + 21.5 (141.5): the drawing ends a little below it
         drawing = svg("svg", kids, viewBox="0 4 170 142", style={"display": "block", "width": "100%", "height": "auto",
                                                                  "max-width": "240px", "margin": "4px auto 0"})
-        return vt_tile([vt_head(title, word), drawing], items_[0], title)
+        return vt_tile([vt_head(title, word), drawing], items_[0], title,
+                       second=phases_popup(items_, names, neutral=neutral, abs_=True))
     # without a neutral (the Huawei meter) the drawing grows into the height its row gives the tile, so no empty
     # space stays under it (user, 2026-10-06)
     drawing = div([svg("svg", kids, viewBox="0 4 170 118",
                        style={"position": "absolute", "inset": "0", "width": "100%", "height": "100%"})],
                   **{"position": "relative", "flex": "1 1 auto", "min-height": "160px", "margin-top": "4px"})
-    return vt_tile([vt_head(title, word), drawing], items_[0], title,
+    return vt_tile([vt_head(title, word), drawing], items_[0], title, second=phases_popup(items_, names, abs_=True),
                    **{"display": "flex", "flex-direction": "column"})
 
 
@@ -7176,7 +7201,10 @@ def phase_cos(title, items_, names):
                  svg_text(cx, 45, f"='{n} ' + {fixed(num(item), 2)}", 8.5, opacity="0.75")]
     return vt_tile([vt_title(title), svg("svg", kids, viewBox="0 0 160 48",
                                             style={"display": "block", "width": "100%", "height": "auto",
-                                                   "max-width": "260px", "margin-top": "6px"})], items_[0], title)
+                                                   "max-width": "260px", "margin-top": "6px"})], items_[0], title,
+                   # amounts in the popup: SmartPi's sign flips with every reading near no load, its course was a
+                   # band from -1 to 1; the direction is the power's popup's
+                   second=phases_popup(items_, names, abs_=True))
 
 
 PHASE_NEUTRAL = {"smartpi_i1": "smartpi_i4"}
@@ -8733,29 +8761,76 @@ def item_popup():
     """The popup a tile of a device page opens: the item's value large, its course over the day as a line, or as a
     band of its states for switches, texts and numbers with state options. With a second item (a tile of two values,
     such as Vorlauf and Rücklauf; user, 2026-10-08) both values side by side under their names, in their colours, and
-    their courses as two lines of one chart."""
+    their courses as two lines of one chart; so with a third and a fourth (the phases and the neutral conductor of a
+    phase tile, phases_popup(); user, 2026-10-10), four of them two by two on a phone. With abs their amounts, with
+    scale an axis fitted to the values."""
     ph = PLUG_PLACEHOLDERS
     item, title, color = ph["item"], ph["title"], ph["color"]
     item2, name, name2, color2 = ph["item2"], ph["name"], ph["name2"], ph["color2"]
     one, two = "=!props.item2", "=!!props.item2"
-    side = lambda n, it, c, align: div([label(n, **{**VT_SUB, "text-align": align}),
-                                       label(f"={dash(disp(it))}", **{**HERO, "color": c, "white-space": "nowrap",
-                                                                     "text-align": align})], **{"min-width": "0"})
+    # the third and fourth items straight from the props, as no plug card shows them
+    color3, color4 = "(props.color3 || '#78909c')", f"(props.color4 || {NEUTRAL_LINE})"
+    shown = lambda v: f"(props.abs ? {v}.replace('-', '') : {v})"  # an amount: its state without the sign
+    def more(it):
+        """A third or fourth item's state as disp() gives it, nothing without the item."""
+        st = f"items[{it}].state"
+        state = "(['NULL', 'UNDEF'].includes(" + st + ") ? '–' : (items[" + it + "].displayState || " + st + "))"
+        return f"({it} ? {dash(shown(state))} : '')"
+    big = {**HERO, "font-size": f"=props.item3 ? ({NARROW} ? '20px' : '22px') : ({NARROW} ? '26px' : '28px')",
+           "line-height": f"=props.item3 ? '28px' : ({NARROW} ? '32px' : '34px')"}
+    side = lambda n, v, c, align, vis=None: div([label(n, **{**VT_SUB, "text-align": align}),
+                                                label(f"={v}", **{**big, "color": c, "white-space": "nowrap",
+                                                                   "text-align": align})], vis, **{"min-width": "0"})
+    # four values two by two on a phone, each column's value flush with its edge, the middle ones centred
+    cols = f"='repeat(' + (props.item4 ? ({NARROW} ? 2 : 4) : props.item3 ? 3 : 2) + ', minmax(0, 1fr))'"
+    sides = [side(name, dash(shown(disp(item))), color, "left"),
+             side(name2, dash(shown(disp(item2))), color2, f"=props.item3 && !({NARROW} && props.item4) ? 'center' : 'right'"),
+             side("=props.name3", more("props.item3"), "=" + color3,
+                  f"=props.item4 ? ({NARROW} ? 'left' : 'center') : 'right'", "=!!props.item3"),
+             side("=props.name4", more("props.item4"), "=" + color4, "right", "=!!props.item4")]
     # with a heating curve, the values' card is the present beside it
     now = card(f"=props.curve ? 'Jetzt' : '{title}'", [label(f"={dash(disp(item))}", one, **{**HERO, "overflow-wrap": "anywhere",
                                                             "padding": "4px 16px 18px"}),
-                       div([side(name, item, color, "left"), side(name2, item2, color2, "right")], two,
-                           **{"display": "flex", "justify-content": "space-between", "align-items": "flex-end",
-                              "gap": "12px", "padding": "4px 16px 18px"})])
+                       div(sides, two, **{"display": "grid", "grid-template-columns": cols, "align-items": "end",
+                                          "gap": "10px 12px", "padding": "4px 16px 18px"})])
     course = card("Verlauf", [day_chart([area(title, item, color)], [value_axis("")])])
     course["config"]["visible"] = "=!props.item2 && (!props.kind || props.kind === 'number')"
     # a second item that is a reference, such as the first one's mean, dashed as its tile draws it (prop dashed2;
-    # user, 2026-10-09)
-    second = line(name2, item2, color2)
-    second["config"]["lineStyle"].update({"type": "=props.dashed2 ? 'dashed' : 'solid'",
-                                          "width": "=props.dashed2 ? 1.5 : 2"})
-    courses = card("Verlauf", [day_chart([line(name, item, color), second], [value_axis("")])])
-    courses["config"]["visible"] = two
+    # user, 2026-10-09); a fourth, the neutral conductor, so (dashed4). Sampled: a meter's phases persist about
+    # 15,000 readings a day each
+    dashed = lambda d: {"type": f"=props.{d} ? 'dashed' : 'solid'", "width": f"=props.{d} ? 1.5 : 2"}
+    lines = [line(name, item, color, sampling="lttb"), line(name2, item2, color2, sampling="lttb"),
+             line("=props.name3", "=props.item3", "=" + color3, sampling="lttb"),
+             line("=props.name4", "=props.item4", "=" + color4, sampling="lttb")]
+    lines[1]["config"]["lineStyle"].update(dashed("dashed2"))
+    lines[3]["config"]["lineStyle"].update(dashed("dashed4"))
+    # amounts (abs): ECharts can not take a value's amount, so each is a custom series drawing its whole line at its
+    # last reading, the points from a string of as many spaces (MainUI's expressions know no loop and no Array); the
+    # axis from 0 to the largest amount, the tooltip naming amounts
+    def amounts(n, it, c, d):
+        pts = ("' '.repeat(params.dataInsideLength).split('').map((s, i) => "
+               "api.coord([api.value(0, i), Math.abs(api.value(1, i))]))")
+        render = (f"=(params, api) => params.dataIndexInside === params.dataInsideLength - 1 ? ({{type: 'polyline', "
+                  f"shape: {{points: {pts}}}, style: {{fill: 'none', stroke: {c}, lineWidth: {d} ? 1.5 : 2, "
+                  f"lineDash: {d} ? [6,4] : null}}}}) : null")
+        return time_series(n, it, type="custom", renderItem=render, encode={"x": 0, "y": 1},
+                           itemStyle={"color": "=" + c}, silent=True, progressive=0, clip=True)
+    absolute = [amounts(name, item, f"'{color}'", "false"), amounts(name2, item2, f"'{color2}'", "props.dashed2"),
+                amounts("=props.name3", "=props.item3", color3, "false"),
+                amounts("=props.name4", "=props.item4", color4, "props.dashed4")]
+    names = "=['zzname1', 'zzname2', props.name3, props.name4].filter((n) => n)"
+    courses = card("Verlauf", [day_chart(lines, [value_axis("", scale="=!!props.scale")])])
+    courses["config"]["visible"] = "=!!props.item2 && !props.abs"
+    # the top on a round number just above the largest amount (9.7 A to 10, 10.3 to 12, 14.2 to 15), on which
+    # ECharts' steps end, so the axis' last label keeps its gap
+    top = ("=(v) => ((m) => ((p) => [1,1.2,1.5,2,2.5,3,4,5,6,8,10].map((f) => f * p).filter((x) => x >= m)[0])"
+           "(Math.pow(10, Math.floor(Math.log10(Math.max(m, 0.001))))))(Math.max(-v.min, v.max))")
+    loads = card("Verlauf", [day_chart(absolute, [value_axis("", min=0, max=top)])])
+    loads["config"]["visible"] = "=!!props.item2 && !!props.abs"
+    for c in (courses, loads):
+        c["slots"]["content"][0]["slots"]["legend"][0]["config"]["data"] = names
+    loads["slots"]["content"][0]["slots"]["tooltip"][0]["config"]["valueFormatter"] = (
+        "=(x) => Math.abs(Number(x)).toLocaleString('de-AT') + ' ' + p.seriesId.split('#')[2]")
     band = card("Verlauf", [chart({"period": "D", "periodVisible": True, "height": "150px"},
                                   grid=[comp("oh-chart-grid", {"top": "35", "bottom": "35", "left": "20", "right": "20"})],
                                   xAxis=[comp("oh-time-axis", {"gridIndex": 0})],
@@ -8765,7 +8840,7 @@ def item_popup():
                                                                    "yAxisIndex": 0, "yValue": 0, "mapState": STATE_LABEL})],
                                   tooltip=[comp("oh-chart-tooltip", {"show": True, "confine": True})])])
     band["config"]["visible"] = "=props.kind === 'state'"
-    root = div([heating_curve_card(color2, color), now, course, courses, band], **{"padding": "8px 6px"})
+    root = div([heating_curve_card(color2, color), now, course, courses, loads, band], **{"padding": "8px 6px"})
     root["config"]["stylesheet"] = "\n".join([CARD_STYLE, PERIOD_MENU])  # the cards' look; the chart's period menu, out of the layout while closed
     return root
 
@@ -8857,6 +8932,21 @@ ITEM_POPUP_PARAMS = [
     param("color2", "Second colour", "Colour of the second item's value and line as #rrggbb", default=POPUP_COLOR2),
     param("dashed2", "Second dashed", "Draw the second item's line dashed, for a reference such as the first one's "
           "mean", "BOOLEAN", default="false"),
+    dict(param("item3", "Third item", "A third item, such as a meter's third phase, beside the others and as a third "
+               "line"), context="item"),
+    param("name3", "Third name", "The third item's name"),
+    param("color3", "Third colour", "Colour of the third item's value and line as #rrggbb", default="#78909c"),
+    dict(param("item4", "Fourth item", "A fourth item, such as the neutral conductor; four values stand two by two on "
+               "a phone"), context="item"),
+    param("name4", "Fourth name", "The fourth item's name"),
+    param("color4", "Fourth colour", "Colour of the fourth item's value and line as #rrggbb; empty: a grey of the "
+          "theme"),
+    param("dashed4", "Fourth dashed", "Draw the fourth item's line dashed, for a reference such as the neutral "
+          "conductor", "BOOLEAN", default="false"),
+    param("abs", "Amounts", "Show the values without their sign and draw their amounts from 0, e.g. the load of "
+          "lines whose meter signs the direction", "BOOLEAN", default="false"),
+    param("scale", "Fitted axis", "Fit the value axis to the values instead of starting it at 0, e.g. for voltages",
+          "BOOLEAN", default="false"),
     dict(param("curve", "Heating curve", "A String item holding a learnt heating curve as JSON (rule "
                "heatpump_heating_curve), drawn as a chart on top with item (outdoor) and item2 (setpoint) as the "
                "present point"), context="item")]

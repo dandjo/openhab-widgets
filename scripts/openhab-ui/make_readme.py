@@ -601,7 +601,11 @@ the day with arrows for earlier days, as a line for measurements or as a band of
 numbers with state options (labelled from the `states` prop), or the value alone for dates. Given a second item
 (`item2`, with `name`, `name2` and `color2`), it shows both values side by side and their courses as two lines, as my
 tiles of two values (flow and return) open it; `dashed2` draws the second line dashed, for a reference such as the
-outdoor mean beside the outdoor temperature. Given `curve`, a String item holding the heating curve my rule
+outdoor mean beside the outdoor temperature. A third and a fourth item (`item3`, `item4` with their names and colours)
+join them the same way, four values two by two on a phone: my phase tiles open it with L1 to L3 and the neutral
+conductor dashed (`dashed4`; without `color4` a grey of the theme). `abs` shows the values without their sign and
+draws their amounts from 0, for the load of lines whose meter signs the direction; `scale` fits the axis to the
+values, for voltages. Given `curve`, a String item holding the heating curve my rule
 `heatpump_heating_curve` learns (as JSON), it draws that curve as a chart on top, with the measured bins and the
 present point (`item` the outdoor mean, `item2` the setpoint). Open it from any link with `action: popup`, `actionModal:
 widget:item-popup` and its props in `actionModalConfig`:
