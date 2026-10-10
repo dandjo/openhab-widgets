@@ -52,7 +52,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 10, 2026, 3:26:17 PM
+timestamp: Oct 10, 2026, 5:24:26 PM
 component: div
 config:
   style:
@@ -724,11 +724,16 @@ slots:
                 right; margin-left: 20px"><b style="text-align: right;">'' + ((v) => v.toLocaleString(''en-GB'') + '' '' +
                 p.seriesId.split(''#'')[2])(Number(p.value[1])) + ''</b></span><br/>'').join(''''))).join('''') + ''</div>'''
               position: '=(pt, ps, dom, rect, size) => ((T, B) => ((c, left, h) => [c.style.setProperty(''align-items'', left
-                ? ''flex-end'' : ''flex-start''), ((f) => f(f, 0, 0))((f, i, y) => i < 1 ? ((b) => b.style.display === ''none''
-                ? f(f, i + 1, y) : ((top) => [b.style.setProperty(''margin-top'', (top - y) + ''px''), f(f, i + 1, top + b.offsetHeight)][1])(Math.max(y
-                ? y + 4 : 0, i === h ? Math.max(T[i], Math.min(pt[1] + 20, B[i] - b.offsetHeight)) : T[i])))(c.children[i])
-                : 0), [left ? pt[0] - 20 - c.offsetWidth : pt[0] + 20, 0]][2])(dom.firstChild, pt[0] > size.viewSize[0] /
-                2, T.filter((t) => t <= pt[1]).length - 1))([62], [size.viewSize[1] - 60])'
+                ? ''flex-end'' : ''flex-start''), dom.hasAttribute(''data-wb'') || [dom.parentNode.addEventListener(''mouseleave'',
+                () => [0].map((i) => dom.removeAttribute(''data-wb'' + i))), dom.setAttribute(''data-wb'', '''')], [0].map((i)
+                => ((b) => b.style.display === ''none'' ? 0 : ((w) => [b.style.setProperty(''box-sizing'', ''border-box''),
+                b.style.setProperty(''min-width'', w + ''px''), dom.setAttribute(''data-wb'' + i, w)])(Math.max(b.offsetWidth,
+                Number(dom.getAttribute(''data-wb'' + i)))))(c.children[i])), ((f) => f(f, 0, 0))((f, i, y) => i < 1 ? ((b)
+                => b.style.display === ''none'' ? f(f, i + 1, y) : ((top) => [b.style.setProperty(''margin-top'', (top - y)
+                + ''px''), f(f, i + 1, top + b.offsetHeight)][1])(Math.max(y ? y + 4 : 0, i === h ? Math.max(T[i], Math.min(pt[1]
+                + 20, B[i] - b.offsetHeight)) : T[i])))(c.children[i]) : 0), [left ? pt[0] - 20 - c.offsetWidth : pt[0] +
+                20, 0]][4])(dom.firstChild, pt[0] > size.viewSize[0] / 2, T.filter((t) => t <= pt[1]).length - 1))([62], [size.viewSize[1]
+                - 60])'
               backgroundColor: transparent
               borderWidth: 0
               padding: 0
@@ -865,11 +870,15 @@ slots:
                 => k === undefined ? 0 : hd.replaceChildren(dayjs().date(1).year(Number(w[1])).month(k).date(Number(hd.getAttribute(''data-head''))).format(''ddd,
                 ll'')))([0,1,2,3,4,5,6,7,8,9,10,11].filter((k) => dayjs().date(1).month(k).format(''MMM'') === w[0])[0]))(per.textContent.trim().split(''
                 '')) : 0)(c.querySelector(''[data-head]''), (dom.closest(''.oh-chart-container'') || dom).querySelector(''.menu-item-content:not(:has(i))'')),
-                c.style.setProperty(''align-items'', left ? ''flex-end'' : ''flex-start''), ((f) => f(f, 0, 0))((f, i, y)
-                => i < 1 ? ((b) => b.style.display === ''none'' ? f(f, i + 1, y) : ((top) => [b.style.setProperty(''margin-top'',
+                c.style.setProperty(''align-items'', left ? ''flex-end'' : ''flex-start''), dom.hasAttribute(''data-wb'')
+                || [dom.parentNode.addEventListener(''mouseleave'', () => [0].map((i) => dom.removeAttribute(''data-wb'' +
+                i))), dom.setAttribute(''data-wb'', '''')], [0].map((i) => ((b) => b.style.display === ''none'' ? 0 : ((w)
+                => [b.style.setProperty(''box-sizing'', ''border-box''), b.style.setProperty(''min-width'', w + ''px''), dom.setAttribute(''data-wb''
+                + i, w)])(Math.max(b.offsetWidth, Number(dom.getAttribute(''data-wb'' + i)))))(c.children[i])), ((f) => f(f,
+                0, 0))((f, i, y) => i < 1 ? ((b) => b.style.display === ''none'' ? f(f, i + 1, y) : ((top) => [b.style.setProperty(''margin-top'',
                 (top - y) + ''px''), f(f, i + 1, top + b.offsetHeight)][1])(Math.max(y ? y + 4 : 0, i === h ? Math.max(T[i],
                 Math.min(pt[1] + 20, B[i] - b.offsetHeight)) : T[i])))(c.children[i]) : 0), [left ? pt[0] - 20 - c.offsetWidth
-                : pt[0] + 20, 0]][3])(dom.firstChild, pt[0] > size.viewSize[0] / 2, T.filter((t) => t <= pt[1]).length - 1))([62],
+                : pt[0] + 20, 0]][5])(dom.firstChild, pt[0] > size.viewSize[0] / 2, T.filter((t) => t <= pt[1]).length - 1))([62],
                 [size.viewSize[1] - 60])'
               backgroundColor: transparent
               borderWidth: 0

@@ -10,7 +10,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 10, 2026, 3:26:17 PM
+timestamp: Oct 10, 2026, 5:24:26 PM
 component: div
 config:
   style:
@@ -168,6 +168,13 @@ slots:
               confine: true
               transitionDuration: 0
               borderColor: '=themeOptions.dark === ''dark'' ? ''rgb(91, 94, 100)'' : ''rgb(183, 185, 190)'''
+              position: '=(pt, ps, dom, rect, size) => [dom.hasAttribute(''data-wt'') || [dom.parentNode.addEventListener(''mouseleave'',
+                () => [0].map((i) => dom.removeAttribute(''data-wt'' + i))), dom.setAttribute(''data-wt'', '''')], [0].map((i)
+                => ((b) => b.style.display === ''none'' ? 0 : ((w) => [b.style.setProperty(''box-sizing'', ''border-box''),
+                b.style.setProperty(''min-width'', w + ''px''), dom.setAttribute(''data-wt'' + i, w)])(Math.max(b.offsetWidth,
+                Number(dom.getAttribute(''data-wt'' + i)))))(dom)), ((w, h) => [pt[0] + w + 20 + 2 > size.viewSize[0] ? pt[0]
+                - w - 20 : pt[0] + 20, pt[1] + h + 20 > size.viewSize[1] ? pt[1] - h - 20 : pt[1] + 20])(dom.offsetWidth,
+                dom.offsetHeight)][2]'
       - component: div
         config:
           style:
