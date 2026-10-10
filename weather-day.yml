@@ -16,7 +16,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 8, 2026, 11:30:29 PM
+timestamp: Oct 10, 2026, 3:26:17 PM
 component: div
 config:
   style:
@@ -380,7 +380,33 @@ slots:
                       show: true
                       confine: true
                       trigger: axis
-                      smartFormatter: true
+                      smartFormatter: false
+                      formatter: '=(ps) => ''<div style="display: flex; flex-direction: column; align-items: flex-start; height:
+                        0">'' + [0,1,2].map((g) => ((r) => ''<div style="'' + (r ? ''border: 1px solid; border-radius: 4px;
+                        padding: 10px; box-shadow: rgba(0, 0, 0, 0.2) 1px 2px 10px; '' + (themeOptions.dark === ''dark'' ?
+                        ''background-color: rgb(58, 62, 68); border-color: rgb(91, 94, 100)'' : ''background-color: rgb(255,
+                        255, 255); border-color: rgb(183, 185, 190)'') : ''display: none'') + ''">'' + (r ? ''<div'' + ''
+                        data-head="'' + (ps[0].axisType === ''xAxis.time'' ? dayjs(ps[0].axisValue).format(''llll'') : ps[0].axisValueLabel)
+                        + ''"'' + '' style="font-size: 12px; line-height: 18px; margin: 0 -10px 6px; padding: 0 10px 6px;
+                        border-bottom: 1px solid; border-bottom-color: inherit">'' + (ps[0].axisType === ''xAxis.time'' ?
+                        dayjs(ps[0].axisValue).format(''llll'') : ps[0].axisValueLabel) + ''</div>'' + r : '''') + ''</div>'')(ps.filter((p)
+                        => [0,1,2][p.axisIndex] === g && p.seriesId && (p.seriesId.indexOf(''oh-time-series'') === 0 ? !p.seriesId.split(''#'')[4]
+                        : p.seriesId.indexOf(''oh-state-series'') !== 0)).map((p) => p.marker + '' '' + p.seriesName + ''<span
+                        style="float: right; margin-left: 20px"><b style="text-align: right;">'' + ((v) => v.toLocaleString(''en-GB'')
+                        + '' '' + p.seriesId.split(''#'')[2])(Number(p.value[1])) + ''</b></span><br/>'').join(''''))).join('''')
+                        + ''</div>'''
+                      position: '=(pt, ps, dom, rect, size) => ((T, B) => ((c, left, h) => [c.style.setProperty(''align-items'',
+                        left ? ''flex-end'' : ''flex-start''), ((f) => f(f, 0, 0))((f, i, y) => i < 3 ? ((b) => b.style.display
+                        === ''none'' ? f(f, i + 1, y) : ((top) => [b.style.setProperty(''margin-top'', (top - y) + ''px''),
+                        f(f, i + 1, top + b.offsetHeight)][1])(Math.max(y ? y + 4 : 0, i === h ? Math.max(T[i], Math.min(pt[1]
+                        + 20, B[i] - b.offsetHeight)) : T[i])))(c.children[i]) : 0), [left ? pt[0] - 20 - c.offsetWidth :
+                        pt[0] + 20, 0]][2])(dom.firstChild, pt[0] > size.viewSize[0] / 2, T.filter((t) => t <= pt[1]).length
+                        - 1))([35,230,345], [175,290,size.viewSize[1] - 60])'
+                      backgroundColor: transparent
+                      borderWidth: 0
+                      padding: 0
+                      transitionDuration: 0
+                      extraCssText: 'box-shadow: none;'
                   legend:
                   - component: oh-chart-legend
                     config:

@@ -67,7 +67,7 @@ props:
     required: false
     context: item
   parameterGroups: []
-timestamp: Oct 9, 2026, 6:08:33 PM
+timestamp: Oct 10, 2026, 3:26:17 PM
 component: div
 config:
   style:
@@ -255,9 +255,11 @@ slots:
                 type: line
                 snap: true
               smartFormatter: false
-              formatter: '=((c, jx, jy) => (ps) => ((F, k) => k ? ((x, m) => ''<div>'' + F(x) + '' °C outdoor</div>'' + k.marker
-                + '' '' + (k.value[2] ? ''Heating curve (extrapolated)'' : ''Heating curve'') + ''<span style="float: right;
-                margin-left: 20px"><b>'' + F(k.value[1]) + '' °C</b></span><br/>'' + (m ? ''<span style="display:inline-block;margin-right:4px;border-radius:10px;width:10px;height:10px;background-color:rgba(127,
+              formatter: '=((c, jx, jy) => (ps) => ((F, k) => k ? ((x, m) => ''<div'' + '' style="font-size: 12px; line-height:
+                18px; margin: 0 -10px 6px; padding: 0 10px 6px; border-bottom: 1px solid; border-bottom-color: inherit">''
+                + F(x) + '' °C outdoor'' + ''</div>'' + k.marker + '' '' + (k.value[2] ? ''Heating curve (extrapolated)''
+                : ''Heating curve'') + ''<span style="float: right; margin-left: 20px"><b>'' + F(k.value[1]) + '' °C</b></span><br/>''
+                + (m ? ''<span style="display:inline-block;margin-right:4px;border-radius:10px;width:10px;height:10px;background-color:rgba(127,
                 127, 127, 0.65);"></span>'' + '' '' + ''Measured ('' + Math.round(m[2] / 4) + '' h)'' + ''<span style="float:
                 right; margin-left: 20px"><b>'' + F(m[1]) + '' °C</b></span><br/>'' : '''') + (!Number.isNaN(jx) && !Number.isNaN(jy)
                 && Math.abs(jx - x) < 0.3 ? ''<span style="display:inline-block;margin-right:4px;border-radius:10px;width:10px;height:10px;background-color:''
@@ -266,6 +268,8 @@ slots:
                 < 0.25)[0]) : '''')(((v) => v.toFixed(1).replace(''-'', ''−'')), ps.filter((p) => p.seriesName === ''Curve'')[0]))((((s)
                 => (s || '''').charAt(0) === ''{'' ? JSON.parse(s) : null)(props.curve ? items[props.curve].state : '''')),
                 Number(items[props.item].numericState), Number(items[props.item2].numericState))'
+              transitionDuration: 0
+              borderColor: '=themeOptions.dark === ''dark'' ? ''rgb(91, 94, 100)'' : ''rgb(183, 185, 190)'''
           legend:
           - component: oh-chart-legend
             config:
@@ -447,7 +451,30 @@ slots:
               show: true
               confine: true
               trigger: axis
-              smartFormatter: true
+              smartFormatter: false
+              formatter: '=(ps) => ''<div style="display: flex; flex-direction: column; align-items: flex-start; height: 0">''
+                + [0].map((g) => ((r) => ''<div style="'' + (r ? ''border: 1px solid; border-radius: 4px; padding: 10px; box-shadow:
+                rgba(0, 0, 0, 0.2) 1px 2px 10px; '' + (themeOptions.dark === ''dark'' ? ''background-color: rgb(58, 62, 68);
+                border-color: rgb(91, 94, 100)'' : ''background-color: rgb(255, 255, 255); border-color: rgb(183, 185, 190)'')
+                : ''display: none'') + ''">'' + (r ? ''<div'' + '' data-head="'' + (ps[0].axisType === ''xAxis.time'' ? dayjs(ps[0].axisValue).format(''llll'')
+                : ps[0].axisValueLabel) + ''"'' + '' style="font-size: 12px; line-height: 18px; margin: 0 -10px 6px; padding:
+                0 10px 6px; border-bottom: 1px solid; border-bottom-color: inherit">'' + (ps[0].axisType === ''xAxis.time''
+                ? dayjs(ps[0].axisValue).format(''llll'') : ps[0].axisValueLabel) + ''</div>'' + r : '''') + ''</div>'')(ps.filter((p)
+                => [0][p.axisIndex] === g && p.seriesId && (p.seriesId.indexOf(''oh-time-series'') === 0 ? !p.seriesId.split(''#'')[4]
+                : p.seriesId.indexOf(''oh-state-series'') !== 0)).map((p) => p.marker + '' '' + p.seriesName + ''<span style="float:
+                right; margin-left: 20px"><b style="text-align: right;">'' + ((v) => v.toLocaleString(''en-GB'') + '' '' +
+                p.seriesId.split(''#'')[2])(Number(p.value[1])) + ''</b></span><br/>'').join(''''))).join('''') + ''</div>'''
+              position: '=(pt, ps, dom, rect, size) => ((T, B) => ((c, left, h) => [c.style.setProperty(''align-items'', left
+                ? ''flex-end'' : ''flex-start''), ((f) => f(f, 0, 0))((f, i, y) => i < 1 ? ((b) => b.style.display === ''none''
+                ? f(f, i + 1, y) : ((top) => [b.style.setProperty(''margin-top'', (top - y) + ''px''), f(f, i + 1, top + b.offsetHeight)][1])(Math.max(y
+                ? y + 4 : 0, i === h ? Math.max(T[i], Math.min(pt[1] + 20, B[i] - b.offsetHeight)) : T[i])))(c.children[i])
+                : 0), [left ? pt[0] - 20 - c.offsetWidth : pt[0] + 20, 0]][2])(dom.firstChild, pt[0] > size.viewSize[0] /
+                2, T.filter((t) => t <= pt[1]).length - 1))([62], [size.viewSize[1] - 35])'
+              backgroundColor: transparent
+              borderWidth: 0
+              padding: 0
+              transitionDuration: 0
+              extraCssText: 'box-shadow: none;'
   - component: oh-card
     config:
       title: History
@@ -544,7 +571,30 @@ slots:
               show: true
               confine: true
               trigger: axis
-              smartFormatter: true
+              smartFormatter: false
+              formatter: '=(ps) => ''<div style="display: flex; flex-direction: column; align-items: flex-start; height: 0">''
+                + [0].map((g) => ((r) => ''<div style="'' + (r ? ''border: 1px solid; border-radius: 4px; padding: 10px; box-shadow:
+                rgba(0, 0, 0, 0.2) 1px 2px 10px; '' + (themeOptions.dark === ''dark'' ? ''background-color: rgb(58, 62, 68);
+                border-color: rgb(91, 94, 100)'' : ''background-color: rgb(255, 255, 255); border-color: rgb(183, 185, 190)'')
+                : ''display: none'') + ''">'' + (r ? ''<div'' + '' data-head="'' + (ps[0].axisType === ''xAxis.time'' ? dayjs(ps[0].axisValue).format(''llll'')
+                : ps[0].axisValueLabel) + ''"'' + '' style="font-size: 12px; line-height: 18px; margin: 0 -10px 6px; padding:
+                0 10px 6px; border-bottom: 1px solid; border-bottom-color: inherit">'' + (ps[0].axisType === ''xAxis.time''
+                ? dayjs(ps[0].axisValue).format(''llll'') : ps[0].axisValueLabel) + ''</div>'' + r : '''') + ''</div>'')(ps.filter((p)
+                => [0,0][p.axisIndex] === g && p.seriesId && (p.seriesId.indexOf(''oh-time-series'') === 0 ? !p.seriesId.split(''#'')[4]
+                : p.seriesId.indexOf(''oh-state-series'') !== 0)).map((p) => p.marker + '' '' + p.seriesName + ''<span style="float:
+                right; margin-left: 20px"><b style="text-align: right;">'' + ((v) => v.toLocaleString(''en-GB'') + '' '' +
+                p.seriesId.split(''#'')[2])(Number(p.value[1])) + ''</b></span><br/>'').join(''''))).join('''') + ''</div>'''
+              position: '=(pt, ps, dom, rect, size) => ((T, B) => ((c, left, h) => [c.style.setProperty(''align-items'', left
+                ? ''flex-end'' : ''flex-start''), ((f) => f(f, 0, 0))((f, i, y) => i < 1 ? ((b) => b.style.display === ''none''
+                ? f(f, i + 1, y) : ((top) => [b.style.setProperty(''margin-top'', (top - y) + ''px''), f(f, i + 1, top + b.offsetHeight)][1])(Math.max(y
+                ? y + 4 : 0, i === h ? Math.max(T[i], Math.min(pt[1] + 20, B[i] - b.offsetHeight)) : T[i])))(c.children[i])
+                : 0), [left ? pt[0] - 20 - c.offsetWidth : pt[0] + 20, 0]][2])(dom.firstChild, pt[0] > size.viewSize[0] /
+                2, T.filter((t) => t <= pt[1]).length - 1))([62], [size.viewSize[1] - 60])'
+              backgroundColor: transparent
+              borderWidth: 0
+              padding: 0
+              transitionDuration: 0
+              extraCssText: 'box-shadow: none;'
           legend:
           - component: oh-chart-legend
             config:
@@ -596,8 +646,19 @@ slots:
               yValue: 0
               mapState: =(s) => ((props.states || 'ON=On,OFF=Off').split(',').map((o) => o.trim().split('=')).find((o) =>
                 o[0] === s) || [s, s])[1]
+              tooltip:
+                formatter: '=(p) => p.value && p.value.length > 3 ? ''<div'' + '' style="font-size: 12px; line-height: 18px;
+                  margin: 0 -10px 6px; padding: 0 10px 6px; border-bottom: 1px solid; border-bottom-color: inherit">'' + dayjs(p.value[1]).format(''llll'')
+                  + '' – '' + dayjs(p.value[2]).format(dayjs(p.value[2]).isSame(p.value[1], ''day'') ? ''HH:mm'' : ''llll'')
+                  + ''</div>'' + p.marker + '' '' + p.seriesName + ''<span style="float: right; margin-left: 20px"><b>'' +
+                  p.value[3] + '' · '' + (((p.value[2] - p.value[1]) / 60000) >= 60 ? Math.floor(((p.value[2] - p.value[1])
+                  / 60000) / 60) + '':'' + (Math.floor(((p.value[2] - p.value[1]) / 60000) % 60) < 10 ? ''0'' : '''') + Math.floor(((p.value[2]
+                  - p.value[1]) / 60000) % 60) + '' h'' : Math.round(((p.value[2] - p.value[1]) / 60000)) + '' min'') + ''</b></span>''
+                  : '''''
           tooltip:
           - component: oh-chart-tooltip
             config:
               show: true
               confine: true
+              transitionDuration: 0
+              borderColor: '=themeOptions.dark === ''dark'' ? ''rgb(91, 94, 100)'' : ''rgb(183, 185, 190)'''
