@@ -212,6 +212,12 @@ EN.update({"Heizkurve": "Heating curve", "Heizkurve (fortgesetzt": "Heating curv
            "°C außen": "°C outdoor", "°C außen</div>": "°C outdoor</div>", "Außen Ø 24 h": "Outdoor Ø 24 h",
            "ESPAltherma Außentemperatur gemittelt": "ESPAltherma External Ambient Temperature Average"})
 
+    # the heating card's compressor start badges and the cycle guard's note (2026-10-11)
+EN.update({"Taktschutz · Soll": "Cycle guard · setpoint",
+           "Wärmepumpe Starts Warmwasser heute": "Heatpump DHW Starts Today",
+           "Wärmepumpe Starts Heizung heute": "Heatpump Heating Starts Today",
+           "Wärmepumpe Taktschutz Anhebung": "Heatpump Cycle Guard Lift"})
+
     # installation texts the screenshots show (Miele programs and phases), for ui_proxy.py
 EN.update({"Pflegeleicht": "Easy care", "Baumwolle": "Cottons", "Waschen": "Washing", "Trocknen": "Drying",
            "Spülen": "Rinsing", "Schleudern": "Spinning", "Hauptwäsche": "Main wash", "Vorwäsche": "Pre-wash",

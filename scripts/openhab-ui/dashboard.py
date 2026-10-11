@@ -3396,7 +3396,7 @@ def battery_period_slider():
 
 # hot water, heating and the hot-water automation as three switch pills side by side, named short to fit a phone
 # the heat pump's switches; Automatik switches the group heatpump_management, which passes the command on to its
-# members (the hot-water automation heatpump_dhw_management)
+# members (the hot-water automation heatpump_dhw_management and the cycle guard heatpump_cycle_management)
 HP_SWITCH_BAR = [("Heizung", "pyaltherma_climate_control_power", "material:local_fire_department"),
                  ("Warmwasser", "pyaltherma_dhw_power", "material:shower"),
                  ("Automatik", "heatpump_management", "material:auto_mode")]
@@ -4524,14 +4524,17 @@ def heat_icon(drawing, orbit, defs=None):
                width=HEAT_ICON, height=HEAT_ICON, style={"display": "block", "overflow": "visible"})
 
 
-def heat_tile(icon, title, on, color, value, setpoint, dark, light, runtime=None, notes=(), countdown=None):
+def heat_tile(icon, title, on, color, value, setpoint, dark, light, runtime=None, notes=(), countdown=None,
+              starts=None):
     """A tile like the appliances': the icon, the title, the temperature as a pill (user's variant E, 2026-10-03),
     filled in the tile's colour while switched on, only outlined in it while off, and beside it the setpoint as a
     tinted pill with a small target icon, as the dishwasher's remaining time; both pills the size of the appliances'
     (user, 2026-10-04: 12 px, the outline inside the chip's size). dark and light: the setpoint's text colour in each
     theme. runtime: (since item, what) for a line under them while a run lasts, 'Laden seit 18:05 · 35 min', in the
     style of a Miele machine's program line; notes: (text, visible) expressions for further lines in its style;
-    countdown: (seconds, visible) expressions for a pill with a timer that stands in the setpoint's place while
+    starts: an item with today's compressor starts, for a round badge with the count right of the pills, hidden
+    while its count is unknown; countdown: (seconds, visible) expressions for a pill with a timer that stands in the
+    setpoint's place while
     visible, as a Miele machine's remaining time (the heating tile during a hot-water charge). A tap opens the heat
     pump's page, as in the energy flow."""
     temperature = label(value, **{"background": f"={on} ? '{color}' : 'transparent'",
@@ -4549,6 +4552,26 @@ def heat_tile(icon, title, on, color, value, setpoint, dark, light, runtime=None
         target["config"]["visible"] = f"=!({shown_})"
         pills.append(div([comp("f7-icon", {"f7": "timer", "size": 13}), label(f"={duration(None, secs)}")],
                          visible=f"={shown_}", **pill))
+    if starts:
+        # today's compressor starts as a round badge right of the pills, as high as they are (22 px; user, 2026-10-11:
+        # "das Badge ... rechts neben die Pillen"): outlined in the tile's colour, transparent, the number in the
+        # setpoint's text colour, grey at 0; its digits centred by their cap height (text-box), whatever the font's
+        # ascent and descent; it stays with the last pill when the row wraps
+        n = f"Number.parseFloat(items.{starts}.state)"
+        some = f"{n} > 0"
+        badge = div([label(f"=Math.round({n})", **{"text-box": "trim-both cap alphabetic", "line-height": "1",
+                                                     "font-variant-numeric": "proportional-nums"})],
+                    visible=f"=!Number.isNaN({n})",
+                    **{"display": "inline-flex", "align-items": "center", "justify-content": "center",
+                       "flex": "0 0 auto", "width": "22px", "height": "22px", "box-sizing": "border-box",
+                       "border-radius": "50%",
+                       "border": f"={some} ? '1.5px solid {color}' : '1.5px solid {BADGE_OFF}'",
+                       "color": f"={some} ? (themeOptions.dark === 'dark' ? '{dark}' : '{light}') : "
+                                f"(themeOptions.dark === 'dark' ? '{BADGE_OFF}' : '#757575')",
+                       "font-size": "12px", "font-weight": "700"})
+        last = div([*pills[1:], badge], **{"display": "inline-flex", "align-items": "center", "gap": "6px",
+                                           "white-space": "nowrap"})
+        pills = [pills[0], last]
     lines = []
     if runtime:
         since, what = runtime
@@ -4572,7 +4595,9 @@ def heat_specs():
     towards the tank's expected end while it charges, the end in a line under the tile; and the leaving water; on is
     the switch for hot water and for heating. The charge's time left and end stand under the heat pump while it charges
     the tank, under the tank while its booster heater heats it alone (user, 2026-10-06), as rule heatpump_dhw_eta
-    tells the two apart: the valve off hot water with the booster heater on."""
+    tells the two apart: the valve off hot water with the booster heater on. starts: today's compressor starts for
+    the tile's purpose (rule heatpump_starts_today, user 2026-10-11); while the cycle guard lifts the setpoint, a line
+    under the heating says by how much."""
     tank = heat_icon([*tank_node(0, 0, "heatTank"), *tank_source_badge(0, 0)],
                      hp_orbit((0, 0), "#e57373", f"({TANK_FLOW} || {BSH_ON})",
                               f"{num(HPX['tank'])} / {TANK_FULL}"),
@@ -4588,13 +4613,20 @@ def heat_specs():
     by_bsh, by_pump = f"({DHW_ETA_OK} && {bsh_alone})", f"({DHW_ETA_OK} && !{bsh_alone})"
     charge = lambda shown: dict(countdown=(f"({DHW_LEFT}) * 60", shown),
                                 notes=[(f"'Warmwasserladung · fertig ' + {DHW_DONE}", shown)])
+    # while the cycle guard lifts the leaving water offset for a start (rule heatpump_cycle_management, user
+    # 2026-10-11), a line under the heating says so and by how much, as its setpoint pill then shows the lifted setpoint
+    lift = num("heatpump_cycle_raise")
+    heat_charge = charge(by_pump)
+    heat_charge["notes"] = [*heat_charge["notes"], (f"'Taktschutz · Soll +' + Math.round({lift}) + ' K'", f"{lift} > 0")]
     return [dict(icon=tank, title="Warmwasserspeicher", on="items.pyaltherma_dhw_power.state === 'ON'", color=DHW_C,
                  value=f"={disp(HPX['tank'])}", setpoint=f"={disp(HPX['tank_set'])}", dark=DHW_C, light="#c62828",
-                 runtime=("heatpump_dhw_since", f"({BSH_ON} ? 'Zusatzheizung' : 'Laden')"), **charge(by_bsh)),
+                 runtime=("heatpump_dhw_since", f"({BSH_ON} ? 'Zusatzheizung' : 'Laden')"), **charge(by_bsh),
+                 starts="heatpump_starts_dhw_today"),
             dict(icon=pump, title="Heizung", on="items.pyaltherma_climate_control_power.state === 'ON'",
                  color=SPACE_C, value=f"={disp(HPX['supply'])}",
                  setpoint=f"={disp('espaltherma_leaving_water_setpoint')}", dark=SPACE_C, light="#e65100",
-                 runtime=("heatpump_heating_since", "'Heizen'"), **charge(by_pump))]
+                 runtime=("heatpump_heating_since", "'Heizen'"), **heat_charge,
+                 starts="heatpump_starts_heating_today")]
 
 
 def heating(tile=heat_tile):
