@@ -4556,16 +4556,17 @@ def heat_tile(icon, title, on, color, value, setpoint, dark, light, runtime=None
         # today's compressor starts as a round badge right of the pills, as high as they are (22 px; user, 2026-10-11:
         # "das Badge ... rechts neben die Pillen"): outlined in the tile's colour, transparent, the number in the
         # setpoint's text colour, grey at 0; its digits centred by their cap height (text-box), whatever the font's
-        # ascent and descent; it stays with the last pill when the row wraps
+        # ascent and descent; it stays with the last pill when the row wraps. The ring is an inset box-shadow, not a
+        # border: Chrome floors border widths to whole device pixels, so at a scale of 1 the ring was 1 px with
+        # uneven anti-aliasing and looked pixelated (user, 2026-10-12); a shadow keeps its 1.5 px
         n = f"Number.parseFloat(items.{starts}.state)"
         some = f"{n} > 0"
         badge = div([label(f"=Math.round({n})", **{"text-box": "trim-both cap alphabetic", "line-height": "1",
                                                      "font-variant-numeric": "proportional-nums"})],
                     visible=f"=!Number.isNaN({n})",
                     **{"display": "inline-flex", "align-items": "center", "justify-content": "center",
-                       "flex": "0 0 auto", "width": "22px", "height": "22px", "box-sizing": "border-box",
-                       "border-radius": "50%",
-                       "border": f"={some} ? '1.5px solid {color}' : '1.5px solid {BADGE_OFF}'",
+                       "flex": "0 0 auto", "width": "22px", "height": "22px", "border-radius": "50%",
+                       "box-shadow": f"={some} ? 'inset 0 0 0 1.5px {color}' : 'inset 0 0 0 1.5px {BADGE_OFF}'",
                        "color": f"={some} ? (themeOptions.dark === 'dark' ? '{dark}' : '{light}') : "
                                 f"(themeOptions.dark === 'dark' ? '{BADGE_OFF}' : '#757575')",
                        "font-size": "12px", "font-weight": "700"})
@@ -4613,11 +4614,12 @@ def heat_specs():
     by_bsh, by_pump = f"({DHW_ETA_OK} && {bsh_alone})", f"({DHW_ETA_OK} && !{bsh_alone})"
     charge = lambda shown: dict(countdown=(f"({DHW_LEFT}) * 60", shown),
                                 notes=[(f"'Warmwasserladung · fertig ' + {DHW_DONE}", shown)])
-    # while the cycle guard lifts the leaving water offset for a start (rule heatpump_cycle_management, user
-    # 2026-10-11), a line under the heating says so and by how much, as its setpoint pill then shows the lifted setpoint
-    lift = num("heatpump_cycle_raise")
+    # while the cycle guard locks the heating's starts after a stop (rule heatpump_cycle_management, user
+    # 2026-10-11, a start lock since 2026-10-12), a line under the heating says so, as its setpoint pill then shows the
+    # setpoint lowered by the lock
+    lock = num("heatpump_cycle_lock")
     heat_charge = charge(by_pump)
-    heat_charge["notes"] = [*heat_charge["notes"], (f"'Taktschutz · Soll +' + Math.round({lift}) + ' K'", f"{lift} > 0")]
+    heat_charge["notes"] = [*heat_charge["notes"], ("'Taktschutz · Pause'", f"{lock} > 0")]
     return [dict(icon=tank, title="Warmwasserspeicher", on="items.pyaltherma_dhw_power.state === 'ON'", color=DHW_C,
                  value=f"={disp(HPX['tank'])}", setpoint=f"={disp(HPX['tank_set'])}", dark=DHW_C, light="#c62828",
                  runtime=("heatpump_dhw_since", f"({BSH_ON} ? 'Zusatzheizung' : 'Laden')"), **charge(by_bsh),
