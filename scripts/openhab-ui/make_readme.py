@@ -67,8 +67,9 @@ OVERVIEW = [
      "While the tank charges or the heating runs, a line under its tile says since when. A round badge right of "
      "each tile's pills counts today's compressor starts, for hot water and for the heating (the restarts of a "
      "defrost do not count), outlined in the tile's colour, grey at none; while the cycle guard of my installation "
-     "lifts the leaving water setpoint for a start, so that the run does not end after a few minutes, a line under "
-     "the heating tile says by how much. The screenshots show it with the heat pump card's demo values and the "
+     "holds back the next start after a stop (it lowers the leaving water setpoint until the return water has "
+     "cooled well below the heating curve, so that the run after it lasts), a line under the heating tile says "
+     "so. The screenshots show it with the heat pump card's demo values and the "
      "start counts of the moment shown."),
     ("electricity-price-card", "Electricity price", "The all-in price, the cheapest and priciest hour, and the prices "
      "12 hours back and 36 hours ahead, coloured green, orange and red by price."),

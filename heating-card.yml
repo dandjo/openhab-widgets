@@ -129,8 +129,8 @@ props:
     type: TEXT
     required: true
     context: item
-  - name: heatpumpCycleRaise
-    label: Heatpump Cycle Guard Lift
+  - name: heatpumpCycleLock
+    label: Heatpump Cycle Guard Lock
     description: Number item
     type: TEXT
     required: true
@@ -202,7 +202,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 11, 2026, 9:37:25 PM
+timestamp: Oct 12, 2026, 2:00:23 PM
 component: oh-card
 config:
   title: Heating & Hot Water
@@ -695,10 +695,9 @@ slots:
                             flex: 0 0 auto
                             width: 22px
                             height: 22px
-                            box-sizing: border-box
                             border-radius: 50%
-                            border: '=Number.parseFloat(items[props.heatpumpStartsDhwToday].state) > 0 ? ''1.5px solid #e57373''
-                              : ''1.5px solid #9e9e9e'''
+                            box-shadow: '=Number.parseFloat(items[props.heatpumpStartsDhwToday].state) > 0 ? ''inset 0 0 0
+                              1.5px #e57373'' : ''inset 0 0 0 1.5px #9e9e9e'''
                             color: '=Number.parseFloat(items[props.heatpumpStartsDhwToday].state) > 0 ? (themeOptions.dark
                               === ''dark'' ? ''#e57373'' : ''#c62828'') : (themeOptions.dark === ''dark'' ? ''#9e9e9e'' :
                               ''#757575'')'
@@ -1120,10 +1119,9 @@ slots:
                             flex: 0 0 auto
                             width: 22px
                             height: 22px
-                            box-sizing: border-box
                             border-radius: 50%
-                            border: '=Number.parseFloat(items[props.heatpumpStartsHeatingToday].state) > 0 ? ''1.5px solid
-                              #ffb74d'' : ''1.5px solid #9e9e9e'''
+                            box-shadow: '=Number.parseFloat(items[props.heatpumpStartsHeatingToday].state) > 0 ? ''inset 0
+                              0 0 1.5px #ffb74d'' : ''inset 0 0 0 1.5px #9e9e9e'''
                             color: '=Number.parseFloat(items[props.heatpumpStartsHeatingToday].state) > 0 ? (themeOptions.dark
                               === ''dark'' ? ''#ffb74d'' : ''#e65100'') : (themeOptions.dark === ''dark'' ? ''#9e9e9e'' :
                               ''#757575'')'
@@ -1151,7 +1149,7 @@ slots:
                     !== 'NULL')) || (((items[props.heatpumpDhwEta].state !== 'UNDEF' && items[props.heatpumpDhwEta].state
                     !== 'NULL' && items[props.heatpumpDhwSince].state !== 'UNDEF' && items[props.heatpumpDhwSince].state !==
                     'NULL') && !(items[props.heatpumpBshMode].state === 'ON' && !(items[props.heatpumpValve].state === 'DHW'))))
-                    || ((Number(items[props.heatpumpCycleRaise].numericState) || 0) > 0)
+                    || ((Number(items[props.heatpumpCycleLock].numericState) || 0) > 0)
                 slots:
                   default:
                   - component: Label
@@ -1172,9 +1170,8 @@ slots:
                         && !(items[props.heatpumpBshMode].state === 'ON' && !(items[props.heatpumpValve].state === 'DHW')))
                   - component: Label
                     config:
-                      text: ='Cycle guard · setpoint +' + Math.round((Number(items[props.heatpumpCycleRaise].numericState)
-                        || 0)) + ' K'
-                      visible: =(Number(items[props.heatpumpCycleRaise].numericState) || 0) > 0
+                      text: ='Cycle guard · pause'
+                      visible: =(Number(items[props.heatpumpCycleLock].numericState) || 0) > 0
               - component: oh-link
                 config:
                   action: popup
