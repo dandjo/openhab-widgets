@@ -70,7 +70,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 10, 2026, 5:24:26 PM
+timestamp: Oct 13, 2026, 8:31:04 PM
 component: div
 config:
   style:
@@ -396,74 +396,6 @@ slots:
                                   cy: 32
                                   r: 26
                                   fill: none
-                                  stroke: '#66bb6a'
-                                  pathLength: 100
-                                  transform: rotate(-90 32 32)
-                                  stroke-width: 8
-                                  stroke-linecap: round
-                                  stroke-dasharray: =(Math.max(0, Math.min(100, (Number(items[props.heatpumpCop].numericState)
-                                    || 0) / 6 * 100))).toFixed(1) + ' 100'
-                          - component: oh-icon
-                            config:
-                              icon: material:eco
-                              width: 12
-                              height: 12
-                              style:
-                                position: absolute
-                                left: 50%
-                                top: 50%
-                                width: 12px
-                                height: 12px
-                                transform: translate(-50%, -50%)
-                                color: '#66bb6a'
-                      - component: Label
-                        config:
-                          text: '=''COP total '' + ((Number(items[props.heatpumpCop].numericState) || 0) > 0 ? ((Number(items[props.heatpumpCop].numericState)
-                            || 0)).toFixed(2) : ''–'')'
-                          style:
-                            font-size: 12px
-                            font-weight: '600'
-                            white-space: nowrap
-                  - component: div
-                    config:
-                      style:
-                        display: flex
-                        align-items: center
-                        gap: 6px
-                    slots:
-                      default:
-                      - component: div
-                        config:
-                          style:
-                            position: relative
-                            width: 26px
-                            height: 26px
-                            flex: 0 0 auto
-                        slots:
-                          default:
-                          - component: svg
-                            config:
-                              viewBox: 0 0 64 64
-                              style:
-                                width: 26px
-                                height: 26px
-                                flex: 0 0 auto
-                            slots:
-                              default:
-                              - component: circle
-                                config:
-                                  cx: 32
-                                  cy: 32
-                                  r: 26
-                                  fill: none
-                                  stroke: rgba(127, 127, 127, 0.22)
-                                  stroke-width: 8
-                              - component: circle
-                                config:
-                                  cx: 32
-                                  cy: 32
-                                  r: 26
-                                  fill: none
                                   stroke: '#ffb74d'
                                   pathLength: 100
                                   transform: rotate(-90 32 32)
@@ -555,6 +487,74 @@ slots:
                       - component: Label
                         config:
                           text: '=''COP DHW '' + ((Number(items[props.heatpumpCopDhw].numericState) || 0) > 0 ? ((Number(items[props.heatpumpCopDhw].numericState)
+                            || 0)).toFixed(2) : ''–'')'
+                          style:
+                            font-size: 12px
+                            font-weight: '600'
+                            white-space: nowrap
+                  - component: div
+                    config:
+                      style:
+                        display: flex
+                        align-items: center
+                        gap: 6px
+                    slots:
+                      default:
+                      - component: div
+                        config:
+                          style:
+                            position: relative
+                            width: 26px
+                            height: 26px
+                            flex: 0 0 auto
+                        slots:
+                          default:
+                          - component: svg
+                            config:
+                              viewBox: 0 0 64 64
+                              style:
+                                width: 26px
+                                height: 26px
+                                flex: 0 0 auto
+                            slots:
+                              default:
+                              - component: circle
+                                config:
+                                  cx: 32
+                                  cy: 32
+                                  r: 26
+                                  fill: none
+                                  stroke: rgba(127, 127, 127, 0.22)
+                                  stroke-width: 8
+                              - component: circle
+                                config:
+                                  cx: 32
+                                  cy: 32
+                                  r: 26
+                                  fill: none
+                                  stroke: '#66bb6a'
+                                  pathLength: 100
+                                  transform: rotate(-90 32 32)
+                                  stroke-width: 8
+                                  stroke-linecap: round
+                                  stroke-dasharray: =(Math.max(0, Math.min(100, (Number(items[props.heatpumpCop].numericState)
+                                    || 0) / 6 * 100))).toFixed(1) + ' 100'
+                          - component: oh-icon
+                            config:
+                              icon: material:eco
+                              width: 12
+                              height: 12
+                              style:
+                                position: absolute
+                                left: 50%
+                                top: 50%
+                                width: 12px
+                                height: 12px
+                                transform: translate(-50%, -50%)
+                                color: '#66bb6a'
+                      - component: Label
+                        config:
+                          text: '=''COP total '' + ((Number(items[props.heatpumpCop].numericState) || 0) > 0 ? ((Number(items[props.heatpumpCop].numericState)
                             || 0)).toFixed(2) : ''–'')'
                           style:
                             font-size: 12px
@@ -809,74 +809,6 @@ slots:
                                   cy: 32
                                   r: 26
                                   fill: none
-                                  stroke: '#66bb6a'
-                                  pathLength: 100
-                                  transform: rotate(-90 32 32)
-                                  stroke-width: 8
-                                  stroke-linecap: round
-                                  stroke-dasharray: =(Math.max(0, Math.min(100, (Number(items[props.heatpumpDcop].numericState)
-                                    || 0) / 6 * 100))).toFixed(1) + ' 100'
-                          - component: oh-icon
-                            config:
-                              icon: material:eco
-                              width: 12
-                              height: 12
-                              style:
-                                position: absolute
-                                left: 50%
-                                top: 50%
-                                width: 12px
-                                height: 12px
-                                transform: translate(-50%, -50%)
-                                color: '#66bb6a'
-                      - component: Label
-                        config:
-                          text: '=''COP total '' + ((Number(items[props.heatpumpDcop].numericState) || 0) > 0 ? ((Number(items[props.heatpumpDcop].numericState)
-                            || 0)).toFixed(2) : ''–'')'
-                          style:
-                            font-size: 12px
-                            font-weight: '600'
-                            white-space: nowrap
-                  - component: div
-                    config:
-                      style:
-                        display: flex
-                        align-items: center
-                        gap: 6px
-                    slots:
-                      default:
-                      - component: div
-                        config:
-                          style:
-                            position: relative
-                            width: 26px
-                            height: 26px
-                            flex: 0 0 auto
-                        slots:
-                          default:
-                          - component: svg
-                            config:
-                              viewBox: 0 0 64 64
-                              style:
-                                width: 26px
-                                height: 26px
-                                flex: 0 0 auto
-                            slots:
-                              default:
-                              - component: circle
-                                config:
-                                  cx: 32
-                                  cy: 32
-                                  r: 26
-                                  fill: none
-                                  stroke: rgba(127, 127, 127, 0.22)
-                                  stroke-width: 8
-                              - component: circle
-                                config:
-                                  cx: 32
-                                  cy: 32
-                                  r: 26
-                                  fill: none
                                   stroke: '#ffb74d'
                                   pathLength: 100
                                   transform: rotate(-90 32 32)
@@ -968,6 +900,74 @@ slots:
                       - component: Label
                         config:
                           text: '=''COP DHW '' + ((Number(items[props.heatpumpDcopDhw].numericState) || 0) > 0 ? ((Number(items[props.heatpumpDcopDhw].numericState)
+                            || 0)).toFixed(2) : ''–'')'
+                          style:
+                            font-size: 12px
+                            font-weight: '600'
+                            white-space: nowrap
+                  - component: div
+                    config:
+                      style:
+                        display: flex
+                        align-items: center
+                        gap: 6px
+                    slots:
+                      default:
+                      - component: div
+                        config:
+                          style:
+                            position: relative
+                            width: 26px
+                            height: 26px
+                            flex: 0 0 auto
+                        slots:
+                          default:
+                          - component: svg
+                            config:
+                              viewBox: 0 0 64 64
+                              style:
+                                width: 26px
+                                height: 26px
+                                flex: 0 0 auto
+                            slots:
+                              default:
+                              - component: circle
+                                config:
+                                  cx: 32
+                                  cy: 32
+                                  r: 26
+                                  fill: none
+                                  stroke: rgba(127, 127, 127, 0.22)
+                                  stroke-width: 8
+                              - component: circle
+                                config:
+                                  cx: 32
+                                  cy: 32
+                                  r: 26
+                                  fill: none
+                                  stroke: '#66bb6a'
+                                  pathLength: 100
+                                  transform: rotate(-90 32 32)
+                                  stroke-width: 8
+                                  stroke-linecap: round
+                                  stroke-dasharray: =(Math.max(0, Math.min(100, (Number(items[props.heatpumpDcop].numericState)
+                                    || 0) / 6 * 100))).toFixed(1) + ' 100'
+                          - component: oh-icon
+                            config:
+                              icon: material:eco
+                              width: 12
+                              height: 12
+                              style:
+                                position: absolute
+                                left: 50%
+                                top: 50%
+                                width: 12px
+                                height: 12px
+                                transform: translate(-50%, -50%)
+                                color: '#66bb6a'
+                      - component: Label
+                        config:
+                          text: '=''COP total '' + ((Number(items[props.heatpumpDcop].numericState) || 0) > 0 ? ((Number(items[props.heatpumpDcop].numericState)
                             || 0)).toFixed(2) : ''–'')'
                           style:
                             font-size: 12px
