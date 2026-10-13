@@ -86,14 +86,22 @@ if (!missing) {
   }
 }
 const pause = stop !== null ? (now - stop.at) / 60000 : 0;
+// the guard keeps out while the day heating holds the offset (its day window and the night off, see heatpump_day_heating)
 const enabled = state('heatpump_cycle_management') === 'ON'
   && state('pyaltherma_climate_control_power') === 'ON'
-  && state('espaltherma_smart_grid') === '0';
+  && state('espaltherma_smart_grid') === '0'
+  && !['day', 'night'].includes(state('heatpump_day_heating_state'));
 
 // a stop is locked only while the controller's own space heating is on (it reads ON all season, OFF in summer)
 const heating = state('espaltherma_space_heating_operation') === 'ON';
 const lock = lockItem.numericState || 0;
-const settled = now - (cache.private.get('write') || 0) >= SETTLE * 1000;
+// a decision waits SETTLE seconds after the guard's own write and after any change of the offset (the day heating's
+// writes too), as the setpoint reports back about 5 seconds after the offset
+if (offset !== null && cache.private.get('seen') !== offset) {
+  cache.private.put('seen', offset);
+  cache.private.put('changed', now);
+}
+const settled = now - Math.max(cache.private.get('write') || 0, cache.private.get('changed') || 0) >= SETTLE * 1000;
 // the curve is the setpoint without the offset, taken while no lock holds and no write is on its way; during a lock the
 // controller may hold the setpoint at its minimum, so the curve from before the lock is used
 if (!missing && lock === 0 && settled && cache.private.get('expected') == null) {

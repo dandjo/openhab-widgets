@@ -21,6 +21,9 @@ while one automation runs.
 heatpump_cycle_lock holds the kelvins the offset is lowered by (InfluxDB on change, MapDB restores it for the rule
 after a restart). apply sets the new switch to the group's state and the lock to 0 where they have none yet, refuses
 while the former lift heatpump_cycle_raise is above 0, and deletes that item once the rule no longer uses it.
+While the day heating (hp_day_heating.py) holds the offset, in its day window and the night off, the guard keeps out
+(it reads heatpump_day_heating_state, so apply hp_day_heating.py first), and every decision waits 20 seconds after
+any change of the offset, not only after its own writes, as the setpoint reports back about 5 seconds later.
 Usage: hp_cycle_guard.py check|apply   (on homepi, as pi; the API token from ~/.openhab_token)"""
 import json
 import os
@@ -50,7 +53,7 @@ METADATA = {SWITCH: {"stateDescription": {"value": " ", "config": {"pattern": "%
 # which change every few seconds, every 20 seconds
 WATCHED = ("espaltherma_inv_frequency", "pyaltherma_leaving_water_temp_offset_heating", "espaltherma_3way_valve_mode",
            "espaltherma_defrost_operaton", SWITCH, "pyaltherma_climate_control_power",
-           "espaltherma_space_heating_operation", "espaltherma_smart_grid")
+           "espaltherma_space_heating_operation", "espaltherma_smart_grid", "heatpump_day_heating_state")
 RULE = {
     "uid": UID,
     "name": "Wärmepumpe Taktschutz-Automatik",
