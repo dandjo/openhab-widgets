@@ -53,7 +53,7 @@ EN = {
     "Heizen seit": "Heating since", "Laden seit": "Charging since", "Außen": "Outdoor", "Innen": "Indoor",
     "außen": "outdoor", "Außenluft": "Outdoor air", "Außentemperatur": "Outdoor temperature", "Raum": "Room",
     "Raumtemperatur": "Room temperature", "Raum Sollwert": "Room setpoint", "Vorlauf": "Flow", "Rücklauf": "Return",
-    "Vorlauf-Soll": "Flow target", "Vorlauf Sollwert": "Flow setpoint", "Vorlauf Sollwert (Zusatz": "Flow setpoint (add",
+    "Vorlauf-Soll": "Flow target", "VL-Soll": "Flow target", "Vorlauf Sollwert": "Flow setpoint", "Vorlauf Sollwert (Zusatz": "Flow setpoint (add",
     "Vorlauf nach Heizstab": "Flow after backup heater", "Vorlauf vor Heizstab": "Flow before backup heater",
     "Vorlauf-Offset": "Flow offset", "Soll": "Target", "Warmwasser Soll": "Hot water target",
     "Warmwasser Sollwert": "Hot water setpoint", "Warmwasser-Boost": "Hot water boost", "Durchfluss": "Flow rate",

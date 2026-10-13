@@ -2721,7 +2721,7 @@ hp_svg = svg("svg", [
     # the heating circuit's tile: the leaving water's setpoint (the curve with the offset, lowered while the cycle
     # guard holds the starts back) over the leaving and inlet water (user, 2026-10-13: instead of the water's heat)
     *hp_tile(*CIRCUIT_TILE, "Heizkreis", "waves", SUPPLY, HEATING_FLOW, [
-        ("Vorlauf-Soll", f"={disp('espaltherma_leaving_water_setpoint')}", "currentColor"),
+        ("VL-Soll", f"={disp('espaltherma_leaving_water_setpoint')}", "currentColor"),
         ("Vorlauf", f"={disp(HPX['supply'])}", SUPPLY), ("Rücklauf", f"={disp(HPX['return'])}", RETURN)]),
     # the floors' climate left of their floor loops, tinted while those carry water:
     # the upper floor's from the air conditioner (temperature) and its Tado zone (humidity), the ground floor's from
