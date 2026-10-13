@@ -90,12 +90,13 @@ if (!missing) {
   }
 }
 const pause = stop !== null ? (now - stop.at) / 60000 : 0;
-// the day heating's night keeps the heating off, the guard keeps out then; in its window it locks as on a mild day
+// the day heating's night keeps the heating off, the guard keeps out then; in its window it locks as on a mild day.
+// Smart Grid does not matter (user, 2026-10-13): forced on (3) only charges the tank to 60 °C, the heating's setpoint
+// stays, and the short heating runs after those charges are what the lock is for
 const dayState = state('heatpump_day_heating_state');
 const night = dayState === 'night';
 const enabled = state('heatpump_cycle_management') === 'ON'
   && state('pyaltherma_climate_control_power') === 'ON'
-  && state('espaltherma_smart_grid') === '0'
   && !night;
 
 // a stop is locked only while the controller's own space heating is on (it reads ON all season, OFF in summer)

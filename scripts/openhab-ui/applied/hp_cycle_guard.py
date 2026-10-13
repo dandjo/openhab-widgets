@@ -56,7 +56,7 @@ METADATA = {SWITCH: {"stateDescription": {"value": " ", "config": {"pattern": "%
 # which change every few seconds, every 20 seconds
 WATCHED = ("espaltherma_inv_frequency", "pyaltherma_leaving_water_temp_offset_heating", "espaltherma_3way_valve_mode",
            "espaltherma_defrost_operaton", SWITCH, "pyaltherma_climate_control_power",
-           "espaltherma_space_heating_operation", "espaltherma_smart_grid", "heatpump_day_heating_state")
+           "espaltherma_space_heating_operation", "heatpump_day_heating_state")
 RULE = {
     "uid": UID,
     "name": "Wärmepumpe Taktschutz-Automatik",
