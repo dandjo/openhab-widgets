@@ -1016,7 +1016,12 @@ VENT_EXHAUST = "#90a4ae"  # the used air the ventilation unit blows out
 # how the car's figures come about, under them on its page
 ECAR_CALC = ("Berechnet aus der Messung der Klimaanlage (Shelly EM) abzüglich der Leistung laut Faikin und der "
              "Grundlast der Klimaanlage (Standby, Innengerät); unter 300 W lädt das Auto nicht.")
-HP_ON = 50  # watts; the heat pump idles at about 20 W
+# watts; above it the heat pump counts as running, its badge filled; its circulation pump alone draws 30-40 W
+HP_ON = 50
+# watts; from here power flows to the heat pump in the energy flow and wherever its node is drawn: it idles at
+# 15-25 W, its circulation pump alone draws 30-40 W (measured 2026-10-03 to 10-13; user, 2026-10-13: a flow while
+# the circulation pump runs)
+HP_FLOW = 28
 HP_ORANGE = "#fb8c00"
 HEATER_RED = "#e53935"  # the heat pump's electric heaters at work, as the wall unit's ring in the heat pump card
 HOME = "home_active_power"
@@ -1397,7 +1402,7 @@ def hp_mode_badges(cx, cy, heaters=None, running=None):
 # the house's ring as a pie of its power
 def consumers():
     """The consumers clockwise from the top: node, power, threshold, colour (some colours are defined further down)."""
-    return [(VENT_XY, VENT_POWER, 5, VENT_TEAL), (HP_XY, num(HP), HP_ON, HP_ORANGE), (AC_XY, AC_FLOW, AC_ON, AC_BLUE),
+    return [(VENT_XY, VENT_POWER, 5, VENT_TEAL), (HP_XY, num(HP), HP_FLOW, HP_ORANGE), (AC_XY, AC_FLOW, AC_ON, AC_BLUE),
             (ECAR_XY, num(ECAR), ECAR_ON, ECAR_COLOR), (APPL_XY, APPL_POWER, APPL_ON, APPL_COLOR)]
 
 
@@ -1477,7 +1482,7 @@ def energy_flow():
         # connections first, so the nodes sit on top of the line ends
         *spoke(PV_XY, "#ffb300", num(PV), "true"),
         *spoke(GRID_XY, GRID_COLOR, num(GRID), f"{num(GRID)} > 0"),
-        *spoke(HP_XY, "#fb8c00", num(HP), "false", threshold=HP_ON),
+        *spoke(HP_XY, "#fb8c00", num(HP), "false", threshold=HP_FLOW),
         *spoke(AC_XY, "#29b6f6", AC_FLOW, "false", threshold=AC_ON),
         *spoke(ECAR_XY, ECAR_COLOR, num(ECAR), "false", threshold=ECAR_ON),
         *spoke(APPL_XY, APPL_COLOR, APPL_POWER, "false", threshold=APPL_ON),
@@ -1490,7 +1495,7 @@ def energy_flow():
         flow_orbit(PV_XY, "#ffb300", num(PV), 10),
         flow_orbit(GRID_XY, GRID_COLOR, num(GRID), 10),
         flow_orbit(BATT_XY, "#7cb342", num(BATT), 10, share=f"{num(SOC)} / 100"),
-        flow_orbit(HP_XY, HP_ORANGE, num(HP), HP_ON, share=DHW_PROGRESS),
+        flow_orbit(HP_XY, HP_ORANGE, num(HP), HP_FLOW, share=DHW_PROGRESS),
         flow_orbit(ECAR_XY, ECAR_COLOR, num(ECAR), ECAR_ON),
         flow_orbit(APPL_XY, APPL_COLOR, APPL_POWER, APPL_ON),
         *house_pie(),
@@ -1503,7 +1508,7 @@ def energy_flow():
         share_orbit(VENT_XY, f"{M_VENT} / {timer_full('ventilation_timer', 360)}", VENT_TEAL,
                     active=flowing(VENT_POWER, 5)),
         share_orbit(BATT_XY, f"{num(SOC)} / 100", "#7cb342", active=flowing(num(BATT), 10)),
-        share_orbit(HP_XY, DHW_PROGRESS, HP_ORANGE, active=flowing(num(HP), HP_ON)),
+        share_orbit(HP_XY, DHW_PROGRESS, HP_ORANGE, active=flowing(num(HP), HP_FLOW)),
         *[share_pill(*c) for c in consumers()],
         flow_node("pv", PV_XY, num(PV)),
         flow_node("grid", GRID_XY, num(GRID)),
@@ -4607,7 +4612,7 @@ def heat_specs():
     # draw, not by the booster heater in the tank (user, 2026-10-04)
     pump = heat_icon([flow_node("heat-pump-split", (0, 0), num(HPX["power"]), frequency=num(HPX["hz"])),
                       *hp_mode_badges(0, 0, heaters=BUH_ON, running=f"{num(HPX['circuit'])} > {HP_ON}")],
-                     hp_orbit((0, 0), HP_ORANGE, flowing(num(HP), HP_ON), DHW_PROGRESS))
+                     hp_orbit((0, 0), HP_ORANGE, flowing(num(HP), HP_FLOW), DHW_PROGRESS))
     # during a hot-water charge the time left in the setpoint's place, as a Miele machine's, and the end under it
     # (user, 2026-10-04), on the tile of what charges the tank
     bsh_alone = f"({BSH_ON} && !({DHW_MODE}))"
@@ -7922,7 +7927,7 @@ def heatpump_blocks():
     # towards its expected end; while the tank charges the time left, the end large and the charge as a bar
     # (user, 2026-10-05: as Waschmaschine 1)
     since = f"Math.max(0, dayjs().diff(dayjs(items.{DHW_SINCE}.state), 'minute'))"
-    icon = node_icon("heat-pump-split", HP_ORANGE, flowing(num(HP), HP_ON), share=DHW_PROGRESS,
+    icon = node_icon("heat-pump-split", HP_ORANGE, flowing(num(HP), HP_FLOW), share=DHW_PROGRESS,
                      badges=hp_mode_badges(0, 0), power=num(HP), frequency=num(P["hz"]))
     now = [hero("material:heat_pump", "#fb8c00", "Elektrische Leistung", f"={disp(P['power'])}",
                 [chips(chip(f"={disp(P['valve'])}", "#ffa726"),
@@ -7992,7 +7997,7 @@ def heatpump_blocks():
                            vtile("3-Wege-Ventil", P["valve"]), vtile("Taktschutz", "heatpump_cycle_lock"),
                            vtile("Fehlercode", "espaltherma_error_code")])
     plug, _, _, electric = plug_refs("heatpump", "material:heat_pump", "#fb8c00", title="Shelly EM",
-                                            kind="heat-pump-split", active=flowing(num(HP), HP_ON),
+                                            kind="heat-pump-split", active=flowing(num(HP), HP_FLOW),
                                             frequency=num(P["hz"]))
     # the cards of values on top, the full charts below, the cards paired by height so none stands with much empty
     # space (user, 2026-10-06): Jetzt beside the controls over the operation, today's energies with their conversion

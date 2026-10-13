@@ -202,7 +202,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 12, 2026, 2:00:23 PM
+timestamp: Oct 13, 2026, 4:17:07 AM
 component: oh-card
 config:
   title: Heating & Hot Water
@@ -809,7 +809,7 @@ slots:
                           fill: none
                           stroke: '#fb8c00'
                           stroke-width: 2.9
-                          visible: '=(Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) > 50) && !((((items[props.heatpumpDhwEta].state
+                          visible: '=(Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) > 28) && !((((items[props.heatpumpDhwEta].state
                             !== ''UNDEF'' && items[props.heatpumpDhwEta].state !== ''NULL'' && items[props.heatpumpDhwSince].state
                             !== ''UNDEF'' && items[props.heatpumpDhwSince].state !== ''NULL'') ? Math.max(0, dayjs().diff(dayjs(items[props.heatpumpDhwSince].state)))
                             / Math.max(1, dayjs(items[props.heatpumpDhwEta].state).diff(dayjs(items[props.heatpumpDhwSince].state)))
@@ -822,7 +822,7 @@ slots:
                               values: 0.3;1;0.3
                               dur: 2s
                               repeatCount: indefinite
-                              visible: '=(Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) > 50) && !((((items[props.heatpumpDhwEta].state
+                              visible: '=(Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) > 28) && !((((items[props.heatpumpDhwEta].state
                                 !== ''UNDEF'' && items[props.heatpumpDhwEta].state !== ''NULL'' && items[props.heatpumpDhwSince].state
                                 !== ''UNDEF'' && items[props.heatpumpDhwSince].state !== ''NULL'') ? Math.max(0, dayjs().diff(dayjs(items[props.heatpumpDhwSince].state)))
                                 / Math.max(1, dayjs(items[props.heatpumpDhwEta].state).diff(dayjs(items[props.heatpumpDhwSince].state)))
@@ -833,7 +833,7 @@ slots:
                               values: 2.9;4.5;2.9
                               dur: 2s
                               repeatCount: indefinite
-                              visible: '=(Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) > 50) && !((((items[props.heatpumpDhwEta].state
+                              visible: '=(Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) > 28) && !((((items[props.heatpumpDhwEta].state
                                 !== ''UNDEF'' && items[props.heatpumpDhwEta].state !== ''NULL'' && items[props.heatpumpDhwSince].state
                                 !== ''UNDEF'' && items[props.heatpumpDhwSince].state !== ''NULL'') ? Math.max(0, dayjs().diff(dayjs(items[props.heatpumpDhwSince].state)))
                                 / Math.max(1, dayjs(items[props.heatpumpDhwEta].state).diff(dayjs(items[props.heatpumpDhwSince].state)))
@@ -844,7 +844,7 @@ slots:
                               values: 29.2;30;29.2
                               dur: 2s
                               repeatCount: indefinite
-                              visible: '=(Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) > 50) && !((((items[props.heatpumpDhwEta].state
+                              visible: '=(Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) > 28) && !((((items[props.heatpumpDhwEta].state
                                 !== ''UNDEF'' && items[props.heatpumpDhwEta].state !== ''NULL'' && items[props.heatpumpDhwSince].state
                                 !== ''UNDEF'' && items[props.heatpumpDhwSince].state !== ''NULL'') ? Math.max(0, dayjs().diff(dayjs(items[props.heatpumpDhwSince].state)))
                                 / Math.max(1, dayjs(items[props.heatpumpDhwEta].state).diff(dayjs(items[props.heatpumpDhwSince].state)))
@@ -857,7 +857,7 @@ slots:
                           fill: none
                           stroke: '#fb8c00'
                           stroke-width: 2.9
-                          visible: '=(Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) > 50) && ((((items[props.heatpumpDhwEta].state
+                          visible: '=(Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) > 28) && ((((items[props.heatpumpDhwEta].state
                             !== ''UNDEF'' && items[props.heatpumpDhwEta].state !== ''NULL'' && items[props.heatpumpDhwSince].state
                             !== ''UNDEF'' && items[props.heatpumpDhwSince].state !== ''NULL'') ? Math.max(0, dayjs().diff(dayjs(items[props.heatpumpDhwSince].state)))
                             / Math.max(1, dayjs(items[props.heatpumpDhwEta].state).diff(dayjs(items[props.heatpumpDhwSince].state)))
@@ -870,7 +870,7 @@ slots:
                               values: 0.3;0.06;0.3
                               dur: 2s
                               repeatCount: indefinite
-                              visible: '=(Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) > 50) && ((((items[props.heatpumpDhwEta].state
+                              visible: '=(Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) > 28) && ((((items[props.heatpumpDhwEta].state
                                 !== ''UNDEF'' && items[props.heatpumpDhwEta].state !== ''NULL'' && items[props.heatpumpDhwSince].state
                                 !== ''UNDEF'' && items[props.heatpumpDhwSince].state !== ''NULL'') ? Math.max(0, dayjs().diff(dayjs(items[props.heatpumpDhwSince].state)))
                                 / Math.max(1, dayjs(items[props.heatpumpDhwEta].state).diff(dayjs(items[props.heatpumpDhwSince].state)))
@@ -926,21 +926,21 @@ slots:
                               values: 1;0.55;1
                               dur: 2s
                               repeatCount: indefinite
-                              visible: =Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) > 50
+                              visible: =Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) > 28
                           - component: animate
                             config:
                               attributeName: stroke-width
                               values: 4.5;2.9;4.5
                               dur: 2s
                               repeatCount: indefinite
-                              visible: =Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) > 50
+                              visible: =Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) > 28
                           - component: animate
                             config:
                               attributeName: r
                               values: 30;29.2;30
                               dur: 2s
                               repeatCount: indefinite
-                              visible: =Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) > 50
+                              visible: =Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) > 28
                   - component: widget:flow-node
                     config:
                       kind: heat-pump-split
