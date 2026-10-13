@@ -160,7 +160,7 @@ Needs `flow-link`, `flow-node`.
 ![Energy flow in dark mode](screenshots/energy-flow-card-dark.gif)
 
 <details>
-<summary>44 props</summary>
+<summary>46 props</summary>
 
 | Prop | Item | Item type |
 |---|---|---|
@@ -188,6 +188,8 @@ Needs `flow-link`, `flow-node`.
 | `heatpumpBuhStep1Mode` | ESPAltherma Backup Heater (BUH) Step 1 Mode | Switch |
 | `heatpumpBuhStep2Mode` | ESPAltherma Backup Heater (BUH) Step 2 Mode | Switch |
 | `heatpumpBshMode` | ESPAltherma Booster Heater (BSH) Mode | Switch |
+| `heatpumpWaterPumpOperation` | ESPAltherma Water Pump Operation | Switch |
+| `heatpumpFlowSensor` | ESPAltherma Flow Sensor (l/min) | Number:VolumetricFlowRate |
 | `heatpumpDefrostOperaton` | ESPAltherma Defrost Operation | Switch |
 | `heatpumpValve` | ESPAltherma 3-Way Valve Mode | String |
 | `acMode` | Faikout Perfera Mode | String |
