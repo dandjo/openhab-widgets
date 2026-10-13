@@ -7,10 +7,11 @@ heatpump_day_heating (hp_day_heating.js next to this file) sets the offset to th
 9–19 h) and to −10 K outside it, where the setpoint stays at the controller's minimum of 20 °C and it never calls for
 heat; day mode while the 24-hour mean outdoor temperature (espaltherma_ext_ambient_temp_avg, the heating curve's
 basis) is 10 °C or more, until it falls below 8 °C, or until the heating ran through two whole windows in a row without
-reaching its own stop (hot-water charges and the short runs after them never count as its stops, their time is taken
-out of the window); after such a fallback day mode returns once the 24-hour mean has risen 2 K above its value then.
-In normal operation the offset goes back to 0 once and the cycle guard (hp_cycle_guard.js) works as before; in day mode
-the guard keeps out, as it reads heatpump_day_heating_state.
+reaching its own stop (hot-water charges and the short runs after them never count as its stops; their time and that
+of the cycle guard's locks after them is taken out of the window); after such a fallback day mode returns once the
+24-hour mean has risen 2 K above its value then. In normal operation the offset goes back to 0 once and the cycle guard
+(hp_cycle_guard.js) works as before; in day mode it locks starts in the window only after a charge or a short run (the
+rule waits for its lock to go) and keeps out at night, as it reads heatpump_day_heating_state.
 Items: the switch heatpump_day_heating (a member of heatpump_management, like the two other heat pump automations, so
 the Automatik pill switches it too), heatpump_day_heating_state (day, night, normal, off), the settings
 heatpump_day_heating_offset (K, whole kelvins: the controller takes no others), heatpump_day_heating_start and _end

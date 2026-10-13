@@ -4,25 +4,28 @@
 // the night, during which the rule keeps the heating off (offset −10 K: the setpoint stays at its minimum of 20 °C, so
 // the controller never calls for heat). Day mode while the 24-hour mean outdoor temperature, the heating curve's basis,
 // is 10 °C or more, until it falls below 8 °C, or when the heating never reached its own stop in two whole windows in a
-// row while running for at least 70 % of the window's time without hot-water charges (the window then gives the
-// house too little; a day the house needs nothing has no stop either, but no heating); after that it comes back only once the 24-hour mean has risen 2 K
-// above the value it ended at. A stop counts as the heating's own only after 10 minutes of space heating (the valve on
-// the heating, so a hot-water charge and the short runs right after it never count), with the leaving water at its stop
-// (2 K or more above the setpoint) and no restart within 3 minutes (a defrost). In day mode the offset is the rule's:
-// it sets it again whenever it differs, so a change by hand needs the switch off; the cycle guard keeps out then. In
-// normal operation the offset goes back to 0 once and the cycle guard takes over. Offset, start and end of the window
-// are items, so they can be changed without touching the rule.
+// row while running for at least 70 % of the window's time without hot-water charges and the cycle guard's locks (the
+// window then gives the house too little; a day the house needs nothing has no stop either, but no heating); after that
+// it comes back only once the 24-hour mean has risen 2 K above the value it ended at. A stop counts as the heating's
+// own only after 10 minutes of space heating (the valve on the heating, so a hot-water charge and the short runs right
+// after it never count), with the leaving water at its stop (2 K or more above the setpoint) and no restart within 3
+// minutes (a defrost). In day mode the offset is the rule's: it sets it again whenever it differs, so a change by hand
+// needs the switch off. Only the cycle guard lowers it for a while in the window, after a hot-water charge or a short
+// run (user, 2026-10-13: a hot compressor's start ends within minutes); the rule waits for its lock to go, and at night
+// the guard leaves its lock to the rule as it stands. In normal operation the offset goes back to 0 once and the cycle
+// guard works as before. Offset, start and end of the window are items, so they can be changed without touching the
+// rule.
 const ON_AVG = 10;       // °C 24-hour mean outdoors from which day mode starts
 const OFF_AVG = 8;       // °C below which it ends
 const RESUME_RISE = 2;   // K the 24-hour mean must rise above its value at a fallback before day mode returns
 const NIGHT = -10;       // K offset outside the window: the setpoint at its minimum, no call for heat
 const FULL_DAYS = 2;     // whole windows in a row without the heating's own stop that end day mode
-const FULL_SHARE = 0.7;  // ... in which the heating also ran this share of the window's time without hot water
+const FULL_SHARE = 0.7;  // ... in which the heating also ran this share of the window's time without hot water and locks
 const SPACE_RUN = 10;    // minutes of space heating before a stop counts as the heating's own
 const AT_STOP = 2;       // K above the setpoint the leaving water must have reached in the run's last 2 minutes
 const RESTART = 3;       // minutes after a stop without a restart (a defrost restarts within 30–90 s)
 const DEFROST_GAP = 5;   // minutes around a defrost in which a stop does not count
-const SETTLE = 30;       // seconds after a write before the offset is checked
+const SETTLE = 30;       // seconds after a write or a change of the guard's lock before the offset is checked
 const RETRY = 5;         // minutes between writes once 3 quick ones did not arrive
 const OFFSET_MIN = -10;  // the controller's offset range is −10..+10
 const OFFSET_MAX = 10;
@@ -126,14 +129,17 @@ const dayFrom = cache.private.get('dayFrom') || now;
 if (phase === 'day') {
   if (win === null || win.date !== today) {
     // a window counts only when the rule held it from its start (not after a restart, switching on or a season change)
-    win = { date: today, whole: previous === 'night', stopped: false, heating: 0, dhw: 0, seen: now };
+    win = { date: today, whole: previous === 'night', stopped: false, heating: 0, dhw: 0, locked: 0, seen: now };
   }
-  // the heating's and the tank's time in the window, between two runs of the rule (at most a minute counted)
+  // the heating's, the tank's and the guard's locks' time in the window, between two runs of the rule (at most a
+  // minute counted); a lock follows a charge or a short run, so its time is the charge's
   const step = Math.min(60000, Math.max(0, now - win.seen));
   if (!missing && freq > 0 && valve === 'Space') {
     win.heating += step;
   } else if (!missing && valve !== 'Space') {
     win.dhw += step;
+  } else if (!missing && lock > 0) {
+    win.locked = (win.locked || 0) + step;
   }
   win.seen = now;
   // during the window only decided stops count, so a defrost right after a stop is seen first
@@ -147,13 +153,13 @@ if (phase === 'day') {
     win.stopped = true;
   }
   if (win.whole) {
-    const free = Math.max(1, now - dayFrom - win.dhw);  // the window's time without hot water
+    const free = Math.max(1, now - dayFrom - win.dhw - (win.locked || 0));  // the window's time without hot water and locks
     const share = win.heating / free;
     const ranThrough = !win.stopped && share >= FULL_SHARE;
     full = ranThrough ? full + 1 : 0;
     console.info(`day heating: window of ${today} ${win.stopped ? 'reached the heating\'s own stop' :
       ranThrough ? 'ran through without the heating\'s own stop' : 'had no stop but little heating'}, heating ` +
-      `${Math.round(share * 100)} % of ${Math.round(free / 60000)} min without hot water (${full} in a row)`);
+      `${Math.round(share * 100)} % of ${Math.round(free / 60000)} min without hot water and locks (${full} in a row)`);
     if (full >= FULL_DAYS) {
       resume = Math.max(ON_AVG, Math.round(((avg ?? ON_AVG) + RESUME_RISE) * 10) / 10);
       items.getItem(RESUME).postUpdate(resume);
@@ -182,7 +188,18 @@ if (phase !== previous) {
 }
 
 const target = phase === 'day' ? dayOffset : phase === 'night' ? NIGHT : 0;
-const settled = now - (cache.private.get('write') || 0) >= SETTLE * 1000;
+// the guard's release writes the offset itself, so the rule waits after a change of the lock as after its own write
+if (cache.private.get('lockSeen') !== lock) {
+  cache.private.put('lockSeen', lock);
+  cache.private.put('lockChanged', now);
+}
+const settled = now - Math.max(cache.private.get('write') || 0, cache.private.get('lockChanged') || 0) >= SETTLE * 1000;
+// leaving day mode: the offset goes back to 0 once, remembered until it has arrived, as the write may have to wait
+if (phase === 'day' || phase === 'night') {
+  cache.private.remove('release');
+} else if (wasDay) {
+  cache.private.put('release', true);
+}
 if (!missing && settled) {
   if (phase === 'day' || phase === 'night') {
     // the offset is the rule's: set again whenever it differs, once the cycle guard has let go of a lock
@@ -198,9 +215,8 @@ if (!missing && settled) {
     } else if (Math.abs(offset - target) <= 0.25) {
       cache.private.remove('attempts');
     }
-  } else if (wasDay || cache.private.get('release')) {
-    // leaving day mode: the offset back to 0, once; afterwards it belongs to the cycle guard and to hand settings
-    cache.private.put('release', true);
+  } else if (cache.private.get('release')) {
+    // the offset back to 0, once; afterwards it belongs to the cycle guard and to hand settings
     if (Math.abs(offset) <= 0.25) {
       cache.private.remove('release');
       cache.private.remove('attempts');
