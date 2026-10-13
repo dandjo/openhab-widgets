@@ -1385,16 +1385,22 @@ def hp_mode_badges(cx, cy, heaters=None, running=None):
     """The heat pump's badge, upper right on the ring of its node at (cx, cy): defrosting, else what its valve serves,
     a flame for space heating, a shower for hot water; filled while `running`, by default while it draws more than
     HP_ON watts. While only its heaters run (`heaters`, by default the backup heater or the tank's booster heater),
-    the compressor standing, a bolt in the backup heater's red instead."""
+    the compressor standing, a bolt in the backup heater's red instead; while only its circulation pump runs, neither
+    compressor nor heaters, the water's flow as the wall unit's badge in the heat pump card shows it, filled (user,
+    2026-10-13)."""
     defrost = f"items.{HPX['defrost']}.state === 'ON'"
     operation = f"={defrost} ? 'ac_unit' : {DHW_MODE} ? 'shower' : 'local_fire_department'"
-    heaters_only = f"(({heaters or f'{BUH_ON} || {BSH_ON}'}) && !({COMPRESSOR}))"
+    heaters_on = f"({heaters or f'{BUH_ON} || {BSH_ON}'})"
+    heaters_only = f"({heaters_on} && !({COMPRESSOR}))"
+    circulating = f"({PUMP_ON} && !{heaters_on} && !({COMPRESSOR}))"
     xy = round(cx + ON_RING, 1), round(cy - ON_RING, 1)
     mode = ring_badge(*xy, operation, HP_ORANGE, running or HP_RUNNING)
-    mode["config"]["visible"] = f"=!{heaters_only}"
+    mode["config"]["visible"] = f"=!{heaters_only} && !{circulating}"
     heater = ring_badge(*xy, "electric_bolt", HEATER_RED, "true")
     heater["config"]["visible"] = f"={heaters_only}"
-    return [mode, heater]
+    flow = ring_badge(*xy, "water", HP_ORANGE, "true")
+    flow["config"]["visible"] = f"={circulating}"
+    return [mode, heater, flow]
 
 
 # what each consumer draws of the house's power now (user, 2026-10-05, proposals B and D): its share in a pill in the
