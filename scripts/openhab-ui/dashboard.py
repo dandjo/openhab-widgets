@@ -6898,6 +6898,19 @@ def ok_tile(title, item, ok_expr):
                 item, title)
 
 
+def cycle_tile(title, item, switch="heatpump_cycle_management"):
+    """The cycle guard (rule heatpump_cycle_management) as the heating card's line shows it, under Betrieb on the heat
+    pump's page (user, 2026-10-13): a pill whether it pauses the heating's starts after a stop (item, the kelvins the
+    leaving water offset is lowered by, above 0), waits for the next stop or is switched off, and while it pauses by how
+    much the leaving water setpoint is lowered, as large as its neighbours' values; a tap opens the lock's history."""
+    paused, on = f"({num(item)} > 0)", f"(items.{switch}.state === 'ON')"
+    word = f"={paused} ? 'Pause' : {on} ? 'bereit' : 'aus'"
+    return vt_tile([vt_head(title, vt_chip(word, f"{paused} ? 'info' : {on} ? 'good' : 'neutral'")),
+                 vt_value(f"={paused} ? '−' + {fixed(num(item), 0)} + ' K' : '–'"),
+                 label("Vorlauf-Soll gesenkt", f"={paused}", **VT_SUB)],
+                item, title)
+
+
 # ---------------------------------------------------------------- 13 · time
 
 
@@ -7704,6 +7717,7 @@ VALUE_RENDER = {
                                            HPX["hot_gas"]),
     HPX["pressure"]: vt_r(lambda t, i: spark_tile(t, i, "#ba68c8", "bar", 1, span=2)),
     "espaltherma_error_code": vt_r(lambda t, i: ok_tile(t, i, f"['0', '', 'NULL', 'UNDEF'].includes(items.{i}.state)")),
+    "heatpump_cycle_lock": vt_r(cycle_tile),
     # ventilation
     "ventilation_power": vt_r(lambda t, i: spark_tile(t, i, VENT_TEAL, "W", 1, span=20)),
     "ventilation_energy_today": vt_r(lambda t, i: compare_tile("Energie heute", i, VENT_TEAL)),
@@ -7975,7 +7989,8 @@ def heatpump_blocks():
                              vtile("Drucksensor Temperatur", "espaltherma_pressure_sensor_temp")])
     operation = value_grid([vtile("Außengerät Betrieb", "espaltherma_operation_mode"),
                            vtile("Innengerät Betrieb", "espaltherma_i_u_operation_mode"),
-                           vtile("3-Wege-Ventil", P["valve"]), vtile("Fehlercode", "espaltherma_error_code")])
+                           vtile("3-Wege-Ventil", P["valve"]), vtile("Taktschutz", "heatpump_cycle_lock"),
+                           vtile("Fehlercode", "espaltherma_error_code")])
     plug, _, _, electric = plug_refs("heatpump", "material:heat_pump", "#fb8c00", title="Shelly EM",
                                             kind="heat-pump-split", active=flowing(num(HP), HP_ON),
                                             frequency=num(P["hz"]))
