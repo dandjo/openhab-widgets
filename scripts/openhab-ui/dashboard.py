@@ -7470,11 +7470,12 @@ def price_now(title, item):
 
 
 def cop_row(total, space, dhw):
-    """The COPs in one line under a conversion's bands, each with its ring and icon: total (the heating card's green
-    with its leaf), heating, hot water (user, 2026-10-07: under the drawing, not beside the title)."""
-    return div([cop_badge("COP gesamt", total, COP_C, "material:eco"),
-                cop_badge("COP Heizung", space, SPACE_C, "material:local_fire_department"),
-                cop_badge("COP WW", dhw, DHW_C, "material:water_drop")],
+    """The COPs in one line under a conversion's bands, each with its ring and icon: heating, hot water, total (the
+    heating card's green with its leaf) last, so it sits on the right and on a phone wraps alone into the second line
+    (user, 2026-10-07: under the drawing, not beside the title; 2026-10-13: total last)."""
+    return div([cop_badge("COP Heizung", space, SPACE_C, "material:local_fire_department"),
+                cop_badge("COP WW", dhw, DHW_C, "material:water_drop"),
+                cop_badge("COP gesamt", total, COP_C, "material:eco")],
                **{"display": "flex", "flex-wrap": "wrap", "justify-content": "space-around", "gap": "6px 14px",
                   "margin-top": "8px"})
 
