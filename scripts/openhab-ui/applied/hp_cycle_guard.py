@@ -21,9 +21,12 @@ while one automation runs.
 heatpump_cycle_lock holds the kelvins the offset is lowered by (InfluxDB on change, MapDB restores it for the rule
 after a restart). apply sets the new switch to the group's state and the lock to 0 where they have none yet, refuses
 while the former lift heatpump_cycle_raise is above 0, and deletes that item once the rule no longer uses it.
-While the day heating (hp_day_heating.py) holds the offset, in its day window and the night off, the guard keeps out
-(it reads heatpump_day_heating_state, so apply hp_day_heating.py first), and every decision waits 20 seconds after
-any change of the offset, not only after its own writes, as the setpoint reports back about 5 seconds later.
+In the day heating's window (hp_day_heating.py) the guard locks only after a charge or a short run, by the rules above
+9 °C whatever the outdoor air, and in its night it keeps out and leaves a lock to the day heating as it stands, without
+a write (it reads heatpump_day_heating_state, so apply hp_day_heating.py first). The return's marks lie below the
+setpoint without the lock, the curve plus the offset the lock was taken from (the day offset in the window). Every
+decision waits 20 seconds after any change of the offset, not only after its own writes, as the setpoint reports back
+about 5 seconds later.
 Usage: hp_cycle_guard.py check|apply   (on homepi, as pi; the API token from ~/.openhab_token)"""
 import json
 import os

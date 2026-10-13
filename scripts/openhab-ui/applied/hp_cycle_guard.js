@@ -15,7 +15,11 @@
 // (25 °C here), whatever the offset, so a lock only works where the curve lies at least a kelvin above that: the rule
 // remembers the curve from before a lock and the minimum it meets, and leaves stops alone where a lock would not lower
 // the setpoint. heatpump_cycle_lock holds the kelvins the offset is lowered by (MapDB restores it, so the rule knows its
-// share of the offset after a restart); a value set by hand meanwhile stands.
+// share of the offset after a restart); a value set by hand meanwhile stands. The return's marks lie below the setpoint
+// without the lock, the curve plus the offset the lock was taken from. In the day heating's window (heatpump_day_heating,
+// user, 2026-10-13) the guard locks only after a hot-water charge or a short run, as above 9 °C, whatever the outdoor
+// air, so the window's own runs go on; in its night it keeps out and leaves a lock to it as it stands, as a release to
+// the day offset would call for heat until the night's offset arrives.
 const LOCK = 5;              // K the offset is lowered by while starts are locked
 const COLD = 9;              // °C outdoor air below which a start's start-up control runs at 42–48 Hz
 const RETURN_COLD = 3.2;     // K below the curve the return must be below 9 °C, with a hot compressor
@@ -86,11 +90,13 @@ if (!missing) {
   }
 }
 const pause = stop !== null ? (now - stop.at) / 60000 : 0;
-// the guard keeps out while the day heating holds the offset (its day window and the night off, see heatpump_day_heating)
+// the day heating's night keeps the heating off, the guard keeps out then; in its window it locks as on a mild day
+const dayState = state('heatpump_day_heating_state');
+const night = dayState === 'night';
 const enabled = state('heatpump_cycle_management') === 'ON'
   && state('pyaltherma_climate_control_power') === 'ON'
   && state('espaltherma_smart_grid') === '0'
-  && !['day', 'night'].includes(state('heatpump_day_heating_state'));
+  && !night;
 
 // a stop is locked only while the controller's own space heating is on (it reads ON all season, OFF in summer)
 const heating = state('espaltherma_space_heating_operation') === 'ON';
@@ -103,12 +109,17 @@ if (offset !== null && cache.private.get('seen') !== offset) {
 }
 const settled = now - Math.max(cache.private.get('write') || 0, cache.private.get('changed') || 0) >= SETTLE * 1000;
 // the curve is the setpoint without the offset, taken while no lock holds and no write is on its way; during a lock the
-// controller may hold the setpoint at its minimum, so the curve from before the lock is used
-if (!missing && lock === 0 && settled && cache.private.get('expected') == null) {
+// controller may hold the setpoint at its minimum, so the curve from before the lock is used (and the day heating's
+// night is left out, as its offset keeps the setpoint at the minimum)
+if (!missing && lock === 0 && settled && !night && cache.private.get('expected') == null) {
   cache.private.put('curve', setpoint - offset);
 }
 const curve = cache.private.get('curve') ?? null;
+const base = offset !== null ? offset + lock : null;  // the offset without the lock
+const ref = curve !== null && base !== null ? curve + base : null;  // the setpoint without the lock
 const cold = outdoor < COLD;
+// a start-up control that lifts the water less (above 9 °C), or the day heating's window: lock only a hot compressor
+const mild = !cold || dayState === 'day';
 
 const write = (value, newLock, why) => {
   // in °C like the item: a quantity in K would be taken as an absolute temperature (−272.15 °C)
@@ -125,10 +136,10 @@ const write = (value, newLock, why) => {
 // stands, has stayed at or below its mark for HOLD minutes; above 9 °C a cooled compressor is enough (the valve may
 // then still stand on the tank, with no reading of the return), or an hour, as the outdoor unit's readings freeze
 // while it idles on warm days
-const reading = !missing && curve !== null && freq === 0 && valve === 'Space' && flow >= FLOW;
-const mark = cold ? (discharge < COOL_AT ? RETURN_COOL : RETURN_COLD) : RETURN_MILD;
+const reading = !missing && ref !== null && freq === 0 && valve === 'Space' && flow >= FLOW;
+const mark = mild ? RETURN_MILD : discharge < COOL_AT ? RETURN_COOL : RETURN_COLD;
 if (reading && settled) {
-  if (returnTemp <= curve - mark) {
+  if (returnTemp <= ref - mark) {
     if (!cache.private.get('below')) {
       cache.private.put('below', now);
     }
@@ -138,7 +149,7 @@ if (reading && settled) {
 }
 const below = cache.private.get('below');
 const held = reading && below && now - below >= HOLD * 60000;
-const cooled = !missing && !cold && freq === 0 && (discharge <= DISCHARGE || pause >= MILD_PAUSE);
+const cooled = !missing && mild && freq === 0 && (discharge <= DISCHARGE || pause >= MILD_PAUSE);
 const free = settled && (held || cooled);
 
 if (missing) {
@@ -183,20 +194,27 @@ if (missing) {
     if (expected !== null && expected !== undefined && lock === 0) {
       cache.private.remove('expected');
     }
-    const base = offset + lock;  // the offset without the lock
-    if (lock > 0) {
+    if (lock > 0 && night) {
+      // the day heating's night takes the offset over as it stands: no write, the lock is only forgotten
+      lockItem.postUpdate(0);
+      cache.private.remove('expected');
+      if (stop !== null) {
+        stop.done = true;
+        cache.private.put('stop', stop);
+      }
+      console.info(`cycle guard: lock of ${lock} K left to the day heating's night at offset ${offset}`);
+    } else if (lock > 0) {
       let why = null;
-      const target = curve !== null ? curve + base : null;  // the setpoint without the lock
-      if (target !== null && setpoint > target - LOCK + 0.5) {
+      if (ref !== null && setpoint > ref - LOCK + 0.5) {
         cache.private.put('floor', { value: setpoint, at: now });
-      } else if (target !== null) {
+      } else if (ref !== null) {
         cache.private.remove('floor');
       }
       if (!enabled) {
         why = 'guard off';
       } else if (curve === null) {
         why = 'curve unknown after a restart';
-      } else if (target - setpoint < EFFECT) {
+      } else if (ref - setpoint < EFFECT) {
         why = `the controller keeps the setpoint at ${setpoint} °C, its minimum`;
       } else if (freq > 0 && valve === 'Space') {
         why = 'the compressor runs for the heating';
@@ -204,7 +222,8 @@ if (missing) {
         why = `${MAX_PAUSE} min after the stop`;
       } else if (free && pause >= MIN_PAUSE) {
         why = held
-          ? `return ${returnTemp} °C, ${(curve - returnTemp).toFixed(1)} K below the curve, after ${Math.round(pause)} min`
+          ? `return ${returnTemp} °C, ${(ref - returnTemp).toFixed(1)} K below the curve` +
+            (base !== 0 ? ` ${base > 0 ? '+' : '−'} ${Math.abs(base)} K` : '') + `, after ${Math.round(pause)} min`
           : discharge <= DISCHARGE ? `compressor cooled to ${discharge} °C after ${Math.round(pause)} min`
             : `${Math.round(pause)} min after the stop`;
       }
@@ -218,7 +237,7 @@ if (missing) {
     } else if (stop !== null && !stop.done && freq === 0) {
       const defrost = cache.private.get('defrost') || 0;
       const hot = stop.dhw || (stop.minutes !== null && stop.minutes < SHORT);
-      if (!enabled || !heating || now - defrost < DEFROST_GAP * 60000 || pause >= MAX_PAUSE || (!cold && !hot)) {
+      if (!enabled || !heating || now - defrost < DEFROST_GAP * 60000 || pause >= MAX_PAUSE || (mild && !hot)) {
         // nothing to lock for this stop (a defrost's stop is followed by its restart)
         if (now - defrost >= DEFROST_GAP * 60000 && pause * 60 >= DELAY) {
           stop.done = true;
