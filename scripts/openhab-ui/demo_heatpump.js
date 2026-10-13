@@ -18,6 +18,7 @@
     espaltherma_heating_power: q(4350, "W", 0), espaltherma_heating_power_after_buh: q(4350, "W", 0),
     espaltherma_cop: { state: "3.69", numericState: 3.69, displayState: "3,69", type: "Decimal" },
     espaltherma_leaving_water_temp_after_buh: q(33.5, "°C", 1), espaltherma_inlet_water_temp: q(29.1, "°C", 1),
+    espaltherma_leaving_water_setpoint: q(31, "°C", 1),
     espaltherma_ext_ambient_temp: q(4.5, "°C", 1), espaltherma_heat_exchanger_mid_temp: q(-1.8, "°C", 1),
     espaltherma_outdoor_air_temp: q(5.5, "°C", 1), espaltherma_ext_ambient_temp_avg: q(3.2, "°C", 1),
     espaltherma_discharge_pipe_temp: q(68.4, "°C", 1), espaltherma_refrig_temp_liquid_side: q(31.2, "°C", 1),

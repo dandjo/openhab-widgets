@@ -2607,8 +2607,9 @@ GROUND_TILE = (FLOOR_TILE_X + FLOOR_TILE_W / 2, round(GROUND_MID - (35 + 3 * TIL
 TANK_TILE = (OUTER_LEFT + 214 / 2, BOTTOM + 12, 214)
 INDOOR_TILE = (OUTER_RIGHT - 156 / 2, BOTTOM + 12, 156)
 # viewBox: x, y, width, height; from the house's outer edge on the left to the one on the right, 7 units above the
-# upper tiles, 6 below the lower
-HP_VB = (OUTER_LEFT, OUTDOOR_TILE[1] - 7, OUTER_RIGHT - OUTER_LEFT, BOTTOM + 121 - (OUTDOOR_TILE[1] - 7))
+# upper tiles, 6 below the lower (three rows each)
+HP_VB = (OUTER_LEFT, OUTDOOR_TILE[1] - 7, OUTER_RIGHT - OUTER_LEFT,
+         BOTTOM + 12 + 35 + 3 * TILE_ROW + 6 - (OUTDOOR_TILE[1] - 7))
 
 
 def hp_tile(cx, y, w, title, icon, color, on, rows, state=None):
@@ -2717,10 +2718,10 @@ hp_svg = svg("svg", [
         ("Heißgas", f"={disp(HPX['hot_gas'])}", "currentColor"),
         ("Flüssig", f"={disp(HPX['refrigerant'])}", "currentColor"),
         ("Druck", f"={disp(HPX['pressure'])}", "currentColor")]),
-    # the heating circuit's tile: the water's heat after the backup heater (what the pipe from the wall unit carries,
-    # without the booster heater in the tank) over its leaving and inlet temperatures
+    # the heating circuit's tile: the leaving water's setpoint (the curve with the offset, lowered while the cycle
+    # guard holds the starts back) over the leaving and inlet water (user, 2026-10-13: instead of the water's heat)
     *hp_tile(*CIRCUIT_TILE, "Heizkreis", "waves", SUPPLY, HEATING_FLOW, [
-        ("Wärme", f"={kw2(HPX['water_heat'])}", "currentColor"),
+        ("Vorlauf-Soll", f"={disp('espaltherma_leaving_water_setpoint')}", "currentColor"),
         ("Vorlauf", f"={disp(HPX['supply'])}", SUPPLY), ("Rücklauf", f"={disp(HPX['return'])}", RETURN)]),
     # the floors' climate left of their floor loops, tinted while those carry water:
     # the upper floor's from the air conditioner (temperature) and its Tado zone (humidity), the ground floor's from
@@ -2736,13 +2737,12 @@ hp_svg = svg("svg", [
         ("CO₂", f"={disp('netatmo_weatherstation_co2')}", "currentColor")]),
     # below the house, flush with its walls, the tank's and the indoor unit's tiles: the tank's temperature,
     # its setpoint and its booster heater, at work while it charges or heats; the indoor unit's flow, the circuit's
-    # pressure (red outside its range) and the backup heater, at work while the pump runs; over them its own draw:
-    # the measured circuit (Shelly EM) and the backup heater's steps, without the tank's booster heater
+    # pressure (red outside its range) and the backup heater, at work while the pump runs; no electrical power
+    # (user, 2026-10-13), the outdoor unit's tile has the circuit's
     *hp_tile(*TANK_TILE, "Warmwasserspeicher", "propane_tank", DHW_C, f"({TANK_FLOW} || {BSH_ON})", [
         ("Temperatur", f"={disp(HPX['tank'])}", tank_text), ("Soll", f"={disp(HPX['tank_set'])}", "currentColor"),
         ("Zusatzheizung", f"={BSH_ON} ? {kw2(HPX['bsh_power'])} : 'Aus'", "currentColor")]),
     *hp_tile(*INDOOR_TILE, "Innengerät", "hvac", "#64b5f6", PUMP_ON, [
-        ("Leistung", f"={kw2(HPX['circuit'], HPX['buh_power'])}", "#fb8c00"),
         ("Durchfluss", f"={disp(HPX['flow'])}", "currentColor"),
         ("Druck", f"={disp(HPX['water_pressure'])}", f"={WATER_PRESSURE_BAD} ? '#e57373' : 'currentColor'"),
         ("Heizstab", f"={BUH_ON} ? {kw2(HPX['buh_power'])} : 'Aus'", "currentColor")]),
@@ -2864,7 +2864,7 @@ def hp_popup_link(style, uid):
 HP_TILE_POPUPS = [(CONTROL_TILE, 5, "heatpump-control-quick"), (OUTDOOR_TILE, 5, "heatpump-outdoor-quick"),
                   (REFRIGERANT_TILE, 3, "heatpump-refrigerant-quick"),
                   (CIRCUIT_TILE, 3, "heatpump-circuit-quick"), (UPPER_TILE, 2, "upper-floor-quick"),
-                  (GROUND_TILE, 3, "ground-floor-quick"), (INDOOR_TILE, 4, "heatpump-indoor-quick"),
+                  (GROUND_TILE, 3, "ground-floor-quick"), (INDOOR_TILE, 3, "heatpump-indoor-quick"),
                   (TANK_TILE, 3, "heatpump-tank-quick")]
 HP_NODE_POPUPS = [(WALL, "heatpump-indoor-quick"), (OUT, "heatpump-outdoor-quick"), (TANK, "heatpump-tank-quick"),
                   (VALVE, "heatpump-valve-quick")]

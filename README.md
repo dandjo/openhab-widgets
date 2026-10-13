@@ -389,16 +389,16 @@ icon. Badges just outside three rings say what the outdoor unit's ring shows (*H
 flows, a red bolt while the backup heater runs) and where the tank's heat comes from; grey while their device rests.
 Tiles in the style of the switch tiles hold the figures: the outdoor unit (its power, the compressor, both outdoor
 sensors and its heat exchanger), the control (heating, hot water, Smart Grid, automation and the outdoor mean its
-heating curve works with), the refrigerant, the heating circuit, the climate of the two floors, the tank with its
-booster heater and the indoor unit with its own power (the measured circuit plus the backup heater), each tinted in its
-colour while what it shows is at work. A tap on a tile, the wall unit, the outdoor unit, the tank or the valve opens its
-quick popup (see [Quick popups](#quick-popups)). At the card's top, across its whole width as the energy flow's tiles,
-the electrical power, the heat and the COP as a row of value tiles that open their quick popups too (today's split and
-COPs are in the heating card). The drawing ends at the house's walls, and the tiles beside them end flush with the
-walls; on a phone it takes the card's width inside the same padding as the value tiles above it, so the house and its
-outer tiles line up with them. Everywhere else it stands at its own size, as the energy flow does, so their texts keep
-the UI's sizes and their rings come out the same and never shrink, centred and in the middle of the height the card is
-given. The recordings show it with demo values (a space heating run).
+heating curve works with), the refrigerant, the heating circuit (the leaving water setpoint over leaving and inlet
+water), the climate of the two floors, the tank with its booster heater and the indoor unit (flow, water pressure,
+backup heater), each tinted in its colour while what it shows is at work. A tap on a tile, the wall unit, the outdoor
+unit, the tank or the valve opens its quick popup (see [Quick popups](#quick-popups)). At the card's top, across its
+whole width as the energy flow's tiles, the electrical power, the heat and the COP as a row of value tiles that open
+their quick popups too (today's split and COPs are in the heating card). The drawing ends at the house's walls, and the
+tiles beside them end flush with the walls; on a phone it takes the card's width inside the same padding as the value
+tiles above it, so the house and its outer tiles line up with them. Everywhere else it stands at its own size, as the
+energy flow does, so their texts keep the UI's sizes and their rings come out the same and never shrink, centred and in
+the middle of the height the card is given. The recordings show it with demo values (a space heating run).
 
 Needs `boost-pill`, `flow-node`, `ground-floor-quick`, `heatpump-circuit-quick`, `heatpump-control-quick`,
 `heatpump-cop-quick`, `heatpump-electric-quick`, `heatpump-heat-quick`, `heatpump-indoor-quick`,
@@ -457,7 +457,7 @@ Needs `boost-pill`, `flow-node`, `ground-floor-quick`, `heatpump-circuit-quick`,
 | `heatpumpDischargePipeTemp` | ESPAltherma Discharge Pipe Temperature | Number:Temperature |
 | `heatpumpRefrigerantTemp` | ESPAltherma Refrigerant Temperature Liquid Side | Number:Temperature |
 | `heatpumpRefrigerantPressure` | ESPAltherma Refrigerant Pressure Sensor | Number:Pressure |
-| `heatpumpHeatingPowerAfterBuh` | ESPAltherma Heating Power After BUH | Number:Power |
+| `heatpumpLeavingWaterSetpoint` | ESPAltherma Leaving Water Setpoint | Number:Temperature |
 | `heatpumpInletWaterTemp` | ESPAltherma Inlet Water Temperature | Number:Temperature |
 | `acTemperature` | Faikout Perfera Temperature | Number:Temperature |
 | `tadoHumidity` | Tado Humidity | Number:Dimensionless |
@@ -466,13 +466,13 @@ Needs `boost-pill`, `flow-node`, `ground-floor-quick`, `heatpump-circuit-quick`,
 | `netatmoWeatherstationCo2` | Netatmo Weatherstation CO2 | Number:Dimensionless |
 | `heatpumpDhwSetpoint` | ESPAltherma DHW Setpoint | Number:Temperature |
 | `heatpumpBshPower` | ESPAltherma Electrical Power Booster Heater | Number:Power |
-| `heatpumpBuhPower` | ESPAltherma Electrical Power Backup Heater | Number:Power |
 | `heatpumpWaterPressure` | ESPAltherma Water Pressure | Number:Pressure |
+| `heatpumpBuhPower` | ESPAltherma Electrical Power Backup Heater | Number:Power |
 | `heatpumpDhwTempHeating` | Pyaltherma DHW Temp Heating | Number:Temperature |
 | `heatpumpDhwManagement` | Heatpump DHW Management | Switch |
 | `heatpumpLeavingWaterTempOffsetHeating` | Pyaltherma Leaving Water Temp Offset Heating | Number:Temperature |
-| `heatpumpLeavingWaterSetpoint` | ESPAltherma Leaving Water Setpoint | Number:Temperature |
 | `heatpumpTargetDischargeTemp` | ESPAltherma Target Discharge Temperature | Number:Temperature |
+| `heatpumpHeatingPowerAfterBuh` | ESPAltherma Heating Power After BUH | Number:Power |
 | `heatpumpWaterPumpSignal` | ESPAltherma Water Pump Signal | Number:Dimensionless |
 
 </details>

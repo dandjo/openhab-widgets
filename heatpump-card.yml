@@ -261,9 +261,9 @@ props:
     type: TEXT
     required: true
     context: item
-  - name: heatpumpHeatingPowerAfterBuh
-    label: ESPAltherma Heating Power After BUH
-    description: Number:Power item
+  - name: heatpumpLeavingWaterSetpoint
+    label: ESPAltherma Leaving Water Setpoint
+    description: Number:Temperature item
     type: TEXT
     required: true
     context: item
@@ -315,15 +315,15 @@ props:
     type: TEXT
     required: true
     context: item
-  - name: heatpumpBuhPower
-    label: ESPAltherma Electrical Power Backup Heater
-    description: Number:Power item
-    type: TEXT
-    required: true
-    context: item
   - name: heatpumpWaterPressure
     label: ESPAltherma Water Pressure
     description: Number:Pressure item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpBuhPower
+    label: ESPAltherma Electrical Power Backup Heater
+    description: Number:Power item
     type: TEXT
     required: true
     context: item
@@ -345,15 +345,15 @@ props:
     type: TEXT
     required: true
     context: item
-  - name: heatpumpLeavingWaterSetpoint
-    label: ESPAltherma Leaving Water Setpoint
+  - name: heatpumpTargetDischargeTemp
+    label: ESPAltherma Target Discharge Temperature
     description: Number:Temperature item
     type: TEXT
     required: true
     context: item
-  - name: heatpumpTargetDischargeTemp
-    label: ESPAltherma Target Discharge Temperature
-    description: Number:Temperature item
+  - name: heatpumpHeatingPowerAfterBuh
+    label: ESPAltherma Heating Power After BUH
+    description: Number:Power item
     type: TEXT
     required: true
     context: item
@@ -364,7 +364,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 9, 2026, 6:08:33 PM
+timestamp: Oct 13, 2026, 11:36:00 AM
 component: oh-card
 config:
   title: Heat Pump
@@ -515,7 +515,7 @@ slots:
           default:
           - component: svg
             config:
-              viewBox: 99 1 452 626
+              viewBox: 99 1 452 609
               width: 100%
               style:
                 display: block
@@ -3089,7 +3089,7 @@ slots:
                 config:
                   x: 397.0
                   y: 325.15
-                  content: Heat
+                  content: Flow target
                   fill: currentColor
                   font-size: 11
                   font-weight: normal
@@ -3099,8 +3099,8 @@ slots:
                 config:
                   x: 510.5
                   y: 327
-                  content: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpHeatingPowerAfterBuh].state) ? ''–'' : ((Number(items[props.heatpumpHeatingPowerAfterBuh].numericState)
-                    || 0) / 1000).toFixed(2) + '' kW'')'
+                  content: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpLeavingWaterSetpoint].state) ? ''–'' : (items[props.heatpumpLeavingWaterSetpoint].displayState
+                    || items[props.heatpumpLeavingWaterSetpoint].state))'
                   fill: currentColor
                   font-size: 15
                   font-weight: '700'
@@ -3437,7 +3437,7 @@ slots:
                   x: 395.0
                   y: 518
                   width: 156
-                  height: 103
+                  height: 86
                   rx: 12
                   style:
                     fill: '=(items[props.heatpumpWaterPumpOperation].state === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState)
@@ -3472,27 +3472,6 @@ slots:
                 config:
                   x: 405.0
                   y: 558.15
-                  content: Power
-                  fill: currentColor
-                  font-size: 11
-                  font-weight: normal
-                  text-anchor: start
-                  opacity: '0.7'
-              - component: text
-                config:
-                  x: 541.0
-                  y: 560
-                  content: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpCircuitPower].state) ? ''–'' : (((Number(items[props.heatpumpCircuitPower].numericState)
-                    || 0) + (Number(items[props.heatpumpBuhPower].numericState) || 0)) / 1000).toFixed(2) + '' kW'')'
-                  fill: '#fb8c00'
-                  font-size: 15
-                  font-weight: '700'
-                  text-anchor: end
-                  opacity: '1'
-              - component: text
-                config:
-                  x: 405.0
-                  y: 575.15
                   content: Flow rate
                   fill: currentColor
                   font-size: 11
@@ -3502,7 +3481,7 @@ slots:
               - component: text
                 config:
                   x: 541.0
-                  y: 577
+                  y: 560
                   content: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpFlowSensor].state) ? ''–'' : (items[props.heatpumpFlowSensor].displayState
                     || items[props.heatpumpFlowSensor].state))'
                   fill: currentColor
@@ -3513,7 +3492,7 @@ slots:
               - component: text
                 config:
                   x: 405.0
-                  y: 592.15
+                  y: 575.15
                   content: Pressure
                   fill: currentColor
                   font-size: 11
@@ -3523,7 +3502,7 @@ slots:
               - component: text
                 config:
                   x: 541.0
-                  y: 594
+                  y: 577
                   content: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpWaterPressure].state) ? ''–'' : (items[props.heatpumpWaterPressure].displayState
                     || items[props.heatpumpWaterPressure].state))'
                   fill: '=(![''NULL'', ''UNDEF''].includes(items[props.heatpumpWaterPressure].state) && ((Number(items[props.heatpumpWaterPressure].numericState)
@@ -3535,7 +3514,7 @@ slots:
               - component: text
                 config:
                   x: 405.0
-                  y: 609.15
+                  y: 592.15
                   content: Backup heater
                   fill: currentColor
                   font-size: 11
@@ -3545,7 +3524,7 @@ slots:
               - component: text
                 config:
                   x: 541.0
-                  y: 611
+                  y: 594
                   content: '=(items[props.heatpumpBuhStep1Mode].state === ''ON'' || items[props.heatpumpBuhStep2Mode].state
                     === ''ON'') ? ([''NULL'', ''UNDEF''].includes(items[props.heatpumpBuhPower].state) ? ''–'' : ((Number(items[props.heatpumpBuhPower].numericState)
                     || 0) / 1000).toFixed(2) + '' kW'') : ''Off'''
@@ -3574,9 +3553,9 @@ slots:
                 display: block
                 border-radius: 12px
                 left: 0.00%
-                top: 1.12%
+                top: 1.15%
                 width: 38.94%
-                height: 19.17%
+                height: 19.70%
           - component: oh-link
             config:
               action: popup
@@ -3592,9 +3571,9 @@ slots:
                 display: block
                 border-radius: 12px
                 left: 45.02%
-                top: 1.12%
+                top: 1.15%
                 width: 38.94%
-                height: 19.17%
+                height: 19.70%
           - component: oh-link
             config:
               action: popup
@@ -3610,9 +3589,9 @@ slots:
                 display: block
                 border-radius: 12px
                 left: 63.72%
-                top: 27.00%
+                top: 27.75%
                 width: 29.54%
-                height: 13.74%
+                height: 14.12%
           - component: oh-link
             config:
               action: popup
@@ -3629,9 +3608,9 @@ slots:
                 display: block
                 border-radius: 12px
                 left: 63.72%
-                top: 45.37%
+                top: 46.63%
                 width: 29.54%
-                height: 13.74%
+                height: 14.12%
           - component: oh-link
             config:
               action: popup
@@ -3644,9 +3623,9 @@ slots:
                 display: block
                 border-radius: 12px
                 left: 3.54%
-                top: 28.91%
+                top: 29.72%
                 width: 33.85%
-                height: 11.02%
+                height: 11.33%
           - component: oh-link
             config:
               action: popup
@@ -3660,9 +3639,9 @@ slots:
                 display: block
                 border-radius: 12px
                 left: 3.54%
-                top: 45.37%
+                top: 46.63%
                 width: 33.85%
-                height: 13.74%
+                height: 14.12%
           - component: oh-link
             config:
               action: popup
@@ -3678,9 +3657,9 @@ slots:
                 display: block
                 border-radius: 12px
                 left: 65.49%
-                top: 82.59%
+                top: 84.89%
                 width: 34.51%
-                height: 16.45%
+                height: 14.12%
           - component: oh-link
             config:
               action: popup
@@ -3695,9 +3674,9 @@ slots:
                 display: block
                 border-radius: 12px
                 left: 0.00%
-                top: 82.59%
+                top: 84.89%
                 width: 47.35%
-                height: 13.74%
+                height: 14.12%
           - component: oh-link
             config:
               action: popup
@@ -3713,9 +3692,9 @@ slots:
                 display: block
                 border-radius: 50%
                 left: 75.88%
-                top: 67.89%
+                top: 69.79%
                 width: 13.27%
-                height: 9.58%
+                height: 9.85%
           - component: oh-link
             config:
               action: popup
@@ -3731,9 +3710,9 @@ slots:
                 display: block
                 border-radius: 50%
                 left: 86.62%
-                top: 11.34%
+                top: 11.66%
                 width: 13.27%
-                height: 9.58%
+                height: 9.85%
           - component: oh-link
             config:
               action: popup
@@ -3748,9 +3727,9 @@ slots:
                 display: block
                 border-radius: 50%
                 left: 32.52%
-                top: 67.89%
+                top: 69.79%
                 width: 13.27%
-                height: 9.58%
+                height: 9.85%
           - component: oh-link
             config:
               action: popup
@@ -3762,6 +3741,6 @@ slots:
                 display: block
                 border-radius: 50%
                 left: 54.20%
-                top: 67.89%
+                top: 69.79%
                 width: 13.27%
-                height: 9.58%
+                height: 9.85%
