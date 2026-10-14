@@ -6,8 +6,9 @@ The charge's target: 60 °C while Smart Grid is forced on (3, as the hot-water a
 full battery), else the DHW setpoint. Two phases, as the user described them (2026-10-04):
 - the compressor (valve on DHW) charges fast, up to 55 °C at most: per 0.1 K the mean of the tank's rise over the
   last 5 minutes, shaped by the typical rise that slows as the tank warms (0.30 K/min at 35 °C, 0.26 at 49, 0.18
-  from 51), and of the heat power over those 5 minutes divided by the kWh one kelvin at the sensor takes (0.42 at
-  27 °C to 0.58 at 52, measured on the charges of winter 2025/26 and summer 2026); above 55 °C the booster heater
+  from 51), and of the heat power over those 5 minutes divided by the kWh one kelvin at the sensor takes (0.35 at
+  27 °C to 0.47 at 52, measured on the charges of winter 2025/26 and summer 2026, with the heat less the inlet
+  sensor's offset since 14 October 2026; 0.42 to 0.58 before, see hp_spread_offset.py); above 55 °C the booster heater
   takes 7 minutes per kelvin. From the charge's 5th minute on; during a defrost (the valve stays on DHW, the tank
   loses about 2.5 K in 5 minutes) and the 5 minutes after it the end moves on with the clock.
 - the booster heater alone (valve off DHW) heats the water from the top, while the sensor sits in the upper third: a
@@ -51,7 +52,8 @@ if (items.getItem('espaltherma_defrost_operaton').state === 'ON') {
 const running = since.state !== 'NULL' && since.state !== 'UNDEF' && (dhw || booster);
 const started = running ? time.toZDT(since.state).toInstant().toEpochMilli() : nowMs;
 const curve = [[35, 0.30], [40, 0.28], [49, 0.26], [51, 0.18], [60, 0.17]];
-const kwhPerK = [[27, 0.42], [32, 0.46], [37, 0.50], [42, 0.53], [47, 0.53], [52, 0.58]];
+// with the heat less the inlet sensor's offset (applied/hp_spread_offset.py)
+const kwhPerK = [[27, 0.35], [32, 0.38], [37, 0.42], [42, 0.44], [47, 0.44], [52, 0.47]];
 const interp = (pts, x) => {
   if (x <= pts[0][0]) return pts[0][1];
   for (let i = 1; i < pts.length; i++) {
