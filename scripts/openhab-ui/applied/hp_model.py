@@ -117,11 +117,13 @@ class Metering:
         if is_bsh:
             dhw += 2000
         before_buh = after_buh = h_space = h_dhw = 0.0
-        if x.get("op_mode") == "Heating":
+        # since 2026-10-14 (applied/hp_spread_offset.py): only while the compressor or the backup heater runs, and the
+        # spread less the inlet sensor's offset (0.6 K before the backup heater, 0.7 K after it)
+        if x.get("op_mode") == "Heating" and (is_inverter or is_buh):
             flow_kg_h = (x.get("flow") or 0) * 60
             inlet = x.get("inlet") or 0
-            before_buh += flow_kg_h * 1.1639 * ((x.get("lwt_before") or 0) - inlet)
-            after_buh += flow_kg_h * 1.1639 * ((x.get("lwt_after") or 0) - inlet)
+            before_buh += flow_kg_h * 1.1639 * ((x.get("lwt_before") or 0) - inlet - 0.6)
+            after_buh += flow_kg_h * 1.1639 * ((x.get("lwt_after") or 0) - inlet - 0.7)
             h_space += after_buh if is_space else 0
             h_dhw += after_buh if is_dhw else 0
         if is_bsh:
