@@ -2420,15 +2420,62 @@ def tank_layers(id_):
                                                    ("66%", "#ffcc80"), ("66%", "#bbdefb"), ("100%", "#bbdefb")]])
 
 
+# the tank charges while the compressor heats it (water flowing with the valve on hot water, outside a defrost, which
+# takes heat back out of the tank) or while its booster heater heats
+TANK_CHARGING = f"(({TANK_FLOW} && {COMPRESSOR} && !({DEFROSTING})) || {BSH_ON})"
+# bubbles rising in the tank while it charges (user, 2026-10-14): x from the tank's middle, phase, seconds per rise;
+# fixed durations, as a SMIL animation restarts whenever an expression in it changes, differing ones, so the bubbles
+# never rise in step, and phases spread by their keyPoints and keyTimes as the pipes' dots
+TANK_BUBBLES = [(-4, 0, 2.6), (2, 0.5, 3.1), (-1, 0.25, 2.3), (4, 0.75, 2.9)]
+# along its rise a bubble fades in, then out under the tank's top, and grows (share of the rise, value)
+BUBBLE_OPACITY = [(0, 0), (0.15, 0.9), (0.7, 0.9), (1, 0)]
+BUBBLE_R = [(0, 0.9), (1, 2.1)]
+
+
+def phased(curve, o):
+    """keyTimes and values of an animation along curve, (share of the rise, value) pairs from 0 to 1, for an animation
+    that starts at share o of the rise, runs to its end, jumps back to its start and runs on to o."""
+    def value(s):
+        for (a, va), (b, vb) in zip(curve, curve[1:]):
+            if a <= s <= b:
+                return va + (vb - va) * (s - a) / (b - a)
+    pts = [(0, value(o)), *[(s - o, v) for s, v in curve if o < s < 1], (1 - o, value(1))]
+    if o > 0:
+        pts += [(1 - o, value(0)), *[(s + 1 - o, v) for s, v in curve if 0 < s < o], (1, value(o))]
+    return {"keyTimes": ";".join(f"{round(t, 4):g}" for t, _ in pts),
+            "values": ";".join(f"{round(v, 3):g}" for _, v in pts)}
+
+
+def tank_bubbles(cx, cy):
+    """Bubbles rising in the tank at (cx, cy) while it charges, by its compressor or its booster heater: each from
+    just above the bottom to just under the top, swaying a little, fading in and out and growing as it rises."""
+    mid, bottom, top = cx - 7, cy + 11, cy - 12
+    bubbles = []
+    for dx, o, dur in TANK_BUBBLES:
+        x = mid + dx
+        sway = 1.5 if dx < 0 else -1.5
+        path = f"M{x},{bottom} C{x + sway},{bottom - 8} {x - sway},{top + 8} {x},{top}"
+        timing = ({"keyPoints": "0;1", "keyTimes": "0;1"} if o == 0 else
+                  {"keyPoints": f"{o};1;0;{o}", "keyTimes": f"0;{round(1 - o, 4)};{round(1 - o, 4)};1"})
+        loop = {"dur": f"{dur}s", "repeatCount": "indefinite", "calcMode": "linear"}
+        bubbles.append(svg("circle", [svg("animateMotion", path=path, **loop, **timing),
+                                      *[svg("animate", attributeName=attr, **loop, **phased(curve, o))
+                                        for attr, curve in (("opacity", BUBBLE_OPACITY), ("r", BUBBLE_R))]],
+                           cx=0, cy=0, r=BUBBLE_R[0][1], fill="#ffffff", opacity=0, stroke="rgba(0, 0, 0, 0.35)",
+                           **{"stroke-width": 0.6}))
+    return svg("g", bubbles, visible=f"={TANK_CHARGING}")
+
+
 def tank_node(cx, cy, gradient="hpTank"):
     """TWL tank in layers (tank_layers, the svg's gradient of that id; the user's pick of the variants, 2026-10-03),
-    faint lines between them; the Effect Heater stands beside it, as it is mounted, joined by its two pipes: cold water
-    from the tank's bottom into its foot, hot water from its head back into the tank's top. While it heats it is lit
-    and its pipes run blue and red."""
+    faint lines between them, bubbles rising in it while it charges (tank_bubbles); the Effect Heater stands beside it,
+    as it is mounted, joined by its two pipes: cold water from the tank's bottom into its foot, hot water from its head
+    back into the tank's top. While it heats it is lit and its pipes run blue and red."""
     on = BSH_ON
     return [ring(cx, cy, "#e57373"),
             svg("rect", x=cx - 15, y=cy - 17, width=16, height=34, rx=8, **stroke(1.5, fill=f"url(#{gradient})")),
             *[svg("line", x1=cx - 13, y1=cy + y, x2=cx - 1, y2=cy + y, **stroke(0.8, opacity="0.5")) for y in (-6, 5)],
+            tank_bubbles(cx, cy),
             svg("path", d=f"M{cx + 1},{cy + 9} H{cx + 8}", **stroke(1.4, f"={on} ? '{RETURN}' : 'currentColor'")),
             svg("path", d=f"M{cx + 11.5},{cy - 6} V{cy - 12} H{cx + 0.5}",
                 **stroke(1.4, f"={on} ? '{SUPPLY}' : 'currentColor'", **{"stroke-linejoin": "round"})),
@@ -2447,10 +2494,15 @@ def tank_source_badge(cx, cy):
     return [pump, heater]
 
 
-def floor_node(cx, cy):
+# the floor loops' pipe, from the leaving water's red to the return's blue
+LOOP_STOPS = [("0%", SUPPLY, "1"), ("100%", RETURN, "1")]
+
+
+def floor_node(cx, cy, gradient="hpLoopV"):
+    """Floor heating loops, the pipe in the svg's gradient of that id (LOOP_STOPS)."""
     return [ring(cx, cy, "#f48fb1"),
             svg("path", d=f"M{cx - 15},{cy - 10} H{cx + 15} V{cy - 3} H{cx - 15} V{cy + 4} H{cx + 15} V{cy + 11} H{cx - 15}",
-                **stroke(2, "url(#hpLoopV)", **{"stroke-linejoin": "round"}))]
+                **stroke(2, f"url(#{gradient})", **{"stroke-linejoin": "round"}))]
 
 
 def radiator_node(cx, cy):
@@ -2644,9 +2696,46 @@ def hp_orbit(xy, color, active, share=None, share_color=None):
         ([share_orbit(xy, share, share_color or color, 0.01, active)] if share else [])
 
 
+def hp_node(kind, xy, tank_id="hpTank", loop_id="hpLoopV"):
+    """A device of the drawing at xy, drawn like the energy flow's nodes, as (its ring, its drawing, its badges); shared
+    by the drawing, the heating card and the heads of the popups the drawing opens (user, 2026-10-14), so a device
+    looks and moves alike everywhere. Its grey ring pulses while it works: the outdoor unit's filled by the
+    compressor's frequency; the wall unit's by the water's flow, red while its backup heater runs; the tank's by its
+    temperature; the heating circuits' by the leaving water while they carry it. Badges upper right on the rings,
+    clear of the pipes: the outdoor unit's says what its ring shows, the compressor's frequency (Hz as text), filled
+    while it runs; the wall unit's the water's flow, filled while water flows (user, 2026-10-04), the red bolt instead
+    while its backup heater runs; the tank's, as in the heating card, where its heat comes from. tank_id and loop_id:
+    the ids of the svg's gradients of the tank's layers (tank_layers) and of the floor loops (LOOP_STOPS)."""
+    corner = round(xy[0] + ON_RING, 1), round(xy[1] - ON_RING, 1)
+    if kind == "outdoor":
+        return (hp_orbit(xy, "#fb8c00", COMPRESSOR, f"{num(HPX['hz'])} / {HZ_FULL}"),
+                [flow_node("heat-pump", xy, num(HPX["circuit"]), frequency=num(HPX["hz"]))],
+                [ring_badge(*corner, "Hz", HP_ORANGE, COMPRESSOR, text=True)])
+    if kind == "indoor":
+        return (hp_orbit(xy, "#64b5f6", PUMP_ON, f"{num(HPX['flow'])} / {FLOW_FULL}",
+                         f"={BUH_ON} ? '#e53935' : '#64b5f6'"),
+                wall_unit_node(*xy),
+                [shown(ring_badge(*corner, "water", "#64b5f6", f"{num(HPX['flow'])} > 0"), f"=!{BUH_ON}"),
+                 shown(ring_badge(*corner, "bolt", HEATER_RED, "true"), f"={BUH_ON}")])
+    if kind == "valve":
+        return hp_orbit(xy, "#ffb74d", PUMP_ON), valve_node(*xy), []
+    if kind == "tank":
+        return (hp_orbit(xy, "#e57373", f"({TANK_FLOW} || {BSH_ON})", f"{num(HPX['tank'])} / {TANK_FULL}"),
+                tank_node(*xy, tank_id), tank_source_badge(*xy))
+    if kind == "radiators":
+        return hp_orbit(xy, "#ffab91", HEATING_FLOW, CIRCUIT_SHARE), radiator_node(*xy), []
+    if kind == "floor":
+        return hp_orbit(xy, "#f48fb1", HEATING_FLOW, CIRCUIT_SHARE), floor_node(*xy, loop_id), []
+    raise ValueError(kind)
+
+
+# the drawing's devices where they are
+HP_DEVICES = [("outdoor", OUT), ("indoor", WALL), ("valve", VALVE), ("tank", TANK), ("radiators", RADIATORS),
+              ("floor", GROUND_FH), ("floor", UPPER_FH)]
+HP_NODES = [hp_node(kind, xy) for kind, xy in HP_DEVICES]
+
 hp_svg = svg("svg", [
-    svg("defs", [grad("hpLoopV", [("0%", SUPPLY, "1"), ("100%", RETURN, "1")]),
-                 tank_layers("hpTank")]),
+    svg("defs", [grad("hpLoopV", LOOP_STOPS), tank_layers("hpTank")]),
     # the house as one outline without eaves, corners rounded like the cards; ground level marked inside
     svg("path", d=rounded_polygon([(LEFT, BOTTOM), (LEFT, EAVE), ((LEFT + RIGHT) / 2, RIDGE), (RIGHT, EAVE),
                                    (RIGHT, BOTTOM)], 12),
@@ -2665,31 +2754,10 @@ hp_svg = svg("svg", [
               pace=WATER_PACE),
     *hp_route(f"M{VALVE[0]},{BRANCH_Y} H{RADIATORS[0]} V{RADIATORS[1] - 30}", SUPPLY, HEATING_FLOW,
               reverse=DEFROSTING, pace=WATER_PACE),
-    # devices where they are, drawn like the energy flow nodes
-    # every device's grey ring, its dots running while it works
-    # the outdoor unit's ring filled by the compressor's frequency; the wall unit's by the water's flow, red while its
-    # backup heater runs; the tank's by its temperature; the heating circuits' by the leaving water while they carry it
-    *hp_orbit(OUT, "#fb8c00", COMPRESSOR, f"{num(HPX['hz'])} / {HZ_FULL}"),
-    *hp_orbit(WALL, "#64b5f6", PUMP_ON, f"{num(HPX['flow'])} / {FLOW_FULL}", f"={BUH_ON} ? '#e53935' : '#64b5f6'"),
-    *hp_orbit(VALVE, "#ffb74d", PUMP_ON),
-    *hp_orbit(TANK, "#e57373", f"({TANK_FLOW} || {BSH_ON})", f"{num(HPX['tank'])} / {TANK_FULL}"),
-    *hp_orbit(RADIATORS, "#ffab91", HEATING_FLOW, CIRCUIT_SHARE),
-    *hp_orbit(GROUND_FH, "#f48fb1", HEATING_FLOW, CIRCUIT_SHARE),
-    *hp_orbit(UPPER_FH, "#f48fb1", HEATING_FLOW, CIRCUIT_SHARE),
-    flow_node("heat-pump", OUT, num(HPX["circuit"]), frequency=num(HPX["hz"])),
-    *wall_unit_node(*WALL), *valve_node(*VALVE), *tank_node(*TANK),
-    *radiator_node(*RADIATORS), *floor_node(*GROUND_FH), *floor_node(*UPPER_FH),
-    # badges upper right on the rings, clear of the pipes: what the outdoor unit's ring shows, the compressor's
-    # frequency (Hz as text), filled while it runs; the wall unit's, see below; the tank's, as in the heating card,
-    # where its heat comes from
-    ring_badge(round(OUT[0] + ON_RING, 1), round(OUT[1] - ON_RING, 1), "Hz", HP_ORANGE, COMPRESSOR, text=True),
-    # the wall unit's badge says what its ring shows, the water's flow, filled while water flows (user, 2026-10-04);
-    # the red bolt only while its backup heater runs
-    shown(ring_badge(round(WALL[0] + ON_RING, 1), round(WALL[1] - ON_RING, 1), "water", "#64b5f6",
-                     f"{num(HPX['flow'])} > 0"), f"=!{BUH_ON}"),
-    shown(ring_badge(round(WALL[0] + ON_RING, 1), round(WALL[1] - ON_RING, 1), "bolt", HEATER_RED, "true"),
-          f"={BUH_ON}"),
-    *tank_source_badge(*TANK),
+    # the devices (hp_node): every ring first, over the pipes they hide, then the drawings, then the badges on top
+    *[part for orbit, _, _ in HP_NODES for part in orbit],
+    *[part for _, drawing, _ in HP_NODES for part in drawing],
+    *[part for _, _, badges in HP_NODES for part in badges],
     # the outdoor unit's tile in the sky left of it, clear of the roof: the power of its own circuit, the compressor's
     # frequency, both its outdoor sensors (the one the control reads, its air sensor) and the middle of its heat
     # exchanger; Abtauen during a defrost. 176 wide, so Abtauen at its top right clears the title
@@ -2858,16 +2926,17 @@ def hp_popup_link(style, uid):
                             "actionModalConfig": dict(panel["config"]), "style": style})
 
 
-# what a tap opens: a tile its popup, the wall unit, the outdoor unit, the tank and the valve theirs; radiators and floor
-# loops open nothing (user, 2026-10-06: the heat pump card keeps its own popups, which the rest of the UI gave up on
-# 2026-10-05 for the device pages)
+# what a tap opens: a tile its popup, the wall unit, the outdoor unit, the tank and the valve theirs, the floor loops
+# their floor's (user, 2026-10-14); radiators open nothing (user, 2026-10-06: the heat pump card keeps its own popups,
+# which the rest of the UI gave up on 2026-10-05 for the device pages)
 HP_TILE_POPUPS = [(CONTROL_TILE, 5, "heatpump-control-quick"), (OUTDOOR_TILE, 5, "heatpump-outdoor-quick"),
                   (REFRIGERANT_TILE, 3, "heatpump-refrigerant-quick"),
                   (CIRCUIT_TILE, 3, "heatpump-circuit-quick"), (UPPER_TILE, 2, "upper-floor-quick"),
                   (GROUND_TILE, 3, "ground-floor-quick"), (INDOOR_TILE, 3, "heatpump-indoor-quick"),
                   (TANK_TILE, 3, "heatpump-tank-quick")]
 HP_NODE_POPUPS = [(WALL, "heatpump-indoor-quick"), (OUT, "heatpump-outdoor-quick"), (TANK, "heatpump-tank-quick"),
-                  (VALVE, "heatpump-valve-quick")]
+                  (VALVE, "heatpump-valve-quick"), (UPPER_FH, "upper-floor-quick"),
+                  (GROUND_FH, "ground-floor-quick")]
 
 
 def heatpump_content():
@@ -3447,8 +3516,10 @@ def details_button(page, color):
 
 def quick(icon, title, color, state, children, page):
     """A part's values or controls under a small head with its state, and the way to its page; opened as a compact
-    popup, the bar names the part (config.label)."""
-    head = div([div([comp("oh-icon", {"icon": icon, "width": 20, "height": 20})],
+    popup, the bar names the part (config.label). icon: a glyph in a tinted circle, or a device's drawing as the
+    heat pump card shows it (hp_device_icon())."""
+    head = div([icon if isinstance(icon, dict) else
+                div([comp("oh-icon", {"icon": icon, "width": 20, "height": 20})],
                     **{"width": "34px", "height": "34px", "flex": "0 0 auto", "border-radius": "50%",
                        "display": "flex", "align-items": "center", "justify-content": "center",
                        "background": f"color-mix(in srgb, {color} 22%, transparent)"}),
@@ -3661,7 +3732,7 @@ def hp_indoor_quick():
     """The indoor unit over the day, as the outdoor unit's popup shows its own."""
     state = (f"{kw2(HPX['circuit'], HPX['buh_power'])} + ' · ' + {disp(HPX['flow'])} + ' · ' + "
              f"{disp(HPX['water_pressure'])}")
-    return quick("material:hvac", "Innengerät", "#64b5f6", state,
+    return quick(hp_device_icon("indoor"), "Innengerät", "#64b5f6", state,
                  [quick_values(pump_tile("", HPX["flow"]), rating_tile("Wasserdruck", "espaltherma_water_pressure",
                                                                        "pressure")),
                   quick_stack(*hp_indoor_panels())], "heatpump")
@@ -3671,7 +3742,7 @@ def hp_outdoor_quick():
     """The outdoor unit over the day."""
     state = f"{kw2(HPX['circuit'])} + ' · ' + {disp(HPX['hz'])} + ' · außen ' + {disp(HPX['outdoor'])}"
     # how hard it pulls heat from the air: the outdoor air against its heat exchanger
-    return quick("material:heat_pump", "Außengerät", HP_ORANGE, state,
+    return quick(hp_device_icon("outdoor"), "Außengerät", HP_ORANGE, state,
                  [quick_values(ring_tile("Verdichter", HPX["hz"], "#fb8c00", pct_expr=f"{num(HPX['hz'])} / {HZ_FULL} * 100",
                                          sub=f"von {HZ_FULL} Hz"),
                                pair_tile("Luft · Tauscher", HPX["outdoor"], HPX["exchanger"], "außen",
@@ -3705,7 +3776,7 @@ def hp_tank_quick():
     """The DHW tank over the day."""
     state = (f"{disp(HPX['tank'])} + ' · Soll ' + {disp(HPX['tank_set'])} + ' · Zusatzheizung ' + "
              f"({BSH_ON} ? 'an' : 'aus')")
-    return quick("material:propane_tank", "Warmwasserspeicher", DHW_C, state,
+    return quick(hp_device_icon("tank"), "Warmwasserspeicher", DHW_C, state,
                  [quick_values(tank_tile("Temperatur oben", HPX["tank"], HPX["tank_set"])),
                   quick_stack(*hp_tank_panels())], "heatpump")
 
@@ -3713,11 +3784,12 @@ def hp_tank_quick():
 def hp_valve_quick():
     """The three-way valve over the day."""
     state = f"({DHW_MODE} ? 'Warmwasser' : 'Heizung')"
-    return quick("material:call_split", "3-Wege-Ventil", "#ffb74d", state, [hp_valve_band()], "heatpump")
+    return quick(hp_device_icon("valve"), "3-Wege-Ventil", "#ffb74d", state, [hp_valve_band()], "heatpump")
 
 
-def floor_quick(title, icon, temperature, humidity, co2, page):
-    """A floor's climate over the day: temperature, humidity, the CO₂ where it is measured."""
+def floor_quick(title, temperature, humidity, co2, page):
+    """A floor's climate over the day: temperature, humidity, the CO₂ where it is measured; its floor loops in the
+    head, as the heat pump card draws them."""
     state = f"{disp(temperature)} + ' · ' + {percent(humidity)}" + (f" + ' · ' + {disp(co2)}" if co2 else "")
     panels = [("Temperatur", [line("Temperatur", temperature, "#f48fb1")], span_axis("°C")),
               ("Luftfeuchtigkeit", [line("Luftfeuchtigkeit", humidity, "#4fc3f7")], span_axis("%"))]
@@ -3726,7 +3798,8 @@ def floor_quick(title, icon, temperature, humidity, co2, page):
     # the air rated in words above its course (user, 2026-10-06)
     ratings = ([rating_tile("Luftfeuchtigkeit", humidity, "humidity", value_expr=f"={percent(humidity)}")] +
                ([rating_tile("CO₂", co2, "co2")] if co2 else []))
-    return quick(f"material:{icon}", title, "#f48fb1", state, [quick_values(*ratings), quick_stack(*panels)], page)
+    return quick(hp_device_icon("floor"), title, "#f48fb1", state, [quick_values(*ratings), quick_stack(*panels)],
+                 page)
 
 
 # the parts heatpump_metering splits the heat pump's power and energy into, in the colours of the card's day bars
@@ -3774,9 +3847,9 @@ QUICK_PANELS = {"heatpump-control-quick": hp_control_quick, "heatpump-indoor-qui
                 "heatpump-heat-quick": lambda: hp_split_quick(
                     "Wärme", "local_fire_department", SUPPLY, HPX["heat"], "espaltherma_heating_energy_today", HP_HEAT),
                 "heatpump-cop-quick": hp_cop_quick,
-                "upper-floor-quick": lambda: floor_quick("Obergeschoss", "bed", "faikout_perfera_temperature",
+                "upper-floor-quick": lambda: floor_quick("Obergeschoss", "faikout_perfera_temperature",
                                                          "tado_humidity", None, "air_conditioning"),
-                "ground-floor-quick": lambda: floor_quick("Erdgeschoss", "weekend", HPX["indoor"],
+                "ground-floor-quick": lambda: floor_quick("Erdgeschoss", HPX["indoor"],
                                                           "netatmo_weatherstation_atmospheric_humidity",
                                                           "netatmo_weatherstation_co2", "netatmo")}
 _QUICK = {}
@@ -4535,6 +4608,14 @@ def heat_icon(drawing, orbit, defs=None):
                width=HEAT_ICON, height=HEAT_ICON, style={"display": "block", "overflow": "visible"})
 
 
+def hp_device_icon(kind, tank_id="quickTank", loop_id="quickLoop"):
+    """A device of the heat pump card (hp_node) as an icon of HEAT_ICON, ring, drawing and badges moving as in the
+    card; with its own gradient ids, as the card stands on the same page."""
+    orbit, drawing, badges = hp_node(kind, (0, 0), tank_id, loop_id)
+    defs = {"tank": [tank_layers(tank_id)], "floor": [grad(loop_id, LOOP_STOPS)]}.get(kind)
+    return heat_icon([*drawing, *badges], orbit, defs)
+
+
 def heat_tile(icon, title, on, color, value, setpoint, dark, light, runtime=None, notes=(), countdown=None,
               starts=None):
     """A tile like the appliances': the icon, the title, the temperature as a pill (user's variant E, 2026-10-03),
@@ -4610,10 +4691,7 @@ def heat_specs():
     tells the two apart: the valve off hot water with the booster heater on. starts: today's compressor starts for
     the tile's purpose (rule heatpump_starts_today, user 2026-10-11); while the cycle guard lifts the setpoint, a line
     under the heating says by how much."""
-    tank = heat_icon([*tank_node(0, 0, "heatTank"), *tank_source_badge(0, 0)],
-                     hp_orbit((0, 0), "#e57373", f"({TANK_FLOW} || {BSH_ON})",
-                              f"{num(HPX['tank'])} / {TANK_FULL}"),
-                     [tank_layers("heatTank")])
+    tank = hp_device_icon("tank", "heatTank")
     # the heating's badge: its red bolt only for the backup heater in the wall unit, filled by the heat pump's own
     # draw, not by the booster heater in the tank (user, 2026-10-04)
     pump = heat_icon([flow_node("heat-pump-split", (0, 0), num(HPX["power"]), frequency=num(HPX["hz"])),

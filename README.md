@@ -56,7 +56,7 @@ number formats come from the items.
 | `heatpump-electric-quick` | – |
 | `heatpump-heat-quick` | – |
 | `heatpump-indoor-quick` | – |
-| `heatpump-outdoor-quick` | – |
+| `heatpump-outdoor-quick` | `flow-node` |
 | `heatpump-refrigerant-quick` | – |
 | `heatpump-tank-quick` | – |
 | `heatpump-valve-quick` | – |
@@ -288,12 +288,13 @@ Needs `appliance-icon`, `appliance-tile`.
 ### Heating and hot water: `heating-card`
 
 Two tiles in the appliances' style, the DHW tank and the heat pump: the tank drawn as in the heat pump card, its water
-in three layers (the top in its temperature's colour) with the Effect Heater beside it, lit while it heats, its ring
-filled by its temperature and a badge for where its heat comes from (the booster heater's red bolt, else the heat pump
-while the compressor charges the tank); the heat pump as the energy flow's node with its mode badge, filled while the
-heat pump's own measured circuit draws, its red bolt only for the backup heater in the wall unit (the tank's booster
-heater shows on the tank), its ring as in the energy flow, whole while it draws and filling towards the expected end of
-a hot-water charge, while the setpoint pill gives way to the time left, as a Miele machine's, and a line names the end.
+in three layers (the top in its temperature's colour) with the Effect Heater beside it, lit while it heats, bubbles
+rising in its water while it charges (by the compressor, outside a defrost, or by the booster heater), its ring filled
+by its temperature and a badge for where its heat comes from (the booster heater's red bolt, else the heat pump while
+the compressor charges the tank); the heat pump as the energy flow's node with its mode badge, filled while the heat
+pump's own measured circuit draws, its red bolt only for the backup heater in the wall unit (the tank's booster heater
+shows on the tank), its ring as in the energy flow, whole while it draws and filling towards the expected end of a
+hot-water charge, while the setpoint pill gives way to the time left, as a Miele machine's, and a line names the end.
 Each tile's pill holds the temperature, the tank's and the leaving water's, filled in the tile's colour while hot water
 or heating is switched on, outlined while off, beside a tinted pill with the setpoint and a small target icon; a tap
 opens the heat pump's page of my installation. Below them today's electricity and heat of the heat pump split into space
@@ -324,6 +325,7 @@ Needs `flow-node`.
 | `heatpumpValve` | ESPAltherma 3-Way Valve Mode | String |
 | `heatpumpBshMode` | ESPAltherma Booster Heater (BSH) Mode | Switch |
 | `heatpumpInvFrequency` | ESPAltherma Inverter Frequency | Number:Frequency |
+| `heatpumpDefrostOperaton` | ESPAltherma Defrost Operation | Switch |
 | `heatpumpDhwPower` | Pyaltherma DHW Power | Switch |
 | `heatpumpDhwEta` | Heatpump DHW Done At | DateTime |
 | `heatpumpDhwSince` | Heatpump DHW Charging Since | DateTime |
@@ -333,7 +335,6 @@ Needs `flow-node`.
 | `heatpumpBuhStep1Mode` | ESPAltherma Backup Heater (BUH) Step 1 Mode | Switch |
 | `heatpumpBuhStep2Mode` | ESPAltherma Backup Heater (BUH) Step 2 Mode | Switch |
 | `heatpumpCircuitPower` | Heatpump Power | Number:Power |
-| `heatpumpDefrostOperaton` | ESPAltherma Defrost Operation | Switch |
 | `heatpumpLeavingWaterTempAfterBuh` | ESPAltherma Leaving Water Temperature After BUH | Number:Temperature |
 | `heatpumpClimateControlPower` | Pyaltherma Climate Control Power | Switch |
 | `heatpumpLeavingWaterSetpoint` | ESPAltherma Leaving Water Setpoint | Number:Temperature |
@@ -378,27 +379,28 @@ orange and red by price.
 ### Heat pump: `heatpump-card`
 
 A section through the house: the outdoor unit on the roof (the energy flow's `flow-node`), wall unit, three-way valve,
-DHW tank (in layers, the Effect Heater beside it) and radiators in the basement, floor heating on the two levels above.
-Every device is one grey ring like the energy flow's nodes, pulsing while it works, softly beside the arc that shows its
-value, which pulses in step with it; the outdoor unit's fan turns while the compressor runs and its ring is filled by
-the compressor's frequency, the wall unit's by its own draw, the measured circuit (full and red while the backup heater
-runs; the tank's booster heater does not count), the tank's by its temperature, radiators and floor loops by the leaving
-water while they carry it. Dots run along the pipes, as many as a pipe is long, one at least, faster with the water's
-flow or the compressor's frequency, and all of them backwards during a defrost. The valve shows its position in its
-icon. Badges just outside three rings say what the outdoor unit's ring shows (*Hz*) and the wall unit's (water while it
-flows, a red bolt while the backup heater runs) and where the tank's heat comes from; grey while their device rests.
-Tiles in the style of the switch tiles hold the figures: the outdoor unit (its power, the compressor, both outdoor
-sensors and its heat exchanger), the control (heating, hot water, Smart Grid, automation and the outdoor mean its
-heating curve works with), the refrigerant, the heating circuit (the leaving water setpoint over leaving and inlet
-water), the climate of the two floors, the tank with its booster heater and the indoor unit (flow, water pressure,
-backup heater), each tinted in its colour while what it shows is at work. A tap on a tile, the wall unit, the outdoor
-unit, the tank or the valve opens its quick popup (see [Quick popups](#quick-popups)). At the card's top, across its
-whole width as the energy flow's tiles, the electrical power, the heat and the COP as a row of value tiles that open
-their quick popups too (today's split and COPs are in the heating card). The drawing ends at the house's walls, and the
-tiles beside them end flush with the walls; on a phone it takes the card's width inside the same padding as the value
-tiles above it, so the house and its outer tiles line up with them. Everywhere else it stands at its own size, as the
-energy flow does, so their texts keep the UI's sizes and their rings come out the same and never shrink, centred and in
-the middle of the height the card is given. The recordings show it with demo values (a space heating run).
+DHW tank (in layers, the Effect Heater beside it, bubbles rising in it while it charges) and radiators in the basement,
+floor heating on the two levels above. Every device is one grey ring like the energy flow's nodes, pulsing while it
+works, softly beside the arc that shows its value, which pulses in step with it; the outdoor unit's fan turns while the
+compressor runs and its ring is filled by the compressor's frequency, the wall unit's by its own draw, the measured
+circuit (full and red while the backup heater runs; the tank's booster heater does not count), the tank's by its
+temperature, radiators and floor loops by the leaving water while they carry it. Dots run along the pipes, as many as a
+pipe is long, one at least, faster with the water's flow or the compressor's frequency, and all of them backwards during
+a defrost. The valve shows its position in its icon. Badges just outside three rings say what the outdoor unit's ring
+shows (*Hz*) and the wall unit's (water while it flows, a red bolt while the backup heater runs) and where the tank's
+heat comes from; grey while their device rests. Tiles in the style of the switch tiles hold the figures: the outdoor
+unit (its power, the compressor, both outdoor sensors and its heat exchanger), the control (heating, hot water, Smart
+Grid, automation and the outdoor mean its heating curve works with), the refrigerant, the heating circuit (the leaving
+water setpoint over leaving and inlet water), the climate of the two floors, the tank with its booster heater and the
+indoor unit (flow, water pressure, backup heater), each tinted in its colour while what it shows is at work. A tap on a
+tile, the wall unit, the outdoor unit, the tank, the valve or a floor's loops opens its quick popup (see [Quick
+popups](#quick-popups)). At the card's top, across its whole width as the energy flow's tiles, the electrical power, the
+heat and the COP as a row of value tiles that open their quick popups too (today's split and COPs are in the heating
+card). The drawing ends at the house's walls, and the tiles beside them end flush with the walls; on a phone it takes
+the card's width inside the same padding as the value tiles above it, so the house and its outer tiles line up with
+them. Everywhere else it stands at its own size, as the energy flow does, so their texts keep the UI's sizes and their
+rings come out the same and never shrink, centred and in the middle of the height the card is given. The recordings show
+it with demo values (a space heating run).
 
 Needs `boost-pill`, `flow-node`, `ground-floor-quick`, `heatpump-circuit-quick`, `heatpump-control-quick`,
 `heatpump-cop-quick`, `heatpump-electric-quick`, `heatpump-heat-quick`, `heatpump-indoor-quick`,
@@ -577,7 +579,9 @@ absolute humidity); the day's minimum and maximum, and the last day as a chart f
 ## Quick popups
 
 Compact popups the heat pump card opens: the heat pump's controls or the values and charts of one of its parts, under
-a small head with its state and above *All details*, which opens the heat pump's page of my installation. Each is a
+a small head with its state and above *All details*, which opens the heat pump's page of my installation. The popup of
+a device the card draws (outdoor and indoor unit, tank, valve, the floors with their loops) shows that device in its
+head as the card does, its ring, badges and movement included. Each is a
 widget that takes its items as props; open it from a link with `action: popup`, `actionModal: widget:<uid>` and its
 items in `actionModalConfig`, as the card does:
 
@@ -589,11 +593,16 @@ actionModalConfig:
   heatpumpDhwSetpoint: espaltherma_dhw_setpoint
   heatpumpBshMode: espaltherma_bsh_mode
   heatpumpBshPower: espaltherma_electrical_power_bsh
+  heatpumpWaterPumpOperation: espaltherma_water_pump_operation
+  heatpumpFlowSensor: espaltherma_flow_sensor
+  heatpumpValve: espaltherma_3way_valve_mode
+  heatpumpInvFrequency: espaltherma_inv_frequency
+  heatpumpDefrostOperaton: espaltherma_defrost_operaton
 ```
 
 It opens 420 px wide, on a phone full screen; its values stand two abreast on top, its charts start below their period
-buttons, and a closed period menu takes no room. The card's tiles, wall unit, outdoor unit, tank and valve and the
-three figures at its top open them:
+buttons, and a closed period menu takes no room. The card's tiles, wall unit, outdoor unit, tank, valve and floor
+loops and the three figures at its top open them:
 
 - `heatpump-control-quick`, control: all the heat pump's controls: the Smart Grid, heating, hot water and automation,
   the DHW setpoint, the hot-water boost and the leaving water offset.
@@ -648,25 +657,30 @@ three figures at its top open them:
 </details>
 
 <details>
-<summary><code>heatpump-indoor-quick</code>: 5 props</summary>
+<summary><code>heatpump-indoor-quick</code>: 8 props</summary>
 
 | Prop | Item | Item type |
 |---|---|---|
+| `heatpumpWaterPumpOperation` | ESPAltherma Water Pump Operation | Switch |
+| `heatpumpFlowSensor` | ESPAltherma Flow Sensor (l/min) | Number:VolumetricFlowRate |
+| `heatpumpBuhStep1Mode` | ESPAltherma Backup Heater (BUH) Step 1 Mode | Switch |
+| `heatpumpBuhStep2Mode` | ESPAltherma Backup Heater (BUH) Step 2 Mode | Switch |
 | `heatpumpCircuitPower` | Heatpump Power | Number:Power |
 | `heatpumpBuhPower` | ESPAltherma Electrical Power Backup Heater | Number:Power |
-| `heatpumpFlowSensor` | ESPAltherma Flow Sensor (l/min) | Number:VolumetricFlowRate |
 | `heatpumpWaterPressure` | ESPAltherma Water Pressure | Number:Pressure |
 | `heatpumpWaterPumpSignal` | ESPAltherma Water Pump Signal | Number:Dimensionless |
 
 </details>
+
+`heatpump-outdoor-quick` needs `flow-node`.
 
 <details>
 <summary><code>heatpump-outdoor-quick</code>: 5 props</summary>
 
 | Prop | Item | Item type |
 |---|---|---|
-| `heatpumpCircuitPower` | Heatpump Power | Number:Power |
 | `heatpumpInvFrequency` | ESPAltherma Inverter Frequency | Number:Frequency |
+| `heatpumpCircuitPower` | Heatpump Power | Number:Power |
 | `heatpumpExtAmbientTemp` | ESPAltherma External Ambient Temperature | Number:Temperature |
 | `heatpumpHeatExchangerMidTemp` | ESPAltherma Heat Exchanger Mid Temperature | Number:Temperature |
 | `heatpumpOutdoorAirTemp` | ESPAltherma Outdoor Air Temperature | Number:Temperature |
@@ -703,41 +717,56 @@ three figures at its top open them:
 </details>
 
 <details>
-<summary><code>heatpump-tank-quick</code>: 4 props</summary>
+<summary><code>heatpump-tank-quick</code>: 9 props</summary>
 
 | Prop | Item | Item type |
 |---|---|---|
 | `heatpumpDhwTankTemp` | ESPAltherma DHW Tank Temperature | Number:Temperature |
-| `heatpumpDhwSetpoint` | ESPAltherma DHW Setpoint | Number:Temperature |
+| `heatpumpWaterPumpOperation` | ESPAltherma Water Pump Operation | Switch |
+| `heatpumpFlowSensor` | ESPAltherma Flow Sensor (l/min) | Number:VolumetricFlowRate |
+| `heatpumpValve` | ESPAltherma 3-Way Valve Mode | String |
 | `heatpumpBshMode` | ESPAltherma Booster Heater (BSH) Mode | Switch |
+| `heatpumpInvFrequency` | ESPAltherma Inverter Frequency | Number:Frequency |
+| `heatpumpDefrostOperaton` | ESPAltherma Defrost Operation | Switch |
+| `heatpumpDhwSetpoint` | ESPAltherma DHW Setpoint | Number:Temperature |
 | `heatpumpBshPower` | ESPAltherma Electrical Power Booster Heater | Number:Power |
 
 </details>
 
 <details>
-<summary><code>heatpump-valve-quick</code>: 1 props</summary>
+<summary><code>heatpump-valve-quick</code>: 3 props</summary>
 
 | Prop | Item | Item type |
 |---|---|---|
+| `heatpumpWaterPumpOperation` | ESPAltherma Water Pump Operation | Switch |
+| `heatpumpFlowSensor` | ESPAltherma Flow Sensor (l/min) | Number:VolumetricFlowRate |
 | `heatpumpValve` | ESPAltherma 3-Way Valve Mode | String |
 
 </details>
 
 <details>
-<summary><code>upper-floor-quick</code>: 2 props</summary>
+<summary><code>upper-floor-quick</code>: 6 props</summary>
 
 | Prop | Item | Item type |
 |---|---|---|
+| `heatpumpWaterPumpOperation` | ESPAltherma Water Pump Operation | Switch |
+| `heatpumpFlowSensor` | ESPAltherma Flow Sensor (l/min) | Number:VolumetricFlowRate |
+| `heatpumpValve` | ESPAltherma 3-Way Valve Mode | String |
+| `heatpumpLeavingWaterTempAfterBuh` | ESPAltherma Leaving Water Temperature After BUH | Number:Temperature |
 | `acTemperature` | Faikout Perfera Temperature | Number:Temperature |
 | `tadoHumidity` | Tado Humidity | Number:Dimensionless |
 
 </details>
 
 <details>
-<summary><code>ground-floor-quick</code>: 3 props</summary>
+<summary><code>ground-floor-quick</code>: 7 props</summary>
 
 | Prop | Item | Item type |
 |---|---|---|
+| `heatpumpWaterPumpOperation` | ESPAltherma Water Pump Operation | Switch |
+| `heatpumpFlowSensor` | ESPAltherma Flow Sensor (l/min) | Number:VolumetricFlowRate |
+| `heatpumpValve` | ESPAltherma 3-Way Valve Mode | String |
+| `heatpumpLeavingWaterTempAfterBuh` | ESPAltherma Leaving Water Temperature After BUH | Number:Temperature |
 | `heatpumpIndoorAmbientTemp` | ESPAltherma Indoor Ambient Temperature | Number:Temperature |
 | `netatmoWeatherstationAtmosphericHumidity` | Netatmo Weatherstation Atmospheric Humidity | Number:Dimensionless |
 | `netatmoWeatherstationCo2` | Netatmo Weatherstation CO2 | Number:Dimensionless |

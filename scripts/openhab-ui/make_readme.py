@@ -50,8 +50,9 @@ OVERVIEW = [
      "its power in a dimmed pill beside its state."),
     ("heating-card", "Heating and hot water", "Two tiles in the appliances' style, the DHW tank and the heat pump: "
      "the tank drawn as in the heat pump card, its water in three layers (the top in its temperature's colour) with "
-     "the Effect Heater beside it, lit while it heats, its ring filled by its temperature and a badge for where its "
-     "heat comes from (the booster heater's red bolt, else the heat pump while the compressor charges the tank); the "
+     "the Effect Heater beside it, lit while it heats, bubbles rising in its water while it charges (by the "
+     "compressor, outside a defrost, or by the booster heater), its ring filled by its temperature and a badge for "
+     "where its heat comes from (the booster heater's red bolt, else the heat pump while the compressor charges the tank); the "
      "heat pump as the energy flow's node with its mode badge, filled while the heat pump's own measured circuit "
      "draws, its red bolt only for the backup heater in the wall unit (the tank's booster heater shows on the tank), "
      "its ring as in the energy flow, whole while it draws and filling towards the expected end of a hot-water charge, "
@@ -74,7 +75,8 @@ OVERVIEW = [
     ("electricity-price-card", "Electricity price", "The all-in price, the cheapest and priciest hour, and the prices "
      "12 hours back and 36 hours ahead, coloured green, orange and red by price."),
     ("heatpump-card", "Heat pump", "A section through the house: the outdoor unit on the roof (the energy flow's "
-     "`flow-node`), wall unit, three-way valve, DHW tank (in layers, the Effect Heater beside it) and radiators in "
+     "`flow-node`), wall unit, three-way valve, DHW tank (in layers, the Effect Heater beside it, bubbles rising in it "
+     "while it charges) and radiators in "
      "the basement, floor heating on the two levels above. Every device is one grey ring like the energy flow's "
      "nodes, pulsing while it works, softly beside the arc that shows its value, which pulses in step with it; the outdoor unit's fan turns while the compressor runs and its ring is filled by the compressor's "
      "frequency, the wall unit's by its own draw, the measured circuit (full and red while the backup heater runs; "
@@ -90,7 +92,7 @@ OVERVIEW = [
      "inlet water), the climate of the two floors, the tank with its booster heater and the indoor unit (flow, water "
      "pressure, backup heater), each tinted in its "
      "colour while what it shows is at work. A tap on a tile, the wall unit, the outdoor unit, "
-     "the tank or the valve opens its quick popup (see [Quick popups](#quick-popups)). At the card's top, across its "
+     "the tank, the valve or a floor's loops opens its quick popup (see [Quick popups](#quick-popups)). At the card's top, across its "
      "whole width as the energy flow's tiles, the electrical power, the heat and the COP as a row of value tiles that "
      "open their quick popups too (today's split and COPs are in the heating card). The drawing ends at the house's "
      "walls, and the tiles beside them end flush with the walls; on a phone it takes the card's width inside the same "
@@ -129,8 +131,8 @@ PLUG = [("plug-card", "Now: the device's icon large in a ring, pulsing while it 
                                                                                       "it leaves, the triangle in its "
                                                                                       "middle, and keeps its size "
                                                                                       "without load")]
-# uid, title, what it holds; all open from the heat pump card: its tiles, wall unit, outdoor unit, tank and valve and the
-# figures at its top. Values on top in the forms of my device pages, the charts below hold one value each, two only
+# uid, title, what it holds; all open from the heat pump card: its tiles, wall unit, outdoor unit, tank, valve and floor
+# loops and the figures at its top. Values on top in the forms of my device pages, the charts below hold one value each, two only
 # where they belong together
 QUICK = [
     ("heatpump-control-quick", "Control", "all the heat pump's controls: the Smart Grid, heating, hot water and "
@@ -234,7 +236,9 @@ def quick_popups():
     rows = ["""## Quick popups
 
 Compact popups the heat pump card opens: the heat pump's controls or the values and charts of one of its parts, under
-a small head with its state and above *All details*, which opens the heat pump's page of my installation. Each is a
+a small head with its state and above *All details*, which opens the heat pump's page of my installation. The popup of
+a device the card draws (outdoor and indoor unit, tank, valve, the floors with their loops) shows that device in its
+head as the card does, its ring, badges and movement included. Each is a
 widget that takes its items as props; open it from a link with `action: popup`, `actionModal: widget:<uid>` and its
 items in `actionModalConfig`, as the card does:
 
@@ -246,11 +250,16 @@ actionModalConfig:
   heatpumpDhwSetpoint: espaltherma_dhw_setpoint
   heatpumpBshMode: espaltherma_bsh_mode
   heatpumpBshPower: espaltherma_electrical_power_bsh
+  heatpumpWaterPumpOperation: espaltherma_water_pump_operation
+  heatpumpFlowSensor: espaltherma_flow_sensor
+  heatpumpValve: espaltherma_3way_valve_mode
+  heatpumpInvFrequency: espaltherma_inv_frequency
+  heatpumpDefrostOperaton: espaltherma_defrost_operaton
 ```
 
 It opens 420 px wide, on a phone full screen; its values stand two abreast on top, its charts start below their period
-buttons, and a closed period menu takes no room. The card's tiles, wall unit, outdoor unit, tank and valve and the
-three figures at its top open them:
+buttons, and a closed period menu takes no room. The card's tiles, wall unit, outdoor unit, tank, valve and floor
+loops and the three figures at its top open them:
 """]
     rows += [fill(f"- `{u}`, {t if t[:2].isupper() else t[0].lower() + t[1:]}: {w}.", "  ") for u, t, w in QUICK]
     rows += ["", "| | | |", "|---|---|---|"]
