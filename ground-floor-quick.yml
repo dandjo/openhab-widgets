@@ -3,6 +3,30 @@ tags:
 - controls
 props:
   parameters:
+  - name: heatpumpWaterPumpOperation
+    label: ESPAltherma Water Pump Operation
+    description: Switch item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpFlowSensor
+    label: ESPAltherma Flow Sensor (l/min)
+    description: Number:VolumetricFlowRate item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpValve
+    label: ESPAltherma 3-Way Valve Mode
+    description: String item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpLeavingWaterTempAfterBuh
+    label: ESPAltherma Leaving Water Temperature After BUH
+    description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
   - name: heatpumpIndoorAmbientTemp
     label: ESPAltherma Indoor Ambient Temperature
     description: Number:Temperature item
@@ -22,7 +46,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 10, 2026, 5:24:26 PM
+timestamp: Oct 14, 2026, 1:29:37 PM
 component: div
 config:
   style:
@@ -57,24 +81,225 @@ slots:
             padding-bottom: 4px
         slots:
           default:
-          - component: div
+          - component: svg
             config:
+              viewBox: -34.0 -34.0 68 68
+              width: 68
+              height: 68
               style:
-                width: 34px
-                height: 34px
-                flex: 0 0 auto
-                border-radius: 50%
-                display: flex
-                align-items: center
-                justify-content: center
-                background: 'color-mix(in srgb, #f48fb1 22%, transparent)'
+                display: block
+                overflow: visible
             slots:
               default:
-              - component: oh-icon
+              - component: defs
+                config: {}
+                slots:
+                  default:
+                  - component: linearGradient
+                    config:
+                      id: quickLoop
+                      x1: '0'
+                      y1: '0'
+                      x2: '0'
+                      y2: '1'
+                    slots:
+                      default:
+                      - component: stop
+                        config:
+                          offset: 0%
+                          stop-color: '#e57373'
+                          stop-opacity: '1'
+                      - component: stop
+                        config:
+                          offset: 100%
+                          stop-color: '#64b5f6'
+                          stop-opacity: '1'
+              - component: g
+                config: {}
+                slots:
+                  default:
+                  - component: circle
+                    config:
+                      cx: 0
+                      cy: 0
+                      r: 32.25
+                      style:
+                        fill: 'var(--f7-card-bg-color, #fff)'
+                  - component: circle
+                    config:
+                      cx: 0
+                      cy: 0
+                      r: 29.2
+                      fill: none
+                      stroke: rgba(127, 127, 127, 0.28)
+                      stroke-width: 2.9
+              - component: g
+                config: {}
+                slots:
+                  default:
+                  - component: circle
+                    config:
+                      cx: 0
+                      cy: 0
+                      r: 29.2
+                      fill: none
+                      stroke: '#f48fb1'
+                      stroke-width: 2.9
+                      visible: '=(((items[props.heatpumpWaterPumpOperation].state === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState)
+                        || 0) > 0) && !(items[props.heatpumpValve].state === ''DHW''))) && !(((((items[props.heatpumpWaterPumpOperation].state
+                        === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState) || 0) > 0) && !(items[props.heatpumpValve].state
+                        === ''DHW'')) ? (Number(items[props.heatpumpLeavingWaterTempAfterBuh].numericState) || 0) / 40 : 0))
+                        > 0.01)'
+                    slots:
+                      default:
+                      - component: animate
+                        config:
+                          attributeName: opacity
+                          values: 0.3;1;0.3
+                          dur: 2s
+                          repeatCount: indefinite
+                          visible: '=(((items[props.heatpumpWaterPumpOperation].state === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState)
+                            || 0) > 0) && !(items[props.heatpumpValve].state === ''DHW''))) && !(((((items[props.heatpumpWaterPumpOperation].state
+                            === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState) || 0) > 0) && !(items[props.heatpumpValve].state
+                            === ''DHW'')) ? (Number(items[props.heatpumpLeavingWaterTempAfterBuh].numericState) || 0) / 40
+                            : 0)) > 0.01)'
+                      - component: animate
+                        config:
+                          attributeName: stroke-width
+                          values: 2.9;4.5;2.9
+                          dur: 2s
+                          repeatCount: indefinite
+                          visible: '=(((items[props.heatpumpWaterPumpOperation].state === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState)
+                            || 0) > 0) && !(items[props.heatpumpValve].state === ''DHW''))) && !(((((items[props.heatpumpWaterPumpOperation].state
+                            === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState) || 0) > 0) && !(items[props.heatpumpValve].state
+                            === ''DHW'')) ? (Number(items[props.heatpumpLeavingWaterTempAfterBuh].numericState) || 0) / 40
+                            : 0)) > 0.01)'
+                      - component: animate
+                        config:
+                          attributeName: r
+                          values: 29.2;30;29.2
+                          dur: 2s
+                          repeatCount: indefinite
+                          visible: '=(((items[props.heatpumpWaterPumpOperation].state === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState)
+                            || 0) > 0) && !(items[props.heatpumpValve].state === ''DHW''))) && !(((((items[props.heatpumpWaterPumpOperation].state
+                            === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState) || 0) > 0) && !(items[props.heatpumpValve].state
+                            === ''DHW'')) ? (Number(items[props.heatpumpLeavingWaterTempAfterBuh].numericState) || 0) / 40
+                            : 0)) > 0.01)'
+                  - component: circle
+                    config:
+                      cx: 0
+                      cy: 0
+                      r: 29.2
+                      fill: none
+                      stroke: '#f48fb1'
+                      stroke-width: 2.9
+                      visible: '=(((items[props.heatpumpWaterPumpOperation].state === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState)
+                        || 0) > 0) && !(items[props.heatpumpValve].state === ''DHW''))) && (((((items[props.heatpumpWaterPumpOperation].state
+                        === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState) || 0) > 0) && !(items[props.heatpumpValve].state
+                        === ''DHW'')) ? (Number(items[props.heatpumpLeavingWaterTempAfterBuh].numericState) || 0) / 40 : 0))
+                        > 0.01)'
+                    slots:
+                      default:
+                      - component: animate
+                        config:
+                          attributeName: opacity
+                          values: 0.3;0.06;0.3
+                          dur: 2s
+                          repeatCount: indefinite
+                          visible: '=(((items[props.heatpumpWaterPumpOperation].state === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState)
+                            || 0) > 0) && !(items[props.heatpumpValve].state === ''DHW''))) && (((((items[props.heatpumpWaterPumpOperation].state
+                            === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState) || 0) > 0) && !(items[props.heatpumpValve].state
+                            === ''DHW'')) ? (Number(items[props.heatpumpLeavingWaterTempAfterBuh].numericState) || 0) / 40
+                            : 0)) > 0.01)'
+              - component: g
                 config:
-                  icon: material:weekend
-                  width: 20
-                  height: 20
+                  visible: '=(((items[props.heatpumpWaterPumpOperation].state === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState)
+                    || 0) > 0) && !(items[props.heatpumpValve].state === ''DHW'')) ? (Number(items[props.heatpumpLeavingWaterTempAfterBuh].numericState)
+                    || 0) / 40 : 0) > 0.01'
+                slots:
+                  default:
+                  - component: circle
+                    config:
+                      style:
+                        stroke: 'var(--f7-card-bg-color, #fff)'
+                      cx: 0
+                      cy: 0
+                      r: 29.2
+                      fill: none
+                      transform: rotate(-90 0 0)
+                      stroke-linecap: round
+                      stroke-dasharray: '=(Math.min(1, (((items[props.heatpumpWaterPumpOperation].state === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState)
+                        || 0) > 0) && !(items[props.heatpumpValve].state === ''DHW'')) ? (Number(items[props.heatpumpLeavingWaterTempAfterBuh].numericState)
+                        || 0) / 40 : 0)) * 100).toFixed(2) + '' 100'''
+                      pathLength: 100
+                      stroke-width: 4.9
+                  - component: circle
+                    config:
+                      stroke: '#f48fb1'
+                      cx: 0
+                      cy: 0
+                      r: 29.2
+                      fill: none
+                      transform: rotate(-90 0 0)
+                      stroke-linecap: round
+                      stroke-dasharray: '=(Math.min(1, (((items[props.heatpumpWaterPumpOperation].state === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState)
+                        || 0) > 0) && !(items[props.heatpumpValve].state === ''DHW'')) ? (Number(items[props.heatpumpLeavingWaterTempAfterBuh].numericState)
+                        || 0) / 40 : 0)) * 100).toFixed(2) + '' 100'''
+                      pathLength: 100
+                      stroke-width: 2.9
+                      opacity: '0.9'
+                    slots:
+                      default:
+                      - component: animate
+                        config:
+                          attributeName: opacity
+                          values: 1;0.55;1
+                          dur: 2s
+                          repeatCount: indefinite
+                          visible: =((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
+                            || 0) > 0) && !(items[props.heatpumpValve].state === 'DHW'))
+                      - component: animate
+                        config:
+                          attributeName: stroke-width
+                          values: 4.5;2.9;4.5
+                          dur: 2s
+                          repeatCount: indefinite
+                          visible: =((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
+                            || 0) > 0) && !(items[props.heatpumpValve].state === 'DHW'))
+                      - component: animate
+                        config:
+                          attributeName: r
+                          values: 30;29.2;30
+                          dur: 2s
+                          repeatCount: indefinite
+                          visible: =((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
+                            || 0) > 0) && !(items[props.heatpumpValve].state === 'DHW'))
+              - component: g
+                config: {}
+                slots:
+                  default:
+                  - component: circle
+                    config:
+                      cx: 0
+                      cy: 0
+                      r: 27.75
+                      style:
+                        fill: 'var(--f7-card-bg-color, #fff)'
+                  - component: circle
+                    config:
+                      cx: 0
+                      cy: 0
+                      r: 27.75
+                      fill: '#f48fb1'
+                      fill-opacity: '0.12'
+              - component: path
+                config:
+                  d: M-15,-10 H15 V-3 H-15 V4 H15 V11 H-15
+                  stroke: url(#quickLoop)
+                  stroke-width: 2
+                  stroke-linecap: round
+                  fill: none
+                  stroke-linejoin: round
           - component: div
             config:
               style:
