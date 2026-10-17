@@ -48,7 +48,7 @@ number formats come from the items.
 | `flow-link` | – |
 | `flow-node` | – |
 | `ground-floor-quick` | – |
-| `heating-card` | `flow-node` |
+| `heating-card` | `flow-node`, `item-popup` |
 | `heatpump-card` | `boost-pill`, `flow-node`, `ground-floor-quick`, `heatpump-circuit-quick`, `heatpump-control-quick`, `heatpump-cop-quick`, `heatpump-electric-quick`, `heatpump-heat-quick`, `heatpump-indoor-quick`, `heatpump-outdoor-quick`, `heatpump-refrigerant-quick`, `heatpump-tank-quick`, `heatpump-valve-quick`, `item-popup`, `pill-slider`, `pill-switch`, `state-bar`, `upper-floor-quick`, `value-tile` |
 | `heatpump-circuit-quick` | `pill-slider` |
 | `heatpump-control-quick` | `boost-pill`, `pill-slider`, `pill-switch`, `state-bar` |
@@ -301,14 +301,15 @@ opens the heat pump's page of my installation. Below them today's electricity an
 heating, DHW and standby as bars (hovering a part lifts it everywhere), each with today against yesterday at this time
 in a pill in the middle of its title (the difference in kWh), and today's COPs of space heating, DHW and in total in one
 row as rings like the energy flow's self-consumption, each with today against yesterday at this time in a pill under its
-title. While the tank charges or the heating runs, a line under its tile says since when. A round badge right of each
-tile's pills counts today's compressor starts, for hot water and for the heating (the restarts of a defrost do not
-count), outlined in the tile's colour, grey at none; while the cycle guard of my installation holds back the next start
-after a stop (it lowers the leaving water setpoint until the return water has cooled well below the heating curve, so
-that the run after it lasts), a line under the heating tile says so. The screenshots show it with the heat pump card's
-demo values and the start counts of the moment shown.
+title; a tap on one opens the item popup with that COP large beside its ring and its course over the day. While the tank
+charges or the heating runs, a line under its tile says since when. A round badge right of each tile's pills counts
+today's compressor starts, for hot water and for the heating (the restarts of a defrost do not count), outlined in the
+tile's colour, grey at none; while the cycle guard of my installation holds back the next start after a stop (it lowers
+the leaving water setpoint until the return water has cooled well below the heating curve, so that the run after it
+lasts), a line under the heating tile says so. The screenshots show it with the heat pump card's demo values and the
+start counts of the moment shown.
 
-Needs `flow-node`.
+Needs `flow-node`, `item-popup`.
 
 ![Heating and hot water](screenshots/heating-card.png)
 
@@ -357,19 +358,26 @@ Needs `flow-node`.
 
 ### Electricity price: `electricity-price-card`
 
-The all-in price, the cheapest and priciest hour, and the prices 12 hours back and 36 hours ahead, coloured green,
-orange and red by price.
+The all-in price, the cheapest and priciest hour, a line on the renewable energy community the house belongs to (its
+balance now and its next surplus window with the expected energy), and the prices 12 hours back and 36 hours ahead,
+coloured green, orange and red by price, with the community's balance per quarter hour as teal bars (grey for a deficit)
+on a kW axis on the right.
 
 ![Electricity price](screenshots/electricity-price-card.png)
 
 <details>
-<summary>6 props</summary>
+<summary>11 props</summary>
 
 | Prop | Item | Item type |
 |---|---|---|
 | `priceTotalGross` | EPEX Spot aWATTar Total Gross | Number:EnergyPrice |
 | `priceCheapestHour` | Cheapest hour | DateTime |
 | `pricePriciestHour` | EPEX Spot aWATTar Priciest Hour | DateTime |
+| `communityLevel` | Community level | String |
+| `communityBalance` | Community balance | Number:Power |
+| `communityWindowEnd` | Community window end | DateTime |
+| `communityWindowStart` | Community window start | DateTime |
+| `communityWindowEnergy` | Community window energy | Number:Energy |
 | `priceTotalNet` | EPEX Spot aWATTar Total Net | Number:EnergyPrice |
 | `priceMarketGross` | EPEX Spot aWATTar Market Gross | Number:EnergyPrice |
 | `priceMarketNet` | EPEX Spot aWATTar | Number:EnergyPrice |
@@ -560,7 +568,7 @@ absolute humidity); the day's minimum and maximum, and the last day as a chart f
 ![Temperatures](screenshots/temperatures-card.png)
 
 <details>
-<summary>9 props</summary>
+<summary>10 props</summary>
 
 | Prop | Item | Item type |
 |---|---|---|
@@ -573,15 +581,17 @@ absolute humidity); the day's minimum and maximum, and the last day as a chart f
 | `netatmoWeatherstationTemperature` | Netatmo Weatherstation Temperature | Number:Temperature |
 | `temperatureIndoor15min` | Temperature Indoor 15 min | Number:Temperature |
 | `temperatureOutdoor15min` | Temperature Outdoor 15 min | Number:Temperature |
+| `heatpumpExtAmbientTempAvg` | ESPAltherma External Ambient Temperature Average | Number:Temperature |
 
 </details>
 
 ## Quick popups
 
 Compact popups the heat pump card opens: the heat pump's controls or the values and charts of one of its parts, under
-a small head with its state and above *All details*, which opens the heat pump's page of my installation. The popup of
-a device the card draws (outdoor and indoor unit, tank, valve, the floors with their loops) shows that device in its
-head as the card does, its ring, badges and movement included. Each is a
+a head with its state and above *All details*, which opens the heat pump's page of my installation. The head shows the
+part large in a ring, as the plug card and the appliances' pages do: the popup of a device the card draws (outdoor and
+indoor unit, tank, valve, the floors with their loops) that device as the card does, its ring, badges and movement
+included, the others their icon. Each is a
 widget that takes its items as props; open it from a link with `action: popup`, `actionModal: widget:<uid>` and its
 items in `actionModalConfig`, as the card does:
 
@@ -1341,7 +1351,11 @@ lines overlap in one chart (`dashed4` dashes the fourth). `abs` shows the values
 draws their amounts from 0, for the load of lines whose meter signs the direction; `scale` fits the axis to the
 values, for voltages. Given `curve`, a String item holding the heating curve my rule
 `heatpump_heating_curve` learns (as JSON), it draws that curve as a chart on top, with the measured bins and the
-present point (`item` the outdoor mean, `item2` the setpoint). Open it from any link with `action: popup`, `actionModal:
+present point (`item` the outdoor mean, `item2` the setpoint). Given `ring`, the value stands beside `icon` large in
+a ring filled in the colour up to the value / `ring`, with `caption` over it, as the plug card shows a device; my
+heating card's COP tiles open it so (`ring: 6`), with `positive`, which leaves values of 0 and below out of the course
+(a day's COP before the day's first run), and `today`, which shows the calendar day instead of the last 24 hours.
+Open it from any link with `action: popup`, `actionModal:
 widget:item-popup` and its props in `actionModalConfig`:
 
 ```yaml
@@ -1377,6 +1391,11 @@ actionModalConfig:
 | `stacked` | Each item's course in a chart of its own, one under the other on one time axis and one scale, with one pointer and tooltip; otherwise the lines overlap in one chart | BOOLEAN | `false` |
 | `abs` | Show the values without their sign and draw their amounts from 0, e.g. the load of lines whose meter signs the direction | BOOLEAN | `false` |
 | `scale` | Fit the value axis to the values instead of starting it at 0, e.g. for voltages | BOOLEAN | `false` |
+| `positive` | Values of 0 and below are no reading: the course leaves them out and the tooltip gives a dash, e.g. a day's COP before the day's first run | BOOLEAN | `false` |
+| `today` | The course over the calendar day from midnight, its arrows a day each, instead of the last 24 hours, for a value that starts again at midnight | BOOLEAN | `false` |
+| `ring` | Show the value beside the icon large in a ring, as a device page's head, the ring filled in the colour up to the value / this, e.g. 6 for a COP; empty: the value alone | DECIMAL |  |
+| `icon` | The Material icon in the ring, e.g. eco | TEXT |  |
+| `caption` | Small text over the value beside the ring, e.g. the day the value covers | TEXT |  |
 | `curve` | A String item holding a learnt heating curve as JSON (rule heatpump_heating_curve), drawn as a chart on top with item (outdoor) and item2 (setpoint) as the present point | Item |  |
 
 ## Value tile: `value-tile`

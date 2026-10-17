@@ -21,6 +21,36 @@ props:
     type: TEXT
     required: true
     context: item
+  - name: communityLevel
+    label: Community level
+    description: String item
+    type: TEXT
+    required: true
+    context: item
+  - name: communityBalance
+    label: Community balance
+    description: Number:Power item
+    type: TEXT
+    required: true
+    context: item
+  - name: communityWindowEnd
+    label: Community window end
+    description: DateTime item
+    type: TEXT
+    required: true
+    context: item
+  - name: communityWindowStart
+    label: Community window start
+    description: DateTime item
+    type: TEXT
+    required: true
+    context: item
+  - name: communityWindowEnergy
+    label: Community window energy
+    description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
   - name: priceTotalNet
     label: EPEX Spot aWATTar Total Net
     description: Number:EnergyPrice item
@@ -40,7 +70,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 10, 2026, 5:24:26 PM
+timestamp: Oct 17, 2026, 9:55:42 PM
 component: oh-card
 config:
   title: Electricity Price
@@ -90,6 +120,22 @@ slots:
         padding: 0 16px
         opacity: '0.7'
         font-size: 13px
+  - component: Label
+    config:
+      text: '=''Community '' + (![''NULL'', ''UNDEF''].includes(items[props.communityLevel].state) ? ([''NULL'', ''UNDEF''].includes(items[props.communityBalance].state)
+        ? ''–'' : ((Number(items[props.communityBalance].numericState) || 0) > 0 ? ''+'' : '''') + ((Number(items[props.communityBalance].numericState)
+        || 0) / 1000).toFixed(1) + '' kW'') + '' · '' : '''') + (![''NULL'', ''UNDEF''].includes(items[props.communityWindowEnd].state)
+        ? ''Surplus '' + (dayjs(items[props.communityWindowStart].state).isAfter(dayjs()) ? (dayjs(items[props.communityWindowStart].state).isSame(dayjs(),
+        ''day'') ? dayjs(items[props.communityWindowStart].state).format(''HH:mm'') : items[props.communityWindowStart].displayState)
+        + '' – '' + dayjs(items[props.communityWindowEnd].state).format(''HH:mm'') : ''until '' + (dayjs(items[props.communityWindowEnd].state).isSame(dayjs(),
+        ''day'') ? dayjs(items[props.communityWindowEnd].state).format(''HH:mm'') : items[props.communityWindowEnd].displayState))
+        : (![''NULL'', ''UNDEF''].includes(items[props.communityLevel].state) ? ''none expected'' : ''–'')) + (![''NULL'',
+        ''UNDEF''].includes(items[props.communityWindowEnd].state) ? '' · '' + ((Number(items[props.communityWindowEnergy].numericState)
+        || 0)).toFixed(0) + '' kWh'' : '''')'
+      style:
+        padding: 0 16px
+        opacity: '0.7'
+        font-size: 13px
         margin-bottom: 12px
   - component: div
     config:
@@ -125,11 +171,19 @@ slots:
                   top: '45'
                   bottom: '30'
                   left: '45'
-                  right: '15'
+                  right: '40'
               xAxis:
               - component: oh-time-axis
                 config:
                   gridIndex: 0
+                  axisPointer:
+                    snap: false
+                    label:
+                      show: false
+              - component: oh-time-axis
+                config:
+                  gridIndex: 0
+                  show: false
                   axisPointer:
                     snap: false
                     label:
@@ -171,6 +225,23 @@ slots:
                     - 8
                     - 0
                     - 0
+              - component: oh-value-axis
+                config:
+                  gridIndex: 0
+                  name: kW
+                  nameGap: 14
+                  nameTextStyle:
+                    align: left
+                    padding:
+                    - 0
+                    - 0
+                    - 0
+                    - 8
+                  position: right
+                  splitLine:
+                    show: false
+                  axisLabel:
+                    formatter: =(v) => Math.round(v / 1000)
               series:
               - component: oh-time-series
                 config:
@@ -183,6 +254,22 @@ slots:
                   step: end
                   areaStyle:
                     opacity: 0.25
+                  lineStyle:
+                    opacity: 0
+                  silent: true
+                  tooltip:
+                    show: false
+                  z: 1
+              - component: oh-time-series
+                config:
+                  name: All-in price
+                  gridIndex: 0
+                  xAxisIndex: 0
+                  yAxisIndex: 0
+                  type: line
+                  item: =props.priceTotalGross
+                  step: end
+                  z: 3
                   markLine:
                     symbol:
                     - none
@@ -197,9 +284,20 @@ slots:
                     - xAxis: =dayjs().valueOf()
               - component: oh-time-series
                 config:
-                  name: Total net
+                  name: Community balance
                   gridIndex: 0
                   xAxisIndex: 1
+                  yAxisIndex: 1
+                  type: bar
+                  item: =props.communityBalance
+                  z: 2
+                  itemStyle:
+                    color: '=(p) => p.value[1] >= 0 ? ''rgba(38, 166, 154, 0.6)'' : ''rgba(158, 158, 158, 0.45)'''
+              - component: oh-time-series
+                config:
+                  name: Total net
+                  gridIndex: 0
+                  xAxisIndex: 2
                   yAxisIndex: 0
                   type: line
                   item: =props.priceTotalNet
@@ -212,7 +310,7 @@ slots:
                 config:
                   name: Market gross
                   gridIndex: 0
-                  xAxisIndex: 2
+                  xAxisIndex: 3
                   yAxisIndex: 0
                   type: line
                   item: =props.priceMarketGross
@@ -225,7 +323,7 @@ slots:
                 config:
                   name: Market net
                   gridIndex: 0
-                  xAxisIndex: 3
+                  xAxisIndex: 4
                   yAxisIndex: 0
                   type: line
                   item: =props.priceMarketNet
@@ -240,7 +338,9 @@ slots:
                   show: false
                   type: piecewise
                   dimension: 1
-                  seriesIndex: 0
+                  seriesIndex:
+                  - 0
+                  - 1
                   pieces:
                   - lt: 0.2
                     color: '#43a047'
@@ -264,7 +364,7 @@ slots:
                     === ''xAxis.time'' ? dayjs(ps[0].axisValue).format(''llll'') : ps[0].axisValueLabel) + ''"'' + '' style="font-size:
                     12px; line-height: 18px; margin: 0 -10px 6px; padding: 0 10px 6px; border-bottom: 1px solid; border-bottom-color:
                     inherit">'' + (ps[0].axisType === ''xAxis.time'' ? dayjs(ps[0].axisValue).format(''llll'') : ps[0].axisValueLabel)
-                    + ''</div>'' + r : '''') + ''</div>'')(ps.filter((p) => [0,0,0,0][p.axisIndex] === g && p.seriesId &&
+                    + ''</div>'' + r : '''') + ''</div>'')(ps.filter((p) => [0,0,0,0,0][p.axisIndex] === g && p.seriesId &&
                     (p.seriesId.indexOf(''oh-time-series'') === 0 ? !p.seriesId.split(''#'')[4] : p.seriesId.indexOf(''oh-state-series'')
                     !== 0)).map((p) => p.marker + '' '' + p.seriesName + ''<span style="float: right; margin-left: 20px"><b
                     style="text-align: right;">'' + ((v) => v.toLocaleString(''en-GB'') + '' '' + p.seriesId.split(''#'')[2])(Number(p.value[1]))

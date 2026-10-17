@@ -227,6 +227,19 @@ EN.update({"Pflegeleicht": "Easy care", "Baumwolle": "Cottons", "Waschen": "Wash
            "Hauptspülen": "Main rinse", "Klarspülen": "Final rinse", "Reinigen": "Cleaning", "Vorspülen": "Pre-rinse",
            "Orange": "Orange", "Gelb": "Yellow", "Rot": "Red", "Grün": "Green"})
 
+# the energy community on the electricity price page (2026-10-16)
+EN.update({"EEG Stufe": "Community level", "EEG Sicherheit": "Community certainty",
+           "EEG Erzeugung": "Community production", "EEG Verbrauch": "Community consumption",
+           "EEG Fenster Beginn": "Community window start", "EEG Fenster Ende": "Community window end",
+           "EEG Fenster Energie": "Community window energy", "EEG Fenster Sicherheit": "Community window certainty"})
+EN.update({"EEG": "Community", "EEG jetzt": "Community now", "EEG-Überschuss": "Community surplus", "EEG Bilanz":
+           "Community balance", "Preise und EEG-Bilanz, 12 h zurück, 36 h voraus":
+           "Prices and community balance, 12 h back, 36 h ahead", "Erzeugung": "Production",
+           "kWh erwartet": "kWh expected", "keiner erwartet": "none expected", "in den nächsten Tagen":
+           "in the next days", "keine aktuelle Prognose": "no current forecast",
+           "Überschuss": "Surplus", "Ausgeglichen": "Balanced", "Defizit": "Deficit", "Unbekannt": "Unknown",
+           "Sicher": "Certain", "Wahrscheinlich": "Likely", "Möglich": "Possible", "Keine": "None"})
+
 # whole lists in expressions, translated as a whole: a letter may stand for two days
 LISTS = {
     "['N', 'NNO', 'NO', 'ONO', 'O', 'OSO', 'SO', 'SSO', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW']":

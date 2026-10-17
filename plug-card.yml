@@ -124,7 +124,7 @@ props:
     required: false
     context: item
   parameterGroups: []
-timestamp: Oct 9, 2026, 6:08:33 PM
+timestamp: Oct 17, 2026, 9:55:42 PM
 component: oh-card
 config:
   title: =props.title
@@ -414,7 +414,7 @@ slots:
                   style:
                     font-size: 11px
                     font-weight: '600'
-                    padding: 2px 8px
+                    padding: 3px 8px 2px
                     border-radius: 6px
                     white-space: nowrap
                     width: fit-content
@@ -854,7 +854,7 @@ slots:
                   style:
                     font-size: 11px
                     font-weight: '600'
-                    padding: 2px 8px
+                    padding: 3px 8px 2px
                     border-radius: 6px
                     white-space: nowrap
                     width: fit-content
