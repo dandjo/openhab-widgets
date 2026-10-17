@@ -202,7 +202,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 14, 2026, 1:29:37 PM
+timestamp: Oct 17, 2026, 9:55:42 PM
 component: oh-card
 config:
   title: Heating & Hot Water
@@ -1434,7 +1434,7 @@ slots:
                       style:
                         font-size: 11px
                         font-weight: '600'
-                        padding: 2px 8px
+                        padding: 3px 8px 2px
                         border-radius: 6px
                         white-space: nowrap
                         width: fit-content
@@ -1568,7 +1568,7 @@ slots:
                       style:
                         font-size: 11px
                         font-weight: '600'
-                        padding: 2px 8px
+                        padding: 3px 8px 2px
                         border-radius: 6px
                         white-space: nowrap
                         width: fit-content
@@ -1920,7 +1920,17 @@ slots:
               - component: oh-link
                 config:
                   action: popup
-                  actionModal: page:heatpump
+                  actionModal: widget:item-popup
+                  actionModalConfig:
+                    item: =props.heatpumpDcopSpace
+                    title: Daily COP heating
+                    color: '#ffb74d'
+                    kind: number
+                    positive: true
+                    today: true
+                    ring: 6
+                    icon: local_fire_department
+                    caption: today
                   style:
                     position: absolute
                     inset: '0'
@@ -2109,7 +2119,17 @@ slots:
               - component: oh-link
                 config:
                   action: popup
-                  actionModal: page:heatpump
+                  actionModal: widget:item-popup
+                  actionModalConfig:
+                    item: =props.heatpumpDcopDhw
+                    title: Daily COP hot water
+                    color: '#e57373'
+                    kind: number
+                    positive: true
+                    today: true
+                    ring: 6
+                    icon: water_drop
+                    caption: today
                   style:
                     position: absolute
                     inset: '0'
@@ -2298,7 +2318,17 @@ slots:
               - component: oh-link
                 config:
                   action: popup
-                  actionModal: page:heatpump
+                  actionModal: widget:item-popup
+                  actionModalConfig:
+                    item: =props.heatpumpDcop
+                    title: Daily COP
+                    color: '#66bb6a'
+                    kind: number
+                    positive: true
+                    today: true
+                    ring: 6
+                    icon: eco
+                    caption: today
                   style:
                     position: absolute
                     inset: '0'

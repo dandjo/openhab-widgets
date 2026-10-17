@@ -57,8 +57,14 @@ props:
     type: TEXT
     required: true
     context: item
+  - name: heatpumpExtAmbientTempAvg
+    label: ESPAltherma External Ambient Temperature Average
+    description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
   parameterGroups: []
-timestamp: Oct 10, 2026, 5:24:26 PM
+timestamp: Oct 17, 2026, 9:55:42 PM
 component: oh-card
 config:
   title: Temperatures
@@ -169,6 +175,9 @@ slots:
                           text: '=(Math.abs(((Number(items[props.heatpumpIndoorAmbientTemp].numericState) || 0) * 1 - (Number(((((((items[props.tileHistory].state)
                             || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpIndoorAmbientTemp]
                             || {}).h)) * 1)))).toFixed(1) + '' K / 1 h'''
+                          style:
+                            position: relative
+                            top: 1px
                   - component: Label
                     config:
                       text: '=[''too dry'', ''dry'', ''comfortable'', ''humid'', ''too humid''][(((Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState)
@@ -179,7 +188,7 @@ slots:
                       style:
                         font-size: 11px
                         font-weight: '600'
-                        padding: 2px 8px
+                        padding: 3px 8px 2px
                         border-radius: 6px
                         white-space: nowrap
                         width: fit-content
@@ -309,6 +318,9 @@ slots:
                           text: '=(Math.abs(((Number(items[props.heatpumpExtAmbientTemp].numericState) || 0) * 1 - (Number(((((((items[props.tileHistory].state)
                             || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpExtAmbientTemp]
                             || {}).h)) * 1)))).toFixed(1) + '' K / 1 h'''
+                          style:
+                            position: relative
+                            top: 1px
                   - component: Label
                     config:
                       text: '=((6.112 * Math.exp(17.67 * (Number(items[props.netatmoOutdoorTemperature].numericState) || 0)
@@ -327,7 +339,7 @@ slots:
                       style:
                         font-size: 11px
                         font-weight: '600'
-                        padding: 2px 8px
+                        padding: 3px 8px 2px
                         border-radius: 6px
                         white-space: nowrap
                         width: fit-content
@@ -402,13 +414,21 @@ slots:
       - component: oh-chart-grid
         config:
           top: '40'
-          bottom: '40'
+          bottom: '56'
           left: '40'
           right: '15'
       xAxis:
       - component: oh-time-axis
         config:
           gridIndex: 0
+          axisPointer:
+            snap: false
+            label:
+              show: false
+      - component: oh-time-axis
+        config:
+          gridIndex: 0
+          show: false
           axisPointer:
             snap: false
             label:
@@ -478,6 +498,8 @@ slots:
               color: '#ffffff'
               backgroundColor: '#fb8c00'
               padding:
+              - 5
+              - 7
               - 3
               - 7
               borderRadius: 6
@@ -531,9 +553,64 @@ slots:
               color: '#ffffff'
               backgroundColor: '#29b6f6'
               padding:
+              - 5
+              - 7
               - 3
               - 7
               borderRadius: 6
+      - component: oh-time-series
+        config:
+          name: Ø 24 h
+          gridIndex: 0
+          xAxisIndex: 2
+          yAxisIndex: 0
+          type: line
+          item: =props.heatpumpExtAmbientTempAvg
+          symbol: none
+          lineStyle:
+            width: 1.5
+            type: dashed
+            color: '#29b6f6'
+          itemStyle:
+            color: '#29b6f6'
+          markPoint:
+            data:
+            - type: max
+              name: max
+            - type: min
+              name: min
+              label:
+                position: bottom
+            symbol: circle
+            symbolSize: 8
+            itemStyle:
+              color: rgba(41, 182, 246, 0.35)
+              borderColor: '#29b6f6'
+              borderWidth: 1.5
+            label:
+              show: true
+              position: top
+              distance: 8
+              formatter: '=(p) => ((f, t) => f < 0.12 ? ''{s| }{b|'' + t + ''}'' : f > 0.88 ? ''{b|'' + t + ''}{s| }'' : ''{b|''
+                + t + ''}'')((p.data.coord[0] - dayjs().valueOf()) / 86400000 + 1, ''Ø '' + (Number(p.value)).toFixed(1) +
+                '' °C'')'
+              rich:
+                b:
+                  fontSize: 12
+                  fontWeight: 600
+                  color: '=themeOptions.dark === ''dark'' ? ''#b3e5fc'' : ''#01579b'''
+                  backgroundColor: '=themeOptions.dark === ''dark'' ? ''#1f3b48'' : ''#d4f0fd'''
+                  borderColor: '#29b6f6'
+                  borderWidth: 1
+                  borderType: dashed
+                  padding:
+                  - 5
+                  - 6
+                  - 3
+                  - 6
+                  borderRadius: 6
+                s:
+                  width: 64
       tooltip:
       - component: oh-chart-tooltip
         config:
@@ -549,7 +626,7 @@ slots:
             : ps[0].axisValueLabel) + ''"'' + '' style="font-size: 12px; line-height: 18px; margin: 0 -10px 6px; padding:
             0 10px 6px; border-bottom: 1px solid; border-bottom-color: inherit">'' + (ps[0].axisType === ''xAxis.time'' ?
             dayjs(ps[0].axisValue).format(''llll'') : ps[0].axisValueLabel) + ''</div>'' + r : '''') + ''</div>'')(ps.filter((p)
-            => [0,0][p.axisIndex] === g && p.seriesId && (p.seriesId.indexOf(''oh-time-series'') === 0 ? !p.seriesId.split(''#'')[4]
+            => [0,0,0][p.axisIndex] === g && p.seriesId && (p.seriesId.indexOf(''oh-time-series'') === 0 ? !p.seriesId.split(''#'')[4]
             : p.seriesId.indexOf(''oh-state-series'') !== 0)).map((p) => p.marker + '' '' + p.seriesName + ''<span style="float:
             right; margin-left: 20px"><b style="text-align: right;">'' + ((v) => v.toLocaleString(''en-GB'') + '' '' + p.seriesId.split(''#'')[2])(Number(p.value[1]))
             + ''</b></span><br/>'').join(''''))).join('''') + ''</div>'''
@@ -562,7 +639,7 @@ slots:
             i + 1, y) : ((top) => [b.style.setProperty(''margin-top'', (top - y) + ''px''), f(f, i + 1, top + b.offsetHeight)][1])(Math.max(y
             ? y + 4 : 0, i === h ? Math.max(T[i], Math.min(pt[1] + 20, B[i] - b.offsetHeight)) : T[i])))(c.children[i]) :
             0), [left ? pt[0] - 20 - c.offsetWidth : pt[0] + 20, 0]][4])(dom.firstChild, pt[0] > size.viewSize[0] / 2, T.filter((t)
-            => t <= pt[1]).length - 1))([40], [size.viewSize[1] - 40])'
+            => t <= pt[1]).length - 1))([40], [size.viewSize[1] - 56])'
           backgroundColor: transparent
           borderWidth: 0
           padding: 0

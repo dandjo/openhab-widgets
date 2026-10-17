@@ -225,7 +225,7 @@ ITEM_PROP_PREFIXES = [("huawei_inverter_power_meter_", "grid_"), ("huawei_invert
                       ("miele_washing_machine_wwg360_", "washer1_"), ("miele_tumble_dryer_twc560wp_", "dryer_"),
                       ("miele_dishwasher_g7465_", "dishwasher_"), ("epex_spot_awattar", "price"),
                       ("air_conditioning_unit_", "ac_unit_"), ("air_conditioning_", "ac_meter_"), ("e_car_", "ecar_"),
-                      ("energy_daily_", "daily_")]
+                      ("energy_daily_", "daily_"), ("energy_community_", "community_")]
 ITEM_PROP_NAMES = {
     "huawei_inverter_input_power": "pvPower", "huawei_inverter_e_day": "pvEnergyToday",
     "huawei_inverter_power_meter_active_power": "gridPower", "huawei_inverter_power_meter_ec_day": "gridImportToday",
@@ -2850,18 +2850,24 @@ def stacked_bar(title, total, parts, middle=None):
 # the electricity each day's COP is a ratio of: its pill waits for that to be base enough
 COP_BASE = {"espaltherma_dcop": "espaltherma_energy_today", "espaltherma_dcop_space": "espaltherma_energy_space_today",
             "espaltherma_dcop_dhw": "espaltherma_energy_dhw_today"}
+# the value a day's COP fills its ring at, in its tile and its popup, and the icon its popup's ring holds: its part's
+# in cop_row()
+COP_FULL = 6
+COP_ICON = {"espaltherma_dcop": "eco", "espaltherma_dcop_space": "local_fire_department",
+            "espaltherma_dcop_dhw": "water_drop"}
 
 
-def cop_tile(title, item, color, width="100%", popup=None):
+def cop_tile(title, item, color, width="100%", name=None):
     """A day's COP as Eigenverbrauch and Autarkie stand under the energy flow, the ring the same size at the same
     width: a small card with a ring filled up to 6, the value inside, the title and heute beside it; width is the
-    drawing's width in the card; a tap opens the page named by popup, if given."""
+    drawing's width in the card; a tap opens the item popup with the COP and its course over the day, titled name
+    (user, 2026-10-15; before, the heat pump's page)."""
     value = num(item)
     length = round(2 * math.pi * 22, 2)
     ring = svg("svg", [svg("circle", cx=24, cy=25, r=22, **stroke(5, "#9e9e9e", **{"stroke-opacity": "0.25"})),
                        svg("circle", cx=24, cy=25, r=22, transform="rotate(-90 24 25)",
                            **stroke(5, color, **{"stroke-dasharray":
-                                                  f"=({length} * Math.min(1, {value} / 6)).toFixed(1) + ' {length}'"})),
+                                                  f"=({length} * Math.min(1, {value} / {COP_FULL})).toFixed(1) + ' {length}'"})),
                        svg_text(24, 30, f"={value} > 0 ? {fixed(value, 1)} : '–'", 13, "700"),
                        # title, heute and today's COP against yesterday's at this time in a pill, as one block in the
                        # ring's vertical middle, as the energy flow's tiles (user, 2026-10-06)
@@ -2870,9 +2876,9 @@ def cop_tile(title, item, color, width="100%", popup=None):
                        svg_pill(56, 34, *value_change(item, 1, base=COP_BASE.get(item)))],
                viewBox="0 0 150 50", width="100%", style={"display": "block", "overflow": "visible", "max-width": "170px",
                                                           "width": width})
-    link = [page_link({"position": "absolute", "inset": "0", "display": "block", "border-radius": "12px"},
-                      popup)] if popup else []
-    return div([div([ring], **{"position": "relative", "min-width": "0", "flex": "1 1 auto"}), *link],
+    link = comp("oh-link", {**item_modal(item, name or title, color),
+                            "style": {"position": "absolute", "inset": "0", "display": "block", "border-radius": "12px"}})
+    return div([div([ring], **{"position": "relative", "min-width": "0", "flex": "1 1 auto"}), link],
                **{"position": "relative", "overflow": "hidden", "padding": "8px 10px", "border-radius": "12px",
                   "background": TILE_BG, "min-width": "0", "display": "flex", "align-items": "center"})
 
@@ -2963,6 +2969,45 @@ def heatpump_content():
                    "margin": f"={NARROW} ? 'auto' : 'auto calc((100% - {HP_VB[2]}px) / 2)'",
                    "padding": f"={NARROW} ? '8px 16px 12px' : '8px 0 16px'"})]
 
+# the renewable energy community the house belongs to (WiEnergy): its forecast per quarter hour, filled by
+# the rule energy_community_forecast (2026-10-16); its balance in a colour of its own, teal, so its bars are not read as
+# the price scale's green for a cheap hour
+EC = "energy_community_"
+EC_COLOR = "#26a69a"
+EC_LEVEL_CLS = f"(({{surplus: 'good', balanced: 'neutral', deficit: 'neutral'}})[items.{EC}level.state] || 'neutral')"
+EC_CERT_CLS = (f"(({{certain: 'good', likely: 'ok', possible: 'caution'}})[items.{EC}window_certainty.state] "
+               "|| 'neutral')")
+EC_HAS_WINDOW = f"!['NULL', 'UNDEF'].includes(items.{EC}window_end.state)"
+EC_FRESH = f"!['NULL', 'UNDEF'].includes(items.{EC}level.state)"
+
+
+def ec_kw(item, digits=1, sign=False):
+    """An EEG power item in kW, with a plus before a surplus where sign, a dash while it has none."""
+    text = fixed(f"{num(item)} / 1000", digits)
+    if sign:
+        text = f"({num(item)} > 0 ? '+' : '') + {text}"
+    return f"(['NULL', 'UNDEF'].includes(items.{item}.state) ? '–' : {text} + ' kW')"
+
+
+def ec_when(prefix=""):
+    """The next surplus window's time: 'bis 17:45' while it runs, '08:45 – 17:45' before it starts, another day with
+    its weekday; none ahead: 'keiner erwartet', or a dash without a current forecast. prefix before a window's time."""
+    start, end = f"items.{EC}window_start.state", f"items.{EC}window_end.state"
+
+    def hm(state, item_):
+        return f"(dayjs({state}).isSame(dayjs(), 'day') ? dayjs({state}).format('HH:mm') : items.{item_}.displayState)"
+    return (f"({EC_HAS_WINDOW} ? '{prefix}' + (dayjs({start}).isAfter(dayjs()) ? {hm(start, EC + 'window_start')} + "
+            f"' – ' + dayjs({end}).format('HH:mm') : 'bis ' + {hm(end, EC + 'window_end')}) : "
+            f"({EC_FRESH} ? 'keiner erwartet' : '–'))")
+
+
+def ec_bars(name, axis, **cfg):
+    """The community's balance per quarter hour as bars: teal for a surplus, grey for a deficit."""
+    return time_series(name, EC + "balance", type="bar", yAxisIndex=axis, z=2,
+                       itemStyle={"color": "=(p) => p.value[1] >= 0 ? 'rgba(38, 166, 154, 0.6)' : "
+                                           "'rgba(158, 158, 158, 0.45)'"}, **cfg)
+
+
 # ---------------------------------------------------------------- 3. price
 
 price = [
@@ -2971,21 +3016,33 @@ price = [
         **{"display": "flex", "flex-wrap": "wrap", "align-items": "baseline", "column-gap": "8px", "padding": "0 16px"}),
     label("='Günstigste ' + items.epex_spot_awattar_cheapest_hour.displayState + ' · teuerste ' + "
           "items.epex_spot_awattar_priciest_hour.displayState",
+          **{"padding": "0 16px", "opacity": "0.7", "font-size": "13px"}),
+    # the energy community: its balance now and its next surplus window (2026-10-16)
+    label(f"='EEG ' + ({EC_FRESH} ? {ec_kw(EC + 'balance', 1, True)} + ' · ' : '') + {ec_when('Überschuss ')} + "
+          f"({EC_HAS_WINDOW} ? ' · ' + {fixed(num(EC + 'window_energy'), 0)} + ' kWh' : '')",
           **{"padding": "0 16px", "opacity": "0.7", "font-size": "13px", "margin-bottom": "12px"}),
     fill_chart(chart({"period": "2D", "future": "0.75", "height": "100%"},
-          grid=[comp("oh-chart-grid", {"top": "45", "bottom": "30", "left": "45", "right": "15"})],
+          grid=[comp("oh-chart-grid", {"top": "45", "bottom": "30", "left": "45", "right": "40"})],
           xAxis=[comp("oh-time-axis", {"gridIndex": 0})],
-          yAxis=[comp("oh-value-axis", {"gridIndex": 0, "name": "EUR/kWh", "nameGap": 14, "nameTextStyle": AXIS_NAME})],
-          series=[time_series("All-in price", PRICE, step="end", areaStyle={"opacity": 0.25},
+          yAxis=[comp("oh-value-axis", {"gridIndex": 0, "name": "EUR/kWh", "nameGap": 14, "nameTextStyle": AXIS_NAME}),
+                 comp("oh-value-axis", {"gridIndex": 0, "name": "kW", "nameGap": 14, "nameTextStyle": RIGHT_AXIS_NAME,
+                                        "position": "right", "splitLine": {"show": False},
+                                        "axisLabel": {"formatter": "=(v) => Math.round(v / 1000)"}})],
+          # the price's area a silent series of its own under the community's bars, its line above them (z), as on
+          # the price page (2026-10-16)
+          series=[time_series("All-in price", PRICE, step="end", areaStyle={"opacity": 0.25}, lineStyle={"opacity": 0},
+                              silent=True, tooltip={"show": False}, z=1),
+                  time_series("All-in price", PRICE, step="end", z=3,
                               markLine={"symbol": ["none", "none"], "silent": True, "label": {"show": False},
                                         "lineStyle": {"color": "#888", "type": "dashed"},
                                         "data": [{"xAxis": "=dayjs().valueOf()"}]}),
+                  ec_bars("Community balance", 1),
                   # invisible, same timestamps: the axis tooltip lists all four prices together
                   *[time_series(n, i, lineStyle={"opacity": 0}, itemStyle={"color": c}, symbol="none")
                     for n, i, c in (("Total Net", "epex_spot_awattar_total_net", "#fb8c00"),
                                     ("Market Gross", "epex_spot_awattar_market_gross", "#ffb74d"),
                                     ("Market Net", "epex_spot_awattar", "#ffe0b2"))]],
-          visualMap=[comp("oh-chart-visualmap", {"show": False, "type": "piecewise", "dimension": 1, "seriesIndex": 0,
+          visualMap=[comp("oh-chart-visualmap", {"show": False, "type": "piecewise", "dimension": 1, "seriesIndex": [0, 1],
                                                  "pieces": [{"lt": 0.2, "color": "#43a047"},
                                                             {"gte": 0.2, "lt": 0.3, "color": "#fb8c00"},
                                                             {"gte": 0.3, "color": "#e53935"}]})],
@@ -3515,19 +3572,20 @@ def details_button(page, color):
 
 
 def quick(icon, title, color, state, children, page):
-    """A part's values or controls under a small head with its state, and the way to its page; opened as a compact
-    popup, the bar names the part (config.label). icon: a glyph in a tinted circle, or a device's drawing as the
-    heat pump card shows it (hp_device_icon())."""
-    head = div([icon if isinstance(icon, dict) else
-                div([comp("oh-icon", {"icon": icon, "width": 20, "height": 20})],
-                    **{"width": "34px", "height": "34px", "flex": "0 0 auto", "border-radius": "50%",
-                       "display": "flex", "align-items": "center", "justify-content": "center",
-                       "background": f"color-mix(in srgb, {color} 22%, transparent)"}),
+    """A part's values or controls under a head with its state, and the way to its page; opened as a compact
+    popup, the bar names the part (config.label). icon: a glyph, or a device's drawing as the heat pump card shows it
+    (hp_device_icon()); either large in its ring as a device page's head (user, 2026-10-17: as the household
+    appliances' popups), the drawing's units scaled from the card's pixels to ICON_SIZE."""
+    if isinstance(icon, dict):
+        icon["config"].update({"width": ICON_SIZE, "height": ICON_SIZE})
+    else:
+        icon = glyph_icon(icon, color)
+    # beside the large icon the state may take a second line instead of being cut
+    head = div([icon,
                 div([label(title, **{"font-size": "15px", "font-weight": "600"}),
-                     label(f"={state}", **{"font-size": "12px", "opacity": "0.7", "white-space": "nowrap",
-                                           "overflow": "hidden", "text-overflow": "ellipsis"})],
-                    **{"display": "flex", "flex-direction": "column", "min-width": "0"})],
-               **{"display": "flex", "align-items": "center", "gap": "10px", "padding-bottom": "4px"})
+                     label(f"={state}", **{"font-size": "12px", "opacity": "0.7"})],
+                    **{"display": "flex", "flex-direction": "column", "gap": "2px", "min-width": "0"})],
+               **{"display": "flex", "align-items": "center", "gap": "18px", "padding-bottom": "4px"})
     root = div([div([head, *children, details_button(page, color)],
                     **{"display": "flex", "flex-direction": "column", "gap": "6px", "padding": "12px 14px"})])
     # a chart's closed period menu would stretch the popup by its full length, as on the pages (PERIOD_MENU)
@@ -4317,10 +4375,39 @@ def marks(color):
             "label": {"show": True, "position": "top", "distance": 10,
                       "formatter": f"=(p) => {fixed('Number(p.value)', 1)} + ' °C'",
                       "fontSize": 14, "fontWeight": 700, "color": "#ffffff", "backgroundColor": color,
-                      "padding": [3, 7], "borderRadius": 6}}
+                      # ECharts keeps a descender's room under the line, which digits leave empty: more room above
+                      # sets them in the middle (user, 2026-10-15; measured 1.5 px high with [3, 7])
+                      "padding": [5, 7, 3, 7], "borderRadius": 6}}
+def soft_marks(color, ink):
+    """The minimum and maximum of a reference line such as a mean, set apart from marks()' readings (user,
+    2026-10-15): a smaller tinted dot, the value marked Ø in a lighter badge with a dashed edge in the line's colour,
+    its text dark on light and light on dark (ink). The badge's ground is the tint made opaque on the card (white, and
+    MainUI's dark card rgb(28, 28, 29)), so a line passing under it does not cross its text. A mean's extremes often
+    lie at the ends of the day shown (the last 24 hours), where a centred badge hung over the axis labels or out of
+    the chart: in the outer eighths a spacer beside it moves it inwards."""
+    def ground(bg, a=0.2):
+        return "#" + "".join(f"{round(a * int(color[i:i + 2], 16) + (1 - a) * b):02x}" for i, b in zip((1, 3, 5), bg))
+    text = f"'Ø ' + {fixed('Number(p.value)', 1)} + ' °C'"
+    # the point's place in the day shown, 0 at its left end and 1 at the present
+    where = "(p.data.coord[0] - dayjs().valueOf()) / 86400000 + 1"
+    return {"data": [{"type": "max", "name": "max"}, {"type": "min", "name": "min", "label": {"position": "bottom"}}],
+            "symbol": "circle", "symbolSize": 8,
+            "itemStyle": {"color": rgba(color, 0.35), "borderColor": color, "borderWidth": 1.5},
+            "label": {"show": True, "position": "top", "distance": 8,
+                      "formatter": f"=(p) => ((f, t) => f < 0.12 ? '{{s| }}{{b|' + t + '}}' : f > 0.88 ? "
+                                   f"'{{b|' + t + '}}{{s| }}' : '{{b|' + t + '}}')({where}, {text})",
+                      "rich": {"b": {"fontSize": 12, "fontWeight": 600,
+                                     "color": f"=themeOptions.dark === 'dark' ? '{ink[1]}' : '{ink[0]}'",
+                                     "backgroundColor": f"=themeOptions.dark === 'dark' ? '{ground((28, 28, 29))}' : "
+                                                        f"'{ground((255, 255, 255))}'",
+                                     "borderColor": color, "borderWidth": 1, "borderType": "dashed",
+                                     # more room above than below, as in marks(), to set the digits in the middle
+                                     "padding": [5, 6, 3, 6], "borderRadius": 6},
+                               "s": {"width": 64}}}}
 def temps_content():
     """The temperatures card: indoors with the room's climate in a word (Netatmo's humidity), outdoors with whether
-    airing dries the rooms, both with their trend; the day's course below."""
+    airing dries the rooms, both with their trend; the day's course below, the outdoor one with the mean the heating
+    curve works with dashed beside it, as on the heat pump page (user, 2026-10-15)."""
     hum = "netatmo_weatherstation_atmospheric_humidity"
     lo, hi, segs = VT_SCALES["humidity"]
     climate, _ = rating_parts(num(hum), lo, hi, segs)
@@ -4334,8 +4421,10 @@ def temps_content():
         # on a phone one under the other: side by side the pills beside the values stuck out (user, 2026-10-07)
         **{"display": "grid", "grid-template-columns": f"={NARROW} ? '1fr' : '1fr 1fr'", "gap": "12px",
            "padding": "4px 16px 0"}),
+    # room under the plot for the minimum's badge above the legend, which with three entries reaches as far as where
+    # the morning's minimum usually lies on a phone
     chart({"period": "D", "height": "320px"},
-          grid=[comp("oh-chart-grid", {"top": "40", "bottom": "40", "left": "40", "right": "15"})],
+          grid=[comp("oh-chart-grid", {"top": "40", "bottom": "56", "left": "40", "right": "15"})],
           xAxis=[comp("oh-time-axis", {"gridIndex": 0})],
           yAxis=[comp("oh-value-axis", {"gridIndex": 0, "name": "°C", "scale": True, "nameGap": 14, "nameTextStyle": AXIS_NAME,
                                         "splitLine": {"lineStyle": {"type": "dashed", "opacity": 0.4}}})],
@@ -4344,7 +4433,10 @@ def temps_content():
                               markPoint=marks("#fb8c00")),
                   time_series("Outdoor", "temperature_outdoor_15min", smooth=0.5,
                               lineStyle={"width": 2.5, "color": "#29b6f6"}, itemStyle={"color": "#29b6f6"},
-                              areaStyle={"color": gradient("41, 182, 246")}, markPoint=marks("#29b6f6"))],
+                              areaStyle={"color": gradient("41, 182, 246")}, markPoint=marks("#29b6f6")),
+                  # named as on the heat pump page: a longer name did not fit in a phone's legend
+                  line(HP_AVG_NAME, HPX["outdoor_avg"], "#29b6f6", dashed=True,
+                       markPoint=soft_marks("#29b6f6", ("#01579b", "#b3e5fc")))],
           tooltip=tooltip(trigger="axis", smartFormatter=True), legend=legend()),
     ]
 
@@ -4728,11 +4820,12 @@ def heating(tile=heat_tile):
     # one row of three (user, 2026-10-04: back to one row, "COP WW" so the title fits), every ring as large as
     # Eigenverbrauch's and Autarkie's under the energy flow, which stand three abreast on a desktop and two on a phone;
     # on a phone space heating and DHW side by side over the total, its drawing half its width less 14 px
-    pop = "heatpump"  # a tap on any of them opens the heat pump's page, as the heat pump card's COP tile does
-    total = cop_tile("COP gesamt", "espaltherma_dcop", COP_C, f"={NARROW} ? 'calc(50% - 14px)' : '100%'", pop)
+    # a tap on one opens its popup with the COP's course over the day (user, 2026-10-15), named as the heat pump
+    # page's tiles name them
+    total = cop_tile("COP gesamt", "espaltherma_dcop", COP_C, f"={NARROW} ? 'calc(50% - 14px)' : '100%'", "Tages-COP")
     total["config"]["style"]["grid-column"] = f"={NARROW} ? '1 / -1' : 'auto'"
-    cops = div([cop_tile("COP Heizung", "espaltherma_dcop_space", SPACE_C, "100%", pop),
-                cop_tile("COP WW", "espaltherma_dcop_dhw", DHW_C, "100%", pop), total],
+    cops = div([cop_tile("COP Heizung", "espaltherma_dcop_space", SPACE_C, "100%", "Tages-COP Heizung"),
+                cop_tile("COP WW", "espaltherma_dcop_dhw", DHW_C, "100%", "Tages-COP Warmwasser"), total],
                **{"display": "grid", "gap": "8px",
                   "grid-template-columns": f"={NARROW} ? 'repeat(2, minmax(0, 1fr))' : 'repeat(3, minmax(0, 1fr))'"})
     content = div([tiles, *hp_day_split(), cops], **{"padding": "12px 16px 16px", "font-size": "14px"})
@@ -5594,6 +5687,12 @@ def item_modal(item, title, color=None, second=None):
     props = {"item": item, "title": title, "color": color or POPUP_COLOR, "kind": kind}
     if states:
         props["states"] = states
+    if item in COP_BASE:
+        # a day's COP stands at 0 from midnight until the heat pump's first run of the day: no COP yet, not one of 0;
+        # its course is the calendar day's, as it starts again at midnight (user, 2026-10-15: "Tagesverlauf"); its
+        # value beside its icon large in a ring filled as its tile's, as the household appliances' popups show their
+        # machines (user, 2026-10-17: "einheitlich")
+        props.update({"positive": True, "today": True, "ring": COP_FULL, "icon": COP_ICON[item], "caption": "heute"})
     if second:
         props.update({"item2": second["item2"], "name": second["name"], "name2": second["name2"],
                       "color": second.get("color") or color or POPUP_COLOR,
@@ -5928,7 +6027,11 @@ VT_WIDE = {"grid-column": "1 / -1"}
 
 def vt_chip(text, cls_expr="'neutral'", visible=None):
     color = cls_color(cls_expr)
-    return label(text, visible, **{"font-size": "11px", "font-weight": "600", "padding": "2px 8px",
+    # a pixel more room above than below and the pill a pixel taller: with 2 px each the text sat high (digits 1.4 px
+    # on a HiDPI screen), with 3 and 1 px a text in small letters (kWh zu gestern) looked low (user, 2026-10-15). Chrome
+    # sets the text on whole CSS pixels, so the half step between the two comes from the taller pill: lower-case
+    # letters now centred on HiDPI screens, digits 0.4 to 0.9 px above the middle (measured by pixels)
+    return label(text, visible, **{"font-size": "11px", "font-weight": "600", "padding": "3px 8px 2px",
                                    "border-radius": PILL_R, "white-space": "nowrap", "width": "fit-content", "color": "=" + color,
                                    "background": f"='color-mix(in srgb, ' + {color} + ' 16%, transparent)'"})
 
@@ -5937,9 +6040,11 @@ def vt_icon_chip(icon, text, cls_expr="'neutral'", visible=None):
     """A pill as vt_chip() with a Material icon before its text (icon: an expression of the icon's name)."""
     chip_ = vt_chip(text, cls_expr)
     style = chip_["config"]["style"]
+    # the text a pixel lower, the icon where it is: its digits sat 1.4 px above the middle on a HiDPI screen, as
+    # vt_chip()'s did (2026-10-15)
     return div([comp("oh-icon", {"icon": icon, "width": 13, "height": 13,
                                  "style": {"width": "13px", "height": "13px", "flex": "0 0 auto"}}),
-                label(text)], visible,
+                label(text, **{"position": "relative", "top": "1px"})], visible,
                **{**style, "display": "inline-flex", "align-items": "center", "gap": "3px", "padding": "1px 8px 1px 6px"})
 
 
@@ -7547,6 +7652,28 @@ def price_now(title, item):
     return rating_tile("Strompreis jetzt", PRICE, "price", value_expr=f"={fixed(num(PRICE), 3)} + ' €/kWh'")
 
 
+def ec_now(title, item):
+    """The community's running quarter hour: its balance large, the level (and how certain it is) as a pill,
+    production and consumption below."""
+    level_ok = f"!['NULL', 'UNDEF'].includes(items.{EC}level.state)"
+    cert_ok = f"!['NULL', 'UNDEF'].includes(items.{EC}certainty.state)"
+    pill = f"={disp(EC + 'level')} + ({cert_ok} ? ' · ' + {disp(EC + 'certainty')}.toLowerCase() : '')"
+    return vt_tile([vt_head("EEG jetzt", vt_chip(pill, EC_LEVEL_CLS, visible=f"={level_ok}")),
+                    vt_value(f"={ec_kw(EC + 'balance', 1, True)}"),
+                    label(f"='Erzeugung ' + {ec_kw(EC + 'production')} + ' · Verbrauch ' + {ec_kw(EC + 'consumption')}",
+                          **VT_SUB)], EC + "balance", "EEG Bilanz")
+
+
+def ec_window(title, item):
+    """The community's next surplus window (or the running one): when, how much energy, how certain. A time today
+    as hours, another day with its weekday."""
+    below = (f"({EC_HAS_WINDOW} ? {fixed(num(EC + 'window_energy'), 0)} + ' kWh erwartet' : "
+             f"({EC_FRESH} ? 'in den nächsten Tagen' : 'keine aktuelle Prognose'))")
+    return vt_tile([vt_head("EEG-Überschuss", vt_chip(f"={disp(EC + 'window_certainty')}", EC_CERT_CLS,
+                                                      visible=f"={EC_HAS_WINDOW}")),
+                    vt_value(f"={ec_when()}"), label(f"={below}", **VT_SUB)], EC + "balance", "EEG Bilanz")
+
+
 def cop_row(total, space, dhw):
     """The COPs in one line under a conversion's bands, each with its ring and icon: heating, hot water, total (the
     heating card's green with its leaf) last, so it sits on the right and on a phone wraps alone into the second line
@@ -7827,6 +7954,11 @@ VALUE_RENDER = {
                                                                   "epex_spot_awattar_priciest_hour"),
                                          "epex_spot_awattar_cheapest", "epex_spot_awattar_priciest_hour",
                                          "epex_spot_awattar_priciest"),
+    # the energy community
+    "energy_community_level": vt_r(ec_now, "energy_community_certainty", "energy_community_balance",
+                                   "energy_community_production", "energy_community_consumption"),
+    "energy_community_window_end": vt_r(ec_window, "energy_community_window_start", "energy_community_window_energy",
+                                        "energy_community_window_certainty"),
     # plugs (the widgets' placeholders)
     "zzpfx_energy_today": vt_r(plug_energy),
     "zzpfx_energy_total": vt_r(plug_total),
@@ -8465,7 +8597,9 @@ def epex_spot_blocks():
                       vtile("Günstigste Stunde", "epex_spot_awattar_cheapest_hour"),
                       vtile("Günstigster Preis", "epex_spot_awattar_cheapest"),
                       vtile("Teuerste Stunde", "epex_spot_awattar_priciest_hour"),
-                      vtile("Teuerster Preis", "epex_spot_awattar_priciest")])]
+                      vtile("Teuerster Preis", "epex_spot_awattar_priciest"),
+                      vtile("EEG jetzt", "energy_community_level"),
+                      vtile("EEG-Überschuss", "energy_community_window_end")])]
 
     def price(name, gross, net, color, now=False):
         """A price, gross, its net riding along invisibly on the same hours, so the tooltip lists both; with now a
@@ -8473,18 +8607,28 @@ def epex_spot_blocks():
         mark = {"markLine": {"symbol": ["none", "none"], "silent": True, "label": {"show": False},
                              "lineStyle": {"color": "#888", "type": "dashed"},
                              "data": [{"xAxis": "=dayjs().valueOf()"}]}} if now else {}
-        return [time_series(f"{name} brutto", gross, step="end", symbol="none", lineStyle={"width": 2.5, "color": color},
-                            itemStyle={"color": color}, areaStyle={"opacity": 0.12}, **mark),
+        # the area a silent series of its own under the EEG bars, the lines above them (z), so the bars keep their
+        # colour and the lines stay readable (2026-10-16)
+        return [time_series(f"{name} brutto", gross, step="end", symbol="none", lineStyle={"opacity": 0},
+                            itemStyle={"color": color}, areaStyle={"opacity": 0.12}, silent=True,
+                            tooltip={"show": False}, z=1),
+                time_series(f"{name} brutto", gross, step="end", symbol="none", lineStyle={"width": 2.5, "color": color},
+                            itemStyle={"color": color}, z=3, **mark),
                 time_series(f"{name} netto", net, step="end", symbol="none", lineStyle={"opacity": 0},
-                            itemStyle={"color": color})]
-    # both prices overlapping in one grid again (user, 2026-10-05)
-    prices = stacked_chart([((("Gesamtpreis", "#e53935"), ("Marktpreis", "#fb8c00")),
-                             [*price("Gesamt", PRICE, "epex_spot_awattar_total_net", "#e53935", now=True),
+                            itemStyle={"color": color}, z=3)]
+    # the EEG's balance per quarter hour as bars on an axis of their own on the right, teal for a surplus, grey for
+    # a deficit, under the price lines: when the community has power to spare beside what it costs (2026-10-16)
+    community = ec_bars("EEG Bilanz", 1)
+    # both prices overlapping in one grid again (user, 2026-10-05); the EEG only as 'EEG' in the legend, which otherwise runs
+    # under the period buttons on a phone (the card title and the tooltip name the balance)
+    prices = stacked_chart([((("Gesamtpreis", "#e53935"), ("Marktpreis", "#fb8c00"), ("EEG", EC_COLOR)),
+                             [community,
+                              *price("Gesamt", PRICE, "epex_spot_awattar_total_net", "#e53935", now=True),
                               *price("Markt", "epex_spot_awattar_market_gross", "epex_spot_awattar", "#fb8c00")],
-                             value_axis("EUR/kWh"))], 400, period="2D", future="0.75")
+                             [value_axis("EUR/kWh"), value_axis("W")])], 400, period="2D", future="0.75")
     # as high as Jetzt beside it, at least 300 px (user, 2026-10-05: 400 px left Jetzt with 100 px of empty card)
     return [two(card("Jetzt", now),
-                card("Preise 12 h zurück, 36 h voraus", [fill_stacked(prices, "300px")], fill=True))]
+                card("Preise und EEG-Bilanz, 12 h zurück, 36 h voraus", [fill_stacked(prices, "300px")], fill=True))]
 
 
 GRID_SIGN = f"={num(GRID)} < 0 ? '#43a047' : '#e53935'"
@@ -8587,6 +8731,7 @@ GEN_DE = {
     "Timer": "Timer", "Auto": "Auto",
     # price
     "per kWh all-in": "pro kWh gesamt", "EUR/kWh": "EUR/kWh", "All-in price": "Gesamtpreis",
+    "Community balance": "EEG Bilanz", "kW": "kW",
     "Total Net": "Gesamt netto", "Market Gross": "Markt brutto", "Market Net": "Markt netto",
     # consumption, daily energy, calendar, temperatures
     "Consumers": "Verbraucher", "From PV": "Aus PV", "From Grid": "Aus dem Netz", "PV Production": "PV-Ertrag",
@@ -8934,13 +9079,47 @@ def item_popup():
               f"=props.item4 ? ({NARROW} ? 'left' : 'center') : 'right'", "right"]
     sides = [side(n, it, c, a, None if k < 2 else f"=!!props.item{k + 1}")
              for k, ((it, n, c, _), a) in enumerate(zip(slots, aligns))]
+    # with ring the value beside its icon (props.icon) large in a ring, as a device page's head (a day's COP; user,
+    # 2026-10-17: as the household appliances' popups), the ring filled in the colour up to the value / props.ring
+    ringed = hero(None, ph["color"], "=props.caption || ''", f"={dash(disp(item))}",
+                  picture=device_icon(glyph_parts("=(props.icon || '').replace('material:', '')", ph["color"]),
+                                      ph["color"], share=f"{num(item)} / Number(props.ring)"))
+    ringed["config"]["visible"] = one + " && !!props.ring"
+    # the value card no taller than the popup's 630 px leave beside the course below it: no scrollbar
+    ringed["config"]["style"]["padding"] = "4px 16px 14px"
     # with a heating curve, the values' card is the present beside it
-    now = card(f"=props.curve ? 'Jetzt' : '{title}'", [label(f"={dash(disp(item))}", one, **{**HERO, "overflow-wrap": "anywhere",
-                                                            "padding": "4px 16px 18px"}),
+    now = card(f"=props.curve ? 'Jetzt' : '{title}'", [label(f"={dash(disp(item))}", one + " && !props.ring",
+                                                            **{**HERO, "overflow-wrap": "anywhere",
+                                                            "padding": "4px 16px 18px"}), ringed,
                        div(sides, two, **{"display": "grid", "grid-template-columns": cols, "align-items": "end",
                                           "gap": "10px 12px", "padding": "4px 16px 18px"})])
-    course = card("Verlauf", [day_chart([area(title, item, ph["color"])], [value_axis("")])])
-    course["config"]["visible"] = "=!props.item2 && (!props.kind || props.kind === 'number')"
+    # with positive, values near 0 and below are no reading (a day's COP before the day's first run): its line runs
+    # unseen there and the tooltip gives a dash. The map's colour step lies at 0.05, not 0: a line along 0 sat on the
+    # step and kept its colour. The pieces must be finite (see sign_colors()) and wide enough for every item this
+    # popup shows, a meter's reading in Wh too: outside them ECharts greys the line
+    c1 = ph["color"]
+    hide = comp("oh-chart-visualmap", {"show": False, "type": "piecewise", "dimension": 1, "seriesIndex": 0, "pieces":
+                f"=props.positive ? [{{min: -1e12, max: 0.05, color: 'rgba(0,0,0,0)'}},{{gt: 0.05, lte: 1e12, "
+                f"color: '{c1}'}}] : [{{min: -1e12, max: 1e12, color: '{c1}'}}]"})
+
+    def single(today):
+        """The one item's course: over the last 24 hours, or with today over the calendar day from midnight with
+        arrows a day each and without the reading before midnight that MainUI would add at its start (a value that
+        starts again at midnight). Two cards, as the chart's period button shows its chartType unevaluated."""
+        one_line = area(title, item, c1, **({"noBoundary": True} if today else {}))
+        # the line takes its colour from the visual map alone: a colour of its own would win over the map's
+        del one_line["config"]["lineStyle"]["color"], one_line["config"]["itemStyle"]
+        out = card("Verlauf", [day_chart([one_line], [value_axis("")], visualMap=[hide])])
+        chart_ = out["slots"]["content"][0]
+        if today:
+            chart_["config"]["chartType"] = "day"
+        chart_["slots"]["tooltip"][0]["config"]["valueFormatter"] = (
+            "=(x) => props.positive && Number(x) <= 0 ? '–' : Number(x).toLocaleString('de-AT') + ' ' + "
+            "p.seriesId.split('#')[2]")
+        out["config"]["visible"] = ("=!props.item2 && (!props.kind || props.kind === 'number') && "
+                                    + ("!!props.today" if today else "!props.today"))
+        return out
+    course, course_today = single(False), single(True)
 
     def course_of(k):
         """Slot k's course: a line, sampled (a meter's phases persist about 15,000 readings a day each), dashed for
@@ -9001,7 +9180,7 @@ def item_popup():
                                                                    "yAxisIndex": 0, "yValue": 0, "mapState": STATE_LABEL})],
                                   tooltip=[comp("oh-chart-tooltip", {"show": True, "confine": True})])])
     band["config"]["visible"] = "=props.kind === 'state'"
-    root = div([heating_curve_card(ph["color2"], ph["color"]), now, course, courses, *stacks, band],
+    root = div([heating_curve_card(ph["color2"], ph["color"]), now, course, course_today, courses, *stacks, band],
                **{"padding": "8px 6px"})
     root["config"]["stylesheet"] = "\n".join([CARD_STYLE, PERIOD_MENU])  # the cards' look; the chart's period menu, out of the layout while closed
     return root
@@ -9112,6 +9291,14 @@ ITEM_POPUP_PARAMS = [
           "lines whose meter signs the direction", "BOOLEAN", default="false"),
     param("scale", "Fitted axis", "Fit the value axis to the values instead of starting it at 0, e.g. for voltages",
           "BOOLEAN", default="false"),
+    param("positive", "Positive only", "Values of 0 and below are no reading: the course leaves them out and the "
+          "tooltip gives a dash, e.g. a day's COP before the day's first run", "BOOLEAN", default="false"),
+    param("today", "Calendar day", "The course over the calendar day from midnight, its arrows a day each, instead "
+          "of the last 24 hours, for a value that starts again at midnight", "BOOLEAN", default="false"),
+    param("ring", "Ring full at", "Show the value beside the icon large in a ring, as a device page's head, the "
+          "ring filled in the colour up to the value / this, e.g. 6 for a COP; empty: the value alone", "DECIMAL"),
+    param("icon", "Icon", "The Material icon in the ring, e.g. eco"),
+    param("caption", "Caption", "Small text over the value beside the ring, e.g. the day the value covers"),
     dict(param("curve", "Heating curve", "A String item holding a learnt heating curve as JSON (rule "
                "heatpump_heating_curve), drawn as a chart on top with item (outdoor) and item2 (setpoint) as the "
                "present point"), context="item")]

@@ -40,7 +40,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 10, 2026, 5:24:26 PM
+timestamp: Oct 17, 2026, 9:55:42 PM
 component: div
 config:
   style:
@@ -71,33 +71,130 @@ slots:
           style:
             display: flex
             align-items: center
-            gap: 10px
+            gap: 18px
             padding-bottom: 4px
         slots:
           default:
-          - component: div
+          - component: svg
             config:
+              viewBox: -34 -34 68 68
+              width: 104
+              height: 104
               style:
-                width: 34px
-                height: 34px
+                display: block
                 flex: 0 0 auto
-                border-radius: 50%
-                display: flex
-                align-items: center
-                justify-content: center
-                background: 'color-mix(in srgb, #e57373 22%, transparent)'
+                overflow: visible
             slots:
               default:
-              - component: oh-icon
+              - component: g
+                config: {}
+                slots:
+                  default:
+                  - component: circle
+                    config:
+                      cx: 0
+                      cy: 0
+                      r: 32.25
+                      style:
+                        fill: 'var(--f7-card-bg-color, #fff)'
+                  - component: circle
+                    config:
+                      cx: 0
+                      cy: 0
+                      r: 29.2
+                      fill: none
+                      stroke: rgba(127, 127, 127, 0.28)
+                      stroke-width: 2.9
+              - component: g
+                config: {}
+                slots:
+                  default:
+                  - component: circle
+                    config:
+                      cx: 0
+                      cy: 0
+                      r: 29.2
+                      fill: none
+                      stroke: '#e57373'
+                      stroke-width: 2.9
+                      visible: =(false) && !(false)
+                    slots:
+                      default:
+                      - component: animate
+                        config:
+                          attributeName: opacity
+                          values: 0.3;1;0.3
+                          dur: 2s
+                          repeatCount: indefinite
+                          visible: =(false) && !(false)
+                      - component: animate
+                        config:
+                          attributeName: stroke-width
+                          values: 2.9;4.5;2.9
+                          dur: 2s
+                          repeatCount: indefinite
+                          visible: =(false) && !(false)
+                      - component: animate
+                        config:
+                          attributeName: r
+                          values: 29.2;30;29.2
+                          dur: 2s
+                          repeatCount: indefinite
+                          visible: =(false) && !(false)
+                  - component: circle
+                    config:
+                      cx: 0
+                      cy: 0
+                      r: 29.2
+                      fill: none
+                      stroke: '#e57373'
+                      stroke-width: 2.9
+                      visible: =(false) && (false)
+                    slots:
+                      default:
+                      - component: animate
+                        config:
+                          attributeName: opacity
+                          values: 0.3;0.06;0.3
+                          dur: 2s
+                          repeatCount: indefinite
+                          visible: =(false) && (false)
+              - component: g
+                config: {}
+                slots:
+                  default:
+                  - component: circle
+                    config:
+                      cx: 0
+                      cy: 0
+                      r: 27.75
+                      style:
+                        fill: 'var(--f7-card-bg-color, #fff)'
+                  - component: circle
+                    config:
+                      cx: 0
+                      cy: 0
+                      r: 27.75
+                      fill: '#e57373'
+                      fill-opacity: '0.12'
+              - component: text
                 config:
-                  icon: material:waves
-                  width: 20
-                  height: 20
+                  x: 0
+                  y: 0
+                  content: waves
+                  fill: '#e57373'
+                  font-size: 30
+                  text-anchor: middle
+                  dominant-baseline: central
+                  style:
+                    font-family: '''Material Icons'''
+                    font-feature-settings: '''liga'''
           - component: div
             config:
               style:
                 display: flex
                 flex-direction: column
+                gap: 2px
                 min-width: '0'
             slots:
               default:
@@ -116,9 +213,6 @@ slots:
                   style:
                     font-size: 12px
                     opacity: '0.7'
-                    white-space: nowrap
-                    overflow: hidden
-                    text-overflow: ellipsis
       - component: widget:pill-slider
         config:
           item: =props.heatpumpLeavingWaterTempOffsetHeating
@@ -243,7 +337,7 @@ slots:
                           style:
                             font-size: 11px
                             font-weight: '600'
-                            padding: 2px 8px
+                            padding: 3px 8px 2px
                             border-radius: 6px
                             white-space: nowrap
                             width: fit-content

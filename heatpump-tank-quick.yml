@@ -58,7 +58,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 14, 2026, 1:29:37 PM
+timestamp: Oct 17, 2026, 9:55:42 PM
 component: div
 config:
   style:
@@ -89,15 +89,15 @@ slots:
           style:
             display: flex
             align-items: center
-            gap: 10px
+            gap: 18px
             padding-bottom: 4px
         slots:
           default:
           - component: svg
             config:
               viewBox: -34.0 -34.0 68 68
-              width: 68
-              height: 68
+              width: 104
+              height: 104
               style:
                 display: block
                 overflow: visible
@@ -597,6 +597,7 @@ slots:
               style:
                 display: flex
                 flex-direction: column
+                gap: 2px
                 min-width: '0'
             slots:
               default:
@@ -615,9 +616,6 @@ slots:
                   style:
                     font-size: 12px
                     opacity: '0.7'
-                    white-space: nowrap
-                    overflow: hidden
-                    text-overflow: ellipsis
       - component: div
         config:
           style:
@@ -756,7 +754,7 @@ slots:
                               style:
                                 font-size: 11px
                                 font-weight: '600'
-                                padding: 2px 8px
+                                padding: 3px 8px 2px
                                 border-radius: 6px
                                 white-space: nowrap
                                 width: fit-content
