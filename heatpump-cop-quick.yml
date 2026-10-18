@@ -70,7 +70,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 17, 2026, 9:55:42 PM
+timestamp: Oct 18, 2026, 2:43:03 AM
 component: div
 config:
   style:
@@ -1291,51 +1291,63 @@ slots:
               gridIndex: 0
               xAxisIndex: 0
               yAxisIndex: 0
-              type: bar
+              type: custom
               item: =props.heatpumpDcopSpace
               aggregationFunction: last
               dimension1: date
               itemStyle:
                 color: '#ffb74d'
-                borderRadius:
-                - 3
-                - 3
-                - 0
-                - 0
+              renderItem: '=(params, api) => params.dataIndexInside === params.dataInsideLength - 1 ? ((pts) => ({type: ''group'',
+                children: [{type: ''polyline'', shape: {points: pts}, style: {fill: ''none'', stroke: ''#ffb74d'', lineWidth:
+                2}}].concat(pts.map((p) => ({type: ''circle'', shape: {cx: p[0], cy: p[1], r: 3}, style: {fill: ''#ffb74d''}})))}))(''
+                ''.repeat(params.dataInsideLength).split('''').map((s, i) => [api.value(0, i), api.value(1, i)]).filter((v)
+                => v[1] > 0).map((v) => api.coord(v))) : null'
+              encode:
+                x: 0
+                y: 1
+              progressive: 0
           - component: oh-aggregate-series
             config:
               name: Hot water
               gridIndex: 0
               xAxisIndex: 0
               yAxisIndex: 0
-              type: bar
+              type: custom
               item: =props.heatpumpDcopDhw
               aggregationFunction: last
               dimension1: date
               itemStyle:
                 color: '#e57373'
-                borderRadius:
-                - 3
-                - 3
-                - 0
-                - 0
+              renderItem: '=(params, api) => params.dataIndexInside === params.dataInsideLength - 1 ? ((pts) => ({type: ''group'',
+                children: [{type: ''polyline'', shape: {points: pts}, style: {fill: ''none'', stroke: ''#e57373'', lineWidth:
+                2}}].concat(pts.map((p) => ({type: ''circle'', shape: {cx: p[0], cy: p[1], r: 3}, style: {fill: ''#e57373''}})))}))(''
+                ''.repeat(params.dataInsideLength).split('''').map((s, i) => [api.value(0, i), api.value(1, i)]).filter((v)
+                => v[1] > 0).map((v) => api.coord(v))) : null'
+              encode:
+                x: 0
+                y: 1
+              progressive: 0
           - component: oh-aggregate-series
             config:
               name: Total
               gridIndex: 0
               xAxisIndex: 0
               yAxisIndex: 0
-              type: line
+              type: custom
               item: =props.heatpumpDcop
               aggregationFunction: last
               dimension1: date
               itemStyle:
                 color: '#66bb6a'
-              symbol: circle
-              symbolSize: 5
-              lineStyle:
-                width: 2
-                color: '#66bb6a'
+              renderItem: '=(params, api) => params.dataIndexInside === params.dataInsideLength - 1 ? ((pts) => ({type: ''group'',
+                children: [{type: ''polyline'', shape: {points: pts}, style: {fill: ''none'', stroke: ''#66bb6a'', lineWidth:
+                2}}].concat(pts.map((p) => ({type: ''circle'', shape: {cx: p[0], cy: p[1], r: 3}, style: {fill: ''#66bb6a''}})))}))(''
+                ''.repeat(params.dataInsideLength).split('''').map((s, i) => [api.value(0, i), api.value(1, i)]).filter((v)
+                => v[1] > 0).map((v) => api.coord(v))) : null'
+              encode:
+                x: 0
+                y: 1
+              progressive: 0
           legend:
           - component: oh-chart-legend
             config:
@@ -1358,9 +1370,14 @@ slots:
                 0 10px 6px; border-bottom: 1px solid; border-bottom-color: inherit">'' + (ps[0].axisType === ''xAxis.time''
                 ? dayjs(ps[0].axisValue).format(''llll'') : ps[0].axisValueLabel) + ''</div>'' + r : '''') + ''</div>'')(ps.filter((p)
                 => [0][p.axisIndex] === g && p.seriesId && (p.seriesId.indexOf(''oh-time-series'') === 0 ? !p.seriesId.split(''#'')[4]
-                : p.seriesId.indexOf(''oh-state-series'') !== 0)).map((p) => p.marker + '' '' + p.seriesName + ''<span style="float:
-                right; margin-left: 20px"><b style="text-align: right;">'' + ((v) => v.toLocaleString(''en-GB'') + '' '' +
-                p.seriesId.split(''#'')[2])(Number(p.value[1])) + ''</b></span><br/>'').join(''''))).join('''') + ''</div>'''
+                : p.seriesId.indexOf(''oh-state-series'') !== 0) && (!(p.seriesName === ''Heating'' || p.seriesName === ''Hot
+                water'' || p.seriesName === ''Total'') || Math.abs(p.value[0] - ps[0].axisValue) <= 960000)).map((p) => p.marker
+                + '' '' + p.seriesName + ''<span style="float: right; margin-left: 20px"><b style="text-align: right;">''
+                + ((v) => p.seriesName === ''Heating'' ? (v > 0 ? v.toLocaleString(''en-GB'', {minimumFractionDigits: 2, maximumFractionDigits:
+                2}) : ''–'') : p.seriesName === ''Hot water'' ? (v > 0 ? v.toLocaleString(''en-GB'', {minimumFractionDigits:
+                2, maximumFractionDigits: 2}) : ''–'') : p.seriesName === ''Total'' ? (v > 0 ? v.toLocaleString(''en-GB'',
+                {minimumFractionDigits: 2, maximumFractionDigits: 2}) : ''–'') : v.toLocaleString(''en-GB'') + '' '' + p.seriesId.split(''#'')[2])(Number(p.value[1]))
+                + ''</b></span><br/>'').join(''''))).join('''') + ''</div>'''
               position: '=(pt, ps, dom, rect, size) => ((T, B) => ((c, left, h) => [((hd, per) => hd && per ? ((w) => ((k)
                 => k === undefined ? 0 : hd.replaceChildren(dayjs().date(1).year(Number(w[1])).month(k).date(Number(hd.getAttribute(''data-head''))).format(''ddd,
                 ll'')))([0,1,2,3,4,5,6,7,8,9,10,11].filter((k) => dayjs().date(1).month(k).format(''MMM'') === w[0])[0]))(per.textContent.trim().split(''

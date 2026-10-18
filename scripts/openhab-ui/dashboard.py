@@ -2850,11 +2850,12 @@ def stacked_bar(title, total, parts, middle=None):
 # the electricity each day's COP is a ratio of: its pill waits for that to be base enough
 COP_BASE = {"espaltherma_dcop": "espaltherma_energy_today", "espaltherma_dcop_space": "espaltherma_energy_space_today",
             "espaltherma_dcop_dhw": "espaltherma_energy_dhw_today"}
-# the value a day's COP fills its ring at, in its tile and its popup, and the icon its popup's ring holds: its part's
-# in cop_row()
+# the value a day's COP fills its ring at, in its tile and its popup
 COP_FULL = 6
-COP_ICON = {"espaltherma_dcop": "eco", "espaltherma_dcop_space": "local_fire_department",
-            "espaltherma_dcop_dhw": "water_drop"}
+# the heat each day's COP is the ratio of, beside its electricity (COP_BASE) in its popup
+COP_HEAT = {"espaltherma_dcop": "espaltherma_heating_energy_today",
+            "espaltherma_dcop_space": "espaltherma_heating_energy_space_today",
+            "espaltherma_dcop_dhw": "espaltherma_heating_energy_dhw_today"}
 
 
 def cop_tile(title, item, color, width="100%", name=None):
@@ -3742,15 +3743,33 @@ def hp_cop_panels():
             ("Außentemperatur", [line("Außen", HPX["outdoor"], "#26a69a")], span_axis("°C"))]
 
 
-def hp_cop_month(total=True):
-    """The day's COPs per day of the month: space heating and hot water as columns, the total, their mix, as a line
-    (total: False leaves it to Wärmepumpe pro Tag)."""
-    return month_chart([daily("Heizung", "espaltherma_dcop_space", SPACE_C,
-                              itemStyle={"color": SPACE_C, "borderRadius": [3, 3, 0, 0]}),
-                        daily("Warmwasser", "espaltherma_dcop_dhw", DHW_C,
-                              itemStyle={"color": DHW_C, "borderRadius": [3, 3, 0, 0]})]
-                       + [daily("Gesamt", "espaltherma_dcop", COP_C, type="line", symbol="circle", symbolSize=5,
-                                lineStyle={"width": 2, "color": COP_C})] * total, "COP")
+# a day's COP in a tooltip, a dash on a day without its part (no heating that day, today before the first run)
+COP_TIP = "(v > 0 ? v.toLocaleString('de-AT', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '–')"
+
+
+def cop_day_line(name, item, color, **extra):
+    """A day's COP per day of the month as a line that leaves out the days at 0, a day without its part (no heating
+    that day, today before its first run), where a plain line plunged to 0 (user, 2026-10-18: lines instead of
+    columns): a custom series that draws the whole line at its last day through the days above 0 only, a dot on each,
+    so such a day shows as a missing dot (MainUI's expressions know no loop: the points come from a string of as many
+    spaces). Its tooltip wants COP_TIP among its chart's texts."""
+    pts = ("' '.repeat(params.dataInsideLength).split('').map((s, i) => [api.value(0, i), api.value(1, i)])"
+           ".filter((v) => v[1] > 0).map((v) => api.coord(v))")
+    render = (f"=(params, api) => params.dataIndexInside === params.dataInsideLength - 1 ? ((pts) => "
+              f"({{type: 'group', children: [{{type: 'polyline', shape: {{points: pts}}, style: {{fill: 'none', "
+              f"stroke: '{color}', lineWidth: 2}}}}].concat(pts.map((p) => ({{type: 'circle', shape: "
+              f"{{cx: p[0], cy: p[1], r: 3}}, style: {{fill: '{color}'}}}})))}}))({pts}) : null")
+    return daily(name, item, color, type="custom", renderItem=render, encode={"x": 0, "y": 1}, progressive=0, **extra)
+
+
+def hp_cop_month(total=True, height="270px"):
+    """The day's COPs per day of the month as lines (cop_day_line()): space heating, hot water and the total, their
+    mix (total: False leaves it to Wärmepumpe pro Tag)."""
+    chart_ = month_chart([cop_day_line("Heizung", "espaltherma_dcop_space", SPACE_C),
+                          cop_day_line("Warmwasser", "espaltherma_dcop_dhw", DHW_C)]
+                         + [cop_day_line("Gesamt", "espaltherma_dcop", COP_C)] * total, "COP", height=height)
+    chart_["slots"]["tooltip"][0]["config"]["texts"] = {n: COP_TIP for n in ("Heizung", "Warmwasser", "Gesamt")}
+    return chart_
 
 
 def hp_split_charts(part_power, part_energy, parts):
@@ -3814,7 +3833,7 @@ def hp_refrigerant_quick():
     target = "espaltherma_target_discharge_temp"
     return quick("material:severe_cold", "Kältemittel", REFRIGERANT, state,
                  [quick_values(setpoint_tile("Heißgas gegen Soll", HPX["hot_gas"], num(target), dash(disp(target)),
-                                             0, 100, "#ba68c8", tol=3, valid=f"{num(target)} > 0")),
+                                             0, 100, "#ba68c8", tol=3, valid=f"{num(target)} > 0", set_item=target)),
                   quick_stack(*hp_refrigerant_panels())], "heatpump")
 
 
@@ -3826,7 +3845,7 @@ def hp_circuit_quick():
                  [lw_offset(row=True),
                   quick_values(spread_tile("Vorlauf → Rücklauf", HPX["supply"], HPX["return"], "Vorlauf", "Rücklauf"),
                                setpoint_tile("Vorlauf gegen Soll", HPX["supply"], num(lws), dash(disp(lws)), 20, 50,
-                                             "#e57373")),
+                                             "#e57373", set_item=lws)),
                   quick_stack(*hp_circuit_panels())], "heatpump")
 
 
@@ -5690,9 +5709,13 @@ def item_modal(item, title, color=None, second=None):
     if item in COP_BASE:
         # a day's COP stands at 0 from midnight until the heat pump's first run of the day: no COP yet, not one of 0;
         # its course is the calendar day's, as it starts again at midnight (user, 2026-10-15: "Tagesverlauf"); its
-        # value beside its icon large in a ring filled as its tile's, as the household appliances' popups show their
-        # machines (user, 2026-10-17: "einheitlich")
-        props.update({"positive": True, "today": True, "ring": COP_FULL, "icon": COP_ICON[item], "caption": "heute"})
+        # value large inside a ring filled as its tile's, as the household appliances' popups show their machines
+        # (user, 2026-10-17: "einheitlich"), beside it the heat and electricity it is the ratio of and yesterday's
+        # whole day (user, 2026-10-17: "rechts daneben bisschen sinnvolle Informationen")
+        track_history(item, c=True)
+        props.update({"positive": True, "today": True, "ring": COP_FULL, "caption": "heute",
+                      "fact1": COP_HEAT[item], "factName1": "Wärme", "fact2": COP_BASE[item], "factName2": "Strom",
+                      "history": TILE_HISTORY})
     if second:
         props.update({"item2": second["item2"], "name": second["name"], "name2": second["name2"],
                       "color": second.get("color") or color or POPUP_COLOR,
@@ -6409,9 +6432,12 @@ def rating_tile(title, item, scale, expr=None, value_expr=None, color=None, spar
 # ---------------------------------------------------------------- 02 · setpoint bar and normal band
 
 
-def setpoint_tile(title, item, set_expr, set_text, lo, hi, color, tol=1, unit="K", digits=1, value_expr=None, valid=None):
+def setpoint_tile(title, item, set_expr, set_text, lo, hi, color, tol=1, unit="K", digits=1, value_expr=None, valid=None,
+                  set_item=None):
     """The actual value as a bar, the setpoint as a tick, the difference beside; past the setpoint the bar pales.
-    valid: when the setpoint counts (else the bar alone, 'kein Soll')."""
+    valid: when the setpoint counts (else the bar alone, 'kein Soll'). set_item: the setpoint's item, which a tap shows
+    beside the actual value and as a dashed line under its course (user, 2026-10-18: a popup of the actual value alone
+    said nothing about the comparison)."""
     v, s_ = num(item), set_expr
     ok = valid or "true"
     d = f"({v} - {s_})"
@@ -6427,8 +6453,11 @@ def setpoint_tile(title, item, set_expr, set_text, lo, hi, color, tol=1, unit="K
                 **{"display": "flex", "justify-content": "space-between", **VT_SUB, "margin-top": "6px"})
     delta = label(f"={vt_signed(d, digits, unit)}", visible=f"={ok}",
                   **{"font-size": "14px", "font-weight": "700", "color": "=" + cls_color(cls), "white-space": "nowrap"})
+    # on an axis fitted to the two: from 0, a room's 22.7 against 23 °C were two flat lines on top of each other
+    second = {"item2": set_item, "name": title.replace(" gegen Soll", ""), "name2": "Soll", "color": color,
+              "color2": color, "dashed2": True, "scale": True} if set_item else None
     return vt_tile([vt_title(title), vt_value(value_expr or f"={dash(disp(item))}", None, delta), bars, scale],
-                item, title, color)
+                item, title, color, second=second)
 
 
 def band_bar(title, item, lo, hi, ok_lo, ok_hi, color, nominal=None, ok_text="im Bereich", value_expr=None):
@@ -6962,7 +6991,10 @@ def tank_tile(title, item, set_item):
     texts = div([vt_title(title), vt_value(f"={dash(disp(item))}"),
                  label(f"='Soll ' + {dash(disp(set_item))} + ' · ' + {vt_signed(d, 1, 'K')}", **VT_SUB),
                  div([word], **{"margin-top": "6px"})], **{"min-width": "0"})
-    return vt_tile([div([drawing, texts], **{"display": "flex", "align-items": "center", "gap": "14px"})], item, title)
+    # a tap shows the setpoint beside the temperature and dashed under its course, as setpoint_tile()'s
+    return vt_tile([div([drawing, texts], **{"display": "flex", "align-items": "center", "gap": "14px"})], item, title,
+                   DHW_C, second={"item2": set_item, "name": "Temperatur", "name2": "Soll", "color": DHW_C,
+                                  "color2": DHW_C, "dashed2": True, "scale": True})
 
 
 def levels_tile(title, item, names, color, sub=None, value_expr=None):
@@ -7876,7 +7908,7 @@ VALUE_RENDER = {
     "faikout_perfera_outdoor_temperature": vt_r(lambda t, i: inout_tile("Raum und außen", "faikout_perfera_temperature", i)),
     "faikout_perfera_temperature_setpoint": vt_r(lambda t, i: setpoint_tile("Raum gegen Soll", "faikout_perfera_temperature",
                                                                    num(i), dash(disp(i)), 16, 30, AC_BLUE,
-                                                                   tol=0.5)),
+                                                                   tol=0.5, set_item=i)),
     "faikout_perfera_compressor_frequency": vt_r(lambda t, i: spark_tile(t, i, "#78909c", "Hz", 0, span=20)),
     # the liquid line and the indoor fan with their day's course too, as the compressor (user, 2026-10-06)
     "faikout_perfera_liquid_temperature": vt_r(lambda t, i: spark_tile(t, i, "#29b6f6", "K", 1, span=4)),
@@ -7917,11 +7949,11 @@ VALUE_RENDER = {
                                                    HPX["supply"]),
     HPX["return"]: vt_r(lambda t, i: spark_tile(t, i, "#64b5f6", "K", 1, span=4)),
     "espaltherma_leaving_water_setpoint": vt_r(lambda t, i: setpoint_tile("Vorlauf gegen Soll", HPX["supply"], num(i),
-                                                                 dash(disp(i)), 20, 50, "#e57373")),
+                                                                 dash(disp(i)), 20, 50, "#e57373", set_item=i)),
     "espaltherma_room_temp_setpoint": vt_r(lambda t, i: setpoint_tile("Raum gegen Soll", HPX["indoor"], num(i), dash(disp(i)),
-                                                             18, 26, "#ff8a65", tol=0.5)),
+                                                             18, 26, "#ff8a65", tol=0.5, set_item=i)),
     HPX["tank_set"]: vt_r(lambda t, i: setpoint_tile("Warmwasser gegen Soll", HPX["tank"], num(i), dash(disp(i)), 20, 60,
-                                            "#ef5350", tol=2)),
+                                            "#ef5350", tol=2, set_item=i)),
     # the target spread in K as the measured one: its item is a temperature in °C (as K, openHAB would convert it as an
     # absolute temperature), whose formatted state read "3 °C" beside "0,9 K"
     "espaltherma_target_delta_t_heating": vt_r(lambda t, i: pair_tile("Spreizung Soll · Ist", i, None, "Soll", "Ist",
@@ -7930,7 +7962,7 @@ VALUE_RENDER = {
                                                               value_unit=" K")),
     "espaltherma_target_discharge_temp": vt_r(lambda t, i: setpoint_tile("Heißgas gegen Soll", HPX["hot_gas"], num(i),
                                                                 dash(disp(i)), 0, 100, "#ba68c8", tol=3,
-                                                                valid=f"{num(i)} > 0"),
+                                                                valid=f"{num(i)} > 0", set_item=i),
                                            HPX["hot_gas"]),
     HPX["pressure"]: vt_r(lambda t, i: spark_tile(t, i, "#ba68c8", "bar", 1, span=2)),
     "espaltherma_error_code": vt_r(lambda t, i: ok_tile(t, i, f"['0', '', 'NULL', 'UNDEF'].includes(items.{i}.state)")),
@@ -8097,23 +8129,23 @@ def miele_page(uid, title, front, p, plug, extra, icon, color):
 # ---- the individual devices
 
 
-# Heizbetrieb heute as high as Temperaturen heute over Kältemittel heute beside it (two cards of 420 px charts)
-HP_RUN_H, HP_SIDE_H = 930, 420
+# Heizbetrieb heute and Temperaturen heute beside it as high
+HP_DAY_H = 700
 
 
 def hp_run_panels():
-    """The heat pump's day on the page, every value once (user, 2026-10-07): the valve and the defrosts as bands,
-    electricity against heat, whose gap the COP under them puts in a number, the compressor, the water's flow and the
-    two electric heaters."""
-    return hp_bands() + [
+    """The heat pump's day on the page, every value once (user, 2026-10-07): the valve, the defrosts and the two
+    electric heaters as bands (user, 2026-10-18: their power's panel stood empty on most days), electricity against
+    heat, whose gap the COP under them puts in a number, and the compressor; the water's flow is left to its tile."""
+    heaters = [band_panel("Heizstab", HPX["buh1"], [("ON", "An", HEATER_RED)], "Aus",
+                          extra=[on_off_series("Heizstab", HPX["buh_power"], HEATER_RED)]),
+               band_panel("Zusatzheizung", HPX["bsh"], [("ON", "An", HP_ORANGE)], "Aus",
+                          extra=[on_off_series("Zusatzheizung", HPX["bsh_power"], HP_ORANGE)])]
+    return hp_bands() + heaters + [
         ([("Strom", ELECTRIC_C), ("Wärme", "#e53935")],
          [area("Wärme", HPX["heat"], "#e53935"), area("Strom", HPX["power"], ELECTRIC_C)], value_axis("W")),
         ("COP", [area("COP", HPX["cop"], COP_C)], value_axis("COP", min=0)),
-        ("Verdichter", [line("Verdichter", HPX["hz"], "#78909c")], value_axis("Hz", min=0)),
-        ("Durchfluss", [area("Durchfluss", HPX["flow"], "#64b5f6")], value_axis("l/min", min=0)),
-        ([("Heizstab", HEATER_RED), ("Zusatzheizung", HP_ORANGE)],
-         [area("Heizstab", HPX["buh_power"], HEATER_RED), area("Zusatzheizung", HPX["bsh_power"], HP_ORANGE)],
-         value_axis("W", min=0))]
+        ("Verdichter", [line("Verdichter", HPX["hz"], "#78909c")], value_axis("Hz", min=0))]
 
 
 def hp_temp_panels():
@@ -8131,8 +8163,132 @@ def hp_temp_panels():
              span_axis("°C"))]
 
 
+HP_ERROR = "espaltherma_error_code"
+HP_NO_ERROR = f"['0', '', 'NULL', 'UNDEF'].includes(items.{HP_ERROR}.state)"
+hp_on = lambda item: f"items.{item}.state === 'ON'"
+hp_kw = lambda item: fixed(f"{num(item)} / 1000", 1) + " + ' kW'"
+# what the head of the heat pump's page says only while it happens, as a chip beside the valve's purpose (user,
+# 2026-10-18: the cards of the units' operation words and modes made the page overloaded): (text, while, colour)
+HP_SPECIAL = [("'Abtauen'", hp_on(HPX["defrost"]), "#4fc3f7"),
+              (f"'Heizstab ' + {hp_kw(HPX['buh_power'])}", f"{num(HPX['buh_power'])} > 0", HEATER_RED),
+              (f"'Zusatzheizung ' + {hp_kw(HPX['bsh_power'])}", f"{num(HPX['bsh_power'])} > 0", HP_ORANGE),
+              (f"'Taktschutz −' + {fixed(num('heatpump_cycle_lock'), 0)} + ' K'", f"{num('heatpump_cycle_lock')} > 0",
+               "#78909c"),
+              (f"'Fehler ' + items.{HP_ERROR}.state", f"!{HP_NO_ERROR}", "#e53935"),
+              ("'Flüstermodus'", hp_on("espaltherma_silent_mode"), "#7e57c2"),
+              ("'Geräuscharm'", hp_on("espaltherma_low_noise_control"), "#7e57c2"),
+              ("'Frostschutz'", hp_on("espaltherma_freeze_protection"), "#29b6f6"),
+              ("'Notbetrieb'", hp_on("espaltherma_emergency_active"), "#e53935"),
+              ("'System aus'", hp_on("espaltherma_system_off"), "#78909c"),
+              ("'Ölrückführung'", hp_on("espaltherma_oil_return_operation"), "#78909c"),
+              ("'Druckausgleich'", hp_on("espaltherma_pressure_equalizing_operation"), "#78909c")]
+# every mode of the heat pump, in Diagnose; soft hyphens where a name's one long word met its pill two abreast on a
+# phone
+HP_MODES = [("Umwälzpumpe", HPX["pump"]), ("Heizstab Stufe 1", HPX["buh1"]), ("Heizstab Stufe 2", HPX["buh2"]),
+            ("Warmwasser-Boost", "espaltherma_powerful_dhw_operation"),
+            ("Zusatz­heizung Speicher", HPX["bsh"]), ("Heizbetrieb", "espaltherma_space_heating_operation"),
+            ("Flüstermodus", "espaltherma_silent_mode"),
+            ("Speicher Komfort­modus", "espaltherma_storage_comfort_mode"),
+            ("Speicher Eco-Modus", "espaltherma_storage_eco_mode"), ("Nachheizen", "espaltherma_reheat"),
+            ("System aus", "espaltherma_system_off"), ("Thermostat­schalter", "espaltherma_thermostat_switch"),
+            ("Frostschutz", "espaltherma_freeze_protection"),
+            ("Thermoschutz Heizstab", "espaltherma_thermal_protector_buh"),
+            ("Thermoschutz Zusatz­heizung", "espaltherma_thermal_protector_bsh"),
+            ("Notbetrieb", "espaltherma_emergency_active"), ("Abtauen", HPX["defrost"]),
+            ("Geräusch­armer Betrieb", "espaltherma_low_noise_control"),
+            ("Anforderungs­signal", "espaltherma_demand_signal"),
+            ("Neustart-Standby", "espaltherma_restart_standby"),
+            ("Anlauf­steuerung", "espaltherma_startup_control"),
+            ("Öl­rück­führung", "espaltherma_oil_return_operation"),
+            ("Druck­ausgleich", "espaltherma_pressure_equalizing_operation")]
+
+
+def hp_head():
+    """The head of the heat pump's page: its node from the energy flow large, its operation badge on the ring, the
+    tank's charge as the arc filling towards its expected end; its power, the valve's purpose and HP_SPECIAL as
+    chips; while the tank charges the time left, the end large and the charge as a bar (user, 2026-10-05: as
+    Waschmaschine 1)."""
+    icon = node_icon("heat-pump-split", HP_ORANGE, flowing(num(HP), HP_FLOW), share=DHW_PROGRESS,
+                     badges=hp_mode_badges(0, 0), power=num(HP), frequency=num(HPX["hz"]))
+    specials = []
+    for text, while_, color in HP_SPECIAL:
+        specials.append(chip(f"={text}", color))
+        specials[-1]["config"]["visible"] = f"={while_}"
+    row_ = chips(chip(f"={disp(HPX['valve'])}", "#ffa726"),
+                 timer_chip(f"={hm(DHW_LEFT)}", f"={DHW_ETA_OK}", tint=HP_ORANGE), *specials)
+    row_["config"]["style"]["justify-content"] = "flex-start"
+    since = f"Math.max(0, dayjs().diff(dayjs(items.{DHW_SINCE}.state), 'minute'))"
+    return [hero("material:heat_pump", "#fb8c00", "Elektrische Leistung", f"={disp(HPX['power'])}",
+                 [row_, label(f"='fertig um ' + {DHW_DONE}", f"={DHW_ETA_OK}", **{"font-size": "22px",
+                                                                               "font-weight": "700"})],
+                 picture=icon),
+            bar(f"100 * {DHW_PROGRESS}", HP_ORANGE, f"={hm(since)} + ' vergangen'", f"={hm(DHW_LEFT)} + ' übrig'",
+                f"={DHW_ETA_OK}")]
+
+
+def hp_circuit_tile():
+    """The heating circuit in one tile (user, 2026-10-18): leaving and inlet water with their spread between them, as
+    spread_tile(), the leaving water against its setpoint in the head, the setpoint, the target spread, the flow and
+    the pump's signal under the pipe; a tap shows the leaving water, its setpoint dashed and the inlet water."""
+    sup, ret, setp = HPX["supply"], HPX["return"], "espaltherma_leaving_water_setpoint"
+    d, off = f"({num(sup)} - {num(ret)})", f"({num(sup)} - {num(setp)})"
+    side = lambda name, item, color, align: div([label(name, **{**VT_SUB, "text-align": align}),
+                                                 vt_value(f"={fixed(num(item), 1)} + ' °C'", color, ident=True,
+                                                          **{"text-align": align})], **{"min-width": "0"})
+    delta = vt_chip(f"='ΔT ' + {fixed(d, 1)} + ' K'")
+    delta["config"]["style"].update({"justify-self": "center", "margin-bottom": "4px"})
+    delta["config"]["class"] = "spread-delta"
+    row_ = div([side("Vorlauf", sup, SUPPLY, "left"), delta, side("Rücklauf", ret, RETURN, "right")],
+               **{"display": "grid", "grid-template-columns": "1fr auto 1fr", "align-items": "end", "gap": "4px 8px",
+                  "margin-top": "4px"})
+    row_["config"]["class"] = "spread-row"
+    narrow = div([row_], **{"container-type": "inline-size"})
+    narrow["config"]["stylesheet"] = (
+        "@container (max-width: 235px) { .spread-row { grid-template-columns: 1fr 1fr !important; }\n"
+        "  .spread-delta { grid-column: 1 / -1; grid-row: 2; margin: 0 !important; } }")
+    pipe = div([vt_icon("chevron_right", 12) for _ in range(3)],
+               **{"display": "flex", "justify-content": "space-around", "align-items": "center", "color": "#ffffff",
+                  "height": "10px", "border-radius": "5px", "margin-top": "8px", "overflow": "hidden",
+                  "background": f"linear-gradient(90deg, {SUPPLY}, {RETURN})"})
+    head = vt_head("Heizkreis", vt_chip(f"={vt_signed(off, 1, 'K')} + ' zum Soll'",
+                                        f"(Math.abs({off}) <= 1 ? 'good' : 'warn')"))
+    lines = [label(f"='Vorlauf-Soll ' + {fixed(num(setp), 1)} + ' °C · ΔT-Soll ' + "
+                   f"{fixed(num('espaltherma_target_delta_t_heating'), 1)} + ' K'", **{**VT_SUB, "margin-top": "8px"}),
+             label(f"='Durchfluss ' + {dash(disp(HPX['flow']))} + ' · Pumpe ' + "
+                   f"{dash(disp('espaltherma_water_pump_signal'))}", **{**VT_SUB, "margin-top": "2px"})]
+    return vt_tile([head, narrow, pipe, *lines], sup, "Heizkreis",
+                   second={"item2": setp, "name": "Vorlauf", "name2": "Soll", "color": SUPPLY, "color2": SUPPLY,
+                           "dashed2": True, "item3": ret, "name3": "Rücklauf", "color3": RETURN, "scale": True})
+
+
+def plain_tile(title, item):
+    """A value as it is, without its renderer's form (a course a chart on the same page draws already)."""
+    return vt_tile([vt_head(title), vt_value(f"={dash(disp(item))}")], item, title)
+
+
+def mode_tile(title, item):
+    """status_tile() whose name wraps instead of being cut, for two abreast on a phone."""
+    t = status_tile(title, item)
+    t["slots"]["default"][0]["config"]["style"].update({"white-space": "normal", "overflow": "visible",
+                                                         "line-height": "1.25"})
+    return t
+
+
+def two_on_phone(grid, least):
+    """A grid of tiles two abreast on a phone; on a wider screen as wide as least px each, as many as fit."""
+    grid["config"]["style"]["grid-template-columns"] = (f"={NARROW} ? 'repeat(2, minmax(0, 1fr))' : "
+                                                        f"'repeat(auto-fill, minmax({least}px, 1fr))'")
+    return grid
+
 
 def heatpump_blocks():
+    """The heat pump's page (user, 2026-10-18, from the proposal page: "noch sehr überladen"): every value once.
+    Jetzt is the present, actual against setpoint: the heating circuit in one tile, the tank, the room, outdoors with
+    both sensors, the compressor, the water pressure and the heating curve; Heute the day's electricity and heat
+    against yesterday's, by purpose, and its COPs. Under them the same per day of the month, then the day's courses,
+    then Diagnose for when something seems off: the refrigerant, the units' operation words, the cycle guard, the
+    error code, the leaving water before the backup heater, the second setpoint, every mode and the refrigerant's
+    day; the Shelly EM at the foot."""
     P = HPX
     controls = controls_box(
         smart_grid_section(row=True),
@@ -8140,105 +8296,67 @@ def heatpump_blocks():
         dhw_setpoint(row=True),
         dhw_boost(),
         lw_offset(row=True))
-    # its node from the energy flow large, its operation badge on the ring, the tank's charge as the arc filling
-    # towards its expected end; while the tank charges the time left, the end large and the charge as a bar
-    # (user, 2026-10-05: as Waschmaschine 1)
-    since = f"Math.max(0, dayjs().diff(dayjs(items.{DHW_SINCE}.state), 'minute'))"
-    icon = node_icon("heat-pump-split", HP_ORANGE, flowing(num(HP), HP_FLOW), share=DHW_PROGRESS,
-                     badges=hp_mode_badges(0, 0), power=num(HP), frequency=num(P["hz"]))
-    now = [hero("material:heat_pump", "#fb8c00", "Elektrische Leistung", f"={disp(P['power'])}",
-                [chips(chip(f"={disp(P['valve'])}", "#ffa726"),
-                       timer_chip(f"={hm(DHW_LEFT)}", f"={DHW_ETA_OK}", tint=HP_ORANGE)),
-                 label(f"='fertig um ' + {DHW_DONE}", f"={DHW_ETA_OK}", **{"font-size": "22px", "font-weight": "700"})],
-                picture=icon),
-           bar(f"100 * {DHW_PROGRESS}", HP_ORANGE, f"={hm(since)} + ' vergangen'", f"={hm(DHW_LEFT)} + ' übrig'",
-               f"={DHW_ETA_OK}"),
-           value_grid([vtile("Heizleistung", P["heat"], color="#e53935"),
-                      vtile("COP", P["cop"], f"={num(P['cop'])} > 0 ? {fixed(num(P['cop']), 2)} : '–'"),
-                      vtile("Vorlauf nach Heizstab", P["supply"]), vtile("Rücklauf", P["return"]),
-                      vtile("Warmwasser", P["tank"]), vtile("Außentemperatur", P["outdoor"]),
-                      vtile("Verdichterfrequenz", P["hz"]), vtile("Inverter Strom", "espaltherma_inv_primary_current"),
-                      vtile("Durchfluss", P["flow"]), vtile("Umwälzpumpe Signal", "espaltherma_water_pump_signal"),
-                      vtile("Wasserdruck", "espaltherma_water_pressure")])]
+    now = hp_head() + [value_grid([
+        vtile("Heizleistung", P["heat"], color="#e53935"),  # Strom → Wärme jetzt, only while it runs
+        hp_circuit_tile(),
+        vtile("Warmwasser", P["tank"]),  # the tank against its setpoint
+        vtile("Raum Sollwert", "espaltherma_room_temp_setpoint"),  # Raum gegen Soll
+        pair_tile("Außen", P["outdoor"], "espaltherma_outdoor_air_temp", "Außentemperatur", "Außenluft", digits=1,
+                  unit="K", a_color="#26a69a", b_color="#90a4ae"),
+        ring_tile("Verdichter", P["hz"], "#fb8c00", pct_expr=f"{num(P['hz'])} / {HZ_FULL} * 100",
+                  sub=f"='von {HZ_FULL} Hz · Inverter ' + {dash(disp('espaltherma_inv_primary_current'))}"),
+        vtile("Wasserdruck", "espaltherma_water_pressure"),
+        # the heating curve learnt from the last year's heating, with its input and output now: the outdoor mean it
+        # works with, the leaving water setpoint it makes of it (user, 2026-10-09)
+        heating_curve_tile("Heizkurve", P["outdoor_avg"], "espaltherma_leaving_water_setpoint",
+                           f"Außen {HP_AVG_NAME}", "Vorlauf-Soll", "#26a69a", SUPPLY)])]
+    # the day's two flows are gone: they repeated these tiles' numbers (user, 2026-10-18)
     today = value_grid([vtile("Elektrisch heute", "espaltherma_energy_today"),
-                       vtile("Heizung", "espaltherma_energy_space_today"),
-                       vtile("Warmwasser", "espaltherma_energy_dhw_today"),
-                       vtile("Standby", "espaltherma_energy_standby_today"),
-                       vtile("Wärme heute", "espaltherma_heating_energy_today", color="#e53935"),
-                       vtile("Wärme Heizung", "espaltherma_heating_energy_space_today"),
-                       vtile("Wärme Warmwasser", "espaltherma_heating_energy_dhw_today"),
-                       vtile("Tages-COP", "espaltherma_dcop"), vtile("Tages-COP Heizung", "espaltherma_dcop_space"),
-                       vtile("Tages-COP Warmwasser", "espaltherma_dcop_dhw")])
-    split = value_grid([vtile("Elektrisch Heizung", "espaltherma_electrical_power_space"),
-                       vtile("Elektrisch Warmwasser", "espaltherma_electrical_power_dhw"),
-                       vtile("Elektrisch Standby", "espaltherma_electrical_power_standby"),
-                       vtile("Heizleistung Heizung", "espaltherma_heating_power_space"),
-                       vtile("Heizleistung Warmwasser", "espaltherma_heating_power_dhw"),
-                       vtile("Heizleistung vor Heizstab", "espaltherma_heating_power_before_buh"),
-                       vtile("Heizleistung nach Heizstab", "espaltherma_heating_power_after_buh"),
-                       vtile("COP Heizung", "espaltherma_cop_space"), vtile("COP Warmwasser", "espaltherma_cop_dhw")])
-    temps = value_grid([vtile("Raumtemperatur", P["indoor"]), vtile("Außenluft", "espaltherma_outdoor_air_temp"),
-                       vtile("Außentemperatur", P["outdoor"]), vtile("Warmwasser", P["tank"]),
-                       vtile("Vorlauf vor Heizstab", "espaltherma_leaving_water_temp_before_buh"),
-                       vtile("Vorlauf nach Heizstab", P["supply"]), vtile("Rücklauf", P["return"])])
-    # the heating curve learnt from the last year's heating, with its input and output now: the outdoor mean it works
-    # with, the leaving water setpoint it makes of it (user, 2026-10-09)
-    setpoints = value_grid([heating_curve_tile("Heizkurve", P["outdoor_avg"], "espaltherma_leaving_water_setpoint",
-                                               f"Außen {HP_AVG_NAME}", "Vorlauf-Soll", "#26a69a", SUPPLY),
-                           vtile("Vorlauf Sollwert", "espaltherma_leaving_water_setpoint"),
-                           vtile("Vorlauf Sollwert (Zusatz)", "espaltherma_leaving_water_setpoint_add"),
-                           vtile("Raum Sollwert", "espaltherma_room_temp_setpoint"),
-                           vtile("Warmwasser Sollwert", P["tank_set"]),
-                           vtile("Soll-Spreizung Heizen", "espaltherma_target_delta_t_heating")])
-    modes = status_grid([status_tile(t, i) for t, i in [
-        ("Umwälzpumpe", P["pump"]), ("Heizstab Stufe 1", P["buh1"]), ("Heizstab Stufe 2", P["buh2"]),
-        ("Warmwasser-Boost", "espaltherma_powerful_dhw_operation"), ("Zusatzheizung Speicher", P["bsh"]),
-        ("Heizbetrieb", "espaltherma_space_heating_operation"), ("Flüstermodus", "espaltherma_silent_mode"),
-        ("Speicher Komfortmodus", "espaltherma_storage_comfort_mode"), ("Speicher Eco-Modus", "espaltherma_storage_eco_mode"),
-        ("Nachheizen", "espaltherma_reheat"), ("System aus", "espaltherma_system_off"),
-        ("Thermostatschalter", "espaltherma_thermostat_switch"), ("Frostschutz", "espaltherma_freeze_protection"),
-        ("Thermoschutz Heizstab", "espaltherma_thermal_protector_buh"),
-        ("Thermoschutz Zusatzheizung", "espaltherma_thermal_protector_bsh"), ("Notbetrieb", "espaltherma_emergency_active"),
-        ("Abtauen", P["defrost"]), ("Geräuscharmer Betrieb", "espaltherma_low_noise_control"),
-        ("Anforderungssignal", "espaltherma_demand_signal"), ("Neustart-Standby", "espaltherma_restart_standby"),
-        ("Anlaufsteuerung", "espaltherma_startup_control"), ("Ölrückführung", "espaltherma_oil_return_operation"),
-        ("Druckausgleich", "espaltherma_pressure_equalizing_operation")]])
-    refrigerant = value_grid([vtile("Wärmetauscher Mitte", "espaltherma_heat_exchanger_mid_temp"),
-                             vtile("Kältemittel flüssig", "espaltherma_refrig_temp_liquid_side"),
-                             vtile("Soll-Heißgas", "espaltherma_target_discharge_temp"),
-                             vtile("Heißgas", "espaltherma_discharge_pipe_temp"),
-                             vtile("Kältemitteldruck", "espaltherma_refrigerant_pressure_sensor"),
-                             vtile("Drucksensor Temperatur", "espaltherma_pressure_sensor_temp")])
-    operation = value_grid([vtile("Außengerät Betrieb", "espaltherma_operation_mode"),
-                           vtile("Innengerät Betrieb", "espaltherma_i_u_operation_mode"),
-                           vtile("3-Wege-Ventil", P["valve"]), vtile("Taktschutz", "heatpump_cycle_lock"),
-                           vtile("Fehlercode", "espaltherma_error_code")])
+                        vtile("Heizung", "espaltherma_energy_space_today"),
+                        vtile("Warmwasser", "espaltherma_energy_dhw_today"),
+                        vtile("Standby", "espaltherma_energy_standby_today"),
+                        vtile("Wärme heute", "espaltherma_heating_energy_today", color="#e53935"),
+                        vtile("Wärme Heizung", "espaltherma_heating_energy_space_today"),
+                        vtile("Wärme Warmwasser", "espaltherma_heating_energy_dhw_today"),
+                        vt_tile([vt_head("COP heute"),
+                                 cop_row("espaltherma_dcop", "espaltherma_dcop_space", "espaltherma_dcop_dhw")],
+                                "espaltherma_dcop", "Tages-COP", wide=True)])
+    before = "espaltherma_leaving_water_temp_before_buh"
+    checks = value_grid([
+        plain_tile("Wärmetauscher Mitte", "espaltherma_heat_exchanger_mid_temp"),
+        plain_tile("Kältemittel flüssig", "espaltherma_refrig_temp_liquid_side"),
+        vtile("Soll-Heißgas", "espaltherma_target_discharge_temp"),  # Heißgas gegen Soll
+        plain_tile("Kältemitteldruck", P["pressure"]),
+        plain_tile("Drucksensor-Temp.", "espaltherma_pressure_sensor_temp"),
+        # the leaving water before and after the backup heater, what it adds as the chip; short titles, as two
+        # abreast on a phone cut the longer ones
+        pair_tile("Heizstab", before, P["supply"], "Vorlauf vor", "nach", digits=1, unit="K", a_color="#ffb74d",
+                  b_color=SUPPLY, delta_text=vt_signed(f"{num(P['supply'])} - {num(before)}", 1, "K")),
+        plain_tile("Vorlauf-Soll Zusatz", "espaltherma_leaving_water_setpoint_add"),
+        plain_tile("Außengerät Betrieb", "espaltherma_operation_mode"),
+        plain_tile("Innengerät Betrieb", "espaltherma_i_u_operation_mode"),
+        vtile("Taktschutz", "heatpump_cycle_lock"),
+        vtile("Fehler", HP_ERROR)])
+    sub = lambda text: label(text, **{"font-size": "13px", "font-weight": "600", "opacity": "0.6",
+                                      "padding": "8px 16px 4px"})
+    diagnose = [two_on_phone(checks, 220), sub("Modi"),
+                two_on_phone(status_grid([mode_tile(t, i) for t, i in HP_MODES]), 210), sub("Kältemittel heute"),
+                stacked_chart([pn for pn in hp_refrigerant_panels() if pn[0] != "Wärmetauscher"], 420)]
     plug, _, _, electric = plug_refs("heatpump", "material:heat_pump", "#fb8c00", title="Shelly EM",
-                                            kind="heat-pump-split", active=flowing(num(HP), HP_FLOW),
-                                            frequency=num(P["hz"]))
-    # the cards of values on top, the full charts below, the cards paired by height so none stands with much empty
-    # space (user, 2026-10-06): Jetzt beside the controls over the operation, today's energies with their conversion
-    # beside the split over the refrigerant, temperatures beside setpoints, the Shelly EM beside its electrical
-    # values (user, 2026-10-08: they belong together), the modes
-    return [two(stack(card("Steuerung", [controls]), card("Betrieb", [operation])), card("Jetzt", now)),
-            two(card("Energie heute", [today]),
-                stack(card("Leistung aufgeteilt", [split]), card("Kältemittel", [refrigerant]))),
-            two(card("Temperaturen", [temps]), card("Sollwerte", [setpoints])),
-            two(plug, electric),
-            one(card("Modi", [modes])),
-            # few charts, every value once (user, 2026-10-07): how it ran on one time pointer beside the temperatures
-            # over the refrigerant; electricity and COP by purpose per day, as columns, since a day without heating
-            # has a COP of 0, which a line would plunge to (a purpose's heat is the two multiplied); last the day's
-            # totals. The Shelly EM's power and energy per day, the outdoor air sensor and the water pressure are left
-            # out: Heizbetrieb heute and Wärmepumpe pro Tag show the electricity with the heaters, every value tile
-            # opens its own history
-            two(card("Heizbetrieb heute", [stacked_chart(hp_run_panels(), HP_RUN_H)]),
-                stack(card("Temperaturen heute", [stacked_chart(hp_temp_panels(), HP_SIDE_H)]),
-                      card("Kältemittel heute", [stacked_chart(
-                          [pn for pn in hp_refrigerant_panels() if pn[0] != "Wärmetauscher"], HP_SIDE_H)]))),
-            two(card("Strom nach Zweck pro Tag", [hp_split_charts(*HP_ELECTRIC)[1]]),
-                card("COP nach Zweck pro Tag", [hp_cop_month(total=False)])),
-            one(card("Wärmepumpe pro Tag", [hp_days()]))]
+                                     kind="heat-pump-split", active=flowing(num(HP), HP_FLOW), frequency=num(P["hz"]))
+    # the values on top, the controls over today beside the present; the days of the month right under today, whose
+    # days they are (user, 2026-10-18: Wärmepumpe pro Tag up, no longer last); the day's courses; the Shelly EM's
+    # cards side by side at the foot (user, 2026-10-08: they belong together; 2026-10-18: "ganz runter"). The Shelly
+    # EM's power and energy per day, the outdoor air sensor and the water pressure have no chart: Heizbetrieb heute and
+    # Wärmepumpe pro Tag show the electricity with the heaters, every value tile opens its own history, and the
+    # electricity by purpose per day is the heat pump card's Elektrisch popup's
+    return [two(stack(card("Steuerung", [controls]), card("Heute", [today])), card("Jetzt", now)),
+            two(card("Wärmepumpe pro Tag", [hp_days()]),
+                card("COP nach Zweck pro Tag", [hp_cop_month(total=False, height="300px")])),
+            two(card("Heizbetrieb heute", [stacked_chart(hp_run_panels(), HP_DAY_H)]),
+                card("Temperaturen heute", [stacked_chart(hp_temp_panels(), HP_DAY_H)])),
+            one(card("Diagnose", diagnose)),
+            two(plug, electric)]
 
 
 def air_conditioning_blocks():
@@ -8458,10 +8576,13 @@ def self_use_days():
 
 def hp_days():
     """The heat pump's electricity and heat per day of the month as bars beside each other, the day's COP as a line
-    (Grafana's "Wärmepumpe pro Tag"), in the heat pump card's colours."""
-    return month_combo([("Strom", "espaltherma_energy_today", ELECTRIC_C),
-                        ("Wärme", "espaltherma_heating_energy_today", "#e53935")],
-                       [("COP", "espaltherma_dcop", COP_C)], "kWh", "COP", {"min": 0})
+    that leaves out a day at 0 (cop_day_line(); it plunged to today's 0 after midnight) (Grafana's "Wärmepumpe pro
+    Tag"), in the heat pump card's colours."""
+    chart_ = month_combo([("Strom", "espaltherma_energy_today", ELECTRIC_C),
+                          ("Wärme", "espaltherma_heating_energy_today", "#e53935")], [], "kWh", "COP", {"min": 0})
+    chart_["slots"]["series"].append(cop_day_line("COP", "espaltherma_dcop", COP_C, yAxisIndex=1))
+    chart_["slots"]["tooltip"][0]["config"]["texts"] = {"COP": COP_TIP}
+    return chart_
 
 
 def photovoltaics_blocks():
@@ -9079,14 +9200,35 @@ def item_popup():
               f"=props.item4 ? ({NARROW} ? 'left' : 'center') : 'right'", "right"]
     sides = [side(n, it, c, a, None if k < 2 else f"=!!props.item{k + 1}")
              for k, ((it, n, c, _), a) in enumerate(zip(slots, aligns))]
-    # with ring the value beside its icon (props.icon) large in a ring, as a device page's head (a day's COP; user,
-    # 2026-10-17: as the household appliances' popups), the ring filled in the colour up to the value / props.ring
-    ringed = hero(None, ph["color"], "=props.caption || ''", f"={dash(disp(item))}",
-                  picture=device_icon(glyph_parts("=(props.icon || '').replace('material:', '')", ph["color"]),
-                                      ph["color"], share=f"{num(item)} / Number(props.ring)"))
-    ringed["config"]["visible"] = one + " && !!props.ring"
+    # with ring the value large inside a ring, as a device page's head, filled in the colour up to the value /
+    # props.ring, the caption small under it (a day's COP, as its tile; user, 2026-10-17: beside the facts it stood
+    # lost); beside it what the value comes of, fact1 and fact2 (a COP's heat and electricity today) with one
+    # decimal, and with history its whole day yesterday in the item's decimals
+    val = f"(props.positive && {num(item)} <= 0 ? '–' : {dash(disp(item))})"
+    centre = lambda y, content, size, **extra: svg("text", x=0, y=y, content=content, fill="currentColor", **{
+        "font-size": size, "text-anchor": "middle", "dominant-baseline": "central", **extra})
+    inside = [centre("=props.caption ? -4 : 0", f"={val}", f"=({val}).length > 4 ? 14 : 18", **{"font-weight": "700"}),
+              centre(11.5, "=props.caption || ''", 7.5, opacity="0.6", visible="=!!props.caption")]
+    amount = lambda it: (f"((s) => !s || s.numericState === undefined || s.numericState === null ? '–' : "
+                         f"{fixed('s.numericState', 1)} + ((u) => u ? ' ' + u : '')"
+                         f"(s.unit || (s.displayState || '').split(' ').slice(1).join(' ')))(items[{it}])")
+    yday = (f"((((s) => (s || '').charAt(0) === '{{' ? JSON.parse(s) : {{}})(items[props.history].state))"
+            f"[props.item] || {{}}).d")
+    places = "(((items[props.item].displayState || '').match(/[.,](\\d+)/) || ['', ''])[1].length)"
+    has_yday = f"!!props.history && {vt_has(yday)} && (!props.positive || Number({yday}) > 0)"
+    name_ = {"font-size": "12px", "opacity": "0.65"}
+    big_ = {"font-size": "15px", "font-weight": "600", "white-space": "nowrap"}
+    facts = div([*[x for k in (1, 2) for x in (label(f"=props.factName{k} || ''", f"=!!props.fact{k}", **name_),
+                                               label(f"={amount(f'props.fact{k}')}", f"=!!props.fact{k}", **big_))],
+                 label("Gestern", f"={has_yday}", **name_),
+                 label(f"=Number({yday}).toLocaleString('de-AT', {{minimumFractionDigits: {places}, "
+                       f"maximumFractionDigits: {places}}})", f"={has_yday}", **big_)],
+                **{"display": "grid", "grid-template-columns": "auto auto", "align-items": "baseline",
+                   "gap": "4px 14px", "min-width": "0"})
     # the value card no taller than the popup's 630 px leave beside the course below it: no scrollbar
-    ringed["config"]["style"]["padding"] = "4px 16px 14px"
+    ringed = div([device_icon([ring(0, 0, ph["color"]), *inside], ph["color"], share=f"{num(item)} / Number(props.ring)"),
+                  facts], one + " && !!props.ring",
+                 **{"display": "flex", "align-items": "center", "gap": "18px", "padding": "4px 16px 14px"})
     # with a heating curve, the values' card is the present beside it
     now = card(f"=props.curve ? 'Jetzt' : '{title}'", [label(f"={dash(disp(item))}", one + " && !props.ring",
                                                             **{**HERO, "overflow-wrap": "anywhere",
@@ -9295,13 +9437,23 @@ ITEM_POPUP_PARAMS = [
           "tooltip gives a dash, e.g. a day's COP before the day's first run", "BOOLEAN", default="false"),
     param("today", "Calendar day", "The course over the calendar day from midnight, its arrows a day each, instead "
           "of the last 24 hours, for a value that starts again at midnight", "BOOLEAN", default="false"),
-    param("ring", "Ring full at", "Show the value beside the icon large in a ring, as a device page's head, the "
-          "ring filled in the colour up to the value / this, e.g. 6 for a COP; empty: the value alone", "DECIMAL"),
-    param("icon", "Icon", "The Material icon in the ring, e.g. eco"),
-    param("caption", "Caption", "Small text over the value beside the ring, e.g. the day the value covers"),
+    param("ring", "Ring full at", "Show the value large inside a ring, as a device page's head, the ring filled in "
+          "the colour up to the value / this, e.g. 6 for a COP; empty: the value alone", "DECIMAL"),
+    param("caption", "Caption", "Small text under the value inside the ring, e.g. the day the value covers"),
+    dict(param("fact1", "First fact", "An item shown beside the ring with one decimal, e.g. the heat a COP is the "
+               "ratio of"), context="item"),
+    param("factName1", "First fact's name", "The first fact's name"),
+    dict(param("fact2", "Second fact", "A second item beside the ring, e.g. the electricity a COP is the ratio of"),
+         context="item"),
+    param("factName2", "Second fact's name", "The second fact's name"),
+    dict(param("history", "History item", "The String item the rule tile_history writes the tiles' history into: "
+               "beside the ring the value's whole day yesterday"), context="item"),
     dict(param("curve", "Heating curve", "A String item holding a learnt heating curve as JSON (rule "
                "heatpump_heating_curve), drawn as a chart on top with item (outdoor) and item2 (setpoint) as the "
                "present point"), context="item")]
+
+# the props a link opening the item popup passes items in, which a widget placing that link takes as its own props
+ITEM_PARAMS["item-popup"] = {p["name"] for p in ITEM_POPUP_PARAMS if p.get("context") == "item"}
 
 VALUE_TILE_PARAMS = [
     param("title", "Title", "Title above the value", required=True),

@@ -65,7 +65,8 @@ OVERVIEW = [
      "(the difference in kWh), "
      "and today's COPs of space heating, DHW and in total in one row as rings like the energy "
      "flow's self-consumption, each with today against yesterday at this time in a pill under its title; a tap on "
-     "one opens the item popup with that COP large beside its ring and its course over the day. "
+     "one opens the item popup with that COP large inside its ring, beside it today's heat and electricity it is "
+     "the ratio of and yesterday's whole day, and its course over the day. "
      "While the tank charges or the heating runs, a line under its tile says since when. A round badge right of "
      "each tile's pills counts today's compressor starts, for hot water and for the heating (the restarts of a "
      "defrost do not count), outlined in the tile's colour, grey at none; while the cycle guard of my installation "
@@ -162,7 +163,7 @@ QUICK = [
      "DHW over the day, per day of the month"),
     ("heatpump-cop-quick", "COP", "electricity plus ambient heat becoming heat as flow bands, now while the compressor "
      "runs and for the day, each over a row of rings with the COP in total, of space heating and of DHW; the COP and the outdoor temperature over the day, the daily COPs "
-     "of the month")]
+     "of the month as lines that leave out a day without the purpose, where a plain line plunged to 0")]
 
 
 def fill(text, indent=""):
@@ -629,10 +630,12 @@ lines overlap in one chart (`dashed4` dashes the fourth). `abs` shows the values
 draws their amounts from 0, for the load of lines whose meter signs the direction; `scale` fits the axis to the
 values, for voltages. Given `curve`, a String item holding the heating curve my rule
 `heatpump_heating_curve` learns (as JSON), it draws that curve as a chart on top, with the measured bins and the
-present point (`item` the outdoor mean, `item2` the setpoint). Given `ring`, the value stands beside `icon` large in
-a ring filled in the colour up to the value / `ring`, with `caption` over it, as the plug card shows a device; my
-heating card's COP tiles open it so (`ring: 6`), with `positive`, which leaves values of 0 and below out of the course
-(a day's COP before the day's first run), and `today`, which shows the calendar day instead of the last 24 hours.
+present point (`item` the outdoor mean, `item2` the setpoint). Given `ring`, the value stands large inside a ring
+filled in the colour up to the value / `ring`, `caption` small under it, as the plug card shows a device; beside it the
+items `fact1` and `fact2` under their names with one decimal, and given `history` (the item the rule tile_history
+writes) the value's whole day yesterday. My heating card's COP tiles open it so (`ring: 6`, the day's heat and
+electricity as the facts), with `positive`, which leaves values of 0 and below out of the course (a day's COP before
+the day's first run), and `today`, which shows the calendar day instead of the last 24 hours.
 Open it from any link with `action: popup`, `actionModal:
 widget:item-popup` and its props in `actionModalConfig`:
 

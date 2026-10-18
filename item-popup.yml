@@ -134,20 +134,44 @@ props:
     default: 'false'
   - name: ring
     label: Ring full at
-    description: 'Show the value beside the icon large in a ring, as a device page''s head, the ring filled in the colour
-      up to the value / this, e.g. 6 for a COP; empty: the value alone'
+    description: 'Show the value large inside a ring, as a device page''s head, the ring filled in the colour up to the value
+      / this, e.g. 6 for a COP; empty: the value alone'
     type: DECIMAL
-    required: false
-  - name: icon
-    label: Icon
-    description: The Material icon in the ring, e.g. eco
-    type: TEXT
     required: false
   - name: caption
     label: Caption
-    description: Small text over the value beside the ring, e.g. the day the value covers
+    description: Small text under the value inside the ring, e.g. the day the value covers
     type: TEXT
     required: false
+  - name: fact1
+    label: First fact
+    description: An item shown beside the ring with one decimal, e.g. the heat a COP is the ratio of
+    type: TEXT
+    required: false
+    context: item
+  - name: factName1
+    label: First fact's name
+    description: The first fact's name
+    type: TEXT
+    required: false
+  - name: fact2
+    label: Second fact
+    description: A second item beside the ring, e.g. the electricity a COP is the ratio of
+    type: TEXT
+    required: false
+    context: item
+  - name: factName2
+    label: Second fact's name
+    description: The second fact's name
+    type: TEXT
+    required: false
+  - name: history
+    label: History item
+    description: 'The String item the rule tile_history writes the tiles'' history into: beside the ring the value''s whole
+      day yesterday'
+    type: TEXT
+    required: false
+    context: item
   - name: curve
     label: Heating curve
     description: A String item holding a learnt heating curve as JSON (rule heatpump_heating_curve), drawn as a chart on top
@@ -156,7 +180,7 @@ props:
     required: false
     context: item
   parameterGroups: []
-timestamp: Oct 17, 2026, 9:55:42 PM
+timestamp: Oct 18, 2026, 2:43:03 AM
 component: div
 config:
   style:
@@ -576,41 +600,94 @@ slots:
               - component: text
                 config:
                   x: 0
-                  y: 0
-                  content: =(props.icon || '').replace('material:', '')
-                  fill: =props.color
-                  font-size: 30
+                  y: '=props.caption ? -4 : 0'
+                  content: '=(props.positive && (Number(items[props.item].numericState) || 0) <= 0 ? ''–'' : (([''NULL'',
+                    ''UNDEF''].includes(items[props.item].state) ? ''–'' : (items[props.item].displayState || items[props.item].state))
+                    || ''–''))'
+                  fill: currentColor
+                  font-size: '=((props.positive && (Number(items[props.item].numericState) || 0) <= 0 ? ''–'' : (([''NULL'',
+                    ''UNDEF''].includes(items[props.item].state) ? ''–'' : (items[props.item].displayState || items[props.item].state))
+                    || ''–''))).length > 4 ? 14 : 18'
                   text-anchor: middle
                   dominant-baseline: central
-                  style:
-                    font-family: '''Material Icons'''
-                    font-feature-settings: '''liga'''
+                  font-weight: '700'
+              - component: text
+                config:
+                  x: 0
+                  y: 11.5
+                  content: =props.caption || ''
+                  fill: currentColor
+                  font-size: 7.5
+                  text-anchor: middle
+                  dominant-baseline: central
+                  opacity: '0.6'
+                  visible: =!!props.caption
           - component: div
             config:
               style:
-                display: flex
-                flex-direction: column
-                align-items: flex-start
-                gap: 3px
+                display: grid
+                grid-template-columns: auto auto
+                align-items: baseline
+                gap: 4px 14px
                 min-width: '0'
             slots:
               default:
               - component: Label
                 config:
-                  text: =props.caption || ''
+                  text: =props.factName1 || ''
                   style:
                     font-size: 12px
-                    opacity: '0.7'
+                    opacity: '0.65'
+                  visible: =!!props.fact1
               - component: Label
                 config:
-                  text: '=(([''NULL'', ''UNDEF''].includes(items[props.item].state) ? ''–'' : (items[props.item].displayState
-                    || items[props.item].state)) || ''–'')'
+                  text: '=((s) => !s || s.numericState === undefined || s.numericState === null ? ''–'' : (s.numericState).toFixed(1)
+                    + ((u) => u ? '' '' + u : '''')(s.unit || (s.displayState || '''').split('' '').slice(1).join('' '')))(items[props.fact1])'
                   style:
-                    font-size: '=screen.width < 600 ? ''26px'' : ''28px'''
-                    font-weight: '700'
-                    line-height: '=screen.width < 600 ? ''32px'' : ''34px'''
-                    letter-spacing: -0.01em
+                    font-size: 15px
+                    font-weight: '600'
                     white-space: nowrap
+                  visible: =!!props.fact1
+              - component: Label
+                config:
+                  text: =props.factName2 || ''
+                  style:
+                    font-size: 12px
+                    opacity: '0.65'
+                  visible: =!!props.fact2
+              - component: Label
+                config:
+                  text: '=((s) => !s || s.numericState === undefined || s.numericState === null ? ''–'' : (s.numericState).toFixed(1)
+                    + ((u) => u ? '' '' + u : '''')(s.unit || (s.displayState || '''').split('' '').slice(1).join('' '')))(items[props.fact2])'
+                  style:
+                    font-size: 15px
+                    font-weight: '600'
+                    white-space: nowrap
+                  visible: =!!props.fact2
+              - component: Label
+                config:
+                  text: Yesterday
+                  style:
+                    font-size: 12px
+                    opacity: '0.65'
+                  visible: '=!!props.history && (((((s) => (s || '''').charAt(0) === ''{'' ? JSON.parse(s) : {})(items[props.history].state))[props.item]
+                    || {}).d !== undefined && ((((s) => (s || '''').charAt(0) === ''{'' ? JSON.parse(s) : {})(items[props.history].state))[props.item]
+                    || {}).d !== null) && (!props.positive || Number(((((s) => (s || '''').charAt(0) === ''{'' ? JSON.parse(s)
+                    : {})(items[props.history].state))[props.item] || {}).d) > 0)'
+              - component: Label
+                config:
+                  text: '=Number(((((s) => (s || '''').charAt(0) === ''{'' ? JSON.parse(s) : {})(items[props.history].state))[props.item]
+                    || {}).d).toLocaleString(''en-GB'', {minimumFractionDigits: (((items[props.item].displayState || '''').match(/[.,](\d+)/)
+                    || ['''', ''''])[1].length), maximumFractionDigits: (((items[props.item].displayState || '''').match(/[.,](\d+)/)
+                    || ['''', ''''])[1].length)})'
+                  style:
+                    font-size: 15px
+                    font-weight: '600'
+                    white-space: nowrap
+                  visible: '=!!props.history && (((((s) => (s || '''').charAt(0) === ''{'' ? JSON.parse(s) : {})(items[props.history].state))[props.item]
+                    || {}).d !== undefined && ((((s) => (s || '''').charAt(0) === ''{'' ? JSON.parse(s) : {})(items[props.history].state))[props.item]
+                    || {}).d !== null) && (!props.positive || Number(((((s) => (s || '''').charAt(0) === ''{'' ? JSON.parse(s)
+                    : {})(items[props.history].state))[props.item] || {}).d) > 0)'
       - component: div
         config:
           style:

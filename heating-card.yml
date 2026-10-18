@@ -202,7 +202,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 17, 2026, 9:55:42 PM
+timestamp: Oct 18, 2026, 2:43:03 AM
 component: oh-card
 config:
   title: Heating & Hot Water
@@ -1929,8 +1929,12 @@ slots:
                     positive: true
                     today: true
                     ring: 6
-                    icon: local_fire_department
                     caption: today
+                    fact1: =props.heatpumpHeatingEnergySpaceToday
+                    factName1: Heat
+                    fact2: =props.heatpumpEnergySpaceToday
+                    factName2: Electricity
+                    history: =props.tileHistory
                   style:
                     position: absolute
                     inset: '0'
@@ -2128,8 +2132,12 @@ slots:
                     positive: true
                     today: true
                     ring: 6
-                    icon: water_drop
                     caption: today
+                    fact1: =props.heatpumpHeatingEnergyDhwToday
+                    factName1: Heat
+                    fact2: =props.heatpumpEnergyDhwToday
+                    factName2: Electricity
+                    history: =props.tileHistory
                   style:
                     position: absolute
                     inset: '0'
@@ -2327,8 +2335,12 @@ slots:
                     positive: true
                     today: true
                     ring: 6
-                    icon: eco
                     caption: today
+                    fact1: =props.heatpumpHeatingEnergyToday
+                    factName1: Heat
+                    fact2: =props.heatpumpEnergyToday
+                    factName2: Electricity
+                    history: =props.tileHistory
                   style:
                     position: absolute
                     inset: '0'

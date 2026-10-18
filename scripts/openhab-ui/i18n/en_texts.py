@@ -172,7 +172,7 @@ EN = {
 
     # the value tiles of the device pages, plug cards, overview cards and the heat pump card's popups (2026-10-06)
 EN.update({"auffällig": "elevated", "außerhalb": "outside", "behaglich": "comfortable", "feucht": "humid",
-           "gering": "low", "gestern": "yesterday", "gut": "good", "mäßig": "moderate", "trocken": "dry",
+           "gering": "low", "gestern": "yesterday", "Gestern": "Yesterday", "gut": "good", "mäßig": "moderate", "trocken": "dry",
            "unbedenklich": "harmless", "zu feucht": "too humid", "zu hoch": "too high", "zu niedrig": "too low",
            "zu trocken": "too dry", "unter Soll": "below target", "über Soll": "above target",
            "kein Soll": "no target", "keine Last": "no load", "noch kein Betrieb heute": "not running yet today",

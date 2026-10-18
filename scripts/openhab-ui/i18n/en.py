@@ -58,6 +58,9 @@ RICH = re.compile(r"\{(s\d+)\|([^{}]*)\}")  # a chart title's coloured names, {s
 def tr_core(core):
     if core in EN or core in ITEM_LABELS:
         return EN.get(core) or ITEM_LABELS[core]
+    bare = core.replace("\u00ad", "")  # a German word with soft hyphens where it may break; the English needs none
+    if bare != core and bare in EN:
+        return EN[bare]
     if RICH.search(core):  # each coloured name of a title on its own
         return RICH.sub(lambda m: "{" + m.group(1) + "|" + tr_plain(m.group(2)) + "}", core)
     return core
