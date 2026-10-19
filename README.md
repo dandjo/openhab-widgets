@@ -148,10 +148,12 @@ expected end; beside such an arc the rest of the ring pulses softly and, while t
 with it, brightest and widest with it. A tap on a node opens its device's page of my installation, on the house and the
 appliances a popup of their own. Under the star three tiles: the house as its node inside the pie of what the consumers
 draw, as large as the rings beside it, with its power and today's energy against yesterday's at this time in a pill (the
-difference in kWh), and today's self-consumption and self-sufficiency as rings, each with yesterday's whole day in a
-pill, green while today's share is higher, orange while lower. The card places its lines and nodes as `flow-link` and
-`flow-node`. The recording and the dark screenshot show it with demo powers; today's energies and the comparisons are
-those of the moment shown.
+difference in kWh), and today's self-consumption (the PV generation less the export, of the generation) and
+self-sufficiency (the consumption not taken from the grid) as rings, each with yesterday's whole day in a pill, green
+while today's share is higher, orange while lower. PV's energy is the strings' generation: a hybrid inverter's own day
+yield counts the battery's discharge and leaves out what charges the battery. The card places its lines and nodes as
+`flow-link` and `flow-node`. The recording and the dark screenshot show it with demo powers; today's energies and the
+comparisons are those of the moment shown.
 
 Needs `flow-link`, `flow-node`.
 
@@ -194,7 +196,7 @@ Needs `flow-link`, `flow-node`.
 | `heatpumpValve` | ESPAltherma 3-Way Valve Mode | String |
 | `acMode` | Faikout Perfera Mode | String |
 | `ventilationLevel` | ESPLyfterl Level | String |
-| `pvEnergyToday` | Huawei Inverter E-Day | Number:Energy |
+| `pvGenerationToday` | PV Generation Today | Number:Energy |
 | `ventilationEnergyToday` | Ventilation Energy Today | Number:Energy |
 | `gridImportToday` | Huawei Inverter Power Meter Ec-Day | Number:Energy |
 | `gridExportToday` | Huawei Inverter Power Meter Ep-Day | Number:Energy |
@@ -490,22 +492,24 @@ Needs `boost-pill`, `flow-node`, `ground-floor-quick`, `heatpump-circuit-quick`,
 
 ### Consumption today: `consumption-card`
 
-Today's consumption as one bar split by source (PV, grid), the total against yesterday at this time in a pill between
-the two shares (the difference in kWh), and as one bar split by consumer, with a legend in two columns that gives each
-consumer's energy and how many kWh more (orange) or fewer (green) it drew than yesterday until this time; hovering a
-part lifts it everywhere. The screenshot shows it with demo values.
+Today's consumption as one bar split by source (PV with the battery, the grid less what charged the battery from it),
+the total against yesterday at this time in a pill between the two shares (the difference in kWh), and as one bar split
+by consumer, with a legend in two columns that gives each consumer's energy and how many kWh more (orange) or fewer
+(green) it drew than yesterday until this time; hovering a part lifts it everywhere. The screenshot shows it with demo
+values.
 
 ![Consumption today](screenshots/consumption-card.png)
 
 <details>
-<summary>21 props</summary>
+<summary>22 props</summary>
 
 | Prop | Item | Item type |
 |---|---|---|
 | `homeEnergyToday` | Home Energy Day | Number:Energy |
-| `pvSelfUseToday` | Photovoltaics Own Ec-Day | Number:Energy |
+| `homeFromPvToday` | Home from PV Today | Number:Energy |
+| `homeFromBatteryToday` | Home from Battery Today | Number:Energy |
 | `tileHistory` | Tile history | String |
-| `gridImportToday` | Huawei Inverter Power Meter Ec-Day | Number:Energy |
+| `homeFromGridToday` | Home from Grid Today | Number:Energy |
 | `heatpumpEnergyToday` | ESPAltherma Energy Today | Number:Energy |
 | `ecarEnergyToday` | E-Car Energy Today | Number:Energy |
 | `acUnitEnergyToday` | Air Conditioning Unit Energy Today | Number:Energy |
@@ -528,26 +532,28 @@ part lifts it everywhere. The screenshot shows it with demo values.
 
 ### Energy per day: `energy-days-card`
 
-The month's daily home consumption as stacked bars: from PV and from the grid, with PV production beside it.
+The month's daily home consumption as stacked bars: from PV straight, from the battery and from the grid (less what
+charged the battery from it), with the strings' PV generation as a line.
 
 ![Energy per day](screenshots/energy-days-card.png)
 
 <details>
-<summary>3 props</summary>
+<summary>4 props</summary>
 
 | Prop | Item | Item type |
 |---|---|---|
-| `dailySelfUse` | Energy Daily Self Use | Number:Energy |
-| `dailyGridImport` | Energy Daily Grid Import | Number:Energy |
-| `dailyPv` | Energy Daily PV | Number:Energy |
+| `dailyHousePv` | Energy Daily Home from PV | Number:Energy |
+| `dailyHouseBattery` | Energy Daily Home from Battery | Number:Energy |
+| `dailyHouseGrid` | Energy Daily Home from Grid | Number:Energy |
+| `dailyPvGeneration` | Energy Daily PV Generation | Number:Energy |
 
 </details>
 
 ### PV production per day: `pv-days-card`
 
-The daily PV yield of a year in four views a bar switches: a calendar heatmap of the year, two half-years, twelve month
-calendars and the months' sums as bars; a wider screen gets the year, the month calendars and the bars, a phone the
-half-years instead of the year.
+The daily PV generation of a year (the strings' energy) in four views a bar switches: a calendar heatmap of the year,
+two half-years, twelve month calendars and the months' sums as bars; a wider screen gets the year, the month calendars
+and the bars, a phone the half-years instead of the year.
 
 ![PV production per day](screenshots/pv-days-card.png)
 
@@ -556,7 +562,7 @@ half-years instead of the year.
 
 | Prop | Item | Item type |
 |---|---|---|
-| `dailyPv` | Energy Daily PV | Number:Energy |
+| `dailyPvGeneration` | Energy Daily PV Generation | Number:Energy |
 
 </details>
 

@@ -183,8 +183,8 @@ props:
     type: TEXT
     required: true
     context: item
-  - name: pvEnergyToday
-    label: Huawei Inverter E-Day
+  - name: pvGenerationToday
+    label: PV Generation Today
     description: Number:Energy item
     type: TEXT
     required: true
@@ -280,7 +280,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 13, 2026, 11:10:03 AM
+timestamp: Oct 19, 2026, 7:38:59 PM
 component: oh-card
 config:
   title: Energy Flow
@@ -2443,8 +2443,8 @@ slots:
                 config:
                   x: 99.6
                   y: 90.4
-                  content: '=([''NULL'', ''UNDEF''].includes(items[props.pvEnergyToday].state) ? ''–'' : (items[props.pvEnergyToday].displayState
-                    || items[props.pvEnergyToday].state)) + '' today'''
+                  content: '=([''NULL'', ''UNDEF''].includes(items[props.pvGenerationToday].state) ? ''–'' : (items[props.pvGenerationToday].displayState
+                    || items[props.pvGenerationToday].state)) + '' today'''
                   fill: currentColor
                   font-size: 12
                   font-weight: normal
@@ -3584,15 +3584,16 @@ slots:
                               stroke-width: 5
                               stroke-linecap: round
                               fill: none
-                              stroke-dasharray: '=(138.23 * ((Number(items[props.pvEnergyToday].numericState) || 0) > 0 ?
-                                Math.min(100, Math.round(100 * (Number(items[props.pvSelfUseToday].numericState) || 0) / (Number(items[props.pvEnergyToday].numericState)
-                                || 0))) : 0) / 100).toFixed(1) + '' 138.23'''
+                              stroke-dasharray: '=(138.23 * ((Number(items[props.pvGenerationToday].numericState) || 0) >
+                                0 ? Math.min(100, Math.round(100 * (Number(items[props.pvSelfUseToday].numericState) || 0)
+                                / (Number(items[props.pvGenerationToday].numericState) || 0))) : 0) / 100).toFixed(1) + ''
+                                138.23'''
                           - component: text
                             config:
                               x: 24
                               y: 30
-                              content: '=((Number(items[props.pvEnergyToday].numericState) || 0) > 0 ? Math.min(100, Math.round(100
-                                * (Number(items[props.pvSelfUseToday].numericState) || 0) / (Number(items[props.pvEnergyToday].numericState)
+                              content: '=((Number(items[props.pvGenerationToday].numericState) || 0) > 0 ? Math.min(100, Math.round(100
+                                * (Number(items[props.pvSelfUseToday].numericState) || 0) / (Number(items[props.pvGenerationToday].numericState)
                                 || 0))) : 0) + ''%'''
                               fill: currentColor
                               font-size: 13
@@ -3625,10 +3626,10 @@ slots:
                             : {}))[props.pvSelfUseToday] || {}).d) !== undefined && ((((((items[props.tileHistory].state)
                             || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.pvSelfUseToday]
                             || {}).d) !== null) && (((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
-                            : {}))[props.pvEnergyToday] || {}).d) !== undefined && ((((((items[props.tileHistory].state) ||
-                            '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.pvEnergyToday]
+                            : {}))[props.pvGenerationToday] || {}).d) !== undefined && ((((((items[props.tileHistory].state)
+                            || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.pvGenerationToday]
                             || {}).d) !== null) && Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{''
-                            ? JSON.parse(items[props.tileHistory].state) : {}))[props.pvEnergyToday] || {}).d)) >= 0.05'
+                            ? JSON.parse(items[props.tileHistory].state) : {}))[props.pvGenerationToday] || {}).d)) >= 0.05'
                         slots:
                           default:
                           - component: rect
@@ -3637,53 +3638,57 @@ slots:
                               y: 34
                               height: 13
                               rx: 4
-                              width: '=((''yesterday '' + Math.round(Math.min(100, Number(((((((items[props.tileHistory].state)
+                              width: '=((''yesterday '' + Math.round(Math.min(100, Math.max(0, Number(((((((items[props.tileHistory].state)
                                 || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.pvSelfUseToday]
-                                || {}).d)) / Math.max(Number(((((((items[props.tileHistory].state) || '''').charAt(0) ===
-                                ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.pvEnergyToday] || {}).d)),
+                                || {}).d))) / Math.max(Number(((((((items[props.tileHistory].state) || '''').charAt(0) ===
+                                ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.pvGenerationToday] || {}).d)),
                                 0.001) * 100)) + '' %'').length * 5.2 + 12).toFixed(1)'
                               fill: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
                                 ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
-                                ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[((Number(items[props.pvEnergyToday].numericState)
-                                || 0) < 0.05 || Math.abs((((Number(items[props.pvSelfUseToday].numericState) || 0) / Math.max((Number(items[props.pvEnergyToday].numericState)
-                                || 0), 0.001) * 100) - Math.min(100, Number(((((((items[props.tileHistory].state) || '''').charAt(0)
-                                === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.pvSelfUseToday] || {}).d))
+                                ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[((Number(items[props.pvGenerationToday].numericState)
+                                || 0) < 0.05 || Math.abs(((Math.max(0, (Number(items[props.pvSelfUseToday].numericState) ||
+                                0)) / Math.max((Number(items[props.pvGenerationToday].numericState) || 0), 0.001) * 100) -
+                                Math.min(100, Math.max(0, Number(((((((items[props.tileHistory].state) || '''').charAt(0)
+                                === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.pvSelfUseToday] || {}).d)))
                                 / Math.max(Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
-                                : {}))[props.pvEnergyToday] || {}).d)), 0.001) * 100))) < 2 ? ''neutral'' : (((Number(items[props.pvSelfUseToday].numericState)
-                                || 0) / Math.max((Number(items[props.pvEnergyToday].numericState) || 0), 0.001) * 100) - Math.min(100,
-                                Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
-                                : {}))[props.pvSelfUseToday] || {}).d)) / Math.max(Number(((((((items[props.tileHistory].state)
-                                || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.pvEnergyToday]
-                                || {}).d)), 0.001) * 100)) > 0 ? ''good'' : ''warn'')] || (({good: [''#2e7d32'', ''#81c784''],
-                                ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''],
-                                bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'',
-                                ''#c7c7cc'']})).neutral)[(themeOptions.dark === ''dark'') ? 1 : 0]'
+                                : {}))[props.pvGenerationToday] || {}).d)), 0.001) * 100))) < 2 ? ''neutral'' : ((Math.max(0,
+                                (Number(items[props.pvSelfUseToday].numericState) || 0)) / Math.max((Number(items[props.pvGenerationToday].numericState)
+                                || 0), 0.001) * 100) - Math.min(100, Math.max(0, Number(((((((items[props.tileHistory].state)
+                                || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.pvSelfUseToday]
+                                || {}).d))) / Math.max(Number(((((((items[props.tileHistory].state) || '''').charAt(0) ===
+                                ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.pvGenerationToday] || {}).d)),
+                                0.001) * 100)) > 0 ? ''good'' : ''warn'')] || (({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'',
+                                ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad:
+                                [''#c62828'', ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark
+                                === ''dark'') ? 1 : 0]'
                               fill-opacity: '0.16'
                           - component: text
                             config:
                               x: 62
                               y: 43.3
-                              content: '=''yesterday '' + Math.round(Math.min(100, Number(((((((items[props.tileHistory].state)
+                              content: '=''yesterday '' + Math.round(Math.min(100, Math.max(0, Number(((((((items[props.tileHistory].state)
                                 || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.pvSelfUseToday]
-                                || {}).d)) / Math.max(Number(((((((items[props.tileHistory].state) || '''').charAt(0) ===
-                                ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.pvEnergyToday] || {}).d)),
+                                || {}).d))) / Math.max(Number(((((((items[props.tileHistory].state) || '''').charAt(0) ===
+                                ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.pvGenerationToday] || {}).d)),
                                 0.001) * 100)) + '' %'''
                               fill: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
                                 ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
-                                ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[((Number(items[props.pvEnergyToday].numericState)
-                                || 0) < 0.05 || Math.abs((((Number(items[props.pvSelfUseToday].numericState) || 0) / Math.max((Number(items[props.pvEnergyToday].numericState)
-                                || 0), 0.001) * 100) - Math.min(100, Number(((((((items[props.tileHistory].state) || '''').charAt(0)
-                                === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.pvSelfUseToday] || {}).d))
+                                ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[((Number(items[props.pvGenerationToday].numericState)
+                                || 0) < 0.05 || Math.abs(((Math.max(0, (Number(items[props.pvSelfUseToday].numericState) ||
+                                0)) / Math.max((Number(items[props.pvGenerationToday].numericState) || 0), 0.001) * 100) -
+                                Math.min(100, Math.max(0, Number(((((((items[props.tileHistory].state) || '''').charAt(0)
+                                === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.pvSelfUseToday] || {}).d)))
                                 / Math.max(Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
-                                : {}))[props.pvEnergyToday] || {}).d)), 0.001) * 100))) < 2 ? ''neutral'' : (((Number(items[props.pvSelfUseToday].numericState)
-                                || 0) / Math.max((Number(items[props.pvEnergyToday].numericState) || 0), 0.001) * 100) - Math.min(100,
-                                Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
-                                : {}))[props.pvSelfUseToday] || {}).d)) / Math.max(Number(((((((items[props.tileHistory].state)
-                                || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.pvEnergyToday]
-                                || {}).d)), 0.001) * 100)) > 0 ? ''good'' : ''warn'')] || (({good: [''#2e7d32'', ''#81c784''],
-                                ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''],
-                                bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'',
-                                ''#c7c7cc'']})).neutral)[(themeOptions.dark === ''dark'') ? 1 : 0]'
+                                : {}))[props.pvGenerationToday] || {}).d)), 0.001) * 100))) < 2 ? ''neutral'' : ((Math.max(0,
+                                (Number(items[props.pvSelfUseToday].numericState) || 0)) / Math.max((Number(items[props.pvGenerationToday].numericState)
+                                || 0), 0.001) * 100) - Math.min(100, Math.max(0, Number(((((((items[props.tileHistory].state)
+                                || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.pvSelfUseToday]
+                                || {}).d))) / Math.max(Number(((((((items[props.tileHistory].state) || '''').charAt(0) ===
+                                ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.pvGenerationToday] || {}).d)),
+                                0.001) * 100)) > 0 ? ''good'' : ''warn'')] || (({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'',
+                                ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad:
+                                [''#c62828'', ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark
+                                === ''dark'') ? 1 : 0]'
                               font-size: '9.5'
                               font-weight: '600'
               - component: oh-link
@@ -3751,15 +3756,16 @@ slots:
                               stroke-linecap: round
                               fill: none
                               stroke-dasharray: '=(138.23 * ((Number(items[props.homeEnergyToday].numericState) || 0) > 0
-                                ? Math.min(100, Math.round(100 * (Number(items[props.pvSelfUseToday].numericState) || 0) /
-                                (Number(items[props.homeEnergyToday].numericState) || 0))) : 0) / 100).toFixed(1) + '' 138.23'''
+                                ? Math.min(100, Math.round(100 * Math.max(0, (Number(items[props.homeEnergyToday].numericState)
+                                || 0) - (Number(items[props.gridImportToday].numericState) || 0)) / (Number(items[props.homeEnergyToday].numericState)
+                                || 0))) : 0) / 100).toFixed(1) + '' 138.23'''
                           - component: text
                             config:
                               x: 24
                               y: 30
                               content: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? Math.min(100, Math.round(100
-                                * (Number(items[props.pvSelfUseToday].numericState) || 0) / (Number(items[props.homeEnergyToday].numericState)
-                                || 0))) : 0) + ''%'''
+                                * Math.max(0, (Number(items[props.homeEnergyToday].numericState) || 0) - (Number(items[props.gridImportToday].numericState)
+                                || 0)) / (Number(items[props.homeEnergyToday].numericState) || 0))) : 0) + ''%'''
                               fill: currentColor
                               font-size: 13
                               font-weight: '700'
@@ -3788,11 +3794,14 @@ slots:
                       - component: g
                         config:
                           visible: '=(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
-                            : {}))[props.pvSelfUseToday] || {}).d) !== undefined && ((((((items[props.tileHistory].state)
-                            || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.pvSelfUseToday]
+                            : {}))[props.homeEnergyToday] || {}).d) !== undefined && ((((((items[props.tileHistory].state)
+                            || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.homeEnergyToday]
                             || {}).d) !== null) && (((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
                             : {}))[props.homeEnergyToday] || {}).d) !== undefined && ((((((items[props.tileHistory].state)
                             || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.homeEnergyToday]
+                            || {}).d) !== null) && (((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                            : {}))[props.gridImportToday] || {}).d) !== undefined && ((((((items[props.tileHistory].state)
+                            || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.gridImportToday]
                             || {}).d) !== null) && Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{''
                             ? JSON.parse(items[props.tileHistory].state) : {}))[props.homeEnergyToday] || {}).d)) >= 0.05'
                         slots:
@@ -3803,22 +3812,28 @@ slots:
                               y: 34
                               height: 13
                               rx: 4
-                              width: '=((''yesterday '' + Math.round(Math.min(100, Number(((((((items[props.tileHistory].state)
-                                || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.pvSelfUseToday]
-                                || {}).d)) / Math.max(Number(((((((items[props.tileHistory].state) || '''').charAt(0) ===
-                                ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.homeEnergyToday] || {}).d)),
-                                0.001) * 100)) + '' %'').length * 5.2 + 12).toFixed(1)'
+                              width: '=((''yesterday '' + Math.round(Math.min(100, Math.max(0, (Number(((((((items[props.tileHistory].state)
+                                || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.homeEnergyToday]
+                                || {}).d)) - Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                                : {}))[props.gridImportToday] || {}).d)))) / Math.max(Number(((((((items[props.tileHistory].state)
+                                || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.homeEnergyToday]
+                                || {}).d)), 0.001) * 100)) + '' %'').length * 5.2 + 12).toFixed(1)'
                               fill: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
                                 ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
                                 ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[((Number(items[props.homeEnergyToday].numericState)
-                                || 0) < 0.05 || Math.abs((((Number(items[props.pvSelfUseToday].numericState) || 0) / Math.max((Number(items[props.homeEnergyToday].numericState)
-                                || 0), 0.001) * 100) - Math.min(100, Number(((((((items[props.tileHistory].state) || '''').charAt(0)
-                                === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.pvSelfUseToday] || {}).d))
-                                / Math.max(Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
-                                : {}))[props.homeEnergyToday] || {}).d)), 0.001) * 100))) < 2 ? ''neutral'' : (((Number(items[props.pvSelfUseToday].numericState)
-                                || 0) / Math.max((Number(items[props.homeEnergyToday].numericState) || 0), 0.001) * 100) -
-                                Math.min(100, Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ?
-                                JSON.parse(items[props.tileHistory].state) : {}))[props.pvSelfUseToday] || {}).d)) / Math.max(Number(((((((items[props.tileHistory].state)
+                                || 0) < 0.05 || Math.abs(((Math.max(0, ((Number(items[props.homeEnergyToday].numericState)
+                                || 0) - (Number(items[props.gridImportToday].numericState) || 0))) / Math.max((Number(items[props.homeEnergyToday].numericState)
+                                || 0), 0.001) * 100) - Math.min(100, Math.max(0, (Number(((((((items[props.tileHistory].state)
+                                || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.homeEnergyToday]
+                                || {}).d)) - Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                                : {}))[props.gridImportToday] || {}).d)))) / Math.max(Number(((((((items[props.tileHistory].state)
+                                || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.homeEnergyToday]
+                                || {}).d)), 0.001) * 100))) < 2 ? ''neutral'' : ((Math.max(0, ((Number(items[props.homeEnergyToday].numericState)
+                                || 0) - (Number(items[props.gridImportToday].numericState) || 0))) / Math.max((Number(items[props.homeEnergyToday].numericState)
+                                || 0), 0.001) * 100) - Math.min(100, Math.max(0, (Number(((((((items[props.tileHistory].state)
+                                || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.homeEnergyToday]
+                                || {}).d)) - Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                                : {}))[props.gridImportToday] || {}).d)))) / Math.max(Number(((((((items[props.tileHistory].state)
                                 || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.homeEnergyToday]
                                 || {}).d)), 0.001) * 100)) > 0 ? ''good'' : ''warn'')] || (({good: [''#2e7d32'', ''#81c784''],
                                 ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''],
@@ -3829,22 +3844,28 @@ slots:
                             config:
                               x: 62
                               y: 43.3
-                              content: '=''yesterday '' + Math.round(Math.min(100, Number(((((((items[props.tileHistory].state)
-                                || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.pvSelfUseToday]
-                                || {}).d)) / Math.max(Number(((((((items[props.tileHistory].state) || '''').charAt(0) ===
-                                ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.homeEnergyToday] || {}).d)),
-                                0.001) * 100)) + '' %'''
+                              content: '=''yesterday '' + Math.round(Math.min(100, Math.max(0, (Number(((((((items[props.tileHistory].state)
+                                || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.homeEnergyToday]
+                                || {}).d)) - Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                                : {}))[props.gridImportToday] || {}).d)))) / Math.max(Number(((((((items[props.tileHistory].state)
+                                || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.homeEnergyToday]
+                                || {}).d)), 0.001) * 100)) + '' %'''
                               fill: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
                                 ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
                                 ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[((Number(items[props.homeEnergyToday].numericState)
-                                || 0) < 0.05 || Math.abs((((Number(items[props.pvSelfUseToday].numericState) || 0) / Math.max((Number(items[props.homeEnergyToday].numericState)
-                                || 0), 0.001) * 100) - Math.min(100, Number(((((((items[props.tileHistory].state) || '''').charAt(0)
-                                === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.pvSelfUseToday] || {}).d))
-                                / Math.max(Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
-                                : {}))[props.homeEnergyToday] || {}).d)), 0.001) * 100))) < 2 ? ''neutral'' : (((Number(items[props.pvSelfUseToday].numericState)
-                                || 0) / Math.max((Number(items[props.homeEnergyToday].numericState) || 0), 0.001) * 100) -
-                                Math.min(100, Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ?
-                                JSON.parse(items[props.tileHistory].state) : {}))[props.pvSelfUseToday] || {}).d)) / Math.max(Number(((((((items[props.tileHistory].state)
+                                || 0) < 0.05 || Math.abs(((Math.max(0, ((Number(items[props.homeEnergyToday].numericState)
+                                || 0) - (Number(items[props.gridImportToday].numericState) || 0))) / Math.max((Number(items[props.homeEnergyToday].numericState)
+                                || 0), 0.001) * 100) - Math.min(100, Math.max(0, (Number(((((((items[props.tileHistory].state)
+                                || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.homeEnergyToday]
+                                || {}).d)) - Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                                : {}))[props.gridImportToday] || {}).d)))) / Math.max(Number(((((((items[props.tileHistory].state)
+                                || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.homeEnergyToday]
+                                || {}).d)), 0.001) * 100))) < 2 ? ''neutral'' : ((Math.max(0, ((Number(items[props.homeEnergyToday].numericState)
+                                || 0) - (Number(items[props.gridImportToday].numericState) || 0))) / Math.max((Number(items[props.homeEnergyToday].numericState)
+                                || 0), 0.001) * 100) - Math.min(100, Math.max(0, (Number(((((((items[props.tileHistory].state)
+                                || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.homeEnergyToday]
+                                || {}).d)) - Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                                : {}))[props.gridImportToday] || {}).d)))) / Math.max(Number(((((((items[props.tileHistory].state)
                                 || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.homeEnergyToday]
                                 || {}).d)), 0.001) * 100)) > 0 ? ''good'' : ''warn'')] || (({good: [''#2e7d32'', ''#81c784''],
                                 ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''],

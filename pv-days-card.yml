@@ -3,14 +3,14 @@ tags:
 - overview
 props:
   parameters:
-  - name: dailyPv
-    label: Energy Daily PV
+  - name: dailyPvGeneration
+    label: Energy Daily PV Generation
     description: Number:Energy item
     type: TEXT
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 10, 2026, 5:24:26 PM
+timestamp: Oct 19, 2026, 7:38:59 PM
 component: oh-card
 config:
   title: PV Yield per Day
@@ -144,7 +144,7 @@ slots:
               name: PV yield
               type: heatmap
               calendarIndex: 0
-              item: =props.dailyPv
+              item: =props.dailyPvGeneration
               aggregationFunction: last
           visualMap:
           - component: oh-chart-visualmap
@@ -342,14 +342,14 @@ slots:
               name: PV yield
               type: heatmap
               calendarIndex: 0
-              item: =props.dailyPv
+              item: =props.dailyPvGeneration
               aggregationFunction: last
           - component: oh-calendar-series
             config:
               name: PV yield
               type: heatmap
               calendarIndex: 1
-              item: =props.dailyPv
+              item: =props.dailyPvGeneration
               aggregationFunction: last
           visualMap:
           - component: oh-chart-visualmap
@@ -449,7 +449,7 @@ slots:
                 + 6) % 7))((W - n * 7 * c - (n - 1) * 10) / 2))(Math.floor(n === 3 ? Math.min((W - 32) / 21, (H - 196) / 24)
                 : n === 6 ? c6 : c4)))(W < 600 ? 3 : c6 >= c4 ? 6 : 4))(Math.min((W - 82) / 42, (H - 136) / 12), Math.min((W
                 - 62) / 28, (H - 164) / 18)))(api.getWidth(), api.getHeight(), params.coordSys.rangeInfo.start.y)'
-              item: =props.dailyPv
+              item: =props.dailyPvGeneration
               aggregationFunction: last
           visualMap:
           - component: oh-chart-visualmap
@@ -565,7 +565,7 @@ slots:
               xAxisIndex: 0
               yAxisIndex: 0
               type: bar
-              item: =props.dailyPv
+              item: =props.dailyPvGeneration
               aggregationFunction: sum
               dimension1: month
               itemStyle:
@@ -582,7 +582,7 @@ slots:
               xAxisIndex: 0
               yAxisIndex: 1
               type: line
-              item: =props.dailyPv
+              item: =props.dailyPvGeneration
               aggregationFunction: average
               dimension1: month
               symbol: none

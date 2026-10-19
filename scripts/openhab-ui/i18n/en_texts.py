@@ -219,6 +219,19 @@ EN.update({"Taktschutz · Pause": "Cycle guard · pause",
            "Wärmepumpe Läufe Heizung heute": "Heatpump Heating Runs Today",
            "Wärmepumpe Taktschutz Sperre": "Heatpump Cycle Guard Lock"})
 
+    # the PV generation, the house's sources and the PV forecast (2026-10-19)
+EN.update({"Aus dem Akku": "From Battery", "aus dem Akku": "from the battery", "Wechselrichter gesamt": "Inverter total",
+           "Photovoltaik Erzeugung heute": "PV Generation Today", "Photovoltaik Spitze heute": "PV Peak Today",
+           "Haus aus PV heute": "Home from PV Today", "Haus aus Akku heute": "Home from Battery Today",
+           "Haus aus Netz heute": "Home from Grid Today", "Batteriespeicher Netzladung heute": "Battery Grid Charge Today",
+           "Energie täglich PV-Erzeugung": "Energy Daily PV Generation",
+           "Energie täglich Haus aus PV": "Energy Daily Home from PV",
+           "Energie täglich Haus aus Akku": "Energy Daily Home from Battery",
+           "Energie täglich Haus aus Netz": "Energy Daily Home from Grid",
+           "Energie täglich Akku-Netzladung": "Energy Daily Battery Grid Charge",
+           "PV Prognose": "PV Forecast", "PV Prognose Tagesenergie": "PV Forecast Daily Energy",
+           "PV Prognose Tagesenergie morgen": "PV Forecast Daily Energy Tomorrow"})
+
     # installation texts the screenshots show (Miele programs and phases), for ui_proxy.py
 EN.update({"Pflegeleicht": "Easy care", "Baumwolle": "Cottons", "Waschen": "Washing", "Trocknen": "Drying",
            "Spülen": "Rinsing", "Schleudern": "Spinning", "Hauptwäsche": "Main wash", "Vorwäsche": "Pre-wash",

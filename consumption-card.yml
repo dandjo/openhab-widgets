@@ -9,8 +9,14 @@ props:
     type: TEXT
     required: true
     context: item
-  - name: pvSelfUseToday
-    label: Photovoltaics Own Ec-Day
+  - name: homeFromPvToday
+    label: Home from PV Today
+    description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  - name: homeFromBatteryToday
+    label: Home from Battery Today
     description: Number:Energy item
     type: TEXT
     required: true
@@ -21,8 +27,8 @@ props:
     type: TEXT
     required: true
     context: item
-  - name: gridImportToday
-    label: Huawei Inverter Power Meter Ec-Day
+  - name: homeFromGridToday
+    label: Home from Grid Today
     description: Number:Energy item
     type: TEXT
     required: true
@@ -130,7 +136,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 17, 2026, 9:55:42 PM
+timestamp: Oct 19, 2026, 7:38:59 PM
 component: oh-card
 config:
   title: '=''Consumption Today · '' + ([''NULL'', ''UNDEF''].includes(items[props.homeEnergyToday].state) ? ''–'' : (items[props.homeEnergyToday].displayState
@@ -186,8 +192,9 @@ slots:
                   default:
                   - component: Label
                     config:
-                      text: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? Math.round(100 * (Number(items[props.pvSelfUseToday].numericState)
-                        || 0) / (Number(items[props.homeEnergyToday].numericState) || 0)) : 0) + '' %'''
+                      text: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? Math.round(100 * ((Number(items[props.homeFromPvToday].numericState)
+                        || 0) + (Number(items[props.homeFromBatteryToday].numericState) || 0)) / (Number(items[props.homeEnergyToday].numericState)
+                        || 0)) : 0) + '' %'''
                       style:
                         font-size: '=screen.width < 600 ? ''26px'' : ''28px'''
                         font-weight: '700'
@@ -196,7 +203,8 @@ slots:
                         color: '#43a047'
                   - component: Label
                     config:
-                      text: ='from PV · ' + ((Number(items[props.pvSelfUseToday].numericState) || 0)).toFixed(1) + ' kWh'
+                      text: ='from PV · ' + (((Number(items[props.homeFromPvToday].numericState) || 0) + (Number(items[props.homeFromBatteryToday].numericState)
+                        || 0))).toFixed(1) + ' kWh'
                       style:
                         font-size: 12px
                         opacity: '0.7'
@@ -267,7 +275,7 @@ slots:
                   default:
                   - component: Label
                     config:
-                      text: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? Math.round(100 * (Number(items[props.gridImportToday].numericState)
+                      text: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? Math.round(100 * (Number(items[props.homeFromGridToday].numericState)
                         || 0) / (Number(items[props.homeEnergyToday].numericState) || 0)) : 0) + '' %'''
                       style:
                         font-size: '=screen.width < 600 ? ''26px'' : ''28px'''
@@ -277,8 +285,8 @@ slots:
                         color: '#e53935'
                   - component: Label
                     config:
-                      text: ='from the grid · ' + ((Number(items[props.gridImportToday].numericState) || 0)).toFixed(1) +
-                        ' kWh'
+                      text: ='from the grid · ' + ((Number(items[props.homeFromGridToday].numericState) || 0)).toFixed(1)
+                        + ' kWh'
                       style:
                         font-size: 12px
                         opacity: '0.7'
@@ -293,12 +301,15 @@ slots:
               - component: div
                 config:
                   class: seg k k-pv
-                  title: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? Math.round(100 * (Number(items[props.pvSelfUseToday].numericState)
-                    || 0) / (Number(items[props.homeEnergyToday].numericState) || 0)) : 0) + '' % from PV'''
-                  visible: =(Number(items[props.pvSelfUseToday].numericState) || 0) > 0.005
+                  title: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? Math.round(100 * ((Number(items[props.homeFromPvToday].numericState)
+                    || 0) + (Number(items[props.homeFromBatteryToday].numericState) || 0)) / (Number(items[props.homeEnergyToday].numericState)
+                    || 0)) : 0) + '' % from PV'''
+                  visible: =((Number(items[props.homeFromPvToday].numericState) || 0) + (Number(items[props.homeFromBatteryToday].numericState)
+                    || 0)) > 0.005
                   style:
-                    width: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? 100 * (Number(items[props.pvSelfUseToday].numericState)
-                      || 0) / (Number(items[props.homeEnergyToday].numericState) || 0) : 0).toFixed(2) + ''%'''
+                    width: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? 100 * ((Number(items[props.homeFromPvToday].numericState)
+                      || 0) + (Number(items[props.homeFromBatteryToday].numericState) || 0)) / (Number(items[props.homeEnergyToday].numericState)
+                      || 0) : 0).toFixed(2) + ''%'''
                     height: 100%
                     background: '#a5d6a7'
                     border-radius: 4px
@@ -307,11 +318,11 @@ slots:
               - component: div
                 config:
                   class: seg k k-grid
-                  title: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? Math.round(100 * (Number(items[props.gridImportToday].numericState)
+                  title: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? Math.round(100 * (Number(items[props.homeFromGridToday].numericState)
                     || 0) / (Number(items[props.homeEnergyToday].numericState) || 0)) : 0) + '' % from the grid'''
-                  visible: =(Number(items[props.gridImportToday].numericState) || 0) > 0.005
+                  visible: =(Number(items[props.homeFromGridToday].numericState) || 0) > 0.005
                   style:
-                    width: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? 100 * (Number(items[props.gridImportToday].numericState)
+                    width: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? 100 * (Number(items[props.homeFromGridToday].numericState)
                       || 0) / (Number(items[props.homeEnergyToday].numericState) || 0) : 0).toFixed(2) + ''%'''
                     height: 100%
                     background: '#ef9a9a'

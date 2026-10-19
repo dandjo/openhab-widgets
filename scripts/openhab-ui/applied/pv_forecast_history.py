@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 """The house's PV forecast for the days before rule pv_forecast wrote it (user, 2026-10-19: "Kannst du die Prognose
 auch rückwirkend berechnen, damit ich sie vergleichen kann?"): Open-Meteo's archived forecasts (historical forecast
-API, the same the rule fits on) of the irradiance on the three 25° planes, weighted by the rule's present factors
-(from pv_forecast_hourly), written into pv_forecast_power as the rule writes it: each hour's mean at the hour's middle,
-from the first day of PV readings (30 September 2024) to the day before the rule began (today's points are the
-rule's). Equal timestamps overwrite, so a second run replaces the first.
-check prints what it would write and each month's forecast against the measured yield (energy_daily_pv); apply writes.
+API, the same the rule fits on) of the irradiance on the three 25° planes and of the air's temperature, weighted by
+factors fitted as the rule fits them, each day's on the 14 days before it (model 2 since 2026-10-19: one factor per
+string, its energy against its modules' irradiance at the cells' temperature, -0.34 % per K above 25 °C, NOCT 43 °C;
+the first days, with fewer than 7 days before them, take the first full fit's), written as the rule writes them: into pv_forecast_power each hour's mean at the hour's
+middle, into pv_forecast_energy each day's total at its 23:59:59, from the first day of PV readings (30 September
+2024) to yesterday (from today on the rule writes them). Equal timestamps overwrite, so a second run replaces the
+first. check prints what it would write and each month's forecast against the strings' generation
+(energy_daily_pv_generation, see pv_generation.py; the inverter's yield counts the battery); apply writes.
 Usage: pv_forecast_history.py check|apply [FIRST_DAY [LAST_DAY]]   (on homepi, as pi)"""
 import datetime
 import json
@@ -20,7 +23,11 @@ INFLUX = "http://127.0.0.1:8086"
 LOCATION = "latitude=LAT&longitude=LON&timezone=Europe%2FVienna&timeformat=unixtime"
 TILT = 25
 PLANES = {"east": -90, "west": 90, "north": 180}
+TEMPERATURE_COEFFICIENT, CELL_RISE = -0.0034, (43 - 20) / 800  # as in pv_forecast.js
+MODULES = {"east": 8, "west": 8, "north": 6}
+FIT_DAYS = 14
 ITEM = "pv_forecast_power"
+DAILY = "pv_forecast_energy"
 
 
 def get(url, tries=4):
@@ -38,16 +45,25 @@ def get(url, tries=4):
     raise SystemExit(f"no answer from {url}")
 
 
-def irradiance(first, last, azimuth):
-    """One plane's irradiance by the hour's start (Open-Meteo gives an hour's mean at its end), a quarter at a time."""
+def hourly(first, last, query, field):
+    """An hourly value by the hour's start (Open-Meteo gives it at the hour's end), a quarter at a time."""
     out, start = {}, first
     while start <= last:
         end = min(last, start + datetime.timedelta(days=91))
         h = get(f"https://historical-forecast-api.open-meteo.com/v1/forecast?{LOCATION}&start_date={start}"
-                f"&end_date={end}&hourly=global_tilted_irradiance&tilt={TILT}&azimuth={azimuth}")["hourly"]
-        out.update({t - 3600: g for t, g in zip(h["time"], h["global_tilted_irradiance"]) if isinstance(g, (int, float))})
+                f"&end_date={end}&hourly={query}")["hourly"]
+        out.update({t - 3600: v for t, v in zip(h["time"], h[field]) if isinstance(v, (int, float))})
         start = end + datetime.timedelta(days=1)
     return out
+
+
+def irradiance(first, last, azimuth):
+    return hourly(first, last, f"global_tilted_irradiance&tilt={TILT}&azimuth={azimuth}", "global_tilted_irradiance")
+
+
+def derate(g, temp):
+    """A module's power at an irradiance and the air's temperature against its power at 25 °C cell temperature."""
+    return 1 if temp is None else 1 + TEMPERATURE_COEFFICIENT * (temp + CELL_RISE * g - 25)
 
 
 def influx(query):
@@ -66,20 +82,49 @@ def main():
         k = json.loads(r.read().decode())["k"]
     print(f"factors east {k['east']}, west {k['west']}, north {k['north']} W per W/m²; days {first} to {last}")
     g = {plane: irradiance(first, last, azimuth) for plane, azimuth in PLANES.items()}
+    temps = hourly(first, last, "temperature_2m", "temperature_2m")
     hours = sorted(t for t in g["east"] if t in g["west"] and t in g["north"])
     end = int(datetime.datetime.combine(last + datetime.timedelta(days=1), datetime.time(), TZ).timestamp())
-    points = [(t, round(k["east"] * g["east"][t] + k["west"] * g["west"][t] + k["north"] * g["north"][t]))
-              for t in hours if t < end]
+    # the strings' energy per hour (kWh, the mean kW), for the factors of each day
+    a = int(datetime.datetime.combine(first, datetime.time(), TZ).timestamp())
+    measured = {n: {t: v for t, v in influx(f"SELECT integral(value, 1h) / 1000 FROM huawei_inverter_pv{n}_power "
+                                            f"WHERE time >= {a}s AND time < {end}s GROUP BY time(1h)") if v is not None}
+                for n in (1, 2)}
+    unit = lambda p, t: MODULES[p] * g[p][t] * derate(g[p][t], temps.get(t))
+    by_day = {}
+    for t in hours:
+        by_day.setdefault(datetime.datetime.fromtimestamp(t, TZ).date(), []).append(t)
+    days_sorted = sorted(by_day)
+    factors = {}
+    for i, d in enumerate(days_sorted):
+        sums = [0.0, 0.0, 0.0, 0.0]
+        for x in days_sorted[max(0, i - FIT_DAYS):i]:
+            for t in by_day[x]:
+                x1, x2 = unit("east", t), unit("west", t) + unit("north", t)
+                if x1 + x2 > 0 and t in measured[1] and t in measured[2]:
+                    sums[0] += measured[1][t] * 1000; sums[1] += x1; sums[2] += measured[2][t] * 1000; sums[3] += x2
+        if i >= 7 and sums[1] > 0 and sums[3] > 0:
+            factors[d] = (sums[0] / sums[1], sums[2] / sums[3])
+    first_fit = factors[min(factors)]
+    print(f"factors per module, the last day's: string 1 {factors[max(factors)][0]:.3f}, string 2 "
+          f"{factors[max(factors)][1]:.3f} W per W/m² (the rule now: east {k['east']}, west {k['west']}, north {k['north']})")
+    points = []
+    for t in hours:
+        if t >= end:
+            continue
+        s1, s2 = factors.get(datetime.datetime.fromtimestamp(t, TZ).date(), first_fit)
+        points.append((t, round(s1 * unit("east", t) + s2 * (unit("west", t) + unit("north", t)))))
     print(f"{len(points)} hours, the first {datetime.datetime.fromtimestamp(points[0][0], TZ)}, "
           f"the last {datetime.datetime.fromtimestamp(points[-1][0], TZ)}")
-    # each day's forecast against the measured yield, the day's last value of energy_daily_pv (written at 23:59:59)
+    # each day's forecast against the strings' generation, energy_daily_pv_generation's point at the day's 23:59:59
     days = {}
     for t, w in points:
         d = datetime.datetime.fromtimestamp(t, TZ).date()
-        days[d] = days.get(d, 0) + w / 1000
+        if first <= d <= last:
+            days[d] = days.get(d, 0) + w / 1000
     measured = {datetime.datetime.fromtimestamp(t, TZ).date(): v
-                for t, v in influx(f"SELECT last(value) FROM energy_daily_pv WHERE time >= '{first}T00:00:00Z' "
-                                   "GROUP BY time(1d, 22h)") if v is not None}
+                for t, v in influx(f"SELECT value FROM energy_daily_pv_generation WHERE time >= '{first}T00:00:00Z'")
+                if v is not None}
     months = {}
     for d, f in days.items():
         if d in measured:
@@ -92,6 +137,8 @@ def main():
     if not apply:
         return
     lines = [f"{ITEM},item={ITEM} value={w} {t + 1800}" for t, w in points]
+    lines += [f"{DAILY},item={DAILY} value={round(kwh, 2)} "
+              f"{int(datetime.datetime.combine(d, datetime.time(23, 59, 59), TZ).timestamp())}" for d, kwh in days.items()]
     for i in range(0, len(lines), 5000):
         req = urllib.request.Request(f"{INFLUX}/write?db=openhab&precision=s", method="POST",
                                      data="\n".join(lines[i:i + 5000]).encode())

@@ -233,6 +233,9 @@ ITEM_PROP_NAMES = {
     "huawei_inverter_energy_storage_soc": "batterySoc", "huawei_inverter_energy_storage_day_charge": "batteryChargeToday",
     "huawei_inverter_energy_storage_day_discharge": "batteryDischargeToday", "home_active_power": "homePower",
     "home_ec_day": "homeEnergyToday", "photovoltaics_own_ec_day": "pvSelfUseToday", "epex_spot_awattar": "priceMarketNet",
+    "photovoltaics_generation_day": "pvGenerationToday", "photovoltaics_peak_day": "pvPeakToday",
+    "home_from_pv_day": "homeFromPvToday", "home_from_battery_day": "homeFromBatteryToday",
+    "home_from_grid_day": "homeFromGridToday",
     "espaltherma_electrical_power": "heatpumpPower", "espaltherma_heating_power": "heatpumpHeatPower",
     "heatpump_power": "heatpumpCircuitPower", "espaltherma_electrical_power_buh": "heatpumpBuhPower",
     "espaltherma_electrical_power_bsh": "heatpumpBshPower",
@@ -1077,8 +1080,12 @@ def share_ring(cx, cy, title, part, whole, r=22, visible=None, lift=0):
             svg_text(cx + 32, cy + 14 - lift, "today", 11, anchor="start", opacity="0.5")], visible=visible)]
 
 
-SELF_CONSUMPTION = ("Self-consumption", num("photovoltaics_own_ec_day"), num("huawei_inverter_e_day"))
-SELF_SUFFICIENCY = ("Self-sufficiency", num("photovoltaics_own_ec_day"), num("home_ec_day"))
+# on the strings' generation since 2026-10-19 (the inverter's yield counts the battery's discharge): self-consumption is
+# the generation less the export (in the house or into the battery) of the generation, self-sufficiency the house's
+# consumption not taken from the grid
+SELF_CONSUMPTION = ("Self-consumption", num("photovoltaics_own_ec_day"), num("photovoltaics_generation_day"))
+SELF_SUFFICIENCY = ("Self-sufficiency", f"Math.max(0, {num('home_ec_day')} - {num('huawei_inverter_power_meter_ec_day')})",
+                    num("home_ec_day"))
 HOME_XY = (241.9, 210.2)
 SPOKE = 170  # distance of every node from the house
 FLOW_W, FLOW_H = 461, 461
@@ -1531,7 +1538,7 @@ def energy_flow():
         # the air conditioner's mode (user, 2026-10-04: instead of the power symbol), filled while it is on
         ring_badge(round(AC_XY[0] - ON_RING, 1), round(AC_XY[1] - ON_RING, 1), AC_MODE_ICON, AC_BLUE, AC_ON_STATE),
         vent_level_badge(*VENT_XY),
-        *beside(PV_XY, f"={kw(PV)}", f"={disp('huawei_inverter_e_day')} + ' heute'", -1),
+        *beside(PV_XY, f"={kw(PV)}", f"={disp('photovoltaics_generation_day')} + ' heute'", -1),
         *vent_texts,
         *below(GRID_XY, f"={signed_kw}", into_out_of(("Bezug", num("huawei_inverter_power_meter_ec_day")),
                                                    ("Einsp.", num("huawei_inverter_power_meter_ep_day")))),
@@ -1599,10 +1606,10 @@ def house_tiles():
                       "background": TILE_BG, "min-width": "0", "display": "flex", "align-items": "center", **extra})
     return div([tile(home, "flow_home", **{"grid-column": f"={NARROW} ? '1 / -1' : 'auto'"}),
                 tile(share(SELF_CONSUMPTION, svg_pill(56, 34, *points_change("photovoltaics_own_ec_day",
-                                                                             "huawei_inverter_e_day"))),
+                                                                             "photovoltaics_generation_day"))),
                      "flow_self_consumption"),
-                tile(share(SELF_SUFFICIENCY, svg_pill(56, 34, *points_change("photovoltaics_own_ec_day",
-                                                                             "home_ec_day"))),
+                tile(share(SELF_SUFFICIENCY, svg_pill(56, 34, *points_change(
+                    "home_ec_day", "home_ec_day", minus="huawei_inverter_power_meter_ec_day"))),
                      "flow_self_sufficiency")],
                **{"display": "grid", "gap": "8px",
                   "grid-template-columns": f"={NARROW} ? 'repeat(2, minmax(0, 1fr))' : 'repeat(3, minmax(0, 1fr))'"})
@@ -4025,7 +4032,10 @@ value_items = [its for _, its, _ in parts]
 value_items[1] = ["air_conditioning_unit_energy_today"]
 value_items.insert(1, ["e_car_energy_today"])
 value_items.append(None)
-FROM_PV, FROM_GRID = num("photovoltaics_own_ec_day"), num("huawei_inverter_power_meter_ec_day")
+# the house's consumption from PV (the battery's discharge included) and from the grid (less the battery's grid charge,
+# which is no consumption), rule home_energy since 2026-10-19
+FROM_PV = f"({num('home_from_pv_day')} + {num('home_from_battery_day')})"
+FROM_GRID = num("home_from_grid_day")
 PV_GREEN, GRID_RED = "#a5d6a7", "#ef9a9a"
 
 
@@ -4124,6 +4134,7 @@ def consumption_content():
 # ---------------------------------------------------------------- 6. energy per day
 
 SELF_C, IMPORT_C, PV_C = "#81c784", "#e57373", "#ffa000"
+BATTERY_C = "#4db6ac"  # the battery's share of a day's consumption, between PV's green and the grid's red
 PV_AMBER = "#ffb300"  # the PV calendar's view bar and the monthly PV line
 
 
@@ -4133,7 +4144,8 @@ def daily(name, item, color, **extra):
                                         "itemStyle": {"color": color}, **extra})
 
 
-# one column per day of the month: home consumption split into PV and grid, the PV production as a line
+# one column per day of the month: home consumption split into PV straight, the battery and the grid (less the battery's
+# grid charge), the strings' generation as a line (the inverter's yield counts the battery's discharge; 2026-10-19)
 energy_days = chart({"chartType": "month", "periodVisible": True, "height": "100%"},
                     grid=[comp("oh-chart-grid", {"top": "40", "bottom": "70", "left": "45", "right": "20"})],
                     xAxis=[comp("oh-category-axis", {"gridIndex": 0, "categoryType": "month", "name": "Tag", "nameGap": 12,
@@ -4141,10 +4153,11 @@ energy_days = chart({"chartType": "month", "periodVisible": True, "height": "100
                     yAxis=[comp("oh-value-axis", {"gridIndex": 0, "name": "kWh", "nameGap": 14,
                                                   "nameTextStyle": AXIS_NAME,
                                                   "splitLine": {"lineStyle": {"type": "dashed", "opacity": 0.4}}})],
-                    series=[daily("From PV", "energy_daily_self_use", SELF_C, stack="home"),
-                            daily("From Grid", "energy_daily_grid_import", IMPORT_C, stack="home",
+                    series=[daily("From PV", "energy_daily_house_pv", SELF_C, stack="home"),
+                            daily("From Battery", "energy_daily_house_battery", BATTERY_C, stack="home"),
+                            daily("From Grid", "energy_daily_house_grid", IMPORT_C, stack="home",
                                   itemStyle={"color": IMPORT_C, "borderRadius": [4, 4, 0, 0]}),
-                            daily("PV Production", "energy_daily_pv", PV_C, type="line", symbol="circle",
+                            daily("PV Production", "energy_daily_pv_generation", PV_C, type="line", symbol="circle",
                                   symbolSize=7, lineStyle={"width": 2.5, "color": PV_C}, z=3)],
                     tooltip=tooltip(trigger="axis", smartFormatter=True), legend=legend())
 
@@ -4171,7 +4184,7 @@ calendar = chart({"chartType": "year", "periodVisible": True, "height": "250px",
                                                      "dayLabel": {"firstDay": 1}, "yearLabel": {"show": False},
                                                      "monthLabel": {"fontSize": "=screen.width < 600 ? 8 : 12"}})],
                  series=[comp("oh-calendar-series", {"name": "PV Production", "type": "heatmap", "calendarIndex": 0,
-                                                     "item": "energy_daily_pv", "aggregationFunction": "last"})],
+                                                     "item": "energy_daily_pv_generation", "aggregationFunction": "last"})],
                  visualMap=[comp("oh-chart-visualmap", {"show": "=!(screen.width < 600)", "min": 0, "max": 60, "type": "continuous", "calculable": True,
                                                         "orient": "horizontal", "left": "center", "top": "8", "itemWidth": 12, "itemHeight": 200,
                                                         "inRange": {"color": PV_SCALE}})],
@@ -4215,7 +4228,7 @@ pv_halves = chart({"chartType": "year", "periodVisible": True, "height": "318px"
                    "options": {"graphic": pv_halves_graphic}},
                   calendar=[pv_half(PV_T1, PV_X0), pv_half(PV_T2, f"={PV_X0} - 26 * {PV_CW}")],
                   series=[comp("oh-calendar-series", {"name": "PV Production", "type": "heatmap", "calendarIndex": i,
-                                                      "item": "energy_daily_pv", "aggregationFunction": "last"})
+                                                      "item": "energy_daily_pv_generation", "aggregationFunction": "last"})
                           for i in (0, 1)],
                   visualMap=[comp("oh-chart-visualmap", {"show": True, "min": 0, "max": 60, "type": "continuous",
                                                          "calculable": True, "orient": "horizontal", "left": PV_X0,
@@ -4236,7 +4249,7 @@ def pv_hidden_calendar():
 def pv_custom_days(render):
     """The days' yields as a custom series on the hidden calendar, drawn by render."""
     return comp("oh-calendar-series", {"name": "PV Production", "calendarIndex": 0, "type": "custom",
-                                       "renderItem": render, "item": "energy_daily_pv", "aggregationFunction": "last"})
+                                       "renderItem": render, "item": "energy_daily_pv_generation", "aggregationFunction": "last"})
 
 
 def pv_short_scale():
@@ -4321,11 +4334,11 @@ pv_months = chart({"chartType": "year", "periodVisible": True, "height": "250px"
                                                 "splitLine": {"lineStyle": {"type": "dashed", "opacity": 0.4}}}),
                          comp("oh-value-axis", {"gridIndex": 0, "show": False})],
                   series=[comp("oh-aggregate-series", {"name": "PV Production", "gridIndex": 0, "xAxisIndex": 0,
-                                                       "yAxisIndex": 0, "type": "bar", "item": "energy_daily_pv",
+                                                       "yAxisIndex": 0, "type": "bar", "item": "energy_daily_pv_generation",
                                                        "aggregationFunction": "sum", "dimension1": "month",
                                                        "itemStyle": {"color": "#ffb300", "borderRadius": [4, 4, 0, 0]}}),
                           comp("oh-aggregate-series", {"name": "Average per Day", "gridIndex": 0, "xAxisIndex": 0,
-                                                       "yAxisIndex": 1, "type": "line", "item": "energy_daily_pv",
+                                                       "yAxisIndex": 1, "type": "line", "item": "energy_daily_pv_generation",
                                                        "aggregationFunction": "average", "dimension1": "month",
                                                        "symbol": "none", "lineStyle": {"opacity": 0},
                                                        "itemStyle": {"color": "#e65100"}})],
@@ -5508,19 +5521,23 @@ def month_sums(series):
 
 
 def home_sources_today():
-    """Where today's consumption came from: from PV (the battery's share included) and from the grid, as a donut."""
-    own, imp = num("photovoltaics_own_ec_day"), num("huawei_inverter_power_meter_ec_day")
-    return donut_tile("Verbrauch heute: woher", "photovoltaics_own_ec_day",
-                      [("aus PV", own, "#43a047"), ("aus dem Netz", imp, "#e57373")], f"{own} + {imp}",
-                      fixed(num("home_ec_day"), 1), "kWh")
+    """Where today's consumption came from, as a donut: PV straight, the battery and the grid, which counts less the
+    battery's charge from the grid (rule home_energy since 2026-10-19)."""
+    pv, battery, grid = num("home_from_pv_day"), num("home_from_battery_day"), num("home_from_grid_day")
+    return donut_tile("Verbrauch heute: woher", "home_ec_day",
+                      [("aus PV", pv, SELF_C), ("aus dem Akku", battery, BATTERY_C), ("aus dem Netz", grid, IMPORT_C)],
+                      f"{pv} + {battery} + {grid}", fixed(num("home_ec_day"), 1), "kWh")
 
 
 def self_rings():
     """Self-sufficiency and self-consumption of the day as rings."""
-    own, home, pv = num("photovoltaics_own_ec_day"), num("home_ec_day"), num("huawei_inverter_e_day")
+    # on the strings' generation since 2026-10-19: self-consumption the generation less the export of the generation,
+    # self-sufficiency the consumption not taken from the grid
+    own, home, pv = num("photovoltaics_own_ec_day"), num("home_ec_day"), num("photovoltaics_generation_day")
+    autark = f"Math.max(0, {home} - {num('huawei_inverter_power_meter_ec_day')})"
     share = lambda part, whole: f"({whole} > 0 ? 100 * {part} / {whole} : 0)"
-    return (ring_tile("Autarkie heute", "photovoltaics_own_ec_day", "#43a047", pct_expr=share(own, home),
-                      value_expr=f"=Math.round({share(own, home)}) + ' %'", sub="des Verbrauchs aus eigenem PV"),
+    return (ring_tile("Autarkie heute", "home_ec_day", "#43a047", pct_expr=share(autark, home),
+                      value_expr=f"=Math.round({share(autark, home)}) + ' %'", sub="des Verbrauchs nicht aus dem Netz"),
             ring_tile("Eigenverbrauch heute", "photovoltaics_own_ec_day", "#43a047", pct_expr=share(own, pv),
                       value_expr=f"=Math.round({share(own, pv)}) + ' %'", sub="des PV-Ertrags selbst genutzt"))
 
@@ -5554,17 +5571,18 @@ def home_blocks():
                           visual_map=sign_colors(2))
     # the day's values in the device pages' forms (user, 2026-10-06)
     today = vt_grid([compare_tile("Verbrauch heute", "home_ec_day", HOME_BLUE, better="less"),
-                     compare_tile("PV-Ertrag", "huawei_inverter_e_day", "#ffb300", better="more"),
+                     compare_tile("PV-Ertrag", "photovoltaics_generation_day", "#ffb300", better="more"),
                      home_sources_today(), self_rings()[0], self_rings()[1],
                      grid_day("huawei_inverter_power_meter_ec_day", "huawei_inverter_power_meter_ep_day")(
                          {"title": "", "item": "huawei_inverter_power_meter_ec_day"})[0],
                      battery_day("Akku heute", "huawei_inverter_energy_storage_day_charge",
                                  "huawei_inverter_energy_storage_day_discharge")])
     props = overview_widget_props()
-    months = month_sums([("From PV", "energy_daily_self_use", SELF_C, {"stack": "home"}),
-                         ("From Grid", "energy_daily_grid_import", IMPORT_C,
+    months = month_sums([("From PV", "energy_daily_house_pv", SELF_C, {"stack": "home"}),
+                         ("From Battery", "energy_daily_house_battery", BATTERY_C, {"stack": "home"}),
+                         ("From Grid", "energy_daily_house_grid", IMPORT_C,
                           {"stack": "home", "itemStyle": {"color": IMPORT_C, "borderRadius": [4, 4, 0, 0]}}),
-                         ("PV Production", "energy_daily_pv", PV_AMBER,
+                         ("PV Production", "energy_daily_pv_generation", PV_AMBER,
                           {"type": "line", "symbol": "circle", "symbolSize": 7, "lineStyle": {"width": 2.5, "color": PV_AMBER},
                            "z": 3})])
     # Heute under Jetzt, where Jetzt left space beside the day's power (user, 2026-10-05), and the consumers of the
@@ -5624,14 +5642,15 @@ def appliances_blocks():
 # the energy flow's own popups, for the two nodes without a device page, laid out like the device pages and opened as
 # wide as they are: uid: (label, builder of the blocks)
 def self_consumption_blocks():
-    """Self-consumption, the share of PV's yield the house uses itself, in the battery included: where PV's power goes
-    now, today's yield and its parts, and per day and per month what was used and what was fed in."""
+    """Self-consumption, the share of the strings' generation the house uses itself, in the battery included: where
+    PV's power goes now, today's generation and its parts, and per day and per month what was used and what was fed
+    in (on the generation since 2026-10-19, as the inverter's yield counts the battery's discharge)."""
     now = [hero("material:solar_power", "#ffb300", "PV-Leistung", f"={kw(PV)}",
                 [chip(f"={num(PV)} > 10 ? 'jetzt ' + Math.round(100 * ({PV_HOUSE} + {PV_BATT}) / {num(PV)}) + "
                       f"' % selbst genutzt' : 'PV ruht'", f"={num(PV)} > 10 ? '#43a047' : '#9e9e9e'")],
                 picture=node_icon("pv", "#ffb300", flowing(num(PV), 10), power=num(PV))),
            *pv_destinations()]
-    today = vt_grid([self_rings()[1], compare_tile("PV-Ertrag", "huawei_inverter_e_day", "#ffb300", better="more"),
+    today = vt_grid([self_rings()[1], compare_tile("PV-Ertrag", "photovoltaics_generation_day", "#ffb300", better="more"),
                      own_use("", "photovoltaics_own_ec_day"),
                      vtile("Akku geladen", "huawei_inverter_energy_storage_day_charge")])
     split = [("Selbst genutzt", "energy_daily_self_use", SELF_C), ("Eingespeist", "energy_daily_grid_export", "#90a4ae")]
@@ -5641,8 +5660,8 @@ def self_consumption_blocks():
 
 def self_sufficiency_blocks():
     """Self-sufficiency, the share of the house's consumption that PV covers, by way of the battery too: where the
-    house's power comes from now, today's consumption and its sources, and per day and per month from PV and from the
-    grid."""
+    house's power comes from now, today's consumption and its sources, and per day and per month from PV straight,
+    from the battery and from the grid (less the battery's grid charge; 2026-10-19)."""
     own = f"({PV_HOUSE} + {BATT_OUT})"
     now = [hero("material:home", HOME_BLUE, "Hausverbrauch", f"={kw(HOME)}",
                 [chip(f"='jetzt ' + Math.round(100 * Math.min(1, {own} / Math.max(1, {num(HOME)}))) + "
@@ -5650,7 +5669,8 @@ def self_sufficiency_blocks():
            *home_sources()]
     today = vt_grid([self_rings()[0], compare_tile("Verbrauch heute", "home_ec_day", HOME_BLUE, better="less"),
                      home_sources_today(), vtile("Akku entladen", "huawei_inverter_energy_storage_day_discharge")])
-    split = [("From PV", "energy_daily_self_use", SELF_C), ("From Grid", "energy_daily_grid_import", IMPORT_C)]
+    split = [("From PV", "energy_daily_house_pv", SELF_C), ("From Battery", "energy_daily_house_battery", BATTERY_C),
+             ("From Grid", "energy_daily_house_grid", IMPORT_C)]
     months = month_sums([(n, i, c, {"stack": "home"}) for n, i, c in split])
     return two_filled(now, today, day_sums(split, "home"), months)
 
@@ -6128,20 +6148,22 @@ def value_change(item, digits=1, unit="", base=None):
     return text, cls, f"={vt_has(vt_hv(item, 'y'))} && {y} > 0{guard}"
 
 
-def points_change(own, base):
+def points_change(own, base, minus=None):
     """A share (own / base) as yesterday's whole day, "gestern 78 %", as (text, class, visible) for a pill; green where
     today's share so far is higher, orange where lower (more is better), neutral while today's whole has no base yet.
     Yesterday's share at this time read nonsense at night: "+100 Pkt." after a night on an empty battery (user,
-    2026-10-07)."""
-    for i in (own, base):
+    2026-10-07). minus: an item taken off own first, as the self-sufficiency's consumption less the import."""
+    for i in (own, base, *([minus] if minus else [])):
         track_history(i, c=True)
     d_own, d_base = vt_hv(own, "d"), vt_hv(base, "d")
-    today = f"({num(own)} / Math.max({num(base)}, 0.001) * 100)"
-    yday = f"Math.min(100, Number({d_own}) / Math.max(Number({d_base}), 0.001) * 100)"
+    part = f"({num(own)} - {num(minus)})" if minus else num(own)
+    d_part = f"(Number({d_own}) - Number({vt_hv(minus, 'd')}))" if minus else f"Number({d_own})"
+    today = f"(Math.max(0, {part}) / Math.max({num(base)}, 0.001) * 100)"
+    yday = f"Math.min(100, Math.max(0, {d_part}) / Math.max(Number({d_base}), 0.001) * 100)"
     d = f"({today} - {yday})"
     cls = f"({num(base)} < {DAY_BASE_MIN} || Math.abs({d}) < 2 ? 'neutral' : {d} > 0 ? 'good' : 'warn')"
-    return (f"='gestern ' + Math.round({yday}) + ' %'", cls,
-            f"={vt_has(d_own)} && {vt_has(d_base)} && Number({d_base}) >= {DAY_BASE_MIN}")
+    known = f"{vt_has(d_own)} && {vt_has(d_base)}" + (f" && {vt_has(vt_hv(minus, 'd'))}" if minus else "")
+    return (f"='gestern ' + Math.round({yday}) + ' %'", cls, f"={known} && Number({d_base}) >= {DAY_BASE_MIN}")
 
 
 def svg_pill(x, y, text, cls_expr, visible=None):
@@ -7619,7 +7641,8 @@ HP_POWER_ALL = HPX["power"]  # the heat pump's electrical power, incl. its heate
 kw_text = lambda item, d=2: f"={fixed(f'{num(item)} / 1000', d)} + ' kW'"
 STORAGE_ = "huawei_inverter_energy_storage_"
 STORAGE_UNIT1_ = STORAGE_ + "unit_1_"
-PV_DAY, PV_OWN = "huawei_inverter_e_day", "photovoltaics_own_ec_day"
+# the strings' generation, as the inverter's yield (huawei_inverter_e_day) counts the battery's discharge (2026-10-19)
+PV_DAY, PV_OWN = "photovoltaics_generation_day", "photovoltaics_own_ec_day"
 
 
 def absolute_humidity(temp, rh):
@@ -7811,22 +7834,35 @@ def water_today(title, item):
 
 
 def own_use(title, item):
-    parts = [("Eigenverbrauch", num(PV_OWN), "#43a047"),
-             ("Einspeisung", f"Math.max(0, {num(PV_DAY)} - {num(PV_OWN)})", "#a5d6a7")]
-    return donut_tile("Ertrag heute: wohin", item, parts, num(PV_DAY), fixed(num(PV_DAY), 1), "kWh")
+    """Where today's generation went: into the house straight, into the battery (the inverter's losses with it, the
+    rest after the house and the grid) and into the grid (user, 2026-10-19)."""
+    gen, house, export = num(PV_DAY), num("home_from_pv_day"), num("huawei_inverter_power_meter_ep_day")
+    parts = [("ins Haus", f"Math.min({house}, {gen})", SELF_C),
+             ("in den Akku", f"Math.max(0, {gen} - {export} - {house})", BATTERY_C),
+             ("ins Netz", export, "#90a4ae")]
+    return donut_tile("Ertrag heute: wohin", item, parts, gen, fixed(gen, 1), "kWh")
 
 
 def pv_power(title, item):
-    """The inverter's output against the day's peak: the bar to now, the peak as a tick."""
-    peak = "huawei_inverter_active_peak_of_current_day"
-    top = f"Math.max({num(peak)}, {num(item)}, 1)"
-    bars = track_bar([fill_bar(vt_clamp(f"{num(item)} / {top} * 100"), "#5c6bc0", height=10),
+    """The strings' peak of the day (rule photovoltaics_energy_day; the inverter's own peak counts the battery's
+    discharge, user 2026-10-19) and their input power now against it: the bar to now, the peak as a tick."""
+    top = f"Math.max({num(item)}, {num(PV)}, 1)"
+    bars = track_bar([fill_bar(vt_clamp(f"{num(PV)} / {top} * 100"), "#ffb300", height=10),
                       div([], **{"position": "absolute", "right": "0", "top": "-5px", "height": "20px", "width": "2px",
                                  "background": "currentColor"})], height=10, **{"margin": "12px 0 4px"})
-    sub = div([label("0"), label(f"='Spitze heute ' + {kw_text(peak, 3)[1:]}")],
+    sub = div([label("0"), label(f"='jetzt ' + {kw_text(PV, 3)[1:]}")],
               **{"display": "flex", "justify-content": "space-between", **VT_SUB, "margin-top": "6px"})
-    return vt_tile([vt_head(title, vt_chip(f"=Math.round({num(item)} / {top} * 100) + ' % der Spitze'")),
-                 vt_value(kw_text(item, 3)), bars, sub], item, title, "#5c6bc0")
+    return vt_tile([vt_head(title, vt_chip(f"='jetzt ' + Math.round({num(PV)} / {top} * 100) + ' % der Spitze'")),
+                 vt_value(kw_text(item, 3)), bars, sub], item, title, "#ffb300")
+
+
+def pv_forecast_tile(title, item):
+    """The house's own PV forecast (rule pv_forecast): today's total with how much of it the strings have generated,
+    tomorrow's under it (user, 2026-10-19)."""
+    today = num(item)
+    chip = vt_chip(f"={today} > 0 ? Math.round(100 * {num(PV_DAY)} / {today}) + ' % erzeugt' : 'keine Prognose'")
+    sub = label(f"='morgen ' + {dash(disp('pv_forecast_energy_tomorrow'))}", **VT_SUB)
+    return vt_tile([vt_head(title, chip), vt_value(f"={dash(disp(item))}"), sub], item, title, "#ffb300")
 
 
 def plug_energy(title, item):
@@ -7876,17 +7912,19 @@ VALUE_RENDER = {
     "huawei_inverter_power_meter_frequency": vt_r(lambda t, i: band_bar(t, i, 49.8, 50.2, 49.9, 50.1, "#7986cb",
                                                                      nominal=50)),
     # photovoltaics
-    "huawei_inverter_active_power": vt_r(pv_power, "huawei_inverter_active_peak_of_current_day"),
+    "photovoltaics_peak_day": vt_r(pv_power),
+    "pv_forecast_energy": vt_r(pv_forecast_tile),
     # at night the inverter reports 100 % with nothing coming in: no value then (user, 2026-10-07)
     "huawei_inverter_efficiency": vt_r(lambda t, i: ring_tile(
         t, i, "#ffb300", pct_expr=f"({num(PV)} > 0.01 ? {num(i)} : 0)",
         value_expr=f"={num(PV)} > 0.01 ? {dash(disp(i))} : '–'", sub="Wechselrichter")),
     PV_DAY: vt_r(lambda t, i: compare_tile("Ertrag heute", i, "#ffb300", better="more")),
     PV_OWN: vt_r(own_use),
-    "huawei_inverter_e_total": vt_r(lambda t, i: counter_tile("Ertrag gesamt", i, 6, 1, "kWh")),
+    # the inverter's lifetime output, the battery's discharge in it (user, 2026-10-19: named so)
+    "huawei_inverter_e_total": vt_r(lambda t, i: counter_tile("Wechselrichter gesamt", i, 6, 1, "kWh")),
     "huawei_inverter_startup_time": vt_r(lambda t, i: sun_tile("Sonnenbogen des Wechselrichters", i,
                                                        "huawei_inverter_shutdown_time",
-                                                       "huawei_inverter_active_peak_of_current_day", PV),
+                                                       "photovoltaics_peak_day", PV),
                                       "huawei_inverter_shutdown_time"),
     "huawei_inverter_internal_temperature": vt_r(lambda t, i: spark_tile(t, i, "#ff7043", "K", 1, span=6)),
     "huawei_inverter_error_code": vt_r(lambda t, i: ok_tile(t, i, f"{num(i)} === 0")),
@@ -8586,6 +8624,8 @@ def hp_days():
     return chart_
 
 
+# the forecast's mark on the yield bars, in the text's tone of each theme
+FORECAST_TICK = "(themeOptions.dark === 'dark' ? '#eeeeee' : '#424242')"
 PHONE_BUTTONS_ABOVE = """@media (max-width: 599px) { .oh-chart-container { height: 560px !important; }
   .oh-chart { top: 40px !important; height: 520px !important; } }"""
 
@@ -8594,11 +8634,11 @@ def photovoltaics_blocks():
     now = [hero("material:solar_power", "#ffb300", "Eingangsleistung", kwc(PV),
                 picture=node_icon("pv", "#ffb300", flowing(num(PV), 10), power=num(PV))),
            value_grid([vtile("Wirkleistung", "huawei_inverter_active_power", kwc("huawei_inverter_active_power")),
-                      vtile("Spitze heute", "huawei_inverter_active_peak_of_current_day",
-                            kwc("huawei_inverter_active_peak_of_current_day")),
+                      vtile("Spitze heute", "photovoltaics_peak_day", kwc("photovoltaics_peak_day")),
                       vtile("Blindleistung", "huawei_inverter_reactive_power"),
                       vtile("Wirkungsgrad", "huawei_inverter_efficiency"),
-                      vtile("Energie heute", "huawei_inverter_e_day", color="#ffb300"),
+                      vtile("Energie heute", PV_DAY, color="#ffb300"),
+                      vtile("Prognose", "pv_forecast_energy", color="#ffb300"),
                       vtile("Eigenverbrauch heute", "photovoltaics_own_ec_day", color="#43a047"),
                       vtile("Energie gesamt", "huawei_inverter_e_total")])]
     # input and output overlapping in one panel, the two strings in the other, so a shaded string shows (user,
@@ -8628,7 +8668,17 @@ def photovoltaics_blocks():
                           vtile("Fehlercode", "huawei_inverter_error_code"),
                           vtile("Optimierer online", "huawei_inverter_optimizers_online"),
                           vtile("Optimierer gesamt", "huawei_inverter_optimizers_total")])
-    days = month_bars("PV-Ertrag", "energy_daily_pv", "#ffb300")
+    # the strings' generation per day against the forecast (user, 2026-10-19): the inverter's yield (energy_daily_pv)
+    # counts the battery's discharge and leaves out what the strings charge it with, so it is no measure of what the
+    # modules made; each day's forecast a short bar across its bar in the text's tone (an outline was too faint on
+    # the bars in the dark and striped the narrow bars of a phone), above a bar that fell short, inside one that beat it
+    days = month_bars("Erzeugung", "energy_daily_pv_generation", "#ffb300")
+    forecast = copy.deepcopy(days["slots"]["series"][0])
+    forecast["config"].update(name="Prognose", item="pv_forecast_energy", type="line", symbol="rect",
+                              symbolSize="=[screen.width < 600 ? 9 : 16, 3]", showAllSymbol=True, z=3,
+                              lineStyle={"opacity": 0}, itemStyle={"color": f"={FORECAST_TICK}"})
+    days["slots"]["series"].append(forecast)
+    days["slots"]["title"] = [stack_title((("Erzeugung", "#ffb300"), ("Prognose", f"={FORECAST_TICK}")), 15)]
     days["config"]["height"] = "100%"
     # strings and grid top right beside Jetzt, the yield per day under them filling the rest of that column; below
     # the day's power as high as the inverter beside it (user, 2026-10-06: no empty card space, the grid kept)
@@ -8866,7 +8916,7 @@ GEN_DE = {
     "Community balance": "EEG Bilanz", "kW": "kW",
     "Total Net": "Gesamt netto", "Market Gross": "Markt brutto", "Market Net": "Markt netto",
     # consumption, daily energy, calendar, temperatures
-    "Consumers": "Verbraucher", "From PV": "Aus PV", "From Grid": "Aus dem Netz", "PV Production": "PV-Ertrag",
+    "Consumers": "Verbraucher", "From PV": "Aus PV", "From Battery": "Aus dem Akku", "From Grid": "Aus dem Netz", "PV Production": "PV-Ertrag",
     "Average per Day": "Ø pro Tag", "kWh": "kWh", "Tag": "Tag", "Indoor": "Innen", "Outdoor": "Außen",
     "Heatpump sensor": "Fühler der Wärmepumpe", "°C": "°C", "W": "W",
     # energy flow popups and the controls

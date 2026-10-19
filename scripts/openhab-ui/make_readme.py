@@ -37,8 +37,11 @@ OVERVIEW = [
      "a node opens its device's page of my installation, on the house and the appliances a popup of their own. "
      "Under the star three tiles: the house as its node inside the pie of what the consumers "
      "draw, as large as the rings beside it, with its power and today's energy against yesterday's at this time "
-     "in a pill (the difference in kWh), and today's self-consumption and self-sufficiency as rings, each with yesterday's whole day in a "
-     "pill, green while today's share is higher, orange while lower. The card places its lines and nodes as "
+     "in a pill (the difference in kWh), and today's self-consumption (the PV generation less the export, of the "
+     "generation) and self-sufficiency (the consumption not taken from the grid) as rings, each with yesterday's whole day in a "
+     "pill, green while today's share is higher, orange while lower. PV's energy is the strings' generation: a hybrid "
+     "inverter's own day yield counts the battery's discharge and leaves out what charges the battery. The card "
+     "places its lines and nodes as "
      "`flow-link` and `flow-node`. The recording and the dark screenshot show it with demo powers; today's energies "
      "and the comparisons are those of the moment shown."),
     ("switches-card", "Switches", "The switchable plugs under the energy flow as `switch-tile`s, five abreast, three "
@@ -105,15 +108,18 @@ OVERVIEW = [
      "stands at its own size, as the energy flow does, so their texts keep the UI's sizes and their rings come out the "
      "same and never shrink, centred and in the middle of the height the card is given. The recordings show it with demo "
      "values (a space heating run)."),
-    ("consumption-card", "Consumption today", "Today's consumption as one bar split by source (PV, grid), the "
+    ("consumption-card", "Consumption today", "Today's consumption as one bar split by source (PV with the battery, "
+     "the grid less what charged the battery from it), the "
      "total against yesterday at this time in a pill between the two shares (the difference in kWh), and as one bar "
      "split by consumer, with "
      "a legend in two columns that gives each consumer's energy and how many kWh more (orange) or fewer (green) it "
      "drew than yesterday until this time; hovering a part lifts it everywhere. The screenshot shows it with demo "
      "values."),
-    ("energy-days-card", "Energy per day", "The month's daily home consumption as stacked bars: from PV and from the "
-     "grid, with PV production beside it."),
-    ("pv-days-card", "PV production per day", "The daily PV yield of a year in four views a bar switches: a "
+    ("energy-days-card", "Energy per day", "The month's daily home consumption as stacked bars: from PV straight, from "
+     "the battery and from the grid (less what charged the battery from it), with the strings' PV generation as a "
+     "line."),
+    ("pv-days-card", "PV production per day", "The daily PV generation of a year (the strings' energy) in four views "
+     "a bar switches: a "
      "calendar heatmap of the year, two half-years, twelve month calendars and the months' sums as bars; a wider "
      "screen gets the year, the month calendars and the bars, a phone the half-years instead of the year."),
     ("temperatures-card", "Temperatures", "Indoor and outdoor temperature now, each with its change over the last "

@@ -3,26 +3,32 @@ tags:
 - overview
 props:
   parameters:
-  - name: dailySelfUse
-    label: Energy Daily Self Use
+  - name: dailyHousePv
+    label: Energy Daily Home from PV
     description: Number:Energy item
     type: TEXT
     required: true
     context: item
-  - name: dailyGridImport
-    label: Energy Daily Grid Import
+  - name: dailyHouseBattery
+    label: Energy Daily Home from Battery
     description: Number:Energy item
     type: TEXT
     required: true
     context: item
-  - name: dailyPv
-    label: Energy Daily PV
+  - name: dailyHouseGrid
+    label: Energy Daily Home from Grid
+    description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  - name: dailyPvGeneration
+    label: Energy Daily PV Generation
     description: Number:Energy item
     type: TEXT
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 10, 2026, 5:24:26 PM
+timestamp: Oct 19, 2026, 7:38:59 PM
 component: oh-card
 config:
   title: Energy per Day
@@ -103,11 +109,24 @@ slots:
                   xAxisIndex: 0
                   yAxisIndex: 0
                   type: bar
-                  item: =props.dailySelfUse
+                  item: =props.dailyHousePv
                   aggregationFunction: last
                   dimension1: date
                   itemStyle:
                     color: '#81c784'
+                  stack: home
+              - component: oh-aggregate-series
+                config:
+                  name: From Battery
+                  gridIndex: 0
+                  xAxisIndex: 0
+                  yAxisIndex: 0
+                  type: bar
+                  item: =props.dailyHouseBattery
+                  aggregationFunction: last
+                  dimension1: date
+                  itemStyle:
+                    color: '#4db6ac'
                   stack: home
               - component: oh-aggregate-series
                 config:
@@ -116,7 +135,7 @@ slots:
                   xAxisIndex: 0
                   yAxisIndex: 0
                   type: bar
-                  item: =props.dailyGridImport
+                  item: =props.dailyHouseGrid
                   aggregationFunction: last
                   dimension1: date
                   itemStyle:
@@ -134,7 +153,7 @@ slots:
                   xAxisIndex: 0
                   yAxisIndex: 0
                   type: line
-                  item: =props.dailyPv
+                  item: =props.dailyPvGeneration
                   aggregationFunction: last
                   dimension1: date
                   itemStyle:
