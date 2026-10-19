@@ -19,7 +19,14 @@
 // without the lock, the curve plus the offset the lock was taken from. In the day heating's window (heatpump_day_heating,
 // user, 2026-10-13) the guard locks only after a hot-water charge or a short run, as above 9 °C, whatever the outdoor
 // air, so the window's own runs go on; in its night it keeps out and leaves a lock to it as it stands, as a release to
-// the day offset would call for heat until the night's offset arrives.
+// the day offset would call for heat until the night's offset arrives. The outdoor unit protects itself by its own air
+// sensor (the one read here) and heats nothing above 25 °C there. After every stop it reads that sensor again only
+// after 12 minutes, and standing still in the midday sun the sensor has climbed by then, by 3 to 5 K: of 18 daytime
+// pauses from 3 to 18 October 2026 with 19.5 °C or more at the stop, 9 reached 25 °C 12 to 18 minutes after the stop
+// (the others had little sun, or a restart came first), and the outdoor unit, powered down by its power saving
+// function, then kept the heating out for 2 h 11 min or a multiple (16 and 18 October: 4 h 22 min after a lock of the
+// guard after a hot-water charge). So the guard locks nothing where that sensor read 19.5 °C or more at the stop, and
+// gives a lock free once it reads 22.5 °C, where it climbs more slowly (user, 2026-10-18).
 const LOCK = 5;              // K the offset is lowered by while starts are locked
 const COLD = 9;              // °C outdoor air below which a start's start-up control runs at 42–48 Hz
 const RETURN_COLD = 3.2;     // K below the curve the return must be below 9 °C, with a hot compressor
@@ -40,6 +47,8 @@ const FLOW = 5;              // l/min at least for the return reading to be the 
 const OFFSET_MIN = -10;      // the controller's offset range is −10..+10
 const EFFECT = 1;            // K at least by which a lock must lower the setpoint to be worth it
 const FLOOR_AGE = 6;         // hours after which a minimum met is tried again (the installer setting may have changed)
+const SUN_STOP = 19.5;       // °C at the outdoor unit's sensor at a stop from which the sun may lift it to 25 °C
+const SUN = 22.5;            // °C at that sensor at which a lock goes, early enough for the call and the start-up
 
 const offsetItem = items.getItem('pyaltherma_leaving_water_temp_offset_heating');
 const lockItem = items.getItem('heatpump_cycle_lock');
@@ -219,6 +228,8 @@ if (missing) {
         why = `the controller keeps the setpoint at ${setpoint} °C, its minimum`;
       } else if (freq > 0 && valve === 'Space') {
         why = 'the compressor runs for the heating';
+      } else if (outdoor >= SUN && freq === 0) {
+        why = `outdoor unit's sensor at ${outdoor} °C after ${Math.round(pause)} min, the sun lifts it to its 25 °C limit`;
       } else if (pause >= MAX_PAUSE) {
         why = `${MAX_PAUSE} min after the stop`;
       } else if (free && pause >= MIN_PAUSE) {
@@ -238,11 +249,16 @@ if (missing) {
     } else if (stop !== null && !stop.done && freq === 0) {
       const defrost = cache.private.get('defrost') || 0;
       const hot = stop.dhw || (stop.minutes !== null && stop.minutes < SHORT);
-      if (!enabled || !heating || now - defrost < DEFROST_GAP * 60000 || pause >= MAX_PAUSE || (mild && !hot)) {
+      const due = enabled && heating && pause < MAX_PAUSE && !(mild && !hot);
+      // the outdoor unit's sensor still reads as at the stop (it reads again 12 minutes after)
+      if (!due || now - defrost < DEFROST_GAP * 60000 || outdoor >= SUN_STOP) {
         // nothing to lock for this stop (a defrost's stop is followed by its restart)
         if (now - defrost >= DEFROST_GAP * 60000 && pause * 60 >= DELAY) {
           stop.done = true;
           cache.private.put('stop', stop);
+          if (due && outdoor >= SUN_STOP) {
+            console.info(`cycle guard: no lock, the outdoor unit's sensor read ${outdoor} °C at the stop`);
+          }
         }
       } else if (pause * 60 >= DELAY) {
         stop.done = true;

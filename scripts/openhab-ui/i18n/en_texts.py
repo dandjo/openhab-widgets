@@ -95,6 +95,7 @@ EN = {
     "{s0|Heißgas} · {s1|Soll gestrichelt}": "{s0|Hot gas} · {s1|Target dashed}",
     "{s0|Temperatur} · {s1|Soll gestrichelt}": "{s0|Temperature} · {s1|Target dashed}",
     "{s0|Vorlauf} · {s1|Rücklauf}": "{s0|Flow} · {s1|Return}",
+    "Soll gestrichelt": "Target dashed",
     "{s0|Heizstab} · {s1|Zusatzheizung}": "{s0|Backup heater} · {s1|Booster heater}",
     "Ventil auf Warmwasser": "Valve on hot water", "Auf Warmwasser": "On hot water",
     "Space=Heizung,DHW=Warmwasser": "Space=Heating,DHW=Hot water",
@@ -212,10 +213,10 @@ EN.update({"Heizkurve": "Heating curve", "Heizkurve (fortgesetzt": "Heating curv
            "°C außen": "°C outdoor", "°C außen</div>": "°C outdoor</div>", "Außen Ø 24 h": "Outdoor Ø 24 h",
            "ESPAltherma Außentemperatur gemittelt": "ESPAltherma External Ambient Temperature Average"})
 
-    # the heating card's compressor start badges and the cycle guard's note (2026-10-11)
+    # the heating card's compressor run badges and the cycle guard's note (2026-10-11)
 EN.update({"Taktschutz · Pause": "Cycle guard · pause",
-           "Wärmepumpe Starts Warmwasser heute": "Heatpump DHW Starts Today",
-           "Wärmepumpe Starts Heizung heute": "Heatpump Heating Starts Today",
+           "Wärmepumpe Läufe Warmwasser heute": "Heatpump DHW Runs Today",
+           "Wärmepumpe Läufe Heizung heute": "Heatpump Heating Runs Today",
            "Wärmepumpe Taktschutz Sperre": "Heatpump Cycle Guard Lock"})
 
     # installation texts the screenshots show (Miele programs and phases), for ui_proxy.py

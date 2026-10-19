@@ -303,11 +303,12 @@ in a pill in the middle of its title (the difference in kWh), and today's COPs o
 row as rings like the energy flow's self-consumption, each with today against yesterday at this time in a pill under its
 title; a tap on one opens the item popup with that COP large inside its ring, beside it today's heat and electricity it
 is the ratio of and yesterday's whole day, and its course over the day. While the tank charges or the heating runs, a
-line under its tile says since when. A round badge right of each tile's pills counts today's compressor starts, for hot
-water and for the heating (the restarts of a defrost do not count), outlined in the tile's colour, grey at none; while
-the cycle guard of my installation holds back the next start after a stop (it lowers the leaving water setpoint until
-the return water has cooled well below the heating curve, so that the run after it lasts), a line under the heating tile
-says so. The screenshots show it with the heat pump card's demo values and the start counts of the moment shown.
+line under its tile says since when. A round badge right of each tile's pills counts today's compressor runs in the
+tile's mode: every stretch of 2 minutes or more in which the compressor runs with the three-way valve on that side, so a
+charge that takes over a running heating run counts for hot water (the restarts of a defrost do not count), outlined in
+the tile's colour, grey at none; while the cycle guard of my installation holds back the next start after a stop (it
+lowers the leaving water setpoint until the return water has cooled well below the heating curve, so that the run after
+it lasts), a line under the heating tile says so. The screenshots show it with the heat pump card's demo values.
 
 Needs `flow-node`, `item-popup`.
 
@@ -331,7 +332,7 @@ Needs `flow-node`, `item-popup`.
 | `heatpumpDhwEta` | Heatpump DHW Done At | DateTime |
 | `heatpumpDhwSince` | Heatpump DHW Charging Since | DateTime |
 | `heatpumpDhwSetpoint` | ESPAltherma DHW Setpoint | Number:Temperature |
-| `heatpumpStartsDhwToday` | Heatpump DHW Starts Today | Number |
+| `heatpumpStartsDhwToday` | Heatpump DHW Runs Today | Number |
 | `heatpumpPower` | ESPAltherma Electrical Power | Number:Power |
 | `heatpumpBuhStep1Mode` | ESPAltherma Backup Heater (BUH) Step 1 Mode | Switch |
 | `heatpumpBuhStep2Mode` | ESPAltherma Backup Heater (BUH) Step 2 Mode | Switch |
@@ -339,7 +340,7 @@ Needs `flow-node`, `item-popup`.
 | `heatpumpLeavingWaterTempAfterBuh` | ESPAltherma Leaving Water Temperature After BUH | Number:Temperature |
 | `heatpumpClimateControlPower` | Pyaltherma Climate Control Power | Switch |
 | `heatpumpLeavingWaterSetpoint` | ESPAltherma Leaving Water Setpoint | Number:Temperature |
-| `heatpumpStartsHeatingToday` | Heatpump Heating Starts Today | Number |
+| `heatpumpStartsHeatingToday` | Heatpump Heating Runs Today | Number |
 | `heatpumpHeatingSince` | Heatpump Heating Running Since | DateTime |
 | `heatpumpCycleLock` | Heatpump Cycle Guard Lock | Number |
 | `heatpumpEnergyToday` | ESPAltherma Energy Today | Number:Energy |

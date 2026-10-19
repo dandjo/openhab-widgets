@@ -1,16 +1,22 @@
 #!/usr/bin/env python3
-"""Compressor starts per day, for hot water and for the heating (user, 2026-10-11: "wie viele Starts es pro Tag gab ...
-eine Nummer jeweils für Warmwasser und Heizung separat"), as badges on the overview's Heizung & Warmwasser.
-The rule heatpump_starts_today (hp_starts.js next to this file) counts a start whenever the compressor
-(espaltherma_inv_frequency) leaves 0 Hz: for hot water when the valve stands on DHW at the start or within its first
-2 minutes, else for the heating; a heating run whose valve turns to hot water later is no new start. During a defrost
-the compressor stops for about a minute, twice; a start at most 2 minutes after a stop, with the defrost flag on from
-2 minutes before that stop, continues the run (in the history 2024-09..2026-10 every defrost restart came after
-30-90 s, every other restart after 90 s or more). The counts start at 0 at midnight; MapDB restores them after a
-restart, and a restored count without a point in InfluxDB since midnight is yesterday's and goes back to 0.
-Replayed on the history: 2026-10-10 2 hot-water and 18 heating starts, 2026-01-15 0 and 3 (44 defrost restarts not
-counted; both charges of that day began inside heating runs).
-Both items: InfluxDB on change (one point per start, the day's last value is its count), MapDB restores them.
+"""Compressor runs per day, for hot water and for the heating (user, 2026-10-11: "wie viele Starts es pro Tag gab ...
+eine Nummer jeweils für Warmwasser und Heizung separat"; 2026-10-19: "das Badge soll jeden Verdichterlauf im
+Warmwassermodus zählen. Die Heizung jeden Verdichterlauf im Heizungsmodus"), as badges on the overview's Heizung &
+Warmwasser; the item names stay from when they counted starts. The rule heatpump_starts_today (hp_starts.js next to
+this file) counts every stretch in which the compressor (espaltherma_inv_frequency above 0 Hz) runs with the valve on
+one side once it has lasted 2 minutes: for hot water while the valve stands on DHW, else for the heating, so a charge
+that takes over a running heating run counts for hot water. A turn of the valve for less than 2 minutes and back
+continues the stretch before it; a run with no stretch of 2 minutes counts once, for hot water if its valve stood on
+DHW at any time. During a defrost the compressor stops for about a minute, twice; a start at most 2 minutes after a
+stop, with the defrost flag on from 2 minutes before that stop, continues the run and its stretch (in the history
+2024-09..2026-10 every defrost restart came after 30-90 s, every other restart after 90 s or more). The counts start
+at 0 at midnight; MapDB restores them after a restart, and a restored count without a point in InfluxDB since midnight
+is yesterday's and goes back to 0.
+Replayed on the history: 2026-10-13 6 hot-water and 11 heating runs (counted as starts: 3 and 11), 2026-01-15 2 and 3
+(as starts: 0 and 3, both charges began inside heating runs); in 10-19 October and 11-20 January every charge ended
+with a stop of the compressor, so the heating counts equal the start counts. The rule's replay rewrote both items'
+history from 2026-10-11 on 2026-10-19.
+Both items: InfluxDB on change (one point per run, the day's last value is its count), MapDB restores them.
 apply DHW HEATING sets today's counts once the rule has run (for a start in the middle of a day).
 Usage: hp_starts.py check|apply [DHW HEATING]   (on homepi, as pi; the API token from ~/.openhab_token)"""
 import json
@@ -29,16 +35,16 @@ TOKEN = open(os.path.expanduser("~/.openhab_token")).read().strip()
 SCRIPT = open(os.path.join(HERE, "hp_starts.js"), encoding="utf-8").read()
 UID, DHW, HEATING = "heatpump_starts_today", "heatpump_starts_dhw_today", "heatpump_starts_heating_today"
 ITEMS = {
-    DHW: {"type": "Number", "name": DHW, "label": "Wärmepumpe Starts Warmwasser heute", "category": "material:autorenew",
+    DHW: {"type": "Number", "name": DHW, "label": "Wärmepumpe Läufe Warmwasser heute", "category": "material:autorenew",
           "tags": [], "groupNames": ["influxdb_change", "mapdb_change_restore"]},
-    HEATING: {"type": "Number", "name": HEATING, "label": "Wärmepumpe Starts Heizung heute",
+    HEATING: {"type": "Number", "name": HEATING, "label": "Wärmepumpe Läufe Heizung heute",
               "category": "material:autorenew", "tags": [], "groupNames": ["influxdb_change", "mapdb_change_restore"]},
 }
 METADATA = {name: {"stateDescription": {"value": " ", "config": {"pattern": "%d"}}} for name in ITEMS}
 WATCHED = ("espaltherma_inv_frequency", "espaltherma_3way_valve_mode", "espaltherma_defrost_operaton")
 RULE = {
     "uid": UID,
-    "name": "Wärmepumpe Starts heute",
+    "name": "Wärmepumpe Läufe heute",
     "description": RULE_DESCRIPTIONS[UID],
     "tags": [],
     "triggers": [{"type": "core.ItemStateChangeTrigger", "configuration": {"itemName": n}} for n in WATCHED] +

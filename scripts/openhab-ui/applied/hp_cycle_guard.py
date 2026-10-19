@@ -27,6 +27,11 @@ a write (it reads heatpump_day_heating_state, so apply hp_day_heating.py first).
 setpoint without the lock, the curve plus the offset the lock was taken from (the day offset in the window). Every
 decision waits 20 seconds after any change of the offset, not only after its own writes, as the setpoint reports back
 about 5 seconds later.
+The outdoor unit protects itself by its own air sensor (espaltherma_outdoor_air_temp) and heats nothing above 25 °C
+there; after a stop it reads that sensor again only after 12 minutes, by when the midday sun has lifted it by 3 to
+5 K, and its power saving then keeps the heating out for 2 h 11 min or a multiple (16 and 18 October 2026: 4 h 22 min
+after a lock after a hot-water charge). So the guard locks nothing where that sensor read 19.5 °C or more at the stop
+and gives a lock free once it reads 22.5 °C (user, 2026-10-18).
 Usage: hp_cycle_guard.py check|apply   (on homepi, as pi; the API token from ~/.openhab_token)"""
 import json
 import os

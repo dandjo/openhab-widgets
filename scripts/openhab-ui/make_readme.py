@@ -68,12 +68,13 @@ OVERVIEW = [
      "one opens the item popup with that COP large inside its ring, beside it today's heat and electricity it is "
      "the ratio of and yesterday's whole day, and its course over the day. "
      "While the tank charges or the heating runs, a line under its tile says since when. A round badge right of "
-     "each tile's pills counts today's compressor starts, for hot water and for the heating (the restarts of a "
-     "defrost do not count), outlined in the tile's colour, grey at none; while the cycle guard of my installation "
+     "each tile's pills counts today's compressor runs in the tile's mode: every stretch of 2 minutes or more in "
+     "which the compressor runs with the three-way valve on that side, so a charge that takes over a running heating "
+     "run counts for hot water (the restarts of a defrost do not count), outlined in the tile's colour, grey at "
+     "none; while the cycle guard of my installation "
      "holds back the next start after a stop (it lowers the leaving water setpoint until the return water has "
      "cooled well below the heating curve, so that the run after it lasts), a line under the heating tile says "
-     "so. The screenshots show it with the heat pump card's demo values and the "
-     "start counts of the moment shown."),
+     "so. The screenshots show it with the heat pump card's demo values."),
     ("electricity-price-card", "Electricity price", "The all-in price, the cheapest and priciest hour, a line on the "
      "renewable energy community the house belongs to (its balance now and its next surplus window with the expected "
      "energy), and the prices 12 hours back and 36 hours ahead, coloured green, orange and red by price, with the "

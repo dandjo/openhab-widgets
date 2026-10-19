@@ -70,7 +70,7 @@ props:
     required: true
     context: item
   - name: heatpumpStartsDhwToday
-    label: Heatpump DHW Starts Today
+    label: Heatpump DHW Runs Today
     description: Number item
     type: TEXT
     required: true
@@ -118,7 +118,7 @@ props:
     required: true
     context: item
   - name: heatpumpStartsHeatingToday
-    label: Heatpump Heating Starts Today
+    label: Heatpump Heating Runs Today
     description: Number item
     type: TEXT
     required: true
@@ -202,7 +202,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 18, 2026, 2:43:03 AM
+timestamp: Oct 19, 2026, 6:29:33 PM
 component: oh-card
 config:
   title: Heating & Hot Water

@@ -4799,8 +4799,8 @@ def heat_specs():
     towards the tank's expected end while it charges, the end in a line under the tile; and the leaving water; on is
     the switch for hot water and for heating. The charge's time left and end stand under the heat pump while it charges
     the tank, under the tank while its booster heater heats it alone (user, 2026-10-06), as rule heatpump_dhw_eta
-    tells the two apart: the valve off hot water with the booster heater on. starts: today's compressor starts for
-    the tile's purpose (rule heatpump_starts_today, user 2026-10-11); while the cycle guard lifts the setpoint, a line
+    tells the two apart: the valve off hot water with the booster heater on. starts: today's compressor runs in the
+    tile's mode (rule heatpump_starts_today, user 2026-10-11, runs since 2026-10-19); while the cycle guard lifts the setpoint, a line
     under the heating says by how much."""
     tank = hp_device_icon("tank", "heatTank")
     # the heating's badge: its red bolt only for the backup heater in the wall unit, filled by the heat pump's own
@@ -8150,10 +8150,11 @@ def hp_run_panels():
 
 def hp_temp_panels():
     """The water's and the air's temperatures on the page, each with what it is read against: leaving and inlet
-    water, the tank and its setpoint, the outdoor air with the mean the heating curve works with and the heat exchanger
-    drawing heat from it."""
-    return [([("Vorlauf", SUPPLY), ("Rücklauf", RETURN)],
-             [line("Vorlauf", HPX["supply"], SUPPLY), line("Rücklauf", HPX["return"], RETURN)], span_axis("°C")),
+    water with the leaving water's setpoint (user, 2026-10-18), the tank and its setpoint, the outdoor air with the mean
+    the heating curve works with and the heat exchanger drawing heat from it."""
+    return [([("Vorlauf", SUPPLY), ("Rücklauf", RETURN), ("Soll gestrichelt", SUPPLY)],
+             [line("Vorlauf", HPX["supply"], SUPPLY), line("Rücklauf", HPX["return"], RETURN),
+              line("Soll", "espaltherma_leaving_water_setpoint", SUPPLY, dashed=True)], span_axis("°C")),
             ([("Warmwasser", DHW_C), ("Soll gestrichelt", DHW_C)],
              [line("Warmwasser", HPX["tank"], DHW_C), line("Soll", HPX["tank_set"], DHW_C, dashed=True)],
              span_axis("°C")),
@@ -8585,6 +8586,10 @@ def hp_days():
     return chart_
 
 
+PHONE_BUTTONS_ABOVE = """@media (max-width: 599px) { .oh-chart-container { height: 560px !important; }
+  .oh-chart { top: 40px !important; height: 520px !important; } }"""
+
+
 def photovoltaics_blocks():
     now = [hero("material:solar_power", "#ffb300", "Eingangsleistung", kwc(PV),
                 picture=node_icon("pv", "#ffb300", flowing(num(PV), 10), power=num(PV))),
@@ -8597,14 +8602,20 @@ def photovoltaics_blocks():
                       vtile("Eigenverbrauch heute", "photovoltaics_own_ec_day", color="#43a047"),
                       vtile("Energie gesamt", "huawei_inverter_e_total")])]
     # input and output overlapping in one panel, the two strings in the other, so a shaded string shows (user,
-    # 2026-10-04); two panels, not four, as four were too low to read (user, 2026-10-07)
-    chart_ = stacked_chart([((("Eingang", "#ffb300"), ("Wirkleistung", "#5c6bc0")),
-                             [area("Eingang", PV, "#ffb300"), area("Wirkleistung", "huawei_inverter_active_power", "#5c6bc0")],
-                             value_axis("W")),
+    # 2026-10-04); two panels, not four, as four were too low to read (user, 2026-10-07). Over the input the house's
+    # PV forecast dashed (rule pv_forecast, each hour's mean at its middle), over the calendar day, so the rest of
+    # today shows what is still to come and the arrows page to tomorrow's (user, 2026-10-19)
+    forecast = line("Prognose", "pv_forecast_power", f"={NEUTRAL_LINE}", dashed=True)
+    chart_ = stacked_chart([((("Eingang", "#ffb300"), ("Wirkleistung", "#5c6bc0"), ("Prognose", f"={NEUTRAL_LINE}")),
+                             [area("Eingang", PV, "#ffb300"), area("Wirkleistung", "huawei_inverter_active_power", "#5c6bc0"),
+                              forecast], value_axis("W")),
                             ((("PV1", "#ffca28"), ("PV2", "#ff8f00")),
                              [area("PV1", "huawei_inverter_pv1_power", "#ffca28"),
                               area("PV2", "huawei_inverter_pv2_power", "#ff8f00")], value_axis("W"))],
-                           520)  # as high as the inverter's card beside it
+                           520, chartType="day")  # as high as the inverter's card beside it
+    # on a phone the calendar day's date button leaves the first grid's title too little room beside it (it ran under
+    # the button): there the plot begins below the buttons, the chart 40 px taller
+    chart_ = comp("div", {"stylesheet": PHONE_BUTTONS_ABOVE}, default=[chart_])
     strings = phase_table(["PV1", "PV2"], [("Leistung", ["huawei_inverter_pv1_power", "huawei_inverter_pv2_power"]),
                                            ("Spannung", ["huawei_inverter_pv1_voltage", "huawei_inverter_pv2_voltage"]),
                                            ("Strom", ["huawei_inverter_pv1_current", "huawei_inverter_pv2_current"])])
