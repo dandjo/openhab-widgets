@@ -4,11 +4,16 @@
 // and the air's temperature (-0.34 % per K above 25 °C, NOCT 43 °C), times a factor per string (W per W/m² per
 // module) fitted each day on the last 14 days of Open-Meteo's archived forecasts against the string's energy, as a
 // ratio of sums: one for each hour of the day where that hour's irradiance is enough to tell, so it learns the shade
-// (string 1 loses its afternoon to it), else the day's (user, 2026-10-19). Replayed on 30 September 2024 to
-// 18 October 2026, each day fitted on the 14 before, the afternoon from 13 to 18 h came out 0.01 kWh too low and
-// 1.15 off (with one factor per string 0.17 too high, 1.16 off; the first model, a least-squares fit per plane on the
-// afternoons, was 2.1 kWh a day too low, in summer 6.7, as least squares on forecasts comes out low wherever they err
-// and it could not tell the west plane from the north one). The hours of
+// (string 1 loses its afternoon to it), else the day's (user, 2026-10-19), both on the clear days of the 14 alone,
+// those both sunny and forecast so, where the forecast's irradiance holds: on all 14 the cloudy days' forecast errors
+// went into the factors, and clear summer days came out 1.0 kWh too high (user, 2026-10-19: "an sonnigen Sommertagen
+// merklich darüber"); an hour's factor at most 1.1 times the day's and smoothed with its neighbours', weighted by
+// their irradiance, as with as few as 3 clear days one hour's could run off (9 June 2025: 11.9 kW forecast at 11 h for
+// 6.2). Replayed on 30 September 2024 to 18 October 2026, each day fitted on the 14 before: clear summer days 0.02 kWh
+// too low and 1.39 off (on all 14 days +1.01 and 1.88), their afternoon from 13 to 18 h 0.11 too high, 0.75 off; all
+// days 0.04 too low and 2.25 off, the afternoon 0.00 and 1.13 off (the first model, a
+// least-squares fit per plane on the afternoons, was 2.1 kWh a day too low, in summer 6.7, as least squares on
+// forecasts comes out low wherever they err and it could not tell the west plane from the north one). The hours of
 // today and tomorrow go into pv_forecast_hourly (JSON, read by heatpump_dhw_management) and as a forecast series into
 // pv_forecast_power, each hour's mean at its middle, so that the line through them lies over the measured power (the
 // PV page draws both), and each day's total into pv_forecast_energy at the day's 23:59:59, as the daily totals stand
@@ -28,7 +33,12 @@ const CELL_RISE = (43 - 20) / 800;
 // W per W/m² per plane at 25 °C cell temperature (its modules times its string's factor), fitted on 5 to 18 October
 // 2026; used until the rule's own fit succeeds
 const DEFAULT = { east: 3.51, west: 2.49, north: 1.87 };
-const MODEL = 3;  // the factors' model; factors of another one are fitted anew
+const MODEL = 6;  // the factors' model; factors of another one are fitted anew
+const HOUR_CAP = 1.1;  // an hour's factor at most this many times the day's
+// a clear day of the fit: the strings' energy and the forecast's both at least this share of the window's best; with
+// fewer than CLEAR_DAYS of them, all days count
+const CLEAR = 0.85;
+const CLEAR_DAYS = 3;
 const STRING_OF = { east: 's1', west: 's2', north: 's2' };
 const FIT_DAYS = 14;
 const TRIES = 3;
@@ -100,8 +110,8 @@ function fit() {
   }
   const string1 = items.getItem('huawei_inverter_pv1_power');
   const string2 = items.getItem('huawei_inverter_pv2_power');
-  let m1 = 0, m2 = 0, u1 = 0, u2 = 0, hours = 0, daylight = 0;
-  const byHour = {};  // the local hour of the day: [string 1's energy, its irradiance, string 2's, its]
+  let hours = 0, daylight = 0;
+  const records = [];  // [day, local hour of the day, string 1's power, its modules' irradiance, string 2's, its]
   for (let d = 0; d < FIT_DAYS; d++) {
     for (let hour = 0; hour < 24; hour++) {
       const begin = first.plusDays(d).plusHours(hour);
@@ -121,10 +131,26 @@ function fit() {
       if (p1 === null || p2 === null || p1.numericState === null || p2.numericState === null) {
         continue;
       }
-      m1 += p1.numericState; m2 += p2.numericState; u1 += x1; u2 += x2; hours++;
-      const sums = byHour[begin.hour()] || (byHour[begin.hour()] = [0, 0, 0, 0]);
-      sums[0] += p1.numericState; sums[1] += x1; sums[2] += p2.numericState; sums[3] += x2;
+      records.push([d, begin.hour(), p1.numericState, x1, p2.numericState, x2]);
+      hours++;
     }
+  }
+  // the clear days: the strings' day and the forecast's both near the window's best
+  const days = {};
+  for (const [d, , a, x, b, y] of records) {
+    const sums = days[d] || (days[d] = [0, 0]);
+    sums[0] += a + b; sums[1] += x + y;
+  }
+  const best = Object.values(days).reduce(([m, f], [a, x]) => [Math.max(m, a), Math.max(f, x)], [0, 0]);
+  const clear = Object.keys(days).map(Number)
+    .filter((d) => days[d][0] >= CLEAR * best[0] && days[d][1] >= CLEAR * best[1]);
+  const used = clear.length >= CLEAR_DAYS ? records.filter(([d]) => clear.includes(d)) : records;
+  let m1 = 0, m2 = 0, u1 = 0, u2 = 0;
+  const byHour = {};  // the local hour of the day: [string 1's energy, its irradiance, string 2's, its]
+  for (const [, h, a, x, b, y] of used) {
+    m1 += a; u1 += x; m2 += b; u2 += y;
+    const sums = byHour[h] || (byHour[h] = [0, 0, 0, 0]);
+    sums[0] += a; sums[1] += x; sums[2] += b; sums[3] += y;
   }
   // at least half the daylight hours, with sun enough: as much as 10 hours of 500 W/m² on the west plane
   if (hours < daylight / 2 || u2 < 10 * 500 * MODULES.west) {
@@ -136,14 +162,31 @@ function fit() {
     return null;
   }
   const round = (v) => Math.round(v * 100) / 100;
-  // each hour of the day its own factor where its irradiance makes at least a twentieth of a mean hour's (of 12),
-  // else none, and the day's stands
-  const own = (i) => [...Array(24).keys()].map((h) => {
-    const sums = byHour[h];
-    return sums && sums[i + 1] > 0.05 * (i === 0 ? u1 : u2) / 12 ? Math.round(sums[i] / sums[i + 1] * 1000) / 1000 : null;
-  });
+  // each hour of the day its own factor where its irradiance makes at least a twentieth of a mean hour's (of 12), at
+  // most HOUR_CAP times the day's, then with its neighbours' weighted by their irradiance; else none, and the day's
+  // stands
+  const own = (i) => {
+    const day = i === 0 ? s1 : s2;
+    const raw = [...Array(24).keys()].map((h) => {
+      const sums = byHour[h];
+      return sums && sums[i + 1] > 0.05 * (i === 0 ? u1 : u2) / 12 ? Math.min(sums[i] / sums[i + 1], HOUR_CAP * day) : null;
+    });
+    return raw.map((v, h) => {
+      if (v === null) {
+        return null;
+      }
+      let num = 0, den = 0;
+      for (const k of [h - 1, h, h + 1]) {
+        if (k >= 0 && k < 24 && raw[k] !== null) {
+          num += raw[k] * byHour[k][i + 1]; den += byHour[k][i + 1];
+        }
+      }
+      return Math.round(num / den * 1000) / 1000;
+    });
+  };
   return { east: round(MODULES.east * s1), west: round(MODULES.west * s2), north: round(MODULES.north * s2),
-    hourly: { s1: own(0), s2: own(2) }, at: Math.round(now / 1000), model: MODEL };
+    hourly: { s1: own(0), s2: own(2) }, clear: clear.length >= CLEAR_DAYS ? clear.length : 0, at: Math.round(now / 1000),
+    model: MODEL };
 }
 
 // the last fit: this run's, the cache's, the item's (restored at startup), or the defaults
@@ -165,6 +208,7 @@ if (!fittedToday && time.toZDT().hour() >= 1) {
   const fresh = fit();
   if (fresh !== null) {
     console.info(`PV-Prognose: Faktoren Ost ${fresh.east}, West ${fresh.west}, Nord ${fresh.north} W je W/m²`
+      + (fresh.clear ? ` aus ${fresh.clear} klaren Tagen` : ' aus allen 14 Tagen (zu wenig klare)')
       + (factors ? ` (vorher ${factors.east}, ${factors.west}, ${factors.north})` : ''));
     factors = fresh;
     store.put('factors', factors);

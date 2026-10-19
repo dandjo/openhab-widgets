@@ -2,8 +2,10 @@
 """The house's PV forecast for the days before rule pv_forecast wrote it (user, 2026-10-19: "Kannst du die Prognose
 auch rückwirkend berechnen, damit ich sie vergleichen kann?"): Open-Meteo's archived forecasts (historical forecast
 API, the same the rule fits on) of the irradiance on the three 25° planes and of the air's temperature, weighted by
-factors fitted as the rule fits them, each day's on the 14 days before it (model 3 since 2026-10-19: a factor per
-string and hour of the day where the hour's irradiance is enough to tell, else the string's for the whole day, its
+factors fitted as the rule fits them, each day's on the clear days of the 14 before it (model 4 since 2026-10-19: the
+strings' and the forecast's day both at least 85 % of the window's best, all 14 with fewer than 3 such; a factor per
+string and hour of the day where the hour's irradiance is enough to tell, at most 1.1 times the day's and smoothed with
+its neighbours' (model 6), else the string's for the whole day, its
 energy against its modules' irradiance at the cells' temperature, -0.34 % per K above 25 °C, NOCT 43 °C;
 the first days, with fewer than 7 days before them, take the first full fit's), written as the rule writes them: into pv_forecast_power each hour's mean at the hour's
 middle, into pv_forecast_energy each day's total at its 23:59:59, from the first day of PV readings (30 September
@@ -101,7 +103,14 @@ def main():
     for i, d in enumerate(days_sorted):
         sums = [0.0, 0.0, 0.0, 0.0]
         by_hour = {}
-        for x in days_sorted[max(0, i - FIT_DAYS):i]:
+        window = days_sorted[max(0, i - FIT_DAYS):i]
+        # as the rule: the clear days alone, the strings' and the forecast's day both near the window's best
+        dm = {x: sum((measured[1].get(t, 0) + measured[2].get(t, 0)) * 1000 for t in by_day[x]) for x in window}
+        df = {x: sum(unit("east", t) + unit("west", t) + unit("north", t) for t in by_day[x]) for x in window}
+        if window:
+            clear = [x for x in window if dm[x] >= 0.85 * max(dm.values()) and df[x] >= 0.85 * max(df.values())]
+            window = clear if len(clear) >= 3 else window
+        for x in window:
             for t in by_day[x]:
                 x1, x2 = unit("east", t), unit("west", t) + unit("north", t)
                 if x1 + x2 > 0 and t in measured[1] and t in measured[2]:
@@ -112,9 +121,16 @@ def main():
         if i >= 7 and sums[1] > 0 and sums[3] > 0:
             s1, s2 = sums[0] / sums[1], sums[2] / sums[3]
             # as the rule: an hour's own factor where its irradiance makes a twentieth of a mean hour's (of 12)
-            own = lambda h, j, day, total: (by_hour[h][j] / by_hour[h][j + 1]
-                                            if h in by_hour and by_hour[h][j + 1] > 0.05 * total / 12 else day)
-            factors[d] = (s1, s2, [own(h, 0, s1, sums[1]) for h in range(24)], [own(h, 2, s2, sums[3]) for h in range(24)])
+            def own(j, day, total):
+                raw = [min(by_hour[h][j] / by_hour[h][j + 1], 1.1 * day)
+                       if h in by_hour and by_hour[h][j + 1] > 0.05 * total / 12 else None for h in range(24)]
+                out = []
+                for h in range(24):
+                    near = [k for k in (h - 1, h, h + 1) if 0 <= k < 24 and raw[k] is not None]
+                    out.append(day if raw[h] is None else
+                               sum(raw[k] * by_hour[k][j + 1] for k in near) / sum(by_hour[k][j + 1] for k in near))
+                return out
+            factors[d] = (s1, s2, own(0, s1, sums[1]), own(2, s2, sums[3]))
     first_fit = factors[min(factors)]
     print(f"factors per module, the last day's: string 1 {factors[max(factors)][0]:.3f}, string 2 "
           f"{factors[max(factors)][1]:.3f} W per W/m² (the rule now: east {k['east']}, west {k['west']}, north {k['north']})")
