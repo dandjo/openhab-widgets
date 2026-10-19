@@ -1,18 +1,24 @@
 // The house's own PV forecast (user, 2026-10-19): Open-Meteo's forecast of the irradiance on the three 25° planes of
 // the modules, east (8 modules, string 1), west (8) and north (6, both string 2), Trina Vertex S TSM-DE09R.08 (415 to
 // 435 Wp), each plane's irradiance times its modules, at the cell temperature the datasheet gives for that irradiance
-// and the air's temperature (-0.34 % per K above 25 °C, NOCT 43 °C), times one factor per string (W per W/m² per
+// and the air's temperature (-0.34 % per K above 25 °C, NOCT 43 °C), times a factor per string (W per W/m² per
 // module) fitted each day on the last 14 days of Open-Meteo's archived forecasts against the string's energy, as a
-// ratio of sums. Replayed on 30 September 2024 to 18 October 2026, each day fitted on the 14 before: the day's total
-// 0.03 kWh off on average, 2.3 kWh a day off (the first model, a least-squares fit per plane on the afternoons: 2.1 kWh
-// too low, 3.3 off, in summer 6.7 too low, as least squares on forecasts comes out low wherever they err and could not
-// tell the west plane from the north one), the afternoon from 13 to 18 h 0.17 kWh too high, 1.1 off. The hours of
+// ratio of sums: one for each hour of the day where that hour's irradiance is enough to tell, so it learns the shade
+// (string 1 loses its afternoon to it), else the day's (user, 2026-10-19). Replayed on 30 September 2024 to
+// 18 October 2026, each day fitted on the 14 before, the afternoon from 13 to 18 h came out 0.01 kWh too low and
+// 1.15 off (with one factor per string 0.17 too high, 1.16 off; the first model, a least-squares fit per plane on the
+// afternoons, was 2.1 kWh a day too low, in summer 6.7, as least squares on forecasts comes out low wherever they err
+// and it could not tell the west plane from the north one). The hours of
 // today and tomorrow go into pv_forecast_hourly (JSON, read by heatpump_dhw_management) and as a forecast series into
 // pv_forecast_power, each hour's mean at its middle, so that the line through them lies over the measured power (the
 // PV page draws both), and each day's total into pv_forecast_energy at the day's 23:59:59, as the daily totals stand
 // (energy_daily_*).
 const LOCATION = 'latitude=LAT&longitude=LON&timezone=Europe%2FVienna&timeformat=unixtime';
 const TILT = 25;
+// the planes as the strings behave: the house stands about 10° turned (by the map east -80, west 100, north 170; the
+// strings' curves on sunny days confirm north at about 170), but replayed on two years each turn forecast worse:
+// string 1 (east, no optimizers, string 2 has Huawei P2 ones) loses its afternoon to shade and runs like a plane
+// facing east to east-north-east (user's map and module data, 2026-10-19)
 const PLANES = { east: -90, west: 90, north: 180 };
 const MODULES = { east: 8, west: 8, north: 6 };
 // the modules' power falls by 0.34 % per K of cell temperature above 25 °C; a cell is (NOCT 43 °C − 20 °C) / 800 W/m²
@@ -22,7 +28,8 @@ const CELL_RISE = (43 - 20) / 800;
 // W per W/m² per plane at 25 °C cell temperature (its modules times its string's factor), fitted on 5 to 18 October
 // 2026; used until the rule's own fit succeeds
 const DEFAULT = { east: 3.51, west: 2.49, north: 1.87 };
-const MODEL = 2;  // the factors' model; factors of another one are fitted anew
+const MODEL = 3;  // the factors' model; factors of another one are fitted anew
+const STRING_OF = { east: 's1', west: 's2', north: 's2' };
 const FIT_DAYS = 14;
 const TRIES = 3;
 const Thread = Java.type('java.lang.Thread');
@@ -94,6 +101,7 @@ function fit() {
   const string1 = items.getItem('huawei_inverter_pv1_power');
   const string2 = items.getItem('huawei_inverter_pv2_power');
   let m1 = 0, m2 = 0, u1 = 0, u2 = 0, hours = 0, daylight = 0;
+  const byHour = {};  // the local hour of the day: [string 1's energy, its irradiance, string 2's, its]
   for (let d = 0; d < FIT_DAYS; d++) {
     for (let hour = 0; hour < 24; hour++) {
       const begin = first.plusDays(d).plusHours(hour);
@@ -114,6 +122,8 @@ function fit() {
         continue;
       }
       m1 += p1.numericState; m2 += p2.numericState; u1 += x1; u2 += x2; hours++;
+      const sums = byHour[begin.hour()] || (byHour[begin.hour()] = [0, 0, 0, 0]);
+      sums[0] += p1.numericState; sums[1] += x1; sums[2] += p2.numericState; sums[3] += x2;
     }
   }
   // at least half the daylight hours, with sun enough: as much as 10 hours of 500 W/m² on the west plane
@@ -126,8 +136,14 @@ function fit() {
     return null;
   }
   const round = (v) => Math.round(v * 100) / 100;
+  // each hour of the day its own factor where its irradiance makes at least a twentieth of a mean hour's (of 12),
+  // else none, and the day's stands
+  const own = (i) => [...Array(24).keys()].map((h) => {
+    const sums = byHour[h];
+    return sums && sums[i + 1] > 0.05 * (i === 0 ? u1 : u2) / 12 ? Math.round(sums[i] / sums[i + 1] * 1000) / 1000 : null;
+  });
   return { east: round(MODULES.east * s1), west: round(MODULES.west * s2), north: round(MODULES.north * s2),
-    at: Math.round(now / 1000), model: MODEL };
+    hourly: { s1: own(0), s2: own(2) }, at: Math.round(now / 1000), model: MODEL };
 }
 
 // the last fit: this run's, the cache's, the item's (restored at startup), or the defaults
@@ -138,7 +154,7 @@ try {
   previous = null;
 }
 let factors = store.get('factors')
-  || (previous && previous.k ? { ...previous.k, at: previous.fit, model: previous.model } : null);
+  || (previous && previous.k ? { ...previous.k, hourly: previous.kh, at: previous.fit, model: previous.model } : null);
 if (factors && factors.model !== MODEL) {
   factors = null;  // another model's, fitted anew below
 }
@@ -178,11 +194,15 @@ if (g === null) {
   }
   // the air's temperature for the cells' (without it, the power at 25 °C)
   const temps = temperatures('api.open-meteo.com', 'forecast_days=2');
+  // a plane's factor per module at an hour: its string's for that hour of the day, else the day's
+  const perModule = (p, t) => {
+    const own = factors.hourly ? factors.hourly[STRING_OF[p]][time.toZDT(new Date(t * 1000)).hour()] : null;
+    return own === null || own === undefined ? factors[p] / MODULES[p] : own;
+  };
   const hours = [...g.east.keys()].filter((t) => g.west.has(t) && g.north.has(t)).sort((a, b) => a - b)
-    .map((t) => [t, Math.round(Object.keys(PLANES).reduce((sum, p) => sum + factors[p] / MODULES[p]
-      * unit(p, g, temps, t), 0))]);
+    .map((t) => [t, Math.round(Object.keys(PLANES).reduce((sum, p) => sum + perModule(p, t) * unit(p, g, temps, t), 0))]);
   hourly.postUpdate(JSON.stringify({ at: Math.round(now / 1000), fit: factors.at, model: MODEL,
-    k: { east: factors.east, west: factors.west, north: factors.north }, h: hours }));
+    k: { east: factors.east, west: factors.west, north: factors.north }, kh: factors.hourly || null, h: hours }));
   // the series: each hour's mean at the hour's middle, only points that changed since the last write (equal
   // timestamps overwrite in InfluxDB)
   const sent = store.get('sent') || {};

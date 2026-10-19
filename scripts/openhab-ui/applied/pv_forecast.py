@@ -4,12 +4,15 @@
 irradiance on the modules' three 25° planes (east: 8 modules on string 1; west 8 and north 6 on string 2) every
 30 minutes and at startup, for today and tomorrow, with the air's temperature: each plane's irradiance times its
 modules (Trina Vertex S TSM-DE09R.08) at the cells' temperature (datasheet: -0.34 % per K above 25 °C, NOCT 43 °C),
-times one factor per string it fits once a day (from 1 h) on the last 14 days of Open-Meteo's archived forecasts as the
-string's energy against that sum (model 2 since the evening of 2026-10-19; the first fitted a factor per plane by least
-squares on the afternoons, which came out 2.1 kWh a day too low, in summer up to 6.7).
+times a factor per string it fits once a day (from 1 h) on the last 14 days of Open-Meteo's archived forecasts as the
+string's energy against that sum: one for each hour of the day where the hour's irradiance is enough to tell, so it
+learns the shade, else the string's for the whole day (model 3 since the evening of 2026-10-19; model 2 had the day's
+alone; the first fitted a factor per plane by least squares on the afternoons, which came out 2.1 kWh a day too low,
+in summer up to 6.7).
 - pv_forecast_hourly (String, MapDB restores it): {"at": fetched, "fit": fitted (epoch s, null with the defaults),
-  "model": 2, "k": the planes' factors (W per W/m² at 25 °C cell temperature, their modules times their string's
-  factor), "h": [[hour's start, W], ...]}, read by heatpump_dhw_management, which takes a
+  "model": 3, "k": the planes' factors (W per W/m² at 25 °C cell temperature, their modules times their string's
+  factor for the whole day), "kh": {"s1": [...], "s2": [...]} each string's factor per module for each hour of the day
+  (null where the day's stands), "h": [[hour's start, W], ...]}, read by heatpump_dhw_management, which takes a
   forecast older than 3 hours for none;
 - pv_forecast_power (W): the same hours as a forecast series in InfluxDB through the group influxdb_forecast (policy
   ADD, only changed points), each hour's mean at the hour's middle, set for the running hour;
@@ -17,8 +20,8 @@ squares on the afternoons, which came out 2.1 kWh a day too low, in summer up to
   totals energy_daily_* stand), set to today's, for the Photovoltaik page's yield per day;
 - pv_forecast_energy_tomorrow (kWh): tomorrow's total, persisted on change (the day-ahead forecasts' history).
 Replayed on 30 September 2024 to 18 October 2026, each day on the factors of the 14 days before it: the day's total
-0.03 kWh too high on average and 2.3 kWh off, no month beyond ±1.4 kWh a day; the afternoon from 13 to 18 h 0.17 kWh
-too high, 1.1 off (pv_forecast_history.py writes that replay as the history).
+0.01 kWh too high on average and 2.27 kWh off, the afternoon from 13 to 18 h 0.01 kWh too low and 1.15 off (with the
+day's factor alone 0.17 too high, 1.16 off; pv_forecast_history.py writes that replay as the history).
 apply creates or updates the equipment, its items, their metadata and the rule, and runs the rule once.
 Usage: pv_forecast.py check|apply   (on homepi, as pi; the API token from ~/.openhab_token)"""
 import json

@@ -2,8 +2,9 @@
 """The house's PV forecast for the days before rule pv_forecast wrote it (user, 2026-10-19: "Kannst du die Prognose
 auch rückwirkend berechnen, damit ich sie vergleichen kann?"): Open-Meteo's archived forecasts (historical forecast
 API, the same the rule fits on) of the irradiance on the three 25° planes and of the air's temperature, weighted by
-factors fitted as the rule fits them, each day's on the 14 days before it (model 2 since 2026-10-19: one factor per
-string, its energy against its modules' irradiance at the cells' temperature, -0.34 % per K above 25 °C, NOCT 43 °C;
+factors fitted as the rule fits them, each day's on the 14 days before it (model 3 since 2026-10-19: a factor per
+string and hour of the day where the hour's irradiance is enough to tell, else the string's for the whole day, its
+energy against its modules' irradiance at the cells' temperature, -0.34 % per K above 25 °C, NOCT 43 °C;
 the first days, with fewer than 7 days before them, take the first full fit's), written as the rule writes them: into pv_forecast_power each hour's mean at the hour's
 middle, into pv_forecast_energy each day's total at its 23:59:59, from the first day of PV readings (30 September
 2024) to yesterday (from today on the rule writes them). Equal timestamps overwrite, so a second run replaces the
@@ -96,15 +97,24 @@ def main():
         by_day.setdefault(datetime.datetime.fromtimestamp(t, TZ).date(), []).append(t)
     days_sorted = sorted(by_day)
     factors = {}
+    hour_of = lambda t: datetime.datetime.fromtimestamp(t, TZ).hour
     for i, d in enumerate(days_sorted):
         sums = [0.0, 0.0, 0.0, 0.0]
+        by_hour = {}
         for x in days_sorted[max(0, i - FIT_DAYS):i]:
             for t in by_day[x]:
                 x1, x2 = unit("east", t), unit("west", t) + unit("north", t)
                 if x1 + x2 > 0 and t in measured[1] and t in measured[2]:
-                    sums[0] += measured[1][t] * 1000; sums[1] += x1; sums[2] += measured[2][t] * 1000; sums[3] += x2
+                    m1, m2 = measured[1][t] * 1000, measured[2][t] * 1000
+                    sums[0] += m1; sums[1] += x1; sums[2] += m2; sums[3] += x2
+                    q = by_hour.setdefault(hour_of(t), [0.0, 0.0, 0.0, 0.0])
+                    q[0] += m1; q[1] += x1; q[2] += m2; q[3] += x2
         if i >= 7 and sums[1] > 0 and sums[3] > 0:
-            factors[d] = (sums[0] / sums[1], sums[2] / sums[3])
+            s1, s2 = sums[0] / sums[1], sums[2] / sums[3]
+            # as the rule: an hour's own factor where its irradiance makes a twentieth of a mean hour's (of 12)
+            own = lambda h, j, day, total: (by_hour[h][j] / by_hour[h][j + 1]
+                                            if h in by_hour and by_hour[h][j + 1] > 0.05 * total / 12 else day)
+            factors[d] = (s1, s2, [own(h, 0, s1, sums[1]) for h in range(24)], [own(h, 2, s2, sums[3]) for h in range(24)])
     first_fit = factors[min(factors)]
     print(f"factors per module, the last day's: string 1 {factors[max(factors)][0]:.3f}, string 2 "
           f"{factors[max(factors)][1]:.3f} W per W/m² (the rule now: east {k['east']}, west {k['west']}, north {k['north']})")
@@ -112,8 +122,8 @@ def main():
     for t in hours:
         if t >= end:
             continue
-        s1, s2 = factors.get(datetime.datetime.fromtimestamp(t, TZ).date(), first_fit)
-        points.append((t, round(s1 * unit("east", t) + s2 * (unit("west", t) + unit("north", t)))))
+        _, _, h1, h2 = factors.get(datetime.datetime.fromtimestamp(t, TZ).date(), first_fit)
+        points.append((t, round(h1[hour_of(t)] * unit("east", t) + h2[hour_of(t)] * (unit("west", t) + unit("north", t)))))
     print(f"{len(points)} hours, the first {datetime.datetime.fromtimestamp(points[0][0], TZ)}, "
           f"the last {datetime.datetime.fromtimestamp(points[-1][0], TZ)}")
     # each day's forecast against the strings' generation, energy_daily_pv_generation's point at the day's 23:59:59
@@ -130,6 +140,9 @@ def main():
         if d in measured:
             months.setdefault(d.strftime("%Y-%m"), []).append((f, measured[d]))
     print("month    days  measured  forecast  mean |error|  bias  (kWh a day)")
+    every = [r for rows in months.values() for r in rows]
+    print(f"all     {len(every):5}  {sum(r[1] for r in every) / len(every):8.1f}  {sum(r[0] for r in every) / len(every):8.1f}  "
+          f"{sum(abs(r[0] - r[1]) for r in every) / len(every):11.2f}  {sum(r[0] - r[1] for r in every) / len(every):+5.2f}")
     for m, rows in sorted(months.items()):
         n = len(rows)
         print(f"{m}  {n:4}  {sum(r[1] for r in rows) / n:8.1f}  {sum(r[0] for r in rows) / n:8.1f}  "
