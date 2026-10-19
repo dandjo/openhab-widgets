@@ -15,6 +15,7 @@ first. check prints what it would write and each month's forecast against the st
 Usage: pv_forecast_history.py check|apply [FIRST_DAY [LAST_DAY]]   (on homepi, as pi)"""
 import datetime
 import json
+import os
 import sys
 import time
 import urllib.parse
@@ -23,7 +24,18 @@ from zoneinfo import ZoneInfo
 
 TZ = ZoneInfo("Europe/Vienna")
 INFLUX = "http://127.0.0.1:8086"
-LOCATION = "latitude=LAT&longitude=LON&timezone=Europe%2FVienna&timeformat=unixtime"
+def location():
+    """The house's location from openHAB's own settings (Regional Settings) through the REST API, rounded to 2 decimals
+    as the rule rounds it, so that no coordinates stand in the script."""
+    token = open(os.path.expanduser("~/.openhab_token")).read().strip()
+    req = urllib.request.Request("http://127.0.0.1:8080/rest/services/org.openhab.i18n/config",
+                                 headers={"Authorization": "Bearer " + token})
+    with urllib.request.urlopen(req) as r:
+        lat, lon = (float(x) for x in json.load(r)["location"].split(",")[:2])
+    return f"latitude={lat:.2f}&longitude={lon:.2f}"
+
+
+LOCATION = location() + "&timezone=Europe%2FVienna&timeformat=unixtime"
 TILT = 25
 PLANES = {"east": -90, "west": 90, "north": 180}
 TEMPERATURE_COEFFICIENT, CELL_RISE = -0.0034, (43 - 20) / 800  # as in pv_forecast.js

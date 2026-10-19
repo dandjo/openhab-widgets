@@ -33,7 +33,16 @@
 // weather_quarter_hours: [[epoch seconds, temperature °C, precipitation of the quarter before in mm, wind km/h,
 //                          wind direction °], ...]; AROME has its own quarter hours for about two and a half days,
 //                          the best match's later ones are interpolated from its hours by Open-Meteo
-const BASE = 'https://api.open-meteo.com/v1/forecast?latitude=LAT&longitude=LON&timezone=Europe%2FVienna'
+// the house's location from openHAB's own settings (Settings, Regional Settings), rounded to 2 decimals, about 1 km
+// and finer than the weather models' grid, so that no coordinates stand in the script
+const HERE = (() => {
+  const point = osgi.getService('org.openhab.core.i18n.LocationProvider').getLocation();
+  if (point === null) {
+    throw new Error('no location set in openHAB (Settings, Regional Settings)');
+  }
+  return { lat: point.getLatitude().doubleValue().toFixed(2), lon: point.getLongitude().doubleValue().toFixed(2) };
+})();
+const BASE = `https://api.open-meteo.com/v1/forecast?latitude=${HERE.lat}&longitude=${HERE.lon}&timezone=Europe%2FVienna`
   + '&forecast_days=5&timeformat=unixtime'
   + '&current=weather_code,is_day,precipitation,cloud_cover_low,cloud_cover_mid,cloud_cover_high'
   + '&hourly=temperature_2m,precipitation,wind_speed_10m,wind_direction_10m,weather_code,is_day'

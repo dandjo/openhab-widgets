@@ -18,7 +18,16 @@
 // pv_forecast_power, each hour's mean at its middle, so that the line through them lies over the measured power (the
 // PV page draws both), and each day's total into pv_forecast_energy at the day's 23:59:59, as the daily totals stand
 // (energy_daily_*).
-const LOCATION = 'latitude=LAT&longitude=LON&timezone=Europe%2FVienna&timeformat=unixtime';
+// the house's location from openHAB's own settings (Settings, Regional Settings), rounded to 2 decimals, about 1 km
+// and finer than the weather models' grid, so that no coordinates stand in the script
+const HERE = (() => {
+  const point = osgi.getService('org.openhab.core.i18n.LocationProvider').getLocation();
+  if (point === null) {
+    throw new Error('no location set in openHAB (Settings, Regional Settings)');
+  }
+  return { lat: point.getLatitude().doubleValue().toFixed(2), lon: point.getLongitude().doubleValue().toFixed(2) };
+})();
+const LOCATION = `latitude=${HERE.lat}&longitude=${HERE.lon}&timezone=Europe%2FVienna&timeformat=unixtime`;
 const TILT = 25;
 // the planes as the strings behave: the house stands about 10° turned (by the map east -80, west 100, north 170; the
 // strings' curves on sunny days confirm north at about 170), but replayed on two years each turn forecast worse:
@@ -33,7 +42,7 @@ const CELL_RISE = (43 - 20) / 800;
 // W per W/m² per plane at 25 °C cell temperature (its modules times its string's factor), fitted on 5 to 18 October
 // 2026; used until the rule's own fit succeeds
 const DEFAULT = { east: 3.51, west: 2.49, north: 1.87 };
-const MODEL = 6;  // the factors' model; factors of another one are fitted anew
+const MODEL = 7;  // the factors' model; factors of another one are fitted anew (7: the house's own location)
 const HOUR_CAP = 1.1;  // an hour's factor at most this many times the day's
 // a clear day of the fit: the strings' energy and the forecast's both at least this share of the window's best; with
 // fewer than CLEAR_DAYS of them, all days count

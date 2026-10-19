@@ -6,7 +6,16 @@
 // broadcast notification.
 //
 // weather_warning_list: [{type: German name, level: 1-3, start, end: epoch seconds, text: GeoSphere's text}, ...]
-const URL = 'https://warnungen.zamg.at/wsapp/api/getWarningsForCoords?lon=LON&lat=LAT&lang=de';
+// the house's location from openHAB's own settings (Settings, Regional Settings), rounded to 2 decimals, about 1 km
+// and finer than the weather models' grid, so that no coordinates stand in the script
+const HERE = (() => {
+  const point = osgi.getService('org.openhab.core.i18n.LocationProvider').getLocation();
+  if (point === null) {
+    throw new Error('no location set in openHAB (Settings, Regional Settings)');
+  }
+  return { lat: point.getLatitude().doubleValue().toFixed(2), lon: point.getLongitude().doubleValue().toFixed(2) };
+})();
+const URL = `https://warnungen.zamg.at/wsapp/api/getWarningsForCoords?lon=${HERE.lon}&lat=${HERE.lat}&lang=de`;
 const TYPES = {1: 'Wind', 2: 'Regen', 3: 'Schnee', 4: 'Glatteis', 5: 'Gewitter', 6: 'Hitze', 7: 'Kälte'};
 const WEEKDAYS = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
 const AHEAD = 24 * 3600;
