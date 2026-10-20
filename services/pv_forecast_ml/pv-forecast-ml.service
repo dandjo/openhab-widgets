@@ -1,0 +1,15 @@
+[Unit]
+Description=Learned PV forecast: today's and tomorrow's hours into openHAB (pv_forecast_*)
+Documentation=file:///opt/pv_forecast_ml/README.md
+Wants=network-online.target
+After=network-online.target openhab.service influxdb.service
+
+[Service]
+Type=oneshot
+User=pi
+Group=pi
+EnvironmentFile=/home/pi/.venv/pv_forecast_ml/.env
+ExecStart=/home/pi/.venv/pv_forecast_ml/bin/python /opt/pv_forecast_ml/pv_forecast_ml.py forecast
+# a few seconds
+Nice=10
+TimeoutStartSec=5min

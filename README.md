@@ -1453,3 +1453,16 @@ tools are in [`scripts/openhab-ui/`](scripts/openhab-ui/): `dashboard.py`, the h
 screenshots, and the one-off JSONDB changes in `applied/`. The cards are
 built from the smaller widgets wherever a part stands in more than one place or makes sense on its own, so a fix in
 one widget reaches every place it stands. The widgets in this repository are exported from that script unchanged.
+
+## Services
+
+Two services outside openHAB that rules and cards here rely on are in [`services/`](services/), each with a README,
+an example of its settings and its systemd units:
+
+- [`huawei_modbus_proxy`](services/huawei_modbus_proxy/): a Modbus TCP proxy in front of the Huawei inverter's SDongle,
+  which serves one connection at a time, so that openHAB's Modbus bridge and the rule reading the optimizers share it.
+- [`pv_forecast_ml`](services/pv_forecast_ml/): the PV forecast, gradient boosting models per string on Open-Meteo's
+  forecasts of ten weather models, written into openHAB's items and forecast series every 30 minutes.
+
+Both read their settings from the environment (a `.env` in the service's virtualenv, the systemd unit's
+`EnvironmentFile`), so the code holds no hosts, ports or location.

@@ -1,0 +1,15 @@
+[Unit]
+Description=Learned PV forecast: the weather cache's new days and the nightly training
+Documentation=file:///opt/pv_forecast_ml/README.md
+Wants=network-online.target
+After=network-online.target influxdb.service openhab.service
+
+[Service]
+Type=oneshot
+User=pi
+Group=pi
+EnvironmentFile=/home/pi/.venv/pv_forecast_ml/.env
+ExecStart=/home/pi/.venv/pv_forecast_ml/bin/python /opt/pv_forecast_ml/pv_forecast_ml.py train
+Nice=19
+IOSchedulingClass=idle
+TimeoutStartSec=1h

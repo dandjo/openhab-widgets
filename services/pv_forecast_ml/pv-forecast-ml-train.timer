@@ -1,0 +1,9 @@
+[Unit]
+Description=Learned PV forecast training, nightly at 02:30 (after the InfluxDB downsampling)
+
+[Timer]
+OnCalendar=*-*-* 02:30:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,18 @@
+[Unit]
+Description=Modbus TCP proxy in front of the Huawei inverter's SDongle: one connection for every local client
+Documentation=file:///opt/huawei_modbus_proxy/README.md
+Wants=network-online.target
+After=network-online.target
+Before=openhab.service
+
+[Service]
+Type=simple
+User=pi
+Group=pi
+EnvironmentFile=/home/pi/.venv/huawei_modbus_proxy/.env
+ExecStart=/home/pi/.venv/huawei_modbus_proxy/bin/python /opt/huawei_modbus_proxy/huawei_modbus_proxy.py
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

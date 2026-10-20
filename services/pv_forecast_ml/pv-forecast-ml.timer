@@ -1,0 +1,9 @@
+[Unit]
+Description=Learned PV forecast, at 2 and 32 minutes past each hour
+
+[Timer]
+OnCalendar=*-*-* *:02,32:00
+AccuracySec=1s
+
+[Install]
+WantedBy=timers.target
