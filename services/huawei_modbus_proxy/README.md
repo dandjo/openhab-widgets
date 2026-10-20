@@ -1,97 +1,99 @@
 # huawei_modbus_proxy
 
-A Modbus TCP proxy in front of the Huawei inverter's SDongle (on homepi since 2026-10-20). The dongle serves one
-Modbus TCP connection at a time. A second client beside openHAB got its answer delivered to openHAB, and then the dongle
-closed both connections. The proxy holds the only connection to the dongle and passes the requests of any number of
-local clients to it, one at a time. Its clients on homepi: openHAB's Modbus bridge `modbus:tcp:huawei_inverter`, and
-the rule `huawei_optimizers`
-([`scripts/openhab-ui/applied/huawei_optimizers.js`](../../scripts/openhab-ui/applied/huawei_optimizers.js) in the
-widgets repository), which reads the optimizers' readings with Huawei's file transfer.
+A small Modbus TCP proxy that lets several clients share the SDongle of a Huawei inverter.
 
-## What it does
+The SDongle accepts only one Modbus TCP connection at a time. When a second client connects, the dongle hands that
+client's answers to the first one and then drops both connections. So if openHAB polls the inverter and another
+program wants to read it too (for example the optimizers' data, which Huawei only offers as a file transfer), they
+cannot both talk to the dongle. The proxy solves this: it keeps the only connection to the dongle and serves any
+number of local clients, passing their requests on one at a time.
 
-- **One request at a time, with its own transaction ids.** An answer under another id, the late answer to a request
-  that timed out, is dropped. openHAB's bridge used to take such an answer for the next request's: it logged a
-  `ModbusUnexpectedTransactionIdException` and reset the connection after most timeouts.
-- **Timeouts.** A request the dongle does not answer within 5 s (a frame of a file within 8 s) gets the Modbus
-  exception 0x0B (gateway target device failed to respond). 5 s, not less: for some 15 s after a file upload the
-  dongle answers register reads only after about 3.5 s. Without a connection to the dongle a request gets 0x0A
-  (gateway path unavailable). The client then tries again without resetting its connection. Before the next request
-  the proxy waits up to 2 s more for the late answer and drops it, since the dongle is still busy with it. After 3
-  timeouts in a row it connects anew.
-- **Pacing as openHAB's bridge did it.** It waits 0.8 s after connecting, and at least 0.5 s between an answer and the
-  next request.
-- **Any function code.** Huawei's file transfer (0x41) passes as well. Its frames take the dongle 1 to 4 s each,
-  against about 0.1 s for registers, so other clients' requests go between them. A client that held the dongle for a
-  whole file starved openHAB's bridge into timeouts, and the dongle keeps an upload apart from register reads between
-  its frames. But it knows one upload at a time, and two at once spoil each other. So another client's start of an
-  upload (0x41 sub 0x05) waits in the queue until the running upload is completed (sub 0x0C), its client gone, or 30 s
-  after its client's last request.
-- **Nothing cached, nothing changed** but the transaction id. Writes (the battery's forcible charge) pass unchanged.
-- **Local only.** It listens on 127.0.0.1 by default, since Modbus knows no authentication.
+## How it works
 
-## Settings
+- **One request at a time, with its own transaction ids.** The proxy sends every request under a transaction id of
+  its own and maps the answer back to the client's id. A late answer, which arrives after its request already timed
+  out, is recognised by its id and dropped, so no client ever mistakes it for the answer to its next request.
+- **Timeouts the client can handle.** If the dongle does not answer within 5 seconds (8 seconds for a frame of a file
+  transfer), the client gets the Modbus exception 0x0B, "gateway target device failed to respond". Without a
+  connection to the dongle it gets 0x0A, "gateway path unavailable". Either way the client simply tries again and
+  keeps its connection. After three timeouts in a row the proxy reconnects to the dongle.
+- **Gentle pacing.** It waits 0.8 seconds after connecting and leaves at least 0.5 seconds between an answer and the
+  next request, as openHAB's Modbus binding does.
+- **File transfers welcome.** Every function code passes, including Huawei's file transfer (0x41). A file comes in
+  frames that take the dongle 1 to 4 seconds each, so other clients' requests are slipped in between the frames
+  instead of waiting for the whole file. The dongle can handle only one upload at a time, though, so a second
+  client's upload waits until the first one is completed, its client disconnects or it has been idle for 30 seconds.
+- **Transparent.** Nothing is cached and nothing is changed except the transaction id; writes pass as they are.
+- **Local only.** It listens on 127.0.0.1 by default, since Modbus has no authentication.
 
-From the environment; on homepi from the venv's `.env`, which the systemd unit reads as its `EnvironmentFile`
-([`env.example`](env.example) shows the format). The times are the ones described above.
+The dongle is slow after a file upload: for about 15 seconds it answers register reads only after about 3.5 seconds.
+That is why the answer timeout is 5 seconds and not less.
 
-| Variable | Default | Meaning |
-| --- | --- | --- |
-| `HUAWEI_MODBUS_PROXY_DONGLE` | (required) | the dongle's `host[:port]`, port 502 if left out |
-| `HUAWEI_MODBUS_PROXY_LISTEN` | `127.0.0.1:5502` | where the clients connect, `host:port` |
-| `HUAWEI_MODBUS_PROXY_ANSWER_TIMEOUT` | `5.0` | s for the dongle's answer to a request |
-| `HUAWEI_MODBUS_PROXY_FILE_ANSWER_TIMEOUT` | `8.0` | s for its answer to a file transfer request (0x41) |
-| `HUAWEI_MODBUS_PROXY_LATE_ANSWER_WAIT` | `2.0` | s more for the late answer to a request that timed out |
-| `HUAWEI_MODBUS_PROXY_TIMEOUTS_BEFORE_RECONNECT` | `3` | timeouts in a row after which it connects anew |
-| `HUAWEI_MODBUS_PROXY_SETTLE_AFTER_CONNECT` | `0.8` | s after connecting before the first request |
-| `HUAWEI_MODBUS_PROXY_GAP_BETWEEN_REQUESTS` | `0.5` | s at least between an answer and the next request |
-| `HUAWEI_MODBUS_PROXY_UPLOAD_IDLE_LIMIT` | `30.0` | s without a request after which a client's file upload counts as given up |
-| `HUAWEI_MODBUS_PROXY_RECONNECT_DELAY` | `5.0` | s after a failed connection attempt before the next |
-| `HUAWEI_MODBUS_PROXY_REPORT_INTERVAL` | `3600` | s between the statistics lines |
+## Requirements
+
+Python 3.11 or later. Only the standard library is used.
 
 ## Installing
 
-The standard library is enough (Python 3.11 or later).
-
 ```
 sudo mkdir -p /opt/huawei_modbus_proxy
-sudo cp huawei_modbus_proxy.py README.md env.example huawei-modbus-proxy.service /opt/huawei_modbus_proxy/
+sudo cp huawei_modbus_proxy.py README.md /opt/huawei_modbus_proxy/
 python3 -m venv ~/.venv/huawei_modbus_proxy
-install -m 600 env.example ~/.venv/huawei_modbus_proxy/.env   # then set the dongle's address in it
-sudo cp huawei-modbus-proxy.service /etc/systemd/system/      # adjust User and the paths
-sudo systemctl daemon-reload && sudo systemctl enable --now huawei-modbus-proxy
+install -m 600 env.example ~/.venv/huawei_modbus_proxy/.env
 ```
 
-Then point the Modbus clients at the proxy instead of the dongle. openHAB's bridge needs a longer receive timeout
-(`receiveTimeoutMillis` 15000), as a request may wait behind a frame of a file.
+Set the dongle's address in `~/.venv/huawei_modbus_proxy/.env`. Then install the systemd unit, adjusting the user and
+the paths in it:
 
-## Layout on homepi
+```
+sudo cp huawei-modbus-proxy.service /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable --now huawei-modbus-proxy
+```
 
-| Path | What |
-| --- | --- |
-| `/opt/huawei_modbus_proxy/huawei_modbus_proxy.py` | the proxy (root's, like all of `/opt`: changes with sudo) |
-| `/opt/huawei_modbus_proxy/huawei-modbus-proxy.service` | a copy of the unit, as published |
-| `/home/pi/.venv/huawei_modbus_proxy` | its venv, the standard library only |
-| `/home/pi/.venv/huawei_modbus_proxy/.env` | its settings (mode 600) |
-| `/etc/systemd/system/huawei-modbus-proxy.service` | the service, as `pi`, restarted 5 s after it stops; before openHAB at boot |
+The unit reads the `.env` as its `EnvironmentFile`, starts the proxy before openHAB and restarts it if it stops.
+
+## Settings
+
+The proxy reads its settings from environment variables. Only the dongle's address is required.
+
+| Variable | Default | Meaning |
+| --- | --- | --- |
+| `HUAWEI_MODBUS_PROXY_DONGLE` | (required) | the dongle's address as `host` or `host:port`; the port defaults to 502 |
+| `HUAWEI_MODBUS_PROXY_LISTEN` | `127.0.0.1:5502` | where the clients connect |
+| `HUAWEI_MODBUS_PROXY_ANSWER_TIMEOUT` | `5.0` | seconds to wait for the dongle's answer |
+| `HUAWEI_MODBUS_PROXY_FILE_ANSWER_TIMEOUT` | `8.0` | seconds to wait for the answer to a file transfer request |
+| `HUAWEI_MODBUS_PROXY_LATE_ANSWER_WAIT` | `2.0` | seconds to wait for a late answer before the next request goes out |
+| `HUAWEI_MODBUS_PROXY_TIMEOUTS_BEFORE_RECONNECT` | `3` | timeouts in a row after which the proxy reconnects |
+| `HUAWEI_MODBUS_PROXY_SETTLE_AFTER_CONNECT` | `0.8` | seconds to wait after connecting before the first request |
+| `HUAWEI_MODBUS_PROXY_GAP_BETWEEN_REQUESTS` | `0.5` | minimum seconds between an answer and the next request |
+| `HUAWEI_MODBUS_PROXY_UPLOAD_IDLE_LIMIT` | `30.0` | seconds without a request after which a client's file upload counts as abandoned |
+| `HUAWEI_MODBUS_PROXY_RECONNECT_DELAY` | `5.0` | seconds between failed connection attempts |
+| `HUAWEI_MODBUS_PROXY_REPORT_INTERVAL` | `3600` | seconds between the statistics lines in the log |
+
+## Connecting openHAB
+
+Point openHAB's Modbus TCP bridge at the proxy instead of the dongle, and give it a longer receive timeout, since a
+request may have to wait behind a frame of another client's file transfer:
+
+```
+Bridge modbus:tcp:huawei_inverter [ host="127.0.0.1", port=5502, id=1, receiveTimeoutMillis=15000 ]
+```
+
+Other clients connect the same way. The rule
+[`huawei_optimizers.js`](../../scripts/openhab-ui/applied/huawei_optimizers.js) in this repository is one: it reads
+the optimizers' data with Huawei's file transfer through the proxy.
+
+Never let a client talk to the dongle directly while the proxy runs.
 
 ## Logs
 
-`journalctl -u huawei-modbus-proxy` shows the following:
+`journalctl -u huawei-modbus-proxy` shows clients connecting and leaving, the connections to the dongle, every
+timeout and dropped late answer, and every hour a line with the number of transactions, their mean and longest time
+and the counts of timeouts, dropped answers and connection errors.
 
-- clients coming and going;
-- connections to the dongle;
-- every timeout and dropped late answer;
-- every hour a line with the transactions, their mean and longest time, and the counts of timeouts, dropped answers
-  and connection errors.
+## Removing it
 
-## Going back
-
-To connect openHAB to the dongle directly again:
-
-1. Disable the rule `huawei_optimizers`; it reaches the dongle only through the proxy.
-2. Set the bridge's host and port back to the dongle's (`HUAWEI_MODBUS_PROXY_DONGLE`) and `receiveTimeoutMillis` to
-   3000.
-3. Then run `sudo systemctl disable --now huawei-modbus-proxy`.
-
-Never let the proxy and a direct client talk to the dongle at the same time.
+Point the clients back at the dongle (openHAB's bridge with the dongle's host and port 502; a receive timeout of 3
+seconds is enough then), make sure only one of them is left, and run
+`sudo systemctl disable --now huawei-modbus-proxy`.

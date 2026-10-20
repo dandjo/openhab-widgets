@@ -1,33 +1,32 @@
 #!/usr/bin/env python3
-"""A Modbus TCP proxy in front of the Huawei inverter's SDongle (user, 2026-10-20).
+"""A Modbus TCP proxy in front of a Huawei inverter's SDongle, so that several clients can share it.
 
-The dongle serves one Modbus TCP connection at a time: with a second one beside openHAB's it handed the second
-client's answer to openHAB and closed both connections (tested 2026-10-20). The proxy holds the only connection to the
-dongle and passes the requests of any number of local clients (openHAB's Modbus bridge, the rule that reads the
-optimizers' data) one at a time:
+The SDongle serves one Modbus TCP connection at a time: when a second client connects, it hands that client's answers
+to the first one and then closes both connections. The proxy holds the only connection to the dongle and passes the
+requests of any number of local clients to it, one at a time:
 - each request goes out under a transaction id of the proxy's own; an answer under another id, the late answer to a
-  request that timed out, is dropped. openHAB's bridge used to take such an answer for the next request's, logged a
-  ModbusUnexpectedTransactionIdException and reset the connection after most timeouts;
+  request that timed out, is dropped. A client that took such an answer for the next request's would otherwise
+  reset its connection (openHAB's Modbus binding logs a ModbusUnexpectedTransactionIdException);
 - a request the dongle does not answer in time (ANSWER_TIMEOUT, a frame of a file FILE_ANSWER_TIMEOUT) gets the Modbus
   exception 0x0B (gateway target device failed to respond), one the proxy cannot send for want of a connection 0x0A
   (gateway path unavailable), so that the client tries again without resetting its connection; before the next
   request the proxy waits up to LATE_ANSWER_WAIT more for the late answer and drops it, as the dongle is still busy
   with it; after TIMEOUTS_BEFORE_RECONNECT timeouts in a row it connects anew;
 - after connecting it waits SETTLE_AFTER_CONNECT, and between an answer and the next request at least
-  GAP_BETWEEN_REQUESTS, as openHAB's bridge did (afterConnectionDelayMillis, timeBetweenTransactionsMillis);
+  GAP_BETWEEN_REQUESTS, as openHAB's Modbus binding does (afterConnectionDelayMillis, timeBetweenTransactionsMillis);
 - the function codes do not matter, so Huawei's file transfer (0x41) passes as well. Its frames take the dongle 1 to
-  4 s each against about 0.1 s for registers (20 October 2026), so other clients' requests go between them: a client
-  holding the dongle for a whole file starved openHAB's bridge into timeouts, and the dongle keeps a file upload apart
-  from register reads between its frames. But it knows one upload at a time, two at once spoil each other: another
-  client's start of an upload (0x41 sub 0x05) waits until the running one is completed (sub 0x0C), its client gone,
-  or UPLOAD_IDLE_LIMIT after its client's last request;
+  4 s each against about 0.1 s for registers, so other clients' requests go between them: a client holding the dongle
+  for a whole file would starve the others into timeouts, and the dongle keeps a file upload apart from register
+  reads between its frames. But it knows one upload at a time, two at once spoil each other: another client's start
+  of an upload (0x41 sub 0x05) waits until the running one is completed (sub 0x0C), its client gone, or
+  UPLOAD_IDLE_LIMIT after its client's last request;
 - nothing is cached and nothing is changed but the transaction id.
-It logs to the journal: connections, timeouts, dropped answers and every hour the transactions with their mean and
+It logs connections, timeouts, dropped answers and, every REPORT_INTERVAL, the transactions with their mean and
 longest time.
 
 The settings come from the environment, HUAWEI_MODBUS_PROXY_<setting>, the README lists them; only DONGLE, the
 dongle's host[:port], has no default. LISTEN is 127.0.0.1:5502 by default: keep it local, Modbus knows no
-authentication. On homepi the settings stand in the venv's .env, which the systemd unit reads as its EnvironmentFile.
+authentication.
 """
 import asyncio
 import collections
@@ -72,7 +71,7 @@ LISTEN = address_setting("LISTEN", 5502, "127.0.0.1")
 DONGLE = address_setting("DONGLE", 502)
 SETTLE_AFTER_CONNECT = number_setting("SETTLE_AFTER_CONNECT", 0.8)  # s before the first request
 # s for an answer: for some 15 s after a file upload the dongle answers registers only after about 3.5 s, which a
-# limit of 3 s dropped, three in a row failing a read of openHAB's (20 October 2026)
+# limit of 3 s dropped, failing three tries of a client in a row
 ANSWER_TIMEOUT = number_setting("ANSWER_TIMEOUT", 5.0)
 FILE_ANSWER_TIMEOUT = number_setting("FILE_ANSWER_TIMEOUT", 8.0)  # s for an answer to a file transfer request
 UPLOAD_IDLE_LIMIT = number_setting("UPLOAD_IDLE_LIMIT", 30.0)  # s without a request until an upload counts as given up

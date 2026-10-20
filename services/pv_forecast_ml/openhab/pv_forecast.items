@@ -1,0 +1,12 @@
+// The items pv_forecast_ml writes. The string items are named in PV_FORECAST_ML_STRINGS; add one per string.
+// pv_forecast_power, the string items and pv_forecast_energy get points in the future: persist them with a service that
+// stores such points (InfluxDB, with the "forecast" strategy). pv_forecast_hourly can be restored at startup (MapDB).
+
+Group         pv_forecast                  "PV forecast"                                    <solarplant>  ["Equipment"]
+
+Number:Power  pv_forecast_power            "PV forecast power [%.0f %unit%]"                <solarplant>  (pv_forecast)  ["Power", "Measurement"]   { unit="W" }
+Number:Power  pv_forecast_pv1_power        "PV forecast string 1 power [%.0f %unit%]"       <solarplant>  (pv_forecast)  ["Power", "Measurement"]   { unit="W" }
+Number:Power  pv_forecast_pv2_power        "PV forecast string 2 power [%.0f %unit%]"       <solarplant>  (pv_forecast)  ["Power", "Measurement"]   { unit="W" }
+Number:Energy pv_forecast_energy           "PV forecast energy today [%.1f %unit%]"         <solarplant>  (pv_forecast)  ["Energy", "Measurement"]  { unit="kWh" }
+Number:Energy pv_forecast_energy_tomorrow  "PV forecast energy tomorrow [%.1f %unit%]"      <solarplant>  (pv_forecast)  ["Energy", "Measurement"]  { unit="kWh" }
+String        pv_forecast_hourly           "PV forecast hours"                              <time>        (pv_forecast)  ["Status"]

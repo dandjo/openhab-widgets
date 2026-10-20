@@ -1,5 +1,5 @@
 [Unit]
-Description=Learned PV forecast training, nightly at 02:30 (after the InfluxDB downsampling)
+Description=Learned PV forecast training, nightly at 02:30
 
 [Timer]
 OnCalendar=*-*-* 02:30:00

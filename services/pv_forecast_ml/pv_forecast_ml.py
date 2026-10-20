@@ -1,63 +1,41 @@
 #!/usr/bin/env python3
-"""The house's PV forecast for openHAB (user, 2026-10-19).
+"""A PV forecast for openHAB, learnt from the installation's own measurements.
 
-Gradient boosting models (scikit-learn's HistGradientBoostingRegressor), one per string, learn each string's hourly
-energy from the raw data alone, a truth of their own, and the house's forecast is their sum (user, 2026-10-20):
-Open-Meteo's irradiance on the modules' planes from ten weather models, the best match's weather (radiation parts,
-temperature, humidity, three cloud layers, wind, precipitation, snow, visibility), the sun's elevation and azimuth and
-the day of the year.
+A gradient boosting model per string of the inverter (scikit-learn's HistGradientBoostingRegressor) learns the string's
+energy per hour from Open-Meteo's forecasts alone: the irradiance on each plane of modules from ten weather models,
+the weather of Open-Meteo's best match (radiation parts, temperature, humidity, three cloud layers, wind,
+precipitation, snow, visibility), the sun's elevation and azimuth and the day of the year. The house's forecast is
+the sum of the strings'. The training data are Open-Meteo's archived forecasts (its historical forecast API) and the
+strings' measured power from openHAB's persistence; nothing else is assumed about the modules.
 
-On homepi (east 8 modules on string 1; west 8 and north 6 on string 2, all at 25°), retrained weekly over 2026, the
-sum came out 1.81 kWh a day off against 1.85 of one model for the house (over the last 60 days 1.39 against 1.38),
-string 1 0.81, string 2 1.15. Each string's model sees all planes: given only its own (string 1 the east's, string 2
-the west's and north's), they came out no better (retrained monthly over 2026, string 1 0.84 against 0.83, string 2
-1.14 against 1.12); the strings' sums are the finest the inverter measures, so west and north cannot be learnt apart.
-It replaced openHAB's rule pv_forecast (user, 2026-10-20), which fitted the irradiance to the strings by factors of the
-last 14 days: walk-forward on 2026, retrained weekly, one model for the house came out 1.79 kWh a day off against the
-rule's 2.34, in spring 2.02 against 2.39, over the last 60 days 1.37 against 1.37. Weighting recent days more
-(half-lives of 60 to 365 days), the strings' recent yields as inputs or a correction by the model's own recent error
-made it no better; more history did (trained on the last 6 months 2.44 kWh a day off, on 12 months 1.94, on all, 18 to
-24 months, 1.89, April to October 2026).
-Not used after tests: PVGIS 6 as training years before the PV system (it helped only while the measurements were short),
-a correction within the day by the measured morning (12 to 18 h 1.05 kWh off at best against 1.06), the energy
-community's forecast (made from Open-Meteo's weather data as well), the rule's forecast as an input or mixed in.
-The weather models: of 19 that Open-Meteo archives, each alone as the plain forecast came out 2.41 (DWD ICON-EU) to
-4.91 kWh a day off (25 May to 18 October 2026); the best 5 to 9 of them in the model 1.94 to 1.97, worse than these nine
-of different weather services (1.79), whose errors differ more than those of the DWD's ICON family at the top of that
-list. GeoSphere's AROME Austria, the most local one (archived only from 24 March 2026, alone 3.65), is in as well (user,
-2026-10-20): with it the model came out the same (1.79; July to October 1.68 against 1.70).
+Each training is checked before it replaces the models in use: a candidate trained on all but the last 60 days must
+forecast those days about as well as a plain physical forecast (the irradiance times the modules at the cells'
+temperature, scaled by one factor fitted on the same days). The check catches a broken training, which lands far
+above that; a failed one keeps the models in use and sends a push notification through an openHAB script.
 
 The settings come from the environment, PV_FORECAST_ML_<setting>, the README lists them: PLANES and STRINGS must be
-set, the location falls back to openHAB's regional settings, the rest has defaults. On homepi they stand in the venv's
-.env, which the systemd units read as their EnvironmentFile; by hand: set -a; . ~/.venv/pv_forecast_ml/.env; set +a,
-then the venv's python with this script and a command.
+set, the location falls back to openHAB's regional settings, the rest has defaults.
 
-Commands (the API token from OPENHAB_TOKEN_FILE, the caches and the models in STATE):
-  update     add the days missing up to yesterday to the weather cache (Open-Meteo's historical forecast API) and to the
-             cache of the strings' energy per hour (from openHAB's persistence), and drop from both the days before the
-             first PV reading openHAB's persistence still holds (its retention), as training needs both
-  train      update, then train: a candidate on all but the last 60 days, the house's forecast (the strings' sum), is
-             checked on those against a plain physical forecast (the best match's irradiance times the modules at the
-             cells' temperature times one factor, the ratio of sums over the same days); unless it came out more than
-             20 % worse, the models on all days replace the ones in use, else those in use stay (exit 1, a warning in
-             the journal, a push notification through openHAB's script NOTIFY_RULE)
-  forecast   today's and tomorrow's hours from the forecast API (without a model at all, the plain physical forecast
-             with the last training's factor, each string's from its planes), written into openHAB:
-             pv_forecast_hourly (JSON {at, trained, source, h: [[hour's start, W], ...]}, read by
-             heatpump_dhw_management), pv_forecast_power, each string's forecast item and pv_forecast_energy as
-             forecast series through openHAB's persistence (each hour's mean at its middle; each day's total from
-             today on at its 23:59:59; only changed points), their states (the running hour's, today's total) and
-             pv_forecast_energy_tomorrow (tomorrow's total)
+Commands:
+  update     add the days missing up to yesterday to the weather cache and to the cache of the strings' energy per
+             hour, and drop from both the days before the first PV reading openHAB's persistence still holds
+  train      update, then train and check a candidate; if it passes, the models trained on all days replace the ones
+             in use, else those stay (exit 1, a warning in the log, a push notification through NOTIFY_RULE)
+  forecast   today's and tomorrow's hours from the forecast API into openHAB: pv_forecast_hourly (JSON {at, trained,
+             source, h: [[hour's start, W], ...]}), pv_forecast_power and each string's forecast item, each hour's
+             mean at its middle as forecast series through openHAB's persistence (only changed points),
+             pv_forecast_energy with each day's total at its 23:59:59, and their states (the running hour's, today's
+             total) as well as pv_forecast_energy_tomorrow; without a model the plain physical forecast with the last
+             training's factor
   backfill FROM [--apply]
-             the forecast as the model would have made it from FROM to yesterday, month by month as train decides
-             (where the candidate fails, the old history stays), with --apply written into pv_forecast_power, the
-             strings' series and pv_forecast_energy, the points replaced saved before in the state directory
+             the forecast as the models would have made it from FROM to yesterday, month by month as train decides,
+             with --apply written into the forecast series, the points replaced saved before in the state directory
   restore FILE
              write the points of such a backup back
-  status     the models' and the caches' state
-Nothing here talks to InfluxDB itself: every reading and every write goes through openHAB's REST API for its
+  status     the last training's figures and the caches' extent
+Nothing here talks to the database itself: every reading and every write goes through openHAB's REST API for its
 persistence (GET and PUT /rest/persistence/items/<item>, the service PERSISTENCE), so that the database's connection
-is configured in openHAB alone (user, 2026-10-20).
+is configured in openHAB alone.
 """
 import collections
 import csv
@@ -147,8 +125,8 @@ MIN_VALUES_PER_COLUMN = 100  # a feature column with fewer values over the train
 CHECK_DAYS = 60
 # the candidate fails when it came out more than this many times the plain forecast's error: the check is to catch a
 # broken training (a bug, a library's change, a broken cache or broken readings), which lands far above it; replayed
-# weekly from June 2025 to October 2026 the candidate was 0.44 to 0.6 times the plain forecast's error in summer and
-# winter, but up to 1.01 in the calm weeks of late September and October, when one factor fits well (user, 2026-10-20)
+# weekly over more than a year, a sound candidate came out 0.44 to 0.6 times the plain forecast's error in summer and
+# winter, but up to 1.01 in calm autumn weeks, when one factor fits well
 CHECK_TOLERANCE = 1.2
 MODEL_PARAMETERS = dict(max_iter=400, learning_rate=0.05, max_leaf_nodes=31, min_samples_leaf=40, l2_regularization=1.0,
                         random_state=0)
@@ -374,8 +352,8 @@ def update_weather_cache():
 
 def hourly_energy(readings, start, end):
     """each hour's energy in kWh within [start, end) from power readings in W, as InfluxDB's integral(value, 1h) per
-    hour gives it (equal to the Wh on three days, 20 October 2026): the trapezoids between consecutive readings, one
-    across an hour's border split there at the value interpolated linearly; only hours with a reading of their own"""
+    hour gives it: the trapezoids between consecutive readings, one across an hour's border split there at the value
+    interpolated linearly; only hours with a reading of their own"""
     energy = {}
     for (time1, power1), (time2, power2) in zip(readings, readings[1:]):
         if time2 <= time1:
@@ -483,7 +461,7 @@ def training_data(weather_cache, measured, latitude, longitude):
 
 def train_models(features, energies):
     """a model per string, each on the feature columns with enough values: a weather model not yet archived over the
-    training days (AROME Austria before 24 March 2026) is left out, as an empty column stops the training"""
+    training days (one archived only recently) is left out, as an empty column stops the training"""
     import numpy as np
     from sklearn.ensemble import HistGradientBoostingRegressor
     used_columns = np.where((~np.isnan(features)).sum(axis=0) >= MIN_VALUES_PER_COLUMN)[0]
