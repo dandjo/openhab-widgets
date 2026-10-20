@@ -145,10 +145,10 @@ function evaluate(readings, memory, baseOf, toUtc) {
   for (const r of readings) {
     const t = toUtc(r.t);
     const day = Math.floor(r.t / 86400);
-    // a new day starts from the lifetime energies the day before ended with (nothing is made at night); after a
-    // restart, without memory, from those persistence holds
+    // a new day starts from the lifetime energies the day before ended with (nothing is made at night), when memory
+    // holds the day before; else (after a restart, or a gap filled out of order) from those persistence holds
     if (memory.day !== day) {
-      memory.base = memory.day === undefined ? {} : { ...memory.last };
+      memory.base = memory.day === day - 1 ? { ...memory.last } : {};
       memory.day = day;
       memory.today = {};
     }

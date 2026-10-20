@@ -8687,11 +8687,11 @@ WEST_C, NORTH_C = PHASE_COLORS[1], PHASE_COLORS[0]
 OPT = "huawei_optimizers_"
 OPT_PLANES = {"west": ("West", WEST_C, range(7, 15)), "north": ("Nord", NORTH_C, range(1, 7))}
 # the modules in the arrangement of FusionSolar's physical layout, north up (user, 2026-10-20, a screenshot of it):
-# (address, x, y, width, height), shifted by ROOF_TOP for the planes' labels above them; north 1.0.1 to 1.0.6 above
+# (address, x, y, width, height), shifted down by the margin ROOF_TOP; north 1.0.1 to 1.0.6 above
 # (a pair upright on the left, one upright on the right, three across below them), west 1.0.7 to 1.0.14 below on the
 # left, east on the right (string 1, without optimizers: address None). Each group keeps FusionSolar's shape, the
 # gaps between them are closed up (user: "die Abstände sind ohnehin nicht real"), so the modules come out larger
-ROOF_TOP = 44
+ROOF_TOP = 4
 _L, _P = (117, 88), (87, 116)  # a module across, upright
 _WX, _EX, _Y0, _NY = 4, 381, 356, 7  # the west, east and lower blocks' origins, the north group's top
 # the north group's left: its lowest module, 1.0.4, midway between the west and the east block (user, 2026-10-20)
@@ -8702,7 +8702,8 @@ def _block(x0, cells):
     return [(a, x0 + c * 118, _Y0 + r, *_L) for a, c, r in cells]
 
 
-ROOF = ([(3, _NX, _NY, *_P), (5, _NX + 89, _NY, *_P), (2, _NX + 437, _NY, *_P),
+# 1.0.2 starts one unit after the second row ends, as 1.0.5 ends one unit before it begins (user, 2026-10-20)
+ROOF = ([(3, _NX, _NY, *_P), (5, _NX + 89, _NY, *_P), (2, _NX + 413, _NY, *_P),
          (1, _NX + 177, _NY + 128, *_L), (6, _NX + 295, _NY + 128, *_L), (4, _NX + 234, _NY + 218, *_L)]
         + _block(_WX, [(14, 0, 0), (13, 0, 89), (12, 1, 89), (9, 0, 178), (10, 1, 178), (7, 0, 267), (11, 1, 267),
                        (8, 2, 245)])
@@ -8758,9 +8759,9 @@ def roof_map():
                               id="roof-east-hatch", width=12, height=12, patternUnits="userSpaceOnUse",
                               patternTransform="rotate(45)")])]
 
-    def text(x, y, content, size, cls, weight="normal", opacity="1", italic=False):
+    def text(x, y, content, size, cls, weight="normal", opacity="1", italic=False, anchor="middle"):
         return svg("text", x=x, y=y, content=content, fill="currentColor", **{
-            "class": cls, "font-size": size, "font-weight": weight, "text-anchor": "middle", "opacity": opacity,
+            "class": cls, "font-size": size, "font-weight": weight, "text-anchor": anchor, "opacity": opacity,
             **({"font-style": "italic"} if italic else {})})
     total = lambda expr: f"Math.round({expr}).toLocaleString('de-AT')"
     pv1_day, east_total = num("photovoltaics_pv1_generation_day"), num(OPT + "east_energy_total")
@@ -8791,15 +8792,22 @@ def roof_map():
                        opacity="0.85"),
                   text(cx, top + 38, f"='Σ ' + {total(num(opt_item(a, 'energy')))}", ROOF_SUM, "roof-sum",
                        opacity="0.85")]
-    # the planes' power in kW, as string 1's beside them (user, 2026-10-20)
-    plane = lambda key: (f"='{OPT_PLANES[key][0]} · ' + {kw(OPT + key + '_power')} + ' · ' + "
-                         f"{fixed(num(OPT + key + '_energy_day'), 2)} + ' kWh'")
-    # over each group, centred; Ost without "String 1", so that it keeps clear of West
-    parts += [text(_NX + 262, 30, plane("north"), ROOF_PLANE, "roof-plane", weight="600"),
-              text(_WX + 177, _Y0 + ROOF_TOP - 12, plane("west"), ROOF_PLANE, "roof-plane", weight="600"),
-              text(_EX + 177, _Y0 + ROOF_TOP - 12, f"='Ost · ' + {kw('huawei_inverter_pv1_power')} + ' · ' + "
-                   f"{fixed(num('photovoltaics_pv1_generation_day'), 2)} + ' kWh'", ROOF_PLANE, "roof-plane",
-                   weight="600"),
+    # each plane's name, power in kW (as string 1's) and today's energy one under the other, where the drawing has room
+    # (user, 2026-10-20): north in the gap of its upper row, west and east above their blocks, 34 units off them,
+    # centred over the upper module below like its texts (beside it they looked like panels of their own); bottom is
+    # the last line's baseline
+    def plane_label(x, bottom, anchor, name, power_item, energy_item):
+        lines = [(name, "700"), (f"={kw(power_item)}", "normal"),
+                 (f"={fixed(num(energy_item), 2)} + ' kWh'", "normal")]
+        return [text(x, bottom - 25 * (len(lines) - 1 - k), content, ROOF_PLANE, "roof-plane", weight=weight,
+                     anchor=anchor) for k, (content, weight) in enumerate(lines)]
+    above_blocks = _Y0 + ROOF_TOP - 34
+    parts += [*plane_label(_NX + (176 + 413) / 2, _NY + ROOF_TOP + 89, "middle", "Nord", OPT + "north_power",
+                           OPT + "north_energy_day"),
+              *plane_label(_WX + 117 / 2, above_blocks, "middle", "West", OPT + "west_power",
+                           OPT + "west_energy_day"),
+              *plane_label(_EX + 2 * 118 + 117 / 2, above_blocks, "middle", "Ost", "huawei_inverter_pv1_power",
+                           "photovoltaics_pv1_generation_day"),
               # north up; no inverter, which FusionSolar draws in the middle (user, 2026-10-20: "unnütze information")
               svg("path", d=f"M {ROOF_VB[2] - 24} 8 l 8 22 l -8 -5 l -8 5 Z", fill="currentColor", opacity="0.6"),
               svg_text(ROOF_VB[2] - 24, 50, "N", 18, weight="700", opacity="0.6")]
@@ -8828,7 +8836,7 @@ def shade(hex_, f):
     return "#" + "".join(f"{round(c + (t - c) * abs(f)):02x}" for c in (r, g, b))
 
 
-MODULES_H = 510
+MODULES_H = 488
 PLANES_H = 320
 
 
