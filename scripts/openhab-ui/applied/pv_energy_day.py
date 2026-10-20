@@ -3,11 +3,12 @@
 turned out to count the battery's discharge): rule photovoltaics_energy_day (pv_energy_day.js next to this file)
 writes every minute, from InfluxDB since midnight,
 - photovoltaics_generation_day: the strings' energy since midnight (kWh), the PV generation;
+- photovoltaics_pv1_generation_day, photovoltaics_pv2_generation_day: each string's (user, 2026-10-20);
 - photovoltaics_peak_day: the strings' highest input power since midnight (W);
 - energy_storage_grid_charge_day: what the inverter drew from the AC side to charge the battery from the grid (kWh),
   its active power below zero; checked on 4, 17 and 25 December 2025 and 5 January 2026: the inverter's yield − export
   + import − this matched the house's own power integral within 0.1 kWh (home_ec_day without it: 7.8 to 9.2 kWh high).
-All three persisted on change and every few minutes like the inverter's day counters.
+All persisted on change and every few minutes like the inverter's day counters.
 apply creates or updates the items, their metadata and the rule, and runs it once.
 Usage: pv_energy_day.py check|apply   (on homepi, as pi; the API token from ~/.openhab_token)"""
 import json
@@ -29,6 +30,9 @@ ITEMS = {
     "photovoltaics_generation_day": {"type": "Number:Energy", "label": "Photovoltaik Erzeugung heute",
                                      "category": "material:solar_power", "tags": ["Energy", "Measurement"],
                                      "groupNames": ["photovoltaics", *PERSIST]},
+    **{f"photovoltaics_pv{n}_generation_day": {"type": "Number:Energy", "label": f"Photovoltaik PV{n} Erzeugung heute",
+                                               "category": "material:solar_power", "tags": ["Energy", "Measurement"],
+                                               "groupNames": ["photovoltaics", *PERSIST]} for n in (1, 2)},
     "photovoltaics_peak_day": {"type": "Number:Power", "label": "Photovoltaik Spitze heute",
                                "category": "material:solar_power", "tags": ["Power", "Measurement"],
                                "groupNames": ["photovoltaics", *PERSIST]},
@@ -41,6 +45,10 @@ for name, item in ITEMS.items():
 METADATA = {
     "photovoltaics_generation_day": {"unit": {"value": "kWh"},
                                      "stateDescription": {"value": " ", "config": {"pattern": "%.2f %unit%", "readOnly": True}}},
+    **{f"photovoltaics_pv{n}_generation_day": {"unit": {"value": "kWh"},
+                                               "stateDescription": {"value": " ", "config": {"pattern": "%.2f %unit%",
+                                                                                             "readOnly": True}}}
+       for n in (1, 2)},
     "photovoltaics_peak_day": {"unit": {"value": "W"},
                                "stateDescription": {"value": " ", "config": {"pattern": "%.0f %unit%", "readOnly": True}}},
     "energy_storage_grid_charge_day": {"unit": {"value": "kWh"},

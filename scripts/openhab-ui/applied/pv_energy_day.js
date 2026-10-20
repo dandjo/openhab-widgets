@@ -3,6 +3,8 @@
 // - photovoltaics_generation_day: the strings' energy since midnight (their time-weighted mean power times the hours);
 //   the inverter's yield huawei_inverter_e_day counts the battery's discharge and leaves out what the strings charge
 //   it with, and in winter the battery's charge from the grid comes back out through it too;
+// - photovoltaics_pv1_generation_day, photovoltaics_pv2_generation_day: each string's share of it (user, 2026-10-20,
+//   for the east modules' estimate on the Photovoltaik page, string 1 having no optimizers);
 // - photovoltaics_peak_day: the strings' highest input power since midnight; the inverter's active power peak counts
 //   the battery's discharge;
 // - energy_storage_grid_charge_day: what the inverter draws from the house's AC side to charge the battery from the
@@ -22,6 +24,8 @@ const p1 = numberOf(items.getItem('huawei_inverter_pv1_power').persistence.avera
 const p2 = numberOf(items.getItem('huawei_inverter_pv2_power').persistence.averageSince(midnight, 'influxdb'));
 if (p1 !== null && p2 !== null) {
   post('photovoltaics_generation_day', Math.max(0, p1 + p2) * hours / 1000, 'kWh', 3);
+  post('photovoltaics_pv1_generation_day', Math.max(0, p1) * hours / 1000, 'kWh', 3);
+  post('photovoltaics_pv2_generation_day', Math.max(0, p2) * hours / 1000, 'kWh', 3);
 }
 
 const peak = numberOf(items.getItem('huawei_inverter_input_power').persistence.maximumSince(midnight, 'influxdb'));

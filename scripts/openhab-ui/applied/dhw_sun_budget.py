@@ -3,7 +3,7 @@
 The rule no longer switches Smart Grid. It forced the unit on (3, the tank to 60 °C) at a full battery and a surplus of
 2 kW, mostly after the compressor's own stop at 55 °C, and below about 19 °C outside the unit then started the
 compressor again at 54.x °C for 5 to 10 minutes (9 of 9 such switch-ons since 12 October 2026, none of 19 before, when
-only the booster heater came). Instead the target goes to 60 °C when the PV forecast of rule pv_forecast
+only the booster heater came). Instead the target goes to 60 °C when the PV forecast of pv_forecast_ml
 (pv_forecast_hourly) pays for it: today's rest of the forecast, less the house until the PV ends (its last hour's mean
 without the heat pump, at least 0.3 kW, plus 0.15 kW of heating) and what the battery still takes to be full
 (0.075 kWh per %), must cover the tank's way to 60 °C (0.25 kWh per kelvin) plus a reserve of 0.5 kWh to begin, on the
@@ -40,8 +40,8 @@ ANCHOR = """const tankTempReachedSetpoint = () =>
   items.getItem('espaltherma_dhw_tank_temp').numericState >= items.getItem('pyaltherma_dhw_temp_heating').numericState;
 """
 BUDGET = """
-// 60 °C when the sun pays for it (user, 2026-10-19), in place of Smart Grid: what today's rest of the PV forecast (rule
-// pv_forecast) would still send to the grid once the house is covered until the PV ends and the battery is full; when
+// 60 °C when the sun pays for it (user, 2026-10-19), in place of Smart Grid: what today's rest of the PV forecast (pv_forecast_ml,
+// pv_forecast_hourly) would still send to the grid once the house is covered until the PV ends and the battery is full; when
 // that covers the tank's way to 60 °C, the target is 60 °C. Within a compressor charge the booster heater then takes
 // over at 55 °C at once (50 of 51 such charges since August 2025, down to 2 °C outside), where Smart Grid, switched on
 // at a full battery after the compressor's stop, started the compressor again at 54.x °C below about 19 °C outside

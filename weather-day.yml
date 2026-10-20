@@ -16,7 +16,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 10, 2026, 5:24:26 PM
+timestamp: Oct 20, 2026, 8:46:20 PM
 component: div
 config:
   style:
@@ -141,17 +141,39 @@ slots:
                       gridIndex: 0
                       axisLabel:
                         show: false
+                      axisPointer:
+                        snap: false
+                        label:
+                          show: false
                   - component: oh-time-axis
                     config:
                       gridIndex: 1
                       axisLabel:
                         show: false
+                      axisPointer:
+                        snap: false
+                        label:
+                          show: false
                   - component: oh-time-axis
                     config:
                       gridIndex: 2
                       axisLabel:
                         formatter: '=(v) => dayjs(v).minute() === 0 && dayjs(v).hour() % 6 === 0 ? dayjs(v).format(''HH:mm'')
                           : '''''
+                      axisPointer:
+                        snap: false
+                        label:
+                          show: false
+                  - component: oh-time-axis
+                    config:
+                      gridIndex: 0
+                      axisLabel:
+                        show: false
+                      show: false
+                      axisPointer:
+                        snap: false
+                        label:
+                          show: false
                   yAxis:
                   - component: oh-value-axis
                     config:
@@ -374,6 +396,20 @@ slots:
                           0 && dayjs(r[0] * 1000).hour() % (screen.width < 600 ? 3 : 2) === 0 ? ({coord: [r[0] * 1000, a.slice(Math.max(0,
                           i - 8), i + 9).reduce((m, x) => Math.max(m, x[3] || 0), 0)], symbolRotate: -(r[4] + 180)}) : null).filter((p)
                           => p)'
+                  - component: oh-data-series
+                    config:
+                      id: oh-data-series#clock
+                      name: ''
+                      type: line
+                      xAxisIndex: 3
+                      yAxisIndex: 0
+                      data: =((t0) => [0,1,2,3,4,5,6,7,8,9,10,11].map((a) => [0,1,2,3,4,5,6,7,8,9,10,11].map((b) => [0,1,2,3,4,5].map((c)
+                        => [t0 + ((a * 12 + b) * 6 + c) * 300000, null]))).flat(2))(dayjs().startOf('hour').valueOf())
+                      symbol: none
+                      silent: true
+                      animation: false
+                      lineStyle:
+                        opacity: 0
                   tooltip:
                   - component: oh-chart-tooltip
                     config:
@@ -381,20 +417,23 @@ slots:
                       confine: true
                       trigger: axis
                       smartFormatter: false
-                      formatter: '=(ps) => ''<div style="display: flex; flex-direction: column; align-items: flex-start; height:
-                        0">'' + [0,1,2].map((g) => ((r) => ''<div style="'' + (r ? ''border: 1px solid; border-radius: 4px;
-                        padding: 10px; box-shadow: rgba(0, 0, 0, 0.2) 1px 2px 10px; '' + (themeOptions.dark === ''dark'' ?
-                        ''background-color: rgb(58, 62, 68); border-color: rgb(91, 94, 100)'' : ''background-color: rgb(255,
+                      formatter: '=(ps) => ((H) => ''<div style="display: flex; flex-direction: column; align-items: flex-start;
+                        height: 0">'' + [0,1,2].map((g) => ((r) => ''<div style="'' + (r ? ''border: 1px solid; border-radius:
+                        4px; padding: 10px; box-shadow: rgba(0, 0, 0, 0.2) 1px 2px 10px; '' + (themeOptions.dark === ''dark''
+                        ? ''background-color: rgb(58, 62, 68); border-color: rgb(91, 94, 100)'' : ''background-color: rgb(255,
                         255, 255); border-color: rgb(183, 185, 190)'') : ''display: none'') + ''">'' + (r ? ''<div'' + ''
-                        data-head="'' + (ps[0].axisType === ''xAxis.time'' ? dayjs(ps[0].axisValue).format(''llll'') : ps[0].axisValueLabel)
+                        data-head="'' + (ps[0].axisType === ''xAxis.time'' ? dayjs(H).format(''llll'') : ps[0].axisValueLabel)
                         + ''"'' + '' style="font-size: 12px; line-height: 18px; margin: 0 -10px 6px; padding: 0 10px 6px;
                         border-bottom: 1px solid; border-bottom-color: inherit">'' + (ps[0].axisType === ''xAxis.time'' ?
-                        dayjs(ps[0].axisValue).format(''llll'') : ps[0].axisValueLabel) + ''</div>'' + r : '''') + ''</div>'')(ps.filter((p)
-                        => [0,1,2][p.axisIndex] === g && p.seriesId && (p.seriesId.indexOf(''oh-time-series'') === 0 ? !p.seriesId.split(''#'')[4]
-                        : p.seriesId.indexOf(''oh-state-series'') !== 0)).map((p) => p.marker + '' '' + p.seriesName + ''<span
-                        style="float: right; margin-left: 20px"><b style="text-align: right;">'' + ((v) => v.toLocaleString(''en-GB'')
-                        + '' '' + p.seriesId.split(''#'')[2])(Number(p.value[1])) + ''</b></span><br/>'').join(''''))).join('''')
-                        + ''</div>'''
+                        dayjs(H).format(''llll'') : ps[0].axisValueLabel) + ''</div>'' + r : '''') + ''</div>'')(ps.filter((p)
+                        => [0,1,2,0][p.axisIndex] === g && p.seriesId && p.seriesId !== ''oh-data-series#clock'' && (p.seriesId.indexOf(''oh-time-series'')
+                        === 0 ? !p.seriesId.split(''#'')[4] : p.seriesId.indexOf(''oh-state-series'') !== 0) && !(H > dayjs().valueOf()
+                        && H - p.value[0] > 1800000)).map((p) => p.marker + '' '' + p.seriesName + ''<span style="float: right;
+                        margin-left: 20px"><b style="text-align: right;">'' + ((v) => v.toLocaleString(''en-GB'') + '' ''
+                        + p.seriesId.split(''#'')[2])(Number(p.value[1])) + ''</b></span><br/>'').join(''''))).join('''')
+                        + ''</div>'')(((c, now) => c && c.axisValue > now && ps[0].axisValue <= now && c.axisValue - ps[0].axisValue
+                        > 600000 ? c.axisValue : ps[0].axisValue)(ps.filter((p) => p.seriesId === ''oh-data-series#clock'')[0],
+                        dayjs().valueOf()))'
                       position: '=(pt, ps, dom, rect, size) => ((T, B) => ((c, left, h) => [c.style.setProperty(''align-items'',
                         left ? ''flex-end'' : ''flex-start''), dom.hasAttribute(''data-wb'') || [dom.parentNode.addEventListener(''mouseleave'',
                         () => [0,1,2].map((i) => dom.removeAttribute(''data-wb'' + i))), dom.setAttribute(''data-wb'', '''')],
@@ -417,6 +456,10 @@ slots:
                       show: true
                       bottom: '0'
                       type: scroll
+                      data:
+                      - Temperature
+                      - Precipitation
+                      - Wind
       - component: oh-card
         config:
           title: '=''Hours · '' + (dayjs(dayjs(Number(props.date) * 1000).add(vars.wxShift || 0, ''day'').unix() * 1000).isSame(dayjs(),

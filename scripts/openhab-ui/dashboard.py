@@ -5033,7 +5033,7 @@ def tip_fresh(texts):
     persisted at least every 15): a mirror item's history starts when it was made, and before that its nearest
     reading would name today's state. A JS condition on the series p to add to a tooltip's filter, '' without texts."""
     near = " || ".join(f"p.seriesName === '{n}'" for n in texts)
-    return f" && (!({near}) || Math.abs(p.value[0] - ps[0].axisValue) <= 960000)" if texts else ""
+    return f" && (!({near}) || Math.abs(p.value[0] - H) <= 960000)" if texts else ""
 
 
 # every tooltip looks like MainUI's own (ECharts' themes in MainUI 5.3, read off the page 2026-10-10); its head, the
@@ -5086,6 +5086,45 @@ def tip_position():
             "(dom.offsetWidth, dom.offsetHeight)][2]")
 
 
+CLOCK = "oh-data-series#clock"
+# the clock's points: every 5 minutes for 72 hours from the hour begun (12 x 12 x 6), as MainUI's expressions know no
+# loop and no Array; lists without spaces (PLACEHOLDER_JS)
+CLOCK_DATA = ("=((t0) => [0,1,2,3,4,5,6,7,8,9,10,11].map((a) => [0,1,2,3,4,5,6,7,8,9,10,11].map((b) => "
+              "[0,1,2,3,4,5].map((c) => [t0 + ((a * 12 + b) * 6 + c) * 300000, null]))).flat(2))"
+              "(dayjs().startOf('hour').valueOf())")
+
+
+def add_clock(chart_):
+    """An invisible series of a point every 5 minutes for the next 72 hours, on a hidden time axis of its own, in a
+    chart over time that reaches into the future (a calendar day, or a period with a future part): ECharts hands an
+    axis tooltip, for every axis, the time of the reading nearest the pointer, not the pointer's (MainUI 5.3's
+    ECharts 6.1, axisPointer's showTooltip gets snapToValue whatever snap says), so past the first series' last
+    reading, now, the tooltip's time stood still while the pointer moved on into the forecast (user, 2026-10-20).
+    The clock's reading is the pointer's time to 5 minutes; grid_boxes() takes it where the first series has none
+    near. A legend without its own list gets one, as an unnamed series would add an empty entry. True if added."""
+    slots, cfg = chart_["slots"], chart_["config"]
+    xs = slots.get("xAxis", [])
+    if not xs or any(a["component"] != "oh-time-axis" for a in xs) or not (cfg.get("chartType") == "day" or cfg.get("future")):
+        return False
+    if any(one["config"].get("id") == CLOCK for one in slots.get("series", [])):
+        return True
+    if slots.get("legend") and "data" not in slots["legend"][0]["config"]:
+        names = [one["config"].get("name") for one in slots.get("series", [])]
+        slots["legend"][0]["config"]["data"] = [n for i, n in enumerate(names) if n and n not in names[:i]]
+    extra = copy.deepcopy(xs[0])
+    extra["config"]["show"] = False
+    xs.append(extra)
+    for a in xs:
+        a["config"]["axisPointer"] = {"snap": False, "label": {"show": False}}
+    cfg.setdefault("options", {}).setdefault("axisPointer", {"link": [{"xAxisIndex": "all"}]})
+    grid = int(xs[0]["config"].get("gridIndex", 0))
+    y = next((i for i, a in enumerate(slots.get("yAxis", [])) if int(a["config"].get("gridIndex", 0)) == grid), 0)
+    slots["series"].append(comp("oh-data-series", {"id": CLOCK, "name": "", "type": "line", "xAxisIndex": len(xs) - 1,
+                                                   "yAxisIndex": y, "data": CLOCK_DATA, "symbol": "none",
+                                                   "silent": True, "animation": False, "lineStyle": {"opacity": 0}}))
+    return True
+
+
 def grid_boxes(chart_, texts=None, bands=False, value_formatter=None):
     """The tooltip of a chart over one or more grids, a box per grid, as Grafana's shared tooltip (user,
     2026-10-10): each grid's values in its box under the time (tip_head()), a state band's words in a box of its own.
@@ -5099,8 +5138,13 @@ def grid_boxes(chart_, texts=None, bands=False, value_formatter=None):
     and moves alike. The rows are those of MainUI's smart formatter, or the chart's own valueFormatter's, with words
     (tip_value()). The head is the time on a time axis; on a category axis of days (chartType month) or months (year)
     the position function names the date, from the category and the period MainUI's period button shows ('5' and
-    'Okt. 2026' become 'Mo., 5. Okt. 2026'). A grid's top and height or bottom are taken as pixels; it runs last
-    (tooltips_designed()), once every grid stands where it stays. In place."""
+    'Okt. 2026' become 'Mo., 5. Okt. 2026'). The time H is the first series' reading's; where that series ends
+    before now (a measurement, not a forecast) and the pointer is past it into the future by more than 10 minutes, the
+    clock's (add_clock()), and a reading more than 30 minutes older than a time to come is left out (a measurement's
+    last one, now, under the forecast); a first series with readings to come (prices, the weather) keeps its own. A grid's top and height or
+    bottom are taken as pixels; it runs last (tooltips_designed()), once every grid stands where it stays. In
+    place."""
+    clock = add_clock(chart_)
     slots = chart_["slots"]
     # lists written without spaces: the generator takes "1, 2, 3" for its colour placeholder (PLACEHOLDER_JS)
     js = lambda xs: "[" + ",".join(str(x) for x in xs) + "]"
@@ -5116,15 +5160,22 @@ def grid_boxes(chart_, texts=None, bands=False, value_formatter=None):
     texts = texts or {}
     # a series as the smart formatter lists it: a time series without a fifth part in its id, any other with an id;
     # a state series only where its bars name their state (bands)
-    keep = ("p.seriesId && (p.seriesId.indexOf('oh-time-series') === 0 ? !p.seriesId.split('#')[4] : "
-            + ("true" if bands else "p.seriesId.indexOf('oh-state-series') !== 0") + f"){tip_fresh(texts)}")
+    stale = " && !(H > dayjs().valueOf() && H - p.value[0] > 1800000)" if clock else ""
+    keep = (f"p.seriesId && p.seriesId !== '{CLOCK}' && (p.seriesId.indexOf('oh-time-series') === 0 ? "
+            "!p.seriesId.split('#')[4] : " + ("true" if bands else "p.seriesId.indexOf('oh-state-series') !== 0")
+            + f"){tip_fresh(texts)}{stale}")
+    # the time: the first series' reading's, or the clock's past it into the future
+    at = (f"((c, now) => c && c.axisValue > now && ps[0].axisValue <= now && c.axisValue - ps[0].axisValue > 600000 ? "
+          f"c.axisValue : ps[0].axisValue)(ps.filter((p) => p.seriesId === '{CLOCK}')[0], dayjs().valueOf())"
+          if clock else "ps[0].axisValue")
     row = TIP_ROW.format(value=tip_value(texts, bands, value_formatter))
-    label = "(ps[0].axisType === 'xAxis.time' ? dayjs(ps[0].axisValue).format('llll') : ps[0].axisValueLabel)"
+    label = "(ps[0].axisType === 'xAxis.time' ? dayjs(H).format('llll') : ps[0].axisValueLabel)"
     rows = f"ps.filter((p) => {of_axis}[p.axisIndex] === g && {keep}).map((p) => {row}).join('')"
     # a grid without a value keeps its box, hidden, so the boxes stay in the grids' order
-    formatter = ("=(ps) => '<div style=\"display: flex; flex-direction: column; align-items: flex-start; height: 0\">'"
+    formatter = ("=(ps) => ((H) => '<div style=\"display: flex; flex-direction: column; align-items: flex-start; "
+                 "height: 0\">'"
                  f" + {js(range(len(tops)))}.map((g) => ((r) => '<div style=\"' + (r ? {TIP_BOX} : 'display: none')"
-                 f" + '\">' + (r ? {tip_head(label, label)} + r : '') + '</div>')({rows})).join('') + '</div>'")
+                 f" + '\">' + (r ? {tip_head(label, label)} + r : '') + '</div>')({rows})).join('') + '</div>')({at})")
     # a category's date: the day of the month or the month, and the year, from the period button's text ('Okt. 2026'
     # or '2026'); a month's short name is matched by dayjs' own, from the first of a month so no day runs over
     chart_type = chart_["config"].get("chartType")
@@ -7857,7 +7908,7 @@ def pv_power(title, item):
 
 
 def pv_forecast_tile(title, item):
-    """The house's own PV forecast (rule pv_forecast): today's total with how much of it the strings have generated,
+    """The house's own PV forecast (pv_forecast_ml): today's total with how much of it the strings have generated,
     tomorrow's under it (user, 2026-10-19)."""
     today = num(item)
     chip = vt_chip(f"={today} > 0 ? Math.round(100 * {num(PV_DAY)} / {today}) + ' % erzeugt' : 'keine Prognose'")
@@ -8630,6 +8681,193 @@ PHONE_BUTTONS_ABOVE = """@media (max-width: 599px) { .oh-chart-container { heigh
   .oh-chart { top: 40px !important; height: 520px !important; } }"""
 
 
+# the optimizers on string 2 (rule huawei_optimizers, user, 2026-10-20): the planes' colours, the reference palette's
+# first two of PHASE_COLORS (west the evening's orange, north blue)
+WEST_C, NORTH_C = PHASE_COLORS[1], PHASE_COLORS[0]
+OPT = "huawei_optimizers_"
+OPT_PLANES = {"west": ("West", WEST_C, range(7, 15)), "north": ("Nord", NORTH_C, range(1, 7))}
+# the modules in the arrangement of FusionSolar's physical layout, north up (user, 2026-10-20, a screenshot of it):
+# (address, x, y, width, height), shifted by ROOF_TOP for the planes' labels above them; north 1.0.1 to 1.0.6 above
+# (a pair upright on the left, one upright on the right, three across below them), west 1.0.7 to 1.0.14 below on the
+# left, east on the right (string 1, without optimizers: address None). Each group keeps FusionSolar's shape, the
+# gaps between them are closed up (user: "die Abstände sind ohnehin nicht real"), so the modules come out larger
+ROOF_TOP = 44
+_L, _P = (117, 88), (87, 116)  # a module across, upright
+_WX, _EX, _Y0, _NY = 4, 381, 356, 7  # the west, east and lower blocks' origins, the north group's top
+# the north group's left: its lowest module, 1.0.4, midway between the west and the east block (user, 2026-10-20)
+_NX = (_WX + 2 * 118 + _L[0] + _EX) / 2 - 234 - _L[0] / 2
+
+
+def _block(x0, cells):
+    return [(a, x0 + c * 118, _Y0 + r, *_L) for a, c, r in cells]
+
+
+ROOF = ([(3, _NX, _NY, *_P), (5, _NX + 89, _NY, *_P), (2, _NX + 437, _NY, *_P),
+         (1, _NX + 177, _NY + 128, *_L), (6, _NX + 295, _NY + 128, *_L), (4, _NX + 234, _NY + 218, *_L)]
+        + _block(_WX, [(14, 0, 0), (13, 0, 89), (12, 1, 89), (9, 0, 178), (10, 1, 178), (7, 0, 267), (11, 1, 267),
+                       (8, 2, 245)])
+        + _block(_EX, [(None, 2, 0), (None, 1, 89), (None, 2, 89), (None, 1, 178), (None, 2, 178), (None, 0, 245),
+                       (None, 1, 267), (None, 2, 267)]))
+ROOF_VB = (0, 0, _EX + 2 * 118 + 117 + 4, _Y0 + 267 + 88 + ROOF_TOP + 4)
+
+
+def opt_item(a, what):
+    return f"huawei_optimizer_{a:02d}_{what}"
+
+
+def roof_box(x, y, w, h):
+    """A module's place over the roof drawing, in percent of its viewBox."""
+    x0, y0, vw, vh = ROOF_VB
+    return {"position": "absolute", "display": "block", "border-radius": "6px",
+            "left": f"{(x - x0) / vw * 100:.2f}%", "top": f"{(y + ROOF_TOP - y0) / vh * 100:.2f}%",
+            "width": f"{w / vw * 100:.2f}%", "height": f"{h / vh * 100:.2f}%"}
+
+
+# string 1's colour, as in Leistung heute, for the east modules' estimate
+EAST_C = "#ffca28"
+EAST_N = 8
+
+
+# the roof drawing shrinks to about 0.66 in a half-width card and 0.4 on a phone: its texts in viewBox units large
+# enough for that (user, 2026-10-20: the first ones, 11 to 24, came out at 7 to 14 px); the power in one size in all
+# modules (user: "auch bei den quer Modulen gleich"), the one with which 3 digits fit the narrow upright ones (up to the
+# optimizer's 450 W); on a phone all three lines larger still and moved apart to make room for that, the power up, the
+# lifetime yield down (user: the lifetime yield on the phone too)
+# on a desktop a size smaller again than first set (user, 2026-10-20: "am desktop kann die schrift wieder etwas kleiner
+# werden"); the phone's sizes are the stylesheet's
+ROOF_W, ROOF_DAY, ROOF_SUM = 21, 17, 16
+# the planes' labels: 22 on a phone, a step smaller on the desktop (user, 2026-10-20: "wieder etwas kleiner")
+ROOF_PLANE = 18
+ROOF_CSS = ("@media (max-width: 599px) { .roof-w { font-size: 25px; transform: translateY(-4px); } "
+            ".roof-day { font-size: 23px; transform: translateY(4px); } "
+            ".roof-sum { font-size: 21px; transform: translateY(9px); } .roof-plane { font-size: 22px; } }")
+
+
+def roof_map():
+    """The modules where they lie on the roof, as FusionSolar's physical layout draws them: each optimizer's module
+    with its power, today's energy and its lifetime yield (Σ, its optimizer's counter since the plant started), the
+    small lines without their units, which the line under the drawing names, filled in its plane's colour the more,
+    the closer its power comes to the strongest module of its plane, so that a shaded or failing module shows; a tap
+    opens its power's course, under FusionSolar's name 1.0.<address>. East, on string 1, has no optimizers: string 1's
+    power, today's energy and estimated lifetime yield split evenly over its 8 modules, a fictitious split that shows
+    as such (user, 2026-10-20): hatched in string 1's colour and dashed, the values in italics after an ≈ on a plate in
+    the card's colour, so that they read over the hatching; a tap opens string 1's power. Over each plane its power
+    and today's energy; under the drawing the optimizers' status, the hottest one and the reading's time."""
+    parts = [svg("defs", [svg("pattern", [svg("path", d="M 0 0 L 0 12", stroke=EAST_C, **{"stroke-width": "3",
+                                                                                           "stroke-opacity": "0.35"})],
+                              id="roof-east-hatch", width=12, height=12, patternUnits="userSpaceOnUse",
+                              patternTransform="rotate(45)")])]
+
+    def text(x, y, content, size, cls, weight="normal", opacity="1", italic=False):
+        return svg("text", x=x, y=y, content=content, fill="currentColor", **{
+            "class": cls, "font-size": size, "font-weight": weight, "text-anchor": "middle", "opacity": opacity,
+            **({"font-style": "italic"} if italic else {})})
+    total = lambda expr: f"Math.round({expr}).toLocaleString('de-AT')"
+    pv1_day, east_total = num("photovoltaics_pv1_generation_day"), num(OPT + "east_energy_total")
+    for a, x, y, w, h in ROOF:
+        y += ROOF_TOP
+        # the three lines' block centred in the module (user, 2026-10-20: "zu tief"): from the power's cap to the
+        # lifetime line's baseline 15 + 38 units, so the power's baseline 11.5 above the module's middle
+        cx, top = x + w / 2, y + h / 2 - 11.5
+        if a is None:
+            parts += [svg("rect", x=x + 3, y=y + 3, width=w - 6, height=h - 6, rx=6, fill="url(#roof-east-hatch)",
+                          stroke=EAST_C, **{"stroke-opacity": "0.9", "stroke-dasharray": "6 4"}),
+                      svg("rect", x=x + 9, y=y + 6, width=w - 18, height=h - 12, rx=6,
+                          style={"fill": "var(--f7-card-bg-color, #fff)", "fill-opacity": "0.85"}),
+                      text(cx, top, f"='≈ ' + Math.round({num('huawei_inverter_pv1_power')} / {EAST_N}) + ' W'",
+                           ROOF_W, "roof-w", weight="700", italic=True),
+                      text(cx, top + 20, f"='≈ ' + {fixed(f'{pv1_day} / {EAST_N}', 2)}", ROOF_DAY, "roof-day",
+                           opacity="0.85", italic=True),
+                      text(cx, top + 38, f"='≈ Σ ' + {total(f'{east_total} / {EAST_N}')}", ROOF_SUM, "roof-sum",
+                           opacity="0.85", italic=True)]
+            continue
+        _, color, members = OPT_PLANES["west" if a >= 7 else "north"]
+        peak = "Math.max(1, " + ", ".join(num(opt_item(m, "power")) for m in members) + ")"
+        parts += [svg("rect", x=x + 3, y=y + 3, width=w - 6, height=h - 6, rx=6, fill=color, stroke=color,
+                      **{"fill-opacity": f"=(0.1 + 0.6 * {num(opt_item(a, 'power'))} / {peak}).toFixed(2)",
+                         "stroke-opacity": "0.9"}),
+                  text(cx, top, f"=Math.round({num(opt_item(a, 'power'))}) + ' W'", ROOF_W, "roof-w", weight="700"),
+                  text(cx, top + 20, f"={fixed(num(opt_item(a, 'energy_day')), 2)}", ROOF_DAY, "roof-day",
+                       opacity="0.85"),
+                  text(cx, top + 38, f"='Σ ' + {total(num(opt_item(a, 'energy')))}", ROOF_SUM, "roof-sum",
+                       opacity="0.85")]
+    # the planes' power in kW, as string 1's beside them (user, 2026-10-20)
+    plane = lambda key: (f"='{OPT_PLANES[key][0]} · ' + {kw(OPT + key + '_power')} + ' · ' + "
+                         f"{fixed(num(OPT + key + '_energy_day'), 2)} + ' kWh'")
+    # over each group, centred; Ost without "String 1", so that it keeps clear of West
+    parts += [text(_NX + 262, 30, plane("north"), ROOF_PLANE, "roof-plane", weight="600"),
+              text(_WX + 177, _Y0 + ROOF_TOP - 12, plane("west"), ROOF_PLANE, "roof-plane", weight="600"),
+              text(_EX + 177, _Y0 + ROOF_TOP - 12, f"='Ost · ' + {kw('huawei_inverter_pv1_power')} + ' · ' + "
+                   f"{fixed(num('photovoltaics_pv1_generation_day'), 2)} + ' kWh'", ROOF_PLANE, "roof-plane",
+                   weight="600"),
+              # north up; no inverter, which FusionSolar draws in the middle (user, 2026-10-20: "unnütze information")
+              svg("path", d=f"M {ROOF_VB[2] - 24} 8 l 8 22 l -8 -5 l -8 5 Z", fill="currentColor", opacity="0.6"),
+              svg_text(ROOF_VB[2] - 24, 50, "N", 18, weight="700", opacity="0.6")]
+    links = []
+    for a, x, y, w, h in ROOF:
+        if a is None:
+            links.append(comp("oh-link", {**item_modal("huawei_inverter_pv1_power", "String 1 (Ost)", EAST_C),
+                                          "style": roof_box(x, y, w, h)}))
+        else:
+            name, color, _ = OPT_PLANES["west" if a >= 7 else "north"]
+            links.append(comp("oh-link", {**item_modal(opt_item(a, "power"), f"Modul {name} 1.0.{a}", color),
+                                          "style": roof_box(x, y, w, h)}))
+    drawing = div([svg("svg", parts, viewBox=" ".join(map(str, ROOF_VB)), width="100%", style={"display": "block"}),
+                   *links], **{"position": "relative", "padding": "4px 16px 0"})
+    small = {"font-size": "12px", "opacity": "0.7", "text-align": "center"}
+    # no legend of the lines and the east modules under it (user, 2026-10-20: "den text unten lass einfach weg")
+    foot = div([label(f"={dash(disp(OPT + 'status'))} + ' · max. ' + {fixed(num(OPT + 'temperature_max'), 1)} + "
+                      f"' °C · ' + {dash(disp(OPT + 'updated'))}", **small)], **{"padding": "8px 16px 16px"})
+    return [comp("div", {"stylesheet": ROOF_CSS}, default=[drawing, foot])]
+
+
+def shade(hex_, f):
+    """A colour mixed toward white (f > 0) or black (f < 0) by |f|."""
+    r, g, b = (int(hex_[i:i + 2], 16) for i in (1, 3, 5))
+    t = 255 if f > 0 else 0
+    return "#" + "".join(f"{round(c + (t - c) * abs(f)):02x}" for c in (r, g, b))
+
+
+MODULES_H = 510
+PLANES_H = 320
+
+
+def plot_below_buttons(height):
+    """On a phone the day button leaves the first grid's title too little room beside it, as in Leistung heute: the
+    plot of a day chart height high begins below the buttons, its container 40 px taller."""
+    return (f"@media (max-width: 599px) {{ .oh-chart-container {{ height: {height + 40}px !important; }} "
+            f".oh-chart {{ top: 40px !important; height: {height}px !important; }} }}")
+
+
+def planes_chart():
+    """The three directions' power over the day in one grid, so that they compare: east string 1, which has no
+    optimizers, west and north string 2's planes by their optimizers (user, 2026-10-20: a chart of their own, not
+    in Leistung heute)."""
+    # noBoundary: the reading MainUI adds before the day may be weeks old while a gap is filled
+    return stacked_chart([((("Ost", EAST_C), *((name, color) for name, color, _ in OPT_PLANES.values())),
+                           [line("Ost", "huawei_inverter_pv1_power", EAST_C),
+                            *(line(name, OPT + key + "_power", color, noBoundary=True)
+                              for key, (name, color, _) in OPT_PLANES.items())],
+                           value_axis("W"))], PLANES_H, chartType="day")
+
+
+def modules_chart():
+    """Each module's power over the day, west and north in a grid each, a line per module in shades of its plane's
+    colour, so that one falling short of the others shows; the tooltip names them as FusionSolar does."""
+    panels = []
+    for key in ("west", "north"):
+        name, color, members = OPT_PLANES[key]
+        n = len(members)
+        # noBoundary: the reading MainUI adds before the day may be weeks old while a gap is filled
+        series = [time_series(f"1.0.{a}", opt_item(a, "power"), symbol="none", noBoundary=True,
+                              lineStyle={"width": 1.2, "color": shade(color, 0.5 * k / (n - 1) - 0.25)},
+                              itemStyle={"color": shade(color, 0.5 * k / (n - 1) - 0.25)})
+                  for k, a in enumerate(members)]
+        panels.append((((name, color),), series, value_axis("W")))
+    # about as high as the roof beside it in a half-width card
+    return stacked_chart(panels, MODULES_H, chartType="day")
+
+
 def photovoltaics_blocks():
     now = [hero("material:solar_power", "#ffb300", "Eingangsleistung", kwc(PV),
                 picture=node_icon("pv", "#ffb300", flowing(num(PV), 10), power=num(PV))),
@@ -8643,15 +8881,21 @@ def photovoltaics_blocks():
                       vtile("Energie gesamt", "huawei_inverter_e_total")])]
     # input and output overlapping in one panel, the two strings in the other, so a shaded string shows (user,
     # 2026-10-04); two panels, not four, as four were too low to read (user, 2026-10-07). Over the input the house's
-    # PV forecast dashed (rule pv_forecast, each hour's mean at its middle), over the calendar day, so the rest of
-    # today shows what is still to come and the arrows page to tomorrow's (user, 2026-10-19)
+    # PV forecast dashed (pv_forecast_ml, each hour's mean at its middle), over the calendar day, so the rest of
+    # today shows what is still to come and the arrows page to tomorrow's (user, 2026-10-19); over each string its
+    # own forecast dashed in its colour, the house's the sum of the two (a model per string, user, 2026-10-20), the
+    # title without it: a grey word there would stand for no line; string 2's planes not here but in a chart of their
+    # own, Himmelsrichtungen heute (user, 2026-10-20)
     forecast = line("Prognose", "pv_forecast_power", f"={NEUTRAL_LINE}", dashed=True)
+    string_forecasts = [line(f"Prognose PV{n}", f"pv_forecast_pv{n}_power", color, dashed=True)
+                        for n, color in ((1, "#ffca28"), (2, "#ff8f00"))]
     chart_ = stacked_chart([((("Eingang", "#ffb300"), ("Wirkleistung", "#5c6bc0"), ("Prognose", f"={NEUTRAL_LINE}")),
                              [area("Eingang", PV, "#ffb300"), area("Wirkleistung", "huawei_inverter_active_power", "#5c6bc0"),
                               forecast], value_axis("W")),
                             ((("PV1", "#ffca28"), ("PV2", "#ff8f00")),
                              [area("PV1", "huawei_inverter_pv1_power", "#ffca28"),
-                              area("PV2", "huawei_inverter_pv2_power", "#ff8f00")], value_axis("W"))],
+                              area("PV2", "huawei_inverter_pv2_power", "#ff8f00"), *string_forecasts],
+                             value_axis("W"))],
                            520, chartType="day")  # as high as the inverter's card beside it
     # on a phone the calendar day's date button leaves the first grid's title too little room beside it (it ran under
     # the button): there the plot begins below the buttons, the chart 40 px taller
@@ -8686,6 +8930,14 @@ def photovoltaics_blocks():
                                           card("Ertrag pro Tag", [fill_chart(days, "180px")], fill=True))),
             # the inverter first, the day's power beside it (user, 2026-10-07)
             two(card("Wechselrichter", [inverter]), card("Leistung heute", [chart_])),
+            # the directions against each other, the full width (user, 2026-10-20: a chart of their own)
+            one(card("Himmelsrichtungen heute", [comp("div", {"stylesheet": plot_below_buttons(PLANES_H)},
+                                                      default=[planes_chart()])])),
+            # string 2's modules one by one, by their optimizers (user, 2026-10-20: "Ansicht pro Modul"): where they lie
+            # on the roof, now, and their day beside it
+            two(card("Module", roof_map()),
+                card("Module heute", [comp("div", {"stylesheet": plot_below_buttons(MODULES_H)},
+                                           default=[modules_chart()])])),
             one(card("PV-Eigenverbrauch pro Tag", [self_use_days()]))]
 
 
