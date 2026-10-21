@@ -8761,11 +8761,12 @@ def roof_map():
     with its power, today's energy and its lifetime yield (Σ, its optimizer's counter since the plant started), the
     small lines without their units, which the line under the drawing names, filled in its plane's colour the more,
     the closer its power comes to the strongest module of its plane, so that a shaded or failing module shows; a tap
-    opens its power's course, under FusionSolar's name 1.0.<address>. East, on string 1, has no optimizers: string 1's
-    power, today's energy and estimated lifetime yield split evenly over its 8 modules, a fictitious split that shows
-    as such (user, 2026-10-20): hatched in string 1's colour and dashed, the values in italics after an ≈ on a plate in
-    the card's colour, so that they read over the hatching; a tap opens string 1's power. Over each plane its power
-    and today's energy; under the drawing the optimizers' status, the hottest one and the reading's time."""
+    opens its power's course, under FusionSolar's name 1.0.<address>, which hovering shows as a tooltip. East, on
+    string 1, has no optimizers: string 1's power, today's energy and estimated lifetime yield split evenly over its 8
+    modules, a fictitious split that shows as such (user, 2026-10-20): hatched in string 1's colour and dashed, the
+    values in italics after an ≈ on a plate in the card's colour, so that they read over the hatching; a tap opens
+    string 1's power. Over each plane its power and today's energy; under the drawing the optimizers' status, the
+    hottest one and the reading's time."""
     parts = [svg("defs", [svg("pattern", [svg("path", d="M 0 0 L 0 12", stroke=EAST_C, **{"stroke-width": "3",
                                                                                            "stroke-opacity": "0.35"})],
                               id="roof-east-hatch", width=12, height=12, patternUnits="userSpaceOnUse",
@@ -8823,15 +8824,17 @@ def roof_map():
               # north up; no inverter, which FusionSolar draws in the middle (user, 2026-10-20: "unnütze information")
               svg("path", d=f"M {ROOF_VB[2] - 24} 8 l 8 22 l -8 -5 l -8 5 Z", fill="currentColor", opacity="0.6"),
               svg_text(ROOF_VB[2] - 24, 50, "N", 18, weight="700", opacity="0.6")]
+    # each module's name, the popup's title, also as a tooltip on hover (user, 2026-10-21: the optimizers' numbers
+    # "vielleicht als tooltip"; the face has no room for them)
     links = []
     for a, x, y, w, h in ROOF:
         if a is None:
-            links.append(comp("oh-link", {**item_modal("huawei_inverter_pv1_power", "String 1 (Ost)", EAST_C),
-                                          "style": roof_box(x, y, w, h)}))
+            title, item, color = "String 1 (Ost)", "huawei_inverter_pv1_power", EAST_C
         else:
             name, color, _ = OPT_PLANES["west" if a >= 7 else "north"]
-            links.append(comp("oh-link", {**item_modal(opt_item(a, "power"), f"Modul {name} 1.0.{a}", color),
-                                          "style": roof_box(x, y, w, h)}))
+            title, item = f"Modul {name} 1.0.{a}", opt_item(a, "power")
+        links.append(comp("oh-link", {**item_modal(item, title, color), "tooltip": title,
+                                      "style": roof_box(x, y, w, h)}))
     drawing = div([svg("svg", parts, viewBox=" ".join(map(str, ROOF_VB)), width="100%", style={"display": "block"}),
                    *links], **{"position": "relative", "padding": "4px 16px 0"})
     small = {"font-size": "12px", "opacity": "0.7", "text-align": "center"}
