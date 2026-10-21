@@ -128,9 +128,9 @@ OVERVIEW = [
      "and the last day as a chart from 15-minute means."),
 ]
 PLUG = [("plug-card", "Now: the device's icon large in a ring, pulsing while it works (its energy-flow node or "
-                       "appliance icon, else its icon), power, on/off pill, today's energy against yesterday at this "
-                       "time and the mean of the last 7 days, the total on rollers like a meter's; with `range` (kWh per "
-                       "100 km) a road with the car where today's charge would take it"),
+                       "appliance icon, else its icon), power, on/off pill, today's energy against yesterday's and the "
+                       "7-day mean's whole days (their bars strong up to this time of day), the total on rollers like a "
+                       "meter's; with `range` (kWh per 100 km) a road with the car where today's charge would take it"),
         ("plug-power-card", "Power over the day"),
         ("plug-energy-days-card", "Energy per day of the month"), ("plug-electric-card", "Voltage in its band of 230 V "
                                                                                       "± 10 %, current against the "
@@ -614,7 +614,8 @@ the device's `title`, hide the switch with `controllable: false`, or take the sw
 The comparisons with yesterday and the last 7 days come from one String item, `history`, which the rule in
 [`scripts/openhab-ui/applied/tile_history.py`](scripts/openhab-ui/applied/tile_history.py) writes every ten minutes:
 for each item its value yesterday and the mean of the last 7 days at this time, and the same ten minutes later, between
-which the cards interpolate to the current minute; so no widget queries persistence for a comparison.
+which the cards interpolate to the current minute, and both as whole days, which the cards name, their bars strong up
+to this time; so no widget queries persistence for a comparison.
 
 ![Plug cards](screenshots/plug-cards.png)
 """)

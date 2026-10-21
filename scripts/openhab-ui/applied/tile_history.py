@@ -5,7 +5,7 @@ persisted. Per item it keeps what the
 tiles need (dashboard.py, tile_history_track()): y its value yesterday at this time and a the mean of the last 7 days
 at this time (comparison with yesterday) and both again dt seconds later (y2, a2, with the run's time t: the tiles
 interpolate to the minute shown, as the rule runs every 10 minutes), d its value at yesterday's end (yesterday's whole day, the base a
-comparison needs), h its value some hours ago (trend), s 24 hourly means up to now (day's
+comparison needs), e the mean of the last 7 days' ends (their whole days), h its value some hours ago (trend), s 24 hourly means up to now (day's
 course), f [unix, value] of the hours behind and ahead (the price strip). Finished hours stay in the rule's private
 cache, so a run queries only the current hour anew.
 
@@ -29,7 +29,8 @@ TOKEN = open(os.path.expanduser("~/.openhab_token")).read().strip()
 ITEM = RULE_UID = ns["TILE_HISTORY"]
 SCRIPT = """// the history the device pages' value tiles show, as JSON in tile_history: per item y = its value yesterday at this
 // time, a = the mean of the last 7 days at this time, y2/a2 = both dt seconds later (t = this run, the tiles
-// interpolate to the minute shown), d = its value at yesterday's end, h = its value some hours ago, s = 24 hourly means up to now,
+// interpolate to the minute shown), d = its value at yesterday's end, e = the mean of the last 7 days' ends,
+// h = its value some hours ago, s = 24 hourly means up to now,
 // f = [unix, value] of the hours behind and ahead; the items and what to keep of them come from the UI generator
 const TRACK = __TRACK__;
 const svc = 'influxdb';
@@ -37,10 +38,10 @@ const now = time.toZDT();
 const hour0 = now.withMinute(0).withSecond(0).withNano(0);
 // finished hours never change: their means stay here, a run queries only the current hour anew
 const store = cache.private.get('hourly', () => ({}));
-// yesterday's end does not change all day: read once a day
+// yesterday's end and the last 7 days' ends do not change all day: read once a day
 const midnight = now.withHour(0).withMinute(0).withSecond(0).withNano(0);
 const ends = cache.private.get('day_ends', () => ({}));
-if (ends.day !== midnight.toEpochSecond()) { ends.day = midnight.toEpochSecond(); ends.v = {}; }
+if (ends.day !== midnight.toEpochSecond() || !ends.m) { ends.day = midnight.toEpochSecond(); ends.v = {}; ends.m = {}; }
 // the next run's minute: up to it the tiles interpolate between now and dt later, within the day (before midnight
 // dt shrinks, else yesterday's later value would be the reset counter of the next day)
 const dt = Math.max(1, Math.min(600, midnight.plusDays(1).toEpochSecond() - now.toEpochSecond() - 1));
@@ -70,6 +71,15 @@ for (const name of Object.keys(TRACK)) {
       r.dt = dt;
       if (ends.v[name] === undefined || ends.v[name] === null) ends.v[name] = val(p.persistedState(midnight.minusSeconds(1), svc));
       r.d = ends.v[name];
+      if (ends.m[name] === undefined || ends.m[name] === null) {
+        const xe = [];
+        for (let k = 0; k < 7; k++) {
+          const v = val(p.persistedState(midnight.minusDays(k).minusSeconds(1), svc));
+          if (v !== null) xe.push(v);
+        }
+        ends.m[name] = mean(xe);
+      }
+      r.e = ends.m[name];
     }
     if (want.t) r.h = val(p.persistedState(now.minusHours(want.t), svc));
     if (want.s) {
@@ -122,7 +132,7 @@ def main():
         "name": "Kachel-Verlauf",
         "description": "Schreibt alle 10 Minuten und nach dem Start in tile_history, was die Werte-Kacheln der Geräteseiten an Verlauf "
                        "zeigen: Wert gestern um diese Zeit, Ø der letzten 7 Tage um diese Zeit, Wert am Ende von "
-                       "gestern, Wert vor einigen "
+                       "gestern, Ø der ganzen Tage der letzten 7 Tage, Wert vor einigen "
                        "Stunden, 24 Stundenmittel und die Preise der kommenden Stunden (applied/tile_history.py, "
                        "Liste aus dem UI-Generator).",
         "tags": [],

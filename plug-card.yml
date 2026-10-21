@@ -124,7 +124,7 @@ props:
     required: false
     context: item
   parameterGroups: []
-timestamp: Oct 17, 2026, 9:55:42 PM
+timestamp: Oct 21, 2026, 9:18:14 AM
 component: oh-card
 config:
   title: =props.title
@@ -456,6 +456,7 @@ slots:
               - component: div
                 config:
                   style:
+                    position: relative
                     height: 8px
                     border-radius: 4px
                     background: rgba(127, 127, 127, 0.1)
@@ -464,9 +465,12 @@ slots:
                   - component: div
                     config:
                       style:
+                        position: absolute
+                        left: '0'
+                        top: '0'
                         height: 8px
                         border-radius: 4px
-                        width: '=true ? Math.max(0, Math.min(100, ((Number(items[props.prefix + ''_energy_today''].numericState)
+                        width: '=Math.max(0, Math.min(100, ((Number(items[props.prefix + ''_energy_today''].numericState)
                           || 0) * 1) / (Math.max(((Number(items[props.prefix + ''_energy_today''].numericState) || 0) * 1),
                           (((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y +
                           (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.history].state)
@@ -488,14 +492,23 @@ slots:
                           || h.a2 === null || h.a === null || h.a === undefined ? h.a : h.a + (h.a2 - h.a) * Math.min(1, Math.max(0,
                           (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.history].state) || '''').charAt(0)
                           === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today''] || {})))
-                          * 1) : 0) * 1.08 || 1) * 100)) + ''%'' : ''0%'''
+                          * 1) : 0, (((((((items[props.history].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state)
+                          : {}))[props.prefix + ''_energy_today''] || {}).d) !== undefined && ((((((items[props.history].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today'']
+                          || {}).d) !== null) ? (Number(((((((items[props.history].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state)
+                          : {}))[props.prefix + ''_energy_today''] || {}).d)) * 1) : 0, (((((((items[props.history].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today'']
+                          || {}).e) !== undefined && ((((((items[props.history].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state)
+                          : {}))[props.prefix + ''_energy_today''] || {}).e) !== null) ? (Number(((((((items[props.history].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today'']
+                          || {}).e)) * 1) : 0) * 1.08 || 1) * 100)) + ''%'''
                         background: '#ffa726'
+                      visible: =true
                     slots:
                       default: []
               - component: Label
                 config:
-                  text: '=true ? (((Number(items[props.prefix + ''_energy_today''].numericState) || 0) * 1)).toFixed(2) :
-                    ''–'''
+                  text: =(((Number(items[props.prefix + '_energy_today'].numericState) || 0) * 1)).toFixed(2)
                   style:
                     font-size: 11px
                     text-align: right
@@ -510,6 +523,7 @@ slots:
               - component: div
                 config:
                   style:
+                    position: relative
                     height: 8px
                     border-radius: 4px
                     background: rgba(127, 127, 127, 0.1)
@@ -518,21 +532,16 @@ slots:
                   - component: div
                     config:
                       style:
+                        position: absolute
+                        left: '0'
+                        top: '0'
                         height: 8px
                         border-radius: 4px
-                        width: '=(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y :
-                          h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.history].state)
-                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today'']
-                          || {})) !== undefined && ((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y ===
-                          undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1,
-                          h.dt))))((((((items[props.history].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state)
-                          : {}))[props.prefix + ''_energy_today''] || {})) !== null) ? Math.max(0, Math.min(100, (Number(((h)
+                        width: '=Math.max(0, Math.min(100, (Number(((((((items[props.history].state) || '''').charAt(0) ===
+                          ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today''] || {}).d))
+                          * 1) / (Math.max(((Number(items[props.prefix + ''_energy_today''].numericState) || 0) * 1), (((h)
                           => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y + (h.y2
                           - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.history].state)
-                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today'']
-                          || {}))) * 1) / (Math.max(((Number(items[props.prefix + ''_energy_today''].numericState) || 0) *
-                          1), (((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y
-                          + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.history].state)
                           || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today'']
                           || {})) !== undefined && ((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y ===
                           undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1,
@@ -551,22 +560,82 @@ slots:
                           || h.a2 === null || h.a === null || h.a === undefined ? h.a : h.a + (h.a2 - h.a) * Math.min(1, Math.max(0,
                           (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.history].state) || '''').charAt(0)
                           === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today''] || {})))
-                          * 1) : 0) * 1.08 || 1) * 100)) + ''%'' : ''0%'''
+                          * 1) : 0, (((((((items[props.history].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state)
+                          : {}))[props.prefix + ''_energy_today''] || {}).d) !== undefined && ((((((items[props.history].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today'']
+                          || {}).d) !== null) ? (Number(((((((items[props.history].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state)
+                          : {}))[props.prefix + ''_energy_today''] || {}).d)) * 1) : 0, (((((((items[props.history].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today'']
+                          || {}).e) !== undefined && ((((((items[props.history].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state)
+                          : {}))[props.prefix + ''_energy_today''] || {}).e) !== null) ? (Number(((((((items[props.history].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today'']
+                          || {}).e)) * 1) : 0) * 1.08 || 1) * 100)) + ''%'''
+                        background: rgba(127, 127, 127, 0.22)
+                      visible: '=(((((((items[props.history].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state)
+                        : {}))[props.prefix + ''_energy_today''] || {}).d) !== undefined && ((((((items[props.history].state)
+                        || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today'']
+                        || {}).d) !== null)'
+                    slots:
+                      default: []
+                  - component: div
+                    config:
+                      style:
+                        position: absolute
+                        left: '0'
+                        top: '0'
+                        height: 8px
+                        border-radius: 4px
+                        width: '=Math.max(0, Math.min(100, (Number(((h) => h.y2 === undefined || h.y2 === null || h.y ===
+                          null || h.y === undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() -
+                          h.t) / Math.max(1, h.dt))))((((((items[props.history].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state)
+                          : {}))[props.prefix + ''_energy_today''] || {}))) * 1) / (Math.max(((Number(items[props.prefix +
+                          ''_energy_today''].numericState) || 0) * 1), (((h) => h.y2 === undefined || h.y2 === null || h.y
+                          === null || h.y === undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix()
+                          - h.t) / Math.max(1, h.dt))))((((((items[props.history].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state)
+                          : {}))[props.prefix + ''_energy_today''] || {})) !== undefined && ((h) => h.y2 === undefined ||
+                          h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0,
+                          (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.history].state) || '''').charAt(0)
+                          === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today''] || {}))
+                          !== null) ? (Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
+                          ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.history].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today'']
+                          || {}))) * 1) : 0, (((h) => h.a2 === undefined || h.a2 === null || h.a === null || h.a === undefined
+                          ? h.a : h.a + (h.a2 - h.a) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.history].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today'']
+                          || {})) !== undefined && ((h) => h.a2 === undefined || h.a2 === null || h.a === null || h.a ===
+                          undefined ? h.a : h.a + (h.a2 - h.a) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1,
+                          h.dt))))((((((items[props.history].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state)
+                          : {}))[props.prefix + ''_energy_today''] || {})) !== null) ? (Number(((h) => h.a2 === undefined
+                          || h.a2 === null || h.a === null || h.a === undefined ? h.a : h.a + (h.a2 - h.a) * Math.min(1, Math.max(0,
+                          (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.history].state) || '''').charAt(0)
+                          === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today''] || {})))
+                          * 1) : 0, (((((((items[props.history].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state)
+                          : {}))[props.prefix + ''_energy_today''] || {}).d) !== undefined && ((((((items[props.history].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today'']
+                          || {}).d) !== null) ? (Number(((((((items[props.history].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state)
+                          : {}))[props.prefix + ''_energy_today''] || {}).d)) * 1) : 0, (((((((items[props.history].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today'']
+                          || {}).e) !== undefined && ((((((items[props.history].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state)
+                          : {}))[props.prefix + ''_energy_today''] || {}).e) !== null) ? (Number(((((((items[props.history].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today'']
+                          || {}).e)) * 1) : 0) * 1.08 || 1) * 100)) + ''%'''
                         background: rgba(127, 127, 127, 0.55)
+                      visible: '=(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y :
+                        h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.history].state)
+                        || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today'']
+                        || {})) !== undefined && ((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
+                        ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.history].state)
+                        || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today'']
+                        || {})) !== null)'
                     slots:
                       default: []
               - component: Label
                 config:
-                  text: '=(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y +
-                    (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.history].state)
+                  text: '=(((((((items[props.history].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state)
+                    : {}))[props.prefix + ''_energy_today''] || {}).d) !== undefined && ((((((items[props.history].state)
                     || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today'']
-                    || {})) !== undefined && ((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
-                    ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.history].state)
-                    || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today'']
-                    || {})) !== null) ? ((Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
-                    ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.history].state)
-                    || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today'']
-                    || {}))) * 1)).toFixed(2) : ''–'''
+                    || {}).d) !== null) ? ((Number(((((((items[props.history].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state)
+                    : {}))[props.prefix + ''_energy_today''] || {}).d)) * 1)).toFixed(2) : ''–'''
                   style:
                     font-size: 11px
                     text-align: right
@@ -581,6 +650,7 @@ slots:
               - component: div
                 config:
                   style:
+                    position: relative
                     height: 8px
                     border-radius: 4px
                     background: rgba(127, 127, 127, 0.1)
@@ -589,21 +659,16 @@ slots:
                   - component: div
                     config:
                       style:
+                        position: absolute
+                        left: '0'
+                        top: '0'
                         height: 8px
                         border-radius: 4px
-                        width: '=(((h) => h.a2 === undefined || h.a2 === null || h.a === null || h.a === undefined ? h.a :
-                          h.a + (h.a2 - h.a) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.history].state)
-                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today'']
-                          || {})) !== undefined && ((h) => h.a2 === undefined || h.a2 === null || h.a === null || h.a ===
-                          undefined ? h.a : h.a + (h.a2 - h.a) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1,
-                          h.dt))))((((((items[props.history].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state)
-                          : {}))[props.prefix + ''_energy_today''] || {})) !== null) ? Math.max(0, Math.min(100, (Number(((h)
-                          => h.a2 === undefined || h.a2 === null || h.a === null || h.a === undefined ? h.a : h.a + (h.a2
-                          - h.a) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.history].state)
-                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today'']
-                          || {}))) * 1) / (Math.max(((Number(items[props.prefix + ''_energy_today''].numericState) || 0) *
-                          1), (((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y
-                          + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.history].state)
+                        width: '=Math.max(0, Math.min(100, (Number(((((((items[props.history].state) || '''').charAt(0) ===
+                          ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today''] || {}).e))
+                          * 1) / (Math.max(((Number(items[props.prefix + ''_energy_today''].numericState) || 0) * 1), (((h)
+                          => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y + (h.y2
+                          - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.history].state)
                           || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today'']
                           || {})) !== undefined && ((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y ===
                           undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1,
@@ -622,23 +687,83 @@ slots:
                           || h.a2 === null || h.a === null || h.a === undefined ? h.a : h.a + (h.a2 - h.a) * Math.min(1, Math.max(0,
                           (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.history].state) || '''').charAt(0)
                           === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today''] || {})))
-                          * 1) : 0) * 1.08 || 1) * 100)) + ''%'' : ''0%'''
+                          * 1) : 0, (((((((items[props.history].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state)
+                          : {}))[props.prefix + ''_energy_today''] || {}).d) !== undefined && ((((((items[props.history].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today'']
+                          || {}).d) !== null) ? (Number(((((((items[props.history].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state)
+                          : {}))[props.prefix + ''_energy_today''] || {}).d)) * 1) : 0, (((((((items[props.history].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today'']
+                          || {}).e) !== undefined && ((((((items[props.history].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state)
+                          : {}))[props.prefix + ''_energy_today''] || {}).e) !== null) ? (Number(((((((items[props.history].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today'']
+                          || {}).e)) * 1) : 0) * 1.08 || 1) * 100)) + ''%'''
                         border: 1.5px dashed rgba(127, 127, 127, 0.7)
                         box-sizing: border-box
+                      visible: '=(((((((items[props.history].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state)
+                        : {}))[props.prefix + ''_energy_today''] || {}).e) !== undefined && ((((((items[props.history].state)
+                        || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today'']
+                        || {}).e) !== null)'
+                    slots:
+                      default: []
+                  - component: div
+                    config:
+                      style:
+                        position: absolute
+                        left: '0'
+                        top: '0'
+                        height: 8px
+                        border-radius: 4px
+                        width: '=Math.max(0, Math.min(100, (Number(((h) => h.a2 === undefined || h.a2 === null || h.a ===
+                          null || h.a === undefined ? h.a : h.a + (h.a2 - h.a) * Math.min(1, Math.max(0, (dayjs().unix() -
+                          h.t) / Math.max(1, h.dt))))((((((items[props.history].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state)
+                          : {}))[props.prefix + ''_energy_today''] || {}))) * 1) / (Math.max(((Number(items[props.prefix +
+                          ''_energy_today''].numericState) || 0) * 1), (((h) => h.y2 === undefined || h.y2 === null || h.y
+                          === null || h.y === undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix()
+                          - h.t) / Math.max(1, h.dt))))((((((items[props.history].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state)
+                          : {}))[props.prefix + ''_energy_today''] || {})) !== undefined && ((h) => h.y2 === undefined ||
+                          h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0,
+                          (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.history].state) || '''').charAt(0)
+                          === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today''] || {}))
+                          !== null) ? (Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
+                          ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.history].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today'']
+                          || {}))) * 1) : 0, (((h) => h.a2 === undefined || h.a2 === null || h.a === null || h.a === undefined
+                          ? h.a : h.a + (h.a2 - h.a) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.history].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today'']
+                          || {})) !== undefined && ((h) => h.a2 === undefined || h.a2 === null || h.a === null || h.a ===
+                          undefined ? h.a : h.a + (h.a2 - h.a) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1,
+                          h.dt))))((((((items[props.history].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state)
+                          : {}))[props.prefix + ''_energy_today''] || {})) !== null) ? (Number(((h) => h.a2 === undefined
+                          || h.a2 === null || h.a === null || h.a === undefined ? h.a : h.a + (h.a2 - h.a) * Math.min(1, Math.max(0,
+                          (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.history].state) || '''').charAt(0)
+                          === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today''] || {})))
+                          * 1) : 0, (((((((items[props.history].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state)
+                          : {}))[props.prefix + ''_energy_today''] || {}).d) !== undefined && ((((((items[props.history].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today'']
+                          || {}).d) !== null) ? (Number(((((((items[props.history].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state)
+                          : {}))[props.prefix + ''_energy_today''] || {}).d)) * 1) : 0, (((((((items[props.history].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today'']
+                          || {}).e) !== undefined && ((((((items[props.history].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state)
+                          : {}))[props.prefix + ''_energy_today''] || {}).e) !== null) ? (Number(((((((items[props.history].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today'']
+                          || {}).e)) * 1) : 0) * 1.08 || 1) * 100)) + ''%'''
+                        background: rgba(127, 127, 127, 0.3)
+                      visible: '=(((h) => h.a2 === undefined || h.a2 === null || h.a === null || h.a === undefined ? h.a :
+                        h.a + (h.a2 - h.a) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.history].state)
+                        || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today'']
+                        || {})) !== undefined && ((h) => h.a2 === undefined || h.a2 === null || h.a === null || h.a === undefined
+                        ? h.a : h.a + (h.a2 - h.a) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.history].state)
+                        || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today'']
+                        || {})) !== null)'
                     slots:
                       default: []
               - component: Label
                 config:
-                  text: '=(((h) => h.a2 === undefined || h.a2 === null || h.a === null || h.a === undefined ? h.a : h.a +
-                    (h.a2 - h.a) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.history].state)
+                  text: '=(((((((items[props.history].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state)
+                    : {}))[props.prefix + ''_energy_today''] || {}).e) !== undefined && ((((((items[props.history].state)
                     || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today'']
-                    || {})) !== undefined && ((h) => h.a2 === undefined || h.a2 === null || h.a === null || h.a === undefined
-                    ? h.a : h.a + (h.a2 - h.a) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.history].state)
-                    || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today'']
-                    || {})) !== null) ? ((Number(((h) => h.a2 === undefined || h.a2 === null || h.a === null || h.a === undefined
-                    ? h.a : h.a + (h.a2 - h.a) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.history].state)
-                    || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today'']
-                    || {}))) * 1)).toFixed(2) : ''–'''
+                    || {}).e) !== null) ? ((Number(((((((items[props.history].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state)
+                    : {}))[props.prefix + ''_energy_today''] || {}).e)) * 1)).toFixed(2) : ''–'''
                   style:
                     font-size: 11px
                     text-align: right

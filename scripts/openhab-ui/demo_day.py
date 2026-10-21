@@ -199,6 +199,11 @@ for name, want in track.items():
         xs = [x for x in xs if x is not None]
         r["a"] = round(sum(xs) / len(xs), 3) if xs else None
         r["d"] = fnum(at(name, T.replace(hour=0, minute=0, second=0, microsecond=0) - datetime.timedelta(seconds=1)))
+        # the mean of the last 7 days' ends, their whole days
+        xe = [fnum(at(name, T.replace(hour=0, minute=0, second=0, microsecond=0) - datetime.timedelta(days=k, seconds=1)))
+              for k in range(7)]
+        xe = [x for x in xe if x is not None]
+        r["e"] = round(sum(xe) / len(xe), 3) if xe else None
         # dt seconds later too, as the rule writes them for the tiles' interpolation (within the day)
         midnight = T.replace(hour=0, minute=0, second=0, microsecond=0) + datetime.timedelta(days=1)
         dt = max(1, min(600, int((midnight - T).total_seconds()) - 1))

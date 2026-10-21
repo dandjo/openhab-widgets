@@ -23,6 +23,12 @@ const FULL_DAYS = 2;     // whole windows in a row without the heating's own sto
 const FULL_SHARE = 0.7;  // ... in which the heating also ran this share of the window's time without hot water and locks
 const SPACE_RUN = 10;    // minutes of space heating before a stop counts as the heating's own
 const AT_STOP = 2;       // K above the setpoint the leaving water must have reached in the run's last 2 minutes
+// a window ran through only when the leaving water did not stand at the curve's stop mark, the controller's stop
+// without the day's offset (the setpoint less the offset, plus CURVE_STOP), for CURVE_STOP_TIME: the day offset moves
+// the controller's stop up with the setpoint, so a window can run through on heat the curve alone would have stopped
+// (user, 2026-10-20)
+const CURVE_STOP = 3;      // K above the curve where the controller stops
+const CURVE_STOP_TIME = 10; // minutes at that mark, after SPACE_RUN minutes of space heating, that mean enough heat
 const RESTART = 3;       // minutes after a stop without a restart (a defrost restarts within 30–90 s)
 const DEFROST_GAP = 5;   // minutes around a defrost in which a stop does not count
 const SETTLE = 30;       // seconds after a write or a change of the guard's lock before the offset is checked
@@ -129,13 +135,20 @@ const dayFrom = cache.private.get('dayFrom') || now;
 if (phase === 'day') {
   if (win === null || win.date !== today) {
     // a window counts only when the rule held it from its start (not after a restart, switching on or a season change)
-    win = { date: today, whole: previous === 'night', stopped: false, heating: 0, dhw: 0, locked: 0, seen: now };
+    win = { date: today, whole: previous === 'night', stopped: false, heating: 0, dhw: 0, locked: 0, atCurveStop: 0,
+      seen: now };
   }
   // the heating's, the tank's and the guard's locks' time in the window, between two runs of the rule (at most a
   // minute counted); a lock follows a charge or a short run, so its time is the charge's
   const step = Math.min(60000, Math.max(0, now - win.seen));
   if (!missing && freq > 0 && valve === 'Space') {
     win.heating += step;
+    // the leaving water at the curve's stop mark, once the run heated the house SPACE_RUN minutes (not the hot water
+    // a charge leaves in the pipes)
+    const spaceRun = run !== null && run.space !== null && now - run.space >= SPACE_RUN * 60000;
+    if (spaceRun && leaving !== null && setpoint !== null && leaving >= setpoint - offset + CURVE_STOP) {
+      win.atCurveStop = (win.atCurveStop || 0) + step;
+    }
   } else if (!missing && valve !== 'Space') {
     win.dhw += step;
   } else if (!missing && lock > 0) {
@@ -155,11 +168,14 @@ if (phase === 'day') {
   if (win.whole) {
     const free = Math.max(1, now - dayFrom - win.dhw - (win.locked || 0));  // the window's time without hot water and locks
     const share = win.heating / free;
-    const ranThrough = !win.stopped && share >= FULL_SHARE;
+    const atCurveStop = Math.round((win.atCurveStop || 0) / 60000);
+    const enough = atCurveStop >= CURVE_STOP_TIME;
+    const ranThrough = !win.stopped && !enough && share >= FULL_SHARE;
     full = ranThrough ? full + 1 : 0;
     console.info(`day heating: window of ${today} ${win.stopped ? 'reached the heating\'s own stop' :
-      ranThrough ? 'ran through without the heating\'s own stop' : 'had no stop but little heating'}, heating ` +
-      `${Math.round(share * 100)} % of ${Math.round(free / 60000)} min without hot water and locks (${full} in a row)`);
+      ranThrough ? 'ran through without the heating\'s own stop' : enough ? 'had no stop, but enough heat' :
+      'had no stop but little heating'}, heating ${Math.round(share * 100)} % of ${Math.round(free / 60000)} min ` +
+      `without hot water and locks, ${atCurveStop} min at the curve's stop mark (${full} in a row)`);
     if (full >= FULL_DAYS) {
       resume = Math.max(ON_AVG, Math.round(((avg ?? ON_AVG) + RESUME_RISE) * 10) / 10);
       items.getItem(RESUME).postUpdate(resume);

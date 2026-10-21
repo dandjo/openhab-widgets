@@ -6305,26 +6305,38 @@ def vt_dot(color):
 
 
 def compare_tile(title, item, color, better=None, digits=2, unit="kWh", factor=1, value_expr=None, extra=(), tap=True):
-    """Today's value over yesterday's at this time and the mean of the last 7 days at this time, as three bars, the
-    difference to yesterday as a chip, green or orange where more (or less) is better."""
+    """Today's value against yesterday and the mean of the last 7 days, as three bars on one scale. Yesterday's and the
+    mean's numbers are whole days, their bars pale up to them and strong up to this time of day, so that today's bar
+    still reads against the same time (user, 2026-10-21: the values at this time said nothing, at 2 a.m. "gestern
+    1,01 kWh" of a day of 17,86). The difference to yesterday at this time as a chip, green or orange where more (or
+    less) is better."""
     track_history(item, c=True)
     v = f"({num(item)} * {factor})"
-    y, a = f"(Number({vt_hv(item, 'y')}) * {factor})", f"(Number({vt_hv(item, 'a')}) * {factor})"
-    top = f"(Math.max({v}, {vt_has(vt_hv(item, 'y'))} ? {y} : 0, {vt_has(vt_hv(item, 'a'))} ? {a} : 0) * 1.08 || 1)"
-    diff = vt_chip(change_text(v, y, unit, digits), change_class(v, y, better, DAY_BASE_MIN * factor),
-                   visible=f"={vt_has(vt_hv(item, 'y'))}")
+    hv = lambda key: f"(Number({vt_hv(item, key)}) * {factor})"
+    has = lambda key: vt_has(vt_hv(item, key))
+    top = f"(Math.max({v}, {', '.join(f'{has(k)} ? {hv(k)} : 0' for k in 'yade')}) * 1.08 || 1)"
+    diff = vt_chip(change_text(v, hv("y"), unit, digits), change_class(v, hv("y"), better, DAY_BASE_MIN * factor),
+                   visible=f"={has('y')}")
+
+    def bar(expr, fill, known="true"):
+        return div([], f"={known}", **{"position": "absolute", "left": "0", "top": "0", "height": "8px",
+                                      "border-radius": "4px", "width": f"={vt_clamp(f'{expr} / {top} * 100')} + '%'",
+                                      **fill})
+
+    grey = lambda alpha: {"background": f"rgba(127, 127, 127, {alpha})"}
+    dashed = {"border": "1.5px dashed rgba(127, 127, 127, 0.7)", "box-sizing": "border-box"}
+    whole = lambda key: f"={has(key)} ? {fixed(hv(key), digits)} : '–'"
     rows = []
-    for name, expr, color_, dashed, known in (("heute", v, color, False, "true"),
-                                             ("gestern", y, "rgba(127, 127, 127, 0.55)", False, vt_has(vt_hv(item, 'y'))),
-                                             ("Ø 7 Tage", a, None, True, vt_has(vt_hv(item, 'a')))):
-        fill = ({"border": "1.5px dashed rgba(127, 127, 127, 0.7)", "box-sizing": "border-box"} if dashed else
-                {"background": color_})
+    for name, bars, number in (("heute", [bar(v, {"background": color})], f"={fixed(v, digits)}"),
+                               ("gestern", [bar(hv("d"), grey(0.22), has("d")), bar(hv("y"), grey(0.55), has("y"))],
+                                whole("d")),
+                               ("Ø 7 Tage", [bar(hv("e"), dashed, has("e")), bar(hv("a"), grey(0.3), has("a"))],
+                                whole("e"))):
         rows += [label(name, **{"font-size": "11px", "opacity": "0.65"}),
-                 div([div([], **{"height": "8px", "border-radius": "4px", "width": f"={known} ? {vt_clamp(f'{expr} / {top} * 100')} + '%' : '0%'", **fill})],
-                     **{"height": "8px", "border-radius": "4px", "background": "rgba(127, 127, 127, 0.1)"}),
-                 label(f"={known} ? {fixed(expr, digits)} : '–'",
-                       **{"font-size": "11px", "text-align": "right", "white-space": "nowrap",
-                          **({"font-weight": "600"} if name == "heute" else {"opacity": "0.75"})})]
+                 div(bars, **{"position": "relative", "height": "8px", "border-radius": "4px",
+                              "background": "rgba(127, 127, 127, 0.1)"}),
+                 label(number, **{"font-size": "11px", "text-align": "right", "white-space": "nowrap",
+                                  **({"font-weight": "600"} if name == "heute" else {"opacity": "0.75"})})]
     grid = div(rows, **{"display": "grid", "grid-template-columns": "58px minmax(0, 1fr) auto", "align-items": "center",
                         "gap": "4px 8px", "margin-top": "6px"})
     shown = value_expr or f"={dash(disp(item))}"
