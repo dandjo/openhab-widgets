@@ -6068,6 +6068,33 @@ def sun_scale():
 
 SUN_LO, SUN_HI = sun_scale()
 
+
+def sun_js(day="dayjs()"):
+    """JS: the sun at openHAB's location on the day of the dayjs expression day, as {rise, set, noon, elev}: sunrise,
+    sunset and the solar noon in local minutes after midnight, the sun's height at noon in degrees; NOAA's
+    approximation (within a minute or two; the sun's centre 0.833° below the horizon) with the location read at
+    generation time, so that it stands in the page, not in the code; 45° N on the zone's meridian where it cannot be
+    read."""
+    lat, lon = openhab_location() or (45.0, 15.0)
+    phi = math.radians(lat)
+    eq = ("229.18 * (0.000075 + 0.001868 * Math.cos(g) - 0.032077 * Math.sin(g) - 0.014615 * Math.cos(2 * g) "
+          "- 0.040849 * Math.sin(2 * g))")
+    dec = ("0.006918 - 0.399912 * Math.cos(g) + 0.070257 * Math.sin(g) - 0.006758 * Math.cos(2 * g) "
+           "+ 0.000907 * Math.sin(2 * g) - 0.002697 * Math.cos(3 * g) + 0.00148 * Math.sin(3 * g)")
+    ha = (f"Math.acos(-0.014544 / ({math.cos(phi):.6f} * Math.cos(dec)) - {math.tan(phi):.6f} * Math.tan(dec)) "
+          f"* 180 / Math.PI")
+    sun = (f"({{rise: 720 - 4 * ({lon:.4f} + ha) - eq + t.utcOffset(), set: 720 - 4 * ({lon:.4f} - ha) - eq + "
+           f"t.utcOffset(), noon: 720 - 4 * {lon:.4f} - eq + t.utcOffset(), "
+           f"elev: 90 - Math.abs({phi:.6f} - dec) * 180 / Math.PI}})")
+    return (f"((t) => ((g) => ((eq, dec) => ((ha) => {sun})({ha}))({eq}, {dec}))"
+            f"(2 * Math.PI / (t.endOf('year').diff(t.startOf('year'), 'day') + 1) * t.diff(t.startOf('year'), 'day')))"
+            f"(({day}).hour(12).minute(0))")
+
+
+def hm_js(minutes):
+    """JS: minutes as h:mm, rounded to whole minutes first (a computed time is fractional and read 18:60)"""
+    return f"((r) => Math.floor(r / 60) + ':' + ('0' + r % 60).slice(-2))(Math.round({minutes}))"
+
 # ---------------------------------------------------------------- expression helpers
 
 VT_DARK = "(themeOptions.dark === 'dark')"
@@ -6253,7 +6280,9 @@ def vt_head(title, right=None):
 
 def vt_tile(children, item=None, title="", color=None, wide=False, visible=None, second=None, **style):
     kids = list(children)
-    if item:
+    # no popup where it could only repeat the tile's value: an item without a course, a point in time (kind none; user,
+    # 2026-10-22: the sun arc's popup was "komplett sinnlos")
+    if item and (second or item_kind(item)[0] != "none"):
         kids.append(link_over(item, title=title, color=color, second=second))
     return div(kids, visible, **{**VT_TILE, **(VT_WIDE if wide else {}), **style})
 
@@ -7253,13 +7282,17 @@ def countdown_tile(title, item, none_text="keine"):
 
 def sun_tile(title, start, stop, peak, power_item):
     """The inverter's day as a sun arc from its start to its end (estimated mirror-symmetric around the solar noon
-    while it runs), the sun at the present with the power beside it, the day's peak named."""
+    while it runs), the sun at the present with the power beside it, the day's peak named; a tap opens the sun's day
+    (sun_popup_blocks())."""
     ok = lambda i: f"(!['NULL', 'UNDEF'].includes(items.{i}.state) && dayjs(items.{i}.state).isSame(dayjs(), 'day'))"
     mins = lambda d: f"({d}.hour() * 60 + {d}.minute())"
     t0 = f"({ok(start)} ? {mins(f'dayjs(items.{start}.state)')} : 420)"
-    noon = f"({SOLAR_NOON_UTC} + dayjs().utcOffset())"
-    t1 = f"({ok(stop)} ? {mins(f'dayjs(items.{stop}.state)')} : 2 * {noon} - {t0})"
+    # the solar noon with the equation of time (sun_js()): without it the estimated end lay up to half an hour off
+    noon = f"({sun_js()}).noon"
     now = mins("dayjs()")
+    # while it runs past that estimate (after a late start, or with the west plane's evening sun) the end 5 minutes
+    # ahead, not in the past
+    t1 = f"({ok(stop)} ? {mins(f'dayjs(items.{stop}.state)')} : Math.max(2 * {noon} - {t0}, {now} + 5))"
     X = lambda m: f"(14 + 432 * (({m}) - {SUN_LO}) / {SUN_HI - SUN_LO})"
     cx, rx = f"(({X(t0)} + {X(t1)}) / 2)", f"(({X(t1)} - {X(t0)}) / 2)"
     xn = f"Math.max({X(t0)}, Math.min({X(t1)}, {X(now)}))"
@@ -7302,7 +7335,51 @@ def sun_tile(title, start, stop, peak, power_item):
     word = vt_chip(f"='Spitze ' + {dash(disp(peak))}", "'neutral'")
     return vt_tile([vt_head(title, word), svg("svg", kids, viewBox="0 0 470 118",
                                         style={"display": "block", "width": "100%", "height": "auto",
-                                               "max-width": "560px", "margin": "4px auto 0"})], start, title, wide=True)
+                                               "max-width": "560px", "margin": "4px auto 0"}),
+                    page_link({"position": "absolute", "inset": "0", "display": "block", "border-radius": "12px"},
+                              SUN_POPUP)], wide=True)
+
+
+SUN_POPUP = "pv_sun"
+
+
+def sun_popup_blocks():
+    """The sun arc's popup (user, 2026-10-22: the start time's item popup was "komplett sinnlos", the popup could
+    show something useful, "nicht so kompliziert, keine neuen Items oder Regeln"): the inverter's run today against
+    the daylight, the daylight and how it changed since yesterday, the sun's highest point today and over the year, and
+    the next solstice, all from the inverter's start and end times and sun_js()."""
+    start, stop = "huawei_inverter_startup_time", "huawei_inverter_shutdown_time"
+    today = lambda i: f"(!['NULL', 'UNDEF'].includes(items.{i}.state) && dayjs(items.{i}.state).isSame(dayjs(), 'day'))"
+    mins = lambda i: f"(dayjs(items.{i}.state).hour() * 60 + dayjs(items.{i}.state).minute())"
+    up, ended = today(start), f"({today(stop)} && {mins(stop)} > {mins(start)})"
+    run = f"(({ended} ? {mins(stop)} : dayjs().hour() * 60 + dayjs().minute()) - {mins(start)})"
+    with_sun = lambda body, day="dayjs()": f"=((s) => {body})({sun_js(day)})"
+    yesterday = sun_js("dayjs().subtract(1, 'day')")
+    change = (f"((x) => (Math.abs(x)).toLocaleString('de-AT', {{minimumFractionDigits: 1, maximumFractionDigits: 1}}) "
+              f"+ ' min ' + (x < 0 ? 'kürzer' : 'länger') + ' als gestern')")
+    lat = (openhab_location() or (45.0, 15.0))[0]
+    # the solstices on 21 June and 21 December, a day off in some years
+    solstice = ("[dayjs().month(5).date(21), dayjs().month(11).date(21), dayjs().add(1, 'year').month(5).date(21)]"
+                ".find((x) => !x.isBefore(dayjs(), 'day'))")
+    days = f"({solstice}.diff(dayjs().startOf('day'), 'day'))"
+
+    def tile(title, value, *lines):
+        return vt_tile([vt_title(title), vt_value(value), *[label(line, **VT_SUB) for line in lines]])
+    tiles = [tile("Laufzeit heute", f"={up} ? {hm_js(run)} + ' h' : '–'",
+                  f"={up} ? {hm_js(mins(start))} + ' – ' + ({ended} ? {hm_js(mins(stop))} : 'jetzt') : "
+                  f"'noch nicht gestartet'",
+                  with_sun(f"{up} ? ({ended} ? '' : 'bisher ') + Math.round(100 * {run} / (s.set - s.rise)) + "
+                           f"' % des Tageslichts' : ''")),
+             tile("Tageslicht", with_sun(f"{hm_js('s.set - s.rise')} + ' h'"),
+                  with_sun(f"'Aufgang ' + {hm_js('s.rise')} + ' · Untergang ' + {hm_js('s.set')}"),
+                  with_sun(f"((y) => {change}((s.set - s.rise) - (y.set - y.rise)))({yesterday})")),
+             tile("Sonne am höchsten", with_sun(f"{hm_js('s.noon')} + ' Uhr'"),
+                  with_sun("Math.round(s.elev) + '° über dem Horizont'"),
+                  f"im Juni bis {round(90 - lat + 23.44)}°, im Dezember {round(90 - lat - 23.44)}°"),
+             tile("Sonnenwende", f"={days} === 0 ? 'heute' : 'in ' + {days} + ({days} === 1 ? ' Tag' : ' Tagen')",
+                  f"={solstice}.format('D.M.') + ({solstice}.month() === 11 ? ', kürzester Tag' : ', längster Tag')",
+                  with_sun(f"{hm_js('s.set - s.rise')} + ' h Tageslicht'", solstice))]
+    return [block(row(full(card("Heute", [vt_grid(tiles)]))))]
 
 
 def price_strip(title, price, cheap_hour, dear_hour):
@@ -10022,6 +10099,9 @@ def migrate_pages(d):
     for uid, (title, blocks) in FLOW_POPUPS.items():
         config = {"label": title, "sidebar": False, "style": WIDE_POPUP_MARK, "stylesheet": WIDE_POPUP}
         d = m.insert(d, uid, layout_page(uid, config, plots_below_controls(blocks()), now))
+    # the sun arc's popup, at MainUI's usual popup width
+    d = m.insert(d, SUN_POPUP, layout_page(SUN_POPUP, {"label": "Sonnenbogen", "sidebar": False}, sun_popup_blocks(),
+                                           now))
     for uid, blocks in DEVICE_PAGES.items():  # the device pages, label, icon and sidebar order kept
         old = d[uid]["value"]["config"] if uid in d else NEW_PAGES[uid]
         config = {"label": old["label"], "icon": old.get("icon"), "order": old.get("order"), "sidebar": True,
