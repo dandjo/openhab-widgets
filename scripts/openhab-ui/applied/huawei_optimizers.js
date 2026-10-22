@@ -5,8 +5,10 @@
 // read. This rule reads it through huawei_modbus_proxy (127.0.0.1:5502; the SDongle serves one connection only, see
 // /opt/huawei_modbus_proxy/README.md), every minute at :30:
 // - live, at 2, 7, ... past the hour, once the inverter has written its next 5 minutes: the readings since the newest
-//   stored (huawei_optimizers_updated), at most the last 30 minutes;
-// - a gap (at the first start the last 31 days, then what an outage left) is filled apart from that, a 30-minute piece
+//   stored (huawei_optimizers_updated) or, while string 2 has no voltage, since a live read last found none, at most
+//   the last 30 minutes;
+// - a gap (at the first start the last 31 days, then what an outage left; not the night, which the live reads that
+//   found none cover) is filled apart from that, a 30-minute piece
 //   every minute at night (20 to 6 h) and every 5 minutes by day: each frame of the file costs the dongle about 2 s,
 //   which openHAB's polling waits for. The gap still open is kept in huawei_optimizers_state;
 // - each reading persisted with its own time; the series are in no persistence group, so openHAB does not store them
@@ -29,6 +31,7 @@ const P = 'huawei_optimizers_';
 const HISTORY = 31 * 86400; // s the inverter keeps, about a month
 const PIECE = 1800; // s of readings per request while behind
 const BEHIND = 900; // s after the newest reading from which the rule counts as behind
+const LATE = 900; // s by which the inverter may write a reading after its time (it does within 2.5 minutes)
 const STATUS_DE = { 0: 'offline', 1: 'Standby', 3: 'Fehler', 4: 'in Betrieb', 12: 'aus' };
 const RUNNING = 4;
 // the alarm bits as huawei-solar knows them; bit 31 is set in every reading of all optimizers (a flag, not an alarm)
@@ -108,16 +111,24 @@ function parseSerials(b) {
 
 // ------------------------------------------------------------------ what to read, what to make of it
 
-// the live window [from, to] (UTC seconds) of this run, or null, and the gap it leaves when the newest reading stored
-// (updated, null for none) lies further back than a piece; minute local
-function planLive(now, updated, minute) {
+// the time up to which no reading is missing but those in the gap: the newest stored (updated) or, when later, quiet,
+// which the live reads advance; null for neither
+const knownUntil = (updated, quiet) => (updated === null ? quiet : quiet === null ? updated : Math.max(updated, quiet));
+
+// the live window [from, to] (UTC seconds) of this run, or null, and the gap it leaves when the time up to which no
+// reading is missing (known, null at the first start) lies further back than a piece; minute local
+function planLive(now, known, minute) {
   if (minute % 5 !== 2) {
     return null;
   }
-  const from = updated === null ? now - PIECE : Math.max(updated + 1, now - PIECE);
-  const gap = updated === null ? [now - HISTORY, from - 1] : updated + 1 < from ? [updated + 1, from - 1] : null;
+  const from = known === null ? now - PIECE : Math.max(known + 1, now - PIECE);
+  const gap = known === null ? [now - HISTORY, from - 1] : known + 1 < from ? [known + 1, from - 1] : null;
   return { from, to: now, gap };
 }
+
+// quiet after a live read that found no readings while string 2 has no voltage (the optimizers report from a few minutes
+// before it has one to a few after): its window, but for the last LATE seconds, which the inverter may still write
+const quietAfter = (quiet, live) => Math.max(quiet === null ? 0 : quiet, live.to - LATE);
 
 // the next piece of a gap [from, to]
 const pieceOf = (gap) => ({ from: gap[0], to: Math.min(gap[1], gap[0] + PIECE) });
@@ -315,7 +326,8 @@ function run() {
     }
   }
 
-  const live = planLive(now, stored, clock.getMinute());
+  const quiet = typeof state.quiet === 'number' ? state.quiet : null;
+  const live = planLive(now, knownUntil(stored, quiet), clock.getMinute());
   const fill = live ? null : planFill(state.gap || null, clock.getHour(), clock.getMinute());
   if (!live && !fill) {
     return;
@@ -421,10 +433,17 @@ function run() {
 
     if (live) {
       const readings = read(live);
-      if (readings.length > 0) {
-        // what lies between the newest reading stored and this window is filled apart; not while no readings come
-        // in, in the evening and at night, which would only leave empty windows to read
+      // an empty answer is believed only while string 2 has no voltage (unknown right after a start, null): by day the
+      // next live reads look back again, and only readings show what lies behind
+      const volts = items.getItem('huawei_inverter_pv2_voltage').numericState;
+      const dark = readings.length === 0 && volts !== null && volts < 1;
+      if (readings.length > 0 || dark) {
+        // what lies between the time up to which no reading is missing and this window is filled apart
         state.gap = mergeGap(state.gap || null, live.gap);
+      }
+      if (dark) {
+        state.quiet = quietAfter(quiet, live);
+      } else if (readings.length > 0) {
         const memory = store.get('memory') || { last: {} };
         const { points, states } = evaluate(readings, memory, baseOf, toUtc);
         persist(points);
