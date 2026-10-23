@@ -17,8 +17,9 @@
 //   optimizer's energy today (not persisted);
 // - huawei_optimizers_status: how many run, which do not, alarms; huawei_optimizers_east_energy_total: string 1's
 //   lifetime yield estimated from the optimizers' counters by the strings' measured ratio (string 1 has none);
-// - a broadcast when an optimizer fails, that is, it does not run while at least half of its plane does, or it reports
-//   an alarm, in two readings in a row; once, until it runs again, which is reported too. A broadcast as well when no
+// - a broadcast when an optimizer fails, that is, it does not run while at least half of its plane does and delivers
+//   MIN_PLANE_POWER on average, or it reports an alarm, in two readings in a row; once, until it runs again in two
+//   readings, which is reported too. Not running in weaker light counts neither way. A broadcast as well when no
 //   reading comes in for an hour while string 2 produces;
 // - once a day the optimizers' system information (file 0x45): a serial number that changed at an address is reported,
 //   as the plane of each address is fixed here.
@@ -34,6 +35,10 @@ const BEHIND = 900; // s after the newest reading from which the rule counts as 
 const LATE = 900; // s by which the inverter may write a reading after its time (it does within 2.5 minutes)
 const STATUS_DE = { 0: 'offline', 1: 'Standby', 3: 'Fehler', 4: 'in Betrieb', 12: 'aus' };
 const RUNNING = 4;
+// W the running optimizers of a plane deliver on average at least before one that does not run counts as failed: at
+// dawn and dusk some start later or stop earlier, the others then at 3.5 W on average at most (19 September to 23
+// October 2026; 1.0.2 offline at dawn on 23 October was reported as failed)
+const MIN_PLANE_POWER = 10;
 // the alarm bits as huawei-solar knows them; bit 31 is set in every reading of all optimizers (a flag, not an alarm)
 // and, like any other bit not listed, ignored
 const ALARMS_DE = [[0x1, 'Eingangsüberspannung'], [0x2, 'Eingangsunterspannung'], [0x8, 'Ausgangsüberspannung'],
@@ -224,18 +229,23 @@ function statusOf(r) {
   return text;
 }
 
-// an optimizer's problem in a reading, or null: an alarm, or not running while at least half of its plane runs
+// an optimizer's problem in a reading: an alarm, or not running while at least half of its plane runs and delivers
+// MIN_PLANE_POWER on average; null when it runs; undefined when it does not run in weaker light, which tells nothing
 function problemOf(r, a) {
   const o = r.opt[a];
   if (o && alarmsOf(o).length > 0) {
     return `Alarm ${alarmsOf(o).join(', ')}`;
   }
+  if (o && o.status === RUNNING) {
+    return null;
+  }
   const plane = PLANES[planeOf(a)];
-  const running = plane.filter((x) => r.opt[x] && r.opt[x].status === RUNNING).length;
-  if ((!o || o.status !== RUNNING) && running * 2 >= plane.length) {
+  const running = plane.filter((x) => r.opt[x] && r.opt[x].status === RUNNING);
+  const mean = running.length ? running.reduce((s, x) => s + r.opt[x].power, 0) / running.length : 0;
+  if (running.length * 2 >= plane.length && mean >= MIN_PLANE_POWER) {
     return o ? STATUS_DE[o.status] || `Status ${o.status}` : 'keine Daten';
   }
-  return null;
+  return undefined;
 }
 
 // the broadcasts for a live reading; fail carries per optimizer the readings in a row with and without a problem and
@@ -245,6 +255,9 @@ function failures(r, fail) {
   for (const a of ADDRESSES) {
     const f = fail[a] || (fail[a] = { bad: 0, good: 0, told: false });
     const problem = problemOf(r, a);
+    if (problem === undefined) {
+      continue;
+    }
     if (problem) {
       f.bad++;
       f.good = 0;
