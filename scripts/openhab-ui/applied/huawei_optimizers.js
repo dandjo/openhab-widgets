@@ -101,6 +101,44 @@ function parseReadings(b) {
   return out.sort((x, y) => x.t - y.t);
 }
 
+// file 0x44 whole and as asked for, by what its head and records say of themselves (from, to: the window in the
+// inverter's local seconds): the version V101 and the number of records, each record as long as its optimizers (the
+// length after the time, 2 + 26 per optimizer), each optimizer a known address once, its time inside the window, the
+// last record ending at the file's end. Needed since the inverter's CRC for this file cannot be trusted: from 24
+// October 2026 about 15:40 its completion reports 0xFFFF or another wrong value, while the data are unchanged (the
+// same readings as stored the day before with a valid CRC); file 0x45's CRC stays right
+function wellFormed(b, from, to) {
+  if (b.length < 12 || String.fromCharCode(...b.slice(0, 4)) !== 'V101') {
+    return false;
+  }
+  let i = 12;
+  let records = 0;
+  while (i < b.length) {
+    if (i + 12 > b.length) {
+      return false;
+    }
+    const t = i32le(b, i);
+    const n = i16le(b, i + 10);
+    if (n < 1 || n > ADDRESSES.length || u16le(b, i + 8) !== 2 + 26 * n || i + 12 + 26 * n > b.length || t < from
+      || t > to) {
+      return false;
+    }
+    const seen = new Set();
+    for (let k = 0; k < n; k++) {
+      const a = i16le(b, i + 12 + 26 * k);
+      if (!ADDRESSES.includes(a) || seen.has(a)) {
+        return false;
+      }
+      seen.add(a);
+    }
+    i += 12 + 26 * n;
+    records++;
+  }
+  return records === u32le(b, 4);
+}
+
+const sameBytes = (a, b) => a.length === b.length && a.every((x, i) => x === b[i]);
+
 // file 0x45: a 14-byte head (version, sequence, length, a flag, 3 bytes, the number of optimizers), then per optimizer
 // 106 (V102) or 116 bytes (V103), big-endian: address, online, a byte, string, position, serial number (20 bytes), ...
 function parseSerials(b) {
@@ -382,7 +420,9 @@ function run() {
     }
     return r;
   };
-  const readOnce = (type, custom) => {
+  // { data, trusted }: trusted when the CRC the inverter reports fits (or the file is empty); a wrong CRC throws
+  // when strict
+  const readOnce = (type, custom, strict) => {
     const start = patiently([0x41, 0x05, 1 + custom.length, type, ...custom], 'Start');
     const length = u32be(start, 4);
     const size = start[8];
@@ -392,17 +432,18 @@ function run() {
     }
     const done = patiently([0x41, 0x0c, 1, type], 'Abschluss');
     // an empty file (a window without readings) has no CRC worth checking
-    if (length > 0 && crc16(data) !== u16be(done, 4)) {
+    const trusted = length === 0 || crc16(data) === u16be(done, 4);
+    if (!trusted && strict) {
       throw new Error(`Datei ${type.toString(16)}: Prüfsumme falsch`);
     }
-    return data;
+    return { data, trusted };
   };
   // the dongle now and then rejects a frame in the middle of a file (exception 3, 20 October 2026: in one of a few
   // files of 10 frames, of any age): the upload is closed and read again from its start, twice at most
-  const readFile = (type, custom) => {
+  const readFile = (type, custom, strict = true) => {
     for (let attempt = 0; ; attempt++) {
       try {
-        return readOnce(type, custom);
+        return readOnce(type, custom, strict);
       } catch (e) {
         if (attempt >= 2) {
           throw e;
@@ -433,7 +474,26 @@ function run() {
       const first = Persistence.getAllStatesBetween(item, midnight, midnight.plusDays(1), 'influxdb').iterator();
       return first.hasNext() ? parseFloat(first.next().getState().toString()) : null;
     };
-    const read = (w) => parseReadings(readFile(0x44, [0x10, 12, ...be32(local(w.from)), ...be32(local(w.to)), 0, 0, 0, 0]));
+    // the readings of a window; with a CRC that does not fit (see wellFormed) the data count only when they hold
+    // together and a second upload brings the same bytes, as a frame of another file would fit in among the readings'
+    // values unnoticed
+    const read = (w) => {
+      const custom = [0x10, 12, ...be32(local(w.from)), ...be32(local(w.to)), 0, 0, 0, 0];
+      const first = readFile(0x44, custom, false);
+      if (first.trusted) {
+        return parseReadings(first.data);
+      }
+      if (!wellFormed(first.data, local(w.from), local(w.to))) {
+        throw new Error('Datei 44: Prüfsumme falsch und Aufbau fehlerhaft');
+      }
+      const second = readFile(0x44, custom, false);
+      if (!second.trusted && !sameBytes(first.data, second.data)) {
+        throw new Error('Datei 44: Prüfsumme falsch, zwei Lesungen verschieden');
+      }
+      console.debug(`Optimierer: Datei 44 ohne passende Prüfsumme, ${second.trusted ? 'zweite Lesung mit passender'
+        : 'Aufbau und zweite Lesung stimmen'}`);
+      return parseReadings(second.trusted ? second.data : first.data);
+    };
     const persist = (points) => {
       for (const [item, list] of Object.entries(points)) {
         const series = new JTimeSeries(JTimeSeries.Policy.ADD);
@@ -534,7 +594,7 @@ function run() {
 
     // the serial numbers once a day, in a live run
     if (live && store.get('serialsDay') !== today) {
-      const found = parseSerials(readFile(0x45, []));
+      const found = parseSerials(readFile(0x45, []).data);
       const known = state.serials || {};
       const changed = Object.keys(known).length > 0
         ? ADDRESSES.filter((a) => (found[a] || '') !== (known[a] || '')) : [];
