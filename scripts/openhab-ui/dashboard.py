@@ -1092,17 +1092,17 @@ FLOW_W, FLOW_H = 461, 461
 STEP, TURN = 45, 8  # degrees between two nodes, and the star's turn clockwise from straight up
 ORBIT = 30  # every node's one ring, around its drawing; its dots, arcs and badges say what the node does
 # the ring's stroke at its widest, while a working ring or arc swells at its brightest: as thick as the appliance
-# icons' rings were (4 of 64 units at 72 px); at rest it is SWELL times thinner and swells outwards only, its inner
-# edge fixed on the node's disc, so at its widest it is the ring it was before it pulsed (user, 2026-10-04)
+# icons' rings were (4 of 64 units at 72 px); at rest it is SWELL times thinner (user, 2026-10-04) and swells around
+# its middle, inwards and outwards alike (user, 2026-10-24; outwards only before, its inner edge fixed)
 RING_MAX, SWELL = 4.5, 1.55
 RING_W = round(RING_MAX / SWELL, 2)  # 2.9, the ring at rest, its arcs and the soft pulse beside them
-RING_R = ORBIT - (RING_MAX - RING_W) / 2  # the middle of the ring at rest; ORBIT at its widest
+RING_R = ORBIT - (RING_MAX - RING_W) / 2  # the middle of the ring, at rest and at its widest
 # a working node's ring pulses beside an arc that shows a value (user, 2026-10-03: running dots, then dashes, were
 # tried and replaced by this pulse), never stronger than half the arc's opacity, so the arc reads at the pulse's
 # peak too; a fixed duration, as a SMIL animation restarts whenever an expression in it changes
 PULSE = {"attributeName": "opacity", "values": "0.3;0.06;0.3", "dur": "2s", "repeatCount": "indefinite"}
 # a working ring without an arc pulses as a whole and strongly, as the appliance icon of a machine without progress
-# does (user, 2026-10-04), and swells as an arc does (swell()): brightest and widest at once
+# does (user, 2026-10-04), and swells as an arc does (halo()): brightest and widest at once
 PULSE_FULL = {**PULSE, "values": "0.3;1;0.3"}
 # an arc that shows a value pulses in step with the soft pulse of the ring beside it, brightest and widest while the
 # ring is brightest (user, 2026-10-04: first against it, then in step, which tells them apart better; 0.7 to 1 alone
@@ -1111,12 +1111,18 @@ PULSE_FULL = {**PULSE, "values": "0.3;1;0.3"}
 ARC_PULSE = {**PULSE, "values": "1;0.55;1"}
 
 
-def swell(rest_r, rest_w, max_r, max_w, visible, arc=False):
-    """A ring's or arc's swelling from its width at rest to its widest at its brightest, its radius growing with it so
-    its inner edge stays put: a whole ring's with PULSE_FULL, an arc's (arc) with ARC_PULSE, half a period apart."""
-    return [svg("animate", visible=visible, **{**PULSE, "attributeName": attr,
-                                               "values": f"{b};{a};{b}" if arc else f"{a};{b};{a}"})
-            for attr, a, b in (("stroke-width", rest_w, max_w), ("r", rest_r, max_r))]
+def halo(circle, max_w, visible, arc=False):
+    """The ring or arc (circle) at its widest, max_w around its own middle, so it swells inwards and outwards alike,
+    as a circle of its own to stand right after it, in its radius, stroke, dashes and caps, fading in as the ring
+    brightens and out again: a whole ring's with PULSE_FULL, an arc's (arc) with ARC_PULSE, half a period apart. So a
+    ring swells by an opacity alone (user, 2026-10-24): animating its radius and width cost the browser a style
+    recalculation per ring and frame, which kept a phone's main thread busy on the overview (32 to 37 frames a second,
+    56 without), an opacity animation hardly anything."""
+    keep = ("cx", "cy", "r", "stroke", "transform", "pathLength", "stroke-dasharray", "stroke-dashoffset",
+            "stroke-linecap")
+    shape = {k: v for k, v in circle["config"].items() if k in keep}
+    return svg("circle", [svg("animate", visible=visible, **{**PULSE, "values": "1;0;1" if arc else "0;1;0"})],
+               visible=visible, **shape, fill="none", **{"stroke-width": max_w})
 
 
 def at(angle):
@@ -1324,12 +1330,12 @@ def active_ring(xy, color, active, arc):
     a soft pulse (PULSE) instead, the arc standing still over it, so the value reads and the rest of the ring shows
     that the node works. Nothing while it rests."""
     whole = f"=({active}) && !({arc})"
-    ring_ = svg("circle", [svg("animate", visible=whole, **PULSE_FULL), *swell(RING_R, RING_W, ORBIT, RING_MAX, whole)],
+    ring_ = svg("circle", [svg("animate", visible=whole, **PULSE_FULL)],
                 visible=whole, cx=xy[0], cy=xy[1], r=RING_R, fill="none", stroke=color, **{"stroke-width": RING_W})
     pulse = svg("circle", [svg("animate", visible=f"=({active}) && ({arc})", **PULSE)],
                 visible=f"=({active}) && ({arc})", cx=xy[0], cy=xy[1], r=RING_R, fill="none", stroke=color,
                 **{"stroke-width": RING_W})
-    return svg("g", [ring_, pulse])
+    return svg("g", [ring_, halo(ring_, RING_MAX, whole), pulse])
 
 
 def vent_level_badge(cx, cy):
@@ -1358,15 +1364,15 @@ def share_orbit(xy, share, color, least=0, active=None):
     (the node works) pulsing in step with the ring beside it (ARC_PULSE). An underlay in the card colour hides the grey
     ring and the running dots under the arc, so they run on only where it leaves the ring free; it is a little wider
     and longer than the arc, so no dot peeps out at its edges. The circles' length counts as 100 (pathLength), so the
-    share holds while the arc's radius swells."""
+    share holds on the arc at its widest (halo()) as well."""
     dash = f"=(Math.min(1, {share}) * 100).toFixed(2) + ' 100'"
     arc = {"cx": xy[0], "cy": xy[1], "r": RING_R, "fill": "none", "transform": f"rotate(-90 {xy[0]} {xy[1]})",
            "stroke-linecap": "round", "stroke-dasharray": dash, "pathLength": 100}
+    line = svg("circle", [svg("animate", visible=f"={active}", **ARC_PULSE)] if active else [],
+               stroke=color, **arc, **{"stroke-width": RING_W, "opacity": "0.9"})
     return svg("g", [svg("circle", style={"stroke": "var(--f7-card-bg-color, #fff)"}, **arc,
                          **{"stroke-width": RING_W + 2}),
-                     svg("circle", [svg("animate", visible=f"={active}", **ARC_PULSE),
-                                    *swell(RING_R, RING_W, ORBIT, RING_MAX, f"={active}", arc=True)] if active else [],
-                         stroke=color, **arc, **{"stroke-width": RING_W, "opacity": "0.9"})],
+                     line, *([halo(line, RING_MAX, f"={active}", arc=True)] if active else [])],
                visible=f"={share} > {least}")
 
 
@@ -1442,10 +1448,11 @@ def share_pill(node, power, threshold, color):
                          **{"font-size": 11, "font-weight": "700", "text-anchor": "middle"})])
 
 
-def house_pie(xy=HOME_XY, r=RING_R, w=RING_W, max_r=ORBIT, max_w=RING_MAX, underlay=True):
-    """The house's ring around xy (r and w at rest, max_r and max_w at its widest) as a pie of its power, pulsing as the
+def house_pie(xy=HOME_XY, r=RING_R, w=RING_W, max_w=RING_MAX, underlay=True):
+    """The house's ring around xy (r and w at rest, max_w at its widest) as a pie of its power, pulsing as the
     battery's ring does beside its charge (user, 2026-10-05): each consumer's share as an arc in its colour, clockwise
-    from the top in the order of the nodes, clamped so they never add up beyond the ring, always shown and opaque,
+    from the top in the order of the nodes, clamped so they never add up beyond the ring, opaque, drawn while it has a
+    length (a share of 0 would swell for nothing),
     swelling while the house draws power as the battery's arc does (only in size); the rest, which no known consumer
     draws, is the ring itself, pulsing grey only in its opacity, as the battery's ring beside its arc (PULSE). An
     underlay in the card colour under the arcs hides that pulse, the grey ring and the dots running in under them. Where
@@ -1467,18 +1474,21 @@ def house_pie(xy=HOME_XY, r=RING_R, w=RING_W, max_r=ORBIT, max_w=RING_MAX, under
     under = [svg("circle", style={"stroke": "var(--f7-card-bg-color, #fff)"}, visible=f"={known}", **arc,
                  **{"stroke-width": w + 2, "stroke-linecap": "round",
                     "stroke-dasharray": f"=({before}).toFixed(2) + ' 100'"})] if underlay else []
-    arcs = [svg("circle", swell(r, w, max_r, max_w, f"={working}", arc=True), stroke=color, **arc,
-                **{"stroke-width": w, "stroke-dasharray": f"=({own}).toFixed(2) + ' 100'",
-                   "stroke-dashoffset": f"=(-({start})).toFixed(2)"})
-            for start, own, color in parts]
+    arcs = []
+    for start, own, color in parts:
+        one = svg("circle", visible=f"=({own}) > 0.05", stroke=color, **arc,
+                  **{"stroke-width": w, "stroke-dasharray": f"=({own}).toFixed(2) + ' 100'",
+                     "stroke-dashoffset": f"=(-({start})).toFixed(2)"})
+        arcs += [one, halo(one, max_w, f"=({working}) && ({own}) > 0.05", arc=True)]
 
     def end(at, order):
         """A round end of the band at the share at, in the colour of the first arc in order that has a length."""
         color = "=" + " : ".join(f"({own}) > 0.05 ? '{c}'" for _, own, c in order) + f" : '{order[-1][2]}'"
-        return svg("circle", swell(r, w, max_r, max_w, f"={working}", arc=True), visible=f"={known}",
-                   stroke=color, **arc, **{"stroke-width": w, "stroke-linecap": "round",
-                                           "stroke-dasharray": "0.001 100", "stroke-dashoffset": at})
-    return [rest, *under, *arcs, end("0", parts), end(f"=(-({before})).toFixed(2)", parts[::-1])]
+        dot = svg("circle", visible=f"={known}", stroke=color, **arc,
+                  **{"stroke-width": w, "stroke-linecap": "round", "stroke-dasharray": "0.001 100",
+                     "stroke-dashoffset": at})
+        return [dot, halo(dot, max_w, f"=({working}) && {known}", arc=True)]
+    return [rest, *under, *arcs, *end("0", parts), *end(f"=(-({before})).toFixed(2)", parts[::-1])]
 
 
 def energy_flow():
@@ -1579,14 +1589,14 @@ def house_tiles():
                                  style={"display": "block", "overflow": "visible", "max-width": "170px"})
     share = lambda ring, pill: ring_svg([*share_ring(24, 25, *ring, lift=10), pill])
     # the house as its node in the star, the ring the pie of what the consumers draw, at its widest pulse as large and
-    # as wide as the self-consumption ring beside it (user, 2026-10-05), SWELL times thinner at rest with its inner
-    # edge fixed, as the star's rings; its power and today's energy beside it
+    # as wide as the self-consumption ring beside it (user, 2026-10-05), SWELL times thinner at rest, swelling around
+    # its middle as the star's rings; its power and today's energy beside it
     max_r, max_w = 22, 5  # share_ring()'s
     w = round(max_w / SWELL, 2)
     r = max_r - (max_w - w) / 2
     home = ring_svg([svg("circle", cx=24, cy=25, r=r, fill="none", stroke="rgba(127, 127, 127, 0.28)",
                          **{"stroke-width": w}),
-                     *house_pie((24, 25), r, w, max_r, max_w, underlay=False),
+                     *house_pie((24, 25), r, w, max_w, underlay=False),
                      # the node's disc just inside the ring
                      svg("g", [flow_node("home", (0, 0), num(HOME))],
                          transform=f"translate(24 25) scale({(r - w / 2) / (ORBIT - RING_MAX / 2):.3f})"),
@@ -4531,12 +4541,11 @@ def appliance_icon_widget():
     when there is no progress."""
     running = "!!props.running"
     has_progress = "(props.progress !== undefined && props.progress !== null && props.progress !== '')"
-    # the ring as the energy flow's: at rest SWELL times thinner than at its widest (4, at radius 28), its inner edge
-    # fixed at 26
+    # the ring as the energy flow's: at rest SWELL times thinner than at its widest (4), swelling around its middle
     w, r = round(4 / SWELL, 2), round(26 + 4 / SWELL / 2, 2)
     progressing = f"={running} && {has_progress}"
     track = svg("circle", cx=32, cy=32, r=r, **stroke(w, "#9e9e9e", **{"stroke-opacity": "0.25"}))
-    arc = svg("circle", [svg("animate", visible=progressing, **ARC_PULSE), *swell(r, w, 28, 4, progressing, arc=True)],
+    arc = svg("circle", [svg("animate", visible=progressing, **ARC_PULSE)],
               cx=32, cy=32, r=r, transform="rotate(-90 32 32)", visible=progressing, pathLength=100,
               **stroke(w, "=props.color || '#1e88e5'",
                        **{"stroke-dasharray": "=Number(props.progress).toFixed(1) + ' 100'"}))
@@ -4545,10 +4554,11 @@ def appliance_icon_widget():
                                values=f"={has_progress} ? '{PULSE['values']}' : '{PULSE_FULL['values']}'",
                                visible=f"={running}")],
                 cx=32, cy=32, r=r, visible=f"={running}", **stroke(w, "=props.color || '#1e88e5'"))
-    # without progress the whole ring swells as well, as the energy flow's do
-    pulse["slots"]["default"] += swell(r, w, 28, 4, f"={running} && !{has_progress}")
     fronts = [svg("g", front(running), visible=f"=props.kind === '{kind}'") for kind, front in APPLIANCE_FRONTS]
-    return svg("svg", [track, pulse, arc, *machine_body(fronts)], viewBox="0 0 64 64", width="=props.size || 72",
+    # the arc swells, and without progress the whole ring as well, as the energy flow's do
+    return svg("svg", [track, pulse, halo(pulse, 4, f"={running} && !{has_progress}"), arc,
+                       halo(arc, 4, progressing, arc=True), *machine_body(fronts)], viewBox="0 0 64 64",
+               width="=props.size || 72",
                height="=props.size || 72")
 
 

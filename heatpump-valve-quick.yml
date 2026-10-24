@@ -22,7 +22,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 17, 2026, 9:55:42 PM
+timestamp: Oct 24, 2026, 9:36:11 PM
 component: div
 config:
   style:
@@ -110,18 +110,22 @@ slots:
                           repeatCount: indefinite
                           visible: =((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
                             || 0) > 0)) && !(false)
+                  - component: circle
+                    config:
+                      cx: 0
+                      cy: 0
+                      r: 29.2
+                      stroke: '#ffb74d'
+                      fill: none
+                      stroke-width: 4.5
+                      visible: =((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
+                        || 0) > 0)) && !(false)
+                    slots:
+                      default:
                       - component: animate
                         config:
-                          attributeName: stroke-width
-                          values: 2.9;4.5;2.9
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: =((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
-                            || 0) > 0)) && !(false)
-                      - component: animate
-                        config:
-                          attributeName: r
-                          values: 29.2;30;29.2
+                          attributeName: opacity
+                          values: 0;1;0
                           dur: 2s
                           repeatCount: indefinite
                           visible: =((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)

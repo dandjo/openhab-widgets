@@ -124,7 +124,7 @@ props:
     required: false
     context: item
   parameterGroups: []
-timestamp: Oct 21, 2026, 9:18:14 AM
+timestamp: Oct 24, 2026, 9:36:11 PM
 component: oh-card
 config:
   title: =props.title
@@ -213,19 +213,23 @@ slots:
                           visible: '=(((props.active !== undefined && props.active !== null && props.active !== '''') ? (props.active
                             === true || props.active === ''true'') : (Number(items[props.prefix + ''_power''].numericState)
                             || 0) > (Number(props.threshold) || 10))) && !(false)'
+                  - component: circle
+                    config:
+                      cx: 0
+                      cy: 0
+                      r: 29.2
+                      stroke: =props.color
+                      fill: none
+                      stroke-width: 4.5
+                      visible: '=(((props.active !== undefined && props.active !== null && props.active !== '''') ? (props.active
+                        === true || props.active === ''true'') : (Number(items[props.prefix + ''_power''].numericState) ||
+                        0) > (Number(props.threshold) || 10))) && !(false)'
+                    slots:
+                      default:
                       - component: animate
                         config:
-                          attributeName: stroke-width
-                          values: 2.9;4.5;2.9
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: '=(((props.active !== undefined && props.active !== null && props.active !== '''') ? (props.active
-                            === true || props.active === ''true'') : (Number(items[props.prefix + ''_power''].numericState)
-                            || 0) > (Number(props.threshold) || 10))) && !(false)'
-                      - component: animate
-                        config:
-                          attributeName: r
-                          values: 29.2;30;29.2
+                          attributeName: opacity
+                          values: 0;1;0
                           dur: 2s
                           repeatCount: indefinite
                           visible: '=(((props.active !== undefined && props.active !== null && props.active !== '''') ? (props.active

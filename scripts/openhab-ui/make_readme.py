@@ -21,7 +21,7 @@ OVERVIEW = [
      "consumer's share of the house's power in a pill on its line, and the house's ring as a pie of that power, the "
      "rest no known consumer draws in grey. Every node "
      "is one grey ring around its drawing, the ring carrying what the node shows beyond it; a working ring and its "
-     "arc swell outwards at their brightest, about half again as wide as at rest. Dots run "
+     "arc swell inwards and outwards at their brightest, about half again as wide as at rest. Dots run "
      "along the lines in the direction of the flow at four speeds and slide under the node rims; while power flows "
      "through a node, its ring pulses in its colour. The icons move with the power (sun rays, air streams, pylon dashes, a pulsing bolt over the middle of the "
      "charging car, sparkles twinkling while the appliances run, the battery filled to its state of charge, the "

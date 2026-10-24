@@ -70,7 +70,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 20, 2026, 8:46:20 PM
+timestamp: Oct 24, 2026, 9:36:11 PM
 component: div
 config:
   style:
@@ -157,17 +157,21 @@ slots:
                           dur: 2s
                           repeatCount: indefinite
                           visible: =(false) && !(false)
+                  - component: circle
+                    config:
+                      cx: 0
+                      cy: 0
+                      r: 29.2
+                      stroke: '#66bb6a'
+                      fill: none
+                      stroke-width: 4.5
+                      visible: =(false) && !(false)
+                    slots:
+                      default:
                       - component: animate
                         config:
-                          attributeName: stroke-width
-                          values: 2.9;4.5;2.9
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: =(false) && !(false)
-                      - component: animate
-                        config:
-                          attributeName: r
-                          values: 29.2;30;29.2
+                          attributeName: opacity
+                          values: 0;1;0
                           dur: 2s
                           repeatCount: indefinite
                           visible: =(false) && !(false)
