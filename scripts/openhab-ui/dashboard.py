@@ -4966,6 +4966,13 @@ def line(name, item, color, y=0, dashed=False, **extra):
     return time_series(name, item, yAxisIndex=y, symbol="none", lineStyle=style, itemStyle={"color": color}, **extra)
 
 
+def now_mark():
+    """A series' markLine at the present, dashed as the price charts draw it, for a grid with a forecast (user,
+    2026-10-24); ECharts leaves it out on a day the present is not in."""
+    return {"symbol": ["none", "none"], "silent": True, "label": {"show": False},
+            "lineStyle": {"color": "#888", "type": "dashed"}, "data": [{"xAxis": "=dayjs().valueOf()"}]}
+
+
 def value_axis(name, **extra):
     return comp("oh-value-axis", {"gridIndex": 0, "name": name, "nameGap": 14, "nameTextStyle": AXIS_NAME,
                                   "splitLine": {"lineStyle": {"type": "dashed", "opacity": 0.4}}, **extra})
@@ -8985,9 +8992,11 @@ def photovoltaics_blocks():
     # today shows what is still to come and the arrows page to tomorrow's (user, 2026-10-19); over each string its
     # own forecast dashed in its colour, the house's the sum of the two (a model per string, user, 2026-10-20), the
     # title without it: a grey word there would stand for no line; string 2's planes not here but in a chart of their
-    # own, Himmelsrichtungen heute (user, 2026-10-20)
-    forecast = line("Prognose", "pv_forecast_power", f"={NEUTRAL_LINE}", dashed=True)
-    string_forecasts = [line(f"Prognose PV{n}", f"pv_forecast_pv{n}_power", color, dashed=True)
+    # own, Himmelsrichtungen heute (user, 2026-10-20); the present a dashed line in both grids, as on the prices (user,
+    # 2026-10-24), one per grid
+    forecast = line("Prognose", "pv_forecast_power", f"={NEUTRAL_LINE}", dashed=True, markLine=now_mark())
+    string_forecasts = [line(f"Prognose PV{n}", f"pv_forecast_pv{n}_power", color, dashed=True,
+                             **({"markLine": now_mark()} if n == 1 else {}))
                         for n, color in ((1, "#ffca28"), (2, "#ff8f00"))]
     chart_ = stacked_chart([((("Eingang", "#ffb300"), ("Wirkleistung", "#5c6bc0"), ("Prognose", f"={NEUTRAL_LINE}")),
                              [area("Eingang", PV, "#ffb300"), area("Wirkleistung", "huawei_inverter_active_power", "#5c6bc0"),
