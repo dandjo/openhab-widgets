@@ -364,7 +364,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 14, 2026, 1:29:37 PM
+timestamp: Oct 24, 2026, 11:49:21 AM
 component: oh-card
 config:
   title: Heat Pump
@@ -1580,7 +1580,7 @@ slots:
                       stroke-width: 2.9
                       visible: =((((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
                         || 0) > 0) && (items[props.heatpumpValve].state === 'DHW')) || items[props.heatpumpBshMode].state
-                        === 'ON')) && !(((Number(items[props.heatpumpDhwTankTemp].numericState) || 0) / 60) > 0.01)
+                        === 'ON')) && !((((Number(items[props.heatpumpDhwTankTemp].numericState) || 0) - 20) / 40) > 0.01)
                     slots:
                       default:
                       - component: animate
@@ -1591,7 +1591,7 @@ slots:
                           repeatCount: indefinite
                           visible: =((((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
                             || 0) > 0) && (items[props.heatpumpValve].state === 'DHW')) || items[props.heatpumpBshMode].state
-                            === 'ON')) && !(((Number(items[props.heatpumpDhwTankTemp].numericState) || 0) / 60) > 0.01)
+                            === 'ON')) && !((((Number(items[props.heatpumpDhwTankTemp].numericState) || 0) - 20) / 40) > 0.01)
                       - component: animate
                         config:
                           attributeName: stroke-width
@@ -1600,7 +1600,7 @@ slots:
                           repeatCount: indefinite
                           visible: =((((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
                             || 0) > 0) && (items[props.heatpumpValve].state === 'DHW')) || items[props.heatpumpBshMode].state
-                            === 'ON')) && !(((Number(items[props.heatpumpDhwTankTemp].numericState) || 0) / 60) > 0.01)
+                            === 'ON')) && !((((Number(items[props.heatpumpDhwTankTemp].numericState) || 0) - 20) / 40) > 0.01)
                       - component: animate
                         config:
                           attributeName: r
@@ -1609,7 +1609,7 @@ slots:
                           repeatCount: indefinite
                           visible: =((((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
                             || 0) > 0) && (items[props.heatpumpValve].state === 'DHW')) || items[props.heatpumpBshMode].state
-                            === 'ON')) && !(((Number(items[props.heatpumpDhwTankTemp].numericState) || 0) / 60) > 0.01)
+                            === 'ON')) && !((((Number(items[props.heatpumpDhwTankTemp].numericState) || 0) - 20) / 40) > 0.01)
                   - component: circle
                     config:
                       cx: 276
@@ -1620,7 +1620,7 @@ slots:
                       stroke-width: 2.9
                       visible: =((((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
                         || 0) > 0) && (items[props.heatpumpValve].state === 'DHW')) || items[props.heatpumpBshMode].state
-                        === 'ON')) && (((Number(items[props.heatpumpDhwTankTemp].numericState) || 0) / 60) > 0.01)
+                        === 'ON')) && ((((Number(items[props.heatpumpDhwTankTemp].numericState) || 0) - 20) / 40) > 0.01)
                     slots:
                       default:
                       - component: animate
@@ -1631,10 +1631,10 @@ slots:
                           repeatCount: indefinite
                           visible: =((((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
                             || 0) > 0) && (items[props.heatpumpValve].state === 'DHW')) || items[props.heatpumpBshMode].state
-                            === 'ON')) && (((Number(items[props.heatpumpDhwTankTemp].numericState) || 0) / 60) > 0.01)
+                            === 'ON')) && ((((Number(items[props.heatpumpDhwTankTemp].numericState) || 0) - 20) / 40) > 0.01)
               - component: g
                 config:
-                  visible: =(Number(items[props.heatpumpDhwTankTemp].numericState) || 0) / 60 > 0.01
+                  visible: =((Number(items[props.heatpumpDhwTankTemp].numericState) || 0) - 20) / 40 > 0.01
                 slots:
                   default:
                   - component: circle
@@ -1647,8 +1647,8 @@ slots:
                       fill: none
                       transform: rotate(-90 276 456)
                       stroke-linecap: round
-                      stroke-dasharray: =(Math.min(1, (Number(items[props.heatpumpDhwTankTemp].numericState) || 0) / 60) *
-                        100).toFixed(2) + ' 100'
+                      stroke-dasharray: =(Math.min(1, ((Number(items[props.heatpumpDhwTankTemp].numericState) || 0) - 20)
+                        / 40) * 100).toFixed(2) + ' 100'
                       pathLength: 100
                       stroke-width: 4.9
                   - component: circle
@@ -1660,8 +1660,8 @@ slots:
                       fill: none
                       transform: rotate(-90 276 456)
                       stroke-linecap: round
-                      stroke-dasharray: =(Math.min(1, (Number(items[props.heatpumpDhwTankTemp].numericState) || 0) / 60) *
-                        100).toFixed(2) + ' 100'
+                      stroke-dasharray: =(Math.min(1, ((Number(items[props.heatpumpDhwTankTemp].numericState) || 0) - 20)
+                        / 40) * 100).toFixed(2) + ' 100'
                       pathLength: 100
                       stroke-width: 2.9
                       opacity: '0.9'

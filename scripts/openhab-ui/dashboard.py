@@ -2354,8 +2354,9 @@ PUMP_ON =f"(items.{HPX['pump']}.state === 'ON' || {num(HPX['flow'])} > 0)"
 # what fills a ring of the heat pump card: the compressor's top frequency, the water's flow (the pump delivers about
 # 24.5 l/min at its top; user, 2026-10-04), a hot tank, the highest leaving water the one heating circuit, floor
 # heating, is set to ([9-00] 40 °C; its heating curve reaches 35 °C at the coldest, [1-02]). The rings stay in the
-# nodes' colours, graded nowhere.
+# nodes' colours, graded nowhere. The tank's ring is empty at TANK_EMPTY, not at 0 °C (user, 2026-10-24).
 HZ_FULL, FLOW_FULL, TANK_FULL, SUPPLY_FULL = 74, 25, 60, 40
+TANK_EMPTY = 20
 DHW_MODE = f"items.{HPX['valve']}.state === 'DHW'"
 # the tank's charge: since when (rule heatpump_run_since) and when it will end (rule heatpump_dhw_eta, from the charge's
 # 10th minute on, else UNDEF); the heat pump's ring in the energy flow and in the heating card fills towards that end
@@ -2727,7 +2728,8 @@ def hp_node(kind, xy, tank_id="hpTank", loop_id="hpLoopV"):
     if kind == "valve":
         return hp_orbit(xy, "#ffb74d", PUMP_ON), valve_node(*xy), []
     if kind == "tank":
-        return (hp_orbit(xy, "#e57373", f"({TANK_FLOW} || {BSH_ON})", f"{num(HPX['tank'])} / {TANK_FULL}"),
+        return (hp_orbit(xy, "#e57373", f"({TANK_FLOW} || {BSH_ON})",
+                         f"({num(HPX['tank'])} - {TANK_EMPTY}) / {TANK_FULL - TANK_EMPTY}"),
                 tank_node(*xy, tank_id), tank_source_badge(*xy))
     if kind == "radiators":
         return hp_orbit(xy, "#ffab91", HEATING_FLOW, CIRCUIT_SHARE), radiator_node(*xy), []
