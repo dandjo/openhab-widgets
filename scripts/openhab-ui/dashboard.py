@@ -9033,9 +9033,8 @@ def e_car_controls():
     where they fit:
     Laden as a boost pill, Starten and Stoppen, while a cable is plugged in or it charges, a hint without, and
     Klimatisierung, on with the target temperature below or off. Under them the settings as pill sliders: the charge
-    target set in the car (Ladeziel), the value it charges to, 50 to 100 % in steps of 10, whose context says the battery
-    care target Škoda sets it back to after the next charge while battery care is on (the API can switch neither battery
-    care nor its target, the MyŠkoda app can), and the target
+    target set in the car (Ladeziel), the value it charges to, 50 to 100 % in steps of 10, whose context gives the
+    charge and the range now, and the target
     temperature, LO, 16 to 29.5 °C in steps of 0.5 and HI, sent with the start
     or, while the air conditioning runs, at once. Last how the last command went. The rule skoda_enyaq_status sends
     the commands; their items change once Škoda accepted them."""
@@ -9050,9 +9049,8 @@ def e_car_controls():
     pill["config"]["visible"] = f"={plugged}"
     hint = label("Zum Laden das Ladekabel einstecken", f"=!{plugged}",
                  **{"font-size": "13px", "opacity": "0.7", "padding": "10px 2px"})
-    # its line says what battery care sets it back to after the next charge, where that differs
-    context = (f"{E_CAR_CARE_LATER} ? 'Akkuschonung → ' + {disp(skoda('battery_care_target'))} : "
-               f"'bis hierhin lädt das Auto'")
+    # its line the charge now and the range it gives, against the target set above (user, 2026-10-25)
+    context = f"{disp(skoda('soc'))} + ' / ' + {disp(skoda('range'))}"
     slider = pill_slider(target, ECAR_COLOR, 50, 100, 10, "Ladeziel", f"Math.round({num(target)}) + ' %'", context,
                          [(50, "50 %"), (60, "60"), (70, "70"), (80, "80"), (90, "90"), (100, "100 %")], "%",
                          icon="material:battery_charging_full", row=True)
