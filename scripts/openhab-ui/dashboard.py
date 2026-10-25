@@ -9031,8 +9031,12 @@ def e_car_controls():
     the commands; their items change once Škoda accepted them."""
     plug, charging, target = skoda("plug"), skoda("charging"), skoda("charge_target")
     plugged = f"(items.{plug}.state === 'ON' || items.{charging}.state === 'ON' || {SKODA_CHARGING})"
+    # while it charges the time left until the charge target (user, 2026-10-25), from when the car says it will be full;
+    # it follows the car's reports, every 5 minutes while charging, as MainUI does not re-evaluate it as time passes
+    full_at = skoda("full_at")
+    left = f"Math.max(0, Math.round(dayjs(items.{full_at}.state).diff(dayjs(), 'minute', true)))"
     pill = boost_pill(charging, "material:ev_station", ECAR_COLOR, "Laden",
-                      f"{disp(skoda('soc'))} + ' → ' + {disp(target)}")
+                      f"({ok(full_at)} ? 'noch ' + {hm(left)} : 'lädt')")
     pill["config"]["visible"] = f"={plugged}"
     hint = label("Zum Laden das Ladekabel einstecken", f"=!{plugged}",
                  **{"font-size": "13px", "opacity": "0.7", "padding": "10px 2px"})
