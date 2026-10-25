@@ -8920,7 +8920,7 @@ def when_short(item):
 
 
 def target_bar(pct, target, color, left, right):
-    """bar() with a mark at target (an expression, per cent): a car's charge up to the charge limit it stops at."""
+    """bar() with a mark at target (an item, per cent): a car's charge and the charge target set in it."""
     mark = div([], visible=f"={num(target)} > 0",
                **{"position": "absolute", "top": "-3px", "bottom": "-3px", "width": "2px", "border-radius": "1px",
                   "background": "var(--f7-text-color)", "opacity": "0.55",
@@ -8940,7 +8940,7 @@ def e_car_now():
     """The car as it last reported itself (user, 2026-10-25): its drawing from the energy flow with the charge on its
     ring, the charge large, beside it its charging state and where it stands as chips and when it reported (the API
     does not wake the car, so the time says how current all of it is), while it charges when it will be full; the
-    charge as a bar marked at the charge limit (Ladelimit), the range and the limit at its ends; then the locks with what stands
+    charge as a bar marked at the charge target (Ladeziel), the range and the target at its ends; then the locks with what stands
     open, the place, the odometer, the climate, the charging cable and the plug's lock (user, 2026-10-25: cable and
     plug up here, under odometer and climate)."""
     soc, state, plug = skoda("soc"), skoda("charging_state"), skoda("plug")
@@ -8967,10 +8967,12 @@ def e_car_now():
                  label(f"='Stand ' + {when_short(skoda('updated'))}", **{"font-size": "14px"}),
                  label(f"={full}", f"={SKODA_CHARGING} && {ok(full_at)}",
                        **{"font-size": "22px", "font-weight": "700"})], picture=icon)
-    limit = skoda("charge_limit")
-    charge = target_bar(vt_clamp(num(soc)), limit, ECAR_COLOR, f"={disp(skoda('range'))} + ' Reichweite'",
-                        f"='Ladelimit ' + {disp(limit)} + (items.{skoda('battery_care')}.state === 'ON' ? "
-                        f"' · Akkuschonung' : '')")
+    # the mark at the charge target set in the car (user, 2026-10-25: the setpoint is the target, not the limit),
+    # where battery care stops the car earlier that limit beside it
+    target, limit = skoda("charge_target"), skoda("charge_limit")
+    charge = target_bar(vt_clamp(num(soc)), target, ECAR_COLOR, f"={disp(skoda('range'))} + ' Reichweite'",
+                        f"='Ladeziel ' + {disp(target)} + (items.{skoda('battery_care')}.state === 'ON' ? "
+                        f"' · Akkuschonung ' + {disp(limit)} : '')")
     # the locks, and below them what stands open; the lights only while on
     locked = skoda("locked")
     lock_text = (f"(items.{locked}.state === 'ON' ? 'Verriegelt' : items.{locked}.state === 'OFF' ? 'Entriegelt' : "
