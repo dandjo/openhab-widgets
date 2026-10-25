@@ -182,16 +182,12 @@ function applyCharging(charging) {
     }
   }
   postTime('full_at', full);
-  // the limit as set in the car, and where it stops: with battery care on at its care target (80 %) at most
+  // the charge target set in the car is the limit it charges to; with battery care on, Škoda sets it back to the care
+  // target (80 %) after the next charge (user, 2026-10-25), so the care target is kept beside it, not taken as a cap
   postQuantity('charge_target', settings.targetStateOfChargeInPercent, '%');
-  const care = onOff(settings.chargingCareMode, 'ACTIVATED', 'DEACTIVATED');
-  post('battery_care', care);
-  let limit = settings.targetStateOfChargeInPercent;
-  if (care === 'ON' && typeof settings.batteryCareModeTargetValueInPercent === 'number') {
-    limit = typeof limit === 'number' ? Math.min(limit, settings.batteryCareModeTargetValueInPercent)
-      : settings.batteryCareModeTargetValueInPercent;
-  }
-  postQuantity('charge_limit', limit, '%');
+  postQuantity('charge_limit', settings.targetStateOfChargeInPercent, '%');
+  post('battery_care', onOff(settings.chargingCareMode, 'ACTIVATED', 'DEACTIVATED'));
+  postQuantity('battery_care_target', settings.batteryCareModeTargetValueInPercent, '%');
 }
 
 function applyStatus(vehicleStatus) {
@@ -478,7 +474,10 @@ function setLimit(command) {
     return;
   }
   sendToCar('PUT', '/charging/limit', { targetStateOfChargeInPercent: percent }, `Ladeziel ${percent} % gesetzt`,
-    () => post('charge_target', `${percent} %`));
+    () => {
+      post('charge_target', `${percent} %`);
+      post('charge_limit', `${percent} %`);
+    });
 }
 
 function setCharging(command) {

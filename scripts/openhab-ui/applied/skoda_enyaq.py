@@ -4,8 +4,9 @@ odometer, locks and openings, parking position and climate as items in the equip
 which the rule skoda_enyaq_status (skoda_enyaq.js next to this file) fills every 5 minutes while the car charges or
 drives, otherwise every 15 (20 requests an hour per vehicle). A read does not wake the car: the values are what it
 last reported, skoda_enyaq_updated says when. Four items take commands to the car (user, same day): the charge target
-skoda_enyaq_charge_target (Ladeziel, 50 to 100 % in steps of 10; skoda_enyaq_charge_limit, Ladelimit, is where the car
-stops, lower with battery care on), skoda_enyaq_charging (ON starts, OFF stops a charge),
+skoda_enyaq_charge_target (Ladeziel, 50 to 100 % in steps of 10; skoda_enyaq_charge_limit, Ladelimit, is the same set
+value the car charges to, while skoda_enyaq_battery_care_target is what Škoda sets it back to after the next charge
+with battery care on), skoda_enyaq_charging (ON starts, OFF stops a charge),
 skoda_enyaq_climate (ON starts, OFF stops the air conditioning) and its target temperature skoda_enyaq_climate_target
 (LO = 15.5 °C, 16 to 29.5 °C in steps of 0.5, HI = 30 °C as the app offers them, sent with the start); the same rule sends them, without autoupdate, so their state
 changes once Škoda accepted the command, and reports in skoda_enyaq_command_result. The values the E-Auto page charts go into InfluxDB (the position too, the
@@ -80,6 +81,8 @@ POINTS = {
     "command_result": ("String", "letzter Befehl", "send", ["Status"], RESTORE, state("%s")),
     "battery_care": ("Switch", "Akkuschonung", "battery_saver", ["Status"], CHANGE,
                      state("%s", options="ON=An,OFF=Aus")),
+    "battery_care_target": ("Number:Dimensionless", "Akkuschonung Ladeziel", "battery_saver", ["Point"], CHANGE,
+                            quantity("%", "%.0f %unit%")),
     "plug": ("Switch", "Ladekabel", "power", ["Status"], CHANGE, state("%s", options="ON=Eingesteckt,OFF=Ausgesteckt")),
     "plug_locked": ("Switch", "Ladestecker verriegelt", "lock", ["Status"], CHANGE,
                     state("%s", options="ON=Verriegelt,OFF=Entriegelt")),
