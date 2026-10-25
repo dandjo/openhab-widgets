@@ -9099,14 +9099,18 @@ def e_car_blocks():
     the plug card over its electrical values on the left, the day's power over the energy per day on the right at
     their own heights (the day's power had stretched to the plug card's), and the Diagnose card under them (the API's
     state, the requests left in its hourly quota, the key's expiry, battery care)."""
-    left = skoda("api_requests_left")
+    left, reset = skoda("api_requests_left"), skoda("api_quota_reset_at")
     diagnose = two_on_phone(value_grid([vtile("API", skoda("api_status")),
                            # the requests left of the hour's quota (Škoda: 20 an hour, "not final"; user, 2026-10-25:
                            # "API-Kontingent", as the tile's old title said little)
                            vt_tile([vt_head("API-Kontingent"),
                                     vt_value(f"={ok(left)} ? Math.round({num(left)}) + ' von {SKODA_REQUESTS_PER_HOUR} "
                                              f"frei' : '–'"),
-                                    label("pro Stunde", **VT_SUB)], left, "API-Kontingent", ECAR_COLOR),
+                                    # and when it is full again, while that lies ahead (user, 2026-10-25)
+                                    label(f"='pro Stunde' + ((m) => m > 0 ? ' · Reset in ' + m + ' min' : '')"
+                                          f"({ok(reset)} ? Math.ceil(dayjs(items.{reset}.state).diff(dayjs(), "
+                                          f"'minute', true)) : 0)", **VT_SUB)],
+                                   left, "API-Kontingent", ECAR_COLOR),
                            vtile("Schlüssel gültig bis", skoda("api_key_expiry")),
                            vtile("Akkuschonung", skoda("battery_care"))]), 200)
     # the controls beside the car's report, about as high as each other, the week's charge across the page under them;

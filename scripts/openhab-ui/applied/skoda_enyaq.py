@@ -109,6 +109,8 @@ POINTS = {
                 state("%1$td.%1$tm. %1$tR")),
     "api_status": ("String", "API-Status", "cloud", ["Status"], RESTORE, state("%s", options=API_STATES)),
     "api_requests_left": ("Number", "API-Anfragen übrig", "data_usage", ["Point"], RESTORE, state("%.0f")),
+    "api_quota_reset_at": ("DateTime", "API-Kontingent wieder voll um", "update", ["Timestamp", "Point"], RESTORE,
+                           state("%1$tR")),
     "api_key_expiry": ("DateTime", "API-Schlüssel gültig bis", "key", ["Timestamp", "Point"], RESTORE,
                        state("%1$td.%1$tm.%1$tY")),
 }

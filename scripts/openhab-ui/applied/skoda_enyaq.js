@@ -138,8 +138,11 @@ function noteHeaders(response) {
   if (response.remaining !== null && response.remaining !== undefined) {
     const remaining = Number(response.remaining);
     store.put('remaining', remaining);
-    store.put('resetAt', now + Number(response.reset || 3600) * 1000);
+    const resetAt = now + Number(response.reset || 3600) * 1000;
+    store.put('resetAt', resetAt);
     post('api_requests_left', remaining);
+    // when the hour's quota is full again, for the page's "Reset in … min"; to the second, as the header gives seconds
+    postTime('api_quota_reset_at', new Date(Math.round(resetAt / 1000) * 1000).toISOString());
   }
   if (response.keyExpiresAt) {
     postTime('api_key_expiry', response.keyExpiresAt);
