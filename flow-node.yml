@@ -69,8 +69,13 @@ props:
     description: The heat pump's compressor frequency in Hz, which turns its fan; usually an expression
     type: DECIMAL
     required: false
+  - name: plugged
+    label: Plugged in
+    description: Whether the E-Car's charging cable is plugged in, which draws the cable; usually an expression
+    type: BOOLEAN
+    required: false
   parameterGroups: []
-timestamp: Oct 25, 2026, 2:07:58 PM
+timestamp: Oct 25, 2026, 7:19:28 PM
 component: g
 config:
   transform: ='translate(' + props.x + ' ' + props.y + ')'
@@ -1288,6 +1293,28 @@ slots:
           stroke-width: 1.2
           stroke-linecap: round
           fill: none
+      - component: g
+        config:
+          visible: =(props.plugged === true || props.plugged === 'true')
+        slots:
+          default:
+          - component: path
+            config:
+              d: M-19.8,-0.2 C-23.2,4.2 -25.2,10.8 -19.6,14.6 C-13.2,18.4 -2,19.5 0,27.75
+              stroke: currentColor
+              stroke-width: 1.4
+              stroke-linecap: round
+              fill: none
+          - component: line
+            config:
+              x1: -17.88
+              y1: -3.15
+              x2: -19.8
+              y2: -0.2
+              stroke: currentColor
+              stroke-width: 3.2
+              stroke-linecap: round
+              fill: none
       - component: circle
         config:
           cx: 14.88

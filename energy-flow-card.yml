@@ -129,6 +129,12 @@ props:
     type: TEXT
     required: true
     context: item
+  - name: ecarPlug
+    label: Škoda Enyaq Charging Cable
+    description: Switch item
+    type: TEXT
+    required: true
+    context: item
   - name: heatpumpBuhStep1Mode
     label: ESPAltherma Backup Heater (BUH) Step 1 Mode
     description: Switch item
@@ -280,7 +286,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 25, 2026, 2:07:58 PM
+timestamp: Oct 25, 2026, 7:19:28 PM
 component: oh-card
 config:
   title: Energy Flow
@@ -2675,6 +2681,8 @@ slots:
                   kind: e-car
                   x: 344.2
                   y: 346.0
+                  plugged: =(items[props.ecarPlug].state === 'ON' || Math.abs((Number(items[props.ecarPower].numericState)
+                    || 0)) > 500)
                   power: =(Number(items[props.ecarPower].numericState) || 0)
               - component: widget:flow-node
                 config:

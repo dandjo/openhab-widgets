@@ -43,7 +43,8 @@ def nodes_card():
         # the grey ring, the node's one circle, is drawn by the card that places the node, as the energy flow does
         items += [g.track(x, 45),
                   g.flow_node(kind, (x, 45), None if power is None else str(power), None if soc is None else str(soc),
-                              "45" if kind.startswith("heat-pump") else None),  # a compressor at 45 Hz turns the fan
+                              "45" if kind.startswith("heat-pump") else None,  # a compressor at 45 Hz turns the fan
+                              "true" if kind == "e-car" else None),  # the car charging, its cable plugged in
                   caption(x, 100, kind)]
     width = 90 + 85 * (len(NODES) - 1)
     return g.card("flow-node", [drawing(items, width, 110, round(width * 1.2))])
@@ -56,7 +57,7 @@ def links_card():
         g.flow_link(pv[0] + 30, 45, home[0] - 30, 45, "#ffb300", "3200", "true"),
         g.flow_link(home[0] + 30, 45, car[0] - 30, 45, g.ECAR_COLOR, "2000", "true"),
         g.track(*pv), g.track(*home), g.track(*car),
-        g.flow_node("pv", pv, "3200"), g.flow_node("home", home, "1200"), g.flow_node("e-car", car, "2000"),
+        g.flow_node("pv", pv, "3200"), g.flow_node("home", home, "1200"), g.flow_node("e-car", car, "2000", plugged="true"),
         g.svg_text(pv[0], 97, "3,2 kW", 16, "700"), g.svg_text(home[0], 97, "1,2 kW", 16, "700"),
         g.svg_text(car[0], 97, "2,0 kW", 16, "700")], 440, 110, 560)])
 

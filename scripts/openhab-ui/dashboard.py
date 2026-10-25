@@ -224,7 +224,7 @@ ITEM_PROP_PREFIXES = [("huawei_inverter_power_meter_", "grid_"), ("huawei_invert
                       ("faikout_perfera_", "ac_"), ("esplyfterl_", "ventilation_"),
                       ("miele_washing_machine_wwg360_", "washer1_"), ("miele_tumble_dryer_twc560wp_", "dryer_"),
                       ("miele_dishwasher_g7465_", "dishwasher_"), ("epex_spot_awattar", "price"),
-                      ("air_conditioning_unit_", "ac_unit_"), ("air_conditioning_", "ac_meter_"), ("e_car_", "ecar_"),
+                      ("air_conditioning_unit_", "ac_unit_"), ("air_conditioning_", "ac_meter_"), ("e_car_", "ecar_"), ("skoda_enyaq_", "ecar_"),
                       ("energy_daily_", "daily_"), ("energy_community_", "community_")]
 ITEM_PROP_NAMES = {
     "huawei_inverter_input_power": "pvPower", "huawei_inverter_e_day": "pvEnergyToday",
@@ -731,11 +731,14 @@ def battery_node(cx, cy, soc=None):
                    "stroke": "var(--f7-card-bg-color, #fff)", "stroke-width": 3, "stroke-linejoin": "round"})]
 
 
-def ecar_node(cx, cy, power):
+def ecar_node(cx, cy, power, plugged="false"):
     """The Enyaq from the side, facing right, after a side photo: long flat bonnet, raked windscreen, long
     arched roof ending in a spoiler, short sloping tailgate, a narrow window band rising to a point at the
     rear, big wheels at the corners, centred in the ring. While it charges, a large bolt over the car's middle
-    fades in and out, slowly, edged in the card colour so it stands out from the car's lines (user, 2026-10-04)."""
+    fades in and out, slowly, edged in the card colour so it stands out from the car's lines (user, 2026-10-04).
+    While its charging cable is plugged in (plugged, an expression), a plug sticks out of the charging port on the
+    rear right quarter panel, above the rear wheel, and the cable runs down behind the wheel to the bottom middle of
+    the disc (user, 2026-10-25)."""
     charging = f"Math.abs({power}) > {ECAR_CHARGING}"
     # drawn in car units (36 long, roof at y -4.9, wheels down to 9.6), scaled, the middle of that span on the ring's
     k, ox, oy = 1.25, cx, cy - 2.9
@@ -763,6 +766,19 @@ def ecar_node(cx, cy, power):
                          **{"stroke": ECAR_COLOR, "stroke-width": 0.8, "stroke-linejoin": "round"})],
                opacity="0", visible=f"={charging}")
     animated(bolt, "a-fade")
+    # the port in car units at (-14.3, -0.2), ahead of the tail light over the wheel arch; the plug points down and
+    # back below the tail light, the cable leaves it behind the rear wheel and ends where the disc does
+    port = (round(ox + k * -14.3, 2), round(oy + k * -0.2, 2))
+    plug_end = (round(cx - 19.8, 2), round(cy - 0.2, 2))
+    end = ORBIT - RING_MAX / 2
+
+    def rel(dx, dy):
+        return f"{round(cx + dx, 2)},{round(cy + dy, 2)}"
+    cable = svg("g", [
+        svg("path", d=f"M{plug_end[0]},{plug_end[1]} C{rel(-23.2, 4.2)} {rel(-25.2, 10.8)} {rel(-19.6, 14.6)} "
+                      f"C{rel(-13.2, 18.4)} {rel(-2, 19.5)} {rel(0, end)}", **stroke(1.4)),
+        svg("line", x1=port[0], y1=port[1], x2=plug_end[0], y2=plug_end[1], **stroke(3.2))],
+        visible=f"={plugged}")
     return [ring(cx, cy, ECAR_COLOR),
             svg("path", d=body, **stroke(1.6, fill="#78909c", **{"fill-opacity": "0.3", "stroke-linejoin": "round"})),
             svg("path", d=window, **stroke(1.2, **{"stroke-linejoin": "round"})),
@@ -774,7 +790,7 @@ def ecar_node(cx, cy, power):
                 y2=round(oy + k * 1.2, 2), **stroke(1.2, "#ffd54f")),  # LED headlight
             svg("line", x1=round(ox + k * -17.9, 2), y1=round(oy + k * 0.4, 2), x2=round(ox + k * -16.3, 2),
                 y2=round(oy + k * 0.7, 2), **stroke(1.2, "#ef5350")),  # tail light
-            *wheels, bolt]
+            cable, *wheels, bolt]
 
 
 def sparkle(x, y, size):
@@ -1185,6 +1201,15 @@ AC_ON = 5  # watts
 ECAR_ON = 100  # watts; standby and an LED light behind the same plug draw a few watts
 ECAR_CHARGING = 500  # it charges with 1.4 to 2.2 kW
 ECAR_COLOR = "#26a69a"
+ECAR_PLUG = "skoda_enyaq_plug"  # the car's own report through the MyŠkoda Public API (rule skoda_enyaq_status)
+
+
+def ecar_plugged(power):
+    """Whether the car's charging cable is plugged in: as the car reports it, or while it charges (power, an
+    expression in W), as the car's report can lag behind a charge that started."""
+    return f"(items.{ECAR_PLUG}.state === 'ON' || {flowing(power, ECAR_CHARGING)})"
+
+
 VENT_TEAL = "#26a69a"
 VENT_EXHAUST = "#90a4ae"  # the used air the ventilation unit blows out
 # how the car's figures come about, under them on its page
@@ -1408,7 +1433,8 @@ FLOW_KINDS = {  # kind: (builder of the drawing around (0, 0) from the power exp
     "heat-pump-split": (lambda p: heatpump_split_node(0, 0, "Number(props.frequency)"),
                         "split heat pump: the outdoor unit as heat-pump, the indoor unit standing in front of it"),
     "air-conditioner": (lambda p: ac_node(0, 0, p), "air conditioner: an indoor unit whose air streams flow"),
-    "e-car": (lambda p: ecar_node(0, 0, p), "E-Car: a car whose bolt fades in and out while it charges"),
+    "e-car": (lambda p: ecar_node(0, 0, p, "(props.plugged === true || props.plugged === 'true')"),
+              "E-Car: a car whose bolt fades in and out while it charges, its cable drawn while plugged in"),
     "battery": (lambda p: battery_node(0, 0, "Number(props.soc)"), "battery: filled to its state of charge"),
     "appliances": (lambda p: appliances_node(0, 0, p),
                    "appliances: an appliance with sparkles that breathe and twinkle while they run"),
@@ -1440,8 +1466,10 @@ def flow_node_widget():
     return svg("g", drawings, transform="='translate(' + props.x + ' ' + props.y + ')'")
 
 
-def flow_node(kind, xy, power=None, soc=None, frequency=None):
+def flow_node(kind, xy, power=None, soc=None, frequency=None, plugged=None):
     cfg = {"kind": kind, "x": xy[0], "y": xy[1]}
+    if plugged is not None:
+        cfg["plugged"] = f"={plugged}"
     if power is not None:
         cfg["power"] = f"={power}"
     if soc is not None:
@@ -1701,7 +1729,7 @@ def energy_flow():
         flow_node("home", HOME_XY, num(HOME)),
         flow_node("heat-pump-split", HP_XY, num(HP), frequency=num(HPX["hz"])),
         flow_node("air-conditioner", AC_XY, AC_FLOW),
-        flow_node("e-car", ECAR_XY, num(ECAR)),
+        flow_node("e-car", ECAR_XY, num(ECAR), plugged=ecar_plugged(num(ECAR))),
         flow_node("appliances", APPL_XY, APPL_POWER),
         flow_node("battery", BATT_XY, soc=num(SOC)),
         flow_node("ventilation", VENT_XY, VENT_POWER),
@@ -6114,7 +6142,7 @@ def plug_icon(prefix, icon, color):
     drawn = f"(!!props.kind && !{machine})"
     # the drawing moves only above the threshold too, as standby would turn its fan or let its air flow
     node = shown(comp("widget:flow-node", {"kind": "=props.kind", "x": 0, "y": 0, "power": f"=({active}) ? {power} : 0",
-                                            "frequency": "=props.frequency"}), f"={drawn}")
+                                            "frequency": "=props.frequency", "plugged": "=props.plugged"}), f"={drawn}")
     plain = svg("g", glyph_parts(f"=('{icon}').replace('material:', '')", color), visible=f"=!{drawn}")
     appliance = shown(comp("widget:appliance-icon", {"kind": "=props.kind", "running": f"={active}",
                                                      "progress": "=props.progress", "size": ICON_SIZE}),
@@ -8367,12 +8395,13 @@ def range_tile(prefix):
 
 def plug_refs(prefix, icon, color, title="Nous Steckdose", controllable=True, note=None, switch=None,
               electric_prefix=None, meter=None, kind=None, threshold=None, active=None, frequency=None,
-              progress=None, range_=None):
+              progress=None, range_=None, plugged=None):
     """The cards every metered plug gets, as widgets: now with switch, power today, energy per day, electrical.
     A device behind a shared meter takes its switch and its electrical values from the meter's items. meter: what
     measures, where the title names the device instead (the E-Auto's, a Shelly EM's derived values). kind,
     threshold, active, frequency, progress: the device's drawing and when it works (plug_icon(); active, frequency
-    and progress expressions, as the energy flow or the device's head has them); range_: kWh per 100 km of a car.
+    and progress expressions, as the energy flow or the device's head has them); range_: kWh per 100 km of a car;
+    plugged: whether a car's charging cable is plugged in (an expression), drawn on the e-car.
     Returns (now, power, energy per day, electrical)."""
     PLUG_PREFIXES.add(prefix)
     # the first card is titled after what measures and switches: a Nous A1T socket, a Shelly EM on a circuit
@@ -8382,7 +8411,7 @@ def plug_refs(prefix, icon, color, title="Nous Steckdose", controllable=True, no
     threshold = STANDBY_ABOVE.get(prefix, threshold)
     if threshold is not None:
         now["threshold"] = threshold
-    for key, expr in (("active", active), ("frequency", frequency), ("progress", progress)):
+    for key, expr in (("active", active), ("frequency", frequency), ("progress", progress), ("plugged", plugged)):
         if expr is not None:
             now[key] = f"={expr}"
     if not controllable:
@@ -8915,7 +8944,8 @@ def e_car_now():
     soc, state, plug = skoda("soc"), skoda("charging_state"), skoda("plug")
     # charging at home shows on the circuit at once, elsewhere only in what the car reports
     power = f"Math.max({num(ECAR)}, {SKODA_CHARGING} ? {num(skoda('charge_power'))} * 1000 : 0)"
-    icon = node_icon("e-car", ECAR_COLOR, flowing(power, ECAR_CHARGING), share=f"{num(soc)} / 100", power=power)
+    icon = node_icon("e-car", ECAR_COLOR, flowing(power, ECAR_CHARGING), share=f"{num(soc)} / 100", power=power,
+                     plugged=ecar_plugged(power))
     charge_type = skoda("charge_type")
     # while it charges with its type and power; plugged in and unlocked without charging the API names no state
     state_text = (f"({SKODA_CHARGING} ? 'Lädt' + (['AC', 'DC'].includes(items.{charge_type}.state) ? ' ' + "
@@ -9023,7 +9053,7 @@ def e_car_blocks():
                 card("Škoda Enyaq", e_car_now())),
             *plug_cards("e_car", "material:electric_car", ECAR_COLOR, title="E-Auto", meter="Shelly EM",
                         controllable=False, range_=20, kind="e-car", threshold=ECAR_ON,
-                        note=ECAR_CALC + " Der Schalter spiegelt nur das Relais des Shelly EM, das mit nichts "
+                        plugged=ecar_plugged(num(ECAR)), note=ECAR_CALC + " Der Schalter spiegelt nur das Relais des Shelly EM, das mit nichts "
                                          "verbunden ist."),
             one(card("Diagnose", [diagnose]))]
 
@@ -10073,6 +10103,8 @@ PLUG_PARAMS = [PREFIX, param("title", "Title", "Card title, the device's name wh
                      "usually an expression", "DECIMAL"),
                param("progress", "Progress", "An appliance's programme progress in %, filling its ring; usually an "
                      "expression", "DECIMAL"),
+               param("plugged", "Plugged in", "Whether a car's charging cable is plugged in, drawn on the e-car; "
+                     "usually an expression", "BOOLEAN"),
                param("range", "Range", "kWh per 100 km of a car: today's charge shown as the kilometres it drives",
                      "DECIMAL"),
                dict(param("history", "History item", "The String item the rule tile_history writes the tiles' "
@@ -10260,7 +10292,9 @@ FLOW_NODE_PARAMS = [
     dict(FLOW_POWER, required=False),
     param("soc", "State of charge", "The battery's state of charge in %; usually an expression", "DECIMAL"),
     param("frequency", "Compressor frequency", "The heat pump's compressor frequency in Hz, which turns its fan; "
-          "usually an expression", "DECIMAL")]
+          "usually an expression", "DECIMAL"),
+    param("plugged", "Plugged in", "Whether the E-Car's charging cable is plugged in, which draws the cable; usually "
+          "an expression", "BOOLEAN")]
 WEATHER_ICON_PARAMS = [
     param("symbol", "Symbol", "The weather drawn: " + ", ".join(k for k, _ in WX_SYMBOLS) + "; usually an "
           "expression", required=True),

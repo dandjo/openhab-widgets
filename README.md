@@ -162,7 +162,7 @@ Needs `flow-link`, `flow-node`.
 ![Energy flow in dark mode](screenshots/energy-flow-card-dark.gif)
 
 <details>
-<summary>46 props</summary>
+<summary>47 props</summary>
 
 | Prop | Item | Item type |
 |---|---|---|
@@ -187,6 +187,7 @@ Needs `flow-link`, `flow-node`.
 | `ventilationTimer` | Ventilation Timer | Number:Time |
 | `ventilationTimerSet` | Ventilation Timer Set | Number:Time |
 | `heatpumpInvFrequency` | ESPAltherma Inverter Frequency | Number:Frequency |
+| `ecarPlug` | Škoda Enyaq Charging Cable | Switch |
 | `heatpumpBuhStep1Mode` | ESPAltherma Backup Heater (BUH) Step 1 Mode | Switch |
 | `heatpumpBuhStep2Mode` | ESPAltherma Backup Heater (BUH) Step 2 Mode | Switch |
 | `heatpumpBshMode` | ESPAltherma Booster Heater (BSH) Mode | Switch |
@@ -1106,6 +1107,7 @@ carries it, a widget with an `svg` root cannot.
 | `power` | The power in W; usually an expression on an item | TEXT |  |
 | `soc` | The battery's state of charge in %; usually an expression | DECIMAL |  |
 | `frequency` | The heat pump's compressor frequency in Hz, which turns its fan; usually an expression | DECIMAL |  |
+| `plugged` | Whether the E-Car's charging cable is plugged in, which draws the cable; usually an expression | BOOLEAN |  |
 
 ### Line: `flow-link`
 
@@ -1317,6 +1319,7 @@ Now: the device's icon large in a ring, pulsing while it works (its energy-flow 
 | `active` | Whether the device works, instead of the threshold; usually an expression | BOOLEAN |  |
 | `frequency` | The heat pump's compressor frequency, turning its drawing's fan; usually an expression | DECIMAL |  |
 | `progress` | An appliance's programme progress in %, filling its ring; usually an expression | DECIMAL |  |
+| `plugged` | Whether a car's charging cable is plugged in, drawn on the e-car; usually an expression | BOOLEAN |  |
 | `range` | kWh per 100 km of a car: today's charge shown as the kilometres it drives | DECIMAL |  |
 | `history` | The String item the rule tile_history writes the tiles' history into (comparison with yesterday) | Item |  |
 

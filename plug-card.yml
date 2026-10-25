@@ -112,6 +112,11 @@ props:
     description: An appliance's programme progress in %, filling its ring; usually an expression
     type: DECIMAL
     required: false
+  - name: plugged
+    label: Plugged in
+    description: Whether a car's charging cable is plugged in, drawn on the e-car; usually an expression
+    type: BOOLEAN
+    required: false
   - name: range
     label: Range
     description: 'kWh per 100 km of a car: today''s charge shown as the kilometres it drives'
@@ -124,7 +129,7 @@ props:
     required: false
     context: item
   parameterGroups: []
-timestamp: Oct 25, 2026, 2:07:58 PM
+timestamp: Oct 25, 2026, 7:19:28 PM
 component: oh-card
 config:
   title: =props.title
@@ -410,6 +415,7 @@ slots:
                     === true || props.active === ''true'') : (Number(items[props.prefix + ''_power''].numericState) || 0)
                     > (Number(props.threshold) || 10))) ? (Number(items[props.prefix + ''_power''].numericState) || 0) : 0'
                   frequency: =props.frequency
+                  plugged: =props.plugged
                   visible: =(!!props.kind && !['washer', 'dryer', 'dish-washer'].includes(props.kind))
               - component: g
                 config:
