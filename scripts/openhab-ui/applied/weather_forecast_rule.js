@@ -54,6 +54,15 @@ const HOURS = 61;
 const DAYS = 5;
 const TRIES = 3;
 const Thread = Java.type('java.lang.Thread');
+const ZONE = Java.type('java.time.ZoneId').of('Europe/Vienna');
+const Instant = Java.type('java.time.Instant');
+
+// a day's true local midnight in epoch seconds, from Open-Meteo's stamp t of the day: Open-Meteo stamps every day
+// with its local midnight at the one UTC offset of the moment asked, so across a switch of the clocks a day comes an
+// hour off (asked on 24 October 2026 in summer time, 26 October came as 25 October 23:00 and was shown as a second
+// Heute); 12 hours on, t lies in its day for certain. The stamp stays Open-Meteo's for looking values up
+const midnight = (t) => Number(Instant.ofEpochSecond(t + 43200).atZone(ZONE).toLocalDate().atStartOfDay(ZONE)
+  .toEpochSecond());
 
 // an answer of Open-Meteo, or null: an error answer ({error: true, reason}) or one without its data is asked again,
 // after 5 and 10 seconds
@@ -190,7 +199,7 @@ function day(arome, best, t) {
   const v = (field) => value([model], 'daily', field, t);
   const sunshine = v('sunshine_duration');
   const daylight = v('daylight_duration');
-  return {t: t, sym: daySymbol(v('weather_code'), v('precipitation_sum'), sunshine, daylight, veilShare(model, t)),
+  return {t: midnight(t), sym: daySymbol(v('weather_code'), v('precipitation_sum'), sunshine, daylight, veilShare(model, t)),
           lo: round(v('temperature_2m_min'), 1), hi: round(v('temperature_2m_max'), 1),
           p: round(v('precipitation_sum'), 1), pp: value([best], 'daily', 'precipitation_probability_max', t),
           w: round(v('wind_speed_10m_max'), 0),
@@ -261,7 +270,7 @@ function quarterRow(t) {
 if (arome || best) {
   // the days from today's midnight, as the answer gives it
   const times = ((best && best.daily) || arome.daily).time.slice(0, DAYS);
-  const today = times[0];
+  const today = midnight(times[0]);
 
   const hour = Math.floor(Date.now() / 3600000) * 3600;
   const fresh = [];
@@ -288,14 +297,15 @@ if (arome || best) {
     items.weather_quarter_hours.postUpdate(JSON.stringify(quarters));
   }
 
-  const daily = merged(times.map((t) => day(arome, best, t)).filter((d) => d), last('weather_daily'), (d) => d.t,
-                       today, DAYS);
+  // the days kept from before by their true midnight too, so a day stamped an hour off before is replaced
+  const daily = merged(times.map((t) => day(arome, best, t)).filter((d) => d),
+                       last('weather_daily').map((d) => ({...d, t: midnight(d.t)})), (d) => d.t, today, DAYS);
   if (daily.length) {
     items.weather_daily.postUpdate(JSON.stringify(daily));
   }
   // the bar's three days by their date: today, tomorrow and the day after
   for (let i = 0; i < 3; i++) {
-    const d = daily.find((x) => x.t === times[i]);
+    const d = daily.find((x) => x.t === midnight(times[i]));
     if (d && d.lo != null && d.hi != null) {
       items['weather_day' + i + '_min'].postUpdate(d.lo + ' °C');
       items['weather_day' + i + '_max'].postUpdate(d.hi + ' °C');
