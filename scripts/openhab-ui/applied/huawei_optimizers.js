@@ -139,6 +139,15 @@ function wellFormed(b, from, to) {
 
 const sameBytes = (a, b) => a.length === b.length && a.every((x, i) => x === b[i]);
 
+// a window w (UTC seconds) in the inverter's local seconds (local(t): t and the offset at t): when the clocks go back
+// an hour, a window across the switch would start later than it ends in local time, which the inverter rejects (25
+// October 2026, 02:12 to 02:35: exception 3 on the start); it then starts its length before its local end, a little
+// more than asked for, which only reads readings again
+function localWindow(w, local) {
+  const to = local(w.to);
+  return { from: Math.min(local(w.from), to - (w.to - w.from)), to };
+}
+
 // file 0x45: a 14-byte head (version, sequence, length, a flag, 3 bytes, the number of optimizers), then per optimizer
 // 106 (V102) or 116 bytes (V103), big-endian: address, online, a byte, string, position, serial number (20 bytes), ...
 function parseSerials(b) {
@@ -478,12 +487,13 @@ function run() {
     // together and a second upload brings the same bytes, as a frame of another file would fit in among the readings'
     // values unnoticed
     const read = (w) => {
-      const custom = [0x10, 12, ...be32(local(w.from)), ...be32(local(w.to)), 0, 0, 0, 0];
+      const lw = localWindow(w, local);
+      const custom = [0x10, 12, ...be32(lw.from), ...be32(lw.to), 0, 0, 0, 0];
       const first = readFile(0x44, custom, false);
       if (first.trusted) {
         return parseReadings(first.data);
       }
-      if (!wellFormed(first.data, local(w.from), local(w.to))) {
+      if (!wellFormed(first.data, lw.from, lw.to)) {
         throw new Error('Datei 44: Prüfsumme falsch und Aufbau fehlerhaft');
       }
       const second = readFile(0x44, custom, false);
@@ -516,6 +526,17 @@ function run() {
       }
       if (dark) {
         state.quiet = quietAfter(quiet, live);
+        // the powers read 0 once no reading can come any more: the inverter does not always end the day with a
+        // reading of 0 W (24 October 2026: 18:05 with 33 W was the last), and the panels showed it until the morning;
+        // states only, the readings stay as the inverter wrote them
+        if (stored === null || now - stored > LATE) {
+          const powers = [...ADDRESSES.map((a) => itemOf(a, 'power')), ...Object.keys(PLANES).map((p) => `${P}${p}_power`)];
+          for (const name of powers) {
+            if (items.getItem(name).numericState !== 0) {
+              items.getItem(name).postUpdate('0 W');
+            }
+          }
+        }
       } else if (readings.length > 0) {
         const memory = store.get('memory') || { last: {} };
         const { points, states } = evaluate(readings, memory, baseOf, toUtc);
