@@ -8944,9 +8944,10 @@ def target_bar(pct, target, color, left, right):
 
 def e_car_now():
     """The car as it last reported itself (user, 2026-10-25): its drawing from the energy flow with the charge on its
-    ring, the charge large, beside it its charging state and where it stands as chips and when it reported (the API
-    does not wake the car, so the time says how current all of it is), while it charges when it will be full; the
-    charge as a bar marked at the charge target (Ladeziel), the range and the target at its ends; then the locks with what stands
+    ring, the charge and the range large, beside it its charging state and where it stands as chips and when it
+    reported (the API does not wake the car, so the time says how current all of it is); the charge as a bar marked at
+    the charge target (Ladeziel), while it charges when it will be done and always the target at its ends; then the
+    locks with what stands
     open, the place, the odometer, the climate, the charging cable and the plug's lock (user, 2026-10-25: cable and
     plug up here, under odometer and climate)."""
     soc, state, plug = skoda("soc"), skoda("charging_state"), skoda("plug")
@@ -8964,22 +8965,20 @@ def e_car_now():
     where = (f"(items.{skoda('parking_state')}.state === 'IN_MOTION' ? 'Fährt' : "
              f"items.{skoda('at_home')}.state === 'ON' ? 'Zu Hause' : "
              f"items.{skoda('at_home')}.state === 'OFF' ? 'Unterwegs' : '–')")
-    # when the charge target will be reached (user, 2026-10-25: not "voll", it charges to the target): the words small,
-    # the clock large, so on a phone the clock goes to a line of its own as a whole
-    reached_at = skoda("target_reached_at")
-    head = hero("material:electric_car", ECAR_COLOR, "Ladestand", f"={disp(soc)}",
+    # the charge and the range it gives as the main value (user, 2026-10-25: charge / range)
+    head = hero("material:electric_car", ECAR_COLOR, "Ladestand",
+                f"={disp(soc)} + ' / ' + {disp(skoda('range'))}",
                 [chips(chip(f"={state_text}", f"={plugged} ? '{ECAR_COLOR}' : '#9e9e9e'"),
                        chip(f"={where}", "#78909c")),
-                 label(f"='Stand ' + {when_short(skoda('updated'))}", **{"font-size": "14px"}),
-                 div([label("Ladeziel erreicht ca.", **{"font-size": "14px"}),
-                      label(f"={clock_of(reached_at)}", **{"font-size": "22px", "font-weight": "700"})],
-                     f"={SKODA_CHARGING} && {ok(reached_at)}",
-                     **{"display": "flex", "flex-wrap": "wrap", "align-items": "baseline", "column-gap": "6px"})],
+                 label(f"='Stand ' + {when_short(skoda('updated'))}", **{"font-size": "14px"})],
                 picture=icon)
-    # the mark at the charge target, the value set in the car that it charges to (user, 2026-10-25); with battery care
-    # on and another battery care target, what Škoda sets it back to after the next charge beside it
-    target = skoda("charge_target")
-    charge = target_bar(vt_clamp(num(soc)), target, ECAR_COLOR, f"={disp(skoda('range'))} + ' Reichweite'",
+    # the mark at the charge target, the value set in the car that it charges to (user, 2026-10-25); under the bar on
+    # the left, while it charges, when it reaches the target ("fertig ca.", user: shorter than "Ladeziel erreicht"), on
+    # the right the target and, with battery care on and another battery care target, what Škoda sets it back to after
+    # the next charge
+    target, reached_at = skoda("charge_target"), skoda("target_reached_at")
+    charge = target_bar(vt_clamp(num(soc)), target, ECAR_COLOR,
+                        f"={SKODA_CHARGING} && {ok(reached_at)} ? 'fertig ca. ' + {clock_of(reached_at)} : ''",
                         f"='Ladeziel ' + {disp(target)} + ({E_CAR_CARE_LATER} ? ' · danach ' + "
                         f"{disp(skoda('battery_care_target'))} : '')")
     # the locks, and below them what stands open; the lights only while on
