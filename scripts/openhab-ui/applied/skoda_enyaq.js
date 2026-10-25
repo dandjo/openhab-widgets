@@ -1,6 +1,6 @@
 // The Škoda Enyaq through the official MyŠkoda Public API (https://public.api.connect.skoda-auto.cz/docs): what the car
 // last reported to Škoda's backend, each part with the time the car captured it, and its commands for charging (the
-// charge limit, starting or stopping a charge) and for the air conditioning (on or off, the target temperature it
+// charge target, starting or stopping a charge) and for the air conditioning (on or off, the target temperature it
 // starts with). A read does not wake the car, so a sleeping car's values stay as they were until
 // it reports again by itself; a command goes to the car. The API key (created in the MyŠkoda app; it expires) and the
 // VIN come from a JSON file, {"apiKey": "...", "vin": "..."}, so that neither stands in this script and a new key
@@ -182,14 +182,11 @@ function applyCharging(charging) {
     }
   }
   postTime('full_at', full);
-  // the charge limit is the value set in the car, the one it charges to; the charge target is what Škoda sets the
-  // limit back to after the next charge while battery care is on (its care target, 80 %), and without battery care the
-  // limit itself, as nothing is set back (user, 2026-10-25)
-  const care = onOff(settings.chargingCareMode, 'ACTIVATED', 'DEACTIVATED');
-  post('battery_care', care);
-  postQuantity('charge_limit', settings.targetStateOfChargeInPercent, '%');
-  postQuantity('charge_target', care === 'ON' && typeof settings.batteryCareModeTargetValueInPercent === 'number'
-    ? settings.batteryCareModeTargetValueInPercent : settings.targetStateOfChargeInPercent, '%');
+  // the charge target (Ladeziel) is the value set in the car, the one it charges to; with battery care on, Škoda sets
+  // it back to the battery care target (80 %) after the next charge (user, 2026-10-25)
+  post('battery_care', onOff(settings.chargingCareMode, 'ACTIVATED', 'DEACTIVATED'));
+  postQuantity('charge_target', settings.targetStateOfChargeInPercent, '%');
+  postQuantity('battery_care_target', settings.batteryCareModeTargetValueInPercent, '%');
 }
 
 function applyStatus(vehicleStatus) {
@@ -400,7 +397,7 @@ function receivedCommand() {
   };
   const item = read('itemName', 'getItemName');
   const command = read('receivedCommand', 'itemCommand', 'getItemCommand');
-  return item && command && [P + 'charge_limit', P + 'charging', P + 'climate', P + 'climate_target'].includes(item)
+  return item && command && [P + 'charge_target', P + 'charging', P + 'climate', P + 'climate_target'].includes(item)
     ? { item, command } : null;
 }
 
@@ -467,22 +464,16 @@ function sendToCar(method, path, body, what, accepted) {
 function setLimit(command) {
   const percent = parseFloat(command);
   if (Number.isNaN(percent) || percent < LIMIT_MIN || percent > LIMIT_MAX || percent % LIMIT_STEP !== 0) {
-    result(`Ladelimit ${command}: geht nicht, nur ${LIMIT_MIN} bis ${LIMIT_MAX} % in Zehnerschritten`);
+    result(`Ladeziel ${command}: geht nicht, nur ${LIMIT_MIN} bis ${LIMIT_MAX} % in Zehnerschritten`);
     return;
   }
-  const current = items.getItem(P + 'charge_limit').numericState;
+  const current = items.getItem(P + 'charge_target').numericState;
   if (current === percent) {
-    result(`Ladelimit ist schon ${percent} %`);
+    result(`Ladeziel ist schon ${percent} %`);
     return;
   }
-  sendToCar('PUT', '/charging/limit', { targetStateOfChargeInPercent: percent }, `Ladelimit ${percent} % gesetzt`,
-    () => {
-      post('charge_limit', `${percent} %`);
-      // without battery care nothing sets the limit back, so it is the target too
-      if (state('battery_care') !== 'ON') {
-        post('charge_target', `${percent} %`);
-      }
-    });
+  sendToCar('PUT', '/charging/limit', { targetStateOfChargeInPercent: percent }, `Ladeziel ${percent} % gesetzt`,
+    () => post('charge_target', `${percent} %`));
 }
 
 function setCharging(command) {
@@ -573,7 +564,7 @@ function run() {
   const received = receivedCommand();
   if (received === null) {
     poll(typeof refresh !== 'undefined');
-  } else if (received.item === P + 'charge_limit') {
+  } else if (received.item === P + 'charge_target') {
     setLimit(received.command);
   } else if (received.item === P + 'charging') {
     setCharging(received.command);

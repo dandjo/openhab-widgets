@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
-"""One-off correction of the Enyaq's charge history in InfluxDB (user, 2026-10-25), after the meaning of the two charge
-items was settled: skoda_enyaq_charge_limit is the value set in the car that it charges to, skoda_enyaq_charge_target
-the care target Škoda sets it back to after a charge with battery care on (80 %).
-- skoda_enyaq_battery_care_target, an item for the care target that turned out to be the charge target, is dropped.
-- skoda_enyaq_charge_limit: its points of 80 % before the correction came from a wrong cap by the care target; the car
-  had 100 % set, so they become 100 %.
-- skoda_enyaq_charge_target: its points before its first point as the care target (the first 80 %) held the set value
-  (100 %, a commanded 90 %); battery care was on all day, so they become 80 %.
-Points are rewritten in place: same measurement, tag and timestamp, new value.
+"""One-off correction of the Enyaq's charge history in InfluxDB (user, 2026-10-25), once the charge items were settled:
+skoda_enyaq_charge_target (Ladeziel) is targetStateOfChargeInPercent, the value set in the car that it charges to;
+skoda_enyaq_battery_care_target is batteryCareModeTargetValueInPercent; skoda_enyaq_charge_limit is gone.
+- The charge target's points from before (written while it held the battery care target) are deleted, and the charge
+  limit's points, which held the set value all along (corrected before: its first 80 % became 100 %), are written as
+  the charge target's at their own times.
+- The charge limit's measurement is dropped.
+Run after skoda_enyaq.py apply, which writes the charge target's first point in its new meaning; everything older than
+that point is replaced.
 Usage: skoda_enyaq_history.py check|apply   (on homepi, as pi)"""
 import json
 import sys
@@ -16,10 +16,8 @@ import urllib.request
 
 INFLUX = "http://127.0.0.1:8086"
 DB = "openhab"
-DROPPED = "skoda_enyaq_battery_care_target"
-LIMIT = "skoda_enyaq_charge_limit"
 TARGET = "skoda_enyaq_charge_target"
-CARE_TARGET = 80
+LIMIT = "skoda_enyaq_charge_limit"
 
 
 def query(q, method="GET"):
@@ -33,7 +31,7 @@ def query(q, method="GET"):
 
 
 def points(measurement):
-    series = query(f'SELECT "item", "value" FROM "{measurement}"').get("series", [])
+    series = query(f'SELECT "value" FROM "{measurement}"').get("series", [])
     return [tuple(v) for v in series[0]["values"]] if series else []
 
 
@@ -45,21 +43,18 @@ def write(lines):
 
 
 apply = sys.argv[1] == "apply"
-limit, target = points(LIMIT), points(TARGET)
-first_care = next((t for t, _, v in target if v == CARE_TARGET), None)
-assert first_care is not None, "the charge target has no care target point yet: apply skoda_enyaq.py first"
-limit_fix = [(t, item, 100) for t, item, v in limit if v == CARE_TARGET and t < first_care]
-target_fix = [(t, item, CARE_TARGET) for t, item, v in target if t < first_care and v != CARE_TARGET]
-dropped = points(DROPPED)
-print(f"{DROPPED}: {len(dropped)} points to drop")
-print(f"{LIMIT}: {len(limit_fix)} points 80 -> 100 before the first care target point")
-print(f"{TARGET}: {len(target_fix)} points -> {CARE_TARGET} before the first care target point")
+target, limit = points(TARGET), points(LIMIT)
+assert limit, f"{LIMIT} has no points (already done?)"
+newest_time, newest_value = target[-1]
+# the charge target's newest point must be its first in the new meaning: newer than the limit's history, same value
+assert newest_time > limit[-1][0] and newest_value == limit[-1][1], \
+    "apply skoda_enyaq.py first, so the charge target has a point in its new meaning"
+old = [t for t, _ in target if t < newest_time]
+print(f"{TARGET}: {len(old)} older points to replace by the {len(limit)} points of {LIMIT}")
+for t, v in limit:
+    print("  ", t, v)
 if apply:
-    if dropped:
-        query(f'DROP MEASUREMENT "{DROPPED}"', method="POST")
-        print(f"{DROPPED} dropped")
-    lines = [f'{LIMIT},item={item} value={value} {t}' for t, item, value in limit_fix] + \
-            [f'{TARGET},item={item} value={value} {t}' for t, item, value in target_fix]
-    if lines:
-        write(lines)
-        print(f"{len(lines)} points rewritten")
+    query(f'DELETE FROM "{TARGET}" WHERE time < {newest_time}', method="POST")
+    write([f"{TARGET},item={TARGET} value={v} {t}" for t, v in limit])
+    query(f'DROP MEASUREMENT "{LIMIT}"', method="POST")
+    print(f"{TARGET}: replaced; {LIMIT} dropped")

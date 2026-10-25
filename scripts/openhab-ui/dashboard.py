@@ -8967,12 +8967,12 @@ def e_car_now():
                  label(f"='Stand ' + {when_short(skoda('updated'))}", **{"font-size": "14px"}),
                  label(f"={full}", f"={SKODA_CHARGING} && {ok(full_at)}",
                        **{"font-size": "22px", "font-weight": "700"})], picture=icon)
-    # the mark at the charge target, what the car is to stay at (user, 2026-10-25: the setpoint is the target); where
-    # the limit set for the next charge differs, that limit beside it
+    # the mark at the charge target, the value set in the car that it charges to (user, 2026-10-25); with battery care
+    # on and another battery care target, what Škoda sets it back to after the next charge beside it
     target = skoda("charge_target")
     charge = target_bar(vt_clamp(num(soc)), target, ECAR_COLOR, f"={disp(skoda('range'))} + ' Reichweite'",
-                        f"='Ladeziel ' + {disp(target)} + ({E_CAR_CARE_LATER} ? ' · Ladelimit ' + "
-                        f"{disp(skoda('charge_limit'))} : '')")
+                        f"='Ladeziel ' + {disp(target)} + ({E_CAR_CARE_LATER} ? ' · danach Akkuschonung ' + "
+                        f"{disp(skoda('battery_care_target'))} : '')")
     # the locks, and below them what stands open; the lights only while on
     locked = skoda("locked")
     lock_text = (f"(items.{locked}.state === 'ON' ? 'Verriegelt' : items.{locked}.state === 'OFF' ? 'Entriegelt' : "
@@ -9007,10 +9007,10 @@ def e_car_now():
     return [head, charge, tiles]
 
 
-# a charge limit other than the charge target: battery care is on and the limit was raised for the next charge, after
-# which Škoda sets it back to the target (user, 2026-10-25), so the pages say what comes after
-E_CAR_CARE_LATER = (f"(items.skoda_enyaq_battery_care.state === 'ON' && {ok('skoda_enyaq_charge_target')} && "
-                    f"{num('skoda_enyaq_charge_target')} !== {num('skoda_enyaq_charge_limit')})")
+# battery care on with a battery care target other than the charge target: after the next charge Škoda sets the charge
+# target back to it (user, 2026-10-25), so the pages say what comes after
+E_CAR_CARE_LATER = (f"(items.skoda_enyaq_battery_care.state === 'ON' && {ok('skoda_enyaq_battery_care_target')} && "
+                    f"{num('skoda_enyaq_battery_care_target')} !== {num('skoda_enyaq_charge_target')})")
 
 
 def climate_degrees(item):
@@ -9023,24 +9023,23 @@ def e_car_controls():
     """The commands the API takes for the car (user, 2026-10-25), the actions on top, side by side where they fit:
     Laden as a boost pill, Starten and Stoppen, while a cable is plugged in or it charges, a hint without, and
     Klimatisierung, on with the target temperature below or off. Under them the settings as pill sliders: the charge
-    limit set in the car (Ladelimit), the value it charges to, 50 to 100 % in steps of 10, whose context says the charge
-    target (Ladeziel) Škoda sets it back to after the next charge while battery care is on (the API cannot switch
-    battery care, the MyŠkoda app can), and the target
+    target set in the car (Ladeziel), the value it charges to, 50 to 100 % in steps of 10, whose context says the battery
+    care target Škoda sets it back to after the next charge while battery care is on (the API can switch neither battery
+    care nor its target, the MyŠkoda app can), and the target
     temperature, LO, 16 to 29.5 °C in steps of 0.5 and HI, sent with the start
     or, while the air conditioning runs, at once. Last how the last command went. The rule skoda_enyaq_status sends
     the commands; their items change once Škoda accepted them."""
-    plug, charging, limit = skoda("plug"), skoda("charging"), skoda("charge_limit")
+    plug, charging, target = skoda("plug"), skoda("charging"), skoda("charge_target")
     plugged = f"(items.{plug}.state === 'ON' || items.{charging}.state === 'ON' || {SKODA_CHARGING})"
     pill = boost_pill(charging, "material:ev_station", ECAR_COLOR, "Laden",
-                      f"{disp(skoda('soc'))} + ' → ' + {disp(skoda('charge_limit'))}")
+                      f"{disp(skoda('soc'))} + ' → ' + {disp(target)}")
     pill["config"]["visible"] = f"={plugged}"
     hint = label("Zum Laden das Ladekabel einstecken", f"=!{plugged}",
                  **{"font-size": "13px", "opacity": "0.7", "padding": "10px 2px"})
-    # the slider sets the limit, the only one the API takes; its line says what battery care sets it back to after the
-    # next charge, where that differs
-    context = (f"{E_CAR_CARE_LATER} ? 'danach Ladeziel ' + {disp(skoda('charge_target'))} : "
+    # its line says what battery care sets it back to after the next charge, where that differs
+    context = (f"{E_CAR_CARE_LATER} ? 'Akkuschonung → ' + {disp(skoda('battery_care_target'))} : "
                f"'bis hierhin lädt das Auto'")
-    slider = pill_slider(limit, ECAR_COLOR, 50, 100, 10, "Ladelimit", f"Math.round({num(limit)}) + ' %'", context,
+    slider = pill_slider(target, ECAR_COLOR, 50, 100, 10, "Ladeziel", f"Math.round({num(target)}) + ' %'", context,
                          [(50, "50 %"), (60, "60"), (70, "70"), (80, "80"), (90, "90"), (100, "100 %")], "%",
                          icon="material:battery_charging_full", row=True)
     climate, climate_target = skoda("climate"), skoda("climate_target")
@@ -9068,13 +9067,13 @@ E_CAR_CHART_H = 250
 
 
 def e_car_charge_chart():
-    """The charge with the charge limit set in the car (dashed, Ladelimit) on the left axis, the charge power the car reports on the
+    """The charge with the charge target set in the car (dashed, Ladeziel) on the left axis, the charge power the car reports on the
     right, over the week (a car's charges and drives span days), as the battery's power and charge in one grid."""
     # short names over the plot, where the period buttons leave a phone little room; the tooltip's are the series'
-    return stacked_chart([((("Ladestand", ECAR_COLOR), ("Limit", ECAR_COLOR), ("Leistung", ELECTRIC_C)),
+    return stacked_chart([((("Ladestand", ECAR_COLOR), ("Ziel", ECAR_COLOR), ("Leistung", ELECTRIC_C)),
                            [area("Ladeleistung", skoda("charge_power"), ELECTRIC_C, y=1),
                             line("Ladestand", skoda("soc"), ECAR_COLOR),
-                            line("Ladelimit", skoda("charge_limit"), ECAR_COLOR, dashed=True)],
+                            line("Ladeziel", skoda("charge_target"), ECAR_COLOR, dashed=True)],
                            [value_axis("%", min=0, max=100), value_axis("kW", min=0)])], E_CAR_CHART_H, period="W")
 
 
