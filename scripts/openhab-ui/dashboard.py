@@ -9104,8 +9104,11 @@ def e_car_blocks():
                            # the requests left of the hour's quota (Škoda: 20 an hour, "not final"; user, 2026-10-25:
                            # "API-Kontingent", as the tile's old title said little)
                            vt_tile([vt_head("API-Kontingent"),
-                                    vt_value(f"={ok(left)} ? Math.round({num(left)}) + ' von {SKODA_REQUESTS_PER_HOUR} "
-                                             f"frei' : '–'"),
+                                    # once the hour has run out the quota is full again, though the item keeps the
+                                    # last answer's count until the next request opens a new hour (user, 2026-10-25)
+                                    vt_value(f"=((over) => {ok(left)} ? (over ? {SKODA_REQUESTS_PER_HOUR} : "
+                                             f"Math.round({num(left)})) + ' von {SKODA_REQUESTS_PER_HOUR} frei' : '–')"
+                                             f"({ok(reset)} && !dayjs(items.{reset}.state).isAfter(dayjs()))"),
                                     # and when it is full again, while that lies ahead (user, 2026-10-25)
                                     label(f"='pro Stunde' + ((m) => m > 0 ? ' · Reset in ' + m + ' min' : '')"
                                           f"({ok(reset)} ? Math.ceil(dayjs(items.{reset}.state).diff(dayjs(), "
