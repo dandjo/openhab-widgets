@@ -136,24 +136,24 @@ line, and the house's ring as a pie of that power, the rest no known consumer dr
 around its drawing, the ring carrying what the node shows beyond it; a working ring and its arc swell inwards and
 outwards at their brightest, about half again as wide as at rest. Dots run along the lines in the direction of the flow
 at four speeds and slide under the node rims; while power flows through a node, its ring pulses in its colour. The icons
-move with the power (sun rays, air streams, pylon dashes, a pulsing bolt over the middle of the charging car, sparkles
-twinkling while the appliances run, the battery filled to its state of charge, the ventilation unit's fan turning and
-its air arrows flowing, fresh air in and used air out), the heat pump, outdoor and indoor unit, its fan with its
-compressor: while only its electric heaters run it stands and the energy only flows. Badges just outside the rings tell
-what the heat pump does (space heating, hot water, defrost, a red bolt while only its electric heaters run), the air
-conditioner's mode (heating, cooling, drying, fan, automatic) and the ventilation's level; a badge is filled in its
-colour while its device works and grey otherwise. A running timer covers its device's ring with an arc, full at what it
-was last set to, the battery's ring is filled with its state of charge, and the heat pump's, while it charges the tank,
-towards the charge's expected end; beside such an arc the rest of the ring pulses softly and, while the node works, the
-arc pulses in step with it, brightest and widest with it. A tap on a node opens its device's page of my installation, on
-the house and the appliances a popup of their own. Under the star three tiles: the house as its node inside the pie of
-what the consumers draw, as large as the rings beside it, with its power and today's energy against yesterday's at this
-time in a pill (the difference in kWh), and today's self-consumption (the PV generation less the export, of the
-generation) and self-sufficiency (the consumption not taken from the grid) as rings, each with yesterday's whole day in
-a pill, green while today's share is higher, orange while lower. PV's energy is the strings' generation: a hybrid
-inverter's own day yield counts the battery's discharge and leaves out what charges the battery. The card places its
-lines and nodes as `flow-link` and `flow-node`. The recording and the dark screenshot show it with demo powers; today's
-energies and the comparisons are those of the moment shown.
+move with the power (sun rays, dots down the air streams and along the pylon's wires, a pulsing bolt over the middle of
+the charging car, sparkles twinkling while the appliances run, the battery filled to its state of charge, the
+ventilation unit's fan turning and its air arrows flowing, fresh air in and used air out), the heat pump, outdoor and
+indoor unit, its fan with its compressor: while only its electric heaters run it stands and the energy only flows.
+Badges just outside the rings tell what the heat pump does (space heating, hot water, defrost, a red bolt while only its
+electric heaters run), the air conditioner's mode (heating, cooling, drying, fan, automatic) and the ventilation's
+level; a badge is filled in its colour while its device works and grey otherwise. A running timer covers its device's
+ring with an arc, full at what it was last set to, the battery's ring is filled with its state of charge, and the heat
+pump's, while it charges the tank, towards the charge's expected end; beside such an arc the rest of the ring pulses
+softly and, while the node works, the arc pulses in step with it, brightest and widest with it. A tap on a node opens
+its device's page of my installation, on the house and the appliances a popup of their own. Under the star three tiles:
+the house as its node inside the pie of what the consumers draw, as large as the rings beside it, with its power and
+today's energy against yesterday's at this time in a pill (the difference in kWh), and today's self-consumption (the PV
+generation less the export, of the generation) and self-sufficiency (the consumption not taken from the grid) as rings,
+each with yesterday's whole day in a pill, green while today's share is higher, orange while lower. PV's energy is the
+strings' generation: a hybrid inverter's own day yield counts the battery's discharge and leaves out what charges the
+battery. The card places its lines and nodes as `flow-link` and `flow-node`. The recording and the dark screenshot show
+it with demo powers; today's energies and the comparisons are those of the moment shown.
 
 Needs `flow-link`, `flow-node`.
 
@@ -1080,17 +1080,19 @@ The recordings show the widgets with fixed demo values.
 ### Node: `flow-node`
 
 A device in a ring, its animation driven by `power`: `pv` (a straight module of six cells with the sun in front of its
-corner, both brighter with the power, rays turning faster), `grid` (a pylon, red on import and green on export, dashes
+corner, both brighter with the power, rays turning faster), `grid` (a pylon, red on import and green on export, dots
 running along its wires), `home` (a house whose windows glow and pulse with the consumption), `heat-pump` (an outdoor
 unit whose fan turns while `frequency`, the compressor's, is above 0 Hz, faster from 30 and 55 Hz), `heat-pump-split`
 (the whole split heat pump: that outdoor unit with the indoor unit standing in front of its right side),
-`air-conditioner` (an indoor unit whose air streams flow), `e-car` (a car with a bolt fading in and out while it
-charges), `battery` (filled to `soc`, red, orange or green), `appliances` (an appliance's housing with sparkles for a
-front, the big one breathing and the small ones twinkling while they run) and `ventilation` (a ventilation unit whose
-fan turns above 5 W, faster with the power, and whose two arrows, fresh air in and used air out, flow while it runs). A
-node is its drawing on a disc tinted in its colour over an opaque one in the card colour, so dots running under it
-disappear; the card that places it draws the grey ring around it, as the energy flow does (`track()` in the generator),
-and its badges.
+`air-conditioner` (an indoor unit with dots flowing down its air streams), `e-car` (a car with a bolt fading in and out
+while it charges), `battery` (filled to `soc`, red, orange or green), `appliances` (an appliance's housing with sparkles
+for a front, the big one breathing and the small ones twinkling while they run) and `ventilation` (a ventilation unit
+whose fan turns above 5 W, faster with the power, and whose two arrows, fresh air in and used air out, flow while it
+runs). A node is its drawing on a disc tinted in its colour over an opaque one in the card colour, so dots running under
+it disappear; the card that places it draws the grey ring around it, as the energy flow does (`track()` in the
+generator), and its badges. Its animations are CSS (opacity and transform only, which the browser runs beside its main
+thread) and need the generator's animation stylesheet on a page or widget around it: every generated page and card
+carries it, a widget with an `svg` root cannot.
 
 ![Flow nodes](screenshots/flow-node.gif)
 

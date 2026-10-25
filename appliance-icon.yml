@@ -39,7 +39,7 @@ props:
     required: false
     default: '72'
   parameterGroups: []
-timestamp: Oct 24, 2026, 9:36:11 PM
+timestamp: Oct 25, 2026, 2:07:58 PM
 component: svg
 config:
   viewBox: 0 0 64 64
@@ -67,16 +67,7 @@ slots:
       stroke-linecap: round
       fill: none
       visible: =!!props.running
-    slots:
-      default:
-      - component: animate
-        config:
-          attributeName: opacity
-          dur: 2s
-          repeatCount: indefinite
-          values: '=(props.progress !== undefined && props.progress !== null && props.progress !== '''') ? ''0.3;0.06;0.3''
-            : ''0.3;1;0.3'''
-          visible: =!!props.running
+      class: '=(props.progress !== undefined && props.progress !== null && props.progress !== '''') ? ''a-soft'' : ''a-full'''
   - component: circle
     config:
       cx: 32
@@ -87,15 +78,7 @@ slots:
       fill: none
       stroke-width: 4
       visible: =!!props.running && !(props.progress !== undefined && props.progress !== null && props.progress !== '')
-    slots:
-      default:
-      - component: animate
-        config:
-          attributeName: opacity
-          values: 0;1;0
-          dur: 2s
-          repeatCount: indefinite
-          visible: =!!props.running && !(props.progress !== undefined && props.progress !== null && props.progress !== '')
+      class: a-halo
   - component: circle
     config:
       cx: 32
@@ -109,15 +92,7 @@ slots:
       fill: none
       stroke-dasharray: =Number(props.progress).toFixed(1) + ' 100'
       visible: =!!props.running && (props.progress !== undefined && props.progress !== null && props.progress !== '')
-    slots:
-      default:
-      - component: animate
-        config:
-          attributeName: opacity
-          values: 1;0.55;1
-          dur: 2s
-          repeatCount: indefinite
-          visible: =!!props.running && (props.progress !== undefined && props.progress !== null && props.progress !== '')
+      class: a-arc
   - component: circle
     config:
       cx: 32
@@ -131,15 +106,7 @@ slots:
       fill: none
       stroke-width: 4
       visible: =!!props.running && (props.progress !== undefined && props.progress !== null && props.progress !== '')
-    slots:
-      default:
-      - component: animate
-        config:
-          attributeName: opacity
-          values: 1;0;1
-          dur: 2s
-          repeatCount: indefinite
-          visible: =!!props.running && (props.progress !== undefined && props.progress !== null && props.progress !== '')
+      class: a-halo-arc
   - component: rect
     config:
       x: 20
@@ -191,9 +158,19 @@ slots:
           stroke-linecap: round
           fill: none
       - component: g
-        config: {}
+        config:
+          class: '=(!!props.running) ? ''a-spin'' : '''''
+          style:
+            animation-duration: 1.1s
         slots:
           default:
+          - component: circle
+            config:
+              cx: 32
+              cy: 35
+              r: 6.5
+              fill: none
+              stroke: none
           - component: path
             config:
               d: M26.5,35 a5.5,5.5 0 0 1 11,0
@@ -211,15 +188,6 @@ slots:
               cy: 38.5
               r: 1.2
               fill: '#42a5f5'
-          - component: animateTransform
-            config:
-              attributeName: transform
-              type: rotate
-              from: 0 32 35
-              to: 360 32 35
-              dur: 1.1s
-              repeatCount: indefinite
-              visible: =!!props.running
   - component: g
     config:
       visible: =props.kind === 'dryer'
@@ -245,9 +213,19 @@ slots:
           stroke-linecap: round
           fill: '#ffb74d'
       - component: g
-        config: {}
+        config:
+          class: '=(!!props.running) ? ''a-spin'' : '''''
+          style:
+            animation-duration: 1.8s
         slots:
           default:
+          - component: circle
+            config:
+              cx: 32
+              cy: 35
+              r: 6.5
+              fill: none
+              stroke: none
           - component: line
             config:
               x1: 32
@@ -281,15 +259,6 @@ slots:
               stroke-width: 1.6
               stroke-linecap: round
               fill: none
-          - component: animateTransform
-            config:
-              attributeName: transform
-              type: rotate
-              from: 0 32 35
-              to: 360 32 35
-              dur: 1.8s
-              repeatCount: indefinite
-              visible: =!!props.running
       - component: line
         config:
           x1: 27
@@ -329,9 +298,19 @@ slots:
           stroke-linecap: round
           fill: '#4fc3f7'
       - component: g
-        config: {}
+        config:
+          class: '=(!!props.running) ? ''a-spin'' : '''''
+          style:
+            animation-duration: 1.4s
         slots:
           default:
+          - component: circle
+            config:
+              cx: 32
+              cy: 38
+              r: 7.5
+              fill: none
+              stroke: none
           - component: line
             config:
               x1: 24.5
@@ -348,60 +327,33 @@ slots:
               cy: 38
               r: 1.4
               fill: '#4fc3f7'
-          - component: animateTransform
-            config:
-              attributeName: transform
-              type: rotate
-              from: 0 32 38
-              to: 360 32 38
-              dur: 1.4s
-              repeatCount: indefinite
-              visible: =!!props.running
       - component: circle
         config:
           cx: 27
-          cy: 35
+          cy: 37
           r: 0.9
           fill: '#4fc3f7'
           visible: =!!props.running
-        slots:
-          default:
-          - component: animate
-            config:
-              attributeName: cy
-              values: 37;29;37
-              dur: 1.0s
-              repeatCount: indefinite
-              visible: =!!props.running
+          class: '=(!!props.running) ? ''a-rise'' : '''''
+          style:
+            animation-duration: 1.0s
       - component: circle
         config:
           cx: 32
-          cy: 35
+          cy: 37
           r: 0.9
           fill: '#4fc3f7'
           visible: =!!props.running
-        slots:
-          default:
-          - component: animate
-            config:
-              attributeName: cy
-              values: 37;29;37
-              dur: 1.3s
-              repeatCount: indefinite
-              visible: =!!props.running
+          class: '=(!!props.running) ? ''a-rise'' : '''''
+          style:
+            animation-duration: 1.3s
       - component: circle
         config:
           cx: 37
-          cy: 35
+          cy: 37
           r: 0.9
           fill: '#4fc3f7'
           visible: =!!props.running
-        slots:
-          default:
-          - component: animate
-            config:
-              attributeName: cy
-              values: 37;29;37
-              dur: 1.6s
-              repeatCount: indefinite
-              visible: =!!props.running
+          class: '=(!!props.running) ? ''a-rise'' : '''''
+          style:
+            animation-duration: 1.6s

@@ -364,7 +364,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 25, 2026, 9:20:45 AM
+timestamp: Oct 25, 2026, 2:07:58 PM
 component: oh-card
 config:
   title: Heat Pump
@@ -376,6 +376,210 @@ config:
     flex: 1 1 auto
     display: flex
     flex-direction: column
+  stylesheet: '@keyframes a-soft { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.06; } }
+
+    @keyframes a-full { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+
+    @keyframes a-arc { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
+
+    @keyframes a-halo { 0%, 100% { opacity: 0; } 50% { opacity: 1; } }
+
+    @keyframes a-halo-arc { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+    @keyframes a-fade { 0%, 100% { opacity: 0; } 50% { opacity: 1; } }
+
+    @keyframes a-glow { 0%, 100% { opacity: 0.35; } 50% { opacity: 1; } }
+
+    @keyframes a-blink-up { 0%, 100% { opacity: 0.2; } 50% { opacity: 1; } }
+
+    @keyframes a-blink-down { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
+
+    @keyframes a-flicker-a { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
+
+    @keyframes a-flicker-b { 0%, 100% { opacity: 0.25; } 50% { opacity: 1; } }
+
+    @keyframes a-flicker-c { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+    @keyframes a-bolt { 0%, 66.7%, 100% { opacity: 1; } 33.3% { opacity: 0.35; } }
+
+    @keyframes a-breathe { 0%, 100% { transform: scale(0.82); } 50% { transform: scale(1.05); } }
+
+    @keyframes a-spin { to { transform: rotate(360deg); } }
+
+    @keyframes a-wobble { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(3px); } }
+
+    @keyframes a-rise { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+
+    @keyframes a-fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+    @keyframes a-ripple { from { transform: scale(1); opacity: 0.7; } to { transform: scale(var(--grow)); opacity: 0; } }
+
+    @keyframes a-run { from { transform: translate(var(--ax), var(--ay)); } to { transform: translate(var(--bx), var(--by));
+    } }
+
+    @keyframes a-drop { 0% { transform: translate(0, 0); opacity: 0; } 25% { opacity: 1; } 75% { opacity: 1; } 100% { transform:
+    translate(-2px, 6px); opacity: 0; } }
+
+    @keyframes a-bubble-l { 0% { transform: translate(0.00px, 0.00px) scale(1.00); opacity: 0; } 15% { opacity: 0.9; } 25%
+    { transform: translate(0.42px, -5.84px) scale(1.33); } 50% { transform: translate(0.00px, -11.50px) scale(1.67); } 70%
+    { opacity: 0.9; } 75% { transform: translate(-0.42px, -17.16px) scale(2.00); } 100% { transform: translate(0.00px, -23.00px)
+    scale(2.33); opacity: 0; } }
+
+    @keyframes a-bubble-r { 0% { transform: translate(0.00px, 0.00px) scale(1.00); opacity: 0; } 15% { opacity: 0.9; } 25%
+    { transform: translate(-0.42px, -5.84px) scale(1.33); } 50% { transform: translate(0.00px, -11.50px) scale(1.67); } 70%
+    { opacity: 0.9; } 75% { transform: translate(0.42px, -17.16px) scale(2.00); } 100% { transform: translate(0.00px, -23.00px)
+    scale(2.33); opacity: 0; } }
+
+    .a-soft { animation: a-soft 2s linear infinite; }
+
+    .a-full { animation: a-full 2s linear infinite; }
+
+    .a-arc { animation: a-arc 2s linear infinite; }
+
+    .a-halo { animation: a-halo 2s linear infinite; }
+
+    .a-halo-arc { animation: a-halo-arc 2s linear infinite; }
+
+    .a-fade { animation: a-fade 2.4s linear infinite; }
+
+    .a-glow { animation: a-glow 2.4s linear infinite; }
+
+    .a-blink-up { animation: a-blink-up 1.8s ease-in-out infinite; }
+
+    .a-blink-down { animation: a-blink-down 1.8s ease-in-out infinite; }
+
+    .a-flicker-a { animation: a-flicker-a 0.9s linear infinite; }
+
+    .a-flicker-b { animation: a-flicker-b 1.3s linear infinite; }
+
+    .a-flicker-c { animation: a-flicker-c 2s linear infinite; }
+
+    .a-bolt { animation: a-bolt 1.8s linear infinite; }
+
+    .a-breathe { transform-box: fill-box; transform-origin: center; animation: a-breathe 2.4s ease-in-out infinite; }
+
+    .a-spin { transform-box: fill-box; transform-origin: center; animation: a-spin 1s linear infinite; }
+
+    .a-wobble { animation: a-wobble 2s linear infinite; }
+
+    .a-rise { animation: a-rise 1s linear infinite; }
+
+    .a-fill { transform-box: fill-box; transform-origin: left center; animation: a-fill 2.4s linear infinite; }
+
+    .a-ripple { transform-box: fill-box; transform-origin: center; animation: a-ripple 1.6s linear infinite; }
+
+    .a-run { animation: a-run 2.5s linear infinite; }
+
+    .a-drop { animation: a-drop 0.9s linear infinite; }
+
+    .a-bubble-l { transform-box: fill-box; transform-origin: center; animation: a-bubble-l 2.6s linear infinite; }
+
+    .a-bubble-r { transform-box: fill-box; transform-origin: center; animation: a-bubble-r 2.6s linear infinite; }
+
+    @keyframes a-route-c93b8bc9 { 0.00% { transform: translate(533.50px, 129.00px); } 91.21% { transform: translate(533.50px,
+    456.00px); } 100.00% { transform: translate(502.00px, 456.00px); } }
+
+    .a-route-c93b8bc9 { animation: a-route-c93b8bc9 10s linear infinite; }
+
+    @keyframes a-route-f746c686 { 0.00% { transform: translate(442.00px, 456.00px); } 100.00% { transform: translate(404.00px,
+    456.00px); } }
+
+    .a-route-f746c686 { animation: a-route-f746c686 10s linear infinite; }
+
+    @keyframes a-route-8350f74f { 0.00% { transform: translate(344.00px, 456.00px); } 100.00% { transform: translate(306.00px,
+    456.00px); } }
+
+    .a-route-8350f74f { animation: a-route-8350f74f 10s linear infinite; }
+
+    @keyframes a-route-4423600f { 0.00% { transform: translate(374.00px, 426.00px); } 87.50% { transform: translate(374.00px,
+    216.00px); } 100.00% { transform: translate(344.00px, 216.00px); } }
+
+    .a-route-4423600f { animation: a-route-4423600f 10s linear infinite; }
+
+    @keyframes a-route-5c276ad1 { 0.00% { transform: translate(374.00px, 328.00px); } 100.00% { transform: translate(344.00px,
+    328.00px); } }
+
+    .a-route-5c276ad1 { animation: a-route-5c276ad1 10s linear infinite; }
+
+    @keyframes a-route-8c3c9559 { 0.00% { transform: translate(374.00px, 402.00px); } 89.09% { transform: translate(178.00px,
+    402.00px); } 100.00% { transform: translate(178.00px, 426.00px); } }
+
+    .a-route-8c3c9559 { animation: a-route-8c3c9559 10s linear infinite; }
+
+    @keyframes a-route-df7a7e2a { 0.00% { transform: translate(-27.00px, -5.00px); } 2.79% { transform: translate(-25.50px,
+    -4.59px); } 5.50% { transform: translate(-24.00px, -4.38px); } 8.19% { transform: translate(-22.50px, -4.34px); } 10.90%
+    { transform: translate(-21.00px, -4.50px); } 13.65% { transform: translate(-19.50px, -4.84px); } 16.51% { transform: translate(-18.00px,
+    -5.38px); } 19.49% { transform: translate(-16.50px, -6.09px); } 22.63% { transform: translate(-15.00px, -7.00px); } 29.63%
+    { transform: translate(-11.25px, -5.91px); } 36.50% { transform: translate(-7.50px, -5.12px); } 43.27% { transform: translate(-3.75px,
+    -4.66px); } 50.00% { transform: translate(0.00px, -4.50px); } 56.73% { transform: translate(3.75px, -4.66px); } 63.50%
+    { transform: translate(7.50px, -5.12px); } 70.37% { transform: translate(11.25px, -5.91px); } 77.37% { transform: translate(15.00px,
+    -7.00px); } 80.51% { transform: translate(16.50px, -6.09px); } 83.49% { transform: translate(18.00px, -5.38px); } 86.35%
+    { transform: translate(19.50px, -4.84px); } 89.10% { transform: translate(21.00px, -4.50px); } 91.81% { transform: translate(22.50px,
+    -4.34px); } 94.50% { transform: translate(24.00px, -4.38px); } 97.21% { transform: translate(25.50px, -4.59px); } 100.00%
+    { transform: translate(27.00px, -5.00px); } 0% { opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { opacity:
+    0; } }
+
+    .a-route-df7a7e2a { animation: a-route-df7a7e2a 10s linear infinite; }
+
+    @keyframes a-route-4a077550 { 0.00% { transform: translate(-27.00px, 2.00px); } 2.90% { transform: translate(-25.44px,
+    2.41px); } 5.96% { transform: translate(-23.75px, 2.62px); } 9.22% { transform: translate(-21.94px, 2.66px); } 12.72%
+    { transform: translate(-20.00px, 2.50px); } 16.48% { transform: translate(-17.94px, 2.16px); } 20.53% { transform: translate(-15.75px,
+    1.62px); } 24.89% { transform: translate(-13.44px, 0.91px); } 29.56% { transform: translate(-11.00px, 0.00px); } 34.89%
+    { transform: translate(-8.25px, 1.09px); } 40.03% { transform: translate(-5.50px, 1.88px); } 45.05% { transform: translate(-2.75px,
+    2.34px); } 50.00% { transform: translate(0.00px, 2.50px); } 54.95% { transform: translate(2.75px, 2.34px); } 59.97% {
+    transform: translate(5.50px, 1.88px); } 65.11% { transform: translate(8.25px, 1.09px); } 70.44% { transform: translate(11.00px,
+    0.00px); } 75.11% { transform: translate(13.44px, 0.91px); } 79.47% { transform: translate(15.75px, 1.62px); } 83.52%
+    { transform: translate(17.94px, 2.16px); } 87.28% { transform: translate(20.00px, 2.50px); } 90.78% { transform: translate(21.94px,
+    2.66px); } 94.04% { transform: translate(23.75px, 2.62px); } 97.10% { transform: translate(25.44px, 2.41px); } 100.00%
+    { transform: translate(27.00px, 2.00px); } 0% { opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { opacity:
+    0; } }
+
+    .a-route-4a077550 { animation: a-route-4a077550 10s linear infinite; }
+
+    @keyframes a-route-a934eb5f { 0.00% { transform: translate(-9.00px, 3.00px); } 7.04% { transform: translate(-8.34px, 3.88px);
+    } 13.42% { transform: translate(-7.88px, 4.75px); } 19.34% { transform: translate(-7.59px, 5.62px); } 25.00% { transform:
+    translate(-7.50px, 6.50px); } 30.66% { transform: translate(-7.59px, 7.38px); } 36.58% { transform: translate(-7.88px,
+    8.25px); } 42.96% { transform: translate(-8.34px, 9.12px); } 50.00% { transform: translate(-9.00px, 10.00px); } 57.04%
+    { transform: translate(-9.66px, 10.88px); } 63.42% { transform: translate(-10.12px, 11.75px); } 69.34% { transform: translate(-10.41px,
+    12.62px); } 75.00% { transform: translate(-10.50px, 13.50px); } 80.66% { transform: translate(-10.41px, 14.38px); } 86.58%
+    { transform: translate(-10.12px, 15.25px); } 92.96% { transform: translate(-9.66px, 16.12px); } 100.00% { transform: translate(-9.00px,
+    17.00px); } 0% { opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { opacity: 0; } }
+
+    .a-route-a934eb5f { animation: a-route-a934eb5f 10s linear infinite; }
+
+    @keyframes a-route-f590ad61 { 0.00% { transform: translate(0.00px, 3.00px); } 7.04% { transform: translate(0.66px, 3.88px);
+    } 13.42% { transform: translate(1.12px, 4.75px); } 19.34% { transform: translate(1.41px, 5.62px); } 25.00% { transform:
+    translate(1.50px, 6.50px); } 30.66% { transform: translate(1.41px, 7.38px); } 36.58% { transform: translate(1.12px, 8.25px);
+    } 42.96% { transform: translate(0.66px, 9.12px); } 50.00% { transform: translate(0.00px, 10.00px); } 57.04% { transform:
+    translate(-0.66px, 10.88px); } 63.42% { transform: translate(-1.12px, 11.75px); } 69.34% { transform: translate(-1.41px,
+    12.62px); } 75.00% { transform: translate(-1.50px, 13.50px); } 80.66% { transform: translate(-1.41px, 14.38px); } 86.58%
+    { transform: translate(-1.12px, 15.25px); } 92.96% { transform: translate(-0.66px, 16.12px); } 100.00% { transform: translate(0.00px,
+    17.00px); } 0% { opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { opacity: 0; } }
+
+    .a-route-f590ad61 { animation: a-route-f590ad61 10s linear infinite; }
+
+    @keyframes a-route-4c29644b { 0.00% { transform: translate(9.00px, 3.00px); } 7.04% { transform: translate(9.66px, 3.88px);
+    } 13.42% { transform: translate(10.12px, 4.75px); } 19.34% { transform: translate(10.41px, 5.62px); } 25.00% { transform:
+    translate(10.50px, 6.50px); } 30.66% { transform: translate(10.41px, 7.38px); } 36.58% { transform: translate(10.12px,
+    8.25px); } 42.96% { transform: translate(9.66px, 9.12px); } 50.00% { transform: translate(9.00px, 10.00px); } 57.04% {
+    transform: translate(8.34px, 10.88px); } 63.42% { transform: translate(7.88px, 11.75px); } 69.34% { transform: translate(7.59px,
+    12.62px); } 75.00% { transform: translate(7.50px, 13.50px); } 80.66% { transform: translate(7.59px, 14.38px); } 86.58%
+    { transform: translate(7.88px, 15.25px); } 92.96% { transform: translate(8.34px, 16.12px); } 100.00% { transform: translate(9.00px,
+    17.00px); } 0% { opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { opacity: 0; } }
+
+    .a-route-4c29644b { animation: a-route-4c29644b 10s linear infinite; }
+
+    @keyframes a-route-aabac290 { 0.00% { transform: translate(-7.00px, -21.00px); } 100.00% { transform: translate(-7.00px,
+    -10.00px); } 0% { opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { opacity: 0; } }
+
+    .a-route-aabac290 { animation: a-route-aabac290 10s linear infinite; }
+
+    @keyframes a-route-4221cc14 { 0.00% { transform: translate(7.00px, -7.00px); } 100.00% { transform: translate(7.00px,
+    -18.00px); } 0% { opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { opacity: 0; } }
+
+    .a-route-4221cc14 { animation: a-route-4221cc14 10s linear infinite; }
+
+    '
 slots:
   content:
   - component: div
@@ -635,20 +839,17 @@ slots:
                   cx: 0
                   cy: 0
                   visible: =(Number(items[props.heatpumpInvFrequency].numericState) || 0) > 0
-                slots:
-                  default:
-                  - component: animateMotion
-                    config:
-                      path: '=items[props.heatpumpDefrostOperaton].state === ''ON'' ? ''M502,456 L533.5,456 L533.5,129'' :
-                        ''M533.5,129 V456 H502'''
-                      dur: '=Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 21 ? ''17.93s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState)
-                        || 0)) < 34 ? ''10.24s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0))
-                        < 48 ? ''7.17s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 61 ?
-                        ''5.52s'' : (''4.48s''))))'
-                      repeatCount: indefinite
-                      calcMode: linear
-                      keyPoints: 0;1
-                      keyTimes: 0;1
+                  class: '=((Number(items[props.heatpumpInvFrequency].numericState) || 0) > 0) ? ''a-route-c93b8bc9'' : '''''
+                  style:
+                    animation-duration: '=(Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 21 ?
+                      17.93 : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 34 ? 10.24 : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState)
+                      || 0)) < 48 ? 7.17 : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 61 ?
+                      5.52 : (4.48))))) + ''s'''
+                    animation-delay: '=(-0 / 9 * (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0))
+                      < 21 ? 17.93 : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 34 ? 10.24
+                      : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 48 ? 7.17 : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState)
+                      || 0)) < 61 ? 5.52 : (4.48)))))) + ''s'''
+                    animation-direction: '=(items[props.heatpumpDefrostOperaton].state === ''ON'') ? ''reverse'' : ''normal'''
               - component: circle
                 config:
                   r: 4.5
@@ -656,20 +857,17 @@ slots:
                   cx: 0
                   cy: 0
                   visible: =(Number(items[props.heatpumpInvFrequency].numericState) || 0) > 0
-                slots:
-                  default:
-                  - component: animateMotion
-                    config:
-                      path: '=items[props.heatpumpDefrostOperaton].state === ''ON'' ? ''M502,456 L533.5,456 L533.5,129'' :
-                        ''M533.5,129 V456 H502'''
-                      dur: '=Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 21 ? ''17.93s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState)
-                        || 0)) < 34 ? ''10.24s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0))
-                        < 48 ? ''7.17s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 61 ?
-                        ''5.52s'' : (''4.48s''))))'
-                      repeatCount: indefinite
-                      calcMode: linear
-                      keyPoints: 0.1111;1;0;0.1111
-                      keyTimes: 0;0.8889;0.8889;1
+                  class: '=((Number(items[props.heatpumpInvFrequency].numericState) || 0) > 0) ? ''a-route-c93b8bc9'' : '''''
+                  style:
+                    animation-duration: '=(Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 21 ?
+                      17.93 : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 34 ? 10.24 : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState)
+                      || 0)) < 48 ? 7.17 : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 61 ?
+                      5.52 : (4.48))))) + ''s'''
+                    animation-delay: '=(-1 / 9 * (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0))
+                      < 21 ? 17.93 : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 34 ? 10.24
+                      : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 48 ? 7.17 : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState)
+                      || 0)) < 61 ? 5.52 : (4.48)))))) + ''s'''
+                    animation-direction: '=(items[props.heatpumpDefrostOperaton].state === ''ON'') ? ''reverse'' : ''normal'''
               - component: circle
                 config:
                   r: 4.5
@@ -677,20 +875,17 @@ slots:
                   cx: 0
                   cy: 0
                   visible: =(Number(items[props.heatpumpInvFrequency].numericState) || 0) > 0
-                slots:
-                  default:
-                  - component: animateMotion
-                    config:
-                      path: '=items[props.heatpumpDefrostOperaton].state === ''ON'' ? ''M502,456 L533.5,456 L533.5,129'' :
-                        ''M533.5,129 V456 H502'''
-                      dur: '=Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 21 ? ''17.93s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState)
-                        || 0)) < 34 ? ''10.24s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0))
-                        < 48 ? ''7.17s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 61 ?
-                        ''5.52s'' : (''4.48s''))))'
-                      repeatCount: indefinite
-                      calcMode: linear
-                      keyPoints: 0.2222;1;0;0.2222
-                      keyTimes: 0;0.7778;0.7778;1
+                  class: '=((Number(items[props.heatpumpInvFrequency].numericState) || 0) > 0) ? ''a-route-c93b8bc9'' : '''''
+                  style:
+                    animation-duration: '=(Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 21 ?
+                      17.93 : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 34 ? 10.24 : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState)
+                      || 0)) < 48 ? 7.17 : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 61 ?
+                      5.52 : (4.48))))) + ''s'''
+                    animation-delay: '=(-2 / 9 * (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0))
+                      < 21 ? 17.93 : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 34 ? 10.24
+                      : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 48 ? 7.17 : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState)
+                      || 0)) < 61 ? 5.52 : (4.48)))))) + ''s'''
+                    animation-direction: '=(items[props.heatpumpDefrostOperaton].state === ''ON'') ? ''reverse'' : ''normal'''
               - component: circle
                 config:
                   r: 4.5
@@ -698,20 +893,17 @@ slots:
                   cx: 0
                   cy: 0
                   visible: =(Number(items[props.heatpumpInvFrequency].numericState) || 0) > 0
-                slots:
-                  default:
-                  - component: animateMotion
-                    config:
-                      path: '=items[props.heatpumpDefrostOperaton].state === ''ON'' ? ''M502,456 L533.5,456 L533.5,129'' :
-                        ''M533.5,129 V456 H502'''
-                      dur: '=Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 21 ? ''17.93s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState)
-                        || 0)) < 34 ? ''10.24s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0))
-                        < 48 ? ''7.17s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 61 ?
-                        ''5.52s'' : (''4.48s''))))'
-                      repeatCount: indefinite
-                      calcMode: linear
-                      keyPoints: 0.3333;1;0;0.3333
-                      keyTimes: 0;0.6667;0.6667;1
+                  class: '=((Number(items[props.heatpumpInvFrequency].numericState) || 0) > 0) ? ''a-route-c93b8bc9'' : '''''
+                  style:
+                    animation-duration: '=(Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 21 ?
+                      17.93 : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 34 ? 10.24 : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState)
+                      || 0)) < 48 ? 7.17 : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 61 ?
+                      5.52 : (4.48))))) + ''s'''
+                    animation-delay: '=(-3 / 9 * (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0))
+                      < 21 ? 17.93 : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 34 ? 10.24
+                      : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 48 ? 7.17 : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState)
+                      || 0)) < 61 ? 5.52 : (4.48)))))) + ''s'''
+                    animation-direction: '=(items[props.heatpumpDefrostOperaton].state === ''ON'') ? ''reverse'' : ''normal'''
               - component: circle
                 config:
                   r: 4.5
@@ -719,20 +911,17 @@ slots:
                   cx: 0
                   cy: 0
                   visible: =(Number(items[props.heatpumpInvFrequency].numericState) || 0) > 0
-                slots:
-                  default:
-                  - component: animateMotion
-                    config:
-                      path: '=items[props.heatpumpDefrostOperaton].state === ''ON'' ? ''M502,456 L533.5,456 L533.5,129'' :
-                        ''M533.5,129 V456 H502'''
-                      dur: '=Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 21 ? ''17.93s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState)
-                        || 0)) < 34 ? ''10.24s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0))
-                        < 48 ? ''7.17s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 61 ?
-                        ''5.52s'' : (''4.48s''))))'
-                      repeatCount: indefinite
-                      calcMode: linear
-                      keyPoints: 0.4444;1;0;0.4444
-                      keyTimes: 0;0.5556;0.5556;1
+                  class: '=((Number(items[props.heatpumpInvFrequency].numericState) || 0) > 0) ? ''a-route-c93b8bc9'' : '''''
+                  style:
+                    animation-duration: '=(Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 21 ?
+                      17.93 : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 34 ? 10.24 : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState)
+                      || 0)) < 48 ? 7.17 : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 61 ?
+                      5.52 : (4.48))))) + ''s'''
+                    animation-delay: '=(-4 / 9 * (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0))
+                      < 21 ? 17.93 : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 34 ? 10.24
+                      : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 48 ? 7.17 : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState)
+                      || 0)) < 61 ? 5.52 : (4.48)))))) + ''s'''
+                    animation-direction: '=(items[props.heatpumpDefrostOperaton].state === ''ON'') ? ''reverse'' : ''normal'''
               - component: circle
                 config:
                   r: 4.5
@@ -740,20 +929,17 @@ slots:
                   cx: 0
                   cy: 0
                   visible: =(Number(items[props.heatpumpInvFrequency].numericState) || 0) > 0
-                slots:
-                  default:
-                  - component: animateMotion
-                    config:
-                      path: '=items[props.heatpumpDefrostOperaton].state === ''ON'' ? ''M502,456 L533.5,456 L533.5,129'' :
-                        ''M533.5,129 V456 H502'''
-                      dur: '=Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 21 ? ''17.93s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState)
-                        || 0)) < 34 ? ''10.24s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0))
-                        < 48 ? ''7.17s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 61 ?
-                        ''5.52s'' : (''4.48s''))))'
-                      repeatCount: indefinite
-                      calcMode: linear
-                      keyPoints: 0.5556;1;0;0.5556
-                      keyTimes: 0;0.4444;0.4444;1
+                  class: '=((Number(items[props.heatpumpInvFrequency].numericState) || 0) > 0) ? ''a-route-c93b8bc9'' : '''''
+                  style:
+                    animation-duration: '=(Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 21 ?
+                      17.93 : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 34 ? 10.24 : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState)
+                      || 0)) < 48 ? 7.17 : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 61 ?
+                      5.52 : (4.48))))) + ''s'''
+                    animation-delay: '=(-5 / 9 * (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0))
+                      < 21 ? 17.93 : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 34 ? 10.24
+                      : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 48 ? 7.17 : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState)
+                      || 0)) < 61 ? 5.52 : (4.48)))))) + ''s'''
+                    animation-direction: '=(items[props.heatpumpDefrostOperaton].state === ''ON'') ? ''reverse'' : ''normal'''
               - component: circle
                 config:
                   r: 4.5
@@ -761,20 +947,17 @@ slots:
                   cx: 0
                   cy: 0
                   visible: =(Number(items[props.heatpumpInvFrequency].numericState) || 0) > 0
-                slots:
-                  default:
-                  - component: animateMotion
-                    config:
-                      path: '=items[props.heatpumpDefrostOperaton].state === ''ON'' ? ''M502,456 L533.5,456 L533.5,129'' :
-                        ''M533.5,129 V456 H502'''
-                      dur: '=Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 21 ? ''17.93s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState)
-                        || 0)) < 34 ? ''10.24s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0))
-                        < 48 ? ''7.17s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 61 ?
-                        ''5.52s'' : (''4.48s''))))'
-                      repeatCount: indefinite
-                      calcMode: linear
-                      keyPoints: 0.6667;1;0;0.6667
-                      keyTimes: 0;0.3333;0.3333;1
+                  class: '=((Number(items[props.heatpumpInvFrequency].numericState) || 0) > 0) ? ''a-route-c93b8bc9'' : '''''
+                  style:
+                    animation-duration: '=(Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 21 ?
+                      17.93 : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 34 ? 10.24 : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState)
+                      || 0)) < 48 ? 7.17 : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 61 ?
+                      5.52 : (4.48))))) + ''s'''
+                    animation-delay: '=(-6 / 9 * (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0))
+                      < 21 ? 17.93 : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 34 ? 10.24
+                      : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 48 ? 7.17 : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState)
+                      || 0)) < 61 ? 5.52 : (4.48)))))) + ''s'''
+                    animation-direction: '=(items[props.heatpumpDefrostOperaton].state === ''ON'') ? ''reverse'' : ''normal'''
               - component: circle
                 config:
                   r: 4.5
@@ -782,20 +965,17 @@ slots:
                   cx: 0
                   cy: 0
                   visible: =(Number(items[props.heatpumpInvFrequency].numericState) || 0) > 0
-                slots:
-                  default:
-                  - component: animateMotion
-                    config:
-                      path: '=items[props.heatpumpDefrostOperaton].state === ''ON'' ? ''M502,456 L533.5,456 L533.5,129'' :
-                        ''M533.5,129 V456 H502'''
-                      dur: '=Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 21 ? ''17.93s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState)
-                        || 0)) < 34 ? ''10.24s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0))
-                        < 48 ? ''7.17s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 61 ?
-                        ''5.52s'' : (''4.48s''))))'
-                      repeatCount: indefinite
-                      calcMode: linear
-                      keyPoints: 0.7778;1;0;0.7778
-                      keyTimes: 0;0.2222;0.2222;1
+                  class: '=((Number(items[props.heatpumpInvFrequency].numericState) || 0) > 0) ? ''a-route-c93b8bc9'' : '''''
+                  style:
+                    animation-duration: '=(Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 21 ?
+                      17.93 : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 34 ? 10.24 : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState)
+                      || 0)) < 48 ? 7.17 : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 61 ?
+                      5.52 : (4.48))))) + ''s'''
+                    animation-delay: '=(-7 / 9 * (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0))
+                      < 21 ? 17.93 : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 34 ? 10.24
+                      : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 48 ? 7.17 : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState)
+                      || 0)) < 61 ? 5.52 : (4.48)))))) + ''s'''
+                    animation-direction: '=(items[props.heatpumpDefrostOperaton].state === ''ON'') ? ''reverse'' : ''normal'''
               - component: circle
                 config:
                   r: 4.5
@@ -803,20 +983,17 @@ slots:
                   cx: 0
                   cy: 0
                   visible: =(Number(items[props.heatpumpInvFrequency].numericState) || 0) > 0
-                slots:
-                  default:
-                  - component: animateMotion
-                    config:
-                      path: '=items[props.heatpumpDefrostOperaton].state === ''ON'' ? ''M502,456 L533.5,456 L533.5,129'' :
-                        ''M533.5,129 V456 H502'''
-                      dur: '=Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 21 ? ''17.93s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState)
-                        || 0)) < 34 ? ''10.24s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0))
-                        < 48 ? ''7.17s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 61 ?
-                        ''5.52s'' : (''4.48s''))))'
-                      repeatCount: indefinite
-                      calcMode: linear
-                      keyPoints: 0.8889;1;0;0.8889
-                      keyTimes: 0;0.1111;0.1111;1
+                  class: '=((Number(items[props.heatpumpInvFrequency].numericState) || 0) > 0) ? ''a-route-c93b8bc9'' : '''''
+                  style:
+                    animation-duration: '=(Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 21 ?
+                      17.93 : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 34 ? 10.24 : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState)
+                      || 0)) < 48 ? 7.17 : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 61 ?
+                      5.52 : (4.48))))) + ''s'''
+                    animation-delay: '=(-8 / 9 * (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0))
+                      < 21 ? 17.93 : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 34 ? 10.24
+                      : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 48 ? 7.17 : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState)
+                      || 0)) < 61 ? 5.52 : (4.48)))))) + ''s'''
+                    animation-direction: '=(items[props.heatpumpDefrostOperaton].state === ''ON'') ? ''reverse'' : ''normal'''
               - component: path
                 config:
                   d: M442,456 H404
@@ -835,19 +1012,18 @@ slots:
                   cy: 0
                   visible: =(items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
                     || 0) > 0)
-                slots:
-                  default:
-                  - component: animateMotion
-                    config:
-                      path: '=items[props.heatpumpDefrostOperaton].state === ''ON'' ? ''M404,456 L442,456'' : ''M442,456 H404'''
-                      dur: '=Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 6 ? ''1.9s'' : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState)
-                        || 0)) < 12 ? ''1.09s'' : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) <
-                        18 ? ''0.76s'' : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 24 ? ''0.58s''
-                        : (''0.47s''))))'
-                      repeatCount: indefinite
-                      calcMode: linear
-                      keyPoints: 0;1
-                      keyTimes: 0;1
+                  class: '=((items[props.heatpumpWaterPumpOperation].state === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState)
+                    || 0) > 0)) ? ''a-route-f746c686'' : '''''
+                  style:
+                    animation-duration: '=(Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 6 ? 1.9
+                      : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 12 ? 1.09 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState)
+                      || 0)) < 18 ? 0.76 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 24 ? 0.58
+                      : (0.47))))) + ''s'''
+                    animation-delay: '=(-0 / 1 * (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) <
+                      6 ? 1.9 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 12 ? 1.09 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState)
+                      || 0)) < 18 ? 0.76 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 24 ? 0.58
+                      : (0.47)))))) + ''s'''
+                    animation-direction: '=(items[props.heatpumpDefrostOperaton].state === ''ON'') ? ''reverse'' : ''normal'''
               - component: path
                 config:
                   d: M344,456 H306
@@ -866,19 +1042,18 @@ slots:
                   cy: 0
                   visible: =((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
                     || 0) > 0) && (items[props.heatpumpValve].state === 'DHW'))
-                slots:
-                  default:
-                  - component: animateMotion
-                    config:
-                      path: '=items[props.heatpumpDefrostOperaton].state === ''ON'' ? ''M306,456 L344,456'' : ''M344,456 H306'''
-                      dur: '=Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 6 ? ''1.9s'' : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState)
-                        || 0)) < 12 ? ''1.09s'' : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) <
-                        18 ? ''0.76s'' : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 24 ? ''0.58s''
-                        : (''0.47s''))))'
-                      repeatCount: indefinite
-                      calcMode: linear
-                      keyPoints: 0;1
-                      keyTimes: 0;1
+                  class: '=(((items[props.heatpumpWaterPumpOperation].state === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState)
+                    || 0) > 0) && (items[props.heatpumpValve].state === ''DHW''))) ? ''a-route-8350f74f'' : '''''
+                  style:
+                    animation-duration: '=(Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 6 ? 1.9
+                      : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 12 ? 1.09 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState)
+                      || 0)) < 18 ? 0.76 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 24 ? 0.58
+                      : (0.47))))) + ''s'''
+                    animation-delay: '=(-0 / 1 * (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) <
+                      6 ? 1.9 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 12 ? 1.09 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState)
+                      || 0)) < 18 ? 0.76 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 24 ? 0.58
+                      : (0.47)))))) + ''s'''
+                    animation-direction: '=(items[props.heatpumpDefrostOperaton].state === ''ON'') ? ''reverse'' : ''normal'''
               - component: path
                 config:
                   d: M374,426 V216 H344
@@ -897,20 +1072,18 @@ slots:
                   cy: 0
                   visible: =((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
                     || 0) > 0) && !(items[props.heatpumpValve].state === 'DHW'))
-                slots:
-                  default:
-                  - component: animateMotion
-                    config:
-                      path: '=items[props.heatpumpDefrostOperaton].state === ''ON'' ? ''M344,216 L374,216 L374,426'' : ''M374,426
-                        V216 H344'''
-                      dur: '=Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 6 ? ''12.0s'' : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState)
-                        || 0)) < 12 ? ''6.86s'' : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) <
-                        18 ? ''4.8s'' : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 24 ? ''3.69s''
-                        : (''3.0s''))))'
-                      repeatCount: indefinite
-                      calcMode: linear
-                      keyPoints: 0;1
-                      keyTimes: 0;1
+                  class: '=(((items[props.heatpumpWaterPumpOperation].state === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState)
+                    || 0) > 0) && !(items[props.heatpumpValve].state === ''DHW''))) ? ''a-route-4423600f'' : '''''
+                  style:
+                    animation-duration: '=(Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 6 ? 12.0
+                      : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 12 ? 6.86 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState)
+                      || 0)) < 18 ? 4.8 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 24 ? 3.69
+                      : (3.0))))) + ''s'''
+                    animation-delay: '=(-0 / 6 * (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) <
+                      6 ? 12.0 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 12 ? 6.86 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState)
+                      || 0)) < 18 ? 4.8 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 24 ? 3.69
+                      : (3.0)))))) + ''s'''
+                    animation-direction: '=(items[props.heatpumpDefrostOperaton].state === ''ON'') ? ''reverse'' : ''normal'''
               - component: circle
                 config:
                   r: 4.5
@@ -919,20 +1092,18 @@ slots:
                   cy: 0
                   visible: =((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
                     || 0) > 0) && !(items[props.heatpumpValve].state === 'DHW'))
-                slots:
-                  default:
-                  - component: animateMotion
-                    config:
-                      path: '=items[props.heatpumpDefrostOperaton].state === ''ON'' ? ''M344,216 L374,216 L374,426'' : ''M374,426
-                        V216 H344'''
-                      dur: '=Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 6 ? ''12.0s'' : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState)
-                        || 0)) < 12 ? ''6.86s'' : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) <
-                        18 ? ''4.8s'' : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 24 ? ''3.69s''
-                        : (''3.0s''))))'
-                      repeatCount: indefinite
-                      calcMode: linear
-                      keyPoints: 0.1667;1;0;0.1667
-                      keyTimes: 0;0.8333;0.8333;1
+                  class: '=(((items[props.heatpumpWaterPumpOperation].state === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState)
+                    || 0) > 0) && !(items[props.heatpumpValve].state === ''DHW''))) ? ''a-route-4423600f'' : '''''
+                  style:
+                    animation-duration: '=(Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 6 ? 12.0
+                      : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 12 ? 6.86 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState)
+                      || 0)) < 18 ? 4.8 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 24 ? 3.69
+                      : (3.0))))) + ''s'''
+                    animation-delay: '=(-1 / 6 * (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) <
+                      6 ? 12.0 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 12 ? 6.86 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState)
+                      || 0)) < 18 ? 4.8 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 24 ? 3.69
+                      : (3.0)))))) + ''s'''
+                    animation-direction: '=(items[props.heatpumpDefrostOperaton].state === ''ON'') ? ''reverse'' : ''normal'''
               - component: circle
                 config:
                   r: 4.5
@@ -941,20 +1112,18 @@ slots:
                   cy: 0
                   visible: =((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
                     || 0) > 0) && !(items[props.heatpumpValve].state === 'DHW'))
-                slots:
-                  default:
-                  - component: animateMotion
-                    config:
-                      path: '=items[props.heatpumpDefrostOperaton].state === ''ON'' ? ''M344,216 L374,216 L374,426'' : ''M374,426
-                        V216 H344'''
-                      dur: '=Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 6 ? ''12.0s'' : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState)
-                        || 0)) < 12 ? ''6.86s'' : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) <
-                        18 ? ''4.8s'' : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 24 ? ''3.69s''
-                        : (''3.0s''))))'
-                      repeatCount: indefinite
-                      calcMode: linear
-                      keyPoints: 0.3333;1;0;0.3333
-                      keyTimes: 0;0.6667;0.6667;1
+                  class: '=(((items[props.heatpumpWaterPumpOperation].state === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState)
+                    || 0) > 0) && !(items[props.heatpumpValve].state === ''DHW''))) ? ''a-route-4423600f'' : '''''
+                  style:
+                    animation-duration: '=(Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 6 ? 12.0
+                      : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 12 ? 6.86 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState)
+                      || 0)) < 18 ? 4.8 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 24 ? 3.69
+                      : (3.0))))) + ''s'''
+                    animation-delay: '=(-2 / 6 * (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) <
+                      6 ? 12.0 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 12 ? 6.86 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState)
+                      || 0)) < 18 ? 4.8 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 24 ? 3.69
+                      : (3.0)))))) + ''s'''
+                    animation-direction: '=(items[props.heatpumpDefrostOperaton].state === ''ON'') ? ''reverse'' : ''normal'''
               - component: circle
                 config:
                   r: 4.5
@@ -963,20 +1132,18 @@ slots:
                   cy: 0
                   visible: =((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
                     || 0) > 0) && !(items[props.heatpumpValve].state === 'DHW'))
-                slots:
-                  default:
-                  - component: animateMotion
-                    config:
-                      path: '=items[props.heatpumpDefrostOperaton].state === ''ON'' ? ''M344,216 L374,216 L374,426'' : ''M374,426
-                        V216 H344'''
-                      dur: '=Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 6 ? ''12.0s'' : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState)
-                        || 0)) < 12 ? ''6.86s'' : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) <
-                        18 ? ''4.8s'' : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 24 ? ''3.69s''
-                        : (''3.0s''))))'
-                      repeatCount: indefinite
-                      calcMode: linear
-                      keyPoints: 0.5;1;0;0.5
-                      keyTimes: 0;0.5;0.5;1
+                  class: '=(((items[props.heatpumpWaterPumpOperation].state === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState)
+                    || 0) > 0) && !(items[props.heatpumpValve].state === ''DHW''))) ? ''a-route-4423600f'' : '''''
+                  style:
+                    animation-duration: '=(Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 6 ? 12.0
+                      : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 12 ? 6.86 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState)
+                      || 0)) < 18 ? 4.8 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 24 ? 3.69
+                      : (3.0))))) + ''s'''
+                    animation-delay: '=(-3 / 6 * (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) <
+                      6 ? 12.0 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 12 ? 6.86 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState)
+                      || 0)) < 18 ? 4.8 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 24 ? 3.69
+                      : (3.0)))))) + ''s'''
+                    animation-direction: '=(items[props.heatpumpDefrostOperaton].state === ''ON'') ? ''reverse'' : ''normal'''
               - component: circle
                 config:
                   r: 4.5
@@ -985,20 +1152,18 @@ slots:
                   cy: 0
                   visible: =((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
                     || 0) > 0) && !(items[props.heatpumpValve].state === 'DHW'))
-                slots:
-                  default:
-                  - component: animateMotion
-                    config:
-                      path: '=items[props.heatpumpDefrostOperaton].state === ''ON'' ? ''M344,216 L374,216 L374,426'' : ''M374,426
-                        V216 H344'''
-                      dur: '=Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 6 ? ''12.0s'' : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState)
-                        || 0)) < 12 ? ''6.86s'' : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) <
-                        18 ? ''4.8s'' : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 24 ? ''3.69s''
-                        : (''3.0s''))))'
-                      repeatCount: indefinite
-                      calcMode: linear
-                      keyPoints: 0.6667;1;0;0.6667
-                      keyTimes: 0;0.3333;0.3333;1
+                  class: '=(((items[props.heatpumpWaterPumpOperation].state === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState)
+                    || 0) > 0) && !(items[props.heatpumpValve].state === ''DHW''))) ? ''a-route-4423600f'' : '''''
+                  style:
+                    animation-duration: '=(Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 6 ? 12.0
+                      : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 12 ? 6.86 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState)
+                      || 0)) < 18 ? 4.8 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 24 ? 3.69
+                      : (3.0))))) + ''s'''
+                    animation-delay: '=(-4 / 6 * (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) <
+                      6 ? 12.0 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 12 ? 6.86 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState)
+                      || 0)) < 18 ? 4.8 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 24 ? 3.69
+                      : (3.0)))))) + ''s'''
+                    animation-direction: '=(items[props.heatpumpDefrostOperaton].state === ''ON'') ? ''reverse'' : ''normal'''
               - component: circle
                 config:
                   r: 4.5
@@ -1007,20 +1172,18 @@ slots:
                   cy: 0
                   visible: =((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
                     || 0) > 0) && !(items[props.heatpumpValve].state === 'DHW'))
-                slots:
-                  default:
-                  - component: animateMotion
-                    config:
-                      path: '=items[props.heatpumpDefrostOperaton].state === ''ON'' ? ''M344,216 L374,216 L374,426'' : ''M374,426
-                        V216 H344'''
-                      dur: '=Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 6 ? ''12.0s'' : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState)
-                        || 0)) < 12 ? ''6.86s'' : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) <
-                        18 ? ''4.8s'' : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 24 ? ''3.69s''
-                        : (''3.0s''))))'
-                      repeatCount: indefinite
-                      calcMode: linear
-                      keyPoints: 0.8333;1;0;0.8333
-                      keyTimes: 0;0.1667;0.1667;1
+                  class: '=(((items[props.heatpumpWaterPumpOperation].state === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState)
+                    || 0) > 0) && !(items[props.heatpumpValve].state === ''DHW''))) ? ''a-route-4423600f'' : '''''
+                  style:
+                    animation-duration: '=(Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 6 ? 12.0
+                      : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 12 ? 6.86 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState)
+                      || 0)) < 18 ? 4.8 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 24 ? 3.69
+                      : (3.0))))) + ''s'''
+                    animation-delay: '=(-5 / 6 * (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) <
+                      6 ? 12.0 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 12 ? 6.86 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState)
+                      || 0)) < 18 ? 4.8 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 24 ? 3.69
+                      : (3.0)))))) + ''s'''
+                    animation-direction: '=(items[props.heatpumpDefrostOperaton].state === ''ON'') ? ''reverse'' : ''normal'''
               - component: path
                 config:
                   d: M374,328 H344
@@ -1039,19 +1202,18 @@ slots:
                   cy: 0
                   visible: =((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
                     || 0) > 0) && !(items[props.heatpumpValve].state === 'DHW'))
-                slots:
-                  default:
-                  - component: animateMotion
-                    config:
-                      path: '=items[props.heatpumpDefrostOperaton].state === ''ON'' ? ''M344,328 L374,328'' : ''M374,328 H344'''
-                      dur: '=Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 6 ? ''1.5s'' : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState)
-                        || 0)) < 12 ? ''0.86s'' : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) <
-                        18 ? ''0.6s'' : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 24 ? ''0.46s''
-                        : (''0.38s''))))'
-                      repeatCount: indefinite
-                      calcMode: linear
-                      keyPoints: 0;1
-                      keyTimes: 0;1
+                  class: '=(((items[props.heatpumpWaterPumpOperation].state === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState)
+                    || 0) > 0) && !(items[props.heatpumpValve].state === ''DHW''))) ? ''a-route-5c276ad1'' : '''''
+                  style:
+                    animation-duration: '=(Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 6 ? 1.5
+                      : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 12 ? 0.86 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState)
+                      || 0)) < 18 ? 0.6 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 24 ? 0.46
+                      : (0.38))))) + ''s'''
+                    animation-delay: '=(-0 / 1 * (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) <
+                      6 ? 1.5 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 12 ? 0.86 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState)
+                      || 0)) < 18 ? 0.6 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 24 ? 0.46
+                      : (0.38)))))) + ''s'''
+                    animation-direction: '=(items[props.heatpumpDefrostOperaton].state === ''ON'') ? ''reverse'' : ''normal'''
               - component: path
                 config:
                   d: M374,402 H178 V426
@@ -1070,20 +1232,18 @@ slots:
                   cy: 0
                   visible: =((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
                     || 0) > 0) && !(items[props.heatpumpValve].state === 'DHW'))
-                slots:
-                  default:
-                  - component: animateMotion
-                    config:
-                      path: '=items[props.heatpumpDefrostOperaton].state === ''ON'' ? ''M178,426 L178,402 L374,402'' : ''M374,402
-                        H178 V426'''
-                      dur: '=Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 6 ? ''11.0s'' : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState)
-                        || 0)) < 12 ? ''6.29s'' : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) <
-                        18 ? ''4.4s'' : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 24 ? ''3.38s''
-                        : (''2.75s''))))'
-                      repeatCount: indefinite
-                      calcMode: linear
-                      keyPoints: 0;1
-                      keyTimes: 0;1
+                  class: '=(((items[props.heatpumpWaterPumpOperation].state === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState)
+                    || 0) > 0) && !(items[props.heatpumpValve].state === ''DHW''))) ? ''a-route-8c3c9559'' : '''''
+                  style:
+                    animation-duration: '=(Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 6 ? 11.0
+                      : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 12 ? 6.29 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState)
+                      || 0)) < 18 ? 4.4 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 24 ? 3.38
+                      : (2.75))))) + ''s'''
+                    animation-delay: '=(-0 / 6 * (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) <
+                      6 ? 11.0 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 12 ? 6.29 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState)
+                      || 0)) < 18 ? 4.4 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 24 ? 3.38
+                      : (2.75)))))) + ''s'''
+                    animation-direction: '=(items[props.heatpumpDefrostOperaton].state === ''ON'') ? ''reverse'' : ''normal'''
               - component: circle
                 config:
                   r: 4.5
@@ -1092,20 +1252,18 @@ slots:
                   cy: 0
                   visible: =((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
                     || 0) > 0) && !(items[props.heatpumpValve].state === 'DHW'))
-                slots:
-                  default:
-                  - component: animateMotion
-                    config:
-                      path: '=items[props.heatpumpDefrostOperaton].state === ''ON'' ? ''M178,426 L178,402 L374,402'' : ''M374,402
-                        H178 V426'''
-                      dur: '=Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 6 ? ''11.0s'' : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState)
-                        || 0)) < 12 ? ''6.29s'' : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) <
-                        18 ? ''4.4s'' : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 24 ? ''3.38s''
-                        : (''2.75s''))))'
-                      repeatCount: indefinite
-                      calcMode: linear
-                      keyPoints: 0.1667;1;0;0.1667
-                      keyTimes: 0;0.8333;0.8333;1
+                  class: '=(((items[props.heatpumpWaterPumpOperation].state === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState)
+                    || 0) > 0) && !(items[props.heatpumpValve].state === ''DHW''))) ? ''a-route-8c3c9559'' : '''''
+                  style:
+                    animation-duration: '=(Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 6 ? 11.0
+                      : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 12 ? 6.29 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState)
+                      || 0)) < 18 ? 4.4 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 24 ? 3.38
+                      : (2.75))))) + ''s'''
+                    animation-delay: '=(-1 / 6 * (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) <
+                      6 ? 11.0 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 12 ? 6.29 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState)
+                      || 0)) < 18 ? 4.4 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 24 ? 3.38
+                      : (2.75)))))) + ''s'''
+                    animation-direction: '=(items[props.heatpumpDefrostOperaton].state === ''ON'') ? ''reverse'' : ''normal'''
               - component: circle
                 config:
                   r: 4.5
@@ -1114,20 +1272,18 @@ slots:
                   cy: 0
                   visible: =((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
                     || 0) > 0) && !(items[props.heatpumpValve].state === 'DHW'))
-                slots:
-                  default:
-                  - component: animateMotion
-                    config:
-                      path: '=items[props.heatpumpDefrostOperaton].state === ''ON'' ? ''M178,426 L178,402 L374,402'' : ''M374,402
-                        H178 V426'''
-                      dur: '=Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 6 ? ''11.0s'' : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState)
-                        || 0)) < 12 ? ''6.29s'' : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) <
-                        18 ? ''4.4s'' : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 24 ? ''3.38s''
-                        : (''2.75s''))))'
-                      repeatCount: indefinite
-                      calcMode: linear
-                      keyPoints: 0.3333;1;0;0.3333
-                      keyTimes: 0;0.6667;0.6667;1
+                  class: '=(((items[props.heatpumpWaterPumpOperation].state === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState)
+                    || 0) > 0) && !(items[props.heatpumpValve].state === ''DHW''))) ? ''a-route-8c3c9559'' : '''''
+                  style:
+                    animation-duration: '=(Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 6 ? 11.0
+                      : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 12 ? 6.29 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState)
+                      || 0)) < 18 ? 4.4 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 24 ? 3.38
+                      : (2.75))))) + ''s'''
+                    animation-delay: '=(-2 / 6 * (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) <
+                      6 ? 11.0 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 12 ? 6.29 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState)
+                      || 0)) < 18 ? 4.4 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 24 ? 3.38
+                      : (2.75)))))) + ''s'''
+                    animation-direction: '=(items[props.heatpumpDefrostOperaton].state === ''ON'') ? ''reverse'' : ''normal'''
               - component: circle
                 config:
                   r: 4.5
@@ -1136,20 +1292,18 @@ slots:
                   cy: 0
                   visible: =((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
                     || 0) > 0) && !(items[props.heatpumpValve].state === 'DHW'))
-                slots:
-                  default:
-                  - component: animateMotion
-                    config:
-                      path: '=items[props.heatpumpDefrostOperaton].state === ''ON'' ? ''M178,426 L178,402 L374,402'' : ''M374,402
-                        H178 V426'''
-                      dur: '=Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 6 ? ''11.0s'' : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState)
-                        || 0)) < 12 ? ''6.29s'' : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) <
-                        18 ? ''4.4s'' : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 24 ? ''3.38s''
-                        : (''2.75s''))))'
-                      repeatCount: indefinite
-                      calcMode: linear
-                      keyPoints: 0.5;1;0;0.5
-                      keyTimes: 0;0.5;0.5;1
+                  class: '=(((items[props.heatpumpWaterPumpOperation].state === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState)
+                    || 0) > 0) && !(items[props.heatpumpValve].state === ''DHW''))) ? ''a-route-8c3c9559'' : '''''
+                  style:
+                    animation-duration: '=(Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 6 ? 11.0
+                      : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 12 ? 6.29 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState)
+                      || 0)) < 18 ? 4.4 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 24 ? 3.38
+                      : (2.75))))) + ''s'''
+                    animation-delay: '=(-3 / 6 * (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) <
+                      6 ? 11.0 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 12 ? 6.29 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState)
+                      || 0)) < 18 ? 4.4 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 24 ? 3.38
+                      : (2.75)))))) + ''s'''
+                    animation-direction: '=(items[props.heatpumpDefrostOperaton].state === ''ON'') ? ''reverse'' : ''normal'''
               - component: circle
                 config:
                   r: 4.5
@@ -1158,20 +1312,18 @@ slots:
                   cy: 0
                   visible: =((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
                     || 0) > 0) && !(items[props.heatpumpValve].state === 'DHW'))
-                slots:
-                  default:
-                  - component: animateMotion
-                    config:
-                      path: '=items[props.heatpumpDefrostOperaton].state === ''ON'' ? ''M178,426 L178,402 L374,402'' : ''M374,402
-                        H178 V426'''
-                      dur: '=Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 6 ? ''11.0s'' : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState)
-                        || 0)) < 12 ? ''6.29s'' : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) <
-                        18 ? ''4.4s'' : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 24 ? ''3.38s''
-                        : (''2.75s''))))'
-                      repeatCount: indefinite
-                      calcMode: linear
-                      keyPoints: 0.6667;1;0;0.6667
-                      keyTimes: 0;0.3333;0.3333;1
+                  class: '=(((items[props.heatpumpWaterPumpOperation].state === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState)
+                    || 0) > 0) && !(items[props.heatpumpValve].state === ''DHW''))) ? ''a-route-8c3c9559'' : '''''
+                  style:
+                    animation-duration: '=(Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 6 ? 11.0
+                      : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 12 ? 6.29 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState)
+                      || 0)) < 18 ? 4.4 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 24 ? 3.38
+                      : (2.75))))) + ''s'''
+                    animation-delay: '=(-4 / 6 * (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) <
+                      6 ? 11.0 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 12 ? 6.29 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState)
+                      || 0)) < 18 ? 4.4 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 24 ? 3.38
+                      : (2.75)))))) + ''s'''
+                    animation-direction: '=(items[props.heatpumpDefrostOperaton].state === ''ON'') ? ''reverse'' : ''normal'''
               - component: circle
                 config:
                   r: 4.5
@@ -1180,20 +1332,18 @@ slots:
                   cy: 0
                   visible: =((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
                     || 0) > 0) && !(items[props.heatpumpValve].state === 'DHW'))
-                slots:
-                  default:
-                  - component: animateMotion
-                    config:
-                      path: '=items[props.heatpumpDefrostOperaton].state === ''ON'' ? ''M178,426 L178,402 L374,402'' : ''M374,402
-                        H178 V426'''
-                      dur: '=Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 6 ? ''11.0s'' : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState)
-                        || 0)) < 12 ? ''6.29s'' : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) <
-                        18 ? ''4.4s'' : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 24 ? ''3.38s''
-                        : (''2.75s''))))'
-                      repeatCount: indefinite
-                      calcMode: linear
-                      keyPoints: 0.8333;1;0;0.8333
-                      keyTimes: 0;0.1667;0.1667;1
+                  class: '=(((items[props.heatpumpWaterPumpOperation].state === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState)
+                    || 0) > 0) && !(items[props.heatpumpValve].state === ''DHW''))) ? ''a-route-8c3c9559'' : '''''
+                  style:
+                    animation-duration: '=(Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 6 ? 11.0
+                      : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 12 ? 6.29 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState)
+                      || 0)) < 18 ? 4.4 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 24 ? 3.38
+                      : (2.75))))) + ''s'''
+                    animation-delay: '=(-5 / 6 * (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) <
+                      6 ? 11.0 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 12 ? 6.29 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState)
+                      || 0)) < 18 ? 4.4 : (Math.abs((Number(items[props.heatpumpFlowSensor].numericState) || 0)) < 24 ? 3.38
+                      : (2.75)))))) + ''s'''
+                    animation-direction: '=(items[props.heatpumpDefrostOperaton].state === ''ON'') ? ''reverse'' : ''normal'''
               - component: g
                 config: {}
                 slots:
@@ -1227,16 +1377,7 @@ slots:
                       stroke-width: 2.9
                       visible: =((Number(items[props.heatpumpInvFrequency].numericState) || 0) > 0) && !(((Number(items[props.heatpumpInvFrequency].numericState)
                         || 0) / 74) > 0.01)
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          values: 0.3;1;0.3
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: =((Number(items[props.heatpumpInvFrequency].numericState) || 0) > 0) && !(((Number(items[props.heatpumpInvFrequency].numericState)
-                            || 0) / 74) > 0.01)
+                      class: a-full
                   - component: circle
                     config:
                       cx: 520.5
@@ -1247,16 +1388,7 @@ slots:
                       stroke-width: 4.5
                       visible: =((Number(items[props.heatpumpInvFrequency].numericState) || 0) > 0) && !(((Number(items[props.heatpumpInvFrequency].numericState)
                         || 0) / 74) > 0.01)
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          values: 0;1;0
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: =((Number(items[props.heatpumpInvFrequency].numericState) || 0) > 0) && !(((Number(items[props.heatpumpInvFrequency].numericState)
-                            || 0) / 74) > 0.01)
+                      class: a-halo
                   - component: circle
                     config:
                       cx: 520.5
@@ -1267,16 +1399,7 @@ slots:
                       stroke-width: 2.9
                       visible: =((Number(items[props.heatpumpInvFrequency].numericState) || 0) > 0) && (((Number(items[props.heatpumpInvFrequency].numericState)
                         || 0) / 74) > 0.01)
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          values: 0.3;0.06;0.3
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: =((Number(items[props.heatpumpInvFrequency].numericState) || 0) > 0) && (((Number(items[props.heatpumpInvFrequency].numericState)
-                            || 0) / 74) > 0.01)
+                      class: a-soft
               - component: g
                 config:
                   visible: =(Number(items[props.heatpumpInvFrequency].numericState) || 0) / 74 > 0.01
@@ -1310,15 +1433,7 @@ slots:
                       pathLength: 100
                       stroke-width: 2.9
                       opacity: '0.9'
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          values: 1;0.55;1
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: =(Number(items[props.heatpumpInvFrequency].numericState) || 0) > 0
+                      class: '=((Number(items[props.heatpumpInvFrequency].numericState) || 0) > 0) ? ''a-arc'' : '''''
                   - component: circle
                     config:
                       stroke: '#fb8c00'
@@ -1333,15 +1448,7 @@ slots:
                       fill: none
                       stroke-width: 4.5
                       visible: =(Number(items[props.heatpumpInvFrequency].numericState) || 0) > 0
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          values: 1;0;1
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: =(Number(items[props.heatpumpInvFrequency].numericState) || 0) > 0
+                      class: a-halo-arc
               - component: g
                 config: {}
                 slots:
@@ -1375,16 +1482,7 @@ slots:
                       stroke-width: 2.9
                       visible: =((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
                         || 0) > 0)) && !(((Number(items[props.heatpumpFlowSensor].numericState) || 0) / 25) > 0.01)
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          values: 0.3;1;0.3
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: =((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
-                            || 0) > 0)) && !(((Number(items[props.heatpumpFlowSensor].numericState) || 0) / 25) > 0.01)
+                      class: a-full
                   - component: circle
                     config:
                       cx: 472
@@ -1395,16 +1493,7 @@ slots:
                       stroke-width: 4.5
                       visible: =((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
                         || 0) > 0)) && !(((Number(items[props.heatpumpFlowSensor].numericState) || 0) / 25) > 0.01)
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          values: 0;1;0
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: =((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
-                            || 0) > 0)) && !(((Number(items[props.heatpumpFlowSensor].numericState) || 0) / 25) > 0.01)
+                      class: a-halo
                   - component: circle
                     config:
                       cx: 472
@@ -1415,16 +1504,7 @@ slots:
                       stroke-width: 2.9
                       visible: =((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
                         || 0) > 0)) && (((Number(items[props.heatpumpFlowSensor].numericState) || 0) / 25) > 0.01)
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          values: 0.3;0.06;0.3
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: =((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
-                            || 0) > 0)) && (((Number(items[props.heatpumpFlowSensor].numericState) || 0) / 25) > 0.01)
+                      class: a-soft
               - component: g
                 config:
                   visible: =(Number(items[props.heatpumpFlowSensor].numericState) || 0) / 25 > 0.01
@@ -1459,16 +1539,8 @@ slots:
                       pathLength: 100
                       stroke-width: 2.9
                       opacity: '0.9'
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          values: 1;0.55;1
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: =(items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
-                            || 0) > 0)
+                      class: '=((items[props.heatpumpWaterPumpOperation].state === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState)
+                        || 0) > 0)) ? ''a-arc'' : '''''
                   - component: circle
                     config:
                       stroke: '=(items[props.heatpumpBuhStep1Mode].state === ''ON'' || items[props.heatpumpBuhStep2Mode].state
@@ -1485,16 +1557,7 @@ slots:
                       stroke-width: 4.5
                       visible: =(items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
                         || 0) > 0)
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          values: 1;0;1
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: =(items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
-                            || 0) > 0)
+                      class: a-halo-arc
               - component: g
                 config: {}
                 slots:
@@ -1528,16 +1591,7 @@ slots:
                       stroke-width: 2.9
                       visible: =((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
                         || 0) > 0)) && !(false)
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          values: 0.3;1;0.3
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: =((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
-                            || 0) > 0)) && !(false)
+                      class: a-full
                   - component: circle
                     config:
                       cx: 374
@@ -1548,16 +1602,7 @@ slots:
                       stroke-width: 4.5
                       visible: =((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
                         || 0) > 0)) && !(false)
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          values: 0;1;0
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: =((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
-                            || 0) > 0)) && !(false)
+                      class: a-halo
                   - component: circle
                     config:
                       cx: 374
@@ -1568,16 +1613,7 @@ slots:
                       stroke-width: 2.9
                       visible: =((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
                         || 0) > 0)) && (false)
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          values: 0.3;0.06;0.3
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: =((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
-                            || 0) > 0)) && (false)
+                      class: a-soft
               - component: g
                 config: {}
                 slots:
@@ -1612,17 +1648,7 @@ slots:
                       visible: =((((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
                         || 0) > 0) && (items[props.heatpumpValve].state === 'DHW')) || items[props.heatpumpBshMode].state
                         === 'ON')) && !((((Number(items[props.heatpumpDhwTankTemp].numericState) || 0) - 20) / 40) > 0.01)
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          values: 0.3;1;0.3
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: =((((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
-                            || 0) > 0) && (items[props.heatpumpValve].state === 'DHW')) || items[props.heatpumpBshMode].state
-                            === 'ON')) && !((((Number(items[props.heatpumpDhwTankTemp].numericState) || 0) - 20) / 40) > 0.01)
+                      class: a-full
                   - component: circle
                     config:
                       cx: 276
@@ -1634,17 +1660,7 @@ slots:
                       visible: =((((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
                         || 0) > 0) && (items[props.heatpumpValve].state === 'DHW')) || items[props.heatpumpBshMode].state
                         === 'ON')) && !((((Number(items[props.heatpumpDhwTankTemp].numericState) || 0) - 20) / 40) > 0.01)
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          values: 0;1;0
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: =((((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
-                            || 0) > 0) && (items[props.heatpumpValve].state === 'DHW')) || items[props.heatpumpBshMode].state
-                            === 'ON')) && !((((Number(items[props.heatpumpDhwTankTemp].numericState) || 0) - 20) / 40) > 0.01)
+                      class: a-halo
                   - component: circle
                     config:
                       cx: 276
@@ -1656,17 +1672,7 @@ slots:
                       visible: =((((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
                         || 0) > 0) && (items[props.heatpumpValve].state === 'DHW')) || items[props.heatpumpBshMode].state
                         === 'ON')) && ((((Number(items[props.heatpumpDhwTankTemp].numericState) || 0) - 20) / 40) > 0.01)
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          values: 0.3;0.06;0.3
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: =((((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
-                            || 0) > 0) && (items[props.heatpumpValve].state === 'DHW')) || items[props.heatpumpBshMode].state
-                            === 'ON')) && ((((Number(items[props.heatpumpDhwTankTemp].numericState) || 0) - 20) / 40) > 0.01)
+                      class: a-soft
               - component: g
                 config:
                   visible: =((Number(items[props.heatpumpDhwTankTemp].numericState) || 0) - 20) / 40 > 0.01
@@ -1700,17 +1706,9 @@ slots:
                       pathLength: 100
                       stroke-width: 2.9
                       opacity: '0.9'
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          values: 1;0.55;1
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: =(((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
-                            || 0) > 0) && (items[props.heatpumpValve].state === 'DHW')) || items[props.heatpumpBshMode].state
-                            === 'ON')
+                      class: '=((((items[props.heatpumpWaterPumpOperation].state === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState)
+                        || 0) > 0) && (items[props.heatpumpValve].state === ''DHW'')) || items[props.heatpumpBshMode].state
+                        === ''ON'')) ? ''a-arc'' : '''''
                   - component: circle
                     config:
                       stroke: '#e57373'
@@ -1727,17 +1725,7 @@ slots:
                       visible: =(((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
                         || 0) > 0) && (items[props.heatpumpValve].state === 'DHW')) || items[props.heatpumpBshMode].state
                         === 'ON')
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          values: 1;0;1
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: =(((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
-                            || 0) > 0) && (items[props.heatpumpValve].state === 'DHW')) || items[props.heatpumpBshMode].state
-                            === 'ON')
+                      class: a-halo-arc
               - component: g
                 config: {}
                 slots:
@@ -1774,19 +1762,7 @@ slots:
                         === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState) || 0) > 0) && !(items[props.heatpumpValve].state
                         === ''DHW'')) ? (Number(items[props.heatpumpLeavingWaterTempAfterBuh].numericState) || 0) / 40 : 0))
                         > 0.01)'
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          values: 0.3;1;0.3
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: '=(((items[props.heatpumpWaterPumpOperation].state === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState)
-                            || 0) > 0) && !(items[props.heatpumpValve].state === ''DHW''))) && !(((((items[props.heatpumpWaterPumpOperation].state
-                            === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState) || 0) > 0) && !(items[props.heatpumpValve].state
-                            === ''DHW'')) ? (Number(items[props.heatpumpLeavingWaterTempAfterBuh].numericState) || 0) / 40
-                            : 0)) > 0.01)'
+                      class: a-full
                   - component: circle
                     config:
                       cx: 178
@@ -1800,19 +1776,7 @@ slots:
                         === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState) || 0) > 0) && !(items[props.heatpumpValve].state
                         === ''DHW'')) ? (Number(items[props.heatpumpLeavingWaterTempAfterBuh].numericState) || 0) / 40 : 0))
                         > 0.01)'
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          values: 0;1;0
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: '=(((items[props.heatpumpWaterPumpOperation].state === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState)
-                            || 0) > 0) && !(items[props.heatpumpValve].state === ''DHW''))) && !(((((items[props.heatpumpWaterPumpOperation].state
-                            === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState) || 0) > 0) && !(items[props.heatpumpValve].state
-                            === ''DHW'')) ? (Number(items[props.heatpumpLeavingWaterTempAfterBuh].numericState) || 0) / 40
-                            : 0)) > 0.01)'
+                      class: a-halo
                   - component: circle
                     config:
                       cx: 178
@@ -1826,19 +1790,7 @@ slots:
                         === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState) || 0) > 0) && !(items[props.heatpumpValve].state
                         === ''DHW'')) ? (Number(items[props.heatpumpLeavingWaterTempAfterBuh].numericState) || 0) / 40 : 0))
                         > 0.01)'
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          values: 0.3;0.06;0.3
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: '=(((items[props.heatpumpWaterPumpOperation].state === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState)
-                            || 0) > 0) && !(items[props.heatpumpValve].state === ''DHW''))) && (((((items[props.heatpumpWaterPumpOperation].state
-                            === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState) || 0) > 0) && !(items[props.heatpumpValve].state
-                            === ''DHW'')) ? (Number(items[props.heatpumpLeavingWaterTempAfterBuh].numericState) || 0) / 40
-                            : 0)) > 0.01)'
+                      class: a-soft
               - component: g
                 config:
                   visible: '=(((items[props.heatpumpWaterPumpOperation].state === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState)
@@ -1876,16 +1828,8 @@ slots:
                       pathLength: 100
                       stroke-width: 2.9
                       opacity: '0.9'
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          values: 1;0.55;1
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: =((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
-                            || 0) > 0) && !(items[props.heatpumpValve].state === 'DHW'))
+                      class: '=(((items[props.heatpumpWaterPumpOperation].state === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState)
+                        || 0) > 0) && !(items[props.heatpumpValve].state === ''DHW''))) ? ''a-arc'' : '''''
                   - component: circle
                     config:
                       stroke: '#ffab91'
@@ -1902,16 +1846,7 @@ slots:
                       stroke-width: 4.5
                       visible: =((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
                         || 0) > 0) && !(items[props.heatpumpValve].state === 'DHW'))
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          values: 1;0;1
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: =((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
-                            || 0) > 0) && !(items[props.heatpumpValve].state === 'DHW'))
+                      class: a-halo-arc
               - component: g
                 config: {}
                 slots:
@@ -1948,19 +1883,7 @@ slots:
                         === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState) || 0) > 0) && !(items[props.heatpumpValve].state
                         === ''DHW'')) ? (Number(items[props.heatpumpLeavingWaterTempAfterBuh].numericState) || 0) / 40 : 0))
                         > 0.01)'
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          values: 0.3;1;0.3
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: '=(((items[props.heatpumpWaterPumpOperation].state === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState)
-                            || 0) > 0) && !(items[props.heatpumpValve].state === ''DHW''))) && !(((((items[props.heatpumpWaterPumpOperation].state
-                            === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState) || 0) > 0) && !(items[props.heatpumpValve].state
-                            === ''DHW'')) ? (Number(items[props.heatpumpLeavingWaterTempAfterBuh].numericState) || 0) / 40
-                            : 0)) > 0.01)'
+                      class: a-full
                   - component: circle
                     config:
                       cx: 314
@@ -1974,19 +1897,7 @@ slots:
                         === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState) || 0) > 0) && !(items[props.heatpumpValve].state
                         === ''DHW'')) ? (Number(items[props.heatpumpLeavingWaterTempAfterBuh].numericState) || 0) / 40 : 0))
                         > 0.01)'
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          values: 0;1;0
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: '=(((items[props.heatpumpWaterPumpOperation].state === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState)
-                            || 0) > 0) && !(items[props.heatpumpValve].state === ''DHW''))) && !(((((items[props.heatpumpWaterPumpOperation].state
-                            === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState) || 0) > 0) && !(items[props.heatpumpValve].state
-                            === ''DHW'')) ? (Number(items[props.heatpumpLeavingWaterTempAfterBuh].numericState) || 0) / 40
-                            : 0)) > 0.01)'
+                      class: a-halo
                   - component: circle
                     config:
                       cx: 314
@@ -2000,19 +1911,7 @@ slots:
                         === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState) || 0) > 0) && !(items[props.heatpumpValve].state
                         === ''DHW'')) ? (Number(items[props.heatpumpLeavingWaterTempAfterBuh].numericState) || 0) / 40 : 0))
                         > 0.01)'
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          values: 0.3;0.06;0.3
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: '=(((items[props.heatpumpWaterPumpOperation].state === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState)
-                            || 0) > 0) && !(items[props.heatpumpValve].state === ''DHW''))) && (((((items[props.heatpumpWaterPumpOperation].state
-                            === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState) || 0) > 0) && !(items[props.heatpumpValve].state
-                            === ''DHW'')) ? (Number(items[props.heatpumpLeavingWaterTempAfterBuh].numericState) || 0) / 40
-                            : 0)) > 0.01)'
+                      class: a-soft
               - component: g
                 config:
                   visible: '=(((items[props.heatpumpWaterPumpOperation].state === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState)
@@ -2050,16 +1949,8 @@ slots:
                       pathLength: 100
                       stroke-width: 2.9
                       opacity: '0.9'
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          values: 1;0.55;1
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: =((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
-                            || 0) > 0) && !(items[props.heatpumpValve].state === 'DHW'))
+                      class: '=(((items[props.heatpumpWaterPumpOperation].state === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState)
+                        || 0) > 0) && !(items[props.heatpumpValve].state === ''DHW''))) ? ''a-arc'' : '''''
                   - component: circle
                     config:
                       stroke: '#f48fb1'
@@ -2076,16 +1967,7 @@ slots:
                       stroke-width: 4.5
                       visible: =((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
                         || 0) > 0) && !(items[props.heatpumpValve].state === 'DHW'))
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          values: 1;0;1
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: =((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
-                            || 0) > 0) && !(items[props.heatpumpValve].state === 'DHW'))
+                      class: a-halo-arc
               - component: g
                 config: {}
                 slots:
@@ -2122,19 +2004,7 @@ slots:
                         === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState) || 0) > 0) && !(items[props.heatpumpValve].state
                         === ''DHW'')) ? (Number(items[props.heatpumpLeavingWaterTempAfterBuh].numericState) || 0) / 40 : 0))
                         > 0.01)'
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          values: 0.3;1;0.3
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: '=(((items[props.heatpumpWaterPumpOperation].state === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState)
-                            || 0) > 0) && !(items[props.heatpumpValve].state === ''DHW''))) && !(((((items[props.heatpumpWaterPumpOperation].state
-                            === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState) || 0) > 0) && !(items[props.heatpumpValve].state
-                            === ''DHW'')) ? (Number(items[props.heatpumpLeavingWaterTempAfterBuh].numericState) || 0) / 40
-                            : 0)) > 0.01)'
+                      class: a-full
                   - component: circle
                     config:
                       cx: 314
@@ -2148,19 +2018,7 @@ slots:
                         === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState) || 0) > 0) && !(items[props.heatpumpValve].state
                         === ''DHW'')) ? (Number(items[props.heatpumpLeavingWaterTempAfterBuh].numericState) || 0) / 40 : 0))
                         > 0.01)'
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          values: 0;1;0
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: '=(((items[props.heatpumpWaterPumpOperation].state === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState)
-                            || 0) > 0) && !(items[props.heatpumpValve].state === ''DHW''))) && !(((((items[props.heatpumpWaterPumpOperation].state
-                            === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState) || 0) > 0) && !(items[props.heatpumpValve].state
-                            === ''DHW'')) ? (Number(items[props.heatpumpLeavingWaterTempAfterBuh].numericState) || 0) / 40
-                            : 0)) > 0.01)'
+                      class: a-halo
                   - component: circle
                     config:
                       cx: 314
@@ -2174,19 +2032,7 @@ slots:
                         === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState) || 0) > 0) && !(items[props.heatpumpValve].state
                         === ''DHW'')) ? (Number(items[props.heatpumpLeavingWaterTempAfterBuh].numericState) || 0) / 40 : 0))
                         > 0.01)'
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          values: 0.3;0.06;0.3
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: '=(((items[props.heatpumpWaterPumpOperation].state === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState)
-                            || 0) > 0) && !(items[props.heatpumpValve].state === ''DHW''))) && (((((items[props.heatpumpWaterPumpOperation].state
-                            === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState) || 0) > 0) && !(items[props.heatpumpValve].state
-                            === ''DHW'')) ? (Number(items[props.heatpumpLeavingWaterTempAfterBuh].numericState) || 0) / 40
-                            : 0)) > 0.01)'
+                      class: a-soft
               - component: g
                 config:
                   visible: '=(((items[props.heatpumpWaterPumpOperation].state === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState)
@@ -2224,16 +2070,8 @@ slots:
                       pathLength: 100
                       stroke-width: 2.9
                       opacity: '0.9'
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          values: 1;0.55;1
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: =((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
-                            || 0) > 0) && !(items[props.heatpumpValve].state === 'DHW'))
+                      class: '=(((items[props.heatpumpWaterPumpOperation].state === ''ON'' || (Number(items[props.heatpumpFlowSensor].numericState)
+                        || 0) > 0) && !(items[props.heatpumpValve].state === ''DHW''))) ? ''a-arc'' : '''''
                   - component: circle
                     config:
                       stroke: '#f48fb1'
@@ -2250,16 +2088,7 @@ slots:
                       stroke-width: 4.5
                       visible: =((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
                         || 0) > 0) && !(items[props.heatpumpValve].state === 'DHW'))
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          values: 1;0;1
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: =((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
-                            || 0) > 0) && !(items[props.heatpumpValve].state === 'DHW'))
+                      class: a-halo-arc
               - component: widget:flow-node
                 config:
                   kind: heat-pump
@@ -2445,144 +2274,56 @@ slots:
                   default:
                   - component: circle
                     config:
-                      cx: 0
-                      cy: 0
+                      cx: 265
+                      cy: 467
                       r: 0.9
                       fill: '#ffffff'
                       opacity: 0
                       stroke: rgba(0, 0, 0, 0.35)
                       stroke-width: 0.6
-                    slots:
-                      default:
-                      - component: animateMotion
-                        config:
-                          path: M265,467 C266.5,459 263.5,452 265,444
-                          dur: 2.6s
-                          repeatCount: indefinite
-                          calcMode: linear
-                          keyPoints: 0;1
-                          keyTimes: 0;1
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          dur: 2.6s
-                          repeatCount: indefinite
-                          calcMode: linear
-                          keyTimes: 0;0.15;0.7;1
-                          values: 0;0.9;0.9;-0
-                      - component: animate
-                        config:
-                          attributeName: r
-                          dur: 2.6s
-                          repeatCount: indefinite
-                          calcMode: linear
-                          keyTimes: 0;1
-                          values: 0.9;2.1
+                      class: a-bubble-l
+                      style:
+                        animation-duration: 2.6s
+                        animation-delay: 0.00s
                   - component: circle
                     config:
-                      cx: 0
-                      cy: 0
+                      cx: 271
+                      cy: 467
                       r: 0.9
                       fill: '#ffffff'
                       opacity: 0
                       stroke: rgba(0, 0, 0, 0.35)
                       stroke-width: 0.6
-                    slots:
-                      default:
-                      - component: animateMotion
-                        config:
-                          path: M271,467 C269.5,459 272.5,452 271,444
-                          dur: 3.1s
-                          repeatCount: indefinite
-                          calcMode: linear
-                          keyPoints: 0.5;1;0;0.5
-                          keyTimes: 0;0.5;0.5;1
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          dur: 3.1s
-                          repeatCount: indefinite
-                          calcMode: linear
-                          keyTimes: 0;0.2;0.5;0.5;0.65;1
-                          values: 0.9;0.9;-0;0;0.9;0.9
-                      - component: animate
-                        config:
-                          attributeName: r
-                          dur: 3.1s
-                          repeatCount: indefinite
-                          calcMode: linear
-                          keyTimes: 0;0.5;0.5;1
-                          values: 1.5;2.1;0.9;1.5
+                      class: a-bubble-r
+                      style:
+                        animation-duration: 3.1s
+                        animation-delay: -1.55s
                   - component: circle
                     config:
-                      cx: 0
-                      cy: 0
+                      cx: 268
+                      cy: 467
                       r: 0.9
                       fill: '#ffffff'
                       opacity: 0
                       stroke: rgba(0, 0, 0, 0.35)
                       stroke-width: 0.6
-                    slots:
-                      default:
-                      - component: animateMotion
-                        config:
-                          path: M268,467 C269.5,459 266.5,452 268,444
-                          dur: 2.3s
-                          repeatCount: indefinite
-                          calcMode: linear
-                          keyPoints: 0.25;1;0;0.25
-                          keyTimes: 0;0.75;0.75;1
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          dur: 2.3s
-                          repeatCount: indefinite
-                          calcMode: linear
-                          keyTimes: 0;0.45;0.75;0.75;0.9;1
-                          values: 0.9;0.9;-0;0;0.9;0.9
-                      - component: animate
-                        config:
-                          attributeName: r
-                          dur: 2.3s
-                          repeatCount: indefinite
-                          calcMode: linear
-                          keyTimes: 0;0.75;0.75;1
-                          values: 1.2;2.1;0.9;1.2
+                      class: a-bubble-l
+                      style:
+                        animation-duration: 2.3s
+                        animation-delay: -0.57s
                   - component: circle
                     config:
-                      cx: 0
-                      cy: 0
+                      cx: 273
+                      cy: 467
                       r: 0.9
                       fill: '#ffffff'
                       opacity: 0
                       stroke: rgba(0, 0, 0, 0.35)
                       stroke-width: 0.6
-                    slots:
-                      default:
-                      - component: animateMotion
-                        config:
-                          path: M273,467 C271.5,459 274.5,452 273,444
-                          dur: 2.9s
-                          repeatCount: indefinite
-                          calcMode: linear
-                          keyPoints: 0.75;1;0;0.75
-                          keyTimes: 0;0.25;0.25;1
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          dur: 2.9s
-                          repeatCount: indefinite
-                          calcMode: linear
-                          keyTimes: 0;0.25;0.25;0.4;0.95;1
-                          values: 0.75;-0;0;0.9;0.9;0.75
-                      - component: animate
-                        config:
-                          attributeName: r
-                          dur: 2.9s
-                          repeatCount: indefinite
-                          calcMode: linear
-                          keyTimes: 0;0.25;0.25;1
-                          values: 1.8;2.1;0.9;1.8
+                      class: a-bubble-r
+                      style:
+                        animation-duration: 2.9s
+                        animation-delay: -2.17s
               - component: path
                 config:
                   d: M277,465 H284

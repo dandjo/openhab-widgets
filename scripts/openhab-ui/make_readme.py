@@ -23,7 +23,7 @@ OVERVIEW = [
      "is one grey ring around its drawing, the ring carrying what the node shows beyond it; a working ring and its "
      "arc swell inwards and outwards at their brightest, about half again as wide as at rest. Dots run "
      "along the lines in the direction of the flow at four speeds and slide under the node rims; while power flows "
-     "through a node, its ring pulses in its colour. The icons move with the power (sun rays, air streams, pylon dashes, a pulsing bolt over the middle of the "
+     "through a node, its ring pulses in its colour. The icons move with the power (sun rays, dots down the air streams and along the pylon's wires, a pulsing bolt over the middle of the "
      "charging car, sparkles twinkling while the appliances run, the battery filled to its state of charge, the "
      "ventilation unit's fan turning and its air arrows flowing, fresh air in and used air out), the heat pump, "
      "outdoor and indoor unit, its fan with its compressor: while only its electric heaters run it stands and the energy only flows. Badges just "
@@ -499,17 +499,20 @@ The recordings show the widgets with fixed demo values.
 """)
 md.append(section("Node", "flow-node", """A device in a ring, its animation driven by `power`: `pv` (a straight module of
 six cells with the sun in front of its corner, both brighter with the power, rays turning faster), `grid` (a pylon, red on import and green on export,
-dashes running along its wires), `home` (a house whose windows glow and pulse with the consumption), `heat-pump` (an
+dots running along its wires), `home` (a house whose windows glow and pulse with the consumption), `heat-pump` (an
 outdoor unit whose fan turns while `frequency`, the compressor's, is above 0 Hz, faster from 30 and 55 Hz),
 `heat-pump-split` (the whole split heat pump: that outdoor unit with the indoor unit standing in front of its right
 side),
-`air-conditioner` (an indoor unit whose air streams flow), `e-car` (a car
+`air-conditioner` (an indoor unit with dots flowing down its air streams), `e-car` (a car
 with a bolt fading in and out while it charges), `battery` (filled to `soc`, red, orange or green), `appliances`
 (an appliance's housing with sparkles for a front, the big one breathing and the small ones twinkling while
 they run) and `ventilation` (a ventilation unit whose fan turns above 5 W, faster with the power, and whose two
 arrows, fresh air in and used air out, flow while it runs). A node is its drawing on a disc tinted in its colour over
 an opaque one in the card colour, so dots running under it disappear; the card that places it draws the grey ring
-around it, as the energy flow does (`track()` in the generator), and its badges.""", shot=gifs("flow-node", "Flow nodes")))
+around it, as the energy flow does (`track()` in the generator), and its badges. Its animations are CSS (opacity
+and transform only, which the browser runs beside its main thread) and need the generator's animation stylesheet
+on a page or widget around it: every generated page and card carries it, a widget with an `svg` root cannot.""",
+                   shot=gifs("flow-node", "Flow nodes")))
 md.append(section("Line", "flow-link", """A line from (`x1`, `y1`) to (`x2`, `y2`) in `color`. While
 |`power`| exceeds `threshold` three dots run along it, towards (`x2`, `y2`) while `forward` holds and back otherwise, at
 four speeds by the power; below the threshold the line fades. The dots run a dot radius past both ends, so they slide

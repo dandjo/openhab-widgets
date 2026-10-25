@@ -22,7 +22,7 @@ props:
     required: false
     default: '36'
   parameterGroups: []
-timestamp: Sep 29, 2026, 11:22:19 PM
+timestamp: Oct 25, 2026, 2:07:58 PM
 component: svg
 config:
   viewBox: 0 0 48 48
@@ -44,9 +44,19 @@ slots:
         slots:
           default:
           - component: g
-            config: {}
+            config:
+              class: a-spin
+              style:
+                animation-duration: 24s
             slots:
               default:
+              - component: circle
+                config:
+                  cx: 24
+                  cy: 24
+                  r: 14.5
+                  fill: none
+                  stroke: none
               - component: line
                 config:
                   x1: 34.5
@@ -127,15 +137,6 @@ slots:
                   stroke-width: 2.2
                   stroke-linecap: round
                   fill: none
-              - component: animateTransform
-                config:
-                  attributeName: transform
-                  type: rotate
-                  from: 0 24 24
-                  to: 360 24 24
-                  dur: 24s
-                  repeatCount: indefinite
-                  visible: =true
           - component: circle
             config:
               cx: 24
@@ -163,9 +164,19 @@ slots:
         slots:
           default:
           - component: g
-            config: {}
+            config:
+              class: a-spin
+              style:
+                animation-duration: 24s
             slots:
               default:
+              - component: circle
+                config:
+                  cx: 24
+                  cy: 24
+                  r: 14.5
+                  fill: none
+                  stroke: none
               - component: line
                 config:
                   x1: 34.5
@@ -246,15 +257,6 @@ slots:
                   stroke-width: 2.2
                   stroke-linecap: round
                   fill: none
-              - component: animateTransform
-                config:
-                  attributeName: transform
-                  type: rotate
-                  from: 0 24 24
-                  to: 360 24 24
-                  dur: 24s
-                  repeatCount: indefinite
-                  visible: =true
           - component: circle
             config:
               cx: 24
@@ -296,9 +298,19 @@ slots:
         slots:
           default:
           - component: g
-            config: {}
+            config:
+              class: a-spin
+              style:
+                animation-duration: 24s
             slots:
               default:
+              - component: circle
+                config:
+                  cx: 24
+                  cy: 24
+                  r: 14.5
+                  fill: none
+                  stroke: none
               - component: line
                 config:
                   x1: 34.5
@@ -379,15 +391,6 @@ slots:
                   stroke-width: 2.2
                   stroke-linecap: round
                   fill: none
-              - component: animateTransform
-                config:
-                  attributeName: transform
-                  type: rotate
-                  from: 0 24 24
-                  to: 360 24 24
-                  dur: 24s
-                  repeatCount: indefinite
-                  visible: =true
           - component: circle
             config:
               cx: 24
@@ -429,9 +432,19 @@ slots:
         slots:
           default:
           - component: g
-            config: {}
+            config:
+              class: a-spin
+              style:
+                animation-duration: 24s
             slots:
               default:
+              - component: circle
+                config:
+                  cx: 24
+                  cy: 24
+                  r: 14.5
+                  fill: none
+                  stroke: none
               - component: line
                 config:
                   x1: 34.5
@@ -512,15 +525,6 @@ slots:
                   stroke-width: 2.2
                   stroke-linecap: round
                   fill: none
-              - component: animateTransform
-                config:
-                  attributeName: transform
-                  type: rotate
-                  from: 0 24 24
-                  to: 360 24 24
-                  dur: 24s
-                  repeatCount: indefinite
-                  visible: =true
           - component: circle
             config:
               cx: 24
@@ -594,9 +598,19 @@ slots:
         slots:
           default:
           - component: g
-            config: {}
+            config:
+              class: a-spin
+              style:
+                animation-duration: 24s
             slots:
               default:
+              - component: circle
+                config:
+                  cx: 24
+                  cy: 24
+                  r: 14.5
+                  fill: none
+                  stroke: none
               - component: line
                 config:
                   x1: 34.5
@@ -677,15 +691,6 @@ slots:
                   stroke-width: 2.2
                   stroke-linecap: round
                   fill: none
-              - component: animateTransform
-                config:
-                  attributeName: transform
-                  type: rotate
-                  from: 0 24 24
-                  to: 360 24 24
-                  dur: 24s
-                  repeatCount: indefinite
-                  visible: =true
           - component: circle
             config:
               cx: 24
@@ -786,9 +791,19 @@ slots:
         slots:
           default:
           - component: g
-            config: {}
+            config:
+              class: a-spin
+              style:
+                animation-duration: 24s
             slots:
               default:
+              - component: circle
+                config:
+                  cx: 24
+                  cy: 24
+                  r: 14.5
+                  fill: none
+                  stroke: none
               - component: line
                 config:
                   x1: 34.5
@@ -869,15 +884,6 @@ slots:
                   stroke-width: 2.2
                   stroke-linecap: round
                   fill: none
-              - component: animateTransform
-                config:
-                  attributeName: transform
-                  type: rotate
-                  from: 0 24 24
-                  to: 360 24 24
-                  dur: 24s
-                  repeatCount: indefinite
-                  visible: =true
           - component: circle
             config:
               cx: 24
@@ -913,65 +919,41 @@ slots:
         config:
           x1: 18
           y1: 36
-          x2: 16
-          y2: 42
+          x2: 17.05
+          y2: 38.85
           stroke: '#42a5f5'
           stroke-width: 2.2
           stroke-linecap: round
           fill: none
-          stroke-dasharray: 3 3
-        slots:
-          default:
-          - component: animate
-            config:
-              attributeName: stroke-dashoffset
-              from: '0'
-              to: '-6'
-              dur: 0.9s
-              repeatCount: indefinite
-              visible: =true
+          class: a-drop
+          style:
+            animation-delay: -0.0s
       - component: line
         config:
           x1: 25
           y1: 36
-          x2: 23
-          y2: 42
+          x2: 24.05
+          y2: 38.85
           stroke: '#42a5f5'
           stroke-width: 2.2
           stroke-linecap: round
           fill: none
-          stroke-dasharray: 3 3
-        slots:
-          default:
-          - component: animate
-            config:
-              attributeName: stroke-dashoffset
-              from: '0'
-              to: '-6'
-              dur: 0.9s
-              repeatCount: indefinite
-              visible: =true
+          class: a-drop
+          style:
+            animation-delay: -0.3s
       - component: line
         config:
           x1: 32
           y1: 36
-          x2: 30
-          y2: 42
+          x2: 31.05
+          y2: 38.85
           stroke: '#42a5f5'
           stroke-width: 2.2
           stroke-linecap: round
           fill: none
-          stroke-dasharray: 3 3
-        slots:
-          default:
-          - component: animate
-            config:
-              attributeName: stroke-dashoffset
-              from: '0'
-              to: '-6'
-              dur: 0.9s
-              repeatCount: indefinite
-              visible: =true
+          class: a-drop
+          style:
+            animation-delay: -0.6s
   - component: g
     config:
       visible: =(props.symbol === 'snow' || props.symbol === 'snow_sun')
@@ -994,14 +976,9 @@ slots:
           fill: '#ffffff'
           stroke: '#90a4ae'
           stroke-width: 1
-        slots:
-          default:
-          - component: animate
-            config:
-              attributeName: cy
-              values: 38.5;41.5;38.5
-              dur: 2.0s
-              repeatCount: indefinite
+          class: a-wobble
+          style:
+            animation-duration: 2.0s
       - component: circle
         config:
           cx: 25.5
@@ -1010,14 +987,9 @@ slots:
           fill: '#ffffff'
           stroke: '#90a4ae'
           stroke-width: 1
-        slots:
-          default:
-          - component: animate
-            config:
-              attributeName: cy
-              values: 42;45;42
-              dur: 2.4s
-              repeatCount: indefinite
+          class: a-wobble
+          style:
+            animation-duration: 2.4s
       - component: circle
         config:
           cx: 33
@@ -1026,14 +998,9 @@ slots:
           fill: '#ffffff'
           stroke: '#90a4ae'
           stroke-width: 1
-        slots:
-          default:
-          - component: animate
-            config:
-              attributeName: cy
-              values: 38.5;41.5;38.5
-              dur: 2.8s
-              repeatCount: indefinite
+          class: a-wobble
+          style:
+            animation-duration: 2.8s
   - component: g
     config:
       visible: =(props.symbol === 'thunder' || props.symbol === 'thunder_sun')
@@ -1055,11 +1022,4 @@ slots:
           stroke: '#f9a825'
           stroke-width: 0.8
           stroke-linejoin: round
-        slots:
-          default:
-          - component: animate
-            config:
-              attributeName: opacity
-              values: 1;0.35;1;1
-              dur: 1.8s
-              repeatCount: indefinite
+          class: a-bolt

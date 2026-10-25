@@ -81,7 +81,7 @@ props:
     required: false
     context: item
   parameterGroups: []
-timestamp: Oct 8, 2026, 3:48:44 AM
+timestamp: Oct 25, 2026, 2:07:58 PM
 component: div
 config:
   style:
@@ -95,6 +95,107 @@ config:
     border-radius: 12px
     text-align: center
     background: color-mix(in srgb, var(--f7-text-color) 6%, transparent)
+  stylesheet: '@keyframes a-soft { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.06; } }
+
+    @keyframes a-full { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+
+    @keyframes a-arc { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
+
+    @keyframes a-halo { 0%, 100% { opacity: 0; } 50% { opacity: 1; } }
+
+    @keyframes a-halo-arc { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+    @keyframes a-fade { 0%, 100% { opacity: 0; } 50% { opacity: 1; } }
+
+    @keyframes a-glow { 0%, 100% { opacity: 0.35; } 50% { opacity: 1; } }
+
+    @keyframes a-blink-up { 0%, 100% { opacity: 0.2; } 50% { opacity: 1; } }
+
+    @keyframes a-blink-down { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
+
+    @keyframes a-flicker-a { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
+
+    @keyframes a-flicker-b { 0%, 100% { opacity: 0.25; } 50% { opacity: 1; } }
+
+    @keyframes a-flicker-c { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+    @keyframes a-bolt { 0%, 66.7%, 100% { opacity: 1; } 33.3% { opacity: 0.35; } }
+
+    @keyframes a-breathe { 0%, 100% { transform: scale(0.82); } 50% { transform: scale(1.05); } }
+
+    @keyframes a-spin { to { transform: rotate(360deg); } }
+
+    @keyframes a-wobble { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(3px); } }
+
+    @keyframes a-rise { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+
+    @keyframes a-fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+    @keyframes a-ripple { from { transform: scale(1); opacity: 0.7; } to { transform: scale(var(--grow)); opacity: 0; } }
+
+    @keyframes a-run { from { transform: translate(var(--ax), var(--ay)); } to { transform: translate(var(--bx), var(--by));
+    } }
+
+    @keyframes a-drop { 0% { transform: translate(0, 0); opacity: 0; } 25% { opacity: 1; } 75% { opacity: 1; } 100% { transform:
+    translate(-2px, 6px); opacity: 0; } }
+
+    @keyframes a-bubble-l { 0% { transform: translate(0.00px, 0.00px) scale(1.00); opacity: 0; } 15% { opacity: 0.9; } 25%
+    { transform: translate(0.42px, -5.84px) scale(1.33); } 50% { transform: translate(0.00px, -11.50px) scale(1.67); } 70%
+    { opacity: 0.9; } 75% { transform: translate(-0.42px, -17.16px) scale(2.00); } 100% { transform: translate(0.00px, -23.00px)
+    scale(2.33); opacity: 0; } }
+
+    @keyframes a-bubble-r { 0% { transform: translate(0.00px, 0.00px) scale(1.00); opacity: 0; } 15% { opacity: 0.9; } 25%
+    { transform: translate(-0.42px, -5.84px) scale(1.33); } 50% { transform: translate(0.00px, -11.50px) scale(1.67); } 70%
+    { opacity: 0.9; } 75% { transform: translate(0.42px, -17.16px) scale(2.00); } 100% { transform: translate(0.00px, -23.00px)
+    scale(2.33); opacity: 0; } }
+
+    .a-soft { animation: a-soft 2s linear infinite; }
+
+    .a-full { animation: a-full 2s linear infinite; }
+
+    .a-arc { animation: a-arc 2s linear infinite; }
+
+    .a-halo { animation: a-halo 2s linear infinite; }
+
+    .a-halo-arc { animation: a-halo-arc 2s linear infinite; }
+
+    .a-fade { animation: a-fade 2.4s linear infinite; }
+
+    .a-glow { animation: a-glow 2.4s linear infinite; }
+
+    .a-blink-up { animation: a-blink-up 1.8s ease-in-out infinite; }
+
+    .a-blink-down { animation: a-blink-down 1.8s ease-in-out infinite; }
+
+    .a-flicker-a { animation: a-flicker-a 0.9s linear infinite; }
+
+    .a-flicker-b { animation: a-flicker-b 1.3s linear infinite; }
+
+    .a-flicker-c { animation: a-flicker-c 2s linear infinite; }
+
+    .a-bolt { animation: a-bolt 1.8s linear infinite; }
+
+    .a-breathe { transform-box: fill-box; transform-origin: center; animation: a-breathe 2.4s ease-in-out infinite; }
+
+    .a-spin { transform-box: fill-box; transform-origin: center; animation: a-spin 1s linear infinite; }
+
+    .a-wobble { animation: a-wobble 2s linear infinite; }
+
+    .a-rise { animation: a-rise 1s linear infinite; }
+
+    .a-fill { transform-box: fill-box; transform-origin: left center; animation: a-fill 2.4s linear infinite; }
+
+    .a-ripple { transform-box: fill-box; transform-origin: center; animation: a-ripple 1.6s linear infinite; }
+
+    .a-run { animation: a-run 2.5s linear infinite; }
+
+    .a-drop { animation: a-drop 0.9s linear infinite; }
+
+    .a-bubble-l { transform-box: fill-box; transform-origin: center; animation: a-bubble-l 2.6s linear infinite; }
+
+    .a-bubble-r { transform-box: fill-box; transform-origin: center; animation: a-bubble-r 2.6s linear infinite; }
+
+    '
 slots:
   default:
   - component: widget:appliance-icon

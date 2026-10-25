@@ -114,7 +114,13 @@ def gallery_page(now):
     # 5 switch tiles, 6 value tiles
     blocks = [g.two(nodes_card(), links_card()), g.two(appliance_icons_card(), bars_card()),
               g.one(pills_card()), g.one(tiles_card()), g.two(value_tiles_card(), g.div([]))]
-    return g.layout_page(UID, {"label": "Widget-Galerie", "sidebar": False}, blocks, now)
+    page = g.layout_page(UID, {"label": "Widget-Galerie", "sidebar": False}, blocks, now)
+    # the animations' stylesheet in the page's, with the bent paths of the widgets it places (the generator's main()
+    # does this when it writes; the placed widgets' json comes from the live widgets file)
+    for uid, entry in json.load(open(g.m.DB + "uicomponents_ui_widget.json")).items():
+        g.WIDGET_TEXT[uid] = json.dumps(entry["value"])
+    g.widgets()  # builds the widgets, which registers the keyframes of the bent paths their dots run along
+    return g.anim_css_in({UID: page})[UID]
 
 
 os.makedirs(OUT, exist_ok=True)

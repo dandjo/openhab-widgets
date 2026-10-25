@@ -280,7 +280,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 24, 2026, 9:36:11 PM
+timestamp: Oct 25, 2026, 2:07:58 PM
 component: oh-card
 config:
   title: Energy Flow
@@ -292,6 +292,180 @@ config:
     flex: 1 1 auto
     display: flex
     flex-direction: column
+  stylesheet: '@keyframes a-soft { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.06; } }
+
+    @keyframes a-full { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+
+    @keyframes a-arc { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
+
+    @keyframes a-halo { 0%, 100% { opacity: 0; } 50% { opacity: 1; } }
+
+    @keyframes a-halo-arc { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+    @keyframes a-fade { 0%, 100% { opacity: 0; } 50% { opacity: 1; } }
+
+    @keyframes a-glow { 0%, 100% { opacity: 0.35; } 50% { opacity: 1; } }
+
+    @keyframes a-blink-up { 0%, 100% { opacity: 0.2; } 50% { opacity: 1; } }
+
+    @keyframes a-blink-down { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
+
+    @keyframes a-flicker-a { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
+
+    @keyframes a-flicker-b { 0%, 100% { opacity: 0.25; } 50% { opacity: 1; } }
+
+    @keyframes a-flicker-c { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+    @keyframes a-bolt { 0%, 66.7%, 100% { opacity: 1; } 33.3% { opacity: 0.35; } }
+
+    @keyframes a-breathe { 0%, 100% { transform: scale(0.82); } 50% { transform: scale(1.05); } }
+
+    @keyframes a-spin { to { transform: rotate(360deg); } }
+
+    @keyframes a-wobble { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(3px); } }
+
+    @keyframes a-rise { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+
+    @keyframes a-fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+    @keyframes a-ripple { from { transform: scale(1); opacity: 0.7; } to { transform: scale(var(--grow)); opacity: 0; } }
+
+    @keyframes a-run { from { transform: translate(var(--ax), var(--ay)); } to { transform: translate(var(--bx), var(--by));
+    } }
+
+    @keyframes a-drop { 0% { transform: translate(0, 0); opacity: 0; } 25% { opacity: 1; } 75% { opacity: 1; } 100% { transform:
+    translate(-2px, 6px); opacity: 0; } }
+
+    @keyframes a-bubble-l { 0% { transform: translate(0.00px, 0.00px) scale(1.00); opacity: 0; } 15% { opacity: 0.9; } 25%
+    { transform: translate(0.42px, -5.84px) scale(1.33); } 50% { transform: translate(0.00px, -11.50px) scale(1.67); } 70%
+    { opacity: 0.9; } 75% { transform: translate(-0.42px, -17.16px) scale(2.00); } 100% { transform: translate(0.00px, -23.00px)
+    scale(2.33); opacity: 0; } }
+
+    @keyframes a-bubble-r { 0% { transform: translate(0.00px, 0.00px) scale(1.00); opacity: 0; } 15% { opacity: 0.9; } 25%
+    { transform: translate(-0.42px, -5.84px) scale(1.33); } 50% { transform: translate(0.00px, -11.50px) scale(1.67); } 70%
+    { opacity: 0.9; } 75% { transform: translate(0.42px, -17.16px) scale(2.00); } 100% { transform: translate(0.00px, -23.00px)
+    scale(2.33); opacity: 0; } }
+
+    .a-soft { animation: a-soft 2s linear infinite; }
+
+    .a-full { animation: a-full 2s linear infinite; }
+
+    .a-arc { animation: a-arc 2s linear infinite; }
+
+    .a-halo { animation: a-halo 2s linear infinite; }
+
+    .a-halo-arc { animation: a-halo-arc 2s linear infinite; }
+
+    .a-fade { animation: a-fade 2.4s linear infinite; }
+
+    .a-glow { animation: a-glow 2.4s linear infinite; }
+
+    .a-blink-up { animation: a-blink-up 1.8s ease-in-out infinite; }
+
+    .a-blink-down { animation: a-blink-down 1.8s ease-in-out infinite; }
+
+    .a-flicker-a { animation: a-flicker-a 0.9s linear infinite; }
+
+    .a-flicker-b { animation: a-flicker-b 1.3s linear infinite; }
+
+    .a-flicker-c { animation: a-flicker-c 2s linear infinite; }
+
+    .a-bolt { animation: a-bolt 1.8s linear infinite; }
+
+    .a-breathe { transform-box: fill-box; transform-origin: center; animation: a-breathe 2.4s ease-in-out infinite; }
+
+    .a-spin { transform-box: fill-box; transform-origin: center; animation: a-spin 1s linear infinite; }
+
+    .a-wobble { animation: a-wobble 2s linear infinite; }
+
+    .a-rise { animation: a-rise 1s linear infinite; }
+
+    .a-fill { transform-box: fill-box; transform-origin: left center; animation: a-fill 2.4s linear infinite; }
+
+    .a-ripple { transform-box: fill-box; transform-origin: center; animation: a-ripple 1.6s linear infinite; }
+
+    .a-run { animation: a-run 2.5s linear infinite; }
+
+    .a-drop { animation: a-drop 0.9s linear infinite; }
+
+    .a-bubble-l { transform-box: fill-box; transform-origin: center; animation: a-bubble-l 2.6s linear infinite; }
+
+    .a-bubble-r { transform-box: fill-box; transform-origin: center; animation: a-bubble-r 2.6s linear infinite; }
+
+    @keyframes a-route-df7a7e2a { 0.00% { transform: translate(-27.00px, -5.00px); } 2.79% { transform: translate(-25.50px,
+    -4.59px); } 5.50% { transform: translate(-24.00px, -4.38px); } 8.19% { transform: translate(-22.50px, -4.34px); } 10.90%
+    { transform: translate(-21.00px, -4.50px); } 13.65% { transform: translate(-19.50px, -4.84px); } 16.51% { transform: translate(-18.00px,
+    -5.38px); } 19.49% { transform: translate(-16.50px, -6.09px); } 22.63% { transform: translate(-15.00px, -7.00px); } 29.63%
+    { transform: translate(-11.25px, -5.91px); } 36.50% { transform: translate(-7.50px, -5.12px); } 43.27% { transform: translate(-3.75px,
+    -4.66px); } 50.00% { transform: translate(0.00px, -4.50px); } 56.73% { transform: translate(3.75px, -4.66px); } 63.50%
+    { transform: translate(7.50px, -5.12px); } 70.37% { transform: translate(11.25px, -5.91px); } 77.37% { transform: translate(15.00px,
+    -7.00px); } 80.51% { transform: translate(16.50px, -6.09px); } 83.49% { transform: translate(18.00px, -5.38px); } 86.35%
+    { transform: translate(19.50px, -4.84px); } 89.10% { transform: translate(21.00px, -4.50px); } 91.81% { transform: translate(22.50px,
+    -4.34px); } 94.50% { transform: translate(24.00px, -4.38px); } 97.21% { transform: translate(25.50px, -4.59px); } 100.00%
+    { transform: translate(27.00px, -5.00px); } 0% { opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { opacity:
+    0; } }
+
+    .a-route-df7a7e2a { animation: a-route-df7a7e2a 10s linear infinite; }
+
+    @keyframes a-route-4a077550 { 0.00% { transform: translate(-27.00px, 2.00px); } 2.90% { transform: translate(-25.44px,
+    2.41px); } 5.96% { transform: translate(-23.75px, 2.62px); } 9.22% { transform: translate(-21.94px, 2.66px); } 12.72%
+    { transform: translate(-20.00px, 2.50px); } 16.48% { transform: translate(-17.94px, 2.16px); } 20.53% { transform: translate(-15.75px,
+    1.62px); } 24.89% { transform: translate(-13.44px, 0.91px); } 29.56% { transform: translate(-11.00px, 0.00px); } 34.89%
+    { transform: translate(-8.25px, 1.09px); } 40.03% { transform: translate(-5.50px, 1.88px); } 45.05% { transform: translate(-2.75px,
+    2.34px); } 50.00% { transform: translate(0.00px, 2.50px); } 54.95% { transform: translate(2.75px, 2.34px); } 59.97% {
+    transform: translate(5.50px, 1.88px); } 65.11% { transform: translate(8.25px, 1.09px); } 70.44% { transform: translate(11.00px,
+    0.00px); } 75.11% { transform: translate(13.44px, 0.91px); } 79.47% { transform: translate(15.75px, 1.62px); } 83.52%
+    { transform: translate(17.94px, 2.16px); } 87.28% { transform: translate(20.00px, 2.50px); } 90.78% { transform: translate(21.94px,
+    2.66px); } 94.04% { transform: translate(23.75px, 2.62px); } 97.10% { transform: translate(25.44px, 2.41px); } 100.00%
+    { transform: translate(27.00px, 2.00px); } 0% { opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { opacity:
+    0; } }
+
+    .a-route-4a077550 { animation: a-route-4a077550 10s linear infinite; }
+
+    @keyframes a-route-a934eb5f { 0.00% { transform: translate(-9.00px, 3.00px); } 7.04% { transform: translate(-8.34px, 3.88px);
+    } 13.42% { transform: translate(-7.88px, 4.75px); } 19.34% { transform: translate(-7.59px, 5.62px); } 25.00% { transform:
+    translate(-7.50px, 6.50px); } 30.66% { transform: translate(-7.59px, 7.38px); } 36.58% { transform: translate(-7.88px,
+    8.25px); } 42.96% { transform: translate(-8.34px, 9.12px); } 50.00% { transform: translate(-9.00px, 10.00px); } 57.04%
+    { transform: translate(-9.66px, 10.88px); } 63.42% { transform: translate(-10.12px, 11.75px); } 69.34% { transform: translate(-10.41px,
+    12.62px); } 75.00% { transform: translate(-10.50px, 13.50px); } 80.66% { transform: translate(-10.41px, 14.38px); } 86.58%
+    { transform: translate(-10.12px, 15.25px); } 92.96% { transform: translate(-9.66px, 16.12px); } 100.00% { transform: translate(-9.00px,
+    17.00px); } 0% { opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { opacity: 0; } }
+
+    .a-route-a934eb5f { animation: a-route-a934eb5f 10s linear infinite; }
+
+    @keyframes a-route-f590ad61 { 0.00% { transform: translate(0.00px, 3.00px); } 7.04% { transform: translate(0.66px, 3.88px);
+    } 13.42% { transform: translate(1.12px, 4.75px); } 19.34% { transform: translate(1.41px, 5.62px); } 25.00% { transform:
+    translate(1.50px, 6.50px); } 30.66% { transform: translate(1.41px, 7.38px); } 36.58% { transform: translate(1.12px, 8.25px);
+    } 42.96% { transform: translate(0.66px, 9.12px); } 50.00% { transform: translate(0.00px, 10.00px); } 57.04% { transform:
+    translate(-0.66px, 10.88px); } 63.42% { transform: translate(-1.12px, 11.75px); } 69.34% { transform: translate(-1.41px,
+    12.62px); } 75.00% { transform: translate(-1.50px, 13.50px); } 80.66% { transform: translate(-1.41px, 14.38px); } 86.58%
+    { transform: translate(-1.12px, 15.25px); } 92.96% { transform: translate(-0.66px, 16.12px); } 100.00% { transform: translate(0.00px,
+    17.00px); } 0% { opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { opacity: 0; } }
+
+    .a-route-f590ad61 { animation: a-route-f590ad61 10s linear infinite; }
+
+    @keyframes a-route-4c29644b { 0.00% { transform: translate(9.00px, 3.00px); } 7.04% { transform: translate(9.66px, 3.88px);
+    } 13.42% { transform: translate(10.12px, 4.75px); } 19.34% { transform: translate(10.41px, 5.62px); } 25.00% { transform:
+    translate(10.50px, 6.50px); } 30.66% { transform: translate(10.41px, 7.38px); } 36.58% { transform: translate(10.12px,
+    8.25px); } 42.96% { transform: translate(9.66px, 9.12px); } 50.00% { transform: translate(9.00px, 10.00px); } 57.04% {
+    transform: translate(8.34px, 10.88px); } 63.42% { transform: translate(7.88px, 11.75px); } 69.34% { transform: translate(7.59px,
+    12.62px); } 75.00% { transform: translate(7.50px, 13.50px); } 80.66% { transform: translate(7.59px, 14.38px); } 86.58%
+    { transform: translate(7.88px, 15.25px); } 92.96% { transform: translate(8.34px, 16.12px); } 100.00% { transform: translate(9.00px,
+    17.00px); } 0% { opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { opacity: 0; } }
+
+    .a-route-4c29644b { animation: a-route-4c29644b 10s linear infinite; }
+
+    @keyframes a-route-aabac290 { 0.00% { transform: translate(-7.00px, -21.00px); } 100.00% { transform: translate(-7.00px,
+    -10.00px); } 0% { opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { opacity: 0; } }
+
+    .a-route-aabac290 { animation: a-route-aabac290 10s linear infinite; }
+
+    @keyframes a-route-4221cc14 { 0.00% { transform: translate(7.00px, -7.00px); } 100.00% { transform: translate(7.00px,
+    -18.00px); } 0% { opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { opacity: 0; } }
+
+    .a-route-4221cc14 { animation: a-route-4221cc14 10s linear infinite; }
+
+    '
 slots:
   content:
   - component: div
@@ -589,15 +763,7 @@ slots:
                       stroke: '#ffb300'
                       stroke-width: 2.9
                       visible: =(Math.abs((Number(items[props.pvPower].numericState) || 0)) > 10) && !(false)
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          values: 0.3;1;0.3
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: =(Math.abs((Number(items[props.pvPower].numericState) || 0)) > 10) && !(false)
+                      class: a-full
                   - component: circle
                     config:
                       cx: 139.6
@@ -607,15 +773,7 @@ slots:
                       fill: none
                       stroke-width: 4.5
                       visible: =(Math.abs((Number(items[props.pvPower].numericState) || 0)) > 10) && !(false)
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          values: 0;1;0
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: =(Math.abs((Number(items[props.pvPower].numericState) || 0)) > 10) && !(false)
+                      class: a-halo
                   - component: circle
                     config:
                       cx: 139.6
@@ -625,15 +783,7 @@ slots:
                       stroke: '#ffb300'
                       stroke-width: 2.9
                       visible: =(Math.abs((Number(items[props.pvPower].numericState) || 0)) > 10) && (false)
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          values: 0.3;0.06;0.3
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: =(Math.abs((Number(items[props.pvPower].numericState) || 0)) > 10) && (false)
+                      class: a-soft
               - component: g
                 config: {}
                 slots:
@@ -647,15 +797,7 @@ slots:
                       stroke: '=(Number(items[props.gridPower].numericState) || 0) < 0 ? ''#43a047'' : ''#e53935'''
                       stroke-width: 2.9
                       visible: =(Math.abs((Number(items[props.gridPower].numericState) || 0)) > 10) && !(false)
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          values: 0.3;1;0.3
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: =(Math.abs((Number(items[props.gridPower].numericState) || 0)) > 10) && !(false)
+                      class: a-full
                   - component: circle
                     config:
                       cx: 73.6
@@ -665,15 +807,7 @@ slots:
                       fill: none
                       stroke-width: 4.5
                       visible: =(Math.abs((Number(items[props.gridPower].numericState) || 0)) > 10) && !(false)
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          values: 0;1;0
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: =(Math.abs((Number(items[props.gridPower].numericState) || 0)) > 10) && !(false)
+                      class: a-halo
                   - component: circle
                     config:
                       cx: 73.6
@@ -683,15 +817,7 @@ slots:
                       stroke: '=(Number(items[props.gridPower].numericState) || 0) < 0 ? ''#43a047'' : ''#e53935'''
                       stroke-width: 2.9
                       visible: =(Math.abs((Number(items[props.gridPower].numericState) || 0)) > 10) && (false)
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          values: 0.3;0.06;0.3
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: =(Math.abs((Number(items[props.gridPower].numericState) || 0)) > 10) && (false)
+                      class: a-soft
               - component: g
                 config: {}
                 slots:
@@ -706,16 +832,7 @@ slots:
                       stroke-width: 2.9
                       visible: =(Math.abs((Number(items[props.batteryPower].numericState) || 0)) > 10) && !(((Number(items[props.batterySoc].numericState)
                         || 0) / 100) > 0)
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          values: 0.3;1;0.3
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: =(Math.abs((Number(items[props.batteryPower].numericState) || 0)) > 10) && !(((Number(items[props.batterySoc].numericState)
-                            || 0) / 100) > 0)
+                      class: a-full
                   - component: circle
                     config:
                       cx: 106.1
@@ -726,16 +843,7 @@ slots:
                       stroke-width: 4.5
                       visible: =(Math.abs((Number(items[props.batteryPower].numericState) || 0)) > 10) && !(((Number(items[props.batterySoc].numericState)
                         || 0) / 100) > 0)
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          values: 0;1;0
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: =(Math.abs((Number(items[props.batteryPower].numericState) || 0)) > 10) && !(((Number(items[props.batterySoc].numericState)
-                            || 0) / 100) > 0)
+                      class: a-halo
                   - component: circle
                     config:
                       cx: 106.1
@@ -746,16 +854,7 @@ slots:
                       stroke-width: 2.9
                       visible: =(Math.abs((Number(items[props.batteryPower].numericState) || 0)) > 10) && (((Number(items[props.batterySoc].numericState)
                         || 0) / 100) > 0)
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          values: 0.3;0.06;0.3
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: =(Math.abs((Number(items[props.batteryPower].numericState) || 0)) > 10) && (((Number(items[props.batterySoc].numericState)
-                            || 0) / 100) > 0)
+                      class: a-soft
               - component: g
                 config: {}
                 slots:
@@ -773,19 +872,7 @@ slots:
                         !== ''UNDEF'' && items[props.heatpumpDhwSince].state !== ''NULL'') ? Math.max(0, dayjs().diff(dayjs(items[props.heatpumpDhwSince].state)))
                         / Math.max(1, dayjs(items[props.heatpumpDhwEta].state).diff(dayjs(items[props.heatpumpDhwSince].state)))
                         : 0)) > 0)'
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          values: 0.3;1;0.3
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: '=(Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) > 28) && !((((items[props.heatpumpDhwEta].state
-                            !== ''UNDEF'' && items[props.heatpumpDhwEta].state !== ''NULL'' && items[props.heatpumpDhwSince].state
-                            !== ''UNDEF'' && items[props.heatpumpDhwSince].state !== ''NULL'') ? Math.max(0, dayjs().diff(dayjs(items[props.heatpumpDhwSince].state)))
-                            / Math.max(1, dayjs(items[props.heatpumpDhwEta].state).diff(dayjs(items[props.heatpumpDhwSince].state)))
-                            : 0)) > 0)'
+                      class: a-full
                   - component: circle
                     config:
                       cx: 377.7
@@ -799,19 +886,7 @@ slots:
                         !== ''UNDEF'' && items[props.heatpumpDhwSince].state !== ''NULL'') ? Math.max(0, dayjs().diff(dayjs(items[props.heatpumpDhwSince].state)))
                         / Math.max(1, dayjs(items[props.heatpumpDhwEta].state).diff(dayjs(items[props.heatpumpDhwSince].state)))
                         : 0)) > 0)'
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          values: 0;1;0
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: '=(Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) > 28) && !((((items[props.heatpumpDhwEta].state
-                            !== ''UNDEF'' && items[props.heatpumpDhwEta].state !== ''NULL'' && items[props.heatpumpDhwSince].state
-                            !== ''UNDEF'' && items[props.heatpumpDhwSince].state !== ''NULL'') ? Math.max(0, dayjs().diff(dayjs(items[props.heatpumpDhwSince].state)))
-                            / Math.max(1, dayjs(items[props.heatpumpDhwEta].state).diff(dayjs(items[props.heatpumpDhwSince].state)))
-                            : 0)) > 0)'
+                      class: a-halo
                   - component: circle
                     config:
                       cx: 377.7
@@ -825,19 +900,7 @@ slots:
                         !== ''UNDEF'' && items[props.heatpumpDhwSince].state !== ''NULL'') ? Math.max(0, dayjs().diff(dayjs(items[props.heatpumpDhwSince].state)))
                         / Math.max(1, dayjs(items[props.heatpumpDhwEta].state).diff(dayjs(items[props.heatpumpDhwSince].state)))
                         : 0)) > 0)'
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          values: 0.3;0.06;0.3
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: '=(Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) > 28) && ((((items[props.heatpumpDhwEta].state
-                            !== ''UNDEF'' && items[props.heatpumpDhwEta].state !== ''NULL'' && items[props.heatpumpDhwSince].state
-                            !== ''UNDEF'' && items[props.heatpumpDhwSince].state !== ''NULL'') ? Math.max(0, dayjs().diff(dayjs(items[props.heatpumpDhwSince].state)))
-                            / Math.max(1, dayjs(items[props.heatpumpDhwEta].state).diff(dayjs(items[props.heatpumpDhwSince].state)))
-                            : 0)) > 0)'
+                      class: a-soft
               - component: g
                 config: {}
                 slots:
@@ -851,15 +914,7 @@ slots:
                       stroke: '#26a69a'
                       stroke-width: 2.9
                       visible: =(Math.abs((Number(items[props.ecarPower].numericState) || 0)) > 100) && !(false)
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          values: 0.3;1;0.3
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: =(Math.abs((Number(items[props.ecarPower].numericState) || 0)) > 100) && !(false)
+                      class: a-full
                   - component: circle
                     config:
                       cx: 344.2
@@ -869,15 +924,7 @@ slots:
                       fill: none
                       stroke-width: 4.5
                       visible: =(Math.abs((Number(items[props.ecarPower].numericState) || 0)) > 100) && !(false)
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          values: 0;1;0
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: =(Math.abs((Number(items[props.ecarPower].numericState) || 0)) > 100) && !(false)
+                      class: a-halo
                   - component: circle
                     config:
                       cx: 344.2
@@ -887,15 +934,7 @@ slots:
                       stroke: '#26a69a'
                       stroke-width: 2.9
                       visible: =(Math.abs((Number(items[props.ecarPower].numericState) || 0)) > 100) && (false)
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          values: 0.3;0.06;0.3
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: =(Math.abs((Number(items[props.ecarPower].numericState) || 0)) > 100) && (false)
+                      class: a-soft
               - component: g
                 config: {}
                 slots:
@@ -911,17 +950,7 @@ slots:
                       visible: =(Math.abs(((Number(items[props.washingMachine1Power].numericState) || 0) + (Number(items[props.washingMachine2Power].numericState)
                         || 0) + (Number(items[props.tumbleDryerPower].numericState) || 0) + (Number(items[props.dishwasherPower].numericState)
                         || 0))) > 10) && !(false)
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          values: 0.3;1;0.3
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: =(Math.abs(((Number(items[props.washingMachine1Power].numericState) || 0) + (Number(items[props.washingMachine2Power].numericState)
-                            || 0) + (Number(items[props.tumbleDryerPower].numericState) || 0) + (Number(items[props.dishwasherPower].numericState)
-                            || 0))) > 10) && !(false)
+                      class: a-full
                   - component: circle
                     config:
                       cx: 218.2
@@ -933,17 +962,7 @@ slots:
                       visible: =(Math.abs(((Number(items[props.washingMachine1Power].numericState) || 0) + (Number(items[props.washingMachine2Power].numericState)
                         || 0) + (Number(items[props.tumbleDryerPower].numericState) || 0) + (Number(items[props.dishwasherPower].numericState)
                         || 0))) > 10) && !(false)
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          values: 0;1;0
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: =(Math.abs(((Number(items[props.washingMachine1Power].numericState) || 0) + (Number(items[props.washingMachine2Power].numericState)
-                            || 0) + (Number(items[props.tumbleDryerPower].numericState) || 0) + (Number(items[props.dishwasherPower].numericState)
-                            || 0))) > 10) && !(false)
+                      class: a-halo
                   - component: circle
                     config:
                       cx: 218.2
@@ -955,17 +974,7 @@ slots:
                       visible: =(Math.abs(((Number(items[props.washingMachine1Power].numericState) || 0) + (Number(items[props.washingMachine2Power].numericState)
                         || 0) + (Number(items[props.tumbleDryerPower].numericState) || 0) + (Number(items[props.dishwasherPower].numericState)
                         || 0))) > 10) && (false)
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          values: 0.3;0.06;0.3
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: =(Math.abs(((Number(items[props.washingMachine1Power].numericState) || 0) + (Number(items[props.washingMachine2Power].numericState)
-                            || 0) + (Number(items[props.tumbleDryerPower].numericState) || 0) + (Number(items[props.dishwasherPower].numericState)
-                            || 0))) > 10) && (false)
+                      class: a-soft
               - component: circle
                 config:
                   stroke: '#9e9e9e'
@@ -975,15 +984,7 @@ slots:
                   fill: none
                   stroke-width: 2.9
                   visible: =Math.abs((Number(items[props.homePower].numericState) || 0)) > 10
-                slots:
-                  default:
-                  - component: animate
-                    config:
-                      attributeName: opacity
-                      values: 0.3;0.06;0.3
-                      dur: 2s
-                      repeatCount: indefinite
-                      visible: =Math.abs((Number(items[props.homePower].numericState) || 0)) > 10
+                  class: a-soft
               - component: circle
                 config:
                   style:
@@ -1141,17 +1142,7 @@ slots:
                   visible: =(Math.abs((Number(items[props.homePower].numericState) || 0)) > 10) && (Math.max(0, Math.min(Math.min(100,
                     Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
                     || 0)) * 100), 100 - (0)))) > 0.05
-                slots:
-                  default:
-                  - component: animate
-                    config:
-                      attributeName: opacity
-                      values: 1;0;1
-                      dur: 2s
-                      repeatCount: indefinite
-                      visible: =(Math.abs((Number(items[props.homePower].numericState) || 0)) > 10) && (Math.max(0, Math.min(Math.min(100,
-                        Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
-                        || 0)) * 100), 100 - (0)))) > 0.05
+                  class: a-halo-arc
               - component: circle
                 config:
                   stroke: '#fb8c00'
@@ -1192,19 +1183,7 @@ slots:
                     Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
                     || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
                     || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))))))) > 0.05
-                slots:
-                  default:
-                  - component: animate
-                    config:
-                      attributeName: opacity
-                      values: 1;0;1
-                      dur: 2s
-                      repeatCount: indefinite
-                      visible: =(Math.abs((Number(items[props.homePower].numericState) || 0)) > 10) && (Math.max(0, Math.min(Math.min(100,
-                        Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
-                        || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
-                        || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))))))
-                        > 0.05
+                  class: a-halo-arc
               - component: circle
                 config:
                   stroke: '#29b6f6'
@@ -1270,23 +1249,7 @@ slots:
                     || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
                     || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))))))))))
                     > 0.05'
-                slots:
-                  default:
-                  - component: animate
-                    config:
-                      attributeName: opacity
-                      values: 1;0;1
-                      dur: 2s
-                      repeatCount: indefinite
-                      visible: '=(Math.abs((Number(items[props.homePower].numericState) || 0)) > 10) && (Math.max(0, Math.min(Math.min(100,
-                        Math.max(0, (items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
-                        || 0) : 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (((0 +
-                        Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
-                        || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0,
-                        Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1,
-                        (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100,
-                        Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
-                        || 0)) * 100), 100 - (0)))))))))))) > 0.05'
+                  class: a-halo-arc
               - component: circle
                 config:
                   stroke: '#26a69a'
@@ -1393,29 +1356,7 @@ slots:
                     (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100,
                     Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
                     || 0)) * 100), 100 - (0)))))))))))))))) > 0.05'
-                slots:
-                  default:
-                  - component: animate
-                    config:
-                      attributeName: opacity
-                      values: 1;0;1
-                      dur: 2s
-                      repeatCount: indefinite
-                      visible: '=(Math.abs((Number(items[props.homePower].numericState) || 0)) > 10) && (Math.max(0, Math.min(Math.min(100,
-                        Math.max(0, (Number(items[props.ecarPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
-                        || 0)) * 100), 100 - ((((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
-                        || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0,
-                        Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1,
-                        (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100,
-                        Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
-                        || 0)) * 100), 100 - (0)))))))) + Math.max(0, Math.min(Math.min(100, Math.max(0, (items[props.acSwitch].state
-                        === ''ON'' ? (Number(items[props.acUnitPower].numericState) || 0) : 0)) / Math.max(1, (Number(items[props.homePower].numericState)
-                        || 0)) * 100), 100 - (((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
-                        || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0,
-                        Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1,
-                        (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100,
-                        Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
-                        || 0)) * 100), 100 - (0)))))))))))))))) > 0.05'
+                  class: a-halo-arc
               - component: circle
                 config:
                   stroke: '#5c6bc0'
@@ -1609,45 +1550,7 @@ slots:
                     || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
                     || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))))))))))))))))))
                     > 0.05'
-                slots:
-                  default:
-                  - component: animate
-                    config:
-                      attributeName: opacity
-                      values: 1;0;1
-                      dur: 2s
-                      repeatCount: indefinite
-                      visible: '=(Math.abs((Number(items[props.homePower].numericState) || 0)) > 10) && (Math.max(0, Math.min(Math.min(100,
-                        Math.max(0, ((Number(items[props.washingMachine1Power].numericState) || 0) + (Number(items[props.washingMachine2Power].numericState)
-                        || 0) + (Number(items[props.tumbleDryerPower].numericState) || 0) + (Number(items[props.dishwasherPower].numericState)
-                        || 0))) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (((((0 + Math.max(0,
-                        Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1,
-                        (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0, Math.min(Math.min(100,
-                        Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
-                        || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
-                        || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))))))
-                        + Math.max(0, Math.min(Math.min(100, Math.max(0, (items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
-                        || 0) : 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (((0 +
-                        Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
-                        || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0,
-                        Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1,
-                        (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100,
-                        Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
-                        || 0)) * 100), 100 - (0)))))))))))) + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ecarPower].numericState)
-                        || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((((0 + Math.max(0,
-                        Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1,
-                        (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0, Math.min(Math.min(100,
-                        Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
-                        || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
-                        || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))))))
-                        + Math.max(0, Math.min(Math.min(100, Math.max(0, (items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
-                        || 0) : 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (((0 +
-                        Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
-                        || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0,
-                        Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1,
-                        (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100,
-                        Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
-                        || 0)) * 100), 100 - (0)))))))))))))))))))) > 0.05'
+                  class: a-halo-arc
               - component: circle
                 config:
                   stroke: '=(Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
@@ -1899,71 +1802,7 @@ slots:
                     || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
                     || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))))))))))))))))))))
                     > 0.05'
-                slots:
-                  default:
-                  - component: animate
-                    config:
-                      attributeName: opacity
-                      values: 1;0;1
-                      dur: 2s
-                      repeatCount: indefinite
-                      visible: '=(Math.abs((Number(items[props.homePower].numericState) || 0)) > 10) && ((((((0 + Math.max(0,
-                        Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1,
-                        (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0, Math.min(Math.min(100,
-                        Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
-                        || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
-                        || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))))))
-                        + Math.max(0, Math.min(Math.min(100, Math.max(0, (items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
-                        || 0) : 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (((0 +
-                        Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
-                        || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0,
-                        Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1,
-                        (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100,
-                        Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
-                        || 0)) * 100), 100 - (0)))))))))))) + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ecarPower].numericState)
-                        || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((((0 + Math.max(0,
-                        Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1,
-                        (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0, Math.min(Math.min(100,
-                        Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
-                        || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
-                        || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))))))
-                        + Math.max(0, Math.min(Math.min(100, Math.max(0, (items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
-                        || 0) : 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (((0 +
-                        Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
-                        || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0,
-                        Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1,
-                        (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100,
-                        Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
-                        || 0)) * 100), 100 - (0)))))))))))))))) + Math.max(0, Math.min(Math.min(100, Math.max(0, ((Number(items[props.washingMachine1Power].numericState)
-                        || 0) + (Number(items[props.washingMachine2Power].numericState) || 0) + (Number(items[props.tumbleDryerPower].numericState)
-                        || 0) + (Number(items[props.dishwasherPower].numericState) || 0))) / Math.max(1, (Number(items[props.homePower].numericState)
-                        || 0)) * 100), 100 - (((((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
-                        || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0,
-                        Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1,
-                        (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100,
-                        Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
-                        || 0)) * 100), 100 - (0)))))))) + Math.max(0, Math.min(Math.min(100, Math.max(0, (items[props.acSwitch].state
-                        === ''ON'' ? (Number(items[props.acUnitPower].numericState) || 0) : 0)) / Math.max(1, (Number(items[props.homePower].numericState)
-                        || 0)) * 100), 100 - (((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
-                        || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0,
-                        Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1,
-                        (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100,
-                        Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
-                        || 0)) * 100), 100 - (0)))))))))))) + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ecarPower].numericState)
-                        || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((((0 + Math.max(0,
-                        Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1,
-                        (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0, Math.min(Math.min(100,
-                        Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
-                        || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
-                        || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))))))
-                        + Math.max(0, Math.min(Math.min(100, Math.max(0, (items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
-                        || 0) : 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (((0 +
-                        Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
-                        || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0,
-                        Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1,
-                        (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100,
-                        Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
-                        || 0)) * 100), 100 - (0))))))))))))))))))))) > 0.05'
+                  class: a-halo-arc
               - component: circle
                 config:
                   stroke: '=(Math.max(0, Math.min(Math.min(100, Math.max(0, ((Number(items[props.washingMachine1Power].numericState)
@@ -2323,71 +2162,7 @@ slots:
                     || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
                     || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))))))))))))))))))))
                     > 0.05'
-                slots:
-                  default:
-                  - component: animate
-                    config:
-                      attributeName: opacity
-                      values: 1;0;1
-                      dur: 2s
-                      repeatCount: indefinite
-                      visible: '=(Math.abs((Number(items[props.homePower].numericState) || 0)) > 10) && ((((((0 + Math.max(0,
-                        Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1,
-                        (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0, Math.min(Math.min(100,
-                        Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
-                        || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
-                        || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))))))
-                        + Math.max(0, Math.min(Math.min(100, Math.max(0, (items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
-                        || 0) : 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (((0 +
-                        Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
-                        || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0,
-                        Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1,
-                        (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100,
-                        Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
-                        || 0)) * 100), 100 - (0)))))))))))) + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ecarPower].numericState)
-                        || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((((0 + Math.max(0,
-                        Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1,
-                        (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0, Math.min(Math.min(100,
-                        Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
-                        || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
-                        || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))))))
-                        + Math.max(0, Math.min(Math.min(100, Math.max(0, (items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
-                        || 0) : 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (((0 +
-                        Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
-                        || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0,
-                        Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1,
-                        (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100,
-                        Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
-                        || 0)) * 100), 100 - (0)))))))))))))))) + Math.max(0, Math.min(Math.min(100, Math.max(0, ((Number(items[props.washingMachine1Power].numericState)
-                        || 0) + (Number(items[props.washingMachine2Power].numericState) || 0) + (Number(items[props.tumbleDryerPower].numericState)
-                        || 0) + (Number(items[props.dishwasherPower].numericState) || 0))) / Math.max(1, (Number(items[props.homePower].numericState)
-                        || 0)) * 100), 100 - (((((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
-                        || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0,
-                        Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1,
-                        (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100,
-                        Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
-                        || 0)) * 100), 100 - (0)))))))) + Math.max(0, Math.min(Math.min(100, Math.max(0, (items[props.acSwitch].state
-                        === ''ON'' ? (Number(items[props.acUnitPower].numericState) || 0) : 0)) / Math.max(1, (Number(items[props.homePower].numericState)
-                        || 0)) * 100), 100 - (((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
-                        || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0,
-                        Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1,
-                        (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100,
-                        Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
-                        || 0)) * 100), 100 - (0)))))))))))) + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ecarPower].numericState)
-                        || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((((0 + Math.max(0,
-                        Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1,
-                        (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0, Math.min(Math.min(100,
-                        Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
-                        || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
-                        || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))))))
-                        + Math.max(0, Math.min(Math.min(100, Math.max(0, (items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
-                        || 0) : 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (((0 +
-                        Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
-                        || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0,
-                        Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1,
-                        (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100,
-                        Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
-                        || 0)) * 100), 100 - (0))))))))))))))))))))) > 0.05'
+                  class: a-halo-arc
               - component: g
                 config: {}
                 slots:
@@ -2403,17 +2178,7 @@ slots:
                       visible: '=(Math.abs((items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
                         || 0) : 0)) > 5) && !(((Number(items[props.acTimer].numericState) || 0) / Math.max((Number(items[props.acTimer].numericState)
                         || 0), (Number(items[props.acTimerSet].numericState) || 0) || 720)) > 0)'
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          values: 0.3;1;0.3
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: '=(Math.abs((items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
-                            || 0) : 0)) > 5) && !(((Number(items[props.acTimer].numericState) || 0) / Math.max((Number(items[props.acTimer].numericState)
-                            || 0), (Number(items[props.acTimerSet].numericState) || 0) || 720)) > 0)'
+                      class: a-full
                   - component: circle
                     config:
                       cx: 410.2
@@ -2425,17 +2190,7 @@ slots:
                       visible: '=(Math.abs((items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
                         || 0) : 0)) > 5) && !(((Number(items[props.acTimer].numericState) || 0) / Math.max((Number(items[props.acTimer].numericState)
                         || 0), (Number(items[props.acTimerSet].numericState) || 0) || 720)) > 0)'
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          values: 0;1;0
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: '=(Math.abs((items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
-                            || 0) : 0)) > 5) && !(((Number(items[props.acTimer].numericState) || 0) / Math.max((Number(items[props.acTimer].numericState)
-                            || 0), (Number(items[props.acTimerSet].numericState) || 0) || 720)) > 0)'
+                      class: a-halo
                   - component: circle
                     config:
                       cx: 410.2
@@ -2447,17 +2202,7 @@ slots:
                       visible: '=(Math.abs((items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
                         || 0) : 0)) > 5) && (((Number(items[props.acTimer].numericState) || 0) / Math.max((Number(items[props.acTimer].numericState)
                         || 0), (Number(items[props.acTimerSet].numericState) || 0) || 720)) > 0)'
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          values: 0.3;0.06;0.3
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: '=(Math.abs((items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
-                            || 0) : 0)) > 5) && (((Number(items[props.acTimer].numericState) || 0) / Math.max((Number(items[props.acTimer].numericState)
-                            || 0), (Number(items[props.acTimerSet].numericState) || 0) || 720)) > 0)'
+                      class: a-soft
               - component: g
                 config: {}
                 slots:
@@ -2473,17 +2218,7 @@ slots:
                       visible: =(Math.abs((Number(items[props.ventilationPower].numericState) || 0)) > 5) && !(((Number(items[props.ventilationTimer].numericState)
                         || 0) / Math.max((Number(items[props.ventilationTimer].numericState) || 0), (Number(items[props.ventilationTimerSet].numericState)
                         || 0) || 360)) > 0)
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          values: 0.3;1;0.3
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: =(Math.abs((Number(items[props.ventilationPower].numericState) || 0)) > 5) && !(((Number(items[props.ventilationTimer].numericState)
-                            || 0) / Math.max((Number(items[props.ventilationTimer].numericState) || 0), (Number(items[props.ventilationTimerSet].numericState)
-                            || 0) || 360)) > 0)
+                      class: a-full
                   - component: circle
                     config:
                       cx: 265.6
@@ -2495,17 +2230,7 @@ slots:
                       visible: =(Math.abs((Number(items[props.ventilationPower].numericState) || 0)) > 5) && !(((Number(items[props.ventilationTimer].numericState)
                         || 0) / Math.max((Number(items[props.ventilationTimer].numericState) || 0), (Number(items[props.ventilationTimerSet].numericState)
                         || 0) || 360)) > 0)
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          values: 0;1;0
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: =(Math.abs((Number(items[props.ventilationPower].numericState) || 0)) > 5) && !(((Number(items[props.ventilationTimer].numericState)
-                            || 0) / Math.max((Number(items[props.ventilationTimer].numericState) || 0), (Number(items[props.ventilationTimerSet].numericState)
-                            || 0) || 360)) > 0)
+                      class: a-halo
                   - component: circle
                     config:
                       cx: 265.6
@@ -2517,17 +2242,7 @@ slots:
                       visible: =(Math.abs((Number(items[props.ventilationPower].numericState) || 0)) > 5) && (((Number(items[props.ventilationTimer].numericState)
                         || 0) / Math.max((Number(items[props.ventilationTimer].numericState) || 0), (Number(items[props.ventilationTimerSet].numericState)
                         || 0) || 360)) > 0)
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          values: 0.3;0.06;0.3
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: =(Math.abs((Number(items[props.ventilationPower].numericState) || 0)) > 5) && (((Number(items[props.ventilationTimer].numericState)
-                            || 0) / Math.max((Number(items[props.ventilationTimer].numericState) || 0), (Number(items[props.ventilationTimerSet].numericState)
-                            || 0) || 360)) > 0)
+                      class: a-soft
               - component: g
                 config:
                   visible: =(Number(items[props.acTimer].numericState) || 0) / Math.max((Number(items[props.acTimer].numericState)
@@ -2562,16 +2277,8 @@ slots:
                       pathLength: 100
                       stroke-width: 2.9
                       opacity: '0.9'
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          values: 1;0.55;1
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: '=Math.abs((items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
-                            || 0) : 0)) > 5'
+                      class: '=(Math.abs((items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
+                        || 0) : 0)) > 5) ? ''a-arc'' : '''''
                   - component: circle
                     config:
                       stroke: '#29b6f6'
@@ -2587,16 +2294,7 @@ slots:
                       stroke-width: 4.5
                       visible: '=Math.abs((items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
                         || 0) : 0)) > 5'
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          values: 1;0;1
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: '=Math.abs((items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
-                            || 0) : 0)) > 5'
+                      class: a-halo-arc
               - component: g
                 config:
                   visible: =(Number(items[props.ventilationTimer].numericState) || 0) / Math.max((Number(items[props.ventilationTimer].numericState)
@@ -2633,15 +2331,7 @@ slots:
                       pathLength: 100
                       stroke-width: 2.9
                       opacity: '0.9'
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          values: 1;0.55;1
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: =Math.abs((Number(items[props.ventilationPower].numericState) || 0)) > 5
+                      class: '=(Math.abs((Number(items[props.ventilationPower].numericState) || 0)) > 5) ? ''a-arc'' : '''''
                   - component: circle
                     config:
                       stroke: '#26a69a'
@@ -2657,15 +2347,7 @@ slots:
                       fill: none
                       stroke-width: 4.5
                       visible: =Math.abs((Number(items[props.ventilationPower].numericState) || 0)) > 5
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          values: 1;0;1
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: =Math.abs((Number(items[props.ventilationPower].numericState) || 0)) > 5
+                      class: a-halo-arc
               - component: g
                 config:
                   visible: =(Number(items[props.batterySoc].numericState) || 0) / 100 > 0
@@ -2699,15 +2381,7 @@ slots:
                       pathLength: 100
                       stroke-width: 2.9
                       opacity: '0.9'
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          values: 1;0.55;1
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: =Math.abs((Number(items[props.batteryPower].numericState) || 0)) > 10
+                      class: '=(Math.abs((Number(items[props.batteryPower].numericState) || 0)) > 10) ? ''a-arc'' : '''''
                   - component: circle
                     config:
                       stroke: '#7cb342'
@@ -2722,15 +2396,7 @@ slots:
                       fill: none
                       stroke-width: 4.5
                       visible: =Math.abs((Number(items[props.batteryPower].numericState) || 0)) > 10
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          values: 1;0;1
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: =Math.abs((Number(items[props.batteryPower].numericState) || 0)) > 10
+                      class: a-halo-arc
               - component: g
                 config:
                   visible: '=((items[props.heatpumpDhwEta].state !== ''UNDEF'' && items[props.heatpumpDhwEta].state !== ''NULL''
@@ -2773,15 +2439,7 @@ slots:
                       pathLength: 100
                       stroke-width: 2.9
                       opacity: '0.9'
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          values: 1;0.55;1
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: =Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) > 28
+                      class: '=(Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) > 28) ? ''a-arc'' : '''''
                   - component: circle
                     config:
                       stroke: '#fb8c00'
@@ -2799,15 +2457,7 @@ slots:
                       fill: none
                       stroke-width: 4.5
                       visible: =Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) > 28
-                    slots:
-                      default:
-                      - component: animate
-                        config:
-                          attributeName: opacity
-                          values: 1;0;1
-                          dur: 2s
-                          repeatCount: indefinite
-                          visible: =Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) > 28
+                      class: a-halo-arc
               - component: g
                 config: {}
                 slots:
@@ -3554,15 +3204,7 @@ slots:
                           fill: none
                           stroke-width: 3.23
                           visible: =Math.abs((Number(items[props.homePower].numericState) || 0)) > 10
-                        slots:
-                          default:
-                          - component: animate
-                            config:
-                              attributeName: opacity
-                              values: 0.3;0.06;0.3
-                              dur: 2s
-                              repeatCount: indefinite
-                              visible: =Math.abs((Number(items[props.homePower].numericState) || 0)) > 10
+                          class: a-soft
                       - component: circle
                         config:
                           stroke: '#26a69a'
@@ -3597,18 +3239,7 @@ slots:
                           visible: =(Math.abs((Number(items[props.homePower].numericState) || 0)) > 10) && (Math.max(0, Math.min(Math.min(100,
                             Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
                             || 0)) * 100), 100 - (0)))) > 0.05
-                        slots:
-                          default:
-                          - component: animate
-                            config:
-                              attributeName: opacity
-                              values: 1;0;1
-                              dur: 2s
-                              repeatCount: indefinite
-                              visible: =(Math.abs((Number(items[props.homePower].numericState) || 0)) > 10) && (Math.max(0,
-                                Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) ||
-                                0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))
-                                > 0.05
+                          class: a-halo-arc
                       - component: circle
                         config:
                           stroke: '#fb8c00'
@@ -3652,20 +3283,7 @@ slots:
                             || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
                             || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))))))
                             > 0.05
-                        slots:
-                          default:
-                          - component: animate
-                            config:
-                              attributeName: opacity
-                              values: 1;0;1
-                              dur: 2s
-                              repeatCount: indefinite
-                              visible: =(Math.abs((Number(items[props.homePower].numericState) || 0)) > 10) && (Math.max(0,
-                                Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0))
-                                / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0,
-                                Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) ||
-                                0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))))))
-                                > 0.05
+                          class: a-halo-arc
                       - component: circle
                         config:
                           stroke: '#29b6f6'
@@ -3735,24 +3353,7 @@ slots:
                             Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0))
                             / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))))))))))
                             > 0.05'
-                        slots:
-                          default:
-                          - component: animate
-                            config:
-                              attributeName: opacity
-                              values: 1;0;1
-                              dur: 2s
-                              repeatCount: indefinite
-                              visible: '=(Math.abs((Number(items[props.homePower].numericState) || 0)) > 10) && (Math.max(0,
-                                Math.min(Math.min(100, Math.max(0, (items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
-                                || 0) : 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100
-                                - (((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))
-                                + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0
-                                + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))))))))))
-                                > 0.05'
+                          class: a-halo-arc
                       - component: circle
                         config:
                           stroke: '#26a69a'
@@ -3869,31 +3470,7 @@ slots:
                             Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0))
                             / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))))))))))))))
                             > 0.05'
-                        slots:
-                          default:
-                          - component: animate
-                            config:
-                              attributeName: opacity
-                              values: 1;0;1
-                              dur: 2s
-                              repeatCount: indefinite
-                              visible: '=(Math.abs((Number(items[props.homePower].numericState) || 0)) > 10) && (Math.max(0,
-                                Math.min(Math.min(100, Math.max(0, (Number(items[props.ecarPower].numericState) || 0)) / Math.max(1,
-                                (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((((0 + Math.max(0, Math.min(Math.min(100,
-                                Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
-                                || 0)) * 100), 100 - (0)))) + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0
-                                + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))))))
-                                + Math.max(0, Math.min(Math.min(100, Math.max(0, (items[props.acSwitch].state === ''ON'' ?
-                                (Number(items[props.acUnitPower].numericState) || 0) : 0)) / Math.max(1, (Number(items[props.homePower].numericState)
-                                || 0)) * 100), 100 - (((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))
-                                + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0
-                                + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))))))))))))))
-                                > 0.05'
+                          class: a-halo-arc
                       - component: circle
                         config:
                           stroke: '#5c6bc0'
@@ -4111,49 +3688,7 @@ slots:
                             Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0))
                             / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))))))))))))))))))
                             > 0.05'
-                        slots:
-                          default:
-                          - component: animate
-                            config:
-                              attributeName: opacity
-                              values: 1;0;1
-                              dur: 2s
-                              repeatCount: indefinite
-                              visible: '=(Math.abs((Number(items[props.homePower].numericState) || 0)) > 10) && (Math.max(0,
-                                Math.min(Math.min(100, Math.max(0, ((Number(items[props.washingMachine1Power].numericState)
-                                || 0) + (Number(items[props.washingMachine2Power].numericState) || 0) + (Number(items[props.tumbleDryerPower].numericState)
-                                || 0) + (Number(items[props.dishwasherPower].numericState) || 0))) / Math.max(1, (Number(items[props.homePower].numericState)
-                                || 0)) * 100), 100 - (((((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))
-                                + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0
-                                + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))))))
-                                + Math.max(0, Math.min(Math.min(100, Math.max(0, (items[props.acSwitch].state === ''ON'' ?
-                                (Number(items[props.acUnitPower].numericState) || 0) : 0)) / Math.max(1, (Number(items[props.homePower].numericState)
-                                || 0)) * 100), 100 - (((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))
-                                + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0
-                                + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))))))))))
-                                + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ecarPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((((0
-                                + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))
-                                + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0
-                                + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))))))
-                                + Math.max(0, Math.min(Math.min(100, Math.max(0, (items[props.acSwitch].state === ''ON'' ?
-                                (Number(items[props.acUnitPower].numericState) || 0) : 0)) / Math.max(1, (Number(items[props.homePower].numericState)
-                                || 0)) * 100), 100 - (((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))
-                                + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0
-                                + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))))))))))))))))))
-                                > 0.05'
+                          class: a-halo-arc
                       - component: circle
                         config:
                           stroke: '=(Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
@@ -4434,79 +3969,7 @@ slots:
                             Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0))
                             / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))))))))))))))))))))
                             > 0.05'
-                        slots:
-                          default:
-                          - component: animate
-                            config:
-                              attributeName: opacity
-                              values: 1;0;1
-                              dur: 2s
-                              repeatCount: indefinite
-                              visible: '=(Math.abs((Number(items[props.homePower].numericState) || 0)) > 10) && ((((((0 +
-                                Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))
-                                + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0
-                                + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))))))
-                                + Math.max(0, Math.min(Math.min(100, Math.max(0, (items[props.acSwitch].state === ''ON'' ?
-                                (Number(items[props.acUnitPower].numericState) || 0) : 0)) / Math.max(1, (Number(items[props.homePower].numericState)
-                                || 0)) * 100), 100 - (((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))
-                                + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0
-                                + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))))))))))
-                                + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ecarPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((((0
-                                + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))
-                                + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0
-                                + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))))))
-                                + Math.max(0, Math.min(Math.min(100, Math.max(0, (items[props.acSwitch].state === ''ON'' ?
-                                (Number(items[props.acUnitPower].numericState) || 0) : 0)) / Math.max(1, (Number(items[props.homePower].numericState)
-                                || 0)) * 100), 100 - (((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))
-                                + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0
-                                + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))))))))))))))
-                                + Math.max(0, Math.min(Math.min(100, Math.max(0, ((Number(items[props.washingMachine1Power].numericState)
-                                || 0) + (Number(items[props.washingMachine2Power].numericState) || 0) + (Number(items[props.tumbleDryerPower].numericState)
-                                || 0) + (Number(items[props.dishwasherPower].numericState) || 0))) / Math.max(1, (Number(items[props.homePower].numericState)
-                                || 0)) * 100), 100 - (((((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))
-                                + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0
-                                + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))))))
-                                + Math.max(0, Math.min(Math.min(100, Math.max(0, (items[props.acSwitch].state === ''ON'' ?
-                                (Number(items[props.acUnitPower].numericState) || 0) : 0)) / Math.max(1, (Number(items[props.homePower].numericState)
-                                || 0)) * 100), 100 - (((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))
-                                + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0
-                                + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))))))))))
-                                + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ecarPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((((0
-                                + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))
-                                + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0
-                                + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))))))
-                                + Math.max(0, Math.min(Math.min(100, Math.max(0, (items[props.acSwitch].state === ''ON'' ?
-                                (Number(items[props.acUnitPower].numericState) || 0) : 0)) / Math.max(1, (Number(items[props.homePower].numericState)
-                                || 0)) * 100), 100 - (((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))
-                                + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0
-                                + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))))))))))))))))))))
-                                > 0.05'
+                          class: a-halo-arc
                       - component: circle
                         config:
                           stroke: '=(Math.max(0, Math.min(Math.min(100, Math.max(0, ((Number(items[props.washingMachine1Power].numericState)
@@ -4911,79 +4374,7 @@ slots:
                             Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0))
                             / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))))))))))))))))))))
                             > 0.05'
-                        slots:
-                          default:
-                          - component: animate
-                            config:
-                              attributeName: opacity
-                              values: 1;0;1
-                              dur: 2s
-                              repeatCount: indefinite
-                              visible: '=(Math.abs((Number(items[props.homePower].numericState) || 0)) > 10) && ((((((0 +
-                                Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))
-                                + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0
-                                + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))))))
-                                + Math.max(0, Math.min(Math.min(100, Math.max(0, (items[props.acSwitch].state === ''ON'' ?
-                                (Number(items[props.acUnitPower].numericState) || 0) : 0)) / Math.max(1, (Number(items[props.homePower].numericState)
-                                || 0)) * 100), 100 - (((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))
-                                + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0
-                                + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))))))))))
-                                + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ecarPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((((0
-                                + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))
-                                + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0
-                                + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))))))
-                                + Math.max(0, Math.min(Math.min(100, Math.max(0, (items[props.acSwitch].state === ''ON'' ?
-                                (Number(items[props.acUnitPower].numericState) || 0) : 0)) / Math.max(1, (Number(items[props.homePower].numericState)
-                                || 0)) * 100), 100 - (((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))
-                                + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0
-                                + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))))))))))))))
-                                + Math.max(0, Math.min(Math.min(100, Math.max(0, ((Number(items[props.washingMachine1Power].numericState)
-                                || 0) + (Number(items[props.washingMachine2Power].numericState) || 0) + (Number(items[props.tumbleDryerPower].numericState)
-                                || 0) + (Number(items[props.dishwasherPower].numericState) || 0))) / Math.max(1, (Number(items[props.homePower].numericState)
-                                || 0)) * 100), 100 - (((((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))
-                                + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0
-                                + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))))))
-                                + Math.max(0, Math.min(Math.min(100, Math.max(0, (items[props.acSwitch].state === ''ON'' ?
-                                (Number(items[props.acUnitPower].numericState) || 0) : 0)) / Math.max(1, (Number(items[props.homePower].numericState)
-                                || 0)) * 100), 100 - (((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))
-                                + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0
-                                + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))))))))))
-                                + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ecarPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((((0
-                                + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))
-                                + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0
-                                + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))))))
-                                + Math.max(0, Math.min(Math.min(100, Math.max(0, (items[props.acSwitch].state === ''ON'' ?
-                                (Number(items[props.acUnitPower].numericState) || 0) : 0)) / Math.max(1, (Number(items[props.homePower].numericState)
-                                || 0)) * 100), 100 - (((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))
-                                + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0
-                                + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
-                                || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))))))))))))))))))))
-                                > 0.05'
+                          class: a-halo-arc
                       - component: g
                         config:
                           transform: translate(24 25) scale(0.703)

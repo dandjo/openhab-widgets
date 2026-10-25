@@ -369,26 +369,200 @@ def stroke(width=1.6, color="currentColor", **extra):
 
 
 def steps(power, bins, values):
-    """Expression picking an animation duration from a few power bins (fewer restarts than a smooth mapping)."""
+    """Expression picking a value from a few power bins: a duration ('1.4s') or, for a number, seconds as a number,
+    which a delay can be computed from."""
     p = f"Math.abs({power})"
-    expr = f"'{values[-1]}'"
+    lit = lambda v: f"'{v}'" if isinstance(v, str) else f"{v}"
+    expr = lit(values[-1])
     for limit, value in reversed(list(zip(bins, values))):
-        expr = f"{p} < {limit} ? '{value}' : ({expr})"
+        expr = f"{p} < {limit} ? {lit(value)} : ({expr})"
     return "=" + expr
 
 
-def spin(x, y, dur, active):
-    return svg("animateTransform", attributeName="transform", type="rotate", **{"from": f"0 {x} {y}"},
-               to=f"360 {x} {y}", dur=dur, repeatCount="indefinite", visible=f"={active}")
+# ------------------------------------------------------------------ animations: CSS, not SMIL (user, 2026-10-25)
+# Every animation of the drawings is a CSS animation of an opacity or a transform, which Chrome runs on its compositor
+# beside the main thread. The SMIL animations before had the main thread repaint the drawings 60 times a second
+# whatever their number: the overview took 48 % of a desktop core, 7 % with them paused, and 12 pulses or spins cost
+# 32 % as SMIL against 5 % as CSS (measured 2026-10-25). A geometry is no cheaper as CSS (a radius, a dash offset, a
+# motion path cost the same), so dots and dashes move by translate keyframes: along a straight line by the two
+# custom properties of a-run, along a bent path by keyframes of its own (route_class()). Keyframes and classes are one
+# stylesheet, ANIM_CSS, on every page's root and every widget's with a root that takes one; MainUI scopes it to the
+# root's descendants and leaves the keyframes' names global (its stylesheet goes only on div and oh-* components, not
+# on an svg). An element animates while its class is set (an expression, as the SMIL `visible` was); a changed
+# duration no longer restarts it, so the dots keep their spacing. The pulses no longer start with the document: a
+# ring that appears later is out of step with the others (the user took that, 2026-10-25). A pulse's or spin's
+# turning point is the box of what it is on (transform-box fill-box), so a turning group holds an unseen circle
+# around its axis that keeps its box symmetric (spinning()).
+ANIM_PLACEHOLDER = "@@ANIM_CSS@@"  # in the stylesheets while the drawings are built, ANIM_CSS when they are written
+ROUTES = {}  # keyframes of the bent paths dots run along: name -> css
 
 
-def dash_flow(dur, active, to="-12"):
-    return svg("animate", attributeName="stroke-dashoffset", **{"from": "0"}, to=to, dur=dur,
-               repeatCount="indefinite", visible=f"={active}")
+def bubble_keyframes(sway):
+    """A bubble's rise in the tank as keyframes: the SMIL path M0,0 C sway,-8 -sway,-15 0,-23 sampled at quarters,
+    growing from r 0.9 to 2.1 (scale 2.33), fading in by 15 % of the rise and out from 70 % on (BUBBLE_OPACITY)."""
+    def at(t):
+        x = 3 * (1 - t) ** 2 * t * sway + 3 * (1 - t) * t ** 2 * -sway
+        y = 3 * (1 - t) ** 2 * t * -8 + 3 * (1 - t) * t ** 2 * -15 + t ** 3 * -23
+        return f"transform: translate({x:.2f}px, {y:.2f}px) scale({1 + 1.333 * t:.2f});"
+    return (f"0% {{ {at(0)} opacity: 0; }} 15% {{ opacity: 0.9; }} 25% {{ {at(0.25)} }} 50% {{ {at(0.5)} }} "
+            f"70% {{ opacity: 0.9; }} 75% {{ {at(0.75)} }} 100% {{ {at(1)} opacity: 0; }}")
+
+
+ANIM_KEYFRAMES = f"""@keyframes a-soft {{ 0%, 100% {{ opacity: 0.3; }} 50% {{ opacity: 0.06; }} }}
+@keyframes a-full {{ 0%, 100% {{ opacity: 0.3; }} 50% {{ opacity: 1; }} }}
+@keyframes a-arc {{ 0%, 100% {{ opacity: 1; }} 50% {{ opacity: 0.55; }} }}
+@keyframes a-halo {{ 0%, 100% {{ opacity: 0; }} 50% {{ opacity: 1; }} }}
+@keyframes a-halo-arc {{ 0%, 100% {{ opacity: 1; }} 50% {{ opacity: 0; }} }}
+@keyframes a-fade {{ 0%, 100% {{ opacity: 0; }} 50% {{ opacity: 1; }} }}
+@keyframes a-glow {{ 0%, 100% {{ opacity: 0.35; }} 50% {{ opacity: 1; }} }}
+@keyframes a-blink-up {{ 0%, 100% {{ opacity: 0.2; }} 50% {{ opacity: 1; }} }}
+@keyframes a-blink-down {{ 0%, 100% {{ opacity: 1; }} 50% {{ opacity: 0.2; }} }}
+@keyframes a-flicker-a {{ 0%, 100% {{ opacity: 1; }} 50% {{ opacity: 0.25; }} }}
+@keyframes a-flicker-b {{ 0%, 100% {{ opacity: 0.25; }} 50% {{ opacity: 1; }} }}
+@keyframes a-flicker-c {{ 0%, 100% {{ opacity: 1; }} 50% {{ opacity: 0.4; }} }}
+@keyframes a-bolt {{ 0%, 66.7%, 100% {{ opacity: 1; }} 33.3% {{ opacity: 0.35; }} }}
+@keyframes a-breathe {{ 0%, 100% {{ transform: scale(0.82); }} 50% {{ transform: scale(1.05); }} }}
+@keyframes a-spin {{ to {{ transform: rotate(360deg); }} }}
+@keyframes a-wobble {{ 0%, 100% {{ transform: translateY(0); }} 50% {{ transform: translateY(3px); }} }}
+@keyframes a-rise {{ 0%, 100% {{ transform: translateY(0); }} 50% {{ transform: translateY(-8px); }} }}
+@keyframes a-fill {{ from {{ transform: scaleX(0); }} to {{ transform: scaleX(1); }} }}
+@keyframes a-ripple {{ from {{ transform: scale(1); opacity: 0.7; }} to {{ transform: scale(var(--grow)); opacity: 0; }} }}
+@keyframes a-run {{ from {{ transform: translate(var(--ax), var(--ay)); }} to {{ transform: translate(var(--bx), var(--by)); }} }}
+@keyframes a-drop {{ 0% {{ transform: translate(0, 0); opacity: 0; }} 25% {{ opacity: 1; }} 75% {{ opacity: 1; }} 100% {{ transform: translate(-2px, 6px); opacity: 0; }} }}
+@keyframes a-bubble-l {{ {bubble_keyframes(1.5)} }}
+@keyframes a-bubble-r {{ {bubble_keyframes(-1.5)} }}
+.a-soft {{ animation: a-soft 2s linear infinite; }}
+.a-full {{ animation: a-full 2s linear infinite; }}
+.a-arc {{ animation: a-arc 2s linear infinite; }}
+.a-halo {{ animation: a-halo 2s linear infinite; }}
+.a-halo-arc {{ animation: a-halo-arc 2s linear infinite; }}
+.a-fade {{ animation: a-fade 2.4s linear infinite; }}
+.a-glow {{ animation: a-glow 2.4s linear infinite; }}
+.a-blink-up {{ animation: a-blink-up 1.8s ease-in-out infinite; }}
+.a-blink-down {{ animation: a-blink-down 1.8s ease-in-out infinite; }}
+.a-flicker-a {{ animation: a-flicker-a 0.9s linear infinite; }}
+.a-flicker-b {{ animation: a-flicker-b 1.3s linear infinite; }}
+.a-flicker-c {{ animation: a-flicker-c 2s linear infinite; }}
+.a-bolt {{ animation: a-bolt 1.8s linear infinite; }}
+.a-breathe {{ transform-box: fill-box; transform-origin: center; animation: a-breathe 2.4s ease-in-out infinite; }}
+.a-spin {{ transform-box: fill-box; transform-origin: center; animation: a-spin 1s linear infinite; }}
+.a-wobble {{ animation: a-wobble 2s linear infinite; }}
+.a-rise {{ animation: a-rise 1s linear infinite; }}
+.a-fill {{ transform-box: fill-box; transform-origin: left center; animation: a-fill 2.4s linear infinite; }}
+.a-ripple {{ transform-box: fill-box; transform-origin: center; animation: a-ripple 1.6s linear infinite; }}
+.a-run {{ animation: a-run 2.5s linear infinite; }}
+.a-drop {{ animation: a-drop 0.9s linear infinite; }}
+.a-bubble-l {{ transform-box: fill-box; transform-origin: center; animation: a-bubble-l 2.6s linear infinite; }}
+.a-bubble-r {{ transform-box: fill-box; transform-origin: center; animation: a-bubble-r 2.6s linear infinite; }}
+"""
+
+
+def anim_css(used):
+    """The stylesheet of every animation, with the keyframes of the bent paths named in used (a text), known once
+    the drawings are built."""
+    return ANIM_KEYFRAMES + "".join(f"@keyframes {n} {{ {css} }}\n.{n} {{ animation: {n} 10s linear infinite; }}\n"
+                                   for n, css in ROUTES.items() if n in used)
+
+
+def with_anim_css(tree):
+    """The stylesheet's placeholder on the tree's root, which must be a div or an oh-* component to take one."""
+    cfg = tree.setdefault("config", {})
+    if not cfg.get("stylesheet", "").startswith(ANIM_PLACEHOLDER):
+        cfg["stylesheet"] = "\n".join(filter(None, [ANIM_PLACEHOLDER, cfg.get("stylesheet")]))
+    return tree
+
+
+def seconds(expr):
+    """A number of seconds (an expression, with or without its =) as a CSS time expression."""
+    return f"=({expr[1:] if expr.startswith('=') else expr}) + 's'"
+
+
+def animated(el, cls, active=None, **style):
+    """el, an svg() component, runs the animation of the class cls, while active (an expression) holds or always,
+    with these style properties on top (animation-duration, animation-delay, custom properties; expressions too)."""
+    cfg = el["config"]
+    cfg["class"] = cls if active in (None, "true") else f"=({active}) ? '{cls}' : ''"
+    if style:
+        cfg["style"] = {**cfg.get("style", {}), **style}
+    return el
+
+
+def spinning(parts, x, y, r, dur, active):
+    """parts in a group turning around (x, y) once per dur (a duration or its expression) while active holds; an
+    unseen circle of r around the axis keeps the group's box symmetric, as the turn is about the box's middle."""
+    group = svg("g", [svg("circle", cx=x, cy=y, r=r, fill="none", stroke="none"), *parts])
+    return animated(group, "a-spin", active, **{"animation-duration": dur})
+
+
+def sample_path(d, per=8):
+    """Points along a path of M, L, H, V, Q and C commands, absolute or relative: each line as it is, each curve as
+    per points."""
+    points, x, y = [], 0.0, 0.0
+    for cmd, args in re.findall(r"([MLHVQCmlhvqc])\s*([-\d.,\s]*)", d):
+        nums = [float(v) for v in re.split(r"[\s,]+", args.strip()) if v]
+        rel = cmd.islower()
+        ox, oy = (x, y) if rel else (0.0, 0.0)
+        if cmd in "MmLl":
+            x, y = ox + nums[0], oy + nums[1]
+            points.append((x, y))
+        elif cmd in "Hh":
+            x = ox + nums[0]
+            points.append((x, y))
+        elif cmd in "Vv":
+            y = oy + nums[0]
+            points.append((x, y))
+        else:
+            ctrl = [(ox + nums[i], oy + nums[i + 1]) for i in range(0, len(nums), 2)]
+            x0, y0 = x, y
+            for k in range(1, per + 1):
+                t = k / per
+                if cmd in "Qq":
+                    (cx_, cy_), (ex, ey) = ctrl
+                    px = (1 - t) ** 2 * x0 + 2 * (1 - t) * t * cx_ + t ** 2 * ex
+                    py = (1 - t) ** 2 * y0 + 2 * (1 - t) * t * cy_ + t ** 2 * ey
+                else:
+                    (ax, ay), (bx, by), (ex, ey) = ctrl
+                    px = (1 - t) ** 3 * x0 + 3 * (1 - t) ** 2 * t * ax + 3 * (1 - t) * t ** 2 * bx + t ** 3 * ex
+                    py = (1 - t) ** 3 * y0 + 3 * (1 - t) ** 2 * t * ay + 3 * (1 - t) * t ** 2 * by + t ** 3 * ey
+                points.append((px, py))
+            x, y = ctrl[-1]
+    return points
+
+
+def route_class(points, fade=False):
+    """The class of the keyframes that carry a dot along points, stop by stop at one speed (the stops' shares of the
+    length); with fade in over the first tenth and out over the last, for a path whose ends lie in the open."""
+    lengths = [math.hypot(bx - ax, by - ay) for (ax, ay), (bx, by) in zip(points, points[1:])]
+    total = sum(lengths) or 1
+    stops, run = [], 0.0
+    for k, (px, py) in enumerate(points):
+        run += lengths[k - 1] if k else 0
+        stops.append(f"{100 * run / total:.2f}% {{ transform: translate({px:.2f}px, {py:.2f}px); }}")
+    if fade:
+        stops += ["0% { opacity: 0; }", "10% { opacity: 1; }", "90% { opacity: 1; }", "100% { opacity: 0; }"]
+    css = " ".join(stops)
+    name = "a-route-" + hashlib.sha1(css.encode()).hexdigest()[:8]
+    ROUTES[name] = css
+    return name
+
+
+def runners(points, color, dur, active, count, r=4.5, reverse=None, fade=False):
+    """count dots running along points (user units) at one speed, dur seconds (a number or its expression) for the
+    whole way, spaced evenly by their delays, the other way while reverse holds; see route_class for fade."""
+    cls = route_class(points, fade)
+    body = dur[1:] if isinstance(dur, str) and dur.startswith("=") else dur
+    dots = []
+    for i in range(count):
+        style = {"animation-duration": seconds(f"{body}"), "animation-delay": f"=(-{i} / {count} * ({body})) + 's'"}
+        if reverse:
+            style["animation-direction"] = f"=({reverse}) ? 'reverse' : 'normal'"
+        dots.append(animated(svg("circle", visible=f"={active}", r=r, fill=color, cx=0, cy=0), cls, active, **style))
+    return dots
 
 
 def pylon_node(cx, cy, color, power):
-    """High-voltage pylon; dashes run along its wires towards the house on import, away on export."""
+    """High-voltage pylon; dots run along its wires towards the house on import, away on export (dashes until
+    2026-10-25, which no cheap animation moves)."""
     def leg_x(y, side):  # the legs run from (cx±10, cy+16) up to (cx±3, cy-16)
         return round(cx + side * (10 + (y - cy - 16) * 0.21875), 2)
     lines = [(leg_x(cy + 16, -1), cy + 16, leg_x(cy - 16, -1), cy - 16),
@@ -401,14 +575,15 @@ def pylon_node(cx, cy, color, power):
              (cx - 15, cy - 10, cx - 15, cy - 7), (cx + 15, cy - 10, cx + 15, cy - 7),
              (cx - 11, cy - 3, cx - 11, cy), (cx + 11, cy - 3, cx + 11, cy)]
     active = f"Math.abs({power}) > 10"
-    dur = steps(power, [500, 2000], ["2s", "1.2s", "0.7s"])
+    dur = steps(power, [500, 2000], [2, 1.2, 0.7])
     wires = []
     for y_ins, sag in ((cy - 7, 4), (cy, 4)):
         d = (f"M{cx - 27},{y_ins + 2} Q{cx - 21},{y_ins + sag} {cx - 15 if y_ins == cy - 7 else cx - 11},{y_ins} "
              f"Q{cx},{y_ins + sag + 1} {cx + 15 if y_ins == cy - 7 else cx + 11},{y_ins} "
              f"Q{cx + 21},{y_ins + sag} {cx + 27},{y_ins + 2}")
-        wires.append(svg("path", [dash_flow(dur, active, to=f"={power} > 0 ? '-12' : '12'")], d=d,
-                         **stroke(1.4, color, **{"stroke-dasharray": "3 3"})))
+        wires.append(svg("path", d=d, **stroke(1.4, color, opacity=f"={active} ? '0.7' : '0.45'")))
+        # the dots run from the house's side (the right, the wire drawn from the left) on import
+        wires += runners(sample_path(d), color, dur, active, 4, r=1.3, reverse=f"{power} > 0", fade=True)
     return [ring(cx, cy, color), *[svg("line", x1=a, y1=b, x2=c, y2=e, **stroke(1.5)) for a, b, c, e in lines],
             *wires]
 
@@ -442,8 +617,8 @@ def pv_node(cx, cy, power):
             svg("rect", x=x0, y=y0, width=x1 - x0, height=y1 - y0, rx=1.5, **{"fill-opacity": glow},
                 **stroke(1.2, "currentColor", fill="#1e88e5")),
             *cells,
-            svg("g", [*edges, svg("g", rays, opacity=sun_glow),
-                      spin(sx, sy, steps(power, [1000, 4000], ["12s", "7s", "4s"]), active)]),
+            spinning([*edges, svg("g", rays, opacity=sun_glow)], sx, sy, 14.5,
+                     steps(power, [1000, 4000], ["12s", "7s", "4s"]), active),
             svg("circle", cx=sx, cy=sy, r=6.6, style=disc),
             svg("circle", cx=sx, cy=sy, r=5, fill="#ffb300", opacity=sun_glow)]
 
@@ -455,13 +630,12 @@ def heatpump_node(cx, cy, hz):
     active = f"{hz} > 0"
     blades = [svg("path", d=f"M{fx},{fy} q3.5,-3 0,-7.5 q-3.5,3 0,7.5", fill="#fb8c00",
                   transform=f"rotate({angle} {fx} {fy})") for angle in (0, 120, 240)]
-    blades.append(spin(fx, fy, steps(hz, [30, 55], ["1.4s", "0.9s", "0.5s"]), active))
     grille = [svg("line", x1=cx + 7, y1=cy + dy, x2=cx + 14, y2=cy + dy, **stroke(1, opacity="0.7"))
               for dy in (-7, -3.5, 0, 3.5, 7)]
     return [ring(cx, cy, "#fb8c00"),
             svg("rect", x=cx - 17, y=cy - 12, width=34, height=24, rx=3, **stroke(1.6)),
             svg("circle", cx=fx, cy=fy, r=9, **stroke(1.2)),
-            svg("g", blades),
+            spinning(blades, fx, fy, 8, steps(hz, [30, 55], ["1.4s", "0.9s", "0.5s"]), active),
             svg("circle", cx=fx, cy=fy, r=1.5, fill="currentColor"),
             *grille,
             svg("line", x1=cx - 12, y1=cy + 12, x2=cx - 12, y2=cy + 15, **stroke(1.6)),
@@ -478,14 +652,13 @@ def heatpump_split_node(cx, cy, hz):
     active = f"{hz} > 0"
     blades = [svg("path", d=f"M{fx},{fy} q3.5,-3 0,-7.5 q-3.5,3 0,7.5", fill="#fb8c00",
                   transform=f"rotate({angle} {fx} {fy})") for angle in (0, 120, 240)]
-    blades.append(spin(fx, fy, steps(hz, [30, 55], ["1.4s", "0.9s", "0.5s"]), active))
     grille = [svg("line", x1=cx + 1, y1=cy + dy, x2=cx + 8, y2=cy + dy, **stroke(1, opacity="0.7"))
               for dy in (-10, -6.5, -3, 0.5, 4)]
     face = {"x": cx + 3, "y": cy - 8, "width": 16, "height": 24, "rx": 2.5}
     return [ring(cx, cy, "#fb8c00"),
             svg("rect", x=cx - 21, y=cy - 14, width=32, height=22, rx=3, **stroke(1.6)),
             svg("circle", cx=fx, cy=fy, r=8.5, **stroke(1.2)),
-            svg("g", blades),
+            spinning(blades, fx, fy, 8, steps(hz, [30, 55], ["1.4s", "0.9s", "0.5s"]), active),
             svg("circle", cx=fx, cy=fy, r=1.5, fill="currentColor"),
             *grille,
             svg("line", x1=cx - 16, y1=cy + 8, x2=cx - 16, y2=cy + 11, **stroke(1.6)),
@@ -499,12 +672,15 @@ def heatpump_split_node(cx, cy, hz):
 
 
 def ac_node(cx, cy, power):
-    """Indoor split unit; its air streams flow and its LED lights while it draws more than AC_ON watts."""
+    """Indoor split unit; its air streams flow (dots down three wavy lines; dashes until 2026-10-25) and its LED
+    lights while it draws more than AC_ON watts."""
     active = f"Math.abs({power}) > {AC_ON}"
-    dur = steps(power, [300, 800], ["1.6s", "1s", "0.6s"])
-    streams = [svg("path", [dash_flow(dur, active)], d=f"M{x},{cy + 3} q3,3.5 0,7 q-3,3.5 0,7",
-                   opacity=f"={active} ? '1' : '0.25'", **stroke(1.6, "#29b6f6", **{"stroke-dasharray": "3 3"}))
-               for x in (cx - 9, cx, cx + 9)]
+    dur = steps(power, [300, 800], [1.6, 1, 0.6])
+    streams = []
+    for x in (cx - 9, cx, cx + 9):
+        d = f"M{x},{cy + 3} q3,3.5 0,7 q-3,3.5 0,7"
+        streams.append(svg("path", d=d, opacity=f"={active} ? '0.5' : '0.25'", **stroke(1.4, "#29b6f6")))
+        streams += runners(sample_path(d), "#29b6f6", dur, active, 2, r=1.2, fade=True)
     return [ring(cx, cy, "#29b6f6"),
             svg("rect", x=cx - 18, y=cy - 14, width=36, height=14, rx=4, **stroke(1.6)),
             svg("line", x1=cx - 13, y1=cy - 4, x2=cx + 13, y2=cy - 4, **stroke(1.2)),
@@ -516,14 +692,15 @@ def home_node(cx, cy, power):
     """House whose windows glow brighter with the consumption and pulse, faster the more it draws. It stands 2 units
     above the ring's middle, as its pointed roof leaves room above it, so it looks centred; the chimney rises out of
     the right slope, without a line of its own along the roof (user, 2026-10-04)."""
-    glow = f"=(0.3 + 0.7 * Math.min(1, Math.abs({power}) / 3000)).toFixed(2)"
+    glow = f"(0.3 + 0.7 * Math.min(1, Math.abs({power}) / 3000)).toFixed(2)"
     active = f"Math.abs({power}) > 50"
-    pulse = svg("animate", attributeName="fill-opacity", values="0.35;1;0.35",
-                dur=steps(power, [500, 1500], ["2.4s", "1.6s", "1s"]), repeatCount="indefinite", visible=f"={active}")
     y = cy - 2  # the house's own middle
     apex, eave = y - 16, y - 2
     slope = lambda x: round(apex + (eave - apex) * (x - cx) / 17, 2)  # the right slope's height at x
-    windows = [svg("rect", [pulse], x=x, y=y + 1, width=6, height=6, rx=1, fill="#ffd54f", **{"fill-opacity": glow})
+    # while the house draws, the windows' glow is the pulse's alone
+    windows = [animated(svg("rect", x=x, y=y + 1, width=6, height=6, rx=1, fill="#ffd54f",
+                            **{"fill-opacity": f"=({active}) ? '1' : {glow}"}),
+                        "a-glow", active, **{"animation-duration": steps(power, [500, 1500], ["2.4s", "1.6s", "1s"])})
                for x in (cx - 10, cx + 4)]
     return [ring(cx, cy, "#1e88e5"),
             svg("path", d=f"M{cx + 6.5},{slope(cx + 6.5)} V{y - 14} H{cx + 10.5} V{slope(cx + 10.5)}",
@@ -583,9 +760,9 @@ def ecar_node(cx, cy, power):
                                                           "stroke": "var(--f7-card-bg-color, #fff)"},
                          **{"stroke-width": 3.5, "stroke-linejoin": "round"}),
                      svg("polygon", points=points, fill=ECAR_COLOR,
-                         **{"stroke": ECAR_COLOR, "stroke-width": 0.8, "stroke-linejoin": "round"}),
-                     svg("animate", attributeName="opacity", values="0;1;0", dur="2.4s", repeatCount="indefinite")],
+                         **{"stroke": ECAR_COLOR, "stroke-width": 0.8, "stroke-linejoin": "round"})],
                opacity="0", visible=f"={charging}")
+    animated(bolt, "a-fade")
     return [ring(cx, cy, ECAR_COLOR),
             svg("path", d=body, **stroke(1.6, fill="#78909c", **{"fill-opacity": "0.3", "stroke-linejoin": "round"})),
             svg("path", d=window, **stroke(1.2, **{"stroke-linejoin": "round"})),
@@ -613,17 +790,14 @@ def appliances_node(cx, cy, power):
     them clean something; while they draw more than APPL_ON watts together, the sparkles light up, the big one
     breathes and the small ones twinkle by turns, faster the more they draw."""
     active = f"Math.abs({power}) > {APPL_ON}"
-    ease = {"calcMode": "spline", "keyTimes": "0;0.5;1", "keySplines": "0.42 0 0.58 1;0.42 0 0.58 1"}
-    # the big one drawn around (0, 0), as SVG scales around the origin, then moved to (31, 36) of the tiles' 64 × 64
-    # icon, which in turn is moved onto the node
-    breathe = svg("animateTransform", attributeName="transform", type="scale", values="0.82;1.05;0.82",
-                  dur=steps(power, [500, 1500], ["2.4s", "1.6s", "1s"]), repeatCount="indefinite",
-                  visible=f"={active}", **ease)
-    blink = steps(power, [500, 1500], ["1.8s", "1.2s", "0.75s"])
-    small = [svg("path", [svg("animate", attributeName="opacity", values=values, dur=blink, repeatCount="indefinite",
-                              visible=f"={active}", **ease)], d=sparkle(x, y, size), fill=APPL_COLOR)
-             for x, y, size, values in ((38.6, 28, 2.9, "0.2;1;0.2"), (25.2, 43.2, 2.1, "1;0.2;1"))]
-    big = svg("g", [svg("path", [breathe], d=sparkle(0, 0, 8), fill=APPL_COLOR)], transform="translate(31 36)")
+    # the big one drawn around (0, 0), then moved to (31, 36) of the tiles' 64 × 64 icon, which in turn is moved onto
+    # the node; it breathes about its own middle
+    breathe = {"animation-duration": steps(power, [500, 1500], ["2.4s", "1.6s", "1s"])}
+    blink = {"animation-duration": steps(power, [500, 1500], ["1.8s", "1.2s", "0.75s"])}
+    small = [animated(svg("path", d=sparkle(x, y, size), fill=APPL_COLOR), cls, active, **blink)
+             for x, y, size, cls in ((38.6, 28, 2.9, "a-blink-up"), (25.2, 43.2, 2.1, "a-blink-down"))]
+    big = svg("g", [animated(svg("path", d=sparkle(0, 0, 8), fill=APPL_COLOR), "a-breathe", active, **breathe)],
+              transform="translate(31 36)")
     return [ring(cx, cy, APPL_COLOR),
             svg("g", machine_body([svg("g", [big, *small], opacity=f"={active} ? '1' : '0.45'")]),
                 transform=f"translate({cx - 32} {cy - 32})")]
@@ -639,23 +813,24 @@ def ventilation_node(cx, cy, power):
              f"C{fx - 0.5},{fy - 6} {fx - 2},{fy - 3} {fx},{fy} Z")
     blades = [svg("path", d=blade, fill=VENT_TEAL, transform=f"rotate({72 * k} {fx} {fy})", **{"fill-opacity": "0.85"})
               for k in range(5)]
-    blades.append(spin(fx, fy, steps(power, [30, 60], ["2.4s", "1.5s", "0.9s"]), active))
-    dur = steps(power, [30, 60], ["1.6s", "1s", "0.6s"])
+    fan = spinning(blades, fx, fy, 9, steps(power, [30, 60], ["2.4s", "1.5s", "0.9s"]), active)
+    dur = steps(power, [30, 60], [1.6, 1, 0.6])
 
     def air(d, color):
-        return svg("path", [dash_flow(dur, active, to="-12")], d=d, opacity=f"={active} ? '1' : '0.4'",
-                   **stroke(1.8, color, **{"stroke-dasharray": "3 3"}))
+        """An air line with two dots running along it towards its head (dashes until 2026-10-25)."""
+        return [svg("path", d=d, opacity=f"={active} ? '0.5' : '0.3'", **stroke(1.6, color)),
+                *runners(sample_path(d), color, dur, active, 2, r=1.2, fade=True)]
 
     def head(x, y, down, color):
         return svg("path", d=f"M{x - 3.5},{y - 3.5 * down} L{x},{y} L{x + 3.5},{y - 3.5 * down} Z", fill=color)
     return [ring(cx, cy, VENT_TEAL),
             svg("rect", x=cx - 16, y=cy - 6, width=32, height=21, rx=3, **stroke(1.6)),
-            svg("g", blades),
+            fan,
             # the hub over the blades' roots, in the card colour
             svg("circle", cx=fx, cy=fy, r=2, style={"fill": "var(--f7-card-bg-color, #fff)"}, stroke=VENT_TEAL,
                 **{"stroke-width": 1.4}),
-            air(f"M{cx - 7},{cy - 21} V{cy - 10}", VENT_TEAL), head(cx - 7, cy - 8, 1, VENT_TEAL),
-            air(f"M{cx + 7},{cy - 7} V{cy - 18}", VENT_EXHAUST), head(cx + 7, cy - 21, -1, VENT_EXHAUST)]
+            *air(f"M{cx - 7},{cy - 21} V{cy - 10}", VENT_TEAL), head(cx - 7, cy - 8, 1, VENT_TEAL),
+            *air(f"M{cx + 7},{cy - 7} V{cy - 18}", VENT_EXHAUST), head(cx + 7, cy - 21, -1, VENT_EXHAUST)]
 
 
 # ---- devices the energy flow does not draw, for the icons at the heads of their pages (user, 2026-10-05: drawn after the
@@ -729,12 +904,11 @@ def water_meter_parts(color, rate, value, digits=True):
     ticks = [svg("line", x1=round(dial[0] + 4.4 * math.cos(a), 2), y1=round(dial[1] + 4.4 * math.sin(a), 2),
                  x2=round(dial[0] + 5.4 * math.cos(a), 2), y2=round(dial[1] + 5.4 * math.sin(a), 2),
                  **stroke(0.7, opacity="0.7")) for a in (math.radians(36 * k) for k in range(10))]
-    pointer = svg("g", [svg("path", d=f"M{dial[0] - 1},{dial[1]} L{dial[0]},{dial[1] - 4.6} L{dial[0] + 1},{dial[1]} Z",
-                            fill="#e53935"),
-                        spin(*dial, steps(lpm, [3, 10], ["4s", "2s", "1s"]), active)])
+    pointer = spinning([svg("path", d=f"M{dial[0] - 1},{dial[1]} L{dial[0]},{dial[1] - 4.6} L{dial[0] + 1},{dial[1]} Z",
+                            fill="#e53935")], *dial, 4.6, steps(lpm, [3, 10], ["4s", "2s", "1s"]), active)
     star_c = (6.5, 4.2)
-    star = svg("g", [svg("path", d=sparkle(*star_c, 2.6), fill="#e53935"),
-                     spin(*star_c, steps(lpm, [3, 10], ["1.2s", "0.6s", "0.3s"]), active)])
+    star = spinning([svg("path", d=sparkle(*star_c, 2.6), fill="#e53935")], *star_c, 2.6,
+                    steps(lpm, [3, 10], ["1.2s", "0.6s", "0.3s"]), active)
     parts += [svg("circle", cx=dial[0], cy=dial[1], r=5.4, **stroke(0.9)), *ticks, pointer,
               svg("circle", cx=dial[0], cy=dial[1], r=1, fill="currentColor"), star]
     return parts
@@ -953,10 +1127,8 @@ def ebike_node(cx, cy, power):
     mx, my = crank[0] + dx * 0.52, crank[1] + dy * 0.52
     bx, by = round(mx + 3 * math.sin(math.radians(angle)), 2), round(my - 3 * math.cos(math.radians(angle)), 2)
     w, h = 14, 5
-    level = svg("rect", [svg("animate", attributeName="width", values=f"0;{w - 2}", dur="2.4s", repeatCount="indefinite",
-                             visible=f"={charging}")],
-                x=-w / 2 + 1, y=-h / 2 + 1, width=w - 2, height=h - 2, rx=0.8,
-                fill=f"={charging} ? '#7cb342' : '#546e7a'", **{"fill-opacity": "0.9"})
+    level = animated(svg("rect", x=-w / 2 + 1, y=-h / 2 + 1, width=w - 2, height=h - 2, rx=0.8,
+                         fill=f"={charging} ? '#7cb342' : '#546e7a'", **{"fill-opacity": "0.9"}), "a-fill", charging)
     parts.append(svg("g", [svg("rect", x=-w / 2, y=-h / 2, width=w, height=h, rx=1.6, style=CARD_BG), level,
                            svg("rect", x=-w / 2, y=-h / 2, width=w, height=h, rx=1.6, **stroke(1.2))],
                      transform=f"translate({bx} {by}) rotate({round(angle, 2)})"))
@@ -989,15 +1161,14 @@ def rack_node(cx, cy, power):
     ports = lambda k, n: [svg("rect", x=round(cx - 10.5 + i * 3.6, 2), y=round(mid(k) - 1, 2), width=2.4, height=2,
                               rx=0.3, fill="#263238") for i in range(n)]
 
-    def lights(k, xs, values, dur):
-        return svg("g", [svg("circle", cx=round(cx + x, 2), cy=mid(k), r=1.1, fill="#69f0ae") for x in xs] +
-                   [svg("animate", attributeName="opacity", values=values, dur=dur, repeatCount="indefinite",
-                        visible=f"={on}")], opacity=f"={on} ? '1' : '0.3'")
+    def lights(k, xs, cls):
+        return animated(svg("g", [svg("circle", cx=round(cx + x, 2), cy=mid(k), r=1.1, fill="#69f0ae") for x in xs],
+                            opacity=f"={on} ? '1' : '0.3'"), cls, on)
     return [ring(cx, cy, "#5c6bc0"),
             svg("rect", x=cx - 17, y=cy - 13, width=34, height=26, rx=2, **stroke(1.6, fill="#37474f",
                                                                                  **{"fill-opacity": "0.85"})),
-            unit(0), *ports(0, 4), lights(0, [7], "1;0.25;1", "0.9s"), lights(0, [10.5], "0.25;1;0.25", "1.3s"),
-            unit(1), *ports(1, 2), lights(1, [10.5], "1;0.4;1", "2s"),
+            unit(0), *ports(0, 4), lights(0, [7], "a-flicker-a"), lights(0, [10.5], "a-flicker-b"),
+            unit(1), *ports(1, 2), lights(1, [10.5], "a-flicker-c"),
             unit(2), *[svg("circle", cx=cx + x, cy=mid(2), r=1.2, fill="#263238") for x in (-6, 0, 6)]]
 
 
@@ -1099,30 +1270,27 @@ RING_W = round(RING_MAX / SWELL, 2)  # 2.9, the ring at rest, its arcs and the s
 RING_R = ORBIT - (RING_MAX - RING_W) / 2  # the middle of the ring, at rest and at its widest
 # a working node's ring pulses beside an arc that shows a value (user, 2026-10-03: running dots, then dashes, were
 # tried and replaced by this pulse), never stronger than half the arc's opacity, so the arc reads at the pulse's
-# peak too; a fixed duration, as a SMIL animation restarts whenever an expression in it changes
-PULSE = {"attributeName": "opacity", "values": "0.3;0.06;0.3", "dur": "2s", "repeatCount": "indefinite"}
-# a working ring without an arc pulses as a whole and strongly, as the appliance icon of a machine without progress
-# does (user, 2026-10-04), and swells as an arc does (halo()): brightest and widest at once
-PULSE_FULL = {**PULSE, "values": "0.3;1;0.3"}
-# an arc that shows a value pulses in step with the soft pulse of the ring beside it, brightest and widest while the
-# ring is brightest (user, 2026-10-04: first against it, then in step, which tells them apart better; 0.7 to 1 alone
-# was hardly seen); only while its node works. The ring stays at about half the arc's opacity at most at every moment,
-# so the value reads in each phase. All start with the document, so they keep in step whenever they appear
-ARC_PULSE = {**PULSE, "values": "1;0.55;1"}
+# peak too: the class a-soft (opacity 0.3 to 0.06, 2 s). A working ring without an arc pulses as a whole and
+# strongly, as the appliance icon of a machine without progress does (user, 2026-10-04), a-full (0.3 to 1), and
+# swells as an arc does (halo()): brightest and widest at once. An arc that shows a value pulses in step with the
+# soft pulse of the ring beside it, a-arc (1 to 0.55), brightest and widest while the ring is brightest (user,
+# 2026-10-04: first against it, then in step, which tells them apart better; 0.7 to 1 alone was hardly seen); only
+# while its node works. The ring stays at about half the arc's opacity at most at every moment, so the value reads in
+# each phase.
 
 
 def halo(circle, max_w, visible, arc=False):
     """The ring or arc (circle) at its widest, max_w around its own middle, so it swells inwards and outwards alike,
     as a circle of its own to stand right after it, in its radius, stroke, dashes and caps, fading in as the ring
-    brightens and out again: a whole ring's with PULSE_FULL, an arc's (arc) with ARC_PULSE, half a period apart. So a
-    ring swells by an opacity alone (user, 2026-10-24): animating its radius and width cost the browser a style
-    recalculation per ring and frame, which kept a phone's main thread busy on the overview (32 to 37 frames a second,
-    56 without), an opacity animation hardly anything."""
+    brightens and out again: a whole ring's with a-full (a-halo), an arc's (arc) with a-arc (a-halo-arc), half a
+    period apart. So a ring swells by an opacity alone (user, 2026-10-24): animating its radius and width cost the
+    browser a style recalculation per ring and frame, which kept a phone's main thread busy on the overview (32 to 37
+    frames a second, 56 without), an opacity animation hardly anything."""
     keep = ("cx", "cy", "r", "stroke", "transform", "pathLength", "stroke-dasharray", "stroke-dashoffset",
             "stroke-linecap")
     shape = {k: v for k, v in circle["config"].items() if k in keep}
-    return svg("circle", [svg("animate", visible=visible, **{**PULSE, "values": "1;0;1" if arc else "0;1;0"})],
-               visible=visible, **shape, fill="none", **{"stroke-width": max_w})
+    return animated(svg("circle", visible=visible, **shape, fill="none", **{"stroke-width": max_w}),
+                    "a-halo-arc" if arc else "a-halo")
 
 
 def at(angle):
@@ -1204,25 +1372,21 @@ def flow_link_widget():
     """The widget every link of the energy flow is an instance of: a line from (x1, y1) to (x2, y2), and three dots
     that run along it while |power| exceeds threshold, towards (x2, y2) while forward holds, back otherwise, at four
     speeds. The dots run a dot radius past both ends, so they slide out from under one node's rim and back under the
-    other's; the nodes are drawn after the links. The dots are spaced by their keyPoints: a changed speed or direction
-    restarts all three together, and staggered begin times would bunch them up."""
+    other's; the nodes are drawn after the links. The dots are spaced by their delays, a third of the way each."""
     x1, y1, x2, y2 = (f"Number(props.{k})" for k in ("x1", "y1", "x2", "y2"))
     length = f"Math.hypot({x2} - {x1}, {y2} - {y1})"
     a = [f"({x1} - ({x2} - {x1}) / {length} * 5).toFixed(1)", f"({y1} - ({y2} - {y1}) / {length} * 5).toFixed(1)"]
     b = [f"({x2} + ({x2} - {x1}) / {length} * 5).toFixed(1)", f"({y2} + ({y2} - {y1}) / {length} * 5).toFixed(1)"]
-    there = f"'M' + {a[0]} + ',' + {a[1]} + ' L' + {b[0]} + ',' + {b[1]}"
-    back = f"'M' + {b[0]} + ',' + {b[1]} + ' L' + {a[0]} + ',' + {a[1]}"
     p = "Math.abs(Number(props.power))"
     active = f"{p} > Number(props.threshold !== undefined ? props.threshold : 10)"
-    dur = f"=({p} < 300 ? '3.5s' : {p} < 1000 ? '2.5s' : {p} < 2500 ? '1.8s' : '1.2s')"
-    dots = []
-    for i in range(3):
-        o = round(i / 3, 4)
-        timing = ({"keyPoints": "0;1", "keyTimes": "0;1"} if i == 0 else
-                  {"keyPoints": f"{o};1;0;{o}", "keyTimes": f"0;{round(1 - o, 4)};{round(1 - o, 4)};1"})
-        dots.append(svg("circle", [svg("animateMotion", path=f"=props.forward ? {there} : {back}", dur=dur,
-                                       repeatCount="indefinite", calcMode="linear", **timing)],
-                        visible=f"={active}", r=4.5, fill="=props.color", cx=0, cy=0))
+    dur = f"({p} < 300 ? 3.5 : {p} < 1000 ? 2.5 : {p} < 2500 ? 1.8 : 1.2)"
+    # the dots run from a to b (a-run's custom properties), the other way while forward does not hold, a third of the
+    # way apart by their delays
+    ends = {"--ax": f"={a[0]} + 'px'", "--ay": f"={a[1]} + 'px'", "--bx": f"={b[0]} + 'px'", "--by": f"={b[1]} + 'px'",
+            "animation-direction": "=props.forward ? 'normal' : 'reverse'"}
+    dots = [animated(svg("circle", visible=f"={active}", r=4.5, fill="=props.color", cx=0, cy=0), "a-run", active,
+                     **ends, **{"animation-duration": seconds(dur), "animation-delay": f"=(-{i} / 3 * {dur}) + 's'"})
+            for i in range(3)]
     return svg("g", [svg("line", x1="=props.x1", y1="=props.y1", x2="=props.x2", y2="=props.y2", stroke="=props.color",
                          **{"stroke-width": 3, "stroke-linecap": "round", "opacity": f"={active} ? '0.45' : '0.15'"}),
                      *dots])
@@ -1324,17 +1488,16 @@ def ring_badge(x, y, name, color, on, r=12, text=False):
 
 
 def active_ring(xy, color, active, arc):
-    """What a working node shows on its ring: the whole ring pulsing strongly in its colour (PULSE_FULL), swelling at
+    """What a working node shows on its ring: the whole ring pulsing strongly in its colour (a-full), swelling at
     its brightest; where an arc
     on the ring shows a value (arc, an expression: a timer, the battery's charge, a frequency, power or temperature),
-    a soft pulse (PULSE) instead, the arc standing still over it, so the value reads and the rest of the ring shows
+    a soft pulse (a-soft) instead, the arc standing still over it, so the value reads and the rest of the ring shows
     that the node works. Nothing while it rests."""
     whole = f"=({active}) && !({arc})"
-    ring_ = svg("circle", [svg("animate", visible=whole, **PULSE_FULL)],
-                visible=whole, cx=xy[0], cy=xy[1], r=RING_R, fill="none", stroke=color, **{"stroke-width": RING_W})
-    pulse = svg("circle", [svg("animate", visible=f"=({active}) && ({arc})", **PULSE)],
-                visible=f"=({active}) && ({arc})", cx=xy[0], cy=xy[1], r=RING_R, fill="none", stroke=color,
-                **{"stroke-width": RING_W})
+    ring_ = animated(svg("circle", visible=whole, cx=xy[0], cy=xy[1], r=RING_R, fill="none", stroke=color,
+                         **{"stroke-width": RING_W}), "a-full")
+    pulse = animated(svg("circle", visible=f"=({active}) && ({arc})", cx=xy[0], cy=xy[1], r=RING_R, fill="none",
+                         stroke=color, **{"stroke-width": RING_W}), "a-soft")
     return svg("g", [ring_, halo(ring_, RING_MAX, whole), pulse])
 
 
@@ -1361,15 +1524,16 @@ def flow_orbit(xy, color, power, threshold, share=None, least=0):
 def share_orbit(xy, share, color, least=0, active=None):
     """A share as an arc on a node's ring, from the top clockwise, full at 1 (share an expression; shown above least):
     a timer's time left, the battery's charge, the heat pump's frequency, power or tank temperature; while `active`
-    (the node works) pulsing in step with the ring beside it (ARC_PULSE). An underlay in the card colour hides the grey
+    (the node works) pulsing in step with the ring beside it (a-arc). An underlay in the card colour hides the grey
     ring and the running dots under the arc, so they run on only where it leaves the ring free; it is a little wider
     and longer than the arc, so no dot peeps out at its edges. The circles' length counts as 100 (pathLength), so the
     share holds on the arc at its widest (halo()) as well."""
     dash = f"=(Math.min(1, {share}) * 100).toFixed(2) + ' 100'"
     arc = {"cx": xy[0], "cy": xy[1], "r": RING_R, "fill": "none", "transform": f"rotate(-90 {xy[0]} {xy[1]})",
            "stroke-linecap": "round", "stroke-dasharray": dash, "pathLength": 100}
-    line = svg("circle", [svg("animate", visible=f"={active}", **ARC_PULSE)] if active else [],
-               stroke=color, **arc, **{"stroke-width": RING_W, "opacity": "0.9"})
+    line = svg("circle", stroke=color, **arc, **{"stroke-width": RING_W, "opacity": "0.9"})
+    if active:
+        animated(line, "a-arc", active)
     return svg("g", [svg("circle", style={"stroke": "var(--f7-card-bg-color, #fff)"}, **arc,
                          **{"stroke-width": RING_W + 2}),
                      line, *([halo(line, RING_MAX, f"={active}", arc=True)] if active else [])],
@@ -1454,7 +1618,7 @@ def house_pie(xy=HOME_XY, r=RING_R, w=RING_W, max_w=RING_MAX, underlay=True):
     from the top in the order of the nodes, clamped so they never add up beyond the ring, opaque, drawn while it has a
     length (a share of 0 would swell for nothing),
     swelling while the house draws power as the battery's arc does (only in size); the rest, which no known consumer
-    draws, is the ring itself, pulsing grey only in its opacity, as the battery's ring beside its arc (PULSE). An
+    draws, is the ring itself, pulsing grey only in its opacity, as the battery's ring beside its arc (a-soft). An
     underlay in the card colour under the arcs hides that pulse, the grey ring and the dots running in under them. Where
     two arcs meet they join straight; the band of them ends round at both sides, as the battery's arc does (user,
     2026-10-05), by a dot of the band's width in the colour of its first and of its last arc. The arcs' length counts as
@@ -1468,8 +1632,7 @@ def house_pie(xy=HOME_XY, r=RING_R, w=RING_W, max_w=RING_MAX, underlay=True):
         before = f"({before} + {own})"
     ring_ = {"cx": hx, "cy": hy, "r": r, "fill": "none"}
     arc = {**ring_, "pathLength": 100, "transform": f"rotate(-90 {hx} {hy})"}
-    rest = svg("circle", [svg("animate", visible=f"={working}", **PULSE)], visible=f"={working}", stroke=BADGE_OFF,
-               **ring_, **{"stroke-width": w})
+    rest = animated(svg("circle", visible=f"={working}", stroke=BADGE_OFF, **ring_, **{"stroke-width": w}), "a-soft")
     known = f"({before}) > 0.05"
     under = [svg("circle", style={"stroke": "var(--f7-card-bg-color, #fff)"}, visible=f"={known}", **arc,
                  **{"stroke-width": w + 2, "stroke-linecap": "round",
@@ -1669,7 +1832,7 @@ def wx_sun():
                 x2=round(24 + 14.5 * math.cos(math.radians(k * 45)), 2),
                 y2=round(24 + 14.5 * math.sin(math.radians(k * 45)), 2), **stroke(2.2, "#ffb300"))
             for k in range(8)]
-    return [svg("g", [*rays, spin(24, 24, "24s", "true")]), svg("circle", cx=24, cy=24, r=7, fill="#ffb300")]
+    return [spinning(rays, 24, 24, 14.5, "24s", "true"), svg("circle", cx=24, cy=24, r=7, fill="#ffb300")]
 
 
 def wx_cloud(x, y, scale=1.0, fill="#cfd8dc", line="#90a4ae"):
@@ -1684,17 +1847,16 @@ def wx_layers():
     from fair to mostly, a darker second cloud behind from mostly on; veil as the sun behind three thin streaks; fog,
     rain, snow and thunder under a raised cloud, the showers with the sun (moon) peeking out at its top left."""
     back = {"fill": "#b0bec5", "line": "#78909c"}
-    drops = [svg("line", [dash_flow("0.9s", "true", to="-6")], x1=x, y1=36, x2=x - 2, y2=42,
-                 **stroke(2.2, "#42a5f5", **{"stroke-dasharray": "3 3"})) for x in (18, 25, 32)]
+    # a drop falls a dash's length (3) down its line and fades, the three a third of a fall apart
+    drops = [animated(svg("line", x1=x, y1=36, x2=round(x - 0.95, 2), y2=round(36 + 2.85, 2),
+                          **stroke(2.2, "#42a5f5")), "a-drop", **{"animation-delay": f"{-0.3 * i:.1f}s"})
+             for i, x in enumerate((18, 25, 32))]
     # white flakes with a thin outline, so they stay visible on a white card
-    flakes = [svg("circle", [svg("animate", attributeName="cy", values=f"{y};{y + 3};{y}", dur=f"{2 + i * 0.4:.1f}s",
-                                 repeatCount="indefinite")], cx=x, cy=y, r=2.6, fill="#ffffff",
-                  **{"stroke": "#90a4ae", "stroke-width": 1})
+    flakes = [animated(svg("circle", cx=x, cy=y, r=2.6, fill="#ffffff", **{"stroke": "#90a4ae", "stroke-width": 1}),
+                       "a-wobble", **{"animation-duration": f"{2 + i * 0.4:.1f}s"})
               for i, (x, y) in enumerate(((18, 38.5), (25.5, 42), (33, 38.5)))]
-    bolt = svg("polygon", [svg("animate", attributeName="opacity", values="1;0.35;1;1", dur="1.8s",
-                               repeatCount="indefinite")],
-               points="26,31 20,40 24.5,40 22,47 30,37 25.5,37 28,31", fill="#ffca28",
-               **{"stroke": "#f9a825", "stroke-width": 0.8, "stroke-linejoin": "round"})
+    bolt = animated(svg("polygon", points="26,31 20,40 24.5,40 22,47 30,37 25.5,37 28,31", fill="#ffca28",
+                        **{"stroke": "#f9a825", "stroke-width": 0.8, "stroke-linejoin": "round"}), "a-bolt")
     fog = [svg("line", x1=a, y1=y, x2=b, y2=y, **stroke(2.2, "#90a4ae")) for a, b, y in ((12, 36, 37), (15, 33, 42))]
     streaks = [svg("line", x1=a, y1=y, x2=b, y2=y, opacity=0.95, **stroke(2, "#b0bec5"))
                for a, b, y in ((8, 30, 27), (16, 40, 32), (10, 32, 37))]
@@ -1800,10 +1962,8 @@ def wx_teaser():
     level = f"items.{WX_LEVEL}.state"
     color = f"({WX_LEVEL_COLORS}[Number({level})] || '#9e9e9e')"
     wide = "screen.width >= 600"
-    pulse = svg("circle", [svg("animate", attributeName="r", values="9;13.5", dur="2.2s", repeatCount="indefinite"),
-                           svg("animate", attributeName="opacity", values="0.7;0", dur="2.2s",
-                               repeatCount="indefinite")],
-                cx=14, cy=14, r=9, fill="none", stroke=f"={color}", **{"stroke-width": 1.6})
+    pulse = animated(svg("circle", cx=14, cy=14, r=9, fill="none", stroke=f"={color}", **{"stroke-width": 1.6}),
+                     "a-ripple", **{"--grow": "1.5", "animation-duration": "2.2s"})
     size = f"={wide} ? 28 : 24"
     badge = svg("svg", [pulse, *wx_alert_parts(level)], viewBox="0 0 28 28", width=size, height=size,
                 style={"display": "block", "flex": "0 0 auto"})
@@ -2442,26 +2602,10 @@ def tank_layers(id_):
 # takes heat back out of the tank) or while its booster heater heats
 TANK_CHARGING = f"(({TANK_FLOW} && {COMPRESSOR} && !({DEFROSTING})) || {BSH_ON})"
 # bubbles rising in the tank while it charges (user, 2026-10-14): x from the tank's middle, phase, seconds per rise;
-# fixed durations, as a SMIL animation restarts whenever an expression in it changes, differing ones, so the bubbles
-# never rise in step, and phases spread by their keyPoints and keyTimes as the pipes' dots
+# differing durations, so the bubbles never rise in step, and phases by their delays as the pipes' dots. Along its
+# rise a bubble fades in, then out under the tank's top, and grows from BUBBLE_R to 2.1 (bubble_keyframes)
 TANK_BUBBLES = [(-4, 0, 2.6), (2, 0.5, 3.1), (-1, 0.25, 2.3), (4, 0.75, 2.9)]
-# along its rise a bubble fades in, then out under the tank's top, and grows (share of the rise, value)
-BUBBLE_OPACITY = [(0, 0), (0.15, 0.9), (0.7, 0.9), (1, 0)]
-BUBBLE_R = [(0, 0.9), (1, 2.1)]
-
-
-def phased(curve, o):
-    """keyTimes and values of an animation along curve, (share of the rise, value) pairs from 0 to 1, for an animation
-    that starts at share o of the rise, runs to its end, jumps back to its start and runs on to o."""
-    def value(s):
-        for (a, va), (b, vb) in zip(curve, curve[1:]):
-            if a <= s <= b:
-                return va + (vb - va) * (s - a) / (b - a)
-    pts = [(0, value(o)), *[(s - o, v) for s, v in curve if o < s < 1], (1 - o, value(1))]
-    if o > 0:
-        pts += [(1 - o, value(0)), *[(s + 1 - o, v) for s, v in curve if 0 < s < o], (1, value(o))]
-    return {"keyTimes": ";".join(f"{round(t, 4):g}" for t, _ in pts),
-            "values": ";".join(f"{round(v, 3):g}" for _, v in pts)}
+BUBBLE_R = 0.9
 
 
 def tank_bubbles(cx, cy):
@@ -2470,17 +2614,12 @@ def tank_bubbles(cx, cy):
     mid, bottom, top = cx - 7, cy + 11, cy - 12
     bubbles = []
     for dx, o, dur in TANK_BUBBLES:
-        x = mid + dx
-        sway = 1.5 if dx < 0 else -1.5
-        path = f"M{x},{bottom} C{x + sway},{bottom - 8} {x - sway},{top + 8} {x},{top}"
-        timing = ({"keyPoints": "0;1", "keyTimes": "0;1"} if o == 0 else
-                  {"keyPoints": f"{o};1;0;{o}", "keyTimes": f"0;{round(1 - o, 4)};{round(1 - o, 4)};1"})
-        loop = {"dur": f"{dur}s", "repeatCount": "indefinite", "calcMode": "linear"}
-        bubbles.append(svg("circle", [svg("animateMotion", path=path, **loop, **timing),
-                                      *[svg("animate", attributeName=attr, **loop, **phased(curve, o))
-                                        for attr, curve in (("opacity", BUBBLE_OPACITY), ("r", BUBBLE_R))]],
-                           cx=0, cy=0, r=BUBBLE_R[0][1], fill="#ffffff", opacity=0, stroke="rgba(0, 0, 0, 0.35)",
-                           **{"stroke-width": 0.6}))
+        # the rise is the keyframes' (bubble_keyframes, swaying to the right first from the left half), from the
+        # bottom, o of it on at the start
+        bubbles.append(animated(svg("circle", cx=mid + dx, cy=bottom, r=BUBBLE_R, fill="#ffffff", opacity=0,
+                                    stroke="rgba(0, 0, 0, 0.35)", **{"stroke-width": 0.6}),
+                                "a-bubble-l" if dx < 0 else "a-bubble-r",
+                                **{"animation-duration": f"{dur}s", "animation-delay": f"{-o * dur:.2f}s"}))
     return svg("g", bubbles, visible=f"={TANK_CHARGING}")
 
 
@@ -2571,23 +2710,15 @@ FREQUENCY_STEPS = [round(HZ_MIN + (HZ_FULL - HZ_MIN) * k / len(DOT_SPEEDS)) for 
 def hp_route(d, color, active, reverse=None, pace=None, least=1):
     """Pipe along a polyline with dots running in its drawing direction while `active`, the other way while `reverse`
     holds; one dot per DOT_SPACING of its length, `least` at least, at a speed from DOT_SPEEDS by `pace`, a (value,
-    steps) pair. The dots are spaced by their keyPoints, as on the energy flow's links."""
+    steps) pair. The dots are spaced by their delays, as on the energy flow's links."""
     points = path_points(d)
     length = sum(math.hypot(bx - ax, by - ay) for (ax, ay), (bx, by) in zip(points, points[1:]))
     count = max(least, round(length / DOT_SPACING))
     value, bins = pace
-    dur = steps(value, bins, [f"{round(length / speed, 2)}s" for speed in DOT_SPEEDS])
-    path = f"={reverse} ? '{reversed_path(d)}' : '{d}'" if reverse else d
-    dots = []
-    for i in range(count):
-        o = round(i / count, 4)
-        timing = ({"keyPoints": "0;1", "keyTimes": "0;1"} if i == 0 else
-                  {"keyPoints": f"{o};1;0;{o}", "keyTimes": f"0;{round(1 - o, 4)};{round(1 - o, 4)};1"})
-        dots.append(svg("circle", [svg("animateMotion", path=path, dur=dur, repeatCount="indefinite",
-                                       calcMode="linear", **timing)],
-                        visible=f"={active}", r=4.5, fill=color, cx=0, cy=0))
+    dur = steps(value, bins, [round(length / speed, 2) for speed in DOT_SPEEDS])
     return [svg("path", d=d, **stroke(3, color, opacity=f"={active} ? '0.55' : '0.18'",
-                                      **{"stroke-linejoin": "round"})), *dots]
+                                      **{"stroke-linejoin": "round"})),
+            *runners(points, color, dur, active, count, reverse=reverse)]
 
 
 def rounded_polygon(points, r):
@@ -3283,11 +3414,11 @@ def boost_pill_widget():
     Stoppen; while it runs the pill fills with the device colour and rings pulse from the icon. A tap anywhere
     switches."""
     on = "items[props.item].state === 'ON'"
-    pulse = svg("svg", [svg("circle", [
-        svg("animate", attributeName="r", values="11;19", dur="1.6s", begin=b, repeatCount="indefinite"),
-        svg("animate", attributeName="opacity", values="0.7;0", dur="1.6s", begin=b, repeatCount="indefinite")],
-        cx=20, cy=20, r=11, fill="none", stroke="#ffffff", **{"stroke-width": 2}) for b in ("0s", "0.8s")],
-        visible=f"={on}", viewBox="0 0 40 40", width=40, height=40, style={"position": "absolute", "inset": "0"})
+    # two rings growing from 11 to 19 as they fade, half a period apart
+    pulse = svg("svg", [animated(svg("circle", cx=20, cy=20, r=11, fill="none", stroke="#ffffff", **{"stroke-width": 2}),
+                                 "a-ripple", **{"--grow": "1.727", "animation-delay": delay})
+                        for delay in ("0s", "-0.8s")],
+                visible=f"={on}", viewBox="0 0 40 40", width=40, height=40, style={"position": "absolute", "inset": "0"})
     badge_ = div([pulse, comp("oh-icon", {"icon": "=props.icon || 'material:bolt'", "state": "=items[props.item].state",
                                           "width": 22, "height": 22})],
                  **{"position": "relative", "width": "40px", "height": "40px", "flex": "0 0 auto", "border-radius": "50%",
@@ -4504,36 +4635,32 @@ def washer_front(running, water="#42a5f5"):
     """Door with a drum whose laundry turns while the machine runs."""
     drum = [svg("path", d="M26.5,35 a5.5,5.5 0 0 1 11,0", fill=water, **{"fill-opacity": "0.55"}),
             svg("circle", cx=29, cy=37.5, r=1.6, fill=water),
-            svg("circle", cx=35, cy=38.5, r=1.2, fill=water),
-            spin(32, 35, "1.1s", running)]
+            svg("circle", cx=35, cy=38.5, r=1.2, fill=water)]
     return [svg("circle", cx=32, cy=35, r=9, **stroke(1.6)),
             svg("circle", cx=32, cy=35, r=6.5, **stroke(0.8, "#90a4ae")),
-            svg("g", drum)]
+            spinning(drum, 32, 35, 6.5, "1.1s", running)]
 
 
 def dryer_front(running):
     """Door with a drum whose paddles turn while the dryer runs, plus a lint filter slot."""
     paddles = [svg("line", x1=32, y1=29.5, x2=32, y2=33, transform=f"rotate({a} 32 35)", **stroke(1.6, "#ffb74d"))
                for a in (0, 120, 240)]
-    paddles.append(spin(32, 35, "1.8s", running))
     return [svg("circle", cx=32, cy=35, r=9, **stroke(1.6)),
             svg("circle", cx=32, cy=35, r=6.5, **{"fill-opacity": "0.15"}, **stroke(0.8, "#90a4ae", fill="#ffb74d")),
-            svg("g", paddles),
+            spinning(paddles, 32, 35, 6.5, "1.8s", running),
             svg("line", x1=27, y1=46, x2=37, y2=46, **stroke(1.2, opacity="0.7"))]
 
 
 def dishwasher_front(running):
     """Translucent front through which the spray arm turns and droplets rise while it runs."""
     arm = [svg("line", x1=24.5, y1=38, x2=39.5, y2=38, **stroke(2, "#4fc3f7")),
-           svg("circle", cx=32, cy=38, r=1.4, fill="#4fc3f7"),
-           spin(32, 38, "1.4s", running)]
-    drops = [svg("circle", [svg("animate", attributeName="cy", values="37;29;37", dur=f"{1 + i * 0.3:.1f}s",
-                                 repeatCount="indefinite", visible=f"={running}")],
-                 cx=x, cy=35, r=0.9, fill="#4fc3f7", visible=f"={running}") for i, x in enumerate((27, 32, 37))]
+           svg("circle", cx=32, cy=38, r=1.4, fill="#4fc3f7")]
+    drops = [animated(svg("circle", cx=x, cy=37, r=0.9, fill="#4fc3f7", visible=f"={running}"), "a-rise", running,
+                      **{"animation-duration": f"{1 + i * 0.3:.1f}s"}) for i, x in enumerate((27, 32, 37))]
     return [svg("line", x1=27, y1=24.5, x2=37, y2=24.5, **stroke(1.6)),
             svg("rect", x=22.5, y=27, width=19, height=19, rx=2, **{"fill-opacity": "0.12"},
                 **stroke(1, "#90a4ae", fill="#4fc3f7")),
-            svg("g", arm), *drops]
+            spinning(arm, 32, 38, 7.5, "1.4s", running), *drops]
 
 
 def appliance_icon_widget():
@@ -4548,15 +4675,12 @@ def appliance_icon_widget():
     w, r = round(4 / SWELL, 2), round(26 + 4 / SWELL / 2, 2)
     progressing = f"={running} && {has_progress}"
     track = svg("circle", cx=32, cy=32, r=r, **stroke(w, "#9e9e9e", **{"stroke-opacity": "0.25"}))
-    arc = svg("circle", [svg("animate", visible=progressing, **ARC_PULSE)],
-              cx=32, cy=32, r=r, transform="rotate(-90 32 32)", visible=progressing, pathLength=100,
-              **stroke(w, "=props.color || '#1e88e5'",
-                       **{"stroke-dasharray": "=Number(props.progress).toFixed(1) + ' 100'"}))
+    arc = animated(svg("circle", cx=32, cy=32, r=r, transform="rotate(-90 32 32)", visible=progressing, pathLength=100,
+                       **stroke(w, "=props.color || '#1e88e5'",
+                                **{"stroke-dasharray": "=Number(props.progress).toFixed(1) + ' 100'"})), "a-arc")
     # beside the progress arc as weak as the energy flow's pulse, alone as strong as before
-    pulse = svg("circle", [svg("animate", attributeName="opacity", dur="2s", repeatCount="indefinite",
-                               values=f"={has_progress} ? '{PULSE['values']}' : '{PULSE_FULL['values']}'",
-                               visible=f"={running}")],
-                cx=32, cy=32, r=r, visible=f"={running}", **stroke(w, "=props.color || '#1e88e5'"))
+    pulse = svg("circle", cx=32, cy=32, r=r, visible=f"={running}", **stroke(w, "=props.color || '#1e88e5'"))
+    pulse["config"]["class"] = f"={has_progress} ? 'a-soft' : 'a-full'"
     fronts = [svg("g", front(running), visible=f"=props.kind === '{kind}'") for kind, front in APPLIANCE_FRONTS]
     # the arc swells, and without progress the whole ring as well, as the energy flow's do
     return svg("svg", [track, pulse, halo(pulse, 4, f"={running} && !{has_progress}"), arc,
@@ -9381,8 +9505,8 @@ def layout_page(uid, config, blocks, now):
     germanize(blocks, MISSING_DE)
     if config.get("label") in GEN_DE:
         config = {**config, "label": GEN_DE[config["label"]]}
-    config = {**config, "stylesheet": "\n".join(filter(None, [config.get("stylesheet"), CARD_STYLE, PHONE_EDGES,
-                                                              PERIOD_MENU]))}
+    config = {**config, "stylesheet": "\n".join(filter(None, [ANIM_PLACEHOLDER, config.get("stylesheet"), CARD_STYLE,
+                                                              PHONE_EDGES, PERIOD_MENU]))}
     return {
         "class": "org.openhab.core.ui.components.RootUIComponent",
         "value": {"uid": uid, "tags": [], "props": {"parameters": [], "parameterGroups": []},
@@ -10054,6 +10178,10 @@ def widgets():
         out[uid] = (itemized(tree, props), params, ["controls"])
     out["pill-switch"] = (pill_switch_widget(), PILL_SWITCH_PARAMS, ["switch"])
     for uid, (card_, _, _) in out.items():
+        # the animations' stylesheet on every widget whose root takes one, for those shown outside a page (a popup);
+        # an svg root (flow-node, flow-link, appliance-icon, weather-icon) is always inside a page or a widget with one
+        if card_["component"] not in ("svg", "g"):
+            with_anim_css(card_)
         assert not has_placeholder(str(card_)) and "1, 2, 3" not in str(card_), uid
         # references to other widgets carry names such as flow-node, which a group item may share, and the pages
         # a tap opens and the energy flow's node kinds are named after their device, as its group item is (weather,
@@ -10191,13 +10319,46 @@ FILES = {
 }
 
 
+WIDGET_TEXT = {}  # widget uid: its json with that of the widgets it places, for the bent paths a stylesheet needs
+
+
+def placed_text(text, data, seen=()):
+    """text with the json of every widget it places (widget:<uid>), and theirs, from data (this file's widgets) or
+    WIDGET_TEXT (the widgets' file, written before the pages')."""
+    for uid in set(re.findall(r'"widget:([a-z0-9-]+)"', text)) - set(seen):
+        own = WIDGET_TEXT.get(uid) or (m.json.dumps(data[uid]["value"]) if uid in data else "")
+        text += placed_text(own, data, (*seen, uid))
+    return text
+
+
+def anim_css_in(data):
+    """The stylesheets' placeholder replaced by the animations' stylesheet, complete once everything is built, each
+    with the bent paths its own tree and the widgets it places run dots along."""
+    def walk(node):
+        if isinstance(node, dict):
+            cfg = node.get("config")
+            if isinstance(cfg, dict) and ANIM_PLACEHOLDER in str(cfg.get("stylesheet", "")):
+                cfg["stylesheet"] = cfg["stylesheet"].replace(ANIM_PLACEHOLDER,
+                                                              anim_css(placed_text(m.json.dumps(node), data)))
+            for v in node.values():
+                walk(v)
+        elif isinstance(node, list):
+            for v in node:
+                walk(v)
+    walk(data)
+    for uid, entry in data.items():  # the widgets' file comes first: the pages place its widgets
+        if entry.get("value", {}).get("component") != "oh-layout-page":
+            WIDGET_TEXT[uid] = m.json.dumps(entry["value"])
+    return data
+
+
 def main():
     results = {}
     files = ({"uicomponents_ui_widget.json": migrate_widgets, "uicomponents_ui_page.json": migrate_pages}
              if sys.argv[1].startswith("update") else FILES)
     for name, fn in files.items():
         data, enc = m.detect(m.DB + name)
-        results[name] = m.encode(fn(data), *enc)
+        results[name] = m.encode(anim_css_in(fn(data)), *enc)
         print(f"{name}: encoder html={enc[0]} newline={enc[1]} ok")
     if sys.argv[1] not in ("apply", "update-apply"):
         return

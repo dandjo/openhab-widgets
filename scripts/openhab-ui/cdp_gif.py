@@ -66,13 +66,14 @@ async def main():
             clip = {"x": max(0, x - m), "y": max(0, y - m), "width": w + 2 * m, "height": h + 2 * m, "scale": 1}
             frames, stamps = [], []
             if FPS:
-                # the drawings' animations are SMIL: pause every SVG timeline of the card and step it
-                svgs = f"[...document.querySelectorAll('.page-current .card')[{INDEX}].querySelectorAll('svg')]"
-                t0 = (await ev(f"(() => {{ const s = {svgs}; s.forEach(x => x.pauseAnimations()); "
-                               "return s.length ? s[0].getCurrentTime() : 0; })()"))["result"]["value"]
+                # the drawings' animations are CSS (SMIL until 2026-10-25): pause every animation of the page and
+                # step them all together, from the time the first one stands at
+                anims = "document.getAnimations()"
+                t0 = (await ev(f"(() => {{ const a = {anims}; a.forEach((x) => x.pause()); "
+                               "return a.length ? (a[0].currentTime || 0) / 1000 : 0; })()"))["result"]["value"]
                 for k in range(round(SECONDS * FPS)):
                     await call("Runtime.evaluate", awaitPromise=True, expression=(
-                        f"(() => {{ {svgs}.forEach(x => x.setCurrentTime({t0 + k / FPS})); "
+                        f"(() => {{ {anims}.forEach((x) => {{ x.pause(); x.currentTime = {(t0 + k / FPS) * 1000}; }}); "
                         "return new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))); })()"))
                     shot = await call("Page.captureScreenshot", format="png", clip=clip)
                     frames.append(Image.open(io.BytesIO(base64.b64decode(shot["data"]))).convert("RGB"))

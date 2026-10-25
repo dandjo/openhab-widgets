@@ -70,7 +70,7 @@ props:
     type: DECIMAL
     required: false
   parameterGroups: []
-timestamp: Oct 7, 2026, 12:51:17 PM
+timestamp: Oct 25, 2026, 2:07:58 PM
 component: g
 config:
   transform: ='translate(' + props.x + ' ' + props.y + ')'
@@ -142,9 +142,20 @@ slots:
           stroke-linecap: round
           fill: none
       - component: g
-        config: {}
+        config:
+          class: '=(Math.abs(Number(props.power)) > 10) ? ''a-spin'' : '''''
+          style:
+            animation-duration: '=Math.abs(Number(props.power)) < 1000 ? ''12s'' : (Math.abs(Number(props.power)) < 4000 ?
+              ''7s'' : (''4s''))'
         slots:
           default:
+          - component: circle
+            config:
+              cx: 10.33
+              cy: -8.45
+              r: 14.5
+              fill: none
+              stroke: none
           - component: line
             config:
               x1: 16.61
@@ -310,15 +321,6 @@ slots:
                   stroke-width: 1.8
                   stroke-linecap: round
                   fill: none
-          - component: animateTransform
-            config:
-              attributeName: transform
-              type: rotate
-              from: 0 10.33 -8.45
-              to: 360 10.33 -8.45
-              dur: '=Math.abs(Number(props.power)) < 1000 ? ''12s'' : (Math.abs(Number(props.power)) < 4000 ? ''7s'' : (''4s''))'
-              repeatCount: indefinite
-              visible: =Math.abs(Number(props.power)) > 10
       - component: circle
         config:
           cx: 10.33
@@ -483,17 +485,63 @@ slots:
           stroke-width: 1.4
           stroke-linecap: round
           fill: none
-          stroke-dasharray: 3 3
-        slots:
-          default:
-          - component: animate
-            config:
-              attributeName: stroke-dashoffset
-              from: '0'
-              to: '=Number(props.power) > 0 ? ''-12'' : ''12'''
-              dur: '=Math.abs(Number(props.power)) < 500 ? ''2s'' : (Math.abs(Number(props.power)) < 2000 ? ''1.2s'' : (''0.7s''))'
-              repeatCount: indefinite
-              visible: =Math.abs(Number(props.power)) > 10
+          opacity: '=Math.abs(Number(props.power)) > 10 ? ''0.7'' : ''0.45'''
+      - component: circle
+        config:
+          r: 1.3
+          fill: '=Number(props.power) < 0 ? ''#43a047'' : ''#e53935'''
+          cx: 0
+          cy: 0
+          visible: =Math.abs(Number(props.power)) > 10
+          class: '=(Math.abs(Number(props.power)) > 10) ? ''a-route-df7a7e2a'' : '''''
+          style:
+            animation-duration: '=(Math.abs(Number(props.power)) < 500 ? 2 : (Math.abs(Number(props.power)) < 2000 ? 1.2 :
+              (0.7))) + ''s'''
+            animation-delay: '=(-0 / 4 * (Math.abs(Number(props.power)) < 500 ? 2 : (Math.abs(Number(props.power)) < 2000
+              ? 1.2 : (0.7)))) + ''s'''
+            animation-direction: '=(Number(props.power) > 0) ? ''reverse'' : ''normal'''
+      - component: circle
+        config:
+          r: 1.3
+          fill: '=Number(props.power) < 0 ? ''#43a047'' : ''#e53935'''
+          cx: 0
+          cy: 0
+          visible: =Math.abs(Number(props.power)) > 10
+          class: '=(Math.abs(Number(props.power)) > 10) ? ''a-route-df7a7e2a'' : '''''
+          style:
+            animation-duration: '=(Math.abs(Number(props.power)) < 500 ? 2 : (Math.abs(Number(props.power)) < 2000 ? 1.2 :
+              (0.7))) + ''s'''
+            animation-delay: '=(-1 / 4 * (Math.abs(Number(props.power)) < 500 ? 2 : (Math.abs(Number(props.power)) < 2000
+              ? 1.2 : (0.7)))) + ''s'''
+            animation-direction: '=(Number(props.power) > 0) ? ''reverse'' : ''normal'''
+      - component: circle
+        config:
+          r: 1.3
+          fill: '=Number(props.power) < 0 ? ''#43a047'' : ''#e53935'''
+          cx: 0
+          cy: 0
+          visible: =Math.abs(Number(props.power)) > 10
+          class: '=(Math.abs(Number(props.power)) > 10) ? ''a-route-df7a7e2a'' : '''''
+          style:
+            animation-duration: '=(Math.abs(Number(props.power)) < 500 ? 2 : (Math.abs(Number(props.power)) < 2000 ? 1.2 :
+              (0.7))) + ''s'''
+            animation-delay: '=(-2 / 4 * (Math.abs(Number(props.power)) < 500 ? 2 : (Math.abs(Number(props.power)) < 2000
+              ? 1.2 : (0.7)))) + ''s'''
+            animation-direction: '=(Number(props.power) > 0) ? ''reverse'' : ''normal'''
+      - component: circle
+        config:
+          r: 1.3
+          fill: '=Number(props.power) < 0 ? ''#43a047'' : ''#e53935'''
+          cx: 0
+          cy: 0
+          visible: =Math.abs(Number(props.power)) > 10
+          class: '=(Math.abs(Number(props.power)) > 10) ? ''a-route-df7a7e2a'' : '''''
+          style:
+            animation-duration: '=(Math.abs(Number(props.power)) < 500 ? 2 : (Math.abs(Number(props.power)) < 2000 ? 1.2 :
+              (0.7))) + ''s'''
+            animation-delay: '=(-3 / 4 * (Math.abs(Number(props.power)) < 500 ? 2 : (Math.abs(Number(props.power)) < 2000
+              ? 1.2 : (0.7)))) + ''s'''
+            animation-direction: '=(Number(props.power) > 0) ? ''reverse'' : ''normal'''
       - component: path
         config:
           d: M-27,2 Q-21,4 -11,0 Q0,5 11,0 Q21,4 27,2
@@ -501,17 +549,63 @@ slots:
           stroke-width: 1.4
           stroke-linecap: round
           fill: none
-          stroke-dasharray: 3 3
-        slots:
-          default:
-          - component: animate
-            config:
-              attributeName: stroke-dashoffset
-              from: '0'
-              to: '=Number(props.power) > 0 ? ''-12'' : ''12'''
-              dur: '=Math.abs(Number(props.power)) < 500 ? ''2s'' : (Math.abs(Number(props.power)) < 2000 ? ''1.2s'' : (''0.7s''))'
-              repeatCount: indefinite
-              visible: =Math.abs(Number(props.power)) > 10
+          opacity: '=Math.abs(Number(props.power)) > 10 ? ''0.7'' : ''0.45'''
+      - component: circle
+        config:
+          r: 1.3
+          fill: '=Number(props.power) < 0 ? ''#43a047'' : ''#e53935'''
+          cx: 0
+          cy: 0
+          visible: =Math.abs(Number(props.power)) > 10
+          class: '=(Math.abs(Number(props.power)) > 10) ? ''a-route-4a077550'' : '''''
+          style:
+            animation-duration: '=(Math.abs(Number(props.power)) < 500 ? 2 : (Math.abs(Number(props.power)) < 2000 ? 1.2 :
+              (0.7))) + ''s'''
+            animation-delay: '=(-0 / 4 * (Math.abs(Number(props.power)) < 500 ? 2 : (Math.abs(Number(props.power)) < 2000
+              ? 1.2 : (0.7)))) + ''s'''
+            animation-direction: '=(Number(props.power) > 0) ? ''reverse'' : ''normal'''
+      - component: circle
+        config:
+          r: 1.3
+          fill: '=Number(props.power) < 0 ? ''#43a047'' : ''#e53935'''
+          cx: 0
+          cy: 0
+          visible: =Math.abs(Number(props.power)) > 10
+          class: '=(Math.abs(Number(props.power)) > 10) ? ''a-route-4a077550'' : '''''
+          style:
+            animation-duration: '=(Math.abs(Number(props.power)) < 500 ? 2 : (Math.abs(Number(props.power)) < 2000 ? 1.2 :
+              (0.7))) + ''s'''
+            animation-delay: '=(-1 / 4 * (Math.abs(Number(props.power)) < 500 ? 2 : (Math.abs(Number(props.power)) < 2000
+              ? 1.2 : (0.7)))) + ''s'''
+            animation-direction: '=(Number(props.power) > 0) ? ''reverse'' : ''normal'''
+      - component: circle
+        config:
+          r: 1.3
+          fill: '=Number(props.power) < 0 ? ''#43a047'' : ''#e53935'''
+          cx: 0
+          cy: 0
+          visible: =Math.abs(Number(props.power)) > 10
+          class: '=(Math.abs(Number(props.power)) > 10) ? ''a-route-4a077550'' : '''''
+          style:
+            animation-duration: '=(Math.abs(Number(props.power)) < 500 ? 2 : (Math.abs(Number(props.power)) < 2000 ? 1.2 :
+              (0.7))) + ''s'''
+            animation-delay: '=(-2 / 4 * (Math.abs(Number(props.power)) < 500 ? 2 : (Math.abs(Number(props.power)) < 2000
+              ? 1.2 : (0.7)))) + ''s'''
+            animation-direction: '=(Number(props.power) > 0) ? ''reverse'' : ''normal'''
+      - component: circle
+        config:
+          r: 1.3
+          fill: '=Number(props.power) < 0 ? ''#43a047'' : ''#e53935'''
+          cx: 0
+          cy: 0
+          visible: =Math.abs(Number(props.power)) > 10
+          class: '=(Math.abs(Number(props.power)) > 10) ? ''a-route-4a077550'' : '''''
+          style:
+            animation-duration: '=(Math.abs(Number(props.power)) < 500 ? 2 : (Math.abs(Number(props.power)) < 2000 ? 1.2 :
+              (0.7))) + ''s'''
+            animation-delay: '=(-3 / 4 * (Math.abs(Number(props.power)) < 500 ? 2 : (Math.abs(Number(props.power)) < 2000
+              ? 1.2 : (0.7)))) + ''s'''
+            animation-direction: '=(Number(props.power) > 0) ? ''reverse'' : ''normal'''
   - component: g
     config:
       visible: =props.kind === 'home'
@@ -579,16 +673,12 @@ slots:
           height: 6
           rx: 1
           fill: '#ffd54f'
-          fill-opacity: =(0.3 + 0.7 * Math.min(1, Math.abs(Number(props.power)) / 3000)).toFixed(2)
-        slots:
-          default:
-          - component: animate
-            config:
-              attributeName: fill-opacity
-              values: 0.35;1;0.35
-              dur: '=Math.abs(Number(props.power)) < 500 ? ''2.4s'' : (Math.abs(Number(props.power)) < 1500 ? ''1.6s'' : (''1s''))'
-              repeatCount: indefinite
-              visible: =Math.abs(Number(props.power)) > 50
+          fill-opacity: '=(Math.abs(Number(props.power)) > 50) ? ''1'' : (0.3 + 0.7 * Math.min(1, Math.abs(Number(props.power))
+            / 3000)).toFixed(2)'
+          class: '=(Math.abs(Number(props.power)) > 50) ? ''a-glow'' : '''''
+          style:
+            animation-duration: '=Math.abs(Number(props.power)) < 500 ? ''2.4s'' : (Math.abs(Number(props.power)) < 1500 ?
+              ''1.6s'' : (''1s''))'
       - component: rect
         config:
           x: 4
@@ -597,16 +687,12 @@ slots:
           height: 6
           rx: 1
           fill: '#ffd54f'
-          fill-opacity: =(0.3 + 0.7 * Math.min(1, Math.abs(Number(props.power)) / 3000)).toFixed(2)
-        slots:
-          default:
-          - component: animate
-            config:
-              attributeName: fill-opacity
-              values: 0.35;1;0.35
-              dur: '=Math.abs(Number(props.power)) < 500 ? ''2.4s'' : (Math.abs(Number(props.power)) < 1500 ? ''1.6s'' : (''1s''))'
-              repeatCount: indefinite
-              visible: =Math.abs(Number(props.power)) > 50
+          fill-opacity: '=(Math.abs(Number(props.power)) > 50) ? ''1'' : (0.3 + 0.7 * Math.min(1, Math.abs(Number(props.power))
+            / 3000)).toFixed(2)'
+          class: '=(Math.abs(Number(props.power)) > 50) ? ''a-glow'' : '''''
+          style:
+            animation-duration: '=Math.abs(Number(props.power)) < 500 ? ''2.4s'' : (Math.abs(Number(props.power)) < 1500 ?
+              ''1.6s'' : (''1s''))'
   - component: g
     config:
       visible: =props.kind === 'heat-pump'
@@ -651,9 +737,20 @@ slots:
           stroke-linecap: round
           fill: none
       - component: g
-        config: {}
+        config:
+          class: '=(Number(props.frequency) > 0) ? ''a-spin'' : '''''
+          style:
+            animation-duration: '=Math.abs(Number(props.frequency)) < 30 ? ''1.4s'' : (Math.abs(Number(props.frequency)) <
+              55 ? ''0.9s'' : (''0.5s''))'
         slots:
           default:
+          - component: circle
+            config:
+              cx: -5
+              cy: 0
+              r: 8
+              fill: none
+              stroke: none
           - component: path
             config:
               d: M-5,0 q3.5,-3 0,-7.5 q-3.5,3 0,7.5
@@ -669,16 +766,6 @@ slots:
               d: M-5,0 q3.5,-3 0,-7.5 q-3.5,3 0,7.5
               fill: '#fb8c00'
               transform: rotate(240 -5 0)
-          - component: animateTransform
-            config:
-              attributeName: transform
-              type: rotate
-              from: 0 -5 0
-              to: 360 -5 0
-              dur: '=Math.abs(Number(props.frequency)) < 30 ? ''1.4s'' : (Math.abs(Number(props.frequency)) < 55 ? ''0.9s''
-                : (''0.5s''))'
-              repeatCount: indefinite
-              visible: =Number(props.frequency) > 0
       - component: circle
         config:
           cx: -5
@@ -804,9 +891,20 @@ slots:
           stroke-linecap: round
           fill: none
       - component: g
-        config: {}
+        config:
+          class: '=(Number(props.frequency) > 0) ? ''a-spin'' : '''''
+          style:
+            animation-duration: '=Math.abs(Number(props.frequency)) < 30 ? ''1.4s'' : (Math.abs(Number(props.frequency)) <
+              55 ? ''0.9s'' : (''0.5s''))'
         slots:
           default:
+          - component: circle
+            config:
+              cx: -11
+              cy: -3
+              r: 8
+              fill: none
+              stroke: none
           - component: path
             config:
               d: M-11,-3 q3.5,-3 0,-7.5 q-3.5,3 0,7.5
@@ -822,16 +920,6 @@ slots:
               d: M-11,-3 q3.5,-3 0,-7.5 q-3.5,3 0,7.5
               fill: '#fb8c00'
               transform: rotate(240 -11 -3)
-          - component: animateTransform
-            config:
-              attributeName: transform
-              type: rotate
-              from: 0 -11 -3
-              to: 360 -11 -3
-              dur: '=Math.abs(Number(props.frequency)) < 30 ? ''1.4s'' : (Math.abs(Number(props.frequency)) < 55 ? ''0.9s''
-                : (''0.5s''))'
-              repeatCount: indefinite
-              visible: =Number(props.frequency) > 0
       - component: circle
         config:
           cx: -11
@@ -1009,60 +1097,105 @@ slots:
       - component: path
         config:
           d: M-9,3 q3,3.5 0,7 q-3,3.5 0,7
-          opacity: '=Math.abs(Number(props.power)) > 5 ? ''1'' : ''0.25'''
+          opacity: '=Math.abs(Number(props.power)) > 5 ? ''0.5'' : ''0.25'''
           stroke: '#29b6f6'
-          stroke-width: 1.6
+          stroke-width: 1.4
           stroke-linecap: round
           fill: none
-          stroke-dasharray: 3 3
-        slots:
-          default:
-          - component: animate
-            config:
-              attributeName: stroke-dashoffset
-              from: '0'
-              to: '-12'
-              dur: '=Math.abs(Number(props.power)) < 300 ? ''1.6s'' : (Math.abs(Number(props.power)) < 800 ? ''1s'' : (''0.6s''))'
-              repeatCount: indefinite
-              visible: =Math.abs(Number(props.power)) > 5
+      - component: circle
+        config:
+          r: 1.2
+          fill: '#29b6f6'
+          cx: 0
+          cy: 0
+          visible: =Math.abs(Number(props.power)) > 5
+          class: '=(Math.abs(Number(props.power)) > 5) ? ''a-route-a934eb5f'' : '''''
+          style:
+            animation-duration: '=(Math.abs(Number(props.power)) < 300 ? 1.6 : (Math.abs(Number(props.power)) < 800 ? 1 :
+              (0.6))) + ''s'''
+            animation-delay: '=(-0 / 2 * (Math.abs(Number(props.power)) < 300 ? 1.6 : (Math.abs(Number(props.power)) < 800
+              ? 1 : (0.6)))) + ''s'''
+      - component: circle
+        config:
+          r: 1.2
+          fill: '#29b6f6'
+          cx: 0
+          cy: 0
+          visible: =Math.abs(Number(props.power)) > 5
+          class: '=(Math.abs(Number(props.power)) > 5) ? ''a-route-a934eb5f'' : '''''
+          style:
+            animation-duration: '=(Math.abs(Number(props.power)) < 300 ? 1.6 : (Math.abs(Number(props.power)) < 800 ? 1 :
+              (0.6))) + ''s'''
+            animation-delay: '=(-1 / 2 * (Math.abs(Number(props.power)) < 300 ? 1.6 : (Math.abs(Number(props.power)) < 800
+              ? 1 : (0.6)))) + ''s'''
       - component: path
         config:
           d: M0,3 q3,3.5 0,7 q-3,3.5 0,7
-          opacity: '=Math.abs(Number(props.power)) > 5 ? ''1'' : ''0.25'''
+          opacity: '=Math.abs(Number(props.power)) > 5 ? ''0.5'' : ''0.25'''
           stroke: '#29b6f6'
-          stroke-width: 1.6
+          stroke-width: 1.4
           stroke-linecap: round
           fill: none
-          stroke-dasharray: 3 3
-        slots:
-          default:
-          - component: animate
-            config:
-              attributeName: stroke-dashoffset
-              from: '0'
-              to: '-12'
-              dur: '=Math.abs(Number(props.power)) < 300 ? ''1.6s'' : (Math.abs(Number(props.power)) < 800 ? ''1s'' : (''0.6s''))'
-              repeatCount: indefinite
-              visible: =Math.abs(Number(props.power)) > 5
+      - component: circle
+        config:
+          r: 1.2
+          fill: '#29b6f6'
+          cx: 0
+          cy: 0
+          visible: =Math.abs(Number(props.power)) > 5
+          class: '=(Math.abs(Number(props.power)) > 5) ? ''a-route-f590ad61'' : '''''
+          style:
+            animation-duration: '=(Math.abs(Number(props.power)) < 300 ? 1.6 : (Math.abs(Number(props.power)) < 800 ? 1 :
+              (0.6))) + ''s'''
+            animation-delay: '=(-0 / 2 * (Math.abs(Number(props.power)) < 300 ? 1.6 : (Math.abs(Number(props.power)) < 800
+              ? 1 : (0.6)))) + ''s'''
+      - component: circle
+        config:
+          r: 1.2
+          fill: '#29b6f6'
+          cx: 0
+          cy: 0
+          visible: =Math.abs(Number(props.power)) > 5
+          class: '=(Math.abs(Number(props.power)) > 5) ? ''a-route-f590ad61'' : '''''
+          style:
+            animation-duration: '=(Math.abs(Number(props.power)) < 300 ? 1.6 : (Math.abs(Number(props.power)) < 800 ? 1 :
+              (0.6))) + ''s'''
+            animation-delay: '=(-1 / 2 * (Math.abs(Number(props.power)) < 300 ? 1.6 : (Math.abs(Number(props.power)) < 800
+              ? 1 : (0.6)))) + ''s'''
       - component: path
         config:
           d: M9,3 q3,3.5 0,7 q-3,3.5 0,7
-          opacity: '=Math.abs(Number(props.power)) > 5 ? ''1'' : ''0.25'''
+          opacity: '=Math.abs(Number(props.power)) > 5 ? ''0.5'' : ''0.25'''
           stroke: '#29b6f6'
-          stroke-width: 1.6
+          stroke-width: 1.4
           stroke-linecap: round
           fill: none
-          stroke-dasharray: 3 3
-        slots:
-          default:
-          - component: animate
-            config:
-              attributeName: stroke-dashoffset
-              from: '0'
-              to: '-12'
-              dur: '=Math.abs(Number(props.power)) < 300 ? ''1.6s'' : (Math.abs(Number(props.power)) < 800 ? ''1s'' : (''0.6s''))'
-              repeatCount: indefinite
-              visible: =Math.abs(Number(props.power)) > 5
+      - component: circle
+        config:
+          r: 1.2
+          fill: '#29b6f6'
+          cx: 0
+          cy: 0
+          visible: =Math.abs(Number(props.power)) > 5
+          class: '=(Math.abs(Number(props.power)) > 5) ? ''a-route-4c29644b'' : '''''
+          style:
+            animation-duration: '=(Math.abs(Number(props.power)) < 300 ? 1.6 : (Math.abs(Number(props.power)) < 800 ? 1 :
+              (0.6))) + ''s'''
+            animation-delay: '=(-0 / 2 * (Math.abs(Number(props.power)) < 300 ? 1.6 : (Math.abs(Number(props.power)) < 800
+              ? 1 : (0.6)))) + ''s'''
+      - component: circle
+        config:
+          r: 1.2
+          fill: '#29b6f6'
+          cx: 0
+          cy: 0
+          visible: =Math.abs(Number(props.power)) > 5
+          class: '=(Math.abs(Number(props.power)) > 5) ? ''a-route-4c29644b'' : '''''
+          style:
+            animation-duration: '=(Math.abs(Number(props.power)) < 300 ? 1.6 : (Math.abs(Number(props.power)) < 800 ? 1 :
+              (0.6))) + ''s'''
+            animation-delay: '=(-1 / 2 * (Math.abs(Number(props.power)) < 300 ? 1.6 : (Math.abs(Number(props.power)) < 800
+              ? 1 : (0.6)))) + ''s'''
   - component: g
     config:
       visible: =props.kind === 'e-car'
@@ -1203,6 +1336,7 @@ slots:
         config:
           opacity: '0'
           visible: =Math.abs(Number(props.power)) > 500
+          class: a-fade
         slots:
           default:
           - component: polygon
@@ -1220,12 +1354,6 @@ slots:
               stroke: '#26a69a'
               stroke-width: 0.8
               stroke-linejoin: round
-          - component: animate
-            config:
-              attributeName: opacity
-              values: 0;1;0
-              dur: 2.4s
-              repeatCount: indefinite
   - component: g
     config:
       visible: =props.kind === 'battery'
@@ -1358,55 +1486,27 @@ slots:
                     config:
                       d: M0,-8 Q1.28,-1.28 8,0 Q1.28,1.28 0,8 Q-1.28,1.28 -8,0 Q-1.28,-1.28 0,-8 Z
                       fill: '#5c6bc0'
-                    slots:
-                      default:
-                      - component: animateTransform
-                        config:
-                          attributeName: transform
-                          type: scale
-                          values: 0.82;1.05;0.82
-                          dur: '=Math.abs(Number(props.power)) < 500 ? ''2.4s'' : (Math.abs(Number(props.power)) < 1500 ?
-                            ''1.6s'' : (''1s''))'
-                          repeatCount: indefinite
-                          calcMode: spline
-                          keyTimes: 0;0.5;1
-                          keySplines: 0.42 0 0.58 1;0.42 0 0.58 1
-                          visible: =Math.abs(Number(props.power)) > 10
+                      class: '=(Math.abs(Number(props.power)) > 10) ? ''a-breathe'' : '''''
+                      style:
+                        animation-duration: '=Math.abs(Number(props.power)) < 500 ? ''2.4s'' : (Math.abs(Number(props.power))
+                          < 1500 ? ''1.6s'' : (''1s''))'
               - component: path
                 config:
                   d: M38.6,25.1 Q39.06,27.54 41.5,28 Q39.06,28.46 38.6,30.9 Q38.14,28.46 35.7,28 Q38.14,27.54 38.6,25.1 Z
                   fill: '#5c6bc0'
-                slots:
-                  default:
-                  - component: animate
-                    config:
-                      attributeName: opacity
-                      values: 0.2;1;0.2
-                      dur: '=Math.abs(Number(props.power)) < 500 ? ''1.8s'' : (Math.abs(Number(props.power)) < 1500 ? ''1.2s''
-                        : (''0.75s''))'
-                      repeatCount: indefinite
-                      calcMode: spline
-                      keyTimes: 0;0.5;1
-                      keySplines: 0.42 0 0.58 1;0.42 0 0.58 1
-                      visible: =Math.abs(Number(props.power)) > 10
+                  class: '=(Math.abs(Number(props.power)) > 10) ? ''a-blink-up'' : '''''
+                  style:
+                    animation-duration: '=Math.abs(Number(props.power)) < 500 ? ''1.8s'' : (Math.abs(Number(props.power))
+                      < 1500 ? ''1.2s'' : (''0.75s''))'
               - component: path
                 config:
                   d: M25.2,41.1 Q25.54,42.86 27.3,43.2 Q25.54,43.54 25.2,45.3 Q24.86,43.54 23.1,43.2 Q24.86,42.86 25.2,41.1
                     Z
                   fill: '#5c6bc0'
-                slots:
-                  default:
-                  - component: animate
-                    config:
-                      attributeName: opacity
-                      values: 1;0.2;1
-                      dur: '=Math.abs(Number(props.power)) < 500 ? ''1.8s'' : (Math.abs(Number(props.power)) < 1500 ? ''1.2s''
-                        : (''0.75s''))'
-                      repeatCount: indefinite
-                      calcMode: spline
-                      keyTimes: 0;0.5;1
-                      keySplines: 0.42 0 0.58 1;0.42 0 0.58 1
-                      visible: =Math.abs(Number(props.power)) > 10
+                  class: '=(Math.abs(Number(props.power)) > 10) ? ''a-blink-down'' : '''''
+                  style:
+                    animation-duration: '=Math.abs(Number(props.power)) < 500 ? ''1.8s'' : (Math.abs(Number(props.power))
+                      < 1500 ? ''1.2s'' : (''0.75s''))'
   - component: g
     config:
       visible: =props.kind === 'ventilation'
@@ -1442,9 +1542,20 @@ slots:
           stroke-linecap: round
           fill: none
       - component: g
-        config: {}
+        config:
+          class: '=(Math.abs(Number(props.power)) > 5) ? ''a-spin'' : '''''
+          style:
+            animation-duration: '=Math.abs(Number(props.power)) < 30 ? ''2.4s'' : (Math.abs(Number(props.power)) < 60 ? ''1.5s''
+              : (''0.9s''))'
         slots:
           default:
+          - component: circle
+            config:
+              cx: 0
+              cy: 4.5
+              r: 9
+              fill: none
+              stroke: none
           - component: path
             config:
               d: M0,4.5 C2.5,3.0 4.5,-1.0 1.5,-4.0 C-0.5,-1.5 -2,1.5 0,4.5 Z
@@ -1475,15 +1586,6 @@ slots:
               fill: '#26a69a'
               transform: rotate(288 0 4.5)
               fill-opacity: '0.85'
-          - component: animateTransform
-            config:
-              attributeName: transform
-              type: rotate
-              from: 0 0 4.5
-              to: 360 0 4.5
-              dur: '=Math.abs(Number(props.power)) < 30 ? ''2.4s'' : (Math.abs(Number(props.power)) < 60 ? ''1.5s'' : (''0.9s''))'
-              repeatCount: indefinite
-              visible: =Math.abs(Number(props.power)) > 5
       - component: circle
         config:
           cx: 0
@@ -1496,22 +1598,37 @@ slots:
       - component: path
         config:
           d: M-7,-21 V-10
-          opacity: '=Math.abs(Number(props.power)) > 5 ? ''1'' : ''0.4'''
+          opacity: '=Math.abs(Number(props.power)) > 5 ? ''0.5'' : ''0.3'''
           stroke: '#26a69a'
-          stroke-width: 1.8
+          stroke-width: 1.6
           stroke-linecap: round
           fill: none
-          stroke-dasharray: 3 3
-        slots:
-          default:
-          - component: animate
-            config:
-              attributeName: stroke-dashoffset
-              from: '0'
-              to: '-12'
-              dur: '=Math.abs(Number(props.power)) < 30 ? ''1.6s'' : (Math.abs(Number(props.power)) < 60 ? ''1s'' : (''0.6s''))'
-              repeatCount: indefinite
-              visible: =Math.abs(Number(props.power)) > 5
+      - component: circle
+        config:
+          r: 1.2
+          fill: '#26a69a'
+          cx: 0
+          cy: 0
+          visible: =Math.abs(Number(props.power)) > 5
+          class: '=(Math.abs(Number(props.power)) > 5) ? ''a-route-aabac290'' : '''''
+          style:
+            animation-duration: '=(Math.abs(Number(props.power)) < 30 ? 1.6 : (Math.abs(Number(props.power)) < 60 ? 1 : (0.6)))
+              + ''s'''
+            animation-delay: '=(-0 / 2 * (Math.abs(Number(props.power)) < 30 ? 1.6 : (Math.abs(Number(props.power)) < 60 ?
+              1 : (0.6)))) + ''s'''
+      - component: circle
+        config:
+          r: 1.2
+          fill: '#26a69a'
+          cx: 0
+          cy: 0
+          visible: =Math.abs(Number(props.power)) > 5
+          class: '=(Math.abs(Number(props.power)) > 5) ? ''a-route-aabac290'' : '''''
+          style:
+            animation-duration: '=(Math.abs(Number(props.power)) < 30 ? 1.6 : (Math.abs(Number(props.power)) < 60 ? 1 : (0.6)))
+              + ''s'''
+            animation-delay: '=(-1 / 2 * (Math.abs(Number(props.power)) < 30 ? 1.6 : (Math.abs(Number(props.power)) < 60 ?
+              1 : (0.6)))) + ''s'''
       - component: path
         config:
           d: M-10.5,-11.5 L-7,-8 L-3.5,-11.5 Z
@@ -1519,22 +1636,37 @@ slots:
       - component: path
         config:
           d: M7,-7 V-18
-          opacity: '=Math.abs(Number(props.power)) > 5 ? ''1'' : ''0.4'''
+          opacity: '=Math.abs(Number(props.power)) > 5 ? ''0.5'' : ''0.3'''
           stroke: '#90a4ae'
-          stroke-width: 1.8
+          stroke-width: 1.6
           stroke-linecap: round
           fill: none
-          stroke-dasharray: 3 3
-        slots:
-          default:
-          - component: animate
-            config:
-              attributeName: stroke-dashoffset
-              from: '0'
-              to: '-12'
-              dur: '=Math.abs(Number(props.power)) < 30 ? ''1.6s'' : (Math.abs(Number(props.power)) < 60 ? ''1s'' : (''0.6s''))'
-              repeatCount: indefinite
-              visible: =Math.abs(Number(props.power)) > 5
+      - component: circle
+        config:
+          r: 1.2
+          fill: '#90a4ae'
+          cx: 0
+          cy: 0
+          visible: =Math.abs(Number(props.power)) > 5
+          class: '=(Math.abs(Number(props.power)) > 5) ? ''a-route-4221cc14'' : '''''
+          style:
+            animation-duration: '=(Math.abs(Number(props.power)) < 30 ? 1.6 : (Math.abs(Number(props.power)) < 60 ? 1 : (0.6)))
+              + ''s'''
+            animation-delay: '=(-0 / 2 * (Math.abs(Number(props.power)) < 30 ? 1.6 : (Math.abs(Number(props.power)) < 60 ?
+              1 : (0.6)))) + ''s'''
+      - component: circle
+        config:
+          r: 1.2
+          fill: '#90a4ae'
+          cx: 0
+          cy: 0
+          visible: =Math.abs(Number(props.power)) > 5
+          class: '=(Math.abs(Number(props.power)) > 5) ? ''a-route-4221cc14'' : '''''
+          style:
+            animation-duration: '=(Math.abs(Number(props.power)) < 30 ? 1.6 : (Math.abs(Number(props.power)) < 60 ? 1 : (0.6)))
+              + ''s'''
+            animation-delay: '=(-1 / 2 * (Math.abs(Number(props.power)) < 30 ? 1.6 : (Math.abs(Number(props.power)) < 60 ?
+              1 : (0.6)))) + ''s'''
       - component: path
         config:
           d: M3.5,-17.5 L7,-21 L10.5,-17.5 Z
@@ -2475,15 +2607,7 @@ slots:
               rx: 0.8
               fill: '=Math.abs(Number(props.power)) > 10 ? ''#7cb342'' : ''#546e7a'''
               fill-opacity: '0.9'
-            slots:
-              default:
-              - component: animate
-                config:
-                  attributeName: width
-                  values: 0;12
-                  dur: 2.4s
-                  repeatCount: indefinite
-                  visible: =Math.abs(Number(props.power)) > 10
+              class: '=(Math.abs(Number(props.power)) > 10) ? ''a-fill'' : '''''
           - component: rect
             config:
               x: -7.0
@@ -2577,6 +2701,7 @@ slots:
       - component: g
         config:
           opacity: '=Math.abs(Number(props.power)) > 10 ? ''1'' : ''0.3'''
+          class: '=(Math.abs(Number(props.power)) > 10) ? ''a-flicker-a'' : '''''
         slots:
           default:
           - component: circle
@@ -2585,16 +2710,10 @@ slots:
               cy: -6.8
               r: 1.1
               fill: '#69f0ae'
-          - component: animate
-            config:
-              attributeName: opacity
-              values: 1;0.25;1
-              dur: 0.9s
-              repeatCount: indefinite
-              visible: =Math.abs(Number(props.power)) > 10
       - component: g
         config:
           opacity: '=Math.abs(Number(props.power)) > 10 ? ''1'' : ''0.3'''
+          class: '=(Math.abs(Number(props.power)) > 10) ? ''a-flicker-b'' : '''''
         slots:
           default:
           - component: circle
@@ -2603,13 +2722,6 @@ slots:
               cy: -6.8
               r: 1.1
               fill: '#69f0ae'
-          - component: animate
-            config:
-              attributeName: opacity
-              values: 0.25;1;0.25
-              dur: 1.3s
-              repeatCount: indefinite
-              visible: =Math.abs(Number(props.power)) > 10
       - component: rect
         config:
           x: -13.5
@@ -2641,6 +2753,7 @@ slots:
       - component: g
         config:
           opacity: '=Math.abs(Number(props.power)) > 10 ? ''1'' : ''0.3'''
+          class: '=(Math.abs(Number(props.power)) > 10) ? ''a-flicker-c'' : '''''
         slots:
           default:
           - component: circle
@@ -2649,13 +2762,6 @@ slots:
               cy: 0.0
               r: 1.1
               fill: '#69f0ae'
-          - component: animate
-            config:
-              attributeName: opacity
-              values: 1;0.4;1
-              dur: 2s
-              repeatCount: indefinite
-              visible: =Math.abs(Number(props.power)) > 10
       - component: rect
         config:
           x: -13.5
