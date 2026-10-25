@@ -24,10 +24,10 @@ const REFRESH_AFTER_COMMAND_MS = 90000;
 const LIMIT_MIN = 50;
 const LIMIT_MAX = 100;
 const LIMIT_STEP = 10;
-// the target temperatures offered: 16 to 29.5 °C in steps of 0.5, as the MyŠkoda app offers them (the API names no
-// range; the car rejects what it does not take)
-const CLIMATE_MIN = 16;
-const CLIMATE_MAX = 29.5;
+// the target temperatures the MyŠkoda app offers: LO, 16 to 29.5 °C in steps of 0.5, and HI; LO and HI as the values
+// VW group integrations send for them, 15.5 and 30 °C (the API names no range; the car rejects what it does not take)
+const CLIMATE_MIN = 15.5; // LO
+const CLIMATE_MAX = 30; // HI
 const CLIMATE_STEP = 0.5;
 // the states in which the air conditioning works
 const CLIMATE_RUNNING = ['COOLING', 'HEATING', 'HEATING_AUXILIARY', 'VENTILATION'];
@@ -500,7 +500,14 @@ function setCharging(command) {
   }
 }
 
+// a target temperature as the app names it: LO and HI at the ends, else in degrees with a decimal comma
 function celsius(value) {
+  if (value <= CLIMATE_MIN) {
+    return 'LO';
+  }
+  if (value >= CLIMATE_MAX) {
+    return 'HI';
+  }
   return `${String(value).replace('.', ',')} °C`;
 }
 
@@ -538,7 +545,7 @@ function setClimateTarget(command) {
   const target = parseFloat(command);
   if (Number.isNaN(target) || target < CLIMATE_MIN || target > CLIMATE_MAX ||
       Math.round(target / CLIMATE_STEP) * CLIMATE_STEP !== target) {
-    result(`Zieltemperatur ${command}: geht nicht, nur ${celsius(CLIMATE_MIN)} bis ${celsius(CLIMATE_MAX)} in halben Grad`);
+    result(`Zieltemperatur ${command}: geht nicht, nur LO, 16 bis 29,5 °C in halben Grad oder HI`);
     return;
   }
   if (items.getItem(P + 'climate_target').numericState === target) {

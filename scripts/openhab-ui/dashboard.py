@@ -8995,7 +8995,8 @@ def e_car_now():
     odometer = skoda("odometer")
     climate, target = skoda("climate_state"), skoda("climate_target")
     climate_tile = vt_tile([vt_head("Klimatisierung"), vt_value(f"={disp(climate)}"),
-                            label(f"='Ziel ' + {disp(target)}", **VT_SUB)], climate, "Klimatisierung", ECAR_COLOR)
+                            label(f"='Ziel ' + {climate_degrees(target)}", **VT_SUB)], climate, "Klimatisierung",
+                           ECAR_COLOR)
     tiles = two_on_phone(value_grid([lock_tile, place_tile,
                         vtile("Kilometerstand", odometer,
                               f"={ok(odometer)} ? Math.round({num(odometer)}).toLocaleString('de-DE') + ' km' : '–'",
@@ -9006,13 +9007,19 @@ def e_car_now():
     return [head, charge, tiles]
 
 
+def climate_degrees(item):
+    """The car's target temperature as the MyŠkoda app names it: LO at 15.5 °C, HI at 30 °C, else in degrees."""
+    n = num(item)
+    return f"(!{ok(item)} ? '–' : {n} <= 15.5 ? 'LO' : {n} >= 30 ? 'HI' : {degrees(item)})"
+
+
 def e_car_controls():
     """The commands the API takes for the car (user, 2026-10-25), the actions on top, side by side where they fit:
     Laden as a boost pill, Starten and Stoppen, while a cable is plugged in or it charges, a hint without, and
     Klimatisierung, on with the target temperature below or off. Under them the settings as pill sliders: the charge
     target set in the car (Ladeziel), 50 to 100 % in steps of 10, whose context says where the car stops while battery
     care is on, its charge limit (Ladelimit; the API cannot switch battery care, the MyŠkoda app can), and the target
-    temperature, 16 to 29.5 °C in steps of 0.5, sent with the start
+    temperature, LO, 16 to 29.5 °C in steps of 0.5 and HI, sent with the start
     or, while the air conditioning runs, at once. Last how the last command went. The rule skoda_enyaq_status sends
     the commands; their items change once Škoda accepted them."""
     plug, charging, target, care = skoda("plug"), skoda("charging"), skoda("charge_target"), skoda("battery_care")
@@ -9029,12 +9036,13 @@ def e_car_controls():
                          icon="material:battery_charging_full", row=True)
     climate, climate_target = skoda("climate"), skoda("climate_target")
     climate_pill = boost_pill(climate, "material:thermostat", ECAR_COLOR, "Klima",
-                              f"{disp(skoda('climate_state'))} + ' · ' + {degrees(climate_target)}")
+                              f"{disp(skoda('climate_state'))} + ' · ' + {climate_degrees(climate_target)}")
     climate_context = (f"items.{climate}.state === 'ON' ? 'das Auto klimatisiert auf diesen Wert' : "
                        f"'gilt beim nächsten Start'")
-    climate_slider = pill_slider(climate_target, ECAR_COLOR, 16, 29.5, 0.5, "Zieltemperatur",
-                                 degrees(climate_target), climate_context,
-                                 [(16, "16 °C"), (20, "20"), (24, "24"), (29.5, "29,5 °C")], "°C",
+    # LO, 16 to 29.5 °C and HI as the MyŠkoda app offers them (user, 2026-10-25), LO and HI sent as 15.5 and 30 °C
+    climate_slider = pill_slider(climate_target, ECAR_COLOR, 15.5, 30, 0.5, "Zieltemperatur",
+                                 climate_degrees(climate_target), climate_context,
+                                 [(15.5, "LO"), (20, "20 °C"), (25, "25 °C"), (30, "HI")], "°C",
                                  icon="material:device_thermostat", row=True)
     last = skoda("command_result")
     outcome = label(f"=items.{last}.state", f"={ok(last)}",

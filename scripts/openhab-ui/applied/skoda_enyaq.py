@@ -7,7 +7,7 @@ last reported, skoda_enyaq_updated says when. Four items take commands to the ca
 skoda_enyaq_charge_target (Ladeziel, 50 to 100 % in steps of 10; skoda_enyaq_charge_limit, Ladelimit, is where the car
 stops, lower with battery care on), skoda_enyaq_charging (ON starts, OFF stops a charge),
 skoda_enyaq_climate (ON starts, OFF stops the air conditioning) and its target temperature skoda_enyaq_climate_target
-(16 to 29.5 °C in steps of 0.5, sent with the start); the same rule sends them, without autoupdate, so their state
+(LO = 15.5 °C, 16 to 29.5 °C in steps of 0.5, HI = 30 °C as the app offers them, sent with the start); the same rule sends them, without autoupdate, so their state
 changes once Škoda accepted the command, and reports in skoda_enyaq_command_result. The values the E-Auto page charts go into InfluxDB (the position too, the
 user wanted its history); everything is restored after a restart.
 The API key and the VIN are not in this file nor in the rule but in /var/lib/openhab/credentials/skoda-api.json on
@@ -102,7 +102,7 @@ POINTS = {
                 command("%s", options="ON=An,OFF=Aus")),
     "climate_target": ("Number:Temperature", "Klimatisierung Zieltemperatur", "device_thermostat",
                        ["Setpoint", "Temperature"], CHANGE,
-                       {"unit": {"value": "°C"}, **command("%.1f %unit%", min=16, max=29.5, step=0.5)}),
+                       {"unit": {"value": "°C"}, **command("%.1f %unit%", min=15.5, max=30, step=0.5)}),
     "updated": ("DateTime", "zuletzt gemeldet", "update", ["Timestamp", "Point"], RESTORE,
                 state("%1$td.%1$tm. %1$tR")),
     "api_status": ("String", "API-Status", "cloud", ["Status"], RESTORE, state("%s", options=API_STATES)),
