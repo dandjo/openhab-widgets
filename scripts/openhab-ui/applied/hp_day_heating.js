@@ -77,10 +77,12 @@ const nearDefrost = (at) => defrostAt >= at - DEFROST_GAP * 60000;
 const previous = state(STATE);
 const wasDay = previous === 'day' || previous === 'night';
 let resume = num(RESUME);
-if (avg !== null && resume !== null && (avg < OFF_AVG || avg >= resume)) {
-  // a cold spell ends the wait as the ordinary season boundary takes over; reaching the value ends it too
-  items.getItem(RESUME).postUpdate('UNDEF');
-  resume = null;
+if (avg !== null && resume !== null && resume > ON_AVG && (avg < OFF_AVG || avg >= resume)) {
+  // a cold spell ends the wait as the ordinary season boundary takes over; reaching the value ends it too. The wait
+  // goes back to the ordinary start ON_AVG, not to UNDEF: MapDB keeps no UNDEF, so a restart brought the old value
+  // back (2026-10-22); a value at or below ON_AVG holds nothing back
+  items.getItem(RESUME).postUpdate(ON_AVG);
+  resume = ON_AVG;
 }
 let season = avg === null ? wasDay : wasDay ? avg >= OFF_AVG : avg >= Math.max(ON_AVG, resume ?? -99);
 const inWindow = start <= end ? hour >= start && hour < end : hour >= start || hour < end;

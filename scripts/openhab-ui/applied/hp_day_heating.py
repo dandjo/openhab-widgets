@@ -16,7 +16,9 @@ Items: the switch heatpump_day_heating (a member of heatpump_management, like th
 the Automatik pill switches it too), heatpump_day_heating_state (day, night, normal, off), the settings
 heatpump_day_heating_offset (K, whole kelvins: the controller takes no others), heatpump_day_heating_start and _end
 (hours, decimals for minutes), and the rule's memory heatpump_day_heating_full_days and heatpump_day_heating_resume
-(°C, UNDEF while none); all restored by MapDB after a restart, state, offset and the memory in InfluxDB on change.
+(°C; UNDEF until the first fallback, and an ended wait goes back to the ordinary 10 °C, not to UNDEF, which MapDB does
+not keep, so a restart would bring the old value back); all restored by MapDB after a restart, state, offset and the
+memory in InfluxDB on change.
 apply creates or updates items, metadata and the rule, sets the settings to their defaults where they have no state yet
 and the switch to the group's state. Apply before the cycle guard's update, which reads the state item.
 Usage: hp_day_heating.py check|apply   (on homepi, as pi; the API token from ~/.openhab_token)"""
