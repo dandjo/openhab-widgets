@@ -1,10 +1,13 @@
-// The Škoda Enyaq through the official MyŠkoda Public API (https://public.api.connect.skoda-auto.cz/docs), read only:
-// what the car last reported to Škoda's backend, each part with the time the car captured it. A request does not wake
-// the car, so a sleeping car's values stay as they were until it reports again by itself. The API key (created in the
-// MyŠkoda app; it expires) and the VIN come from a JSON file, {"apiKey": "...", "vin": "..."}, so that neither stands
-// in this script and a new key needs no change here.
-// Requests are limited per vehicle (20 an hour, every request counts, failed ones too): every 5 minutes while the car
-// charges or drives, otherwise every 15, and none while the quota is down to a reserve left for the app's API users.
+// The Škoda Enyaq through the official MyŠkoda Public API (https://public.api.connect.skoda-auto.cz/docs): what the car
+// last reported to Škoda's backend, each part with the time the car captured it, and two commands, the charge limit
+// and starting or stopping a charge. A read does not wake the car, so a sleeping car's values stay as they were until
+// it reports again by itself; a command goes to the car. The API key (created in the MyŠkoda app; it expires) and the
+// VIN come from a JSON file, {"apiKey": "...", "vin": "..."}, so that neither stands in this script and a new key
+// needs no change here.
+// Requests are limited per vehicle (20 an hour, every request counts, failed ones and commands too): reads every 5
+// minutes while the car charges or drives, otherwise every 15, and none while the quota is down to a reserve, which
+// is left for commands. A command checks what it can first (a cable to charge, a valid limit) and is not sent when
+// it could not succeed or would change nothing; 90 seconds after a command the state is read again.
 const CREDENTIALS = '/var/lib/openhab/credentials/skoda-api.json';
 const VEHICLE_URL = 'https://public.api.connect.skoda-auto.cz/api/v1/vehicles/';
 const P = 'skoda_enyaq_';
@@ -15,8 +18,13 @@ const QUOTA_RESERVE = 4;
 const HOME_CHARGING_WATTS = 100;
 const HOME_RADIUS_METERS = 200;
 const KEY_WARNING_DAYS = 7;
+const REFRESH_AFTER_COMMAND_MS = 90000;
+// the charge limits the car takes: 50 to 100 % in steps of 10
+const LIMIT_MIN = 50;
+const LIMIT_MAX = 100;
+const LIMIT_STEP = 10;
+const PROBLEM_VEHICLE_DECLINED = 'vehicle-not-accepting-requests';
 const store = cache.private;
-const nowMs = Date.now();
 
 function state(suffix) {
   return items.getItem(P + suffix).state;
@@ -59,6 +67,11 @@ function openClosed(value) {
   return value === 'OPEN' || value === 'CLOSED' ? value : null;
 }
 
+function clock(ms) {
+  return time.toZDT(new Date(ms).toISOString()).withZoneSameInstant(time.toZDT().zone())
+    .format(time.DateTimeFormatter.ofPattern('HH:mm'));
+}
+
 function readCredentials() {
   try {
     const Files = Java.type('java.nio.file.Files');
@@ -70,22 +83,28 @@ function readCredentials() {
   }
 }
 
-// one GET of the vehicle with its status code and the headers that tell the quota and the key's expiry
-function fetchVehicle(credentials) {
+// one request to the vehicle's URL (path appended) with its status code, body and the headers that tell the quota,
+// the key's expiry and how long to wait; a command waits for the car's answer, so it gets more time
+function request(credentials, method, path, body, timeoutSeconds) {
   const HttpClient = Java.type('java.net.http.HttpClient');
   const HttpRequest = Java.type('java.net.http.HttpRequest');
   const BodyHandlers = Java.type('java.net.http.HttpResponse$BodyHandlers');
+  const BodyPublishers = Java.type('java.net.http.HttpRequest$BodyPublishers');
   const Duration = Java.type('java.time.Duration');
   const URI = Java.type('java.net.URI');
   const client = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(15)).build();
   try {
-    const request = HttpRequest.newBuilder(URI.create(VEHICLE_URL + credentials.vin))
+    const builder = HttpRequest.newBuilder(URI.create(VEHICLE_URL + credentials.vin + path))
       .header('X-API-Key', credentials.apiKey)
       .header('Accept', 'application/json')
-      .timeout(Duration.ofSeconds(30))
-      .GET()
-      .build();
-    const response = client.send(request, BodyHandlers.ofString());
+      .timeout(Duration.ofSeconds(timeoutSeconds));
+    if (method === 'GET') {
+      builder.GET();
+    } else {
+      builder.header('Content-Type', 'application/json')
+        .method(method, body === null ? BodyPublishers.noBody() : BodyPublishers.ofString(JSON.stringify(body)));
+    }
+    const response = client.send(builder.build(), BodyHandlers.ofString());
     const header = (name) => {
       const value = response.headers().firstValue(name);
       return value.isPresent() ? String(value.get()) : null;
@@ -105,6 +124,32 @@ function fetchVehicle(credentials) {
   }
 }
 
+// what every answer tells: the quota, the key's expiry, how long to wait after a 429
+function noteHeaders(response) {
+  const now = Date.now();
+  if (response.remaining !== null && response.remaining !== undefined) {
+    const remaining = Number(response.remaining);
+    store.put('remaining', remaining);
+    store.put('resetAt', now + Number(response.reset || 3600) * 1000);
+    post('api_requests_left', remaining);
+  }
+  if (response.keyExpiresAt) {
+    postTime('api_key_expiry', response.keyExpiresAt);
+  }
+  if (response.status === 429) {
+    store.put('retryAt', now + Number(response.retryAfter || 600) * 1000);
+  }
+}
+
+// the problem type's last part of an error answer (RFC 9457), e.g. vehicle-not-accepting-requests
+function problemType(response) {
+  try {
+    return String(JSON.parse(response.body).type || '').split('/').pop();
+  } catch (e) {
+    return '';
+  }
+}
+
 function applyCharging(charging) {
   const status = charging.status || {};
   const battery = status.battery || {};
@@ -114,6 +159,7 @@ function applyCharging(charging) {
   postQuantity('range', typeof meters === 'number' ? Math.round(meters / 1000) : null, 'km');
   // left out when the reported combination has no name (plugged in and unlocked without charging, after a drive)
   post('charging_state', status.state);
+  post('charging', status.state === 'CHARGING' ? 'ON' : 'OFF');
   postQuantity('charge_power', status.chargePowerInKw, 'kW');
   post('charge_type', status.chargeType);
   post('plug', onOff(status.plugConnectionState, 'CONNECTED', 'DISCONNECTED'));
@@ -128,7 +174,8 @@ function applyCharging(charging) {
     }
   }
   postTime('full_at', full);
-  // with battery care on the car stops at its care target (80 %) whatever the target set beside it says
+  // the limit as set in the car, and where it stops: with battery care on at its care target (80 %) at most
+  postQuantity('charge_target', settings.targetStateOfChargeInPercent, '%');
   const care = onOff(settings.chargingCareMode, 'ACTIVATED', 'DEACTIVATED');
   post('battery_care', care);
   let limit = settings.targetStateOfChargeInPercent;
@@ -223,6 +270,14 @@ function setApiStatus(status, logText) {
   post('api_status', status);
 }
 
+function keyExpired() {
+  setApiStatus('KEY_EXPIRED', 'API-Schlüssel abgelaufen oder ungültig (401)');
+  if (!store.get('keyAlarm')) {
+    store.put('keyAlarm', true);
+    notify('Škoda: Der API-Schlüssel ist abgelaufen oder ungültig. Bitte in der MyŠkoda-App einen neuen erstellen und in openHAB eintragen.');
+  }
+}
+
 // once a day from 9 o'clock while the key has a week or less left
 function remindKeyExpiry(expiresAt) {
   const now = time.toZDT();
@@ -236,24 +291,31 @@ function remindKeyExpiry(expiresAt) {
   notify(`Škoda: Der API-Schlüssel läuft am ${date} ab. Bitte in der MyŠkoda-App einen neuen erstellen und in openHAB eintragen.`);
 }
 
+// why no request may go out now, or null: a 429's wait, or the quota down to reserve requests left
+function blocked(reserve) {
+  const now = Date.now();
+  if (now < (store.get('retryAt') || 0)) {
+    return `Anfragelimit erreicht, wieder ab ${clock(store.get('retryAt'))}`;
+  }
+  const remaining = store.get('remaining');
+  const resetAt = store.get('resetAt') || 0;
+  if (remaining !== null && remaining !== undefined && remaining <= reserve && now < resetAt) {
+    return `Stundenkontingent aufgebraucht, wieder ab ${clock(resetAt)}`;
+  }
+  return null;
+}
+
 function due() {
   const active = state('charging_state') === 'CHARGING' || state('parking_state') === 'IN_MOTION' ||
     (items.getItem('e_car_power').numericState || 0) > HOME_CHARGING_WATTS;
   const minutes = active ? ACTIVE_MINUTES : IDLE_MINUTES;
   // a minute's slack, so the cron's own jitter does not skip a turn
-  if (nowMs - (store.get('lastRequest') || 0) < (minutes - 1) * 60000) {
-    return false;
-  }
-  if (nowMs < (store.get('retryAt') || 0)) {
-    return false;
-  }
-  const remaining = store.get('remaining');
-  return remaining === null || remaining === undefined || remaining > QUOTA_RESERVE ||
-    nowMs >= (store.get('resetAt') || 0);
+  return Date.now() - (store.get('lastRequest') || 0) >= (minutes - 1) * 60000;
 }
 
-function run() {
-  if (!due()) {
+// reads the vehicle: when due, or forced after a command (then the reserve may be used, not the last request)
+function poll(force) {
+  if ((!force && !due()) || blocked(force ? 0 : QUOTA_RESERVE) !== null) {
     return;
   }
   const credentials = readCredentials();
@@ -261,17 +323,9 @@ function run() {
     setApiStatus('NO_CREDENTIALS', `keine Zugangsdaten in ${CREDENTIALS}`);
     return;
   }
-  store.put('lastRequest', nowMs);
-  const response = fetchVehicle(credentials);
-  if (response.remaining !== null && response.remaining !== undefined) {
-    const remaining = Number(response.remaining);
-    store.put('remaining', remaining);
-    store.put('resetAt', nowMs + Number(response.reset || 3600) * 1000);
-    post('api_requests_left', remaining);
-  }
-  if (response.keyExpiresAt) {
-    postTime('api_key_expiry', response.keyExpiresAt);
-  }
+  store.put('lastRequest', Date.now());
+  const response = request(credentials, 'GET', '', null, 30);
+  noteHeaders(response);
   if (response.status === 200) {
     let body = null;
     try {
@@ -294,18 +348,146 @@ function run() {
       remindKeyExpiry(response.keyExpiresAt);
     }
   } else if (response.status === 401) {
-    setApiStatus('KEY_EXPIRED', 'API-Schlüssel abgelaufen oder ungültig (401)');
-    if (!store.get('keyAlarm')) {
-      store.put('keyAlarm', true);
-      notify('Škoda: Der API-Schlüssel ist abgelaufen oder ungültig. Bitte in der MyŠkoda-App einen neuen erstellen und in openHAB eintragen.');
-    }
+    keyExpired();
   } else if (response.status === 403) {
     setApiStatus('NOT_AUTHORIZED', 'der API-Schlüssel gilt nicht für dieses Fahrzeug (403)');
   } else if (response.status === 429) {
-    store.put('retryAt', nowMs + Number(response.retryAfter || 600) * 1000);
     setApiStatus('RATE_LIMITED', `Anfragelimit erreicht, nächster Versuch in ${response.retryAfter || 600} s`);
   } else {
     setApiStatus('ERROR', response.status === 0 ? `nicht erreichbar: ${response.error}` : `HTTP ${response.status}`);
+  }
+}
+
+// ---- commands
+
+function result(text) {
+  post('command_result', text);
+  console.info(`Škoda: ${text}`);
+}
+
+// the item and command of the event that triggered the run, for a command to one of the two command items, else null;
+// read as openhab-js passes UI rules their event or as openHAB's own event object
+function receivedCommand() {
+  if (typeof event === 'undefined' || event === null) {
+    return null;
+  }
+  const read = (...keys) => {
+    for (const key of keys) {
+      try {
+        const value = typeof event[key] === 'function' ? event[key]() : event[key];
+        if (value !== undefined && value !== null && String(value) !== '') {
+          return String(value);
+        }
+      } catch (e) {
+        // not this form
+      }
+    }
+    return null;
+  };
+  const item = read('itemName', 'getItemName');
+  const command = read('receivedCommand', 'itemCommand', 'getItemCommand');
+  return item && command && [P + 'charge_target', P + 'charging'].includes(item) ? { item, command } : null;
+}
+
+// a command to the car as German text for its result, or null when it was not sent
+function commandText(response, what) {
+  if (response.status === 202 || response.status === 200) {
+    return null;
+  }
+  if (response.status === 401) {
+    keyExpired();
+    return `${what}: API-Schlüssel abgelaufen oder ungültig`;
+  }
+  if (response.status === 403) {
+    return `${what}: nicht erlaubt (Schlüssel oder Benutzerrechte)`;
+  }
+  if (response.status === 422) {
+    return `${what}: das Auto kann das gerade nicht`;
+  }
+  if (response.status === 429) {
+    return problemType(response) === PROBLEM_VEHICLE_DECLINED ? `${what}: das Auto nimmt gerade keine Befehle an`
+      : `${what}: Anfragelimit erreicht`;
+  }
+  if (response.status === 504) {
+    return `${what}: das Auto hat nicht rechtzeitig geantwortet`;
+  }
+  return response.status === 0 ? `${what}: Škoda nicht erreichbar` : `${what}: Fehler (HTTP ${response.status})`;
+}
+
+function sendToCar(method, path, body, what, accepted) {
+  const credentials = readCredentials();
+  if (credentials === null) {
+    setApiStatus('NO_CREDENTIALS', `keine Zugangsdaten in ${CREDENTIALS}`);
+    result(`${what}: keine Zugangsdaten`);
+    return;
+  }
+  const wait = blocked(0);
+  if (wait !== null) {
+    result(`${what}: ${wait}`);
+    return;
+  }
+  result(`${what}: wird gesendet …`);
+  const response = request(credentials, method, path, body, 90);
+  noteHeaders(response);
+  const failed = commandText(response, what);
+  if (failed === null) {
+    accepted();
+    result(`${what} · ${clock(Date.now())}`);
+  } else {
+    result(failed);
+  }
+  // the car's new state, once it had time to act on the command; one read for several commands in a row
+  if (store.get('refreshTimer')) {
+    clearTimeout(store.get('refreshTimer'));
+  }
+  store.put('refreshTimer', setTimeout(() => {
+    store.remove('refreshTimer');
+    poll(true);
+  }, REFRESH_AFTER_COMMAND_MS));
+}
+
+function setLimit(command) {
+  const percent = parseFloat(command);
+  if (Number.isNaN(percent) || percent < LIMIT_MIN || percent > LIMIT_MAX || percent % LIMIT_STEP !== 0) {
+    result(`Ladelimit ${command}: geht nicht, nur ${LIMIT_MIN} bis ${LIMIT_MAX} % in Zehnerschritten`);
+    return;
+  }
+  const current = items.getItem(P + 'charge_target').numericState;
+  if (current === percent) {
+    result(`Ladelimit ist schon ${percent} %`);
+    return;
+  }
+  sendToCar('PUT', '/charging/limit', { targetStateOfChargeInPercent: percent }, `Ladelimit ${percent} % gesetzt`,
+    () => post('charge_target', `${percent} %`));
+}
+
+function setCharging(command) {
+  const charging = state('charging_state') === 'CHARGING' || state('charging') === 'ON';
+  if (command === 'ON') {
+    if (state('plug') === 'OFF') {
+      result('Laden: kein Ladekabel eingesteckt');
+    } else if (charging) {
+      result('Laden: lädt bereits');
+    } else {
+      sendToCar('POST', '/charging/start', null, 'Laden gestartet', () => post('charging', 'ON'));
+    }
+  } else if (command === 'OFF') {
+    if (!charging) {
+      result('Laden: lädt gerade nicht');
+    } else {
+      sendToCar('POST', '/charging/stop', null, 'Laden gestoppt', () => post('charging', 'OFF'));
+    }
+  }
+}
+
+function run() {
+  const received = receivedCommand();
+  if (received === null) {
+    poll(typeof refresh !== 'undefined');
+  } else if (received.item === P + 'charge_target') {
+    setLimit(received.command);
+  } else {
+    setCharging(received.command);
   }
 }
 

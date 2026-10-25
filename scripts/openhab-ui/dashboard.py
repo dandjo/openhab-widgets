@@ -8910,7 +8910,8 @@ def e_car_now():
     ring, the charge large, beside it its charging state and where it stands as chips and when it reported (the API
     does not wake the car, so the time says how current all of it is), while it charges when it will be full; the
     charge as a bar marked at the charge target, the range and the target at its ends; then the locks with what stands
-    open, the place, the odometer and the climate."""
+    open, the place, the odometer, the climate, the charging cable and the plug's lock (user, 2026-10-25: cable and
+    plug up here, under odometer and climate)."""
     soc, state, plug = skoda("soc"), skoda("charging_state"), skoda("plug")
     # charging at home shows on the circuit at once, elsewhere only in what the car reports
     power = f"Math.max({num(ECAR)}, {SKODA_CHARGING} ? {num(skoda('charge_power'))} * 1000 : 0)"
@@ -8965,8 +8966,34 @@ def e_car_now():
                         vtile("Kilometerstand", odometer,
                               f"={ok(odometer)} ? Math.round({num(odometer)}).toLocaleString('de-DE') + ' km' : '–'",
                               color=ECAR_COLOR),
-                        climate_tile]), 200)
+                        climate_tile,
+                        vtile("Ladekabel", skoda("plug"), color=ECAR_COLOR),
+                        vtile("Ladestecker", skoda("plug_locked"), color=ECAR_COLOR)]), 200)
     return [head, charge, tiles]
+
+
+def e_car_controls():
+    """The two commands the API takes for the car's charging (user, 2026-10-25): Laden as a boost pill, Starten and
+    Stoppen, while a cable is plugged in or it charges, a hint without; the charge limit on a pill slider, 50 to 100 %
+    in steps of 10, whose context says where the car stops while battery care is on (the API cannot switch that, the
+    MyŠkoda app can); below them how the last command went. The rule skoda_enyaq_status sends the commands; their
+    items change once Škoda accepted them."""
+    plug, charging, target, care = skoda("plug"), skoda("charging"), skoda("charge_target"), skoda("battery_care")
+    plugged = f"(items.{plug}.state === 'ON' || items.{charging}.state === 'ON' || {SKODA_CHARGING})"
+    pill = boost_pill(charging, "material:ev_station", ECAR_COLOR, "Laden",
+                      f"{disp(skoda('soc'))} + ' → ' + {disp(skoda('charge_limit'))}")
+    pill["config"]["visible"] = f"={plugged}"
+    hint = label("Zum Laden das Ladekabel einstecken", f"=!{plugged}",
+                 **{"font-size": "13px", "opacity": "0.7", "padding": "10px 2px"})
+    context = (f"items.{care}.state === 'ON' ? 'Akkuschonung an: das Auto hält bei ' + {disp(skoda('charge_limit'))} : "
+               f"'bis hierhin lädt das Auto'")
+    slider = pill_slider(target, ECAR_COLOR, 50, 100, 10, "Ladelimit", f"Math.round({num(target)}) + ' %'", context,
+                         [(50, "50 %"), (60, "60"), (70, "70"), (80, "80"), (90, "90"), (100, "100 %")], "%",
+                         icon="material:battery_charging_full", row=True)
+    last = skoda("command_result")
+    outcome = label(f"=items.{last}.state", f"={ok(last)}",
+                    **{"font-size": "12px", "opacity": "0.65", "padding": "6px 2px 0"})
+    return controls_box(pill, hint, slider, outcome)
 
 
 def e_car_charge_chart():
@@ -8981,18 +9008,19 @@ def e_car_charge_chart():
 
 
 def e_car_blocks():
-    """The E-Auto's page (user, 2026-10-25): the car's own report with its charge over the week beside it on top, the
-    charging at home as the Shelly EM of the air conditioner's circuit measures it below (plug_cards()), and at the
-    foot a Diagnose card with the API's state, the requests left in its hourly quota, the key's expiry and the plug's
-    and battery care's flags."""
+    """The E-Auto's page (user, 2026-10-25): on top the charging controls over the charge of the week beside the car's
+    own report, the charging at home as the Shelly EM of the air conditioner's circuit measures it below
+    (plug_cards()), and at the foot a Diagnose card with the API's state, the requests left in its hourly quota, the
+    key's expiry and battery care."""
     diagnose = two_on_phone(value_grid([vtile("API", skoda("api_status")),
                            vtile("Anfragen übrig", skoda("api_requests_left")),
                            vtile("Schlüssel gültig bis", skoda("api_key_expiry")),
-                           vtile("Ladekabel", skoda("plug")),
-                           vtile("Ladestecker", skoda("plug_locked")),
                            vtile("Akkuschonung", skoda("battery_care"))]), 200)
-    return [two(card("Škoda Enyaq", e_car_now()),
-                card("Ladestand", [fill_stacked(e_car_charge_chart(), "300px")], fill=True)),
+    # the controls on the left over the week's charge, the car's report on the right; on a phone the controls first
+    # (user, on the ventilation page: "Steuerung nach links respektive oben am Smartphone")
+    return [two(stack(card("Steuerung", [e_car_controls()]),
+                      card("Ladestand", [fill_stacked(e_car_charge_chart(), "220px")], fill=True)),
+                card("Škoda Enyaq", e_car_now())),
             *plug_cards("e_car", "material:electric_car", ECAR_COLOR, title="E-Auto", meter="Shelly EM",
                         controllable=False, range_=20, kind="e-car", threshold=ECAR_ON,
                         note=ECAR_CALC + " Der Schalter spiegelt nur das Relais des Shelly EM, das mit nichts "

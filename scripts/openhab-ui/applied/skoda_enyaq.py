@@ -2,8 +2,11 @@
 """The Škoda Enyaq's own data from the official MyŠkoda Public API (user, 2026-10-25): charge, range, charging,
 odometer, locks and openings, parking position and climate as items in the equipment skoda_enyaq (part of e_car),
 which the rule skoda_enyaq_status (skoda_enyaq.js next to this file) fills every 5 minutes while the car charges or
-drives, otherwise every 15 (20 requests an hour per vehicle). A request does not wake the car: the values are what it
-last reported, skoda_enyaq_updated says when. The values the E-Auto page charts go into InfluxDB (the position too, the
+drives, otherwise every 15 (20 requests an hour per vehicle). A read does not wake the car: the values are what it
+last reported, skoda_enyaq_updated says when. Two items take commands to the car (user, same day): the charge limit
+skoda_enyaq_charge_target (50 to 100 % in steps of 10) and skoda_enyaq_charging (ON starts, OFF stops a charge); the
+same rule sends them, without autoupdate, so their state changes once Škoda accepted the command, and reports in
+skoda_enyaq_command_result. The values the E-Auto page charts go into InfluxDB (the position too, the
 user wanted its history); everything is restored after a restart.
 The API key and the VIN are not in this file nor in the rule but in /var/lib/openhab/credentials/skoda-api.json on
 homepi, {"apiKey": "...", "vin": "..."} (owner pi, group openhab, mode 640); a new key goes there.
@@ -45,6 +48,13 @@ def state(pattern, **cfg):
     return {"stateDescription": {"value": " ", "config": {"pattern": pattern, "readOnly": True, **cfg}}}
 
 
+def command(pattern, **cfg):
+    """A state description for an item that takes commands; openHAB does not set its state from the command itself
+    (autoupdate off), the rule does once the car's API accepted it."""
+    return {"stateDescription": {"value": " ", "config": {"pattern": pattern, "readOnly": False, **cfg}},
+            "autoupdate": {"value": "false"}}
+
+
 def quantity(unit, pattern):
     return {"unit": {"value": unit}, **state(pattern)}
 
@@ -62,6 +72,10 @@ POINTS = {
     "full_at": ("DateTime", "Voll um", "schedule", ["Timestamp", "Point"], RESTORE, state("%1$ta %1$tR")),
     "charge_limit": ("Number:Dimensionless", "Ladeziel", "battery_full", ["Point"], CHANGE,
                      quantity("%", "%.0f %unit%")),
+    "charge_target": ("Number:Dimensionless", "Ladelimit", "battery_charging_full", ["Setpoint"], CHANGE,
+                      {"unit": {"value": "%"}, **command("%.0f %unit%", min=50, max=100, step=10)}),
+    "charging": ("Switch", "Laden", "ev_station", ["Switch"], RESTORE, command("%s", options="ON=An,OFF=Aus")),
+    "command_result": ("String", "letzter Befehl", "send", ["Status"], RESTORE, state("%s")),
     "battery_care": ("Switch", "Akkuschonung", "battery_saver", ["Status"], CHANGE,
                      state("%s", options="ON=An,OFF=Aus")),
     "plug": ("Switch", "Ladekabel", "power", ["Status"], CHANGE, state("%s", options="ON=Eingesteckt,OFF=Ausgesteckt")),
@@ -105,9 +119,12 @@ RULE = {
     "name": "Škoda Enyaq Status",
     "description": RULE_DESCRIPTIONS[UID],
     "tags": [],
-    # every 5 minutes, 20 s past, the script itself decides whether a request is due; and once at startup
+    # every 5 minutes, 20 s past, the script itself decides whether a read is due; once at startup; and on a command
+    # to the charge limit or the charging switch
     "triggers": [{"id": "1", "type": "timer.GenericCronTrigger", "configuration": {"cronExpression": "20 0/5 * * * ? *"}},
-                 {"id": "2", "type": "core.SystemStartlevelTrigger", "configuration": {"startlevel": 100}}],
+                 {"id": "2", "type": "core.SystemStartlevelTrigger", "configuration": {"startlevel": 100}},
+                 {"id": "4", "type": "core.ItemCommandTrigger", "configuration": {"itemName": P + "charge_target"}},
+                 {"id": "5", "type": "core.ItemCommandTrigger", "configuration": {"itemName": P + "charging"}}],
     "conditions": [],
     "actions": [{"id": "3", "type": "script.ScriptAction",
                  "configuration": {"type": "application/javascript", "script": SCRIPT}}],
