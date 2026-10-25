@@ -1,12 +1,13 @@
 // The Škoda Enyaq through the official MyŠkoda Public API (https://public.api.connect.skoda-auto.cz/docs): what the car
-// last reported to Škoda's backend, each part with the time the car captured it, and two commands, the charge limit
-// and starting or stopping a charge. A read does not wake the car, so a sleeping car's values stay as they were until
+// last reported to Škoda's backend, each part with the time the car captured it, and its commands for charging (the
+// charge target, starting or stopping a charge) and for the air conditioning (on or off, the target temperature it
+// starts with). A read does not wake the car, so a sleeping car's values stay as they were until
 // it reports again by itself; a command goes to the car. The API key (created in the MyŠkoda app; it expires) and the
 // VIN come from a JSON file, {"apiKey": "...", "vin": "..."}, so that neither stands in this script and a new key
 // needs no change here.
 // Requests are limited per vehicle (20 an hour, every request counts, failed ones and commands too): reads every 5
 // minutes while the car charges or drives, otherwise every 15, and none while the quota is down to a reserve, which
-// is left for commands. A command checks what it can first (a cable to charge, a valid limit) and is not sent when
+// is left for commands. A command checks what it can first (a cable to charge, a valid value) and is not sent when
 // it could not succeed or would change nothing; 90 seconds after a command the state is read again.
 const CREDENTIALS = '/var/lib/openhab/credentials/skoda-api.json';
 const VEHICLE_URL = 'https://public.api.connect.skoda-auto.cz/api/v1/vehicles/';
@@ -23,6 +24,13 @@ const REFRESH_AFTER_COMMAND_MS = 90000;
 const LIMIT_MIN = 50;
 const LIMIT_MAX = 100;
 const LIMIT_STEP = 10;
+// the target temperatures offered: 16 to 29.5 °C in steps of 0.5, as the MyŠkoda app offers them (the API names no
+// range; the car rejects what it does not take)
+const CLIMATE_MIN = 16;
+const CLIMATE_MAX = 29.5;
+const CLIMATE_STEP = 0.5;
+// the states in which the air conditioning works
+const CLIMATE_RUNNING = ['COOLING', 'HEATING', 'HEATING_AUXILIARY', 'VENTILATION'];
 const PROBLEM_VEHICLE_DECLINED = 'vehicle-not-accepting-requests';
 const store = cache.private;
 
@@ -222,9 +230,17 @@ function applyParking(parking) {
   }
 }
 
+// the target temperature as the car reports it, unless one was chosen while the air conditioning was off: that one
+// stays until the car reports it, once it started with it
 function applyAirConditioning(air) {
   post('climate_state', air.state);
+  post('climate', CLIMATE_RUNNING.includes(air.state) ? 'ON' : 'OFF');
   const target = air.targetTemperature || {};
+  const chosen = store.get('climateChosen');
+  if (chosen !== null && chosen !== undefined && target.value !== chosen) {
+    return;
+  }
+  store.remove('climateChosen');
   postQuantity('climate_target', target.value, target.unit === 'FAHRENHEIT' ? '°F' : '°C');
 }
 
@@ -386,7 +402,8 @@ function receivedCommand() {
   };
   const item = read('itemName', 'getItemName');
   const command = read('receivedCommand', 'itemCommand', 'getItemCommand');
-  return item && command && [P + 'charge_target', P + 'charging'].includes(item) ? { item, command } : null;
+  return item && command && [P + 'charge_target', P + 'charging', P + 'climate', P + 'climate_target'].includes(item)
+    ? { item, command } : null;
 }
 
 // a command to the car as German text for its result, or null when it was not sent
@@ -400,6 +417,9 @@ function commandText(response, what) {
   }
   if (response.status === 403) {
     return `${what}: nicht erlaubt (Schlüssel oder Benutzerrechte)`;
+  }
+  if (response.status === 400) {
+    return `${what}: vom Auto nicht angenommen`;
   }
   if (response.status === 422) {
     return `${what}: das Auto kann das gerade nicht`;
@@ -449,15 +469,15 @@ function sendToCar(method, path, body, what, accepted) {
 function setLimit(command) {
   const percent = parseFloat(command);
   if (Number.isNaN(percent) || percent < LIMIT_MIN || percent > LIMIT_MAX || percent % LIMIT_STEP !== 0) {
-    result(`Ladelimit ${command}: geht nicht, nur ${LIMIT_MIN} bis ${LIMIT_MAX} % in Zehnerschritten`);
+    result(`Ladeziel ${command}: geht nicht, nur ${LIMIT_MIN} bis ${LIMIT_MAX} % in Zehnerschritten`);
     return;
   }
   const current = items.getItem(P + 'charge_target').numericState;
   if (current === percent) {
-    result(`Ladelimit ist schon ${percent} %`);
+    result(`Ladeziel ist schon ${percent} %`);
     return;
   }
-  sendToCar('PUT', '/charging/limit', { targetStateOfChargeInPercent: percent }, `Ladelimit ${percent} % gesetzt`,
+  sendToCar('PUT', '/charging/limit', { targetStateOfChargeInPercent: percent }, `Ladeziel ${percent} % gesetzt`,
     () => post('charge_target', `${percent} %`));
 }
 
@@ -480,14 +500,76 @@ function setCharging(command) {
   }
 }
 
+function celsius(value) {
+  return `${String(value).replace('.', ',')} °C`;
+}
+
+// the air conditioning starts with the target temperature and may run on the battery, so it starts away from a
+// charger too
+function startClimate(target, what, accepted) {
+  sendToCar('POST', '/air-conditioning/start',
+    { targetTemperature: { value: target, unit: 'CELSIUS' }, airConditioningWithoutExternalPower: true }, what,
+    accepted);
+}
+
+function setClimate(command) {
+  const running = CLIMATE_RUNNING.includes(state('climate_state')) || state('climate') === 'ON';
+  if (command === 'ON') {
+    const target = items.getItem(P + 'climate_target').numericState;
+    if (running) {
+      result('Klimatisierung: läuft bereits');
+    } else if (target === null) {
+      result('Klimatisierung: keine Zieltemperatur bekannt');
+    } else {
+      startClimate(target, `Klimatisierung auf ${celsius(target)} gestartet`, () => post('climate', 'ON'));
+    }
+  } else if (command === 'OFF') {
+    if (!running) {
+      result('Klimatisierung: läuft gerade nicht');
+    } else {
+      sendToCar('POST', '/air-conditioning/stop', null, 'Klimatisierung gestoppt', () => post('climate', 'OFF'));
+    }
+  }
+}
+
+// a new target temperature: while the air conditioning runs it starts again with it; while it is off the value is
+// kept for its next start
+function setClimateTarget(command) {
+  const target = parseFloat(command);
+  if (Number.isNaN(target) || target < CLIMATE_MIN || target > CLIMATE_MAX ||
+      Math.round(target / CLIMATE_STEP) * CLIMATE_STEP !== target) {
+    result(`Zieltemperatur ${command}: geht nicht, nur ${celsius(CLIMATE_MIN)} bis ${celsius(CLIMATE_MAX)} in halben Grad`);
+    return;
+  }
+  if (items.getItem(P + 'climate_target').numericState === target) {
+    result(`Zieltemperatur ist schon ${celsius(target)}`);
+    return;
+  }
+  const running = CLIMATE_RUNNING.includes(state('climate_state')) || state('climate') === 'ON';
+  if (running) {
+    startClimate(target, `Zieltemperatur ${celsius(target)} gesetzt`, () => {
+      store.put('climateChosen', target);
+      post('climate_target', `${target} °C`);
+    });
+  } else {
+    store.put('climateChosen', target);
+    post('climate_target', `${target} °C`);
+    result(`Zieltemperatur ${celsius(target)}: gilt beim nächsten Start`);
+  }
+}
+
 function run() {
   const received = receivedCommand();
   if (received === null) {
     poll(typeof refresh !== 'undefined');
   } else if (received.item === P + 'charge_target') {
     setLimit(received.command);
-  } else {
+  } else if (received.item === P + 'charging') {
     setCharging(received.command);
+  } else if (received.item === P + 'climate') {
+    setClimate(received.command);
+  } else {
+    setClimateTarget(received.command);
   }
 }
 

@@ -3,10 +3,12 @@
 odometer, locks and openings, parking position and climate as items in the equipment skoda_enyaq (part of e_car),
 which the rule skoda_enyaq_status (skoda_enyaq.js next to this file) fills every 5 minutes while the car charges or
 drives, otherwise every 15 (20 requests an hour per vehicle). A read does not wake the car: the values are what it
-last reported, skoda_enyaq_updated says when. Two items take commands to the car (user, same day): the charge limit
-skoda_enyaq_charge_target (50 to 100 % in steps of 10) and skoda_enyaq_charging (ON starts, OFF stops a charge); the
-same rule sends them, without autoupdate, so their state changes once Škoda accepted the command, and reports in
-skoda_enyaq_command_result. The values the E-Auto page charts go into InfluxDB (the position too, the
+last reported, skoda_enyaq_updated says when. Four items take commands to the car (user, same day): the charge target
+skoda_enyaq_charge_target (Ladeziel, 50 to 100 % in steps of 10; skoda_enyaq_charge_limit, Ladelimit, is where the car
+stops, lower with battery care on), skoda_enyaq_charging (ON starts, OFF stops a charge),
+skoda_enyaq_climate (ON starts, OFF stops the air conditioning) and its target temperature skoda_enyaq_climate_target
+(16 to 29.5 °C in steps of 0.5, sent with the start); the same rule sends them, without autoupdate, so their state
+changes once Škoda accepted the command, and reports in skoda_enyaq_command_result. The values the E-Auto page charts go into InfluxDB (the position too, the
 user wanted its history); everything is restored after a restart.
 The API key and the VIN are not in this file nor in the rule but in /var/lib/openhab/credentials/skoda-api.json on
 homepi, {"apiKey": "...", "vin": "..."} (owner pi, group openhab, mode 640); a new key goes there.
@@ -70,9 +72,9 @@ POINTS = {
     "charge_type": ("String", "Ladeart", "electrical_services", ["Status"], CHANGE,
                     state("%s", options="AC=AC,DC=DC,OFF=Aus")),
     "full_at": ("DateTime", "Voll um", "schedule", ["Timestamp", "Point"], RESTORE, state("%1$ta %1$tR")),
-    "charge_limit": ("Number:Dimensionless", "Ladeziel", "battery_full", ["Point"], CHANGE,
+    "charge_limit": ("Number:Dimensionless", "Ladelimit", "battery_full", ["Point"], CHANGE,
                      quantity("%", "%.0f %unit%")),
-    "charge_target": ("Number:Dimensionless", "Ladelimit", "battery_charging_full", ["Setpoint"], CHANGE,
+    "charge_target": ("Number:Dimensionless", "Ladeziel", "battery_charging_full", ["Setpoint"], CHANGE,
                       {"unit": {"value": "%"}, **command("%.0f %unit%", min=50, max=100, step=10)}),
     "charging": ("Switch", "Laden", "ev_station", ["Switch"], RESTORE, command("%s", options="ON=An,OFF=Aus")),
     "command_result": ("String", "letzter Befehl", "send", ["Status"], RESTORE, state("%s")),
@@ -96,8 +98,11 @@ POINTS = {
     "at_home": ("Switch", "zu Hause", "home", ["Status", "Presence"], CHANGE,
                 state("%s", options="ON=Zu Hause,OFF=Unterwegs")),
     "climate_state": ("String", "Klimatisierung", "thermostat", ["Status"], CHANGE, state("%s", options=CLIMATE_STATES)),
+    "climate": ("Switch", "Klimatisierung Ein/Aus", "air", ["Switch"], RESTORE,
+                command("%s", options="ON=An,OFF=Aus")),
     "climate_target": ("Number:Temperature", "Klimatisierung Zieltemperatur", "device_thermostat",
-                       ["Setpoint", "Temperature"], CHANGE, quantity("°C", "%.1f %unit%")),
+                       ["Setpoint", "Temperature"], CHANGE,
+                       {"unit": {"value": "°C"}, **command("%.1f %unit%", min=16, max=29.5, step=0.5)}),
     "updated": ("DateTime", "zuletzt gemeldet", "update", ["Timestamp", "Point"], RESTORE,
                 state("%1$td.%1$tm. %1$tR")),
     "api_status": ("String", "API-Status", "cloud", ["Status"], RESTORE, state("%s", options=API_STATES)),
@@ -120,11 +125,13 @@ RULE = {
     "description": RULE_DESCRIPTIONS[UID],
     "tags": [],
     # every 5 minutes, 20 s past, the script itself decides whether a read is due; once at startup; and on a command
-    # to the charge limit or the charging switch
+    # to the charge limit, the charging switch, the air conditioning's switch or its target temperature
     "triggers": [{"id": "1", "type": "timer.GenericCronTrigger", "configuration": {"cronExpression": "20 0/5 * * * ? *"}},
                  {"id": "2", "type": "core.SystemStartlevelTrigger", "configuration": {"startlevel": 100}},
                  {"id": "4", "type": "core.ItemCommandTrigger", "configuration": {"itemName": P + "charge_target"}},
-                 {"id": "5", "type": "core.ItemCommandTrigger", "configuration": {"itemName": P + "charging"}}],
+                 {"id": "5", "type": "core.ItemCommandTrigger", "configuration": {"itemName": P + "charging"}},
+                 {"id": "6", "type": "core.ItemCommandTrigger", "configuration": {"itemName": P + "climate"}},
+                 {"id": "7", "type": "core.ItemCommandTrigger", "configuration": {"itemName": P + "climate_target"}}],
     "conditions": [],
     "actions": [{"id": "3", "type": "script.ScriptAction",
                  "configuration": {"type": "application/javascript", "script": SCRIPT}}],

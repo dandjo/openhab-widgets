@@ -766,10 +766,12 @@ def ecar_node(cx, cy, power, plugged="false"):
                          **{"stroke": ECAR_COLOR, "stroke-width": 0.8, "stroke-linejoin": "round"})],
                opacity="0", visible=f"={charging}")
     animated(bolt, "a-fade")
-    # the port in car units at (-14.3, -0.2), ahead of the tail light over the wheel arch; the plug points down and
-    # back below the tail light, the cable leaves it behind the rear wheel and ends where the disc does
+    # the port in car units at (-14.3, -0.2), ahead of the tail light over the wheel arch; a slim plug points down and
+    # back below the tail light (user, 2026-10-25: the first one was a thick knob), the cable leaves it behind the
+    # rear wheel and ends where the disc does
     port = (round(ox + k * -14.3, 2), round(oy + k * -0.2, 2))
     plug_end = (round(cx - 19.8, 2), round(cy - 0.2, 2))
+    plug_start = (round(port[0] + (plug_end[0] - port[0]) * 0.35, 2), round(port[1] + (plug_end[1] - port[1]) * 0.35, 2))
     end = ORBIT - RING_MAX / 2
 
     def rel(dx, dy):
@@ -777,7 +779,7 @@ def ecar_node(cx, cy, power, plugged="false"):
     cable = svg("g", [
         svg("path", d=f"M{plug_end[0]},{plug_end[1]} C{rel(-23.2, 4.2)} {rel(-25.2, 10.8)} {rel(-19.6, 14.6)} "
                       f"C{rel(-13.2, 18.4)} {rel(-2, 19.5)} {rel(0, end)}", **stroke(1.4)),
-        svg("line", x1=port[0], y1=port[1], x2=plug_end[0], y2=plug_end[1], **stroke(3.2))],
+        svg("line", x1=plug_start[0], y1=plug_start[1], x2=plug_end[0], y2=plug_end[1], **stroke(2))],
         visible=f"={plugged}")
     return [ring(cx, cy, ECAR_COLOR),
             svg("path", d=body, **stroke(1.6, fill="#78909c", **{"fill-opacity": "0.3", "stroke-linejoin": "round"})),
@@ -8918,7 +8920,7 @@ def when_short(item):
 
 
 def target_bar(pct, target, color, left, right):
-    """bar() with a mark at target (an expression, per cent): a car's charge up to the charge target it stops at."""
+    """bar() with a mark at target (an expression, per cent): a car's charge up to the charge limit it stops at."""
     mark = div([], visible=f"={num(target)} > 0",
                **{"position": "absolute", "top": "-3px", "bottom": "-3px", "width": "2px", "border-radius": "1px",
                   "background": "var(--f7-text-color)", "opacity": "0.55",
@@ -8938,7 +8940,7 @@ def e_car_now():
     """The car as it last reported itself (user, 2026-10-25): its drawing from the energy flow with the charge on its
     ring, the charge large, beside it its charging state and where it stands as chips and when it reported (the API
     does not wake the car, so the time says how current all of it is), while it charges when it will be full; the
-    charge as a bar marked at the charge target, the range and the target at its ends; then the locks with what stands
+    charge as a bar marked at the charge limit (Ladelimit), the range and the limit at its ends; then the locks with what stands
     open, the place, the odometer, the climate, the charging cable and the plug's lock (user, 2026-10-25: cable and
     plug up here, under odometer and climate)."""
     soc, state, plug = skoda("soc"), skoda("charging_state"), skoda("plug")
@@ -8967,7 +8969,7 @@ def e_car_now():
                        **{"font-size": "22px", "font-weight": "700"})], picture=icon)
     limit = skoda("charge_limit")
     charge = target_bar(vt_clamp(num(soc)), limit, ECAR_COLOR, f"={disp(skoda('range'))} + ' Reichweite'",
-                        f"='Ladeziel ' + {disp(limit)} + (items.{skoda('battery_care')}.state === 'ON' ? "
+                        f"='Ladelimit ' + {disp(limit)} + (items.{skoda('battery_care')}.state === 'ON' ? "
                         f"' · Akkuschonung' : '')")
     # the locks, and below them what stands open; the lights only while on
     locked = skoda("locked")
@@ -9003,11 +9005,14 @@ def e_car_now():
 
 
 def e_car_controls():
-    """The two commands the API takes for the car's charging (user, 2026-10-25): Laden as a boost pill, Starten and
-    Stoppen, while a cable is plugged in or it charges, a hint without; the charge limit on a pill slider, 50 to 100 %
-    in steps of 10, whose context says where the car stops while battery care is on (the API cannot switch that, the
-    MyŠkoda app can); below them how the last command went. The rule skoda_enyaq_status sends the commands; their
-    items change once Škoda accepted them."""
+    """The commands the API takes for the car (user, 2026-10-25), the actions on top, side by side where they fit:
+    Laden as a boost pill, Starten and Stoppen, while a cable is plugged in or it charges, a hint without, and
+    Klimatisierung, on with the target temperature below or off. Under them the settings as pill sliders: the charge
+    target set in the car (Ladeziel), 50 to 100 % in steps of 10, whose context says where the car stops while battery
+    care is on, its charge limit (Ladelimit; the API cannot switch battery care, the MyŠkoda app can), and the target
+    temperature, 16 to 29.5 °C in steps of 0.5, sent with the start
+    or, while the air conditioning runs, at once. Last how the last command went. The rule skoda_enyaq_status sends
+    the commands; their items change once Škoda accepted them."""
     plug, charging, target, care = skoda("plug"), skoda("charging"), skoda("charge_target"), skoda("battery_care")
     plugged = f"(items.{plug}.state === 'ON' || items.{charging}.state === 'ON' || {SKODA_CHARGING})"
     pill = boost_pill(charging, "material:ev_station", ECAR_COLOR, "Laden",
@@ -9015,47 +9020,82 @@ def e_car_controls():
     pill["config"]["visible"] = f"={plugged}"
     hint = label("Zum Laden das Ladekabel einstecken", f"=!{plugged}",
                  **{"font-size": "13px", "opacity": "0.7", "padding": "10px 2px"})
-    context = (f"items.{care}.state === 'ON' ? 'Akkuschonung an: das Auto hält bei ' + {disp(skoda('charge_limit'))} : "
+    context = (f"items.{care}.state === 'ON' ? 'Akkuschonung: ' + {disp(skoda('charge_limit'))} : "
                f"'bis hierhin lädt das Auto'")
-    slider = pill_slider(target, ECAR_COLOR, 50, 100, 10, "Ladelimit", f"Math.round({num(target)}) + ' %'", context,
+    slider = pill_slider(target, ECAR_COLOR, 50, 100, 10, "Ladeziel", f"Math.round({num(target)}) + ' %'", context,
                          [(50, "50 %"), (60, "60"), (70, "70"), (80, "80"), (90, "90"), (100, "100 %")], "%",
                          icon="material:battery_charging_full", row=True)
+    climate, climate_target = skoda("climate"), skoda("climate_target")
+    climate_pill = boost_pill(climate, "material:thermostat", ECAR_COLOR, "Klima",
+                              f"{disp(skoda('climate_state'))} + ' · ' + {degrees(climate_target)}")
+    climate_context = (f"items.{climate}.state === 'ON' ? 'das Auto klimatisiert auf diesen Wert' : "
+                       f"'gilt beim nächsten Start'")
+    climate_slider = pill_slider(climate_target, ECAR_COLOR, 16, 29.5, 0.5, "Zieltemperatur",
+                                 degrees(climate_target), climate_context,
+                                 [(16, "16 °C"), (20, "20"), (24, "24"), (29.5, "29,5 °C")], "°C",
+                                 icon="material:device_thermostat", row=True)
     last = skoda("command_result")
     outcome = label(f"=items.{last}.state", f"={ok(last)}",
                     **{"font-size": "12px", "opacity": "0.65", "padding": "6px 2px 0"})
-    return controls_box(pill, hint, slider, outcome)
+    # the two actions and the two settings each side by side where they fit (desktop), one above the other on a phone
+    actions = pill_switches(pill, hint, climate_pill, min_width="220px")
+    actions["config"]["style"]["margin-bottom"] = "6px"
+    settings = div([slider, climate_slider], **{"display": "grid", "gap": "0 16px",
+                                                "grid-template-columns": "repeat(auto-fit, minmax(220px, 1fr))"})
+    return controls_box(actions, settings, outcome)
+
+
+E_CAR_CHART_H = 250
 
 
 def e_car_charge_chart():
-    """The charge with the target it charges to (dashed) on the left axis, the charge power the car reports on the
+    """The charge with the limit it stops at (dashed, Ladelimit) on the left axis, the charge power the car reports on the
     right, over the week (a car's charges and drives span days), as the battery's power and charge in one grid."""
     # short names over the plot, where the period buttons leave a phone little room; the tooltip's are the series'
-    return stacked_chart([((("Ladestand", ECAR_COLOR), ("Ziel", ECAR_COLOR), ("Leistung", ELECTRIC_C)),
+    return stacked_chart([((("Ladestand", ECAR_COLOR), ("Limit", ECAR_COLOR), ("Leistung", ELECTRIC_C)),
                            [area("Ladeleistung", skoda("charge_power"), ELECTRIC_C, y=1),
                             line("Ladestand", skoda("soc"), ECAR_COLOR),
-                            line("Ladeziel", skoda("charge_limit"), ECAR_COLOR, dashed=True)],
-                           [value_axis("%", min=0, max=100), value_axis("kW", min=0)])], 400, period="W")
+                            line("Ladelimit", skoda("charge_limit"), ECAR_COLOR, dashed=True)],
+                           [value_axis("%", min=0, max=100), value_axis("kW", min=0)])], E_CAR_CHART_H, period="W")
+
+
+# below the width at which a row's two columns stand one above the other (Framework7's large breakpoint), the cards of a
+# row follow their own order: the columns and the stacks in them step aside (display: contents), so the cards become
+# the row's own flex items, a line each, ordered by their style's order; above it the order only sorts the cards of a
+# stack, which keep the order they are built in
+PHONE_ORDER = """
+@media (max-width: 1023px) {
+  .oh-col { display: contents; }
+  .oh-col > div:not(.card) { display: contents !important; }
+  .oh-col .card { flex: 1 1 100% !important; height: auto !important; }
+}"""
 
 
 def e_car_blocks():
-    """The E-Auto's page (user, 2026-10-25): on top the charging controls over the charge of the week beside the car's
-    own report, the charging at home as the Shelly EM of the air conditioner's circuit measures it below
-    (plug_cards()), and at the foot a Diagnose card with the API's state, the requests left in its hourly quota, the
-    key's expiry and battery care."""
+    """The E-Auto's page (user, 2026-10-25): on top the controls over the charge of the week beside the car's own
+    report; below the charging at home as the Shelly EM of the air conditioner's circuit measures it (plug_refs()):
+    the plug card over its electrical values on the left, the day's power over the energy per day on the right at
+    their own heights (the day's power had stretched to the plug card's), and the Diagnose card under them (the API's
+    state, the requests left in its hourly quota, the key's expiry, battery care)."""
     diagnose = two_on_phone(value_grid([vtile("API", skoda("api_status")),
                            vtile("Anfragen übrig", skoda("api_requests_left")),
                            vtile("Schlüssel gültig bis", skoda("api_key_expiry")),
                            vtile("Akkuschonung", skoda("battery_care"))]), 200)
-    # the controls on the left over the week's charge, the car's report on the right; on a phone the controls first
-    # (user, on the ventilation page: "Steuerung nach links respektive oben am Smartphone")
-    return [two(stack(card("Steuerung", [e_car_controls()]),
-                      card("Ladestand", [fill_stacked(e_car_charge_chart(), "220px")], fill=True)),
-                card("Škoda Enyaq", e_car_now())),
-            *plug_cards("e_car", "material:electric_car", ECAR_COLOR, title="E-Auto", meter="Shelly EM",
-                        controllable=False, range_=20, kind="e-car", threshold=ECAR_ON,
-                        plugged=ecar_plugged(num(ECAR)), note=ECAR_CALC + " Der Schalter spiegelt nur das Relais des Shelly EM, das mit nichts "
-                                         "verbunden ist."),
-            one(card("Diagnose", [diagnose]))]
+    # the controls on the left over the week's charge, the car's report on the right; where the columns stand one
+    # above the other (a phone), the controls first, the car's report second, the chart last (user, 2026-10-25)
+    controls = card("Steuerung", [e_car_controls()])
+    # the chart takes the height the car's card leaves beside the controls, on a phone its own
+    chart_ = card("Ladestand", [fill_stacked(e_car_charge_chart(), f"={NARROW} ? '260px' : '200px'")], fill=True)
+    car = card("Škoda Enyaq", e_car_now())
+    for order, card_ in enumerate((controls, car, chart_), 1):
+        card_["config"]["style"]["order"] = str(order)
+    top = two(stack(controls, chart_), car)
+    top["slots"]["default"][0]["config"]["stylesheet"] += PHONE_ORDER
+    now, power, days, electric = plug_refs(
+        "e_car", "material:electric_car", ECAR_COLOR, title="E-Auto", meter="Shelly EM", controllable=False, range_=20,
+        kind="e-car", threshold=ECAR_ON, plugged=ecar_plugged(num(ECAR)),
+        note=ECAR_CALC + " Der Schalter spiegelt nur das Relais des Shelly EM, das mit nichts verbunden ist.")
+    return [top, two(widget_stack(now, electric), widget_stack(power, days, card("Diagnose", [diagnose]), grow=3))]
 
 
 def month_combo(bars, lines, left, right, right_axis=None):

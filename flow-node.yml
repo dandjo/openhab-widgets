@@ -75,7 +75,7 @@ props:
     type: BOOLEAN
     required: false
   parameterGroups: []
-timestamp: Oct 25, 2026, 7:19:28 PM
+timestamp: Oct 25, 2026, 8:07:49 PM
 component: g
 config:
   transform: ='translate(' + props.x + ' ' + props.y + ')'
@@ -1307,12 +1307,12 @@ slots:
               fill: none
           - component: line
             config:
-              x1: -17.88
-              y1: -3.15
+              x1: -18.55
+              y1: -2.12
               x2: -19.8
               y2: -0.2
               stroke: currentColor
-              stroke-width: 3.2
+              stroke-width: 2
               stroke-linecap: round
               fill: none
       - component: circle
