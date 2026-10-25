@@ -270,3 +270,22 @@ LISTS = {
 }
 # the weekday letters of the PV calendar, as seven separate texts in a row of a list, in this order
 DAY_LETTERS = (["M", "D", "M", "D", "F", "S", "S"], ["M", "T", "W", "T", "F", "S", "S"])
+
+# the Škoda Enyaq's own data from the MyŠkoda Public API (2026-10-25)
+EN.update({"Škoda Enyaq Ladestand": "Škoda Enyaq State of Charge", "Škoda Enyaq Reichweite": "Škoda Enyaq Range",
+           "Škoda Enyaq Ladestatus": "Škoda Enyaq Charging State", "Škoda Enyaq Ladeleistung": "Škoda Enyaq Charging Power",
+           "Škoda Enyaq Ladeart": "Škoda Enyaq Charge Type", "Škoda Enyaq Voll um": "Škoda Enyaq Fully Charged At",
+           "Škoda Enyaq Ladeziel": "Škoda Enyaq Charge Target", "Škoda Enyaq Akkuschonung": "Škoda Enyaq Battery Care",
+           "Škoda Enyaq Ladekabel": "Škoda Enyaq Charging Cable",
+           "Škoda Enyaq Ladestecker verriegelt": "Škoda Enyaq Charging Plug Locked",
+           "Škoda Enyaq Kilometerstand": "Škoda Enyaq Odometer", "Škoda Enyaq Verriegelt": "Škoda Enyaq Locked",
+           "Škoda Enyaq Türen": "Škoda Enyaq Doors", "Škoda Enyaq Fenster": "Škoda Enyaq Windows",
+           "Škoda Enyaq Kofferraum": "Škoda Enyaq Boot", "Škoda Enyaq Motorhaube": "Škoda Enyaq Bonnet",
+           "Škoda Enyaq Licht": "Škoda Enyaq Lights", "Škoda Enyaq Parkstatus": "Škoda Enyaq Parking State",
+           "Škoda Enyaq Parkposition": "Škoda Enyaq Parking Position",
+           "Škoda Enyaq Parkadresse": "Škoda Enyaq Parking Address", "Škoda Enyaq zu Hause": "Škoda Enyaq at Home",
+           "Škoda Enyaq Klimatisierung": "Škoda Enyaq Climatisation",
+           "Škoda Enyaq Klimatisierung Zieltemperatur": "Škoda Enyaq Climatisation Target Temperature",
+           "Škoda Enyaq zuletzt gemeldet": "Škoda Enyaq Last Reported", "Škoda Enyaq API-Status": "Škoda Enyaq API Status",
+           "Škoda Enyaq API-Anfragen übrig": "Škoda Enyaq API Requests Left",
+           "Škoda Enyaq API-Schlüssel gültig bis": "Škoda Enyaq API Key Valid Until"})

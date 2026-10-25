@@ -8870,6 +8870,136 @@ def energy_storage_blocks():
                 card("Einheit 1", [unit]))]
 
 
+# ---- the E-Auto: what the Škoda Enyaq reports itself through the MyŠkoda Public API (rule skoda_enyaq_status, items
+# skoda_enyaq_*), above its charging at home as the air conditioner's Shelly EM measures it
+
+
+def skoda(suffix):
+    return "skoda_enyaq_" + suffix
+
+
+SKODA_CHARGING = f"items.{skoda('charging_state')}.state === 'CHARGING'"
+
+
+def when_short(item):
+    """A point in time of the last days as weekday and clock (So 15:56), an older one with its date (18.10. 15:56):
+    absolute, as MainUI does not re-evaluate an expression as time passes."""
+    return (f"({ok(item)} ? ((t) => dayjs().diff(t, 'day') < 6 ? t.format('dd HH:mm') : t.format('DD.MM. HH:mm'))"
+            f"(dayjs(items.{item}.state)) : '–')")
+
+
+def target_bar(pct, target, color, left, right):
+    """bar() with a mark at target (an expression, per cent): a car's charge up to the charge target it stops at."""
+    mark = div([], visible=f"={num(target)} > 0",
+               **{"position": "absolute", "top": "-3px", "bottom": "-3px", "width": "2px", "border-radius": "1px",
+                  "background": "var(--f7-text-color)", "opacity": "0.55",
+                  "left": f"='calc(' + {vt_clamp(num(target))} + '% - 1px)'"})
+    track = div([div([div([], **{"width": f"=Math.min(100, {pct}) + '%'", "height": "100%", "background": color,
+                                 "border-radius": "4px"})],
+                     **{"height": "100%", "border-radius": "4px", "overflow": "hidden"}), mark],
+                **{"position": "relative", "height": "8px", "border-radius": "4px",
+                   "background": "rgba(127, 127, 127, 0.18)"})
+    return div([track, div([label(left), label(right)],
+                           **{"display": "flex", "justify-content": "space-between", "font-size": "12px",
+                              "opacity": "0.7", "margin-top": "4px"})],
+               **{"padding": "0 16px 16px"})
+
+
+def e_car_now():
+    """The car as it last reported itself (user, 2026-10-25): its drawing from the energy flow with the charge on its
+    ring, the charge large, beside it its charging state and where it stands as chips and when it reported (the API
+    does not wake the car, so the time says how current all of it is), while it charges when it will be full; the
+    charge as a bar marked at the charge target, the range and the target at its ends; then the locks with what stands
+    open, the place, the odometer and the climate."""
+    soc, state, plug = skoda("soc"), skoda("charging_state"), skoda("plug")
+    # charging at home shows on the circuit at once, elsewhere only in what the car reports
+    power = f"Math.max({num(ECAR)}, {SKODA_CHARGING} ? {num(skoda('charge_power'))} * 1000 : 0)"
+    icon = node_icon("e-car", ECAR_COLOR, flowing(power, ECAR_CHARGING), share=f"{num(soc)} / 100", power=power)
+    charge_type = skoda("charge_type")
+    # while it charges with its type and power; plugged in and unlocked without charging the API names no state
+    state_text = (f"({SKODA_CHARGING} ? 'Lädt' + (['AC', 'DC'].includes(items.{charge_type}.state) ? ' ' + "
+                  f"items.{charge_type}.state : '') + ' · ' + {fixed(num(skoda('charge_power')), 1)} + ' kW' : "
+                  f"{ok(state)} ? {disp(state)} : items.{plug}.state === 'ON' ? 'Eingesteckt' : "
+                  f"items.{plug}.state === 'OFF' ? 'Nicht eingesteckt' : '–')")
+    plugged = f"(items.{plug}.state === 'ON' || {SKODA_CHARGING})"
+    where = (f"(items.{skoda('parking_state')}.state === 'IN_MOTION' ? 'Fährt' : "
+             f"items.{skoda('at_home')}.state === 'ON' ? 'Zu Hause' : "
+             f"items.{skoda('at_home')}.state === 'OFF' ? 'Unterwegs' : '–')")
+    full_at = skoda("full_at")
+    full = (f"'voll ca. ' + ((t) => t.isSame(dayjs(), 'day') ? t.format('HH:mm') : t.format('dd HH:mm'))"
+            f"(dayjs(items.{full_at}.state))")
+    head = hero("material:electric_car", ECAR_COLOR, "Ladestand", f"={disp(soc)}",
+                [chips(chip(f"={state_text}", f"={plugged} ? '{ECAR_COLOR}' : '#9e9e9e'"),
+                       chip(f"={where}", "#78909c")),
+                 label(f"='Stand ' + {when_short(skoda('updated'))}", **{"font-size": "14px"}),
+                 label(f"={full}", f"={SKODA_CHARGING} && {ok(full_at)}",
+                       **{"font-size": "22px", "font-weight": "700"})], picture=icon)
+    limit = skoda("charge_limit")
+    charge = target_bar(vt_clamp(num(soc)), limit, ECAR_COLOR, f"={disp(skoda('range'))} + ' Reichweite'",
+                        f"='Ladeziel ' + {disp(limit)} + (items.{skoda('battery_care')}.state === 'ON' ? "
+                        f"' · Akkuschonung' : '')")
+    # the locks, and below them what stands open; the lights only while on
+    locked = skoda("locked")
+    lock_text = (f"(items.{locked}.state === 'ON' ? 'Verriegelt' : items.{locked}.state === 'OFF' ? 'Entriegelt' : "
+                 "'–')")
+    parts = ", ".join(f"items.{skoda(suffix)}.state === 'OPEN' ? '{name}' : ''" for suffix, name in
+                      (("doors", "Tür"), ("windows", "Fenster"), ("trunk", "Kofferraum"), ("bonnet", "Motorhaube")))
+    open_text = (f"((o) => (o ? 'offen: ' + o : 'alles zu') + (items.{skoda('lights')}.state === 'ON' ? ' · Licht an' : "
+                 f"''))([{parts}].filter((s) => s !== '').join(', '))")
+    lock_tile = vt_tile([vt_head("Verriegelung"),
+                         label(f"={lock_text}", **{**VT_VALUE,
+                                                    "color": f"=items.{locked}.state === 'OFF' ? '#fb8c00' : ''"}),
+                         label(f"={open_text}", **VT_SUB)], locked, "Verriegelung", ECAR_COLOR)
+    # the address only where the car is parked away from home
+    address = skoda("parking_address")
+    away = (f"items.{skoda('at_home')}.state === 'OFF' && items.{skoda('parking_state')}.state === 'PARKED' && "
+            f"{ok(address)}")
+    place_tile = vt_tile([vt_head("Standort"), vt_value(f"={where}"),
+                          label(f"=items.{address}.state", f"={away}", **{**VT_SUB, "white-space": "normal"})],
+                         skoda("at_home"), "Standort", ECAR_COLOR)
+    odometer = skoda("odometer")
+    climate, target = skoda("climate_state"), skoda("climate_target")
+    climate_tile = vt_tile([vt_head("Klimatisierung"), vt_value(f"={disp(climate)}"),
+                            label(f"='Ziel ' + {disp(target)}", **VT_SUB)], climate, "Klimatisierung", ECAR_COLOR)
+    tiles = two_on_phone(value_grid([lock_tile, place_tile,
+                        vtile("Kilometerstand", odometer,
+                              f"={ok(odometer)} ? Math.round({num(odometer)}).toLocaleString('de-DE') + ' km' : '–'",
+                              color=ECAR_COLOR),
+                        climate_tile]), 200)
+    return [head, charge, tiles]
+
+
+def e_car_charge_chart():
+    """The charge with the target it charges to (dashed) on the left axis, the charge power the car reports on the
+    right, over the week (a car's charges and drives span days), as the battery's power and charge in one grid."""
+    # short names over the plot, where the period buttons leave a phone little room; the tooltip's are the series'
+    return stacked_chart([((("Ladestand", ECAR_COLOR), ("Ziel", ECAR_COLOR), ("Leistung", ELECTRIC_C)),
+                           [area("Ladeleistung", skoda("charge_power"), ELECTRIC_C, y=1),
+                            line("Ladestand", skoda("soc"), ECAR_COLOR),
+                            line("Ladeziel", skoda("charge_limit"), ECAR_COLOR, dashed=True)],
+                           [value_axis("%", min=0, max=100), value_axis("kW", min=0)])], 400, period="W")
+
+
+def e_car_blocks():
+    """The E-Auto's page (user, 2026-10-25): the car's own report with its charge over the week beside it on top, the
+    charging at home as the Shelly EM of the air conditioner's circuit measures it below (plug_cards()), and at the
+    foot a Diagnose card with the API's state, the requests left in its hourly quota, the key's expiry and the plug's
+    and battery care's flags."""
+    diagnose = two_on_phone(value_grid([vtile("API", skoda("api_status")),
+                           vtile("Anfragen übrig", skoda("api_requests_left")),
+                           vtile("Schlüssel gültig bis", skoda("api_key_expiry")),
+                           vtile("Ladekabel", skoda("plug")),
+                           vtile("Ladestecker", skoda("plug_locked")),
+                           vtile("Akkuschonung", skoda("battery_care"))]), 200)
+    return [two(card("Škoda Enyaq", e_car_now()),
+                card("Ladestand", [fill_stacked(e_car_charge_chart(), "300px")], fill=True)),
+            *plug_cards("e_car", "material:electric_car", ECAR_COLOR, title="E-Auto", meter="Shelly EM",
+                        controllable=False, range_=20, kind="e-car", threshold=ECAR_ON,
+                        note=ECAR_CALC + " Der Schalter spiegelt nur das Relais des Shelly EM, das mit nichts "
+                                         "verbunden ist."),
+            one(card("Diagnose", [diagnose]))]
+
+
 def month_combo(bars, lines, left, right, right_axis=None):
     """Values per day of the current month: bars (name, item, colour) on the left axis in left, lines (name, item,
     colour) on an axis on the right in right; the arrows page through months. Grafana's per-day panels rebuilt (user,
@@ -9350,10 +9480,7 @@ DEVICE_PAGES = {
                                  ("Frequenz", "huawei_inverter_power_meter_frequency")], GRID),
     "photovoltaics": photovoltaics_blocks,
     "energy_storage": energy_storage_blocks,
-    "e_car": plug_page("e_car", "material:electric_car", ECAR_COLOR, title="E-Auto", meter="Shelly EM",
-                       controllable=False, range_=20, kind="e-car", threshold=ECAR_ON,
-                       note=ECAR_CALC + " Der Schalter spiegelt nur das Relais des Shelly EM, das mit nichts "
-                                        "verbunden ist."),
+    "e_car": e_car_blocks,
     "air_conditioning": air_conditioning_blocks,
     "heatpump": heatpump_blocks,
     "ventilation": ventilation_blocks,
