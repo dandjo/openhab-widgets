@@ -274,7 +274,7 @@ DAY_LETTERS = (["M", "D", "M", "D", "F", "S", "S"], ["M", "T", "W", "T", "F", "S
 # the Škoda Enyaq's own data from the MyŠkoda Public API (2026-10-25)
 EN.update({"Škoda Enyaq Ladestand": "Škoda Enyaq State of Charge", "Škoda Enyaq Reichweite": "Škoda Enyaq Range",
            "Škoda Enyaq Ladestatus": "Škoda Enyaq Charging State", "Škoda Enyaq Ladeleistung": "Škoda Enyaq Charging Power",
-           "Škoda Enyaq Ladeart": "Škoda Enyaq Charge Type", "Škoda Enyaq Voll um": "Škoda Enyaq Fully Charged At",
+           "Škoda Enyaq Ladeart": "Škoda Enyaq Charge Type", "Škoda Enyaq Ladeziel erreicht um": "Škoda Enyaq Charge Target Reached At",
            "Škoda Enyaq Ladeziel": "Škoda Enyaq Charge Target", "Škoda Enyaq Akkuschonung": "Škoda Enyaq Battery Care",
            "Škoda Enyaq Ladekabel": "Škoda Enyaq Charging Cable",
            "Škoda Enyaq Ladestecker verriegelt": "Škoda Enyaq Charging Plug Locked",

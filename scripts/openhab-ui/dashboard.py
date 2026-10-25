@@ -8912,6 +8912,12 @@ def skoda(suffix):
 SKODA_CHARGING = f"items.{skoda('charging_state')}.state === 'CHARGING'"
 
 
+def clock_of(item):
+    """A coming point in time as its clock (18:40), with the weekday before it beyond today (Mo 06:06)."""
+    return (f"((t) => t.isSame(dayjs(), 'day') ? t.format('HH:mm') : t.format('dd HH:mm'))"
+            f"(dayjs(items.{item}.state))")
+
+
 def when_short(item):
     """A point in time of the last days as weekday and clock (So 15:56), an older one with its date (18.10. 15:56):
     absolute, as MainUI does not re-evaluate an expression as time passes."""
@@ -8958,20 +8964,23 @@ def e_car_now():
     where = (f"(items.{skoda('parking_state')}.state === 'IN_MOTION' ? 'Fährt' : "
              f"items.{skoda('at_home')}.state === 'ON' ? 'Zu Hause' : "
              f"items.{skoda('at_home')}.state === 'OFF' ? 'Unterwegs' : '–')")
-    full_at = skoda("full_at")
-    full = (f"'voll ca. ' + ((t) => t.isSame(dayjs(), 'day') ? t.format('HH:mm') : t.format('dd HH:mm'))"
-            f"(dayjs(items.{full_at}.state))")
+    # when the charge target will be reached (user, 2026-10-25: not "voll", it charges to the target): the words small,
+    # the clock large, so on a phone the clock goes to a line of its own as a whole
+    reached_at = skoda("target_reached_at")
     head = hero("material:electric_car", ECAR_COLOR, "Ladestand", f"={disp(soc)}",
                 [chips(chip(f"={state_text}", f"={plugged} ? '{ECAR_COLOR}' : '#9e9e9e'"),
                        chip(f"={where}", "#78909c")),
                  label(f"='Stand ' + {when_short(skoda('updated'))}", **{"font-size": "14px"}),
-                 label(f"={full}", f"={SKODA_CHARGING} && {ok(full_at)}",
-                       **{"font-size": "22px", "font-weight": "700"})], picture=icon)
+                 div([label("Ladeziel erreicht ca.", **{"font-size": "14px"}),
+                      label(f"={clock_of(reached_at)}", **{"font-size": "22px", "font-weight": "700"})],
+                     f"={SKODA_CHARGING} && {ok(reached_at)}",
+                     **{"display": "flex", "flex-wrap": "wrap", "align-items": "baseline", "column-gap": "6px"})],
+                picture=icon)
     # the mark at the charge target, the value set in the car that it charges to (user, 2026-10-25); with battery care
     # on and another battery care target, what Škoda sets it back to after the next charge beside it
     target = skoda("charge_target")
     charge = target_bar(vt_clamp(num(soc)), target, ECAR_COLOR, f"={disp(skoda('range'))} + ' Reichweite'",
-                        f"='Ladeziel ' + {disp(target)} + ({E_CAR_CARE_LATER} ? ' · danach Akkuschonung ' + "
+                        f"='Ladeziel ' + {disp(target)} + ({E_CAR_CARE_LATER} ? ' · danach ' + "
                         f"{disp(skoda('battery_care_target'))} : '')")
     # the locks, and below them what stands open; the lights only while on
     locked = skoda("locked")
@@ -9031,12 +9040,12 @@ def e_car_controls():
     the commands; their items change once Škoda accepted them."""
     plug, charging, target = skoda("plug"), skoda("charging"), skoda("charge_target")
     plugged = f"(items.{plug}.state === 'ON' || items.{charging}.state === 'ON' || {SKODA_CHARGING})"
-    # while it charges the time left until the charge target (user, 2026-10-25), from when the car says it will be full;
-    # it follows the car's reports, every 5 minutes while charging, as MainUI does not re-evaluate it as time passes
-    full_at = skoda("full_at")
-    left = f"Math.max(0, Math.round(dayjs(items.{full_at}.state).diff(dayjs(), 'minute', true)))"
+    # while it charges the time left until the charge target and the clock it will be reached at (user, 2026-10-25); the
+    # time left follows the car's reports, every 5 minutes while charging, as MainUI does not re-evaluate it as time passes
+    reached_at = skoda("target_reached_at")
+    left = f"Math.max(0, Math.round(dayjs(items.{reached_at}.state).diff(dayjs(), 'minute', true)))"
     pill = boost_pill(charging, "material:ev_station", ECAR_COLOR, "Laden",
-                      f"({ok(full_at)} ? 'noch ' + {hm(left)} : 'lädt')")
+                      f"({ok(reached_at)} ? 'noch ' + {hm(left)} + ' · ' + {clock_of(reached_at)} : 'lädt')")
     pill["config"]["visible"] = f"={plugged}"
     hint = label("Zum Laden das Ladekabel einstecken", f"=!{plugged}",
                  **{"font-size": "13px", "opacity": "0.7", "padding": "10px 2px"})
@@ -9059,8 +9068,9 @@ def e_car_controls():
     last = skoda("command_result")
     outcome = label(f"=items.{last}.state", f"={ok(last)}",
                     **{"font-size": "12px", "opacity": "0.65", "padding": "6px 2px 0"})
-    # the two actions and the two settings each side by side where they fit (desktop), one above the other on a phone
-    actions = pill_switches(pill, hint, climate_pill, min_width="220px")
+    # the two settings side by side where they fit (desktop), one above the other on a phone
+    # side by side only where each pill has room for the time left and the clock, else one above the other
+    actions = pill_switches(pill, hint, climate_pill, min_width="270px")
     actions["config"]["style"]["margin-bottom"] = "6px"
     settings = div([slider, climate_slider], **{"display": "grid", "gap": "0 16px",
                                                 "grid-template-columns": "repeat(auto-fit, minmax(220px, 1fr))"})

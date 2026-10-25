@@ -72,7 +72,8 @@ POINTS = {
                      quantity("kW", "%.1f %unit%")),
     "charge_type": ("String", "Ladeart", "electrical_services", ["Status"], CHANGE,
                     state("%s", options="AC=AC,DC=DC,OFF=Aus")),
-    "full_at": ("DateTime", "Voll um", "schedule", ["Timestamp", "Point"], RESTORE, state("%1$ta %1$tR")),
+    "target_reached_at": ("DateTime", "Ladeziel erreicht um", "schedule", ["Timestamp", "Point"], RESTORE,
+                          state("%1$ta %1$tR")),
     "charge_target": ("Number:Dimensionless", "Ladeziel", "battery_charging_full", ["Setpoint"], CHANGE,
                       {"unit": {"value": "%"}, **command("%.0f %unit%", min=50, max=100, step=10)}),
     "charging": ("Switch", "Laden", "ev_station", ["Switch"], RESTORE, command("%s", options="ON=An,OFF=Aus")),
@@ -152,8 +153,9 @@ def call(method, path, body=None):
 
 
 # what earlier versions had and this one no longer has: the charge limit, the same value as the charge target (user,
-# 2026-10-25); its InfluxDB series is dropped by skoda_enyaq_history.py
-OBSOLETE_ITEMS = [P + "charge_limit"]
+# 2026-10-25; its InfluxDB series is dropped by skoda_enyaq_history.py), and full_at, renamed target_reached_at as the
+# car charges to the target, not to full (user, same day; it was restored by MapDB only, with no InfluxDB series)
+OBSOLETE_ITEMS = [P + "charge_limit", P + "full_at"]
 OBSOLETE_METADATA = {}
 
 apply = sys.argv[1] == "apply"

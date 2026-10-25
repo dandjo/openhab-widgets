@@ -172,16 +172,18 @@ function applyCharging(charging) {
   post('charge_type', status.chargeType);
   post('plug', onOff(status.plugConnectionState, 'CONNECTED', 'DISCONNECTED'));
   post('plug_locked', onOff(status.plugLockState, 'LOCKED', 'UNLOCKED'));
-  let full = null;
+  // when the charge target will be reached, while it charges: the car charges to the target, not to full (the API
+  // still calls it fullyChargedAt and remainingTimeToFullyChargedInMinutes)
+  let reached = null;
   if (status.state === 'CHARGING') {
     if (status.fullyChargedAt) {
-      full = status.fullyChargedAt;
+      reached = status.fullyChargedAt;
     } else if (typeof status.remainingTimeToFullyChargedInMinutes === 'number' && charging.carCapturedTimestamp) {
       const capturedMs = Date.parse(charging.carCapturedTimestamp);
-      full = new Date(capturedMs + status.remainingTimeToFullyChargedInMinutes * 60000).toISOString();
+      reached = new Date(capturedMs + status.remainingTimeToFullyChargedInMinutes * 60000).toISOString();
     }
   }
-  postTime('full_at', full);
+  postTime('target_reached_at', reached);
   // the charge target (Ladeziel) is the value set in the car, the one it charges to; with battery care on, Škoda sets
   // it back to the battery care target (80 %) after the next charge (user, 2026-10-25)
   post('battery_care', onOff(settings.chargingCareMode, 'ACTIVATED', 'DEACTIVATED'));
