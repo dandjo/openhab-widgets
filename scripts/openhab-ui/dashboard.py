@@ -8862,8 +8862,9 @@ def roof_map():
     the closer its power comes to the strongest module of its plane, so that a shaded or failing module shows; a tap
     opens its power's course, under FusionSolar's name 1.0.<address>, which hovering shows as a tooltip. East, on
     string 1, has no optimizers: string 1's power, today's energy and estimated lifetime yield split evenly over its 8
-    modules, a fictitious split that shows as such (user, 2026-10-20): hatched in string 1's colour and dashed, the
-    values in italics after an ≈ on a plate in the card's colour, so that they read over the hatching; a tap opens
+    modules, a fictitious split that shows as such (user, 2026-10-20): hatched in string 1's colour and dashed, in the
+    light theme in the west modules' colour (user, 2026-10-25), the values in italics, without an ≈ since then, on a
+    plate in the card's colour, so that they read over the hatching; a tap opens
     string 1's power. Over each plane its power and today's energy; under the drawing the optimizers' status, the
     hottest one and the reading's time."""
     parts = [svg("defs", [svg("pattern", [svg("path", d="M 0 0 L 0 12", stroke=EAST_C, **{"stroke-width": "3",
@@ -8884,14 +8885,15 @@ def roof_map():
         cx, top = x + w / 2, y + h / 2 - 11.5
         if a is None:
             parts += [svg("rect", x=x + 3, y=y + 3, width=w - 6, height=h - 6, rx=6, fill="url(#roof-east-hatch)",
-                          stroke=EAST_C, **{"stroke-opacity": "0.9", "stroke-dasharray": "6 4"}),
+                          stroke=f"=themeOptions.dark === 'dark' ? '{EAST_C}' : '{WEST_C}'",
+                          **{"stroke-opacity": "0.9", "stroke-dasharray": "6 4"}),
                       svg("rect", x=x + 9, y=y + 6, width=w - 18, height=h - 12, rx=6,
                           style={"fill": "var(--f7-card-bg-color, #fff)", "fill-opacity": "0.85"}),
-                      text(cx, top, f"='≈ ' + Math.round({num('huawei_inverter_pv1_power')} / {EAST_N}) + ' W'",
+                      text(cx, top, f"=Math.round({num('huawei_inverter_pv1_power')} / {EAST_N}) + ' W'",
                            ROOF_W, "roof-w", weight="700", italic=True),
-                      text(cx, top + 20, f"='≈ ' + {fixed(f'{pv1_day} / {EAST_N}', 2)}", ROOF_DAY, "roof-day",
+                      text(cx, top + 20, f"={fixed(f'{pv1_day} / {EAST_N}', 2)}", ROOF_DAY, "roof-day",
                            opacity="0.85", italic=True),
-                      text(cx, top + 38, f"='≈ Σ ' + {total(f'{east_total} / {EAST_N}')}", ROOF_SUM, "roof-sum",
+                      text(cx, top + 38, f"='Σ ' + {total(f'{east_total} / {EAST_N}')}", ROOF_SUM, "roof-sum",
                            opacity="0.85", italic=True)]
             continue
         _, color, members = OPT_PLANES["west" if a >= 7 else "north"]
