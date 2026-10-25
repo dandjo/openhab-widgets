@@ -9029,7 +9029,8 @@ def climate_degrees(item):
 
 
 def e_car_controls():
-    """The commands the API takes for the car (user, 2026-10-25), the actions on top, side by side where they fit:
+    """The commands the API takes for the car (user, 2026-10-25), each action over its setting, the two side by side
+    where they fit:
     Laden as a boost pill, Starten and Stoppen, while a cable is plugged in or it charges, a hint without, and
     Klimatisierung, on with the target temperature below or off. Under them the settings as pill sliders: the charge
     target set in the car (Ladeziel), the value it charges to, 50 to 100 % in steps of 10, whose context says the battery
@@ -9069,15 +9070,15 @@ def e_car_controls():
     outcome = label(f"=items.{last}.state", f"={ok(last)}",
                     **{"font-size": "12px", "opacity": "0.65", "padding": "6px 2px 0"})
     # the two settings side by side where they fit (desktop), one above the other on a phone
-    # side by side only where each pill has room for the time left and the clock, else one above the other
-    actions = pill_switches(pill, hint, climate_pill, min_width="270px")
-    actions["config"]["style"]["margin-bottom"] = "6px"
-    settings = div([slider, climate_slider], **{"display": "grid", "gap": "0 16px",
-                                                "grid-template-columns": "repeat(auto-fit, minmax(220px, 1fr))"})
-    return controls_box(actions, settings, outcome)
+    # each action directly over its setting (user, 2026-10-25: on a phone Laden over Ladeziel, Klima over
+    # Zieltemperatur); the two groups side by side only where each has room for the time left and the clock
+    group = {"display": "flex", "flex-direction": "column", "gap": "6px", "min-width": "0"}
+    groups = div([div([pill, hint, slider], **group), div([climate_pill, climate_slider], **group)],
+                 **{"display": "grid", "gap": "6px 16px", "grid-template-columns": "repeat(auto-fit, minmax(270px, 1fr))"})
+    return controls_box(groups, outcome)
 
 
-E_CAR_CHART_H = 250
+E_CAR_CHART_H = 300
 
 
 def e_car_charge_chart():
@@ -9091,21 +9092,9 @@ def e_car_charge_chart():
                            [value_axis("%", min=0, max=100), value_axis("kW", min=0)])], E_CAR_CHART_H, period="W")
 
 
-# below the width at which a row's two columns stand one above the other (Framework7's large breakpoint), the cards of a
-# row follow their own order: the columns and the stacks in them step aside (display: contents), so the cards become
-# the row's own flex items, a line each, ordered by their style's order; above it the order only sorts the cards of a
-# stack, which keep the order they are built in
-PHONE_ORDER = """
-@media (max-width: 1023px) {
-  .oh-col { display: contents; }
-  .oh-col > div:not(.card) { display: contents !important; }
-  .oh-col .card { flex: 1 1 100% !important; height: auto !important; }
-}"""
-
-
 def e_car_blocks():
-    """The E-Auto's page (user, 2026-10-25): on top the controls over the charge of the week beside the car's own
-    report; below the charging at home as the Shelly EM of the air conditioner's circuit measures it (plug_refs()):
+    """The E-Auto's page (user, 2026-10-25): on top the controls beside the car's own report, under them the charge of
+    the week across the page; below the charging at home as the Shelly EM of the air conditioner's circuit measures it (plug_refs()):
     the plug card over its electrical values on the left, the day's power over the energy per day on the right at
     their own heights (the day's power had stretched to the plug card's), and the Diagnose card under them (the API's
     state, the requests left in its hourly quota, the key's expiry, battery care)."""
@@ -9113,21 +9102,15 @@ def e_car_blocks():
                            vtile("Anfragen übrig", skoda("api_requests_left")),
                            vtile("Schlüssel gültig bis", skoda("api_key_expiry")),
                            vtile("Akkuschonung", skoda("battery_care"))]), 200)
-    # the controls on the left over the week's charge, the car's report on the right; where the columns stand one
-    # above the other (a phone), the controls first, the car's report second, the chart last (user, 2026-10-25)
-    controls = card("Steuerung", [e_car_controls()])
-    # the chart takes the height the car's card leaves beside the controls, on a phone its own
-    chart_ = card("Ladestand", [fill_stacked(e_car_charge_chart(), f"={NARROW} ? '260px' : '200px'")], fill=True)
-    car = card("Škoda Enyaq", e_car_now())
-    for order, card_ in enumerate((controls, car, chart_), 1):
-        card_["config"]["style"]["order"] = str(order)
-    top = two(stack(controls, chart_), car)
-    top["slots"]["default"][0]["config"]["stylesheet"] += PHONE_ORDER
+    # the controls beside the car's report, about as high as each other, the week's charge across the page under them;
+    # on a phone the controls, the car's report and the chart in this order (user, 2026-10-25)
+    top = [two(card("Steuerung", [e_car_controls()]), card("Škoda Enyaq", e_car_now())),
+           one(card("Ladestand", [e_car_charge_chart()]))]
     now, power, days, electric = plug_refs(
         "e_car", "material:electric_car", ECAR_COLOR, title="E-Auto", meter="Shelly EM", controllable=False, range_=20,
         kind="e-car", threshold=ECAR_ON, plugged=ecar_plugged(num(ECAR)),
         note=ECAR_CALC + " Der Schalter spiegelt nur das Relais des Shelly EM, das mit nichts verbunden ist.")
-    return [top, two(widget_stack(now, electric), widget_stack(power, days, card("Diagnose", [diagnose]), grow=3))]
+    return [*top, two(widget_stack(now, electric), widget_stack(power, days, card("Diagnose", [diagnose]), grow=3))]
 
 
 def month_combo(bars, lines, left, right, right_axis=None):
