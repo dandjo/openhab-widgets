@@ -291,5 +291,4 @@ EN.update({"Škoda Enyaq Ladestand": "Škoda Enyaq State of Charge", "Škoda Eny
            "Škoda Enyaq API-Schlüssel gültig bis": "Škoda Enyaq API Key Valid Until",
            "Škoda Enyaq Ladelimit": "Škoda Enyaq Charge Limit", "Škoda Enyaq Laden": "Škoda Enyaq Charging",
            "Škoda Enyaq letzter Befehl": "Škoda Enyaq Last Command",
-           "Škoda Enyaq Klimatisierung Ein/Aus": "Škoda Enyaq Climatisation On/Off",
-           "Škoda Enyaq Akkuschonung Ladeziel": "Škoda Enyaq Battery Care Target"})
+           "Škoda Enyaq Klimatisierung Ein/Aus": "Škoda Enyaq Climatisation On/Off"})

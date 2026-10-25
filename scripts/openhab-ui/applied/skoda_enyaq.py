@@ -4,9 +4,9 @@ odometer, locks and openings, parking position and climate as items in the equip
 which the rule skoda_enyaq_status (skoda_enyaq.js next to this file) fills every 5 minutes while the car charges or
 drives, otherwise every 15 (20 requests an hour per vehicle). A read does not wake the car: the values are what it
 last reported, skoda_enyaq_updated says when. Four items take commands to the car (user, same day): the charge target
-skoda_enyaq_charge_target (Ladeziel, 50 to 100 % in steps of 10; skoda_enyaq_charge_limit, Ladelimit, is the same set
-value the car charges to, while skoda_enyaq_battery_care_target is what Škoda sets it back to after the next charge
-with battery care on), skoda_enyaq_charging (ON starts, OFF stops a charge),
+skoda_enyaq_charge_limit (Ladelimit, the value set in the car that it charges to, 50 to 100 % in steps of 10; the
+read-only skoda_enyaq_charge_target, Ladeziel, is what Škoda sets it back to after the next charge with battery care
+on, without battery care the limit itself), skoda_enyaq_charging (ON starts, OFF stops a charge),
 skoda_enyaq_climate (ON starts, OFF stops the air conditioning) and its target temperature skoda_enyaq_climate_target
 (LO = 15.5 °C, 16 to 29.5 °C in steps of 0.5, HI = 30 °C as the app offers them, sent with the start); the same rule sends them, without autoupdate, so their state
 changes once Škoda accepted the command, and reports in skoda_enyaq_command_result. The values the E-Auto page charts go into InfluxDB (the position too, the
@@ -73,16 +73,14 @@ POINTS = {
     "charge_type": ("String", "Ladeart", "electrical_services", ["Status"], CHANGE,
                     state("%s", options="AC=AC,DC=DC,OFF=Aus")),
     "full_at": ("DateTime", "Voll um", "schedule", ["Timestamp", "Point"], RESTORE, state("%1$ta %1$tR")),
-    "charge_limit": ("Number:Dimensionless", "Ladelimit", "battery_full", ["Point"], CHANGE,
-                     quantity("%", "%.0f %unit%")),
-    "charge_target": ("Number:Dimensionless", "Ladeziel", "battery_charging_full", ["Setpoint"], CHANGE,
-                      {"unit": {"value": "%"}, **command("%.0f %unit%", min=50, max=100, step=10)}),
+    "charge_limit": ("Number:Dimensionless", "Ladelimit", "battery_charging_full", ["Setpoint"], CHANGE,
+                     {"unit": {"value": "%"}, **command("%.0f %unit%", min=50, max=100, step=10)}),
+    "charge_target": ("Number:Dimensionless", "Ladeziel", "battery_full", ["Point"], CHANGE,
+                      quantity("%", "%.0f %unit%")),
     "charging": ("Switch", "Laden", "ev_station", ["Switch"], RESTORE, command("%s", options="ON=An,OFF=Aus")),
     "command_result": ("String", "letzter Befehl", "send", ["Status"], RESTORE, state("%s")),
     "battery_care": ("Switch", "Akkuschonung", "battery_saver", ["Status"], CHANGE,
                      state("%s", options="ON=An,OFF=Aus")),
-    "battery_care_target": ("Number:Dimensionless", "Akkuschonung Ladeziel", "battery_saver", ["Point"], CHANGE,
-                            quantity("%", "%.0f %unit%")),
     "plug": ("Switch", "Ladekabel", "power", ["Status"], CHANGE, state("%s", options="ON=Eingesteckt,OFF=Ausgesteckt")),
     "plug_locked": ("Switch", "Ladestecker verriegelt", "lock", ["Status"], CHANGE,
                     state("%s", options="ON=Verriegelt,OFF=Entriegelt")),
@@ -131,7 +129,7 @@ RULE = {
     # to the charge limit, the charging switch, the air conditioning's switch or its target temperature
     "triggers": [{"id": "1", "type": "timer.GenericCronTrigger", "configuration": {"cronExpression": "20 0/5 * * * ? *"}},
                  {"id": "2", "type": "core.SystemStartlevelTrigger", "configuration": {"startlevel": 100}},
-                 {"id": "4", "type": "core.ItemCommandTrigger", "configuration": {"itemName": P + "charge_target"}},
+                 {"id": "4", "type": "core.ItemCommandTrigger", "configuration": {"itemName": P + "charge_limit"}},
                  {"id": "5", "type": "core.ItemCommandTrigger", "configuration": {"itemName": P + "charging"}},
                  {"id": "6", "type": "core.ItemCommandTrigger", "configuration": {"itemName": P + "climate"}},
                  {"id": "7", "type": "core.ItemCommandTrigger", "configuration": {"itemName": P + "climate_target"}}],
@@ -153,6 +151,11 @@ def call(method, path, body=None):
         return e.code, None
 
 
+# what earlier versions had and this one no longer has: an item (the care target was found to be the charge target,
+# user 2026-10-25) and metadata of items that no longer take commands
+OBSOLETE_ITEMS = [P + "battery_care_target"]
+OBSOLETE_METADATA = {P + "charge_target": ["autoupdate"]}
+
 apply = sys.argv[1] == "apply"
 for group in ("e_car", "influxdb_change", "influxdb_periodic", "mapdb_change_restore"):
     assert call("GET", f"/items/{group}")[0] == 200, f"group {group} missing"
@@ -161,7 +164,15 @@ for name in ITEMS:
     print(f"item {name}:", f"exists, state {item['state']}" if status == 200 else "missing")
 print(f"rule {UID}:", "exists" if call("GET", f"/rules/{UID}")[0] == 200 else "missing",
       f"(script {len(SCRIPT)} chars)")
+for name in OBSOLETE_ITEMS:
+    print(f"obsolete item {name}:", "exists" if call("GET", f"/items/{name}")[0] == 200 else "gone")
 if apply:
+    for name in OBSOLETE_ITEMS:
+        if call("GET", f"/items/{name}")[0] == 200:
+            print(f"item {name} DELETE", call("DELETE", f"/items/{name}")[0])
+    for name, namespaces in OBSOLETE_METADATA.items():
+        for namespace in namespaces:
+            print(f"  metadata {name} {namespace} DELETE", call("DELETE", f"/items/{name}/metadata/{namespace}")[0])
     for name, item in ITEMS.items():
         print(f"item {name} PUT", call("PUT", f"/items/{name}", item)[0])
         for namespace, meta in METADATA[name].items():
