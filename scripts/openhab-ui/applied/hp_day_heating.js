@@ -14,8 +14,8 @@
 // Offset, start and end of the window are items, so they can be changed without touching the rule.
 const SEASON_AVG = 8;    // °C 24-hour mean outdoors at the window's start from which the day is in day mode
 const NIGHT = -10;       // K offset outside the window: the setpoint at its minimum, no call for heat
-const SETTLE = 30;       // seconds after a write or a change of the guard's lock before the offset is checked
-const RETRY = 5;         // minutes between writes once 3 quick ones did not arrive
+const SETTLE = 60;       // seconds after a write or a change of the guard's lock before the offset is checked, and
+                         // written again if it still differs
 const OFFSET_MIN = -10;  // the controller's offset range is −10..+10
 const OFFSET_MAX = 10;
 
@@ -67,14 +67,12 @@ const write = (value, why) => {
   // in °C like the item: a quantity in K would be taken as an absolute temperature (−272.15 °C)
   offsetItem.sendCommand(Quantity(value + ' °C'));
   cache.private.put('write', now);
-  cache.private.put('expected', value);
   console.info(`day heating: offset ${offset} -> ${value}, ${why}`);
 };
 if (phase !== previous) {
   items.getItem(STATE).postUpdate(phase);
   console.info(`day heating: ${previous} -> ${phase}` +
     (decision.mean !== null ? `, 24-hour mean ${decision.mean} °C at the window's start` : ''));
-  cache.private.remove('attempts');
 }
 
 const target = phase === 'day' ? dayOffset : phase === 'night' ? NIGHT : 0;
@@ -94,30 +92,16 @@ if (!missing && settled) {
   if (phase === 'day' || phase === 'night') {
     // the offset is the rule's: set again whenever it differs, once the cycle guard has let go of a lock
     if (lock === 0 && Math.abs(offset - target) > 0.25) {
-      const attempts = (cache.private.get('attempts') || 0) + 1;
-      if (attempts <= 3 || now - (cache.private.get('write') || 0) >= RETRY * 60000) {
-        write(target, phase === 'day' ? `day window ${start}–${end} h` : 'outside the day window');
-        cache.private.put('attempts', attempts);
-        if (attempts === 4) {
-          console.warn(`day heating: offset writes do not arrive, trying every ${RETRY} min`);
-        }
-      }
-    } else if (Math.abs(offset - target) <= 0.25) {
-      cache.private.remove('attempts');
+      write(target, phase === 'day' ? `day window ${start}–${end} h` : 'outside the day window');
     }
   } else if (cache.private.get('release')) {
     // the offset back to 0, once; afterwards it belongs to the cycle guard and to hand settings
     if (Math.abs(offset) <= 0.25) {
       cache.private.remove('release');
-      cache.private.remove('attempts');
     } else if (lock === 0) {
-      const attempts = (cache.private.get('attempts') || 0) + 1;
-      if (attempts <= 3 || now - (cache.private.get('write') || 0) >= RETRY * 60000) {
-        write(0, phase === 'off' ? 'day heating off' : 'normal operation');
-        cache.private.put('attempts', attempts);
-      }
+      write(0, phase === 'off' ? 'day heating off' : 'normal operation');
     }
-  } else if (lock === 0 && Math.abs(offset - NIGHT) <= 0.25 && previous !== null && ['normal', 'off'].includes(previous)) {
+  } else if (lock === 0 && Math.abs(offset - NIGHT) <= 0.25 && ['normal', 'off'].includes(previous)) {
     // the night's offset never belongs to normal operation (a release lost in a restart): back to 0
     write(0, 'night offset left over');
   }
