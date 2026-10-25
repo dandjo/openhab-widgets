@@ -2,35 +2,18 @@
 // at its lowest speed, so it cycles however long its pauses are; the same heat given in a day window, with the leaving
 // water offset a little higher (+1 K by default), is enough load for long runs, and the house's mass carries it through
 // the night, during which the rule keeps the heating off (offset −10 K: the setpoint stays at its minimum of 20 °C, so
-// the controller never calls for heat). Day mode while the 24-hour mean outdoor temperature, the heating curve's basis,
-// is 10 °C or more, until it falls below 8 °C, or when the heating never reached its own stop in two whole windows in a
-// row while running for at least 70 % of the window's time without hot-water charges and the cycle guard's locks (the
-// window then gives the house too little; a day the house needs nothing has no stop either, but no heating); after that
-// it comes back only once the 24-hour mean has risen 2 K above the value it ended at. A stop counts as the heating's
-// own only after 10 minutes of space heating (the valve on the heating, so a hot-water charge and the short runs right
-// after it never count), with the leaving water at its stop (2 K or more above the setpoint) and no restart within 3
-// minutes (a defrost). In day mode the offset is the rule's: it sets it again whenever it differs, so a change by hand
-// needs the switch off. Only the cycle guard lowers it for a while in the window, after a hot-water charge or a short
-// run (user, 2026-10-13: a hot compressor's start ends within minutes); the rule waits for its lock to go, and at night
-// the guard leaves its lock to the rule as it stands. In normal operation the offset goes back to 0 once and the cycle
-// guard works as before. Offset, start and end of the window are items, so they can be changed without touching the
-// rule.
-const ON_AVG = 10;       // °C 24-hour mean outdoors from which day mode starts
-const OFF_AVG = 8;       // °C below which it ends
-const RESUME_RISE = 2;   // K the 24-hour mean must rise above its value at a fallback before day mode returns
+// the controller never calls for heat). The season is decided once a day (user, 2026-10-25): the 24-hour mean outdoor
+// temperature, the heating curve's basis, at the window's start makes that day and the night after it day mode from
+// SEASON_AVG on, and normal operation below it until the next window's start. The mean swings by about 2 K within a
+// day, so a threshold checked all the time would switch back and forth on days around it; one decision a day never
+// does. The mean at the window's start comes from InfluxDB, so a restart keeps the day's decision. In day mode the
+// offset is the rule's: it sets it again whenever it differs, so a change by hand needs the switch off. Only the cycle
+// guard lowers it for a while in the window, after a hot-water charge or a short run (user, 2026-10-13: a hot
+// compressor's start ends within minutes); the rule waits for its lock to go, and at night the guard leaves its lock to
+// the rule as it stands. In normal operation the offset goes back to 0 once and the cycle guard works as before.
+// Offset, start and end of the window are items, so they can be changed without touching the rule.
+const SEASON_AVG = 8;    // °C 24-hour mean outdoors at the window's start from which the day is in day mode
 const NIGHT = -10;       // K offset outside the window: the setpoint at its minimum, no call for heat
-const FULL_DAYS = 2;     // whole windows in a row without the heating's own stop that end day mode
-const FULL_SHARE = 0.7;  // ... in which the heating also ran this share of the window's time without hot water and locks
-const SPACE_RUN = 10;    // minutes of space heating before a stop counts as the heating's own
-const AT_STOP = 2;       // K above the setpoint the leaving water must have reached in the run's last 2 minutes
-// a window ran through only when the leaving water did not stand at the curve's stop mark, the controller's stop
-// without the day's offset (the setpoint less the offset, plus CURVE_STOP), for CURVE_STOP_TIME: the day offset moves
-// the controller's stop up with the setpoint, so a window can run through on heat the curve alone would have stopped
-// (user, 2026-10-20)
-const CURVE_STOP = 3;      // K above the curve where the controller stops
-const CURVE_STOP_TIME = 10; // minutes at that mark, after SPACE_RUN minutes of space heating, that mean enough heat
-const RESTART = 3;       // minutes after a stop without a restart (a defrost restarts within 30–90 s)
-const DEFROST_GAP = 5;   // minutes around a defrost in which a stop does not count
 const SETTLE = 30;       // seconds after a write or a change of the guard's lock before the offset is checked
 const RETRY = 5;         // minutes between writes once 3 quick ones did not arrive
 const OFFSET_MIN = -10;  // the controller's offset range is −10..+10
@@ -38,22 +21,15 @@ const OFFSET_MAX = 10;
 
 const SWITCH = 'heatpump_day_heating';
 const STATE = 'heatpump_day_heating_state';
-const FULL = 'heatpump_day_heating_full_days';
-const RESUME = 'heatpump_day_heating_resume';
+const AVG = 'espaltherma_ext_ambient_temp_avg';
 const offsetItem = items.getItem('pyaltherma_leaving_water_temp_offset_heating');
 const num = (name) => items.getItem(name).numericState;
 const state = (name) => items.getItem(name).state;
 const now = Date.now();
 const clock = time.ZonedDateTime.now();
 const hour = clock.hour() + clock.minute() / 60;
-const today = clock.toLocalDate().toString();
 
-const avg = num('espaltherma_ext_ambient_temp_avg');
 const offset = num('pyaltherma_leaving_water_temp_offset_heating');
-const freq = num('espaltherma_inv_frequency');
-const valve = state('espaltherma_3way_valve_mode');
-const leaving = num('espaltherma_leaving_water_temp_after_buh');
-const setpoint = num('espaltherma_leaving_water_setpoint');
 const lock = num('heatpump_cycle_lock') || 0;
 const setting = (name, fallback, lo, hi) => {
   const v = num(name);
@@ -64,134 +40,29 @@ const dayOffset = Math.round(setting('heatpump_day_heating_offset', 1, OFFSET_MI
 const start = setting('heatpump_day_heating_start', 9, 0, 24);
 const end = setting('heatpump_day_heating_end', 19, 0, 24);
 const enabled = state(SWITCH) === 'ON' && state('pyaltherma_climate_control_power') === 'ON';
-// while a reading is missing (NULL after a restart) it would compare as 0, so nothing is decided on it
-const missing = [offset, freq].some((v) => v === null) || ['NULL', 'UNDEF'].includes(valve);
-if (state('espaltherma_defrost_operaton') === 'ON') {
-  cache.private.put('defrost', now);
-}
-const defrostAt = cache.private.get('defrost') || 0;
-// a stop near a defrost (from DEFROST_GAP minutes before it until now) is the defrost's, not the heating's
-const nearDefrost = (at) => defrostAt >= at - DEFROST_GAP * 60000;
+// while the offset is missing (NULL after a restart) it would compare as 0, so nothing is written on it
+const missing = offset === null;
 
-// the season: day mode from ON_AVG, kept down to OFF_AVG; after a fallback only from the value it waits for
+// the season, decided at the latest window start: today's once it has come, before that yesterday's
 const previous = state(STATE);
 const wasDay = previous === 'day' || previous === 'night';
-let resume = num(RESUME);
-if (avg !== null && resume !== null && resume > ON_AVG && (avg < OFF_AVG || avg >= resume)) {
-  // a cold spell ends the wait as the ordinary season boundary takes over; reaching the value ends it too. The wait
-  // goes back to the ordinary start ON_AVG, not to UNDEF: MapDB keeps no UNDEF, so a restart brought the old value
-  // back (2026-10-22); a value at or below ON_AVG holds nothing back
-  items.getItem(RESUME).postUpdate(ON_AVG);
-  resume = ON_AVG;
+const decidedAt = clock.withHour(Math.floor(start) % 24).withMinute(Math.min(59, Math.round((start % 1) * 60)))
+  .withSecond(0).withNano(0).minusDays(hour >= start ? 0 : 1);
+let decision = cache.private.get('decision');
+if (decision === null || decision.at !== decidedAt.toString()) {
+  const persisted = items.getItem(AVG).persistence.persistedState(decidedAt, 'influxdb');
+  decision = { at: decidedAt.toString(), mean: persisted === null ? null : persisted.numericState };
+  if (decision.mean !== null) {
+    cache.private.put('decision', decision);
+    console.info(`day heating: 24-hour mean ${decision.mean} °C at the window's start ${decision.at}, ` +
+      (decision.mean >= SEASON_AVG ? 'day mode' : 'normal operation') + ' until the next one');
+  }
 }
-let season = avg === null ? wasDay : wasDay ? avg >= OFF_AVG : avg >= Math.max(ON_AVG, resume ?? -99);
+// without a reading at the window's start (InfluxDB away) the mode stays as it is
+const season = decision.mean !== null ? decision.mean >= SEASON_AVG : wasDay;
 const inWindow = start <= end ? hour >= start && hour < end : hour >= start || hour < end;
+const phase = !enabled ? 'off' : !season ? 'normal' : inWindow ? 'day' : 'night';
 
-// the heating's own stops: a run remembers since when it heats the house (the valve on Space) and how far the leaving
-// water rose above the setpoint in its last 2 minutes; a stop is decided RESTART minutes later
-let run = cache.private.get('run') || null;
-let stop = cache.private.get('stop') || null;
-let win = cache.private.get('window') || null;
-if (!missing) {
-  if (freq > 0) {
-    if (stop !== null && !stop.decided) {
-      // restarted at once: a defrost or the controller's own restart, not a stop; the run goes on where it was
-      stop.decided = true;
-      stop.counts = false;
-      run = run ?? stop.run ?? null;
-      delete stop.run;
-      cache.private.put('stop', stop);
-    }
-    if (run === null) {
-      run = { start: now, space: null, rise: [] };
-    }
-    run.space = valve === 'Space' ? (run.space ?? now) : null;
-    if (leaving !== null && setpoint !== null) {
-      run.rise = run.rise.filter((r) => now - r[0] <= 120000).concat([[now, leaving - setpoint]]);
-    }
-    cache.private.put('run', run);
-  } else if (run !== null) {
-    const heated = run.space !== null && now - run.space >= SPACE_RUN * 60000;
-    stop = { at: now, own: heated && run.rise.some((r) => r[1] >= AT_STOP), decided: false, counts: false, run };
-    run = null;
-    cache.private.remove('run');
-    cache.private.put('stop', stop);
-  }
-  if (stop !== null && !stop.decided && freq === 0 && now - stop.at >= RESTART * 60000) {
-    stop.decided = true;
-    stop.counts = stop.own && !nearDefrost(stop.at);
-    delete stop.run;
-    cache.private.put('stop', stop);
-  }
-}
-// a stop of today's window, decided or, at the window's end, still waiting for its restart check
-const ownStop = (s) => s !== null && (s.decided ? s.counts : s.own && !nearDefrost(s.at));
-
-let phase = !enabled ? 'off' : !season ? 'normal' : inWindow ? 'day' : 'night';
-const fullItem = items.getItem(FULL);
-let full = fullItem.numericState || 0;
-if (phase === 'day' && previous !== 'day') {
-  cache.private.put('dayFrom', now);
-}
-const dayFrom = cache.private.get('dayFrom') || now;
-if (phase === 'day') {
-  if (win === null || win.date !== today) {
-    // a window counts only when the rule held it from its start (not after a restart, switching on or a season change)
-    win = { date: today, whole: previous === 'night', stopped: false, heating: 0, dhw: 0, locked: 0, atCurveStop: 0,
-      seen: now };
-  }
-  // the heating's, the tank's and the guard's locks' time in the window, between two runs of the rule (at most a
-  // minute counted); a lock follows a charge or a short run, so its time is the charge's
-  const step = Math.min(60000, Math.max(0, now - win.seen));
-  if (!missing && freq > 0 && valve === 'Space') {
-    win.heating += step;
-    // the leaving water at the curve's stop mark, once the run heated the house SPACE_RUN minutes (not the hot water
-    // a charge leaves in the pipes)
-    const spaceRun = run !== null && run.space !== null && now - run.space >= SPACE_RUN * 60000;
-    if (spaceRun && leaving !== null && setpoint !== null && leaving >= setpoint - offset + CURVE_STOP) {
-      win.atCurveStop = (win.atCurveStop || 0) + step;
-    }
-  } else if (!missing && valve !== 'Space') {
-    win.dhw += step;
-  } else if (!missing && lock > 0) {
-    win.locked = (win.locked || 0) + step;
-  }
-  win.seen = now;
-  // during the window only decided stops count, so a defrost right after a stop is seen first
-  if (stop !== null && stop.decided && stop.counts && stop.at >= dayFrom) {
-    win.stopped = true;
-  }
-  cache.private.put('window', win);
-} else if (previous === 'day' && win !== null && win.date === today && phase === 'night') {
-  // the window's end: whether the heating reached its own stop in it
-  if (ownStop(stop) && stop.at >= dayFrom) {
-    win.stopped = true;
-  }
-  if (win.whole) {
-    const free = Math.max(1, now - dayFrom - win.dhw - (win.locked || 0));  // the window's time without hot water and locks
-    const share = win.heating / free;
-    const atCurveStop = Math.round((win.atCurveStop || 0) / 60000);
-    const enough = atCurveStop >= CURVE_STOP_TIME;
-    const ranThrough = !win.stopped && !enough && share >= FULL_SHARE;
-    full = ranThrough ? full + 1 : 0;
-    console.info(`day heating: window of ${today} ${win.stopped ? 'reached the heating\'s own stop' :
-      ranThrough ? 'ran through without the heating\'s own stop' : enough ? 'had no stop, but enough heat' :
-      'had no stop but little heating'}, heating ${Math.round(share * 100)} % of ${Math.round(free / 60000)} min ` +
-      `without hot water and locks, ${atCurveStop} min at the curve's stop mark (${full} in a row)`);
-    if (full >= FULL_DAYS) {
-      resume = Math.max(ON_AVG, Math.round(((avg ?? ON_AVG) + RESUME_RISE) * 10) / 10);
-      items.getItem(RESUME).postUpdate(resume);
-      console.info(`day heating: ${full} windows in a row without a stop, normal operation until the 24-hour mean ` +
-        `reaches ${resume} °C`);
-      full = 0;
-      season = false;
-      phase = 'normal';
-    }
-    fullItem.postUpdate(full);
-  }
-  cache.private.remove('window');
-  win = null;
-}
 const write = (value, why) => {
   // in °C like the item: a quantity in K would be taken as an absolute temperature (−272.15 °C)
   offsetItem.sendCommand(Quantity(value + ' °C'));
@@ -201,7 +72,8 @@ const write = (value, why) => {
 };
 if (phase !== previous) {
   items.getItem(STATE).postUpdate(phase);
-  console.info(`day heating: ${previous} -> ${phase}` + (avg !== null ? `, 24-hour mean ${avg} °C` : ''));
+  console.info(`day heating: ${previous} -> ${phase}` +
+    (decision.mean !== null ? `, 24-hour mean ${decision.mean} °C at the window's start` : ''));
   cache.private.remove('attempts');
 }
 
