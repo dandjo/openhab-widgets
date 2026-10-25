@@ -2562,7 +2562,10 @@ DOT_SPACING = 40  # units between two dots
 HP_ORBIT = ORBIT  # the ring round every device, as in the energy flow
 DOT_SPEEDS = [20, 35, 50, 65, 80]  # units per second, one per step
 FLOW_STEPS = [6, 12, 18, 24]  # l/min
-FREQUENCY_STEPS = [30, 45, 60, 75]  # Hz
+# the compressor's range, from its lowest frequency to its highest (HZ_FULL), in as many equal steps as there are speeds
+# (user, 2026-10-25: 8 to 74 Hz)
+HZ_MIN = 8
+FREQUENCY_STEPS = [round(HZ_MIN + (HZ_FULL - HZ_MIN) * k / len(DOT_SPEEDS)) for k in range(1, len(DOT_SPEEDS))]  # Hz
 
 
 def hp_route(d, color, active, reverse=None, pace=None, least=1):

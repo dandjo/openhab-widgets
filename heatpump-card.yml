@@ -364,7 +364,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 24, 2026, 9:36:11 PM
+timestamp: Oct 25, 2026, 9:20:45 AM
 component: oh-card
 config:
   title: Heat Pump
@@ -641,9 +641,9 @@ slots:
                     config:
                       path: '=items[props.heatpumpDefrostOperaton].state === ''ON'' ? ''M502,456 L533.5,456 L533.5,129'' :
                         ''M533.5,129 V456 H502'''
-                      dur: '=Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 30 ? ''17.93s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState)
-                        || 0)) < 45 ? ''10.24s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0))
-                        < 60 ? ''7.17s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 75 ?
+                      dur: '=Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 21 ? ''17.93s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState)
+                        || 0)) < 34 ? ''10.24s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0))
+                        < 48 ? ''7.17s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 61 ?
                         ''5.52s'' : (''4.48s''))))'
                       repeatCount: indefinite
                       calcMode: linear
@@ -662,9 +662,9 @@ slots:
                     config:
                       path: '=items[props.heatpumpDefrostOperaton].state === ''ON'' ? ''M502,456 L533.5,456 L533.5,129'' :
                         ''M533.5,129 V456 H502'''
-                      dur: '=Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 30 ? ''17.93s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState)
-                        || 0)) < 45 ? ''10.24s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0))
-                        < 60 ? ''7.17s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 75 ?
+                      dur: '=Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 21 ? ''17.93s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState)
+                        || 0)) < 34 ? ''10.24s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0))
+                        < 48 ? ''7.17s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 61 ?
                         ''5.52s'' : (''4.48s''))))'
                       repeatCount: indefinite
                       calcMode: linear
@@ -683,9 +683,9 @@ slots:
                     config:
                       path: '=items[props.heatpumpDefrostOperaton].state === ''ON'' ? ''M502,456 L533.5,456 L533.5,129'' :
                         ''M533.5,129 V456 H502'''
-                      dur: '=Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 30 ? ''17.93s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState)
-                        || 0)) < 45 ? ''10.24s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0))
-                        < 60 ? ''7.17s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 75 ?
+                      dur: '=Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 21 ? ''17.93s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState)
+                        || 0)) < 34 ? ''10.24s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0))
+                        < 48 ? ''7.17s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 61 ?
                         ''5.52s'' : (''4.48s''))))'
                       repeatCount: indefinite
                       calcMode: linear
@@ -704,9 +704,9 @@ slots:
                     config:
                       path: '=items[props.heatpumpDefrostOperaton].state === ''ON'' ? ''M502,456 L533.5,456 L533.5,129'' :
                         ''M533.5,129 V456 H502'''
-                      dur: '=Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 30 ? ''17.93s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState)
-                        || 0)) < 45 ? ''10.24s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0))
-                        < 60 ? ''7.17s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 75 ?
+                      dur: '=Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 21 ? ''17.93s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState)
+                        || 0)) < 34 ? ''10.24s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0))
+                        < 48 ? ''7.17s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 61 ?
                         ''5.52s'' : (''4.48s''))))'
                       repeatCount: indefinite
                       calcMode: linear
@@ -725,9 +725,9 @@ slots:
                     config:
                       path: '=items[props.heatpumpDefrostOperaton].state === ''ON'' ? ''M502,456 L533.5,456 L533.5,129'' :
                         ''M533.5,129 V456 H502'''
-                      dur: '=Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 30 ? ''17.93s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState)
-                        || 0)) < 45 ? ''10.24s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0))
-                        < 60 ? ''7.17s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 75 ?
+                      dur: '=Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 21 ? ''17.93s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState)
+                        || 0)) < 34 ? ''10.24s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0))
+                        < 48 ? ''7.17s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 61 ?
                         ''5.52s'' : (''4.48s''))))'
                       repeatCount: indefinite
                       calcMode: linear
@@ -746,9 +746,9 @@ slots:
                     config:
                       path: '=items[props.heatpumpDefrostOperaton].state === ''ON'' ? ''M502,456 L533.5,456 L533.5,129'' :
                         ''M533.5,129 V456 H502'''
-                      dur: '=Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 30 ? ''17.93s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState)
-                        || 0)) < 45 ? ''10.24s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0))
-                        < 60 ? ''7.17s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 75 ?
+                      dur: '=Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 21 ? ''17.93s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState)
+                        || 0)) < 34 ? ''10.24s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0))
+                        < 48 ? ''7.17s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 61 ?
                         ''5.52s'' : (''4.48s''))))'
                       repeatCount: indefinite
                       calcMode: linear
@@ -767,9 +767,9 @@ slots:
                     config:
                       path: '=items[props.heatpumpDefrostOperaton].state === ''ON'' ? ''M502,456 L533.5,456 L533.5,129'' :
                         ''M533.5,129 V456 H502'''
-                      dur: '=Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 30 ? ''17.93s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState)
-                        || 0)) < 45 ? ''10.24s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0))
-                        < 60 ? ''7.17s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 75 ?
+                      dur: '=Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 21 ? ''17.93s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState)
+                        || 0)) < 34 ? ''10.24s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0))
+                        < 48 ? ''7.17s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 61 ?
                         ''5.52s'' : (''4.48s''))))'
                       repeatCount: indefinite
                       calcMode: linear
@@ -788,9 +788,9 @@ slots:
                     config:
                       path: '=items[props.heatpumpDefrostOperaton].state === ''ON'' ? ''M502,456 L533.5,456 L533.5,129'' :
                         ''M533.5,129 V456 H502'''
-                      dur: '=Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 30 ? ''17.93s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState)
-                        || 0)) < 45 ? ''10.24s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0))
-                        < 60 ? ''7.17s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 75 ?
+                      dur: '=Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 21 ? ''17.93s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState)
+                        || 0)) < 34 ? ''10.24s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0))
+                        < 48 ? ''7.17s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 61 ?
                         ''5.52s'' : (''4.48s''))))'
                       repeatCount: indefinite
                       calcMode: linear
@@ -809,9 +809,9 @@ slots:
                     config:
                       path: '=items[props.heatpumpDefrostOperaton].state === ''ON'' ? ''M502,456 L533.5,456 L533.5,129'' :
                         ''M533.5,129 V456 H502'''
-                      dur: '=Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 30 ? ''17.93s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState)
-                        || 0)) < 45 ? ''10.24s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0))
-                        < 60 ? ''7.17s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 75 ?
+                      dur: '=Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 21 ? ''17.93s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState)
+                        || 0)) < 34 ? ''10.24s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0))
+                        < 48 ? ''7.17s'' : (Math.abs((Number(items[props.heatpumpInvFrequency].numericState) || 0)) < 61 ?
                         ''5.52s'' : (''4.48s''))))'
                       repeatCount: indefinite
                       calcMode: linear
