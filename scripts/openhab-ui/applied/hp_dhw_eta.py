@@ -123,10 +123,12 @@ if (minutes !== null) {
 RULE = {
     "uid": "heatpump_dhw_eta",
     "name": "Wärmepumpe Warmwasser fertig um",
-    "description": "Schätzt jede Minute, wann die Warmwasser-Ladung fertig ist (heatpump_dhw_eta): mit Verdichter aus "
-                   "Anstieg und Wärmeleistung der letzten 5 Minuten bis 55 °C, darüber und mit dem Heizstab allein "
-                   "entlang seiner steiler werdenden Kurve (Anstieg der letzten 3 Minuten); für den Bogen der "
-                   "Wärmepumpe im Energiefluss und in Heizung & Warmwasser.",
+    "description": "Schätzt jede Minute, wann die Warmwasser-Ladung fertig ist (heatpump_dhw_eta), für den Bogen der "
+                   "Wärmepumpe im Energiefluss und in Heizung & Warmwasser: mit dem Verdichter nach den ersten 5 "
+                   "Minuten aus Anstieg und Wärmeleistung der letzten 5 Minuten bis 55 °C, darüber 7 Minuten je "
+                   "Kelvin für die Zusatzheizung im Speicher; mit der Zusatzheizung allein entlang ihrer steiler "
+                   "werdenden Kurve (Anstieg der letzten 3 Minuten). Bei Smart Grid 3 gilt 60 °C als Ziel; während "
+                   "eines Abtauens rückt die Zeit mit der Uhr weiter.",
     "tags": [],
     "triggers": [{"type": "core.ItemStateChangeTrigger", "configuration": {"itemName": n}}
                  for n in ("espaltherma_3way_valve_mode", "heatpump_dhw_since", "espaltherma_dhw_setpoint",
