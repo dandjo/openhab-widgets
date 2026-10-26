@@ -5,7 +5,8 @@ which the rule skoda_enyaq_status (skoda_enyaq.js next to this file) fills every
 drives, otherwise every 15 (20 requests an hour per vehicle). A read does not wake the car: the values are what it
 last reported, skoda_enyaq_updated says when. Four items take commands to the car (user, same day): the charge target
 skoda_enyaq_charge_target (Ladeziel, the value set in the car that it charges to, 50 to 100 % in steps of 10; the
-read-only skoda_enyaq_battery_care_target is what Škoda sets it back to after the next charge with battery care on),
+target holds with battery care on too; the read-only skoda_enyaq_battery_care_target is that mode's value as the API
+reports it),
 skoda_enyaq_charging (ON starts, OFF stops a charge),
 skoda_enyaq_climate (ON starts, OFF stops the air conditioning) and its target temperature skoda_enyaq_climate_target
 (LO = 15.5 °C, 16 to 29.5 °C in steps of 0.5, HI = 30 °C as the app offers them, sent with the start); the same rule sends them, without autoupdate, so their state

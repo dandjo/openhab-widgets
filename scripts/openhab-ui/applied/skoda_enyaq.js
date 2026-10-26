@@ -187,8 +187,8 @@ function applyCharging(charging) {
     }
   }
   postTime('target_reached_at', reached);
-  // the charge target (Ladeziel) is the value set in the car, the one it charges to; with battery care on, Škoda sets
-  // it back to the battery care target (80 %) after the next charge (user, 2026-10-25)
+  // the charge target (Ladeziel) is the value set in the car, the one it charges to, with battery care on too (user,
+  // 2026-10-26: a 50 % target stayed 50 %); the battery care target is that mode's value as the API reports it
   post('battery_care', onOff(settings.chargingCareMode, 'ACTIVATED', 'DEACTIVATED'));
   postQuantity('charge_target', settings.targetStateOfChargeInPercent, '%');
   postQuantity('battery_care_target', settings.batteryCareModeTargetValueInPercent, '%');

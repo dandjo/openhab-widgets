@@ -8977,13 +8977,13 @@ def e_car_now():
                 picture=icon)
     # the mark at the charge target, the value set in the car that it charges to (user, 2026-10-25); under the bar on
     # the left, while it charges, when it reaches the target ("fertig ca.", user: shorter than "Ladeziel erreicht"), on
-    # the right the target and, with battery care on and another battery care target, what Škoda sets it back to after
-    # the next charge
+    # the right the target and, while battery care is on, "Care-Modus aktiv" (user, 2026-10-26: the target stays as set
+    # with battery care on, a 50 % target stayed 50 %)
     target, reached_at = skoda("charge_target"), skoda("target_reached_at")
     charge = target_bar(vt_clamp(num(soc)), target, ECAR_COLOR,
                         f"={SKODA_CHARGING} && {ok(reached_at)} ? 'fertig ca. ' + {clock_of(reached_at)} : ''",
-                        f"='Ladeziel ' + {disp(target)} + ({E_CAR_CARE_LATER} ? ' · danach ' + "
-                        f"{disp(skoda('battery_care_target'))} : '')")
+                        f"='Ladeziel ' + {disp(target)} + (items.{skoda('battery_care')}.state === 'ON' ? "
+                        f"' · Care-Modus aktiv' : '')")
     # the locks, and below them what stands open; the lights only while on
     locked = skoda("locked")
     lock_text = (f"(items.{locked}.state === 'ON' ? 'Verriegelt' : items.{locked}.state === 'OFF' ? 'Entriegelt' : "
@@ -9018,12 +9018,6 @@ def e_car_now():
                         vtile("Ladekabel", skoda("plug"), color=ECAR_COLOR),
                         vtile("Ladestecker", skoda("plug_locked"), color=ECAR_COLOR)]), 200)
     return [head, charge, tiles]
-
-
-# battery care on with a battery care target other than the charge target: after the next charge Škoda sets the charge
-# target back to it (user, 2026-10-25), so the pages say what comes after
-E_CAR_CARE_LATER = (f"(items.skoda_enyaq_battery_care.state === 'ON' && {ok('skoda_enyaq_battery_care_target')} && "
-                    f"{num('skoda_enyaq_battery_care_target')} !== {num('skoda_enyaq_charge_target')})")
 
 
 def climate_degrees(item):
