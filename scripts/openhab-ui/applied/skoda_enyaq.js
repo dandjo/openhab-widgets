@@ -353,9 +353,10 @@ function poll(force) {
     }
     store.remove('keyAlarm');
     setApiStatus('OK');
+    const previous = tripPrevious();
     apply(body.vehicle || {});
     try {
-      trackTrips(body.vehicle || {}, Date.now());
+      trackTrips(body.vehicle || {}, previous, Date.now());
     } catch (e) {
       console.warn(`Škoda: Fahrten: ${e}`);
     }
@@ -381,16 +382,18 @@ function poll(force) {
 }
 
 // ---- trips (user, 2026-10-26): the API keeps no trips, so the rule finds them in what it reads, as the MyŠkoda app's
-// Reiseverlauf lists them. A trip runs from a parked place to the next: its distance from the odometer, its end from
-// when the car reported the odometer at the new place, its start from the reads around the departure (so "ca.", off
-// by up to half a read interval), the charge from the charge before and after. Trips less than 2 hours apart are one
-// session, as in the app, and a charge away from home within a session is a charging stop. The history is in
-// TRIPS_FILE and the finding's state in TRIP_STATE_FILE: they hold addresses and positions, so neither is in the code.
-// An export from the app, imported by applied/skoda_trips.py, replaces the found trips of its span with the app's.
-// skoda_enyaq_trips holds the last TRIP_DAYS days for the location popup, by day, newest first.
-const TRIPS_DIR = '/var/lib/openhab/skoda';
-const TRIPS_FILE = TRIPS_DIR + '/trips.json';
-const TRIP_STATE_FILE = TRIPS_DIR + '/trip-state.json';
+// Reiseverlauf lists them. A trip runs from a parked place to the next: the place before a read is what the items
+// held before it (parking position, address, odometer, charge), so nothing is kept twice. Its end is when the car
+// reported the odometer at the new place, its start lies between the last read that saw it parked and the first that
+// saw it gone ("ca.", off by up to half a read interval). Trips less than 2 hours apart are one session, as in the
+// app, its places numbered in order for its map; a charge away from home after an arrival is a charging stop there.
+// skoda_enyaq_trip_state holds what the finding needs between reads (since when the car stands, an open session).
+// Finished sessions go to InfluxDB as one point each in TRIP_MEASUREMENT, with the fields of the app's export, which
+// applied/skoda_trips.py imports in place of the found trips of its span. No item may carry that name: the nightly
+// downsampler leaves only measurements without an item alone. skoda_enyaq_trips holds the last TRIP_DAYS days for
+// the location popup and each trip's popup, by day, newest first.
+const TRIP_MEASUREMENT = 'skoda_trips';
+const INFLUX = 'http://127.0.0.1:8086';
 const SESSION_GAP_MS = 2 * 3600000;  // trips closer than this are one session, as in the app
 const MOVED_METERS = 200;            // a parked place this far from the last one is a new one
 const BATTERY_KWH = 77;              // the Enyaq 80x's usable battery, for the energy a found trip took
@@ -399,38 +402,6 @@ const WEEKDAYS = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
 const VIENNA_DISTRICTS = ['Innere Stadt', 'Leopoldstadt', 'Landstraße', 'Wieden', 'Margareten', 'Mariahilf', 'Neubau',
   'Josefstadt', 'Alsergrund', 'Favoriten', 'Simmering', 'Meidling', 'Hietzing', 'Penzing', 'Rudolfsheim-Fünfhaus',
   'Ottakring', 'Hernals', 'Währing', 'Döbling', 'Brigittenau', 'Floridsdorf', 'Donaustadt', 'Liesing'];
-
-function readJson(path, fallback) {
-  try {
-    const Files = Java.type('java.nio.file.Files');
-    const Paths = Java.type('java.nio.file.Paths');
-    return JSON.parse(String(Files.readString(Paths.get(path))));
-  } catch (e) {
-    return fallback;
-  }
-}
-
-// written beside the file and moved over it, readable by openHAB's group only
-function writeJson(path, value) {
-  const Files = Java.type('java.nio.file.Files');
-  const Paths = Java.type('java.nio.file.Paths');
-  const StandardCopyOption = Java.type('java.nio.file.StandardCopyOption');
-  const PosixFilePermissions = Java.type('java.nio.file.attribute.PosixFilePermissions');
-  const temp = Paths.get(path + '.tmp');
-  Files.writeString(temp, JSON.stringify(value));
-  Files.setPosixFilePermissions(temp, PosixFilePermissions.fromString('rw-r-----'));
-  Files.move(temp, Paths.get(path), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
-}
-
-function modified(path) {
-  try {
-    const Files = Java.type('java.nio.file.Files');
-    const Paths = Java.type('java.nio.file.Paths');
-    return Number(Files.getLastModifiedTime(Paths.get(path)).toMillis());
-  } catch (e) {
-    return 0;
-  }
-}
 
 // a point in time in the local zone: its day, its clock and its weekday
 function local(ms) {
@@ -470,6 +441,16 @@ function atHome(pos) {
   return home.distanceFrom(new PointType(`${pos[0]},${pos[1]}`)).doubleValue() <= HOME_RADIUS_METERS;
 }
 
+// where the car stood before this read, as the items held it: read before the read is applied to them
+function tripPrevious() {
+  const pos = String(state('parking_position')).split(',').slice(0, 2).map(Number);
+  const odo = items.getItem(P + 'odometer').numericState;
+  const soc = items.getItem(P + 'soc').numericState;
+  const address = state('parking_address');
+  return { pos: pos.length === 2 && pos.every(Number.isFinite) ? pos : null, odo: typeof odo === 'number' ? odo : null,
+    soc: typeof soc === 'number' ? soc : null, address: ['NULL', 'UNDEF'].includes(address) ? null : address };
+}
+
 // what a read says about where the car is
 function tripReading(vehicle) {
   const parking = vehicle.parkingPosition || {};
@@ -487,116 +468,166 @@ function tripReading(vehicle) {
     charging: status.state === 'CHARGING' };
 }
 
-// a finished session as the history keeps it, in the fields of the app's export
+function tripState() {
+  try {
+    const s = JSON.parse(state('trip_state'));
+    return s !== null && typeof s === 'object' ? s : {};
+  } catch (e) {
+    return {};
+  }
+}
+
+// a session as a trip in the export's fields; its places as [latitude, longitude, time, address, charge gained there]
 function sessionTrip(session) {
-  const gained = session.gained + (session.chargeFrom !== undefined && session.chargeFrom !== null &&
-    session.socNow !== null ? Math.max(0, session.socNow - session.chargeFrom) : 0);
-  const used = session.socStart !== null && session.socEnd !== null ? session.socStart - session.socEnd + gained : null;
-  return { start: new Date(session.start).toISOString(), end: new Date(session.end).toISOString(), approx: true,
-    source: 'auto', from: session.from.address, to: session.to.address, fromPos: session.from.pos,
-    toPos: session.to.pos, km: session.odoEnd - session.odoStart, odoStart: session.odoStart,
-    odoEnd: session.odoEnd, travel: Math.round((session.end - session.start) / 60000), socStart: session.socStart,
-    socEnd: session.socEnd, stops: session.stops, gained,
-    kwh: used === null ? null : Math.round(Math.max(0, used) * BATTERY_KWH) / 100 };
+  const open = session.chargeFrom !== undefined && session.chargeFrom !== null && session.socNow !== null
+    ? Math.max(0, session.socNow - session.chargeFrom) : 0;
+  const gained = session.gained + open;
+  const used = session.socStart !== null && session.socEnd !== null && session.socEnd !== undefined
+    ? session.socStart - session.socEnd + gained : null;
+  const points = session.points.map((p, i) => i === session.points.length - 1 && open > 0
+    ? [p[0], p[1], p[2], p[3], p[4] + open] : p);
+  return { time: session.start, source: 'auto', end: session.end === undefined ? null : session.end, approx: true,
+    from: points[0][3], to: session.end === undefined ? null : points[points.length - 1][3],
+    km: session.odoEnd === undefined ? null : session.odoEnd - session.odoStart, odoStart: session.odoStart,
+    odoEnd: session.odoEnd === undefined ? null : session.odoEnd,
+    travel: session.end === undefined ? null : Math.round((session.end - session.start) / 60000),
+    socStart: session.socStart, socEnd: session.socEnd === undefined ? null : session.socEnd, stops: session.stops,
+    gained, kwh: used === null ? null : Math.round(Math.max(0, used) * BATTERY_KWH) / 100,
+    points: JSON.stringify(points) };
+}
+
+// one point of InfluxDB's line protocol at the trip's start, in ms: numbers as floats, texts quoted
+function tripLine(trip) {
+  const fields = Object.entries(trip).filter(([k, v]) => !['time', 'source'].includes(k) && v !== null &&
+    v !== undefined && !(typeof v === 'number' && !Number.isFinite(v)))
+    .map(([k, v]) => typeof v === 'string' ? `${k}="${v.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"` : `${k}=${v}`);
+  return `${TRIP_MEASUREMENT},source=${trip.source} ${fields.join(',')} ${trip.time}`;
+}
+
+function influxWrite(line) {
+  const answer = actions.HTTP.sendHttpPostRequest(`${INFLUX}/write?db=openhab&precision=ms`, 'text/plain', line, 10000);
+  return answer !== null && answer !== undefined && String(answer).indexOf('"error"') < 0;
 }
 
 // after a read: a departure opens a session (or a leg of the open one), an arrival closes the leg; 2 hours after the
-// last arrival without a new departure the session goes into the history
-function trackTrips(vehicle, now) {
+// last arrival without a new departure the session goes to InfluxDB (kept open while InfluxDB does not take it)
+function trackTrips(vehicle, prev, now) {
   const r = tripReading(vehicle);
   if (r.odo === null || (!r.parked && !r.moving)) {
     return;
   }
-  const s = readJson(TRIP_STATE_FILE, {});
-  const before = JSON.stringify(s);
+  const s = tripState();
   const finish = () => {
-    const history = readJson(TRIPS_FILE, { trips: [] });
-    history.trips.push(sessionTrip(s.session));
-    history.trips.sort((a, b) => Date.parse(a.start) - Date.parse(b.start));
-    writeJson(TRIPS_FILE, history);
-    console.info(`Škoda: Fahrt gespeichert, ${s.session.odoEnd - s.session.odoStart} km`);
-    delete s.session;
-  };
-  if (!s.park) {
-    if (r.parked) {
-      s.park = { at: now, seen: now, pos: r.pos, address: r.address, odo: r.odo, soc: r.soc };
-    }
-  } else {
-    const left = r.odo > s.park.odo || r.moving || (r.parked && metersBetween(s.park.pos, r.pos) > MOVED_METERS);
-    if (!left) {
-      // still where it stood: a charge away from home after an arrival of the open session is a charging stop
-      const sess = s.session;
-      if (sess && sess.end !== undefined && !sess.departing && r.soc !== null) {
-        if (r.charging && !atHome(r.pos) && (sess.chargeFrom === undefined || sess.chargeFrom === null)) {
-          sess.chargeFrom = s.park.soc !== null ? s.park.soc : r.soc;
-          sess.stops += 1;
-        } else if (!r.charging && sess.chargeFrom !== undefined && sess.chargeFrom !== null) {
-          sess.gained += Math.max(0, r.soc - sess.chargeFrom);
-          sess.chargeFrom = null;
-        }
-        sess.socNow = r.soc;
-      }
-      s.park.seen = now;
-      if (r.soc !== null) {
-        s.park.soc = r.soc;
-      }
+    if (influxWrite(tripLine(sessionTrip(s.session)))) {
+      console.info(`Škoda: Fahrt gespeichert, ${s.session.odoEnd - s.session.odoStart} km`);
+      delete s.session;
     } else {
-      // left: a session whose last arrival lies 2 hours or more before the car was last seen there is over
-      if (s.session && s.session.end !== undefined && !s.session.departing &&
-          s.park.seen - s.session.end >= SESSION_GAP_MS) {
-        finish();
-      }
-      if (!s.session) {
-        s.session = { start: null, from: { pos: s.park.pos, address: s.park.address }, odoStart: s.park.odo,
-          socStart: s.park.soc, stops: 0, gained: 0 };
-      }
-      const sess = s.session;
-      if (sess.chargeFrom !== undefined && sess.chargeFrom !== null) {
-        sess.gained += Math.max(0, (s.park.soc !== null ? s.park.soc : sess.chargeFrom) - sess.chargeFrom);
+      console.warn('Škoda: Fahrt nicht in InfluxDB geschrieben, nächster Versuch beim nächsten Lesen');
+    }
+  };
+  if (prev.pos === null || prev.odo === null) {
+    // nothing known of the place before: it starts here
+    if (r.parked) {
+      s.seen = now;
+    }
+  } else if (!(r.odo > prev.odo || r.moving || (r.parked && metersBetween(prev.pos, r.pos) > MOVED_METERS))) {
+    // still where it stood: a charge away from home after an arrival of the open session is a charging stop there
+    const sess = s.session;
+    if (sess && sess.end !== undefined && !sess.departing && r.soc !== null) {
+      const last = sess.points[sess.points.length - 1];
+      if (r.charging && !atHome(r.pos) && (sess.chargeFrom === undefined || sess.chargeFrom === null)) {
+        sess.chargeFrom = prev.soc !== null ? prev.soc : r.soc;
+        sess.stops += 1;
+      } else if (!r.charging && sess.chargeFrom !== undefined && sess.chargeFrom !== null) {
+        const gain = Math.max(0, r.soc - sess.chargeFrom);
+        sess.gained += gain;
+        last[4] += gain;
         sess.chargeFrom = null;
       }
-      // the departure lies between the last read that saw it parked and the first that saw it gone
-      if (!sess.departing) {
-        sess.departing = { after: s.park.seen, by: now };
+      sess.socNow = r.soc;
+    }
+    s.seen = now;
+  } else {
+    // gone: a session whose last arrival lies 2 hours or more before the car was last seen there is over
+    if (s.session && s.session.end !== undefined && !s.session.departing &&
+        (s.seen || now) - s.session.end >= SESSION_GAP_MS) {
+      finish();
+    }
+    if (!s.session) {
+      s.session = { start: null, odoStart: prev.odo, socStart: prev.soc, stops: 0, gained: 0,
+        points: [[prev.pos[0], prev.pos[1], null, prev.address, 0]] };
+    }
+    const sess = s.session;
+    if (sess.chargeFrom !== undefined && sess.chargeFrom !== null) {
+      const gain = Math.max(0, (prev.soc !== null ? prev.soc : sess.chargeFrom) - sess.chargeFrom);
+      sess.gained += gain;
+      sess.points[sess.points.length - 1][4] += gain;
+      sess.chargeFrom = null;
+    }
+    // the departure lies between the last read that saw it parked and the first that saw it gone
+    if (!sess.departing) {
+      sess.departing = { after: s.seen || now, by: now };
+    }
+    if (r.parked) {
+      const arrived = Number.isNaN(r.odoAt) ? now : Math.min(now, Math.max(r.odoAt, sess.departing.after));
+      if (sess.start === null) {
+        const by = Math.min(sess.departing.by, arrived);
+        sess.start = Math.round(sess.departing.after + (by - sess.departing.after) / 2);
+        sess.points[0][2] = sess.start;
       }
-      if (r.parked) {
-        const arrived = Number.isNaN(r.odoAt) ? now : Math.min(now, Math.max(r.odoAt, sess.departing.after));
-        if (sess.start === null) {
-          const by = Math.min(sess.departing.by, arrived);
-          sess.start = Math.round(sess.departing.after + (by - sess.departing.after) / 2);
-        }
-        Object.assign(sess, { end: arrived, to: { pos: r.pos, address: r.address }, odoEnd: r.odo, socEnd: r.soc,
-          socNow: r.soc });
-        delete sess.departing;
-        s.park = { at: arrived, seen: now, pos: r.pos, address: r.address, odo: r.odo, soc: r.soc };
-      } else if (sess.start === null) {
-        sess.start = Math.round(sess.departing.after + (now - sess.departing.after) / 2);
-      }
+      sess.points.push([r.pos[0], r.pos[1], arrived, r.address, 0]);
+      Object.assign(sess, { end: arrived, odoEnd: r.odo, socEnd: r.soc, socNow: r.soc });
+      delete sess.departing;
+      s.seen = now;
+    } else if (sess.start === null) {
+      sess.start = Math.round(sess.departing.after + (now - sess.departing.after) / 2);
+      sess.points[0][2] = sess.start;
     }
   }
   if (s.session && s.session.end !== undefined && !s.session.departing && now - s.session.end >= SESSION_GAP_MS) {
     finish();
   }
-  if (JSON.stringify(s) !== before) {
-    writeJson(TRIP_STATE_FILE, s);
-  }
+  post('trip_state', JSON.stringify(s));
 }
 
-// the last TRIP_DAYS days for the popup: days newest first with their km and a mark on the first of each month, each
-// day's trips newest first, the open session (on the way, or arrived less than 2 hours ago) among them
-function tripWindow(history, session, now) {
-  const from = local(now - TRIP_DAYS * 86400000).day;
-  const trips = history.filter((t) => local(Date.parse(t.start)).day > from);
-  if (session && session.start !== null && session.start !== undefined) {
-    const open = session.end !== undefined && !session.departing ? sessionTrip(session) :
-      { start: new Date(session.start).toISOString(), end: null, approx: true, from: session.from.address,
-        km: null, socStart: session.socStart, stops: session.stops, gained: session.gained };
-    trips.push(open);
+// the trips of the last days from InfluxDB, as records of the export's fields, or null while it does not answer
+function influxTrips(days) {
+  const q = `SELECT * FROM ${TRIP_MEASUREMENT} WHERE time > now() - ${days}d`;
+  const body = actions.HTTP.sendHttpGetRequest(`${INFLUX}/query?db=openhab&epoch=ms&q=${encodeURIComponent(q)}`,
+    10000);
+  if (!body) {
+    return null;
   }
+  const result = (JSON.parse(body).results || [])[0] || {};
+  if (result.error) {
+    return null;
+  }
+  const series = (result.series || [])[0];
+  return series ? series.values.map((v) => {
+    const rec = {};
+    series.columns.forEach((c, i) => { rec[c] = v[i]; });
+    return rec;
+  }) : [];
+}
+
+// the last TRIP_DAYS days for the popups: days newest first with their km and a mark on the first of each month, each
+// day's trips newest first with what the list shows and what a trip's popup shows, the open session among them
+function tripWindow(records, session, now) {
+  const from = local(now - TRIP_DAYS * 86400000).day;
+  const trips = records.filter((t) => local(t.time).day > from);
+  if (session && session.start !== null && session.start !== undefined) {
+    trips.push(sessionTrip(session));
+  }
+  const num = (v, digits) => typeof v === 'number' && Number.isFinite(v) ? Math.round(v * 10 ** digits) / 10 ** digits
+    : null;
   const days = [];
-  trips.sort((a, b) => Date.parse(b.start) - Date.parse(a.start)).forEach((t) => {
-    const start = local(Date.parse(t.start));
-    const end = t.end ? local(Date.parse(t.end)) : null;
+  trips.sort((a, b) => b.time - a.time).forEach((t) => {
+    const start = local(t.time);
+    const end = t.end ? local(t.end) : null;
+    const when = (ms) => {
+      const l = local(ms);
+      return l.day === start.day ? l.hm : `${WEEKDAYS[l.wd]} ${l.hm}`;
+    };
     let day = days.length > 0 && days[days.length - 1].d === start.day ? days[days.length - 1] : null;
     if (day === null) {
       day = { d: start.day, km: 0, t: [] };
@@ -605,25 +636,31 @@ function tripWindow(history, session, now) {
       }
       days.push(day);
     }
-    day.km += typeof t.km === 'number' ? t.km : 0;
-    day.t.push({ s: start.hm, e: end === null ? null : end.day === start.day ? end.hm : `${WEEKDAYS[end.wd]} ${end.hm}`,
-      x: t.approx ? 1 : 0, a: shortAddress(t.from), b: t.to ? shortAddress(t.to) : '', km: t.km,
-      kwh: typeof t.kwh === 'number' ? Math.round(t.kwh * 10) / 10 : null, s0: t.socStart, s1: t.socEnd,
-      c: t.stops || 0, g: t.gained || 0 });
+    day.km += num(t.km, 0) || 0;
+    let points = [];
+    try {
+      points = JSON.parse(t.points || '[]');
+    } catch (e) {
+      points = [];
+    }
+    day.t.push({ id: t.time, s: start.hm, e: end === null ? null : when(t.end), x: t.approx ? 1 : 0,
+      a: shortAddress(t.from), b: t.to ? shortAddress(t.to) : '', km: num(t.km, 0), kwh: num(t.kwh, 1),
+      s0: num(t.socStart, 0), s1: num(t.socEnd, 0), c: num(t.stops, 0) || 0, g: num(t.gained, 0) || 0,
+      dr: num(t.drive, 0), tr: num(t.travel, 0), sp: num(t.speed, 0), k1: num(t.kwh100, 1), o0: num(t.odoStart, 0),
+      o1: num(t.odoEnd, 0),
+      p: points.map((p) => [num(p[0], 6), num(p[1], 6), typeof p[2] === 'number' ? when(p[2]) : '', shortAddress(p[3]),
+        num(p[4], 0) || 0]) });
   });
   return days;
 }
 
-// the popup's trips, rebuilt when the history or the state changed (an import, a trip) or a day began
+// the popups' trips from InfluxDB and the open session, on every run (a light query); unchanged while InfluxDB is away
 function publishTrips() {
-  const stamp = `${modified(TRIPS_FILE)}/${modified(TRIP_STATE_FILE)}/${local(Date.now()).day}`;
-  if (store.get('tripsStamp') === stamp && !['NULL', 'UNDEF'].includes(state('trips'))) {
+  const records = influxTrips(TRIP_DAYS + 1);
+  if (records === null) {
     return;
   }
-  const history = readJson(TRIPS_FILE, { trips: [] });
-  const s = readJson(TRIP_STATE_FILE, {});
-  post('trips', JSON.stringify(tripWindow(history.trips || [], s.session || null, Date.now())));
-  store.put('tripsStamp', stamp);
+  post('trips', JSON.stringify(tripWindow(records, tripState().session || null, Date.now())));
 }
 
 // ---- commands

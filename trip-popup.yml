@@ -1,0 +1,561 @@
+uid: trip-popup
+tags:
+- popup
+props:
+  parameters:
+  - name: trips
+    label: Trips
+    description: The String item holding trips by day as JSON (rule skoda_enyaq_status)
+    type: TEXT
+    required: true
+    context: item
+  - name: id
+    label: Trip
+    description: The trip's id, its start in ms
+    type: TEXT
+    required: true
+  - name: color
+    label: Colour
+    description: 'Colour of the map''s places and line as #rrggbb'
+    type: TEXT
+    required: false
+    default: '#26a69a'
+  parameterGroups: []
+timestamp: Oct 26, 2026, 10:07:37 PM
+component: div
+config:
+  style:
+    padding: 8px 6px
+  stylesheet: '@keyframes a-soft { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.06; } }
+
+    @keyframes a-full { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+
+    @keyframes a-arc { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
+
+    @keyframes a-halo { 0%, 100% { opacity: 0; } 50% { opacity: 1; } }
+
+    @keyframes a-halo-arc { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+    @keyframes a-fade { 0%, 100% { opacity: 0; } 50% { opacity: 1; } }
+
+    @keyframes a-glow { 0%, 100% { opacity: 0.35; } 50% { opacity: 1; } }
+
+    @keyframes a-blink-up { 0%, 100% { opacity: 0.2; } 50% { opacity: 1; } }
+
+    @keyframes a-blink-down { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
+
+    @keyframes a-flicker-a { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
+
+    @keyframes a-flicker-b { 0%, 100% { opacity: 0.25; } 50% { opacity: 1; } }
+
+    @keyframes a-flicker-c { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+    @keyframes a-bolt { 0%, 66.7%, 100% { opacity: 1; } 33.3% { opacity: 0.35; } }
+
+    @keyframes a-breathe { 0%, 100% { transform: scale(0.82); } 50% { transform: scale(1.05); } }
+
+    @keyframes a-spin { to { transform: rotate(360deg); } }
+
+    @keyframes a-wobble { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(3px); } }
+
+    @keyframes a-rise { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+
+    @keyframes a-fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+    @keyframes a-ripple { from { transform: scale(1); opacity: 0.7; } to { transform: scale(var(--grow)); opacity: 0; } }
+
+    @keyframes a-run { from { transform: translate(var(--ax), var(--ay)); } to { transform: translate(var(--bx), var(--by));
+    } }
+
+    @keyframes a-drop { 0% { transform: translate(0, 0); opacity: 0; } 25% { opacity: 1; } 75% { opacity: 1; } 100% { transform:
+    translate(-2px, 6px); opacity: 0; } }
+
+    @keyframes a-bubble-l { 0% { transform: translate(0.00px, 0.00px) scale(1.00); opacity: 0; } 15% { opacity: 0.9; } 25%
+    { transform: translate(0.42px, -5.84px) scale(1.33); } 50% { transform: translate(0.00px, -11.50px) scale(1.67); } 70%
+    { opacity: 0.9; } 75% { transform: translate(-0.42px, -17.16px) scale(2.00); } 100% { transform: translate(0.00px, -23.00px)
+    scale(2.33); opacity: 0; } }
+
+    @keyframes a-bubble-r { 0% { transform: translate(0.00px, 0.00px) scale(1.00); opacity: 0; } 15% { opacity: 0.9; } 25%
+    { transform: translate(-0.42px, -5.84px) scale(1.33); } 50% { transform: translate(0.00px, -11.50px) scale(1.67); } 70%
+    { opacity: 0.9; } 75% { transform: translate(0.42px, -17.16px) scale(2.00); } 100% { transform: translate(0.00px, -23.00px)
+    scale(2.33); opacity: 0; } }
+
+    .a-soft { animation: a-soft 2s linear infinite; }
+
+    .a-full { animation: a-full 2s linear infinite; }
+
+    .a-arc { animation: a-arc 2s linear infinite; }
+
+    .a-halo { animation: a-halo 2s linear infinite; }
+
+    .a-halo-arc { animation: a-halo-arc 2s linear infinite; }
+
+    .a-fade { animation: a-fade 2.4s linear infinite; }
+
+    .a-glow { animation: a-glow 2.4s linear infinite; }
+
+    .a-blink-up { animation: a-blink-up 1.8s ease-in-out infinite; }
+
+    .a-blink-down { animation: a-blink-down 1.8s ease-in-out infinite; }
+
+    .a-flicker-a { animation: a-flicker-a 0.9s linear infinite; }
+
+    .a-flicker-b { animation: a-flicker-b 1.3s linear infinite; }
+
+    .a-flicker-c { animation: a-flicker-c 2s linear infinite; }
+
+    .a-bolt { animation: a-bolt 1.8s linear infinite; }
+
+    .a-breathe { transform-box: fill-box; transform-origin: center; animation: a-breathe 2.4s ease-in-out infinite; }
+
+    .a-spin { transform-box: fill-box; transform-origin: center; animation: a-spin 1s linear infinite; }
+
+    .a-wobble { animation: a-wobble 2s linear infinite; }
+
+    .a-rise { animation: a-rise 1s linear infinite; }
+
+    .a-fill { transform-box: fill-box; transform-origin: left center; animation: a-fill 2.4s linear infinite; }
+
+    .a-ripple { transform-box: fill-box; transform-origin: center; animation: a-ripple 1.6s linear infinite; }
+
+    .a-run { animation: a-run 2.5s linear infinite; }
+
+    .a-drop { animation: a-drop 0.9s linear infinite; }
+
+    .a-bubble-l { transform-box: fill-box; transform-origin: center; animation: a-bubble-l 2.6s linear infinite; }
+
+    .a-bubble-r { transform-box: fill-box; transform-origin: center; animation: a-bubble-r 2.6s linear infinite; }
+
+    '
+slots:
+  default:
+  - component: div
+    config:
+      style:
+        padding: 6px 10px 10px
+    slots:
+      default:
+      - component: Label
+        config:
+          text: =((d) => (['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'])[d.day()] + ', '
+            + d.date() + '. ' + (['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October',
+            'November', 'December'])[d.month()])(dayjs(Number(props.id)))
+          style:
+            font-size: 20px
+            font-weight: '700'
+      - component: Label
+        config:
+          text: '=(((((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) => t.id ===
+            Number(props.id)) || {})(props.trips ? items[props.trips].state : '''')).x ? ''approx. '' : '''') + ((((s) =>
+            ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) => t.id === Number(props.id))
+            || {})(props.trips ? items[props.trips].state : '''')).s || '''') + ((((s) => ((s || '''').charAt(0) === ''[''
+            ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) => t.id === Number(props.id)) || {})(props.trips ? items[props.trips].state
+            : '''')).e ? '' – '' + (((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t)
+            => t.id === Number(props.id)) || {})(props.trips ? items[props.trips].state : '''')).e : '' · on the way''))'
+          style:
+            font-size: 14px
+            opacity: '0.65'
+  - component: oh-card
+    config:
+      title: ''
+      style:
+        height: calc(100% - 2 * var(--f7-card-margin-vertical))
+    slots:
+      content:
+      - component: div
+        config:
+          style:
+            padding: 12px
+        slots:
+          default:
+          - component: oh-webframe
+            config:
+              src: '=''/static/trip-map.html?v=92adbbdb&p='' + ((((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s)
+                : []).flatMap((d) => d.t).find((t) => t.id === Number(props.id)) || {})(props.trips ? items[props.trips].state
+                : '''')).p || []).map((q) => q[0] + '','' + q[1] + '','' + (q[4] > 0 ? 1 : 0)).join('';'') + ''&col='' + ((props.color
+                || ''#26a69a'').replace(''#'', '''')) + ''&dark='' + (themeOptions.dark === ''dark'' ? 1 : 0)'
+              height: 320px
+              frameborder: '0'
+              scrolling: 'no'
+              style:
+                width: 100%
+                border: '0'
+                display: block
+                border-radius: 8px
+          - component: div
+            config:
+              style:
+                padding: 8px 2px 0
+            slots:
+              default:
+              - component: oh-repeater
+                config:
+                  for: pt
+                  sourceType: array
+                  in: '=(((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) => t.id
+                    === Number(props.id)) || {})(props.trips ? items[props.trips].state : '''')).p || []'
+                  fragment: true
+                slots:
+                  default:
+                  - component: div
+                    config:
+                      style:
+                        display: flex
+                        align-items: center
+                        gap: 10px
+                        padding: 6px 2px
+                        font-size: 14px
+                    slots:
+                      default:
+                      - component: Label
+                        config:
+                          text: =loop.pt_idx + 1
+                          style:
+                            flex: 0 0 auto
+                            width: 24px
+                            height: 24px
+                            line-height: 24px
+                            border-radius: 50%
+                            text-align: center
+                            font-size: 12px
+                            font-weight: '700'
+                            color: '#fff'
+                            background: =props.color || '#26a69a'
+                      - component: Label
+                        config:
+                          text: =loop.pt[2]
+                          style:
+                            flex: 0 0 auto
+                            min-width: 44px
+                            font-weight: '600'
+                      - component: Label
+                        config:
+                          text: =loop.pt[3] || 'Stop'
+                          style:
+                            flex: '1'
+                            min-width: '0'
+                            overflow-wrap: anywhere
+                      - component: Label
+                        config:
+                          text: '=loop.pt[4] > 0 ? ''⚡ +'' + loop.pt[4] + '' %'' : '''''
+                          style:
+                            flex: 0 0 auto
+                            font-size: 11px
+                            opacity: '0.65'
+  - component: oh-card
+    config:
+      title: Overview
+      style:
+        height: calc(100% - 2 * var(--f7-card-margin-vertical))
+    slots:
+      content:
+      - component: div
+        config:
+          style:
+            padding: 0 14px 8px
+        slots:
+          default:
+          - component: Label
+            config:
+              text: '=((((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) => t.id
+                === Number(props.id)) || {})(props.trips ? items[props.trips].state : '''')).a || '''') + ((((s) => ((s ||
+                '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) => t.id === Number(props.id))
+                || {})(props.trips ? items[props.trips].state : '''')).b ? '' – '' + (((s) => ((s || '''').charAt(0) === ''[''
+                ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) => t.id === Number(props.id)) || {})(props.trips ? items[props.trips].state
+                : '''')).b : '''')'
+              style:
+                font-size: 17px
+                font-weight: '700'
+          - component: Label
+            config:
+              text: '=((m) => m == null ? ''–'' : (m >= 60 ? Math.floor(m / 60) + '' h '' : '''') + (m % 60) + '' min'')((((s)
+                => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) => t.id === Number(props.id))
+                || {})(props.trips ? items[props.trips].state : '''')).tr) + '' · '' + ((((s) => ((s || '''').charAt(0) ===
+                ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) => t.id === Number(props.id)) || {})(props.trips
+                ? items[props.trips].state : '''')).km == null ? ''–'' : (((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s)
+                : []).flatMap((d) => d.t).find((t) => t.id === Number(props.id)) || {})(props.trips ? items[props.trips].state
+                : '''')).km + '' km'')'
+              style:
+                font-size: 14px
+                opacity: '0.65'
+                padding: 2px 0 6px
+          - component: div
+            config:
+              style:
+                display: flex
+                justify-content: space-between
+                gap: 12px
+                padding: 11px 4px
+                border-bottom: 1px solid rgba(127, 127, 127, 0.2)
+                font-size: 15px
+            slots:
+              default:
+              - component: Label
+                config:
+                  text: Total consumption
+              - component: Label
+                config:
+                  text: '=(((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) =>
+                    t.id === Number(props.id)) || {})(props.trips ? items[props.trips].state : '''')).kwh == null ? ''–''
+                    : ''~ '' + ((((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t)
+                    => t.id === Number(props.id)) || {})(props.trips ? items[props.trips].state : '''')).kwh).toFixed(1) +
+                    '' kWh'''
+                  style:
+                    font-weight: '700'
+                    text-align: right
+                    white-space: nowrap
+          - component: div
+            config:
+              style:
+                display: flex
+                justify-content: space-between
+                gap: 12px
+                padding: 11px 4px
+                border-bottom: 1px solid rgba(127, 127, 127, 0.2)
+                font-size: 15px
+            slots:
+              default:
+              - component: Label
+                config:
+                  text: Avg. consumption
+              - component: Label
+                config:
+                  text: '=((((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) =>
+                    t.id === Number(props.id)) || {})(props.trips ? items[props.trips].state : '''')).k1 != null ? ''~ ''
+                    + ((((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) => t.id
+                    === Number(props.id)) || {})(props.trips ? items[props.trips].state : '''')).k1).toFixed(1) + '' kWh/100
+                    km'' : (((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) =>
+                    t.id === Number(props.id)) || {})(props.trips ? items[props.trips].state : '''')).kwh != null && (((s)
+                    => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) => t.id === Number(props.id))
+                    || {})(props.trips ? items[props.trips].state : '''')).km > 0 ? ''~ '' + ((((s) => ((s || '''').charAt(0)
+                    === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) => t.id === Number(props.id)) || {})(props.trips
+                    ? items[props.trips].state : '''')).kwh / (((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) :
+                    []).flatMap((d) => d.t).find((t) => t.id === Number(props.id)) || {})(props.trips ? items[props.trips].state
+                    : '''')).km * 100).toFixed(1) + '' kWh/100 km'' : ''–'')'
+                  style:
+                    font-weight: '700'
+                    text-align: right
+                    white-space: nowrap
+          - component: div
+            config:
+              style:
+                display: flex
+                justify-content: space-between
+                gap: 12px
+                padding: 11px 4px
+                border-bottom: 1px solid rgba(127, 127, 127, 0.2)
+                font-size: 15px
+            slots:
+              default:
+              - component: Label
+                config:
+                  text: Distance
+              - component: Label
+                config:
+                  text: '=(((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) =>
+                    t.id === Number(props.id)) || {})(props.trips ? items[props.trips].state : '''')).km == null ? ''–'' :
+                    (((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) => t.id ===
+                    Number(props.id)) || {})(props.trips ? items[props.trips].state : '''')).km + '' km'''
+                  style:
+                    font-weight: '700'
+                    text-align: right
+                    white-space: nowrap
+          - component: div
+            config:
+              style:
+                display: flex
+                justify-content: space-between
+                gap: 12px
+                padding: 11px 4px
+                border-bottom: 1px solid rgba(127, 127, 127, 0.2)
+                font-size: 15px
+            slots:
+              default:
+              - component: Label
+                config:
+                  text: Driving time
+              - component: Label
+                config:
+                  text: '=((m) => m == null ? ''–'' : (m >= 60 ? Math.floor(m / 60) + '' h '' : '''') + (m % 60) + '' min'')((((s)
+                    => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) => t.id === Number(props.id))
+                    || {})(props.trips ? items[props.trips].state : '''')).dr)'
+                  style:
+                    font-weight: '700'
+                    text-align: right
+                    white-space: nowrap
+          - component: div
+            config:
+              style:
+                display: flex
+                justify-content: space-between
+                gap: 12px
+                padding: 11px 4px
+                border-bottom: 1px solid rgba(127, 127, 127, 0.2)
+                font-size: 15px
+            slots:
+              default:
+              - component: Label
+                config:
+                  text: Avg. speed
+              - component: Label
+                config:
+                  text: '=(((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) =>
+                    t.id === Number(props.id)) || {})(props.trips ? items[props.trips].state : '''')).sp == null ? ''–'' :
+                    ''~ '' + (((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t)
+                    => t.id === Number(props.id)) || {})(props.trips ? items[props.trips].state : '''')).sp + '' km/h'''
+                  style:
+                    font-weight: '700'
+                    text-align: right
+                    white-space: nowrap
+          - component: div
+            config:
+              style:
+                display: flex
+                justify-content: space-between
+                gap: 12px
+                padding: 11px 4px
+                border-bottom: 1px solid rgba(127, 127, 127, 0.2)
+                font-size: 15px
+              visible: '=(((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) => t.id
+                === Number(props.id)) || {})(props.trips ? items[props.trips].state : '''')).c > 0'
+            slots:
+              default:
+              - component: Label
+                config:
+                  text: charging stops
+              - component: Label
+                config:
+                  text: '=(((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) =>
+                    t.id === Number(props.id)) || {})(props.trips ? items[props.trips].state : '''')).c + ((((s) => ((s ||
+                    '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) => t.id === Number(props.id))
+                    || {})(props.trips ? items[props.trips].state : '''')).g > 0 ? '' (+'' + (((s) => ((s || '''').charAt(0)
+                    === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) => t.id === Number(props.id)) || {})(props.trips
+                    ? items[props.trips].state : '''')).g + '' %)'' : '''')'
+                  style:
+                    font-weight: '700'
+                    text-align: right
+                    white-space: nowrap
+  - component: oh-card
+    config:
+      title: Battery
+      style:
+        height: calc(100% - 2 * var(--f7-card-margin-vertical))
+    slots:
+      content:
+      - component: div
+        config:
+          style:
+            padding: 0 14px 8px
+        slots:
+          default:
+          - component: div
+            config:
+              style:
+                display: flex
+                justify-content: space-between
+                gap: 12px
+                padding: 11px 4px
+                border-bottom: 1px solid rgba(127, 127, 127, 0.2)
+                font-size: 15px
+            slots:
+              default:
+              - component: Label
+                config:
+                  text: Start
+              - component: Label
+                config:
+                  text: '=(((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) =>
+                    t.id === Number(props.id)) || {})(props.trips ? items[props.trips].state : '''')).s0 == null ? ''–'' :
+                    (((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) => t.id ===
+                    Number(props.id)) || {})(props.trips ? items[props.trips].state : '''')).s0 + '' %'''
+                  style:
+                    font-weight: '700'
+                    text-align: right
+                    white-space: nowrap
+          - component: div
+            config:
+              style:
+                display: flex
+                justify-content: space-between
+                gap: 12px
+                padding: 11px 4px
+                border-bottom: 1px solid rgba(127, 127, 127, 0.2)
+                font-size: 15px
+            slots:
+              default:
+              - component: Label
+                config:
+                  text: End
+              - component: Label
+                config:
+                  text: '=(((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) =>
+                    t.id === Number(props.id)) || {})(props.trips ? items[props.trips].state : '''')).s1 == null ? ''–'' :
+                    (((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) => t.id ===
+                    Number(props.id)) || {})(props.trips ? items[props.trips].state : '''')).s1 + '' %'''
+                  style:
+                    font-weight: '700'
+                    text-align: right
+                    white-space: nowrap
+  - component: oh-card
+    config:
+      title: Odometer
+      style:
+        height: calc(100% - 2 * var(--f7-card-margin-vertical))
+    slots:
+      content:
+      - component: div
+        config:
+          style:
+            padding: 0 14px 8px
+        slots:
+          default:
+          - component: div
+            config:
+              style:
+                display: flex
+                justify-content: space-between
+                gap: 12px
+                padding: 11px 4px
+                border-bottom: 1px solid rgba(127, 127, 127, 0.2)
+                font-size: 15px
+            slots:
+              default:
+              - component: Label
+                config:
+                  text: Start
+              - component: Label
+                config:
+                  text: '=(((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) =>
+                    t.id === Number(props.id)) || {})(props.trips ? items[props.trips].state : '''')).o0 == null ? ''–'' :
+                    (((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) => t.id ===
+                    Number(props.id)) || {})(props.trips ? items[props.trips].state : '''')).o0.toLocaleString(''en-GB'')
+                    + '' km'''
+                  style:
+                    font-weight: '700'
+                    text-align: right
+                    white-space: nowrap
+          - component: div
+            config:
+              style:
+                display: flex
+                justify-content: space-between
+                gap: 12px
+                padding: 11px 4px
+                border-bottom: 1px solid rgba(127, 127, 127, 0.2)
+                font-size: 15px
+            slots:
+              default:
+              - component: Label
+                config:
+                  text: End
+              - component: Label
+                config:
+                  text: '=(((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) =>
+                    t.id === Number(props.id)) || {})(props.trips ? items[props.trips].state : '''')).o1 == null ? ''–'' :
+                    (((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) => t.id ===
+                    Number(props.id)) || {})(props.trips ? items[props.trips].state : '''')).o1.toLocaleString(''en-GB'')
+                    + '' km'''
+                  style:
+                    font-weight: '700'
+                    text-align: right
+                    white-space: nowrap

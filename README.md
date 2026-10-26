@@ -48,8 +48,8 @@ number formats come from the items.
 | `flow-link` | – |
 | `flow-node` | – |
 | `ground-floor-quick` | – |
-| `heating-card` | `flow-node`, `item-popup` |
-| `heatpump-card` | `boost-pill`, `flow-node`, `ground-floor-quick`, `heatpump-circuit-quick`, `heatpump-control-quick`, `heatpump-cop-quick`, `heatpump-electric-quick`, `heatpump-heat-quick`, `heatpump-indoor-quick`, `heatpump-outdoor-quick`, `heatpump-refrigerant-quick`, `heatpump-tank-quick`, `heatpump-valve-quick`, `item-popup`, `pill-slider`, `pill-switch`, `state-bar`, `upper-floor-quick`, `value-tile` |
+| `heating-card` | `flow-node`, `item-popup`, `trip-popup` |
+| `heatpump-card` | `boost-pill`, `flow-node`, `ground-floor-quick`, `heatpump-circuit-quick`, `heatpump-control-quick`, `heatpump-cop-quick`, `heatpump-electric-quick`, `heatpump-heat-quick`, `heatpump-indoor-quick`, `heatpump-outdoor-quick`, `heatpump-refrigerant-quick`, `heatpump-tank-quick`, `heatpump-valve-quick`, `item-popup`, `pill-slider`, `pill-switch`, `state-bar`, `trip-popup`, `upper-floor-quick`, `value-tile` |
 | `heatpump-circuit-quick` | `pill-slider` |
 | `heatpump-control-quick` | `boost-pill`, `pill-slider`, `pill-switch`, `state-bar` |
 | `heatpump-cop-quick` | – |
@@ -60,11 +60,11 @@ number formats come from the items.
 | `heatpump-refrigerant-quick` | – |
 | `heatpump-tank-quick` | – |
 | `heatpump-valve-quick` | – |
-| `item-popup` | – |
+| `item-popup` | `trip-popup` |
 | `pill-slider` | – |
 | `pill-switch` | – |
-| `plug-card` | `appliance-icon`, `flow-node`, `item-popup`, `power-pill` |
-| `plug-electric-card` | `item-popup` |
+| `plug-card` | `appliance-icon`, `flow-node`, `item-popup`, `power-pill`, `trip-popup` |
+| `plug-electric-card` | `item-popup`, `trip-popup` |
 | `plug-energy-days-card` | – |
 | `plug-power-card` | – |
 | `power-pill` | – |
@@ -74,8 +74,9 @@ number formats come from the items.
 | `switch-tile` | – |
 | `switches-card` | `switch-tile` |
 | `temperatures-card` | – |
+| `trip-popup` | – |
 | `upper-floor-quick` | – |
-| `value-tile` | `item-popup` |
+| `value-tile` | `item-popup`, `trip-popup` |
 | `weather-card` | `weather-icon` |
 | `weather-day` | `weather-icon` |
 | `weather-icon` | – |
@@ -313,7 +314,7 @@ the tile's colour, grey at none; while the cycle guard of my installation holds 
 lowers the leaving water setpoint until the return water has cooled well below the heating curve, so that the run after
 it lasts), a line under the heating tile says so. The screenshots show it with the heat pump card's demo values.
 
-Needs `flow-node`, `item-popup`.
+Needs `flow-node`, `item-popup`, `trip-popup`.
 
 ![Heating and hot water](screenshots/heating-card.png)
 
@@ -417,7 +418,7 @@ it with demo values (a space heating run).
 Needs `boost-pill`, `flow-node`, `ground-floor-quick`, `heatpump-circuit-quick`, `heatpump-control-quick`,
 `heatpump-cop-quick`, `heatpump-electric-quick`, `heatpump-heat-quick`, `heatpump-indoor-quick`,
 `heatpump-outdoor-quick`, `heatpump-refrigerant-quick`, `heatpump-tank-quick`, `heatpump-valve-quick`, `item-popup`,
-`pill-slider`, `pill-switch`, `state-bar`, `upper-floor-quick`, `value-tile`.
+`pill-slider`, `pill-switch`, `state-bar`, `trip-popup`, `upper-floor-quick`, `value-tile`.
 
 ![Heat pump](screenshots/heatpump-card.gif)
 
@@ -1303,7 +1304,7 @@ to this time; so no widget queries persistence for a comparison.
 
 ### `plug-card`
 
-Now: the device's icon large in a ring, pulsing while it works (its energy-flow node or appliance icon, else its icon), power, on/off pill, today's energy against yesterday's and the 7-day mean's whole days (their bars strong up to this time of day), the total on rollers like a meter's; with `range` (kWh per 100 km) a road with the car where today's charge would take it. Needs `appliance-icon`, `flow-node`, `item-popup`, `power-pill`.
+Now: the device's icon large in a ring, pulsing while it works (its energy-flow node or appliance icon, else its icon), power, on/off pill, today's energy against yesterday's and the 7-day mean's whole days (their bars strong up to this time of day), the total on rollers like a meter's; with `range` (kWh per 100 km) a road with the car where today's charge would take it. Needs `appliance-icon`, `flow-node`, `item-popup`, `power-pill`, `trip-popup`.
 
 | Prop | Description | Type | Default |
 |---|---|---|---|
@@ -1343,7 +1344,7 @@ Energy per day of the month.
 
 ### `plug-electric-card`
 
-Voltage in its band of 230 V ± 10 %, current against the socket's 16 A, active, reactive and apparent power as a triangle with the power factor rated; the triangle's tile takes the height a taller card beside it leaves, the triangle in its middle, and keeps its size without load. Needs `item-popup`.
+Voltage in its band of 230 V ± 10 %, current against the socket's 16 A, active, reactive and apparent power as a triangle with the power factor rated; the triangle's tile takes the height a taller card beside it leaves, the triangle in its middle, and keeps its size without load. Needs `item-popup`, `trip-popup`.
 
 | Prop | Description | Type | Default |
 |---|---|---|---|

@@ -193,7 +193,7 @@ props:
     required: false
     context: item
   parameterGroups: []
-timestamp: Oct 26, 2026, 8:28:42 PM
+timestamp: Oct 26, 2026, 10:07:37 PM
 component: div
 config:
   style:
@@ -569,6 +569,7 @@ slots:
                             border-radius: 12px
                             padding: 10px 12px
                             margin-bottom: 8px
+                            position: relative
                         slots:
                           default:
                           - component: div
@@ -621,18 +622,66 @@ slots:
                                     font-weight: '700'
                                     padding-left: 10px
                                     white-space: nowrap
-                          - component: Label
+                          - component: div
                             config:
-                              text: '=[(loop.trip.kwh === null || loop.trip.kwh === undefined ? '''' : loop.trip.kwh.toFixed(1)
-                                + '' kWh''), (loop.trip.s0 === null || loop.trip.s0 === undefined ? '''' : loop.trip.s0 +
-                                (loop.trip.s1 === null || loop.trip.s1 === undefined ? '' %'' : '' → '' + loop.trip.s1 + ''
-                                %'')), (loop.trip.c > 0 ? loop.trip.c + (loop.trip.c === 1 ? '' charging stop'' : '' charging
-                                stops'') + (loop.trip.g > 0 ? '' (+'' + loop.trip.g + '' %)'' : '''') : '''')].filter((x)
-                                => x !== '''').join('' · '')'
                               style:
                                 font-size: 11px
                                 opacity: '0.65'
+                                display: flex
+                                align-items: center
+                                gap: 3px
+                                flex-wrap: wrap
                                 padding-top: 6px
+                            slots:
+                              default:
+                              - component: Label
+                                config:
+                                  text: '=[(loop.trip.kwh === null || loop.trip.kwh === undefined ? '''' : loop.trip.kwh.toFixed(1)
+                                    + '' kWh''), (loop.trip.s0 === null || loop.trip.s0 === undefined ? '''' : loop.trip.s0)].filter((x)
+                                    => x !== '''').join('' · '') + ((loop.trip.s0 === null || loop.trip.s0 === undefined ?
+                                    '''' : loop.trip.s0) !== '''' && ((loop.trip.s0 === null || loop.trip.s0 === undefined
+                                    ? '''' : loop.trip.s0) === '''' || loop.trip.s1 === null || loop.trip.s1 === undefined
+                                    ? '''' : loop.trip.s1) === '''' ? '' %'' : '''')'
+                              - component: oh-icon
+                                config:
+                                  icon: material:arrow_forward
+                                  width: 11
+                                  height: 11
+                                  style:
+                                    width: 11px
+                                    height: 11px
+                                    flex: 0 0 auto
+                                  visible: '=((loop.trip.s0 === null || loop.trip.s0 === undefined ? '''' : loop.trip.s0)
+                                    === '''' || loop.trip.s1 === null || loop.trip.s1 === undefined ? '''' : loop.trip.s1)
+                                    !== '''''
+                              - component: Label
+                                config:
+                                  text: '=(((loop.trip.s0 === null || loop.trip.s0 === undefined ? '''' : loop.trip.s0) ===
+                                    '''' || loop.trip.s1 === null || loop.trip.s1 === undefined ? '''' : loop.trip.s1) !==
+                                    '''' ? ((loop.trip.s0 === null || loop.trip.s0 === undefined ? '''' : loop.trip.s0) ===
+                                    '''' || loop.trip.s1 === null || loop.trip.s1 === undefined ? '''' : loop.trip.s1) + ''
+                                    %'' : '''') + ((loop.trip.c > 0 ? loop.trip.c + (loop.trip.c === 1 ? '' charging stop''
+                                    : '' charging stops'') + (loop.trip.g > 0 ? '' (+'' + loop.trip.g + '' %)'' : '''') :
+                                    '''') !== '''' ? ([(loop.trip.kwh === null || loop.trip.kwh === undefined ? '''' : loop.trip.kwh.toFixed(1)
+                                    + '' kWh''), (loop.trip.s0 === null || loop.trip.s0 === undefined ? '''' : loop.trip.s0)].filter((x)
+                                    => x !== '''').join('' · '') + ((loop.trip.s0 === null || loop.trip.s0 === undefined ?
+                                    '''' : loop.trip.s0) !== '''' && ((loop.trip.s0 === null || loop.trip.s0 === undefined
+                                    ? '''' : loop.trip.s0) === '''' || loop.trip.s1 === null || loop.trip.s1 === undefined
+                                    ? '''' : loop.trip.s1) === '''' ? '' %'' : '''') !== '''' ? '' · '' : '''') + (loop.trip.c
+                                    > 0 ? loop.trip.c + (loop.trip.c === 1 ? '' charging stop'' : '' charging stops'') + (loop.trip.g
+                                    > 0 ? '' (+'' + loop.trip.g + '' %)'' : '''') : '''') : '''')'
+                          - component: oh-link
+                            config:
+                              action: popup
+                              actionModal: widget:trip-popup
+                              actionModalConfig:
+                                trips: =props.trips
+                                id: =loop.trip.id
+                              style:
+                                position: absolute
+                                inset: '0'
+                                display: block
+                                border-radius: 12px
   - component: oh-card
     config:
       title: '=props.curve ? ''Now'' : props.title'

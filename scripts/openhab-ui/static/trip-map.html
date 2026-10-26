@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fahrt</title>
+<link rel="stylesheet" href="leaflet-1.9.4/leaflet.css">
+<style>
+  html, body, #map { margin: 0; height: 100%; background: transparent; }
+  /* OpenStreetMap has no dark style: in the dark theme its tiles are inverted, turned back in hue; places and line keep
+     their colour */
+  .dark .leaflet-tile-pane { filter: invert(0.9) hue-rotate(180deg); }
+  .place { min-width: 26px; height: 26px; padding: 0 6px; box-sizing: border-box; border-radius: 13px;
+           border: 2px solid #fff; color: #fff; font: 700 12px/22px system-ui, sans-serif; text-align: center;
+           box-shadow: 0 1px 4px rgba(0, 0, 0, 0.45); white-space: nowrap; position: relative; }
+  .place.charge::after { content: "⚡"; position: absolute; right: -11px; top: -12px; font-size: 13px; }
+</style>
+</head>
+<body>
+<div id="map"></div>
+<script src="leaflet-1.9.4/leaflet.js"></script>
+<script>
+// A trip's places on OpenStreetMap (user, 2026-10-26), numbered in order and joined by a dashed line, as the
+// MyŠkoda app draws a trip: only where the car stood, as no positions on the way are known. Everything comes in the
+// address, nothing is stored here: p=lat,lon,charged;lat,lon,charged… (charged 1 where the car charged), col=rrggbb,
+// dark=1 for the dark theme.
+const q = new URLSearchParams(location.search);
+const color = '#' + (/^[0-9a-f]{6}$/i.test(q.get('col') || '') ? q.get('col') : '26a69a');
+const places = (q.get('p') || '').split(';').map((s) => s.split(',').map(Number))
+  .filter((a) => a.length >= 2 && Number.isFinite(a[0]) && Number.isFinite(a[1]));
+if (q.get('dark') === '1') {
+  document.documentElement.classList.add('dark');
+}
+const map = L.map('map');
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+  { maxZoom: 19, attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' }).addTo(map);
+if (places.length > 1) {
+  L.polyline(places.map((a) => [a[0], a[1]]), { color, weight: 4, opacity: 0.9, dashArray: '8 10' }).addTo(map);
+}
+// places whose marks would overlap at the map's zoom share one (3/4/5 for a stop, a move and the end close together),
+// drawn again at every zoom, so zooming in parts them
+const layer = L.layerGroup().addTo(map);
+function draw() {
+  layer.clearLayers();
+  const marks = [];
+  places.forEach((a, i) => {
+    const point = map.latLngToLayerPoint([a[0], a[1]]);
+    const near = marks.find((m) => m.point.distanceTo(point) < 24);
+    if (near) {
+      near.numbers.push(i + 1);
+      near.charge = near.charge || a[2] === 1;
+    } else {
+      marks.push({ lat: a[0], lon: a[1], point, numbers: [i + 1], charge: a[2] === 1 });
+    }
+  });
+  marks.forEach((m) => {
+    const html = `<div class="place${m.charge ? ' charge' : ''}" style="background:${color}">${m.numbers.join('/')}</div>`;
+    const width = 26 + 10 * (m.numbers.length - 1);
+    L.marker([m.lat, m.lon], { icon: L.divIcon({ className: '', html, iconSize: [width, 26],
+      iconAnchor: [width / 2, 13] }) }).addTo(layer);
+  });
+}
+map.on('zoomend', draw);
+if (places.length === 1) {
+  map.setView([places[0][0], places[0][1]], 15);
+} else if (places.length > 1) {
+  map.fitBounds(places.map((a) => [a[0], a[1]]), { padding: [36, 36], maxZoom: 16 });
+} else {
+  map.setView([47.6, 13.8], 6);
+}
+draw();
+</script>
+</body>
+</html>

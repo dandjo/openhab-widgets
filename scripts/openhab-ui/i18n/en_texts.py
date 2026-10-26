@@ -207,7 +207,10 @@ EN.update({"auffällig": "elevated", "außerhalb": "outside", "behaglich": "comf
            "Zählerbild": "Meter picture", "Zählerstand": "Meter reading"})
 
     # the heating curve and the outdoor mean it works with (2026-10-09)
-EN.update({"Fahrten": "Trips", "unterwegs": "on the way", "Ladestopp": "charging stop", "Ladestopps": "charging stops", "ca.": "approx.",
+EN.update({"Zwischenstopp": "Stop", "Batterie": "Battery", "Kilometerzähler": "Odometer", "Gesamtverbrauch": "Total consumption",
+           "Ø Verbrauch": "Avg. consumption", "Entfernung": "Distance", "Fahrzeit": "Driving time",
+           "Ø Geschwindigkeit": "Avg. speed", "Start": "Start", "Ende": "End",
+           "Fahrten": "Trips", "unterwegs": "on the way", "Ladestopp": "charging stop", "Ladestopps": "charging stops", "ca.": "approx.",
            "Fahrten mit weniger als 2 Stunden Abstand sind eine Sitzung, „ca.“: Beginn aus den Abfragen geschätzt":
            "Trips less than 2 hours apart are one session, „approx.“: start estimated from the reads",
            "Parkposition": "Parking position", "Heizkurve": "Heating curve", "Heizkurve (fortgesetzt": "Heating curve (extrapolated",
@@ -287,7 +290,7 @@ EN.update({"Škoda Enyaq Ladestand": "Škoda Enyaq State of Charge", "Škoda Eny
            "Škoda Enyaq Kofferraum": "Škoda Enyaq Boot", "Škoda Enyaq Motorhaube": "Škoda Enyaq Bonnet",
            "Škoda Enyaq Licht": "Škoda Enyaq Lights", "Škoda Enyaq Parkstatus": "Škoda Enyaq Parking State",
            "Škoda Enyaq Parkposition": "Škoda Enyaq Parking Position",
-           "Škoda Enyaq Parkadresse": "Škoda Enyaq Parking Address", "Škoda Enyaq Fahrten": "Škoda Enyaq Trips", "Škoda Enyaq zu Hause": "Škoda Enyaq at Home",
+           "Škoda Enyaq Parkadresse": "Škoda Enyaq Parking Address", "Škoda Enyaq Fahrten": "Škoda Enyaq Trips", "Škoda Enyaq Fahrterkennung": "Škoda Enyaq Trip Finding", "Škoda Enyaq zu Hause": "Škoda Enyaq at Home",
            "Škoda Enyaq Klimatisierung": "Škoda Enyaq Climatisation",
            "Škoda Enyaq Klimatisierung Zieltemperatur": "Škoda Enyaq Climatisation Target Temperature",
            "Škoda Enyaq zuletzt gemeldet": "Škoda Enyaq Last Reported", "Škoda Enyaq API-Status": "Škoda Enyaq API Status",

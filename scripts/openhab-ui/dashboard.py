@@ -10041,16 +10041,27 @@ def trips_card():
                     "overflow-wrap": "anywhere"})
     km = label(f"={t}.km === null || {t}.km === undefined ? '' : {t}.km + ' km'",
                **{"flex": "0 0 auto", "font-weight": "700", "padding-left": "10px", "white-space": "nowrap"})
+    # energy, the charge before and after with the arrow as an icon (user, 2026-10-26: text arrows sat misshapen and
+    # out of line), the charging stops
     kwh = f"({t}.kwh === null || {t}.kwh === undefined ? '' : {t}.kwh.toFixed(1).replace('.', ',') + ' kWh')"
-    soc = (f"({t}.s0 === null || {t}.s0 === undefined ? '' : {t}.s0 + "
-           f"({t}.s1 === null || {t}.s1 === undefined ? ' %' : ' → ' + {t}.s1 + ' %'))")
+    s0 = f"({t}.s0 === null || {t}.s0 === undefined ? '' : {t}.s0)"
+    s1 = f"({s0} === '' || {t}.s1 === null || {t}.s1 === undefined ? '' : {t}.s1)"
     stops = (f"({t}.c > 0 ? {t}.c + ({t}.c === 1 ? ' Ladestopp' : ' Ladestopps') + "
              f"({t}.g > 0 ? ' (+' + {t}.g + ' %)' : '') : '')")
-    detail = label(f"=[{kwh}, {soc}, {stops}].filter((x) => x !== '').join(' · ')",
-                   **{**VT_SUB, "padding-top": "6px"})
-    box = div([div([times, places, km], **{"display": "flex", "align-items": "center"}), detail],
+    before = f"[{kwh}, {s0}].filter((x) => x !== '').join(' · ') + ({s0} !== '' && {s1} === '' ? ' %' : '')"
+    after = f"({s1} !== '' ? {s1} + ' %' : '') + ({stops} !== '' ? ({before} !== '' ? ' · ' : '') + {stops} : '')"
+    arrow = vt_icon("arrow_forward", 11)
+    arrow["config"]["visible"] = f"={s1} !== ''"
+    detail = div([label(f"={before}"), arrow, label(f"={after}")],
+                 **{**VT_SUB, "display": "flex", "align-items": "center", "gap": "3px", "flex-wrap": "wrap",
+                    "padding-top": "6px"})
+    # a tap opens the trip with its map (user, 2026-10-26)
+    tap = comp("oh-link", {"action": "popup", "actionModal": "widget:trip-popup",
+                           "actionModalConfig": {"trips": "=props.trips", "id": f"={t}.id"},
+                           "style": {"position": "absolute", "inset": "0", "display": "block", "border-radius": "12px"}})
+    box = div([div([times, places, km], **{"display": "flex", "align-items": "center"}), detail, tap],
               **{"background": "rgba(127, 127, 127, 0.12)", "border-radius": "12px", "padding": "10px 12px",
-                 "margin-bottom": "8px"})
+                 "margin-bottom": "8px", "position": "relative"})
     trips = comp("oh-repeater", {"for": "trip", "sourceType": "array", "in": "=loop.day.t", "fragment": True},
                  default=[box])
     listed = comp("oh-repeater", {"for": "day", "sourceType": "array", "in": f"={days}", "fragment": True},
@@ -10060,6 +10071,81 @@ def trips_card():
     out = card("Fahrten", [div([note, listed], **{"padding": "0 8px 10px"})])
     out["config"]["visible"] = f"=!!props.trips && {days}.length > 0"
     return out
+
+
+# a trip's popup (user, 2026-10-26: as the MyŠkoda app shows a trip): the trip from the list's item by its id
+TRIP = ("(((s) => ((s || '').charAt(0) === '[' ? JSON.parse(s) : []).flatMap((d) => d.t)"
+        ".find((t) => t.id === Number(props.id)) || {})(props.trips ? items[props.trips].state : ''))")
+# applied/trip_map.py puts the page into openHAB's html folder, with Leaflet beside it; openHAB serves /static/ with a
+# year's cache, so the address carries the page's checksum and a changed page reaches every browser at once
+TRIP_MAP_PAGE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static", "trip-map.html")
+TRIP_MAP = "/static/trip-map.html?v=" + hashlib.sha256(open(TRIP_MAP_PAGE, "rb").read()).hexdigest()[:8]
+
+
+def trip_minutes(expr):
+    """Minutes as the app writes them: 2 h 56 min, 45 min."""
+    return f"((m) => m == null ? '–' : (m >= 60 ? Math.floor(m / 60) + ' h ' : '') + (m % 60) + ' min')({expr})"
+
+
+def trip_popup():
+    """A trip of the location popup's list (prop trips: its item, id: the trip's start in ms), as the MyŠkoda app
+    shows one (user, 2026-10-26): the day and the times, a map of its places numbered in order and joined by a dashed
+    line (the static page TRIP_MAP with Leaflet; only places where the car stood: the API reports none on the way, the
+    app's export only start and end), the places with their time, then Übersicht (from where to where, travel time and
+    km, energy, average consumption, distance, driving time, average speed, charging stops), Batterie and
+    Kilometerzähler, each with its start and end. A trip found from the reads has its start marked "ca."; its driving
+    time and speed are unknown."""
+    t = TRIP
+    day = (f"((d) => ({WX_WEEKDAYS_LONG})[d.day()] + ', ' + d.date() + '. ' + ({WX_MONTHS})[d.month()])"
+           f"(dayjs(Number(props.id)))")
+    times = f"(({t}.x ? 'ca. ' : '') + ({t}.s || '') + ({t}.e ? ' – ' + {t}.e : ' · unterwegs'))"
+    head = div([label(f"={day}", **{"font-size": "20px", "font-weight": "700"}),
+                label(f"={times}", **{**VT_SUB, "font-size": "14px"})], **{"padding": "6px 10px 10px"})
+    points = (f"({t}.p || []).map((q) => q[0] + ',' + q[1] + ',' + (q[4] > 0 ? 1 : 0)).join(';')")
+    color = "((props.color || '" + ECAR_COLOR + "').replace('#', ''))"
+    frame = comp("oh-webframe", {"src": f"='{TRIP_MAP}&p=' + {points} + '&col=' + {color} + '&dark=' + "
+                                        f"(themeOptions.dark === 'dark' ? 1 : 0)",
+                                 "height": "320px", "frameborder": "0", "scrolling": "no",
+                                 "style": {"width": "100%", "border": "0", "display": "block", "border-radius": "8px"}})
+    badge_ = label("=loop.pt_idx + 1", **{"flex": "0 0 auto", "width": "24px", "height": "24px", "line-height": "24px",
+                                          "border-radius": "50%", "text-align": "center", "font-size": "12px",
+                                          "font-weight": "700", "color": "#fff",
+                                          "background": "=props.color || '" + ECAR_COLOR + "'"})
+    place = div([badge_, label("=loop.pt[2]", **{"flex": "0 0 auto", "min-width": "44px", "font-weight": "600"}),
+                 label("=loop.pt[3] || 'Zwischenstopp'",
+                       **{"flex": "1", "min-width": "0", "overflow-wrap": "anywhere"}),
+                 label("=loop.pt[4] > 0 ? '⚡ +' + loop.pt[4] + ' %' : ''", **{"flex": "0 0 auto", **VT_SUB})],
+                **{"display": "flex", "align-items": "center", "gap": "10px", "padding": "6px 2px",
+                   "font-size": "14px"})
+    places = comp("oh-repeater", {"for": "pt", "sourceType": "array", "in": f"={t}.p || []", "fragment": True},
+                  default=[place])
+    map_card = card("", [div([frame, div([places], **{"padding": "8px 2px 0"})], **{"padding": "12px"})])
+
+    def row(name, value, visible=None):
+        return div([label(name), label(f"={value}", **{"font-weight": "700", "text-align": "right",
+                                                         "white-space": "nowrap"})], visible,
+                   **{"display": "flex", "justify-content": "space-between", "gap": "12px", "padding": "11px 4px",
+                      "border-bottom": "1px solid rgba(127, 127, 127, 0.2)", "font-size": "15px"})
+
+    num1 = lambda v: f"({v}).toFixed(1).replace('.', ',')"
+    per100 = (f"({t}.k1 != null ? '~ ' + {num1(t + '.k1')} + ' kWh/100 km' : {t}.kwh != null && {t}.km > 0 ? "
+              f"'~ ' + {num1(t + '.kwh / ' + t + '.km * 100')} + ' kWh/100 km' : '–')")
+    overview = card("Übersicht", [div([
+        label(f"=({t}.a || '') + ({t}.b ? ' – ' + {t}.b : '')", **{"font-size": "17px", "font-weight": "700"}),
+        label(f"={trip_minutes(t + '.tr')} + ' · ' + ({t}.km == null ? '–' : {t}.km + ' km')",
+              **{**VT_SUB, "font-size": "14px", "padding": "2px 0 6px"}),
+        row("Gesamtverbrauch", f"{t}.kwh == null ? '–' : '~ ' + {num1(t + '.kwh')} + ' kWh'"),
+        row("Ø Verbrauch", per100),
+        row("Entfernung", f"{t}.km == null ? '–' : {t}.km + ' km'"),
+        row("Fahrzeit", trip_minutes(f"{t}.dr")),
+        row("Ø Geschwindigkeit", f"{t}.sp == null ? '–' : '~ ' + {t}.sp + ' km/h'"),
+        row("Ladestopps", f"{t}.c + ({t}.g > 0 ? ' (+' + {t}.g + ' %)' : '')", f"={t}.c > 0")],
+        **{"padding": "0 14px 8px"})])
+    pair_card = lambda title, a, b: card(title, [div([row("Start", a), row("Ende", b)], **{"padding": "0 14px 8px"})])
+    pct = lambda v: f"{v} == null ? '–' : {v} + ' %'"
+    km = lambda v: f"{v} == null ? '–' : {v}.toLocaleString('de-AT') + ' km'"
+    return div([head, map_card, overview, pair_card("Batterie", pct(f"{t}.s0"), pct(f"{t}.s1")),
+                pair_card("Kilometerzähler", km(f"{t}.o0"), km(f"{t}.o1"))], **{"padding": "8px 6px"})
 
 
 def item_popup():
@@ -10352,6 +10438,12 @@ ITEM_POPUP_PARAMS = [
 # the props a link opening the item popup passes items in, which a widget placing that link takes as its own props
 ITEM_PARAMS["item-popup"] = {p["name"] for p in ITEM_POPUP_PARAMS if p.get("context") == "item"}
 
+TRIP_POPUP_PARAMS = [
+    dict(param("trips", "Trips", "The String item holding trips by day as JSON (rule skoda_enyaq_status)",
+               required=True), context="item"),
+    param("id", "Trip", "The trip's id, its start in ms", required=True),
+    param("color", "Colour", "Colour of the map's places and line as #rrggbb", default=ECAR_COLOR)]
+
 VALUE_TILE_PARAMS = [
     param("title", "Title", "Title above the value", required=True),
     param("value", "Value", "The text to show, usually an expression on an item", required=True),
@@ -10495,6 +10587,7 @@ def widgets():
         # the plug cards stand on the device pages, whose charts start below their period buttons
         out[uid] = (templated(plots_below_controls(card_)), params, ["plug"])
     out["item-popup"] = (templated(plots_below_controls(item_popup())), ITEM_POPUP_PARAMS, ["popup"])
+    out["trip-popup"] = (trip_popup(), TRIP_POPUP_PARAMS, ["popup"])
     out["value-tile"] = (value_tile_widget(), VALUE_TILE_PARAMS, ["tile"])
     out["pill-slider"] = (pill_slider_widget(), PILL_SLIDER_PARAMS, ["slider"])
     out["switch-row"] = (switch_row_widget(), SWITCH_ROW_PARAMS, ["switch"])
