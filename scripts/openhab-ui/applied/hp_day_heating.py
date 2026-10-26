@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """The heat pump's day heating (user, 2026-10-13): in the transition season the house needs less heat at night than the
 heat pump gives at its lowest speed, so it cycles in short runs however long the cycle guard makes its pauses; the
-same heat given in a day window with the leaving water offset a little higher (+1 K by default) is enough load for
+same heat given in a day window with the leaving water offset a little higher (+2 K by default) is enough load for
 long runs, the house's mass carries it through the night, and more of it comes from the PV. The rule
 heatpump_day_heating (hp_day_heating.js next to this file) sets the offset to the day offset in the window (default
 9–19 h) and to −10 K outside it, where the setpoint stays at the controller's minimum of 20 °C and it never calls for
@@ -54,7 +54,7 @@ METADATA = {
     START: {"stateDescription": {"value": " ", "config": {"pattern": "%s Uhr", "min": 0, "max": 24, "step": 0.5}}},
     END: {"stateDescription": {"value": " ", "config": {"pattern": "%s Uhr", "min": 0, "max": 24, "step": 0.5}}},
 }
-DEFAULTS = {OFFSET: "1", START: "9", END: "19"}
+DEFAULTS = {OFFSET: "2", START: "9", END: "19"}
 # the offset, the switches, the settings and the guard's lock at once; the window's start and end (and with the start
 # the season's decision) every 20 seconds, between the guard's runs
 WATCHED = ("pyaltherma_leaving_water_temp_offset_heating", SWITCH, "pyaltherma_climate_control_power", OFFSET, START,

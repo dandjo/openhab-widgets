@@ -1,6 +1,6 @@
 // day heating (user, 2026-10-13): in the transition season the house needs less heat at night than the heat pump gives
 // at its lowest speed, so it cycles however long its pauses are; the same heat given in a day window, with the leaving
-// water offset a little higher (+1 K by default), is enough load for long runs, and the house's mass carries it through
+// water offset a little higher (+2 K by default), is enough load for long runs, and the house's mass carries it through
 // the night, during which the rule keeps the heating off (offset −10 K: the setpoint stays at its minimum of 20 °C, so
 // the controller never calls for heat). The season is decided once a day (user, 2026-10-25): the 24-hour mean outdoor
 // temperature, the heating curve's basis, at the window's start makes that day and the night after it day mode from
@@ -36,7 +36,7 @@ const setting = (name, fallback, lo, hi) => {
   return v === null || Number.isNaN(v) ? fallback : Math.min(hi, Math.max(lo, v));
 };
 // the controller takes the offset in whole kelvins only
-const dayOffset = Math.round(setting('heatpump_day_heating_offset', 1, OFFSET_MIN, OFFSET_MAX));
+const dayOffset = Math.round(setting('heatpump_day_heating_offset', 2, OFFSET_MIN, OFFSET_MAX));
 const start = setting('heatpump_day_heating_start', 9, 0, 24);
 const end = setting('heatpump_day_heating_end', 19, 0, 24);
 const enabled = state(SWITCH) === 'ON' && state('pyaltherma_climate_control_power') === 'ON';
