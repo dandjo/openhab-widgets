@@ -172,6 +172,7 @@ function applyCharging(charging) {
   post('charging_state', status.state);
   post('charging', status.state === 'CHARGING' ? 'ON' : 'OFF');
   postQuantity('charge_power', status.chargePowerInKw, 'kW');
+  postQuantity('charge_rate', status.chargingRateInKilometersPerHour, 'km/h');
   post('charge_type', status.chargeType);
   post('plug', onOff(status.plugConnectionState, 'CONNECTED', 'DISCONNECTED'));
   post('plug_locked', onOff(status.plugLockState, 'LOCKED', 'UNLOCKED'));

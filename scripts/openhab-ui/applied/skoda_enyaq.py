@@ -71,6 +71,9 @@ POINTS = {
     "charging_state": ("String", "Ladestatus", "ev_station", ["Status"], CHANGE, state("%s", options=CHARGING_STATES)),
     "charge_power": ("Number:Power", "Ladeleistung", "bolt", ["Measurement", "Power"], COURSE,
                      quantity("kW", "%.1f %unit%")),
+    # the range a charging hour adds, as the car works it out (user, 2026-10-26: the API's value, the app's)
+    "charge_rate": ("Number:Speed", "Ladegeschwindigkeit", "speed", ["Measurement", "Speed"], COURSE,
+                    quantity("km/h", "%.0f %unit%")),
     "charge_type": ("String", "Ladeart", "electrical_services", ["Status"], CHANGE,
                     state("%s", options="AC=AC,DC=DC,OFF=Aus")),
     "target_reached_at": ("DateTime", "Ladeziel erreicht um", "schedule", ["Timestamp", "Point"], RESTORE,
