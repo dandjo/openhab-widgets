@@ -186,7 +186,7 @@ props:
     required: false
     context: item
   parameterGroups: []
-timestamp: Oct 26, 2026, 1:32:40 PM
+timestamp: Oct 26, 2026, 1:52:38 PM
 component: div
 config:
   style:
@@ -469,7 +469,7 @@ slots:
           - component: oh-webframe
             config:
               src: '=((p) => ((p) => p.length === 2 && p.every(Number.isFinite))(p) ? ''https://www.openstreetmap.org/export/embed.html?bbox=''
-                + (p[1] - 0.006) + '','' + (p[0] - 0.003) + '','' + (p[1] + 0.006) + '','' + (p[0] + 0.003) + ''&layer=mapnik&marker=''
+                + (p[1] - 0.0015) + '','' + (p[0] - 0.00075) + '','' + (p[1] + 0.0015) + '','' + (p[0] + 0.00075) + ''&layer=mapnik&marker=''
                 + p[0] + '','' + p[1] : ''about:blank'')(((items[props.map] ? items[props.map].state : '''') || '''').split('','').slice(0,
                 2).map(Number))'
               height: 300px

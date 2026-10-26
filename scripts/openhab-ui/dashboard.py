@@ -10002,9 +10002,11 @@ def location_map_card():
     inverts it, turned back in hue, so it does not glare in the dark popup."""
     pos = "((items[props.map] ? items[props.map].state : '') || '').split(',').slice(0, 2).map(Number)"
     valid = "((p) => p.length === 2 && p.every(Number.isFinite))"
-    # about 650 m north to south and 900 m east to west around it: the streets around it, as on a phone
-    url = (f"=((p) => {valid}(p) ? '{OSM_EMBED}?bbox=' + (p[1] - 0.006) + ',' + (p[0] - 0.003) + ',' + "
-           f"(p[1] + 0.006) + ',' + (p[0] + 0.003) + '&layer=mapnik&marker=' + p[0] + ',' + p[1] : 'about:blank')({pos})")
+    # about 170 m north to south and 220 m east to west around it, the street it stands in (user, 2026-10-26: two zoom
+    # levels closer than the 650 by 900 m first shown; each level halves the span)
+    url = (f"=((p) => {valid}(p) ? '{OSM_EMBED}?bbox=' + (p[1] - 0.0015) + ',' + (p[0] - 0.00075) + ',' + "
+           f"(p[1] + 0.0015) + ',' + (p[0] + 0.00075) + '&layer=mapnik&marker=' + p[0] + ',' + p[1] : 'about:blank')"
+           f"({pos})")
     frame = comp("oh-webframe", {"src": url, "height": "300px", "frameborder": "0", "scrolling": "no",
                                  "style": {"width": "100%", "border": "0", "display": "block", "border-radius": "8px",
                                            "filter": "=themeOptions.dark === 'dark' ? "
