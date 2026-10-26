@@ -12,7 +12,8 @@
 // compressor's start ends within minutes); the rule waits for its lock to go, and at night the guard leaves its lock to
 // the rule as it stands. In normal operation the offset goes back to 0 once and the cycle guard works as before.
 // Offset, start and end of the window are items, so they can be changed without touching the rule.
-const SEASON_AVG = 8;    // °C 24-hour mean outdoors at the window's start from which the day is in day mode
+// a trial since 2026-10-26 (user): from 8 to 6 °C, as at 8 to 9 °C the window still held the rooms within 0.1 K a day
+const SEASON_AVG = 6;    // °C 24-hour mean outdoors at the window's start from which the day is in day mode
 const NIGHT = -10;       // K offset outside the window: the setpoint at its minimum, no call for heat
 const SETTLE = 60;       // seconds after a write or a change of the guard's lock before the offset is checked, and
                          // written again if it still differs
