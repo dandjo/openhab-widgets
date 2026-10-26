@@ -2034,7 +2034,6 @@ METEOBLUE = ("https://www.meteoblue.com/de/wetter/widget/daily/wien_%c3%96sterre
              "&precipitation=0&precipitation=1&precipitationprobability=0&precipitationprobability=1&spot=0&spot=1"
              "&pressure=0&pressure=1&layout=")
 ORF_WEATHER = "https://wetter.orf.at/wien/prognose"
-OSM_EMBED = "https://www.openstreetmap.org/export/embed.html"  # OpenStreetMap's map for frames, with a marker
 WEATHER_PAGE = "weather"
 
 
@@ -9997,23 +9996,27 @@ def heating_curve_card(color, now_color):
     return out
 
 
+def osm_credit():
+    """OpenStreetMap's credit right under a map, which carries none of its own (user, 2026-10-26: no badges on the
+    map; OpenStreetMap's guidelines allow the credit adjacent to the map), linked to its copyright page."""
+    return comp("oh-link", {"text": "Kartendaten © OpenStreetMap", "action": "url",
+                            "actionUrl": "https://www.openstreetmap.org/copyright", "actionUrlSameWindow": False,
+                            "style": {**VT_SUB, "display": "block", "text-align": "right", "padding-top": "4px",
+                                      "color": "inherit"}})
+
+
 def location_map_card():
-    """The item popup's map on top (prop map, user 2026-10-26): OpenStreetMap's map for frames around where a Location
-    item stands, with a marker there. The position comes from the item when the popup opens, so no coordinates are in
-    the widget; the browser loads the map from openstreetmap.org. OpenStreetMap has no dark style: the dark theme
-    inverts it, turned back in hue, so it does not glare in the dark popup."""
+    """The item popup's map on top (prop map, user 2026-10-26): where a Location item stands on the trip map's page
+    (TRIP_MAP, a single plain mark), about the street it stands in (zoom 17; user: two levels closer than first shown),
+    OpenStreetMap credited under it. The position comes from the item when the popup opens, so no coordinates are in
+    the widget; the browser loads the tiles from openstreetmap.org."""
     pos = "((items[props.map] ? items[props.map].state : '') || '').split(',').slice(0, 2).map(Number)"
     valid = "((p) => p.length === 2 && p.every(Number.isFinite))"
-    # about 170 m north to south and 220 m east to west around it, the street it stands in (user, 2026-10-26: two zoom
-    # levels closer than the 650 by 900 m first shown; each level halves the span)
-    url = (f"=((p) => {valid}(p) ? '{OSM_EMBED}?bbox=' + (p[1] - 0.0015) + ',' + (p[0] - 0.00075) + ',' + "
-           f"(p[1] + 0.0015) + ',' + (p[0] + 0.00075) + '&layer=mapnik&marker=' + p[0] + ',' + p[1] : 'about:blank')"
-           f"({pos})")
+    url = (f"=((p) => {valid}(p) ? '{TRIP_MAP}&p=' + p[0] + ',' + p[1] + ',0&z=17&col={ECAR_COLOR[1:]}&dark=' + "
+           f"(themeOptions.dark === 'dark' ? 1 : 0) : 'about:blank')({pos})")
     frame = comp("oh-webframe", {"src": url, "height": "300px", "frameborder": "0", "scrolling": "no",
-                                 "style": {"width": "100%", "border": "0", "display": "block", "border-radius": "8px",
-                                           "filter": "=themeOptions.dark === 'dark' ? "
-                                                     "'invert(0.9) hue-rotate(180deg)' : 'none'"}})
-    out = card("Parkposition", [div([frame], **{"padding": "4px 12px 12px"})])
+                                 "style": {"width": "100%", "border": "0", "display": "block", "border-radius": "8px"}})
+    out = card("Parkposition", [div([frame, osm_credit()], **{"padding": "4px 12px 8px"})])
     out["config"]["visible"] = f"=!!props.map && {valid}({pos})"
     return out
 
@@ -10120,7 +10123,7 @@ def trip_popup():
                    "font-size": "14px"})
     places = comp("oh-repeater", {"for": "pt", "sourceType": "array", "in": f"={t}.p || []", "fragment": True},
                   default=[place])
-    map_card = card("", [div([frame, div([places], **{"padding": "8px 2px 0"})], **{"padding": "12px"})])
+    map_card = card("", [div([frame, osm_credit(), div([places], **{"padding": "4px 2px 0"})], **{"padding": "12px"})])
 
     def row(name, value, visible=None):
         return div([label(name), label(f"={value}", **{"font-weight": "700", "text-align": "right",

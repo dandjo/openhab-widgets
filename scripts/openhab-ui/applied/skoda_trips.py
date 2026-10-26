@@ -7,7 +7,9 @@ export's span (+2 hours), the found ones ("ca.") as well. The export knows of a 
 (and how many public charging stops it made); where our own reads saw it, the places the car stood at in between
 come from InfluxDB (parking state and position, the address since it is persisted there, and the charge gained at a
 stop from the charging state and the charge), numbered between start and end on the trip's map (user, 2026-10-26:
-"Zwischenstopp fehlt"). A session the rule still holds open in
+"Zwischenstopp fehlt"). A stop whose address our reads do not have takes the address of a known place within NAMED
+metres: every start, stop and end with an address of the trips in InfluxDB before the import, and the export's own, so
+an address once found stays with a later import. A session the rule still holds open in
 skoda_enyaq_trip_state is dropped when the export covers it. Then it starts the rule, which rebuilds the popups' list.
 No item may be named skoda_trips: the nightly downsampler leaves only measurements without an item alone. Nothing of
 the trips (addresses, positions) is printed here; delete the export afterwards, its file name holds the VIN.
@@ -29,6 +31,7 @@ RULE, STATE_ITEM = "skoda_enyaq_status", "skoda_enyaq_trip_state"
 ZONE = ZoneInfo("Europe/Vienna")
 SESSION_GAP = timedelta(hours=2)
 MOVED = 200  # m: a place this far from the one before is a new one, as the rule counts
+NAMED = 50   # m: a stop without an address takes the address of a known place this near
 
 
 def ms(text):
@@ -77,7 +80,21 @@ def meters(a, b):
     return math.hypot(x, (b[0] - a[0]) * rad) * 6371000
 
 
-def stops(start, end, first, last):
+def known_places():
+    """Every place with an address of the trips in InfluxDB: (latitude, longitude, address)."""
+    q = f"SELECT points FROM {MEASUREMENT}"
+    res = influx("/query?" + urllib.parse.urlencode({"db": "openhab", "q": q}))["results"][0]
+    rows = res["series"][0]["values"] if "series" in res else []
+    return [(p[0], p[1], p[3]) for _, text in rows for p in json.loads(text or "[]") if p[3]]
+
+
+def named(pos, known):
+    near = [(meters(pos, k[:2]), k[2]) for k in known]
+    near = [n for n in near if n[0] <= NAMED]
+    return min(near)[1] if near else None
+
+
+def stops(start, end, first, last, known):
     """The places our reads saw the car stand at between a session's start and end, after first and before last: each
     PARKED of the parking state at the position it then held, the address there and the charge gained while it stood
     (a CHARGING stretch from the charge at its start to the charge at its end); one within MOVED of the place before it
@@ -113,7 +130,7 @@ def stops(start, end, first, last):
                 on = None
         if on is not None:
             gained += max(0, (at(socs, leave) or on) - on)
-        out.append([pos[0], pos[1], t, at(addresses, t), round(gained)])
+        out.append([pos[0], pos[1], t, at(addresses, t) or named(pos, known), round(gained)])
         before = pos
     if out and meters(out[-1][:2], last[:2]) <= MOVED and out[-1][4] == 0:
         out.pop()
@@ -158,10 +175,11 @@ def main():
     if not trips:
         sys.exit("no trips in the export")
     added = 0
+    known = known_places() + [(p[0], p[1], p[3]) for _, f in trips for p in json.loads(f["points"]) if p[3]]
     for start, fields in trips:
         points = json.loads(fields["points"])
         if len(points) == 2:
-            between = stops(start, fields["end"], points[0], points[1])
+            between = stops(start, fields["end"], points[0], points[1], known)
             if between:
                 fields["points"] = json.dumps([points[0], *between, points[1]], ensure_ascii=False)
                 added += len(between)

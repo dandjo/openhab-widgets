@@ -21,7 +21,7 @@ props:
     required: false
     default: '#26a69a'
   parameterGroups: []
-timestamp: Oct 26, 2026, 10:07:37 PM
+timestamp: Oct 26, 2026, 10:23:22 PM
 component: div
 config:
   style:
@@ -170,7 +170,7 @@ slots:
           default:
           - component: oh-webframe
             config:
-              src: '=''/static/trip-map.html?v=92adbbdb&p='' + ((((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s)
+              src: '=''/static/trip-map.html?v=d19bb395&p='' + ((((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s)
                 : []).flatMap((d) => d.t).find((t) => t.id === Number(props.id)) || {})(props.trips ? items[props.trips].state
                 : '''')).p || []).map((q) => q[0] + '','' + q[1] + '','' + (q[4] > 0 ? 1 : 0)).join('';'') + ''&col='' + ((props.color
                 || ''#26a69a'').replace(''#'', '''')) + ''&dark='' + (themeOptions.dark === ''dark'' ? 1 : 0)'
@@ -182,10 +182,23 @@ slots:
                 border: '0'
                 display: block
                 border-radius: 8px
+          - component: oh-link
+            config:
+              text: Map data © OpenStreetMap
+              action: url
+              actionUrl: https://www.openstreetmap.org/copyright
+              actionUrlSameWindow: false
+              style:
+                font-size: 11px
+                opacity: '0.65'
+                display: block
+                text-align: right
+                padding-top: 4px
+                color: inherit
           - component: div
             config:
               style:
-                padding: 8px 2px 0
+                padding: 4px 2px 0
             slots:
               default:
               - component: oh-repeater

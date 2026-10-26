@@ -23,7 +23,9 @@
 // A trip's places on OpenStreetMap (user, 2026-10-26), numbered in order and joined by a dashed line, as the
 // MyŠkoda app draws a trip: only where the car stood, as no positions on the way are known. Everything comes in the
 // address, nothing is stored here: p=lat,lon,charged;lat,lon,charged… (charged 1 where the car charged), col=rrggbb,
-// dark=1 for the dark theme.
+// dark=1 for the dark theme, z the zoom for a single place (a plain mark then, no number). The map carries no
+// attribution of its own: the widget credits OpenStreetMap right under the frame, as its guidelines allow (user,
+// 2026-10-26: "Badges ausblenden"); Leaflet's licence asks for none.
 const q = new URLSearchParams(location.search);
 const color = '#' + (/^[0-9a-f]{6}$/i.test(q.get('col') || '') ? q.get('col') : '26a69a');
 const places = (q.get('p') || '').split(';').map((s) => s.split(',').map(Number))
@@ -31,9 +33,8 @@ const places = (q.get('p') || '').split(';').map((s) => s.split(',').map(Number)
 if (q.get('dark') === '1') {
   document.documentElement.classList.add('dark');
 }
-const map = L.map('map');
-L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-  { maxZoom: 19, attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' }).addTo(map);
+const map = L.map('map', { attributionControl: false });
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
 if (places.length > 1) {
   L.polyline(places.map((a) => [a[0], a[1]]), { color, weight: 4, opacity: 0.9, dashArray: '8 10' }).addTo(map);
 }
@@ -54,7 +55,8 @@ function draw() {
     }
   });
   marks.forEach((m) => {
-    const html = `<div class="place${m.charge ? ' charge' : ''}" style="background:${color}">${m.numbers.join('/')}</div>`;
+    const label = places.length > 1 ? m.numbers.join('/') : '';
+    const html = `<div class="place${m.charge ? ' charge' : ''}" style="background:${color}">${label}</div>`;
     const width = 26 + 10 * (m.numbers.length - 1);
     L.marker([m.lat, m.lon], { icon: L.divIcon({ className: '', html, iconSize: [width, 26],
       iconAnchor: [width / 2, 13] }) }).addTo(layer);
@@ -62,7 +64,7 @@ function draw() {
 }
 map.on('zoomend', draw);
 if (places.length === 1) {
-  map.setView([places[0][0], places[0][1]], 15);
+  map.setView([places[0][0], places[0][1]], Math.min(19, Math.max(3, Number(q.get('z')) || 15)));
 } else if (places.length > 1) {
   map.fitBounds(places.map((a) => [a[0], a[1]]), { padding: [36, 36], maxZoom: 16 });
 } else {

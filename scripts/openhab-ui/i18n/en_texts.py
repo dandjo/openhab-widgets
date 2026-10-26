@@ -207,7 +207,7 @@ EN.update({"auffällig": "elevated", "außerhalb": "outside", "behaglich": "comf
            "Zählerbild": "Meter picture", "Zählerstand": "Meter reading"})
 
     # the heating curve and the outdoor mean it works with (2026-10-09)
-EN.update({"Zwischenstopp": "Stop", "Batterie": "Battery", "Kilometerzähler": "Odometer", "Gesamtverbrauch": "Total consumption",
+EN.update({"Kartendaten © OpenStreetMap": "Map data © OpenStreetMap", "Zwischenstopp": "Stop", "Batterie": "Battery", "Kilometerzähler": "Odometer", "Gesamtverbrauch": "Total consumption",
            "Ø Verbrauch": "Avg. consumption", "Entfernung": "Distance", "Fahrzeit": "Driving time",
            "Ø Geschwindigkeit": "Avg. speed", "Start": "Start", "Ende": "End",
            "Fahrten": "Trips", "unterwegs": "on the way", "Ladestopp": "charging stop", "Ladestopps": "charging stops", "ca.": "approx.",
