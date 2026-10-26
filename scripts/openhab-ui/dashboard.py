@@ -9045,11 +9045,11 @@ def e_car_controls():
     # time left follows the car's reports, every 5 minutes while charging, as MainUI does not re-evaluate it as time passes
     reached_at = skoda("target_reached_at")
     left = f"Math.max(0, Math.round(dayjs(items.{reached_at}.state).diff(dayjs(), 'minute', true)))"
-    # with the charge power in front (user, 2026-10-26)
+    # with the charge power in front and the clock written out as "fertig" (user, 2026-10-26)
     power = skoda("charge_power")
     kw = f"({ok(power)} && {num(power)} > 0 ? {fixed(num(power), 1)} + ' kW' : '')"
     pill = boost_pill(charging, "material:ev_station", ECAR_COLOR, "Laden",
-                      f"([{kw}, {ok(reached_at)} ? 'noch ' + {hm(left)} + ' · ' + {clock_of(reached_at)} : '']"
+                      f"([{kw}, {ok(reached_at)} ? 'noch ' + {hm(left)} + ' · fertig ' + {clock_of(reached_at)} : '']"
                       f".filter((s) => s !== '').join(' · ') || 'lädt')")
     pill["config"]["visible"] = f"={plugged}"
     hint = label("Zum Laden das Ladekabel einstecken", f"=!{plugged}",
