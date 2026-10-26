@@ -9003,7 +9003,8 @@ def e_car_now():
     address = skoda("parking_address")
     away = (f"items.{skoda('at_home')}.state === 'OFF' && items.{skoda('parking_state')}.state === 'PARKED' && "
             f"{ok(address)}")
-    place_tile = vt_tile([vt_head("Standort"), vt_value(f"={where}"),
+    # "Standort und Fahrten", as its popup holds the trips too (user, 2026-10-26)
+    place_tile = vt_tile([vt_head("Standort und Fahrten"), vt_value(f"={where}"),
                           label(f"=items.{address}.state", f"={away}", **{**VT_SUB, "white-space": "normal"})],
                          skoda("at_home"), "Standort", ECAR_COLOR,
                          # its popup with a map of where the car stands and its trips (user, 2026-10-26)
