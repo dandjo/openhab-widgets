@@ -101,6 +101,9 @@ POINTS = {
                       state("%s", options="PARKED=Geparkt,IN_MOTION=Fährt")),
     "parking_position": ("Location", "Parkposition", "place", ["Point"], CHANGE, {}),
     "parking_address": ("String", "Parkadresse", "signpost", ["Status"], RESTORE, state("%s")),
+    # the last 30 days' trips by day as JSON for the location popup (user, 2026-10-26); the rule rebuilds it from its
+    # files, so it needs no history of its own
+    "trips": ("String", "Fahrten", "route", ["Status"], RESTORE, state("%s")),
     "at_home": ("Switch", "zu Hause", "home", ["Status", "Presence"], CHANGE,
                 state("%s", options="ON=Zu Hause,OFF=Unterwegs")),
     "climate_state": ("String", "Klimatisierung", "thermostat", ["Status"], CHANGE, state("%s", options=CLIMATE_STATES)),

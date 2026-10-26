@@ -354,6 +354,11 @@ function poll(force) {
     store.remove('keyAlarm');
     setApiStatus('OK');
     apply(body.vehicle || {});
+    try {
+      trackTrips(body.vehicle || {}, Date.now());
+    } catch (e) {
+      console.warn(`Škoda: Fahrten: ${e}`);
+    }
     const errors = (body.errors || []).map((e) => e.type).sort().join(', ');
     if (errors !== (store.get('errors') || '')) {
       if (errors) {
@@ -373,6 +378,252 @@ function poll(force) {
   } else {
     setApiStatus('ERROR', response.status === 0 ? `nicht erreichbar: ${response.error}` : `HTTP ${response.status}`);
   }
+}
+
+// ---- trips (user, 2026-10-26): the API keeps no trips, so the rule finds them in what it reads, as the MyŠkoda app's
+// Reiseverlauf lists them. A trip runs from a parked place to the next: its distance from the odometer, its end from
+// when the car reported the odometer at the new place, its start from the reads around the departure (so "ca.", off
+// by up to half a read interval), the charge from the charge before and after. Trips less than 2 hours apart are one
+// session, as in the app, and a charge away from home within a session is a charging stop. The history is in
+// TRIPS_FILE and the finding's state in TRIP_STATE_FILE: they hold addresses and positions, so neither is in the code.
+// An export from the app, imported by applied/skoda_trips.py, replaces the found trips of its span with the app's.
+// skoda_enyaq_trips holds the last TRIP_DAYS days for the location popup, by day, newest first.
+const TRIPS_DIR = '/var/lib/openhab/skoda';
+const TRIPS_FILE = TRIPS_DIR + '/trips.json';
+const TRIP_STATE_FILE = TRIPS_DIR + '/trip-state.json';
+const SESSION_GAP_MS = 2 * 3600000;  // trips closer than this are one session, as in the app
+const MOVED_METERS = 200;            // a parked place this far from the last one is a new one
+const BATTERY_KWH = 77;              // the Enyaq 80x's usable battery, for the energy a found trip took
+const TRIP_DAYS = 30;                // days the popup lists (user, 2026-10-26)
+const WEEKDAYS = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+const VIENNA_DISTRICTS = ['Innere Stadt', 'Leopoldstadt', 'Landstraße', 'Wieden', 'Margareten', 'Mariahilf', 'Neubau',
+  'Josefstadt', 'Alsergrund', 'Favoriten', 'Simmering', 'Meidling', 'Hietzing', 'Penzing', 'Rudolfsheim-Fünfhaus',
+  'Ottakring', 'Hernals', 'Währing', 'Döbling', 'Brigittenau', 'Floridsdorf', 'Donaustadt', 'Liesing'];
+
+function readJson(path, fallback) {
+  try {
+    const Files = Java.type('java.nio.file.Files');
+    const Paths = Java.type('java.nio.file.Paths');
+    return JSON.parse(String(Files.readString(Paths.get(path))));
+  } catch (e) {
+    return fallback;
+  }
+}
+
+// written beside the file and moved over it, readable by openHAB's group only
+function writeJson(path, value) {
+  const Files = Java.type('java.nio.file.Files');
+  const Paths = Java.type('java.nio.file.Paths');
+  const StandardCopyOption = Java.type('java.nio.file.StandardCopyOption');
+  const PosixFilePermissions = Java.type('java.nio.file.attribute.PosixFilePermissions');
+  const temp = Paths.get(path + '.tmp');
+  Files.writeString(temp, JSON.stringify(value));
+  Files.setPosixFilePermissions(temp, PosixFilePermissions.fromString('rw-r-----'));
+  Files.move(temp, Paths.get(path), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+}
+
+function modified(path) {
+  try {
+    const Files = Java.type('java.nio.file.Files');
+    const Paths = Java.type('java.nio.file.Paths');
+    return Number(Files.getLastModifiedTime(Paths.get(path)).toMillis());
+  } catch (e) {
+    return 0;
+  }
+}
+
+// a point in time in the local zone: its day, its clock and its weekday
+function local(ms) {
+  const z = time.toZDT(new Date(ms).toISOString()).withZoneSameInstant(time.toZDT().zone());
+  return { day: z.format(time.DateTimeFormatter.ofPattern('yyyy-MM-dd')),
+    hm: z.format(time.DateTimeFormatter.ofPattern('HH:mm')), wd: z.dayOfWeek().value() % 7 };
+}
+
+// an address as the app lists it: the street without its number and the place, Vienna's districts by name
+function shortAddress(address) {
+  const parts = String(address || '').split(',').map((p) => p.trim()).filter((p) => p !== '');
+  if (parts.length < 2) {
+    return parts[0] || '';
+  }
+  const street = parts[0].replace(/\s+\d+[\w/-]*$/, '');
+  const m = parts[1].match(/^(\d{4,5})\s+(.+)$/);
+  let place = m ? m[2] : parts[1];
+  if (m && place === 'Wien' && /^1\d\d0$/.test(m[1])) {
+    place = VIENNA_DISTRICTS[Number(m[1].slice(1, 3)) - 1] || place;
+  }
+  return `${street}, ${place}`;
+}
+
+function metersBetween(a, b) {
+  const rad = Math.PI / 180;
+  const x = (b[1] - a[1]) * rad * Math.cos((a[0] + b[0]) / 2 * rad);
+  const y = (b[0] - a[0]) * rad;
+  return Math.sqrt(x * x + y * y) * 6371000;
+}
+
+function atHome(pos) {
+  const home = osgi.getService('org.openhab.core.i18n.LocationProvider').getLocation();
+  if (home === null || pos === null) {
+    return false;
+  }
+  const PointType = Java.type('org.openhab.core.library.types.PointType');
+  return home.distanceFrom(new PointType(`${pos[0]},${pos[1]}`)).doubleValue() <= HOME_RADIUS_METERS;
+}
+
+// what a read says about where the car is
+function tripReading(vehicle) {
+  const parking = vehicle.parkingPosition || {};
+  const gps = parking.gpsCoordinates || {};
+  const odometer = vehicle.odometer || {};
+  const status = (vehicle.charging || {}).status || {};
+  const battery = status.battery || {};
+  const pos = typeof gps.latitude === 'number' && typeof gps.longitude === 'number'
+    ? [gps.latitude, gps.longitude] : null;
+  return { parked: parking.state === 'PARKED' && pos !== null, moving: parking.state === 'IN_MOTION', pos,
+    address: parking.formattedAddress || null,
+    odo: typeof odometer.mileageInKm === 'number' ? odometer.mileageInKm : null,
+    odoAt: odometer.carCapturedTimestamp ? Date.parse(odometer.carCapturedTimestamp) : NaN,
+    soc: typeof battery.stateOfChargeInPercent === 'number' ? battery.stateOfChargeInPercent : null,
+    charging: status.state === 'CHARGING' };
+}
+
+// a finished session as the history keeps it, in the fields of the app's export
+function sessionTrip(session) {
+  const gained = session.gained + (session.chargeFrom !== undefined && session.chargeFrom !== null &&
+    session.socNow !== null ? Math.max(0, session.socNow - session.chargeFrom) : 0);
+  const used = session.socStart !== null && session.socEnd !== null ? session.socStart - session.socEnd + gained : null;
+  return { start: new Date(session.start).toISOString(), end: new Date(session.end).toISOString(), approx: true,
+    source: 'auto', from: session.from.address, to: session.to.address, fromPos: session.from.pos,
+    toPos: session.to.pos, km: session.odoEnd - session.odoStart, odoStart: session.odoStart,
+    odoEnd: session.odoEnd, travel: Math.round((session.end - session.start) / 60000), socStart: session.socStart,
+    socEnd: session.socEnd, stops: session.stops, gained,
+    kwh: used === null ? null : Math.round(Math.max(0, used) * BATTERY_KWH) / 100 };
+}
+
+// after a read: a departure opens a session (or a leg of the open one), an arrival closes the leg; 2 hours after the
+// last arrival without a new departure the session goes into the history
+function trackTrips(vehicle, now) {
+  const r = tripReading(vehicle);
+  if (r.odo === null || (!r.parked && !r.moving)) {
+    return;
+  }
+  const s = readJson(TRIP_STATE_FILE, {});
+  const before = JSON.stringify(s);
+  const finish = () => {
+    const history = readJson(TRIPS_FILE, { trips: [] });
+    history.trips.push(sessionTrip(s.session));
+    history.trips.sort((a, b) => Date.parse(a.start) - Date.parse(b.start));
+    writeJson(TRIPS_FILE, history);
+    console.info(`Škoda: Fahrt gespeichert, ${s.session.odoEnd - s.session.odoStart} km`);
+    delete s.session;
+  };
+  if (!s.park) {
+    if (r.parked) {
+      s.park = { at: now, seen: now, pos: r.pos, address: r.address, odo: r.odo, soc: r.soc };
+    }
+  } else {
+    const left = r.odo > s.park.odo || r.moving || (r.parked && metersBetween(s.park.pos, r.pos) > MOVED_METERS);
+    if (!left) {
+      // still where it stood: a charge away from home after an arrival of the open session is a charging stop
+      const sess = s.session;
+      if (sess && sess.end !== undefined && !sess.departing && r.soc !== null) {
+        if (r.charging && !atHome(r.pos) && (sess.chargeFrom === undefined || sess.chargeFrom === null)) {
+          sess.chargeFrom = s.park.soc !== null ? s.park.soc : r.soc;
+          sess.stops += 1;
+        } else if (!r.charging && sess.chargeFrom !== undefined && sess.chargeFrom !== null) {
+          sess.gained += Math.max(0, r.soc - sess.chargeFrom);
+          sess.chargeFrom = null;
+        }
+        sess.socNow = r.soc;
+      }
+      s.park.seen = now;
+      if (r.soc !== null) {
+        s.park.soc = r.soc;
+      }
+    } else {
+      // left: a session whose last arrival lies 2 hours or more before the car was last seen there is over
+      if (s.session && s.session.end !== undefined && !s.session.departing &&
+          s.park.seen - s.session.end >= SESSION_GAP_MS) {
+        finish();
+      }
+      if (!s.session) {
+        s.session = { start: null, from: { pos: s.park.pos, address: s.park.address }, odoStart: s.park.odo,
+          socStart: s.park.soc, stops: 0, gained: 0 };
+      }
+      const sess = s.session;
+      if (sess.chargeFrom !== undefined && sess.chargeFrom !== null) {
+        sess.gained += Math.max(0, (s.park.soc !== null ? s.park.soc : sess.chargeFrom) - sess.chargeFrom);
+        sess.chargeFrom = null;
+      }
+      // the departure lies between the last read that saw it parked and the first that saw it gone
+      if (!sess.departing) {
+        sess.departing = { after: s.park.seen, by: now };
+      }
+      if (r.parked) {
+        const arrived = Number.isNaN(r.odoAt) ? now : Math.min(now, Math.max(r.odoAt, sess.departing.after));
+        if (sess.start === null) {
+          const by = Math.min(sess.departing.by, arrived);
+          sess.start = Math.round(sess.departing.after + (by - sess.departing.after) / 2);
+        }
+        Object.assign(sess, { end: arrived, to: { pos: r.pos, address: r.address }, odoEnd: r.odo, socEnd: r.soc,
+          socNow: r.soc });
+        delete sess.departing;
+        s.park = { at: arrived, seen: now, pos: r.pos, address: r.address, odo: r.odo, soc: r.soc };
+      } else if (sess.start === null) {
+        sess.start = Math.round(sess.departing.after + (now - sess.departing.after) / 2);
+      }
+    }
+  }
+  if (s.session && s.session.end !== undefined && !s.session.departing && now - s.session.end >= SESSION_GAP_MS) {
+    finish();
+  }
+  if (JSON.stringify(s) !== before) {
+    writeJson(TRIP_STATE_FILE, s);
+  }
+}
+
+// the last TRIP_DAYS days for the popup: days newest first with their km and a mark on the first of each month, each
+// day's trips newest first, the open session (on the way, or arrived less than 2 hours ago) among them
+function tripWindow(history, session, now) {
+  const from = local(now - TRIP_DAYS * 86400000).day;
+  const trips = history.filter((t) => local(Date.parse(t.start)).day > from);
+  if (session && session.start !== null && session.start !== undefined) {
+    const open = session.end !== undefined && !session.departing ? sessionTrip(session) :
+      { start: new Date(session.start).toISOString(), end: null, approx: true, from: session.from.address,
+        km: null, socStart: session.socStart, stops: session.stops, gained: session.gained };
+    trips.push(open);
+  }
+  const days = [];
+  trips.sort((a, b) => Date.parse(b.start) - Date.parse(a.start)).forEach((t) => {
+    const start = local(Date.parse(t.start));
+    const end = t.end ? local(Date.parse(t.end)) : null;
+    let day = days.length > 0 && days[days.length - 1].d === start.day ? days[days.length - 1] : null;
+    if (day === null) {
+      day = { d: start.day, km: 0, t: [] };
+      if (days.length === 0 || days[days.length - 1].d.slice(0, 7) !== start.day.slice(0, 7)) {
+        day.m = 1;
+      }
+      days.push(day);
+    }
+    day.km += typeof t.km === 'number' ? t.km : 0;
+    day.t.push({ s: start.hm, e: end === null ? null : end.day === start.day ? end.hm : `${WEEKDAYS[end.wd]} ${end.hm}`,
+      x: t.approx ? 1 : 0, a: shortAddress(t.from), b: t.to ? shortAddress(t.to) : '', km: t.km,
+      kwh: typeof t.kwh === 'number' ? Math.round(t.kwh * 10) / 10 : null, s0: t.socStart, s1: t.socEnd,
+      c: t.stops || 0, g: t.gained || 0 });
+  });
+  return days;
+}
+
+// the popup's trips, rebuilt when the history or the state changed (an import, a trip) or a day began
+function publishTrips() {
+  const stamp = `${modified(TRIPS_FILE)}/${modified(TRIP_STATE_FILE)}/${local(Date.now()).day}`;
+  if (store.get('tripsStamp') === stamp && !['NULL', 'UNDEF'].includes(state('trips'))) {
+    return;
+  }
+  const history = readJson(TRIPS_FILE, { trips: [] });
+  const s = readJson(TRIP_STATE_FILE, {});
+  post('trips', JSON.stringify(tripWindow(history.trips || [], s.session || null, Date.now())));
+  store.put('tripsStamp', stamp);
 }
 
 // ---- commands
@@ -578,6 +829,11 @@ function run() {
     setClimate(received.command);
   } else {
     setClimateTarget(received.command);
+  }
+  try {
+    publishTrips();
+  } catch (e) {
+    console.warn(`Škoda: Fahrtenliste: ${e}`);
   }
 }
 

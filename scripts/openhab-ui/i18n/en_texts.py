@@ -207,7 +207,10 @@ EN.update({"auffällig": "elevated", "außerhalb": "outside", "behaglich": "comf
            "Zählerbild": "Meter picture", "Zählerstand": "Meter reading"})
 
     # the heating curve and the outdoor mean it works with (2026-10-09)
-EN.update({"Parkposition": "Parking position", "Heizkurve": "Heating curve", "Heizkurve (fortgesetzt": "Heating curve (extrapolated",
+EN.update({"Fahrten": "Trips", "unterwegs": "on the way", "Ladestopp": "charging stop", "Ladestopps": "charging stops", "ca.": "approx.",
+           "Fahrten mit weniger als 2 Stunden Abstand sind eine Sitzung, „ca.“: Beginn aus den Abfragen geschätzt":
+           "Trips less than 2 hours apart are one session, „approx.“: start estimated from the reads",
+           "Parkposition": "Parking position", "Heizkurve": "Heating curve", "Heizkurve (fortgesetzt": "Heating curve (extrapolated",
            "Kurve": "Curve", "Gemessen": "Measured", "Heizstunden": "heating hours",
            "mittlere Abweichung": "mean deviation", "noch keine Heizperiode erfasst": "no heating season recorded yet",
            "°C außen": "°C outdoor", "°C außen</div>": "°C outdoor</div>", "Außen Ø 24 h": "Outdoor Ø 24 h",
@@ -284,7 +287,7 @@ EN.update({"Škoda Enyaq Ladestand": "Škoda Enyaq State of Charge", "Škoda Eny
            "Škoda Enyaq Kofferraum": "Škoda Enyaq Boot", "Škoda Enyaq Motorhaube": "Škoda Enyaq Bonnet",
            "Škoda Enyaq Licht": "Škoda Enyaq Lights", "Škoda Enyaq Parkstatus": "Škoda Enyaq Parking State",
            "Škoda Enyaq Parkposition": "Škoda Enyaq Parking Position",
-           "Škoda Enyaq Parkadresse": "Škoda Enyaq Parking Address", "Škoda Enyaq zu Hause": "Škoda Enyaq at Home",
+           "Škoda Enyaq Parkadresse": "Škoda Enyaq Parking Address", "Škoda Enyaq Fahrten": "Škoda Enyaq Trips", "Škoda Enyaq zu Hause": "Škoda Enyaq at Home",
            "Škoda Enyaq Klimatisierung": "Škoda Enyaq Climatisation",
            "Škoda Enyaq Klimatisierung Zieltemperatur": "Škoda Enyaq Climatisation Target Temperature",
            "Škoda Enyaq zuletzt gemeldet": "Škoda Enyaq Last Reported", "Škoda Enyaq API-Status": "Škoda Enyaq API Status",

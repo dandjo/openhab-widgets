@@ -178,6 +178,13 @@ props:
     type: TEXT
     required: false
     context: item
+  - name: trips
+    label: Trips
+    description: A String item holding trips by day as JSON (rule skoda_enyaq_status), listed under the map as the MyŠkoda
+      app's travel history
+    type: TEXT
+    required: false
+    context: item
   - name: curve
     label: Heating curve
     description: A String item holding a learnt heating curve as JSON (rule heatpump_heating_curve), drawn as a chart on top
@@ -186,7 +193,7 @@ props:
     required: false
     context: item
   parameterGroups: []
-timestamp: Oct 26, 2026, 1:52:38 PM
+timestamp: Oct 26, 2026, 8:28:42 PM
 component: div
 config:
   style:
@@ -481,6 +488,151 @@ slots:
                 display: block
                 border-radius: 8px
                 filter: '=themeOptions.dark === ''dark'' ? ''invert(0.9) hue-rotate(180deg)'' : ''none'''
+  - component: oh-card
+    config:
+      title: Trips
+      style:
+        height: calc(100% - 2 * var(--f7-card-margin-vertical))
+      visible: '=!!props.trips && (((s) => (s || '''').charAt(0) === ''['' ? JSON.parse(s) : [])(props.trips ? items[props.trips].state
+        : '''')).length > 0'
+    slots:
+      content:
+      - component: div
+        config:
+          style:
+            padding: 0 8px 10px
+        slots:
+          default:
+          - component: Label
+            config:
+              text: 'Trips less than 2 hours apart are one session, „approx.“: start estimated from the reads'
+              style:
+                font-size: 11px
+                opacity: '0.65'
+                padding: 0 2px 4px
+          - component: oh-repeater
+            config:
+              for: day
+              sourceType: array
+              in: '=(((s) => (s || '''').charAt(0) === ''['' ? JSON.parse(s) : [])(props.trips ? items[props.trips].state
+                : ''''))'
+              fragment: true
+            slots:
+              default:
+              - component: div
+                config:
+                  style: {}
+                slots:
+                  default:
+                  - component: Label
+                    config:
+                      text: =(['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October',
+                        'November', 'December'])[dayjs(loop.day.d).month()] + ' ' + dayjs(loop.day.d).year()
+                      style:
+                        font-size: 17px
+                        font-weight: '700'
+                        padding: 10px 2px 2px
+                      visible: =!!loop.day.m
+                  - component: div
+                    config:
+                      style:
+                        display: flex
+                        justify-content: space-between
+                        align-items: baseline
+                        padding: 8px 2px 6px
+                        font-size: 15px
+                    slots:
+                      default:
+                      - component: Label
+                        config:
+                          text: =(['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'])[dayjs(loop.day.d).day()]
+                            + ', ' + dayjs(loop.day.d).date() + '.'
+                          style:
+                            font-weight: '700'
+                      - component: Label
+                        config:
+                          text: =loop.day.km + ' km'
+                          style:
+                            font-weight: '600'
+                  - component: oh-repeater
+                    config:
+                      for: trip
+                      sourceType: array
+                      in: =loop.day.t
+                      fragment: true
+                    slots:
+                      default:
+                      - component: div
+                        config:
+                          style:
+                            background: rgba(127, 127, 127, 0.12)
+                            border-radius: 12px
+                            padding: 10px 12px
+                            margin-bottom: 8px
+                        slots:
+                          default:
+                          - component: div
+                            config:
+                              style:
+                                display: flex
+                                align-items: center
+                            slots:
+                              default:
+                              - component: div
+                                config:
+                                  style:
+                                    flex: 0 0 auto
+                                    min-width: 44px
+                                    padding-right: 10px
+                                    margin-right: 10px
+                                    border-right: 1px solid rgba(127, 127, 127, 0.4)
+                                    text-align: right
+                                    line-height: 21px
+                                    white-space: nowrap
+                                slots:
+                                  default:
+                                  - component: Label
+                                    config:
+                                      text: '=(loop.trip.x ? ''approx. '' : '''') + loop.trip.s'
+                                  - component: Label
+                                    config:
+                                      text: =loop.trip.e || 'on the way'
+                              - component: div
+                                config:
+                                  style:
+                                    flex: '1'
+                                    min-width: '0'
+                                    line-height: 21px
+                                    font-size: 14px
+                                    overflow-wrap: anywhere
+                                slots:
+                                  default:
+                                  - component: Label
+                                    config:
+                                      text: =loop.trip.a
+                                  - component: Label
+                                    config:
+                                      text: =loop.trip.b || '…'
+                              - component: Label
+                                config:
+                                  text: '=loop.trip.km === null || loop.trip.km === undefined ? '''' : loop.trip.km + '' km'''
+                                  style:
+                                    flex: 0 0 auto
+                                    font-weight: '700'
+                                    padding-left: 10px
+                                    white-space: nowrap
+                          - component: Label
+                            config:
+                              text: '=[(loop.trip.kwh === null || loop.trip.kwh === undefined ? '''' : loop.trip.kwh.toFixed(1)
+                                + '' kWh''), (loop.trip.s0 === null || loop.trip.s0 === undefined ? '''' : loop.trip.s0 +
+                                (loop.trip.s1 === null || loop.trip.s1 === undefined ? '' %'' : '' → '' + loop.trip.s1 + ''
+                                %'')), (loop.trip.c > 0 ? loop.trip.c + (loop.trip.c === 1 ? '' charging stop'' : '' charging
+                                stops'') + (loop.trip.g > 0 ? '' (+'' + loop.trip.g + '' %)'' : '''') : '''')].filter((x)
+                                => x !== '''').join('' · '')'
+                              style:
+                                font-size: 11px
+                                opacity: '0.65'
+                                padding-top: 6px
   - component: oh-card
     config:
       title: '=props.curve ? ''Now'' : props.title'

@@ -9006,8 +9006,8 @@ def e_car_now():
     place_tile = vt_tile([vt_head("Standort"), vt_value(f"={where}"),
                           label(f"=items.{address}.state", f"={away}", **{**VT_SUB, "white-space": "normal"})],
                          skoda("at_home"), "Standort", ECAR_COLOR,
-                         # its popup with a map of where the car stands (user, 2026-10-26)
-                         popup={"map": skoda("parking_position")})
+                         # its popup with a map of where the car stands and its trips (user, 2026-10-26)
+                         popup={"map": skoda("parking_position"), "trips": skoda("trips")})
     odometer = skoda("odometer")
     climate, target = skoda("climate_state"), skoda("climate_target")
     climate_tile = vt_tile([vt_head("Klimatisierung"), vt_value(f"={disp(climate)}"),
@@ -10017,6 +10017,51 @@ def location_map_card():
     return out
 
 
+def trips_card():
+    """The item popup's trips (prop trips, user 2026-10-26): a String item holding the last days' trips by day as JSON
+    (rule skoda_enyaq_status), listed as the MyŠkoda app's Reiseverlauf lists them: a month's name over its newest day,
+    each day with its weekday, date and km, each trip in a box with its start and end ("ca." where the rule estimated
+    the start; a trip on its way has no end yet), from where to where and its km, and under them the energy it took,
+    the charge before and after and its charging stops. The addresses come from the item when the popup opens."""
+    days = "(((s) => (s || '').charAt(0) === '[' ? JSON.parse(s) : [])(props.trips ? items[props.trips].state : ''))"
+    d = "dayjs(loop.day.d)"
+    month = label(f"=({WX_MONTHS})[{d}.month()] + ' ' + {d}.year()", "=!!loop.day.m",
+                  **{"font-size": "17px", "font-weight": "700", "padding": "10px 2px 2px"})
+    head = div([label(f"=({WX_WEEKDAYS_LONG})[{d}.day()] + ', ' + {d}.date() + '.'", **{"font-weight": "700"}),
+                label("=loop.day.km + ' km'", **{"font-weight": "600"})],
+               **{"display": "flex", "justify-content": "space-between", "align-items": "baseline",
+                  "padding": "8px 2px 6px", "font-size": "15px"})
+    t = "loop.trip"
+    times = div([label(f"=({t}.x ? 'ca. ' : '') + {t}.s"), label(f"={t}.e || 'unterwegs'")],
+                **{"flex": "0 0 auto", "min-width": "44px", "padding-right": "10px", "margin-right": "10px",
+                   "border-right": "1px solid rgba(127, 127, 127, 0.4)", "text-align": "right",
+                   "line-height": "21px", "white-space": "nowrap"})
+    places = div([label(f"={t}.a"), label(f"={t}.b || '…'")],
+                 **{"flex": "1", "min-width": "0", "line-height": "21px", "font-size": "14px",
+                    "overflow-wrap": "anywhere"})
+    km = label(f"={t}.km === null || {t}.km === undefined ? '' : {t}.km + ' km'",
+               **{"flex": "0 0 auto", "font-weight": "700", "padding-left": "10px", "white-space": "nowrap"})
+    kwh = f"({t}.kwh === null || {t}.kwh === undefined ? '' : {t}.kwh.toFixed(1).replace('.', ',') + ' kWh')"
+    soc = (f"({t}.s0 === null || {t}.s0 === undefined ? '' : {t}.s0 + "
+           f"({t}.s1 === null || {t}.s1 === undefined ? ' %' : ' → ' + {t}.s1 + ' %'))")
+    stops = (f"({t}.c > 0 ? {t}.c + ({t}.c === 1 ? ' Ladestopp' : ' Ladestopps') + "
+             f"({t}.g > 0 ? ' (+' + {t}.g + ' %)' : '') : '')")
+    detail = label(f"=[{kwh}, {soc}, {stops}].filter((x) => x !== '').join(' · ')",
+                   **{**VT_SUB, "padding-top": "6px"})
+    box = div([div([times, places, km], **{"display": "flex", "align-items": "center"}), detail],
+              **{"background": "rgba(127, 127, 127, 0.12)", "border-radius": "12px", "padding": "10px 12px",
+                 "margin-bottom": "8px"})
+    trips = comp("oh-repeater", {"for": "trip", "sourceType": "array", "in": "=loop.day.t", "fragment": True},
+                 default=[box])
+    listed = comp("oh-repeater", {"for": "day", "sourceType": "array", "in": f"={days}", "fragment": True},
+                  default=[div([month, head, trips])])
+    note = label("Fahrten mit weniger als 2 Stunden Abstand sind eine Sitzung, „ca.“: Beginn aus den Abfragen geschätzt",
+                 **{**VT_SUB, "padding": "0 2px 4px"})
+    out = card("Fahrten", [div([note, listed], **{"padding": "0 8px 10px"})])
+    out["config"]["visible"] = f"=!!props.trips && {days}.length > 0"
+    return out
+
+
 def item_popup():
     """The popup a tile of a device page opens: the item's value large, its course over the day as a line, or as a
     band of its states for switches, texts and numbers with state options. With a second item (a tile of two values,
@@ -10166,7 +10211,8 @@ def item_popup():
                                                                    "yAxisIndex": 0, "yValue": 0, "mapState": STATE_LABEL})],
                                   tooltip=[comp("oh-chart-tooltip", {"show": True, "confine": True})])])
     band["config"]["visible"] = "=props.kind === 'state'"
-    root = div([heating_curve_card(ph["color2"], ph["color"]), location_map_card(), now, course, course_today, courses,
+    root = div([heating_curve_card(ph["color2"], ph["color"]), location_map_card(), trips_card(), now, course,
+                course_today, courses,
                 *stacks, band],
                **{"padding": "8px 6px"})
     root["config"]["stylesheet"] = "\n".join([CARD_STYLE, PERIOD_MENU])  # the cards' look; the chart's period menu, out of the layout while closed
@@ -10297,6 +10343,8 @@ ITEM_POPUP_PARAMS = [
                "beside the ring the value's whole day yesterday"), context="item"),
     dict(param("map", "Location", "A Location item: a map (OpenStreetMap) around where it stands, on top"),
          context="item"),
+    dict(param("trips", "Trips", "A String item holding trips by day as JSON (rule skoda_enyaq_status), listed under "
+               "the map as the MyŠkoda app's travel history"), context="item"),
     dict(param("curve", "Heating curve", "A String item holding a learnt heating curve as JSON (rule "
                "heatpump_heating_curve), drawn as a chart on top with item (outdoor) and item2 (setpoint) as the "
                "present point"), context="item")]
