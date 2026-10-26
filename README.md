@@ -1416,6 +1416,7 @@ actionModalConfig:
 | `fact2` | A second item beside the ring, e.g. the electricity a COP is the ratio of | Item |  |
 | `factName2` | The second fact's name | TEXT |  |
 | `history` | The String item the rule tile_history writes the tiles' history into: beside the ring the value's whole day yesterday | Item |  |
+| `map` | A Location item: a map (OpenStreetMap) around where it stands, on top | Item |  |
 | `curve` | A String item holding a learnt heating curve as JSON (rule heatpump_heating_curve), drawn as a chart on top with item (outdoor) and item2 (setpoint) as the present point | Item |  |
 
 ## Value tile: `value-tile`

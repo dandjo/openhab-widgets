@@ -2034,6 +2034,7 @@ METEOBLUE = ("https://www.meteoblue.com/de/wetter/widget/daily/wien_%c3%96sterre
              "&precipitation=0&precipitation=1&precipitationprobability=0&precipitationprobability=1&spot=0&spot=1"
              "&pressure=0&pressure=1&layout=")
 ORF_WEATHER = "https://wetter.orf.at/wien/prognose"
+OSM_EMBED = "https://www.openstreetmap.org/export/embed.html"  # OpenStreetMap's map for frames, with a marker
 WEATHER_PAGE = "weather"
 
 
@@ -5945,7 +5946,7 @@ PHASE_COLORS = ["#3987e5", "#d95926", "#199e70"]
 NEUTRAL_LINE = "(themeOptions.dark === 'dark' ? '#a8a8a8' : '#5a5a5a')"
 
 
-def item_modal(item, title, color=None, second=None):
+def item_modal(item, title, color=None, second=None, extra=None):
     """The props of the item popup for one item: what it shows depends on the item's type and state options. second:
     a tile of two values, {item2, name, name2, color, color2}, the popup then shows both; of up to four, with item3,
     name3, color3, item4, name4, color4 (phases_popup()), and abs or scale for how their chart draws them."""
@@ -5971,6 +5972,8 @@ def item_modal(item, title, color=None, second=None):
                   "abs", "scale"):
             if second.get(k):
                 props[k] = second[k]
+    if extra:
+        props.update(extra)
     return {"action": "popup", "actionModal": "widget:item-popup", "actionModalConfig": props}
 
 
@@ -5994,11 +5997,11 @@ def phases_popup(items_, names, colors=None, neutral=None, abs_=False, scale=Fal
     return {**props, **({"abs": True} if abs_ else {}), **({"scale": True} if scale else {})}
 
 
-def link_over(item, action="popup", radius="12px", title="", color=None, second=None):
-    """Transparent link over a tile: a tap opens the item's popup (or the item's options)."""
+def link_over(item, action="popup", radius="12px", title="", color=None, second=None, popup=None):
+    """Transparent link over a tile: a tap opens the item's popup (or the item's options); popup: more of its props."""
     cfg = {"action": action, "style": {"position": "absolute", "inset": "0", "display": "block", "border-radius": radius}}
     if action == "popup":
-        cfg.update(item_modal(item, title, color, second))
+        cfg.update(item_modal(item, title, color, second, popup))
     else:
         cfg["actionItem"] = item
     return comp("oh-link", cfg)
@@ -6454,12 +6457,12 @@ def vt_head(title, right=None):
     return div(kids, **{"display": "flex", "align-items": "center", "gap": "8px"})
 
 
-def vt_tile(children, item=None, title="", color=None, wide=False, visible=None, second=None, **style):
+def vt_tile(children, item=None, title="", color=None, wide=False, visible=None, second=None, popup=None, **style):
     kids = list(children)
     # no popup where it could only repeat the tile's value: an item without a course, a point in time (kind none; user,
     # 2026-10-22: the sun arc's popup was "komplett sinnlos")
     if item and (second or item_kind(item)[0] != "none"):
-        kids.append(link_over(item, title=title, color=color, second=second))
+        kids.append(link_over(item, title=title, color=color, second=second, popup=popup))
     return div(kids, visible, **{**VT_TILE, **(VT_WIDE if wide else {}), **style})
 
 
@@ -8999,7 +9002,9 @@ def e_car_now():
             f"{ok(address)}")
     place_tile = vt_tile([vt_head("Standort"), vt_value(f"={where}"),
                           label(f"=items.{address}.state", f"={away}", **{**VT_SUB, "white-space": "normal"})],
-                         skoda("at_home"), "Standort", ECAR_COLOR)
+                         skoda("at_home"), "Standort", ECAR_COLOR,
+                         # its popup with a map of where the car stands (user, 2026-10-26)
+                         popup={"map": skoda("parking_position")})
     odometer = skoda("odometer")
     climate, target = skoda("climate_state"), skoda("climate_target")
     climate_tile = vt_tile([vt_head("Klimatisierung"), vt_value(f"={disp(climate)}"),
@@ -9990,6 +9995,25 @@ def heating_curve_card(color, now_color):
     return out
 
 
+def location_map_card():
+    """The item popup's map on top (prop map, user 2026-10-26): OpenStreetMap's map for frames around where a Location
+    item stands, with a marker there. The position comes from the item when the popup opens, so no coordinates are in
+    the widget; the browser loads the map from openstreetmap.org. OpenStreetMap has no dark style: the dark theme
+    inverts it, turned back in hue, so it does not glare in the dark popup."""
+    pos = "((items[props.map] ? items[props.map].state : '') || '').split(',').slice(0, 2).map(Number)"
+    valid = "((p) => p.length === 2 && p.every(Number.isFinite))"
+    # about 650 m north to south and 900 m east to west around it: the streets around it, as on a phone
+    url = (f"=((p) => {valid}(p) ? '{OSM_EMBED}?bbox=' + (p[1] - 0.006) + ',' + (p[0] - 0.003) + ',' + "
+           f"(p[1] + 0.006) + ',' + (p[0] + 0.003) + '&layer=mapnik&marker=' + p[0] + ',' + p[1] : 'about:blank')({pos})")
+    frame = comp("oh-webframe", {"src": url, "height": "300px", "frameborder": "0", "scrolling": "no",
+                                 "style": {"width": "100%", "border": "0", "display": "block", "border-radius": "8px",
+                                           "filter": "=themeOptions.dark === 'dark' ? "
+                                                     "'invert(0.9) hue-rotate(180deg)' : 'none'"}})
+    out = card("Parkposition", [div([frame], **{"padding": "4px 12px 12px"})])
+    out["config"]["visible"] = f"=!!props.map && {valid}({pos})"
+    return out
+
+
 def item_popup():
     """The popup a tile of a device page opens: the item's value large, its course over the day as a line, or as a
     band of its states for switches, texts and numbers with state options. With a second item (a tile of two values,
@@ -10139,7 +10163,8 @@ def item_popup():
                                                                    "yAxisIndex": 0, "yValue": 0, "mapState": STATE_LABEL})],
                                   tooltip=[comp("oh-chart-tooltip", {"show": True, "confine": True})])])
     band["config"]["visible"] = "=props.kind === 'state'"
-    root = div([heating_curve_card(ph["color2"], ph["color"]), now, course, course_today, courses, *stacks, band],
+    root = div([heating_curve_card(ph["color2"], ph["color"]), location_map_card(), now, course, course_today, courses,
+                *stacks, band],
                **{"padding": "8px 6px"})
     root["config"]["stylesheet"] = "\n".join([CARD_STYLE, PERIOD_MENU])  # the cards' look; the chart's period menu, out of the layout while closed
     return root
@@ -10267,6 +10292,8 @@ ITEM_POPUP_PARAMS = [
     param("factName2", "Second fact's name", "The second fact's name"),
     dict(param("history", "History item", "The String item the rule tile_history writes the tiles' history into: "
                "beside the ring the value's whole day yesterday"), context="item"),
+    dict(param("map", "Location", "A Location item: a map (OpenStreetMap) around where it stands, on top"),
+         context="item"),
     dict(param("curve", "Heating curve", "A String item holding a learnt heating curve as JSON (rule "
                "heatpump_heating_curve), drawn as a chart on top with item (outdoor) and item2 (setpoint) as the "
                "present point"), context="item")]

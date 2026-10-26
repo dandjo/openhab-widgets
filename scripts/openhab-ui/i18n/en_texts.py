@@ -207,7 +207,7 @@ EN.update({"auffällig": "elevated", "außerhalb": "outside", "behaglich": "comf
            "Zählerbild": "Meter picture", "Zählerstand": "Meter reading"})
 
     # the heating curve and the outdoor mean it works with (2026-10-09)
-EN.update({"Heizkurve": "Heating curve", "Heizkurve (fortgesetzt": "Heating curve (extrapolated",
+EN.update({"Parkposition": "Parking position", "Heizkurve": "Heating curve", "Heizkurve (fortgesetzt": "Heating curve (extrapolated",
            "Kurve": "Curve", "Gemessen": "Measured", "Heizstunden": "heating hours",
            "mittlere Abweichung": "mean deviation", "noch keine Heizperiode erfasst": "no heating season recorded yet",
            "°C außen": "°C outdoor", "°C außen</div>": "°C outdoor</div>", "Außen Ø 24 h": "Outdoor Ø 24 h",

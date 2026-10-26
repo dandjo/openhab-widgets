@@ -172,6 +172,12 @@ props:
     type: TEXT
     required: false
     context: item
+  - name: map
+    label: Location
+    description: 'A Location item: a map (OpenStreetMap) around where it stands, on top'
+    type: TEXT
+    required: false
+    context: item
   - name: curve
     label: Heating curve
     description: A String item holding a learnt heating curve as JSON (rule heatpump_heating_curve), drawn as a chart on top
@@ -180,7 +186,7 @@ props:
     required: false
     context: item
   parameterGroups: []
-timestamp: Oct 25, 2026, 2:07:58 PM
+timestamp: Oct 26, 2026, 1:32:40 PM
 component: div
 config:
   style:
@@ -445,6 +451,36 @@ slots:
             font-size: 11px
             opacity: '0.65'
             padding: 0 16px 14px
+  - component: oh-card
+    config:
+      title: Parking position
+      style:
+        height: calc(100% - 2 * var(--f7-card-margin-vertical))
+      visible: '=!!props.map && ((p) => p.length === 2 && p.every(Number.isFinite))(((items[props.map] ? items[props.map].state
+        : '''') || '''').split('','').slice(0, 2).map(Number))'
+    slots:
+      content:
+      - component: div
+        config:
+          style:
+            padding: 4px 12px 12px
+        slots:
+          default:
+          - component: oh-webframe
+            config:
+              src: '=((p) => ((p) => p.length === 2 && p.every(Number.isFinite))(p) ? ''https://www.openstreetmap.org/export/embed.html?bbox=''
+                + (p[1] - 0.006) + '','' + (p[0] - 0.003) + '','' + (p[1] + 0.006) + '','' + (p[0] + 0.003) + ''&layer=mapnik&marker=''
+                + p[0] + '','' + p[1] : ''about:blank'')(((items[props.map] ? items[props.map].state : '''') || '''').split('','').slice(0,
+                2).map(Number))'
+              height: 300px
+              frameborder: '0'
+              scrolling: 'no'
+              style:
+                width: 100%
+                border: '0'
+                display: block
+                border-radius: 8px
+                filter: '=themeOptions.dark === ''dark'' ? ''invert(0.9) hue-rotate(180deg)'' : ''none'''
   - component: oh-card
     config:
       title: '=props.curve ? ''Now'' : props.title'
