@@ -10097,8 +10097,8 @@ def trip_popup():
     line (the static page TRIP_MAP with Leaflet; only places where the car stood: the API reports none on the way, the
     app's export only start and end), the places with their time, then Übersicht (from where to where, travel time and
     km, energy, average consumption, distance, driving time, average speed, charging stops), Batterie and
-    Kilometerzähler, each with its start and end. A trip found from the reads has its start marked "ca."; its driving
-    time and speed are unknown."""
+    Kilometerzähler, each with its start and end. A trip found from the reads has its start, driving time and speed
+    estimated from the reads and marked "ca." (user, 2026-10-29)."""
     t = TRIP
     day = (f"((d) => ({WX_WEEKDAYS_LONG})[d.day()] + ', ' + d.date() + '. ' + ({WX_MONTHS})[d.month()])"
            f"(dayjs(Number(props.id)))")
@@ -10141,8 +10141,8 @@ def trip_popup():
         row("Gesamtverbrauch", f"{t}.kwh == null ? '–' : '~ ' + {num1(t + '.kwh')} + ' kWh'"),
         row("Ø Verbrauch", per100),
         row("Entfernung", f"{t}.km == null ? '–' : {t}.km + ' km'"),
-        row("Fahrzeit", trip_minutes(f"{t}.dr")),
-        row("Ø Geschwindigkeit", f"{t}.sp == null ? '–' : '~ ' + {t}.sp + ' km/h'"),
+        row("Fahrzeit", f"({t}.x && {t}.dr != null ? 'ca. ' : '') + {trip_minutes(t + '.dr')}"),
+        row("Ø Geschwindigkeit", f"{t}.sp == null ? '–' : ({t}.x ? 'ca. ' : '~ ') + {t}.sp + ' km/h'"),
         row("Ladestopps", f"{t}.c + ({t}.g > 0 ? ' (+' + {t}.g + ' %)' : '')", f"={t}.c > 0")],
         **{"padding": "0 14px 8px"})])
     pair_card = lambda title, a, b: card(title, [div([row("Start", a), row("Ende", b)], **{"padding": "0 14px 8px"})])

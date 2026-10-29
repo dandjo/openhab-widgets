@@ -477,22 +477,31 @@ function tripState() {
   }
 }
 
-// a session as a trip in the export's fields; its places as [latitude, longitude, time, address, charge gained there]
+// a session as a trip in the export's fields; its places as [latitude, longitude, time, address, charge gained there].
+// A charge at its last place is no part of it, neither stop nor energy, only marked at the place (user, 2026-10-29:
+// a 1 km trip showed 10 kWh and a charging stop); it becomes a stop when the car drives on. The driving time is the
+// travel time less the time the car stood at its stops, estimated from the reads as the start is (user, 2026-10-29)
 function sessionTrip(session) {
   const open = session.chargeFrom !== undefined && session.chargeFrom !== null && session.socNow !== null
     ? Math.max(0, session.socNow - session.chargeFrom) : 0;
-  const gained = session.gained + open;
+  const last = session.points.length - 1;
+  const atEnd = session.chargedAt === last;
+  const gained = session.gained + open - (atEnd ? session.points[last][4] + open : 0);
+  const travel = session.end === undefined ? null : session.end - session.start;
+  const drive = travel === null ? null : travel - (session.parked || 0);
+  const km = session.odoEnd === undefined ? null : session.odoEnd - session.odoStart;
   const used = session.socStart !== null && session.socEnd !== null && session.socEnd !== undefined
     ? session.socStart - session.socEnd + gained : null;
   const points = session.points.map((p, i) => i === session.points.length - 1 && open > 0
     ? [p[0], p[1], p[2], p[3], p[4] + open] : p);
   return { time: session.start, source: 'auto', end: session.end === undefined ? null : session.end, approx: true,
     from: points[0][3], to: session.end === undefined ? null : points[points.length - 1][3],
-    km: session.odoEnd === undefined ? null : session.odoEnd - session.odoStart, odoStart: session.odoStart,
-    odoEnd: session.odoEnd === undefined ? null : session.odoEnd,
-    travel: session.end === undefined ? null : Math.round((session.end - session.start) / 60000),
-    socStart: session.socStart, socEnd: session.socEnd === undefined ? null : session.socEnd, stops: session.stops,
-    gained, kwh: used === null ? null : Math.round(Math.max(0, used) * BATTERY_KWH) / 100,
+    km, odoStart: session.odoStart, odoEnd: session.odoEnd === undefined ? null : session.odoEnd,
+    travel: travel === null ? null : Math.round(travel / 60000), drive: drive === null ? null : Math.round(drive / 60000),
+    speed: drive !== null && drive >= 60000 && km !== null ? Math.round(km * 3600000 / drive) : null,
+    socStart: session.socStart, socEnd: session.socEnd === undefined ? null : session.socEnd,
+    stops: session.stops - (atEnd ? 1 : 0), gained,
+    kwh: used === null ? null : Math.round(Math.max(0, used) * BATTERY_KWH) / 100,
     points: JSON.stringify(points) };
 }
 
@@ -537,7 +546,11 @@ function trackTrips(vehicle, prev, now) {
       const last = sess.points[sess.points.length - 1];
       if (r.charging && !atHome(r.pos) && (sess.chargeFrom === undefined || sess.chargeFrom === null)) {
         sess.chargeFrom = prev.soc !== null ? prev.soc : r.soc;
-        sess.stops += 1;
+        // one stop per place, however often the charge pauses there; sessionTrip needs to know where it was
+        if (sess.chargedAt !== sess.points.length - 1) {
+          sess.stops += 1;
+          sess.chargedAt = sess.points.length - 1;
+        }
       } else if (!r.charging && sess.chargeFrom !== undefined && sess.chargeFrom !== null) {
         const gain = Math.max(0, r.soc - sess.chargeFrom);
         sess.gained += gain;
@@ -570,10 +583,13 @@ function trackTrips(vehicle, prev, now) {
     }
     if (r.parked) {
       const arrived = Number.isNaN(r.odoAt) ? now : Math.min(now, Math.max(r.odoAt, sess.departing.after));
+      const left = Math.round(sess.departing.after + (Math.min(sess.departing.by, arrived) - sess.departing.after) / 2);
       if (sess.start === null) {
-        const by = Math.min(sess.departing.by, arrived);
-        sess.start = Math.round(sess.departing.after + (by - sess.departing.after) / 2);
+        sess.start = left;
         sess.points[0][2] = sess.start;
+      } else if (sess.end !== undefined) {
+        // it left a stop of the session: the time it stood there is no driving time
+        sess.parked = (sess.parked || 0) + Math.max(0, left - sess.end);
       }
       sess.points.push([r.pos[0], r.pos[1], arrived, r.address, 0]);
       Object.assign(sess, { end: arrived, odoEnd: r.odo, socEnd: r.soc, socNow: r.soc });
