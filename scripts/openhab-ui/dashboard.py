@@ -9996,27 +9996,50 @@ def heating_curve_card(color, now_color):
     return out
 
 
-def osm_credit():
-    """OpenStreetMap's credit right under a map, which carries none of its own (user, 2026-10-26: no badges on the
-    map; OpenStreetMap's guidelines allow the credit adjacent to the map), linked to its copyright page."""
+def osm_credit(**style):
+    """OpenStreetMap's credit beside a map, which carries none of its own (user, 2026-10-26: no badges on the map;
+    OpenStreetMap's guidelines allow the credit adjacent to the map), linked to its copyright page; by default a line
+    of its own, right-aligned."""
     return comp("oh-link", {"text": "Kartendaten © OpenStreetMap", "action": "url",
                             "actionUrl": "https://www.openstreetmap.org/copyright", "actionUrlSameWindow": False,
                             "style": {**VT_SUB, "display": "block", "text-align": "right", "padding-top": "4px",
-                                      "color": "inherit"}})
+                                      "color": "inherit", **style}})
+
+
+def map_frame(src, height):
+    """A map page in a frame, for map_card()."""
+    return comp("oh-webframe", {"src": src, "height": height, "frameborder": "0", "scrolling": "no",
+                                "style": {"width": "100%", "border": "0", "display": "block"}})
+
+
+def map_card(content):
+    """A card a map fills to its edges (user, 2026-10-29: no padding beside and below the map): oh-card always gives
+    its content f7's class padding, whose padding is !important, so the card's own stylesheet takes it away with a
+    more specific rule; the card clips, so the map takes the card's corners, whatever its radius."""
+    out = card("", content)
+    out["config"]["style"]["overflow"] = "hidden"
+    out["config"]["stylesheet"] = ".card-content { padding: 0 !important; }"
+    return out
 
 
 def location_map_card():
     """The item popup's map on top (prop map, user 2026-10-26): where a Location item stands on the trip map's page
     (TRIP_MAP, a single plain mark), about the street it stands in (zoom 17; user: two levels closer than first shown),
-    OpenStreetMap credited under it. The position comes from the item when the popup opens, so no coordinates are in
-    the widget; the browser loads the tiles from openstreetmap.org."""
+    filling the card beside and below it, its title and OpenStreetMap's credit in one line above it. The position
+    comes from the item when the popup opens, so no coordinates are in the widget; the browser loads the tiles from
+    openstreetmap.org."""
     pos = "((items[props.map] ? items[props.map].state : '') || '').split(',').slice(0, 2).map(Number)"
     valid = "((p) => p.length === 2 && p.every(Number.isFinite))"
     url = (f"=((p) => {valid}(p) ? '{TRIP_MAP}&p=' + p[0] + ',' + p[1] + ',0&z=17&col={ECAR_COLOR[1:]}&dark=' + "
            f"(themeOptions.dark === 'dark' ? 1 : 0) : 'about:blank')({pos})")
-    frame = comp("oh-webframe", {"src": url, "height": "300px", "frameborder": "0", "scrolling": "no",
-                                 "style": {"width": "100%", "border": "0", "display": "block", "border-radius": "8px"}})
-    out = card("Parkposition", [div([frame, osm_credit()], **{"padding": "4px 12px 8px"})])
+    # the card's title drawn as CARD_STYLE draws a card header, with the credit at its right: below the map, which
+    # now reaches the card's bottom edge, there is no room for it
+    head = div([label("Parkposition", **{"font-size": "13px", "font-weight": "600", "opacity": "0.6",
+                                         "letter-spacing": "0.02em"}),
+                osm_credit(**{"padding-top": "0", "display": "inline"})],
+               **{"display": "flex", "justify-content": "space-between", "align-items": "baseline", "gap": "12px",
+                  "padding": "16px 16px 10px"})
+    out = map_card([head, map_frame(url, "300px")])
     out["config"]["visible"] = f"=!!props.map && {valid}({pos})"
     return out
 
@@ -10024,7 +10047,7 @@ def location_map_card():
 def trips_card():
     """The item popup's trips (prop trips, user 2026-10-26): a String item holding the last days' trips by day as JSON
     (rule skoda_enyaq_status), listed as the MyŠkoda app's Reiseverlauf lists them: a month's name over its newest day,
-    each day with its weekday, date and km, each trip in a box with its start and end ("ca." where the rule estimated
+    each day with its weekday, date and km, each trip in a box with its start and end ("~" where the rule estimated
     the start; a trip on its way has no end yet), from where to where and its km, and under them the energy it took,
     the charge before and after and its charging stops. The addresses come from the item when the popup opens."""
     days = "(((s) => (s || '').charAt(0) === '[' ? JSON.parse(s) : [])(props.trips ? items[props.trips].state : ''))"
@@ -10036,7 +10059,7 @@ def trips_card():
                **{"display": "flex", "justify-content": "space-between", "align-items": "baseline",
                   "padding": "8px 2px 6px", "font-size": "15px"})
     t = "loop.trip"
-    times = div([label(f"=({t}.x ? 'ca. ' : '') + {t}.s"), label(f"={t}.e || 'unterwegs'")],
+    times = div([label(f"=({t}.x ? '~ ' : '') + {t}.s"), label(f"={t}.e || 'unterwegs'")],
                 **{"flex": "0 0 auto", "min-width": "44px", "padding-right": "10px", "margin-right": "10px",
                    "border-right": "1px solid rgba(127, 127, 127, 0.4)", "text-align": "right",
                    "line-height": "21px", "white-space": "nowrap"})
@@ -10070,7 +10093,8 @@ def trips_card():
                  default=[box])
     listed = comp("oh-repeater", {"for": "day", "sourceType": "array", "in": f"={days}", "fragment": True},
                   default=[div([month, head, trips])])
-    note = label("Fahrten mit weniger als 2 Stunden Abstand sind eine Sitzung, „ca.“: Beginn aus den Abfragen geschätzt",
+    # "~" marks what the rule estimated, as the app's own estimates (user, 2026-10-29: "~" instead of "ca.")
+    note = label("Fahrten mit weniger als 2 Stunden Abstand sind eine Sitzung, „~“: aus den Abfragen geschätzt",
                  **{**VT_SUB, "padding": "0 2px 4px"})
     out = card("Fahrten", [div([note, listed], **{"padding": "0 8px 10px"})])
     out["config"]["visible"] = f"=!!props.trips && {days}.length > 0"
@@ -10098,19 +10122,18 @@ def trip_popup():
     app's export only start and end), the places with their time, then Übersicht (from where to where, travel time and
     km, energy, average consumption, distance, driving time, average speed, charging stops), Batterie and
     Kilometerzähler, each with its start and end. A trip found from the reads has its start, driving time and speed
-    estimated from the reads and marked "ca." (user, 2026-10-29)."""
+    estimated from the reads and marked "~" (user, 2026-10-29)."""
     t = TRIP
     day = (f"((d) => ({WX_WEEKDAYS_LONG})[d.day()] + ', ' + d.date() + '. ' + ({WX_MONTHS})[d.month()])"
            f"(dayjs(Number(props.id)))")
-    times = f"(({t}.x ? 'ca. ' : '') + ({t}.s || '') + ({t}.e ? ' – ' + {t}.e : ' · unterwegs'))"
+    times = f"(({t}.x ? '~ ' : '') + ({t}.s || '') + ({t}.e ? ' – ' + {t}.e : ' · unterwegs'))"
     head = div([label(f"={day}", **{"font-size": "20px", "font-weight": "700"}),
                 label(f"={times}", **{**VT_SUB, "font-size": "14px"})], **{"padding": "6px 10px 10px"})
     points = (f"({t}.p || []).map((q) => q[0] + ',' + q[1] + ',' + (q[4] > 0 ? 1 : 0)).join(';')")
     color = "((props.color || '" + ECAR_COLOR + "').replace('#', ''))"
-    frame = comp("oh-webframe", {"src": f"='{TRIP_MAP}&p=' + {points} + '&col=' + {color} + '&dark=' + "
-                                        f"(themeOptions.dark === 'dark' ? 1 : 0)",
-                                 "height": "320px", "frameborder": "0", "scrolling": "no",
-                                 "style": {"width": "100%", "border": "0", "display": "block", "border-radius": "8px"}})
+    # the map fills the card above and beside it (no title), the credit and the places below it keep their margins
+    frame = map_frame(f"='{TRIP_MAP}&p=' + {points} + '&col=' + {color} + '&dark=' + "
+                      f"(themeOptions.dark === 'dark' ? 1 : 0)", "320px")
     badge_ = label("=loop.pt_idx + 1", **{"flex": "0 0 auto", "width": "24px", "height": "24px", "line-height": "24px",
                                           "border-radius": "50%", "text-align": "center", "font-size": "12px",
                                           "font-weight": "700", "color": "#fff",
@@ -10123,7 +10146,8 @@ def trip_popup():
                    "font-size": "14px"})
     places = comp("oh-repeater", {"for": "pt", "sourceType": "array", "in": f"={t}.p || []", "fragment": True},
                   default=[place])
-    map_card = card("", [div([frame, osm_credit(), div([places], **{"padding": "4px 2px 0"})], **{"padding": "12px"})])
+    trip_map = map_card([frame, div([osm_credit(), div([places], **{"padding": "4px 2px 0"})],
+                                    **{"padding": "2px 14px 12px"})])
 
     def row(name, value, visible=None):
         return div([label(name), label(f"={value}", **{"font-weight": "700", "text-align": "right",
@@ -10141,14 +10165,14 @@ def trip_popup():
         row("Gesamtverbrauch", f"{t}.kwh == null ? '–' : '~ ' + {num1(t + '.kwh')} + ' kWh'"),
         row("Ø Verbrauch", per100),
         row("Entfernung", f"{t}.km == null ? '–' : {t}.km + ' km'"),
-        row("Fahrzeit", f"({t}.x && {t}.dr != null ? 'ca. ' : '') + {trip_minutes(t + '.dr')}"),
-        row("Ø Geschwindigkeit", f"{t}.sp == null ? '–' : ({t}.x ? 'ca. ' : '~ ') + {t}.sp + ' km/h'"),
+        row("Fahrzeit", f"({t}.x && {t}.dr != null ? '~ ' : '') + {trip_minutes(t + '.dr')}"),
+        row("Ø Geschwindigkeit", f"{t}.sp == null ? '–' : '~ ' + {t}.sp + ' km/h'"),
         row("Ladestopps", f"{t}.c + ({t}.g > 0 ? ' (+' + {t}.g + ' %)' : '')", f"={t}.c > 0")],
         **{"padding": "0 14px 8px"})])
     pair_card = lambda title, a, b: card(title, [div([row("Start", a), row("Ende", b)], **{"padding": "0 14px 8px"})])
     pct = lambda v: f"{v} == null ? '–' : {v} + ' %'"
     km = lambda v: f"{v} == null ? '–' : {v}.toLocaleString('de-AT') + ' km'"
-    return div([head, map_card, overview, pair_card("Batterie", pct(f"{t}.s0"), pct(f"{t}.s1")),
+    return div([head, trip_map, overview, pair_card("Batterie", pct(f"{t}.s0"), pct(f"{t}.s1")),
                 pair_card("Kilometerzähler", km(f"{t}.o0"), km(f"{t}.o1"))], **{"padding": "8px 6px"})
 
 

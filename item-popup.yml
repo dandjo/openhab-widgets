@@ -193,7 +193,7 @@ props:
     required: false
     context: item
   parameterGroups: []
-timestamp: Oct 26, 2026, 10:23:22 PM
+timestamp: Oct 29, 2026, 10:35:18 PM
 component: div
 config:
   style:
@@ -460,9 +460,11 @@ slots:
             padding: 0 16px 14px
   - component: oh-card
     config:
-      title: Parking position
+      title: ''
       style:
         height: calc(100% - 2 * var(--f7-card-margin-vertical))
+        overflow: hidden
+      stylesheet: '.card-content { padding: 0 !important; }'
       visible: '=!!props.map && ((p) => p.length === 2 && p.every(Number.isFinite))(((items[props.map] ? items[props.map].state
         : '''') || '''').split('','').slice(0, 2).map(Number))'
     slots:
@@ -470,22 +472,21 @@ slots:
       - component: div
         config:
           style:
-            padding: 4px 12px 8px
+            display: flex
+            justify-content: space-between
+            align-items: baseline
+            gap: 12px
+            padding: 16px 16px 10px
         slots:
           default:
-          - component: oh-webframe
+          - component: Label
             config:
-              src: '=((p) => ((p) => p.length === 2 && p.every(Number.isFinite))(p) ? ''/static/trip-map.html?v=d19bb395&p=''
-                + p[0] + '','' + p[1] + '',0&z=17&col=26a69a&dark='' + (themeOptions.dark === ''dark'' ? 1 : 0) : ''about:blank'')(((items[props.map]
-                ? items[props.map].state : '''') || '''').split('','').slice(0, 2).map(Number))'
-              height: 300px
-              frameborder: '0'
-              scrolling: 'no'
+              text: Parking position
               style:
-                width: 100%
-                border: '0'
-                display: block
-                border-radius: 8px
+                font-size: 13px
+                font-weight: '600'
+                opacity: '0.6'
+                letter-spacing: 0.02em
           - component: oh-link
             config:
               text: Map data © OpenStreetMap
@@ -495,10 +496,22 @@ slots:
               style:
                 font-size: 11px
                 opacity: '0.65'
-                display: block
+                display: inline
                 text-align: right
-                padding-top: 4px
+                padding-top: '0'
                 color: inherit
+      - component: oh-webframe
+        config:
+          src: '=((p) => ((p) => p.length === 2 && p.every(Number.isFinite))(p) ? ''/static/trip-map.html?v=d19bb395&p=''
+            + p[0] + '','' + p[1] + '',0&z=17&col=26a69a&dark='' + (themeOptions.dark === ''dark'' ? 1 : 0) : ''about:blank'')(((items[props.map]
+            ? items[props.map].state : '''') || '''').split('','').slice(0, 2).map(Number))'
+          height: 300px
+          frameborder: '0'
+          scrolling: 'no'
+          style:
+            width: 100%
+            border: '0'
+            display: block
   - component: oh-card
     config:
       title: Trips
@@ -516,7 +529,7 @@ slots:
           default:
           - component: Label
             config:
-              text: 'Trips less than 2 hours apart are one session, „approx.“: start estimated from the reads'
+              text: 'Trips less than 2 hours apart are one session, „~“: estimated from the reads'
               style:
                 font-size: 11px
                 opacity: '0.65'
@@ -605,7 +618,7 @@ slots:
                                   default:
                                   - component: Label
                                     config:
-                                      text: '=(loop.trip.x ? ''approx. '' : '''') + loop.trip.s'
+                                      text: '=(loop.trip.x ? ''~ '' : '''') + loop.trip.s'
                                   - component: Label
                                     config:
                                       text: =loop.trip.e || 'on the way'

@@ -21,7 +21,7 @@ props:
     required: false
     default: '#26a69a'
   parameterGroups: []
-timestamp: Oct 29, 2026, 9:58:15 PM
+timestamp: Oct 29, 2026, 10:35:18 PM
 component: div
 config:
   style:
@@ -146,10 +146,10 @@ slots:
       - component: Label
         config:
           text: '=(((((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) => t.id ===
-            Number(props.id)) || {})(props.trips ? items[props.trips].state : '''')).x ? ''approx. '' : '''') + ((((s) =>
-            ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) => t.id === Number(props.id))
-            || {})(props.trips ? items[props.trips].state : '''')).s || '''') + ((((s) => ((s || '''').charAt(0) === ''[''
-            ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) => t.id === Number(props.id)) || {})(props.trips ? items[props.trips].state
+            Number(props.id)) || {})(props.trips ? items[props.trips].state : '''')).x ? ''~ '' : '''') + ((((s) => ((s ||
+            '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) => t.id === Number(props.id)) ||
+            {})(props.trips ? items[props.trips].state : '''')).s || '''') + ((((s) => ((s || '''').charAt(0) === ''['' ?
+            JSON.parse(s) : []).flatMap((d) => d.t).find((t) => t.id === Number(props.id)) || {})(props.trips ? items[props.trips].state
             : '''')).e ? '' – '' + (((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t)
             => t.id === Number(props.id)) || {})(props.trips ? items[props.trips].state : '''')).e : '' · on the way''))'
           style:
@@ -160,28 +160,29 @@ slots:
       title: ''
       style:
         height: calc(100% - 2 * var(--f7-card-margin-vertical))
+        overflow: hidden
+      stylesheet: '.card-content { padding: 0 !important; }'
     slots:
       content:
+      - component: oh-webframe
+        config:
+          src: '=''/static/trip-map.html?v=d19bb395&p='' + ((((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d)
+            => d.t).find((t) => t.id === Number(props.id)) || {})(props.trips ? items[props.trips].state : '''')).p || []).map((q)
+            => q[0] + '','' + q[1] + '','' + (q[4] > 0 ? 1 : 0)).join('';'') + ''&col='' + ((props.color || ''#26a69a'').replace(''#'',
+            '''')) + ''&dark='' + (themeOptions.dark === ''dark'' ? 1 : 0)'
+          height: 320px
+          frameborder: '0'
+          scrolling: 'no'
+          style:
+            width: 100%
+            border: '0'
+            display: block
       - component: div
         config:
           style:
-            padding: 12px
+            padding: 2px 14px 12px
         slots:
           default:
-          - component: oh-webframe
-            config:
-              src: '=''/static/trip-map.html?v=d19bb395&p='' + ((((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s)
-                : []).flatMap((d) => d.t).find((t) => t.id === Number(props.id)) || {})(props.trips ? items[props.trips].state
-                : '''')).p || []).map((q) => q[0] + '','' + q[1] + '','' + (q[4] > 0 ? 1 : 0)).join('';'') + ''&col='' + ((props.color
-                || ''#26a69a'').replace(''#'', '''')) + ''&dark='' + (themeOptions.dark === ''dark'' ? 1 : 0)'
-              height: 320px
-              frameborder: '0'
-              scrolling: 'no'
-              style:
-                width: 100%
-                border: '0'
-                display: block
-                border-radius: 8px
           - component: oh-link
             config:
               text: Map data © OpenStreetMap
@@ -392,10 +393,10 @@ slots:
                   text: '=((((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) =>
                     t.id === Number(props.id)) || {})(props.trips ? items[props.trips].state : '''')).x && (((s) => ((s ||
                     '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) => t.id === Number(props.id))
-                    || {})(props.trips ? items[props.trips].state : '''')).dr != null ? ''approx. '' : '''') + ((m) => m ==
-                    null ? ''–'' : (m >= 60 ? Math.floor(m / 60) + '' h '' : '''') + (m % 60) + '' min'')((((s) => ((s ||
-                    '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) => t.id === Number(props.id))
-                    || {})(props.trips ? items[props.trips].state : '''')).dr)'
+                    || {})(props.trips ? items[props.trips].state : '''')).dr != null ? ''~ '' : '''') + ((m) => m == null
+                    ? ''–'' : (m >= 60 ? Math.floor(m / 60) + '' h '' : '''') + (m % 60) + '' min'')((((s) => ((s || '''').charAt(0)
+                    === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) => t.id === Number(props.id)) || {})(props.trips
+                    ? items[props.trips].state : '''')).dr)'
                   style:
                     font-weight: '700'
                     text-align: right
@@ -418,10 +419,8 @@ slots:
                 config:
                   text: '=(((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) =>
                     t.id === Number(props.id)) || {})(props.trips ? items[props.trips].state : '''')).sp == null ? ''–'' :
-                    ((((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) => t.id
-                    === Number(props.id)) || {})(props.trips ? items[props.trips].state : '''')).x ? ''approx. '' : ''~ '')
-                    + (((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) => t.id
-                    === Number(props.id)) || {})(props.trips ? items[props.trips].state : '''')).sp + '' km/h'''
+                    ''~ '' + (((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t)
+                    => t.id === Number(props.id)) || {})(props.trips ? items[props.trips].state : '''')).sp + '' km/h'''
                   style:
                     font-weight: '700'
                     text-align: right
