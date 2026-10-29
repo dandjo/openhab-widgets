@@ -21,7 +21,7 @@ props:
     required: false
     default: '#26a69a'
   parameterGroups: []
-timestamp: Oct 29, 2026, 11:03:33 PM
+timestamp: Oct 29, 2026, 11:54:03 PM
 component: div
 config:
   style:
@@ -167,7 +167,7 @@ slots:
       content:
       - component: oh-webframe
         config:
-          src: '=''/static/trip-map.html?v=d19bb395&p='' + ((((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d)
+          src: '=''/static/trip-map.html?v=f599ec19&p='' + ((((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d)
             => d.t).find((t) => t.id === Number(props.id)) || {})(props.trips ? items[props.trips].state : '''')).p || []).map((q)
             => q[0] + '','' + q[1] + '','' + (q[4] > 0 ? 1 : 0)).join('';'') + ''&col='' + ((props.color || ''#26a69a'').replace(''#'',
             '''')) + ''&dark='' + (themeOptions.dark === ''dark'' ? 1 : 0)'

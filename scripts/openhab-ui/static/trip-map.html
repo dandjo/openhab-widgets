@@ -7,6 +7,11 @@
 <link rel="stylesheet" href="leaflet-1.9.4/leaflet.css">
 <style>
   html, body, #map { margin: 0; height: 100%; background: transparent; }
+  /* the page's colour scheme is the theme's: a frame whose scheme differs from MainUI's dark one gets an opaque white
+     canvas behind its transparent page, which showed as a light rim along the rounded corners and a cut edge of the
+     map in the dark theme (user, 2026-10-29) */
+  :root { color-scheme: light; }
+  :root.dark { color-scheme: dark; }
   /* OpenStreetMap has no dark style: in the dark theme its tiles are inverted, turned back in hue; places and line keep
      their colour */
   .dark .leaflet-tile-pane { filter: invert(0.9) hue-rotate(180deg); }
