@@ -21,7 +21,7 @@ props:
     required: false
     default: '#26a69a'
   parameterGroups: []
-timestamp: Oct 29, 2026, 10:35:18 PM
+timestamp: Oct 29, 2026, 10:51:53 PM
 component: div
 config:
   style:
@@ -161,6 +161,7 @@ slots:
       style:
         height: calc(100% - 2 * var(--f7-card-margin-vertical))
         overflow: hidden
+        box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--f7-text-color) 8%, transparent)
       stylesheet: '.card-content { padding: 0 !important; }'
     slots:
       content:

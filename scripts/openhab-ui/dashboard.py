@@ -1252,9 +1252,10 @@ TOGGLE_R = "8px"  # the small toggle of a switch row, 24 px high; its knob KNOB_
 SVG_PILL_RX = {18: 6, 14: 4, 13: 4}  # the same corners for pills drawn in SVG, by their height
 HERO = {"font-size": f"={NARROW} ? '26px' : '28px'", "font-weight": "700",
         "line-height": f"={NARROW} ? '32px' : '34px'", "letter-spacing": "-0.01em"}
+CARD_RING = "0 0 0 1px color-mix(in srgb, var(--f7-text-color) 8%, transparent)"  # a card's edge, a faint line around it
 # the cards' shell, every page's and popup's stylesheet; before PHONE_EDGES, whose title padding wins on a phone
 CARD_STYLE = "\n".join([
-    ".card { border-radius: 14px; box-shadow: 0 0 0 1px color-mix(in srgb, var(--f7-text-color) 8%, transparent); }",
+    f".card {{ border-radius: 14px; box-shadow: {CARD_RING}; }}",
     ".card-header { justify-content: flex-start; min-height: 0; font-size: 13px; font-weight: 600;",
     "  padding: 16px 16px 4px; opacity: 0.6; letter-spacing: 0.02em; }",
     ".card-header::after { display: none !important; }",
@@ -10015,9 +10016,11 @@ def map_frame(src, height):
 def map_card(content):
     """A card a map fills to its edges (user, 2026-10-29: no padding beside and below the map): oh-card always gives
     its content f7's class padding, whose padding is !important, so the card's own stylesheet takes it away with a
-    more specific rule; the card clips, so the map takes the card's corners, whatever its radius."""
+    more specific rule; the card clips, so the map takes the card's corners, whatever its radius. Its edge line lies
+    inside it, under the map (user, 2026-10-29: outside it drew a grey rim around the map's rounded corners), so it
+    shows only where the map does not reach."""
     out = card("", content)
-    out["config"]["style"]["overflow"] = "hidden"
+    out["config"]["style"].update({"overflow": "hidden", "box-shadow": f"inset {CARD_RING}"})
     out["config"]["stylesheet"] = ".card-content { padding: 0 !important; }"
     return out
 
