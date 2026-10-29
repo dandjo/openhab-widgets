@@ -6,9 +6,9 @@ long runs, the house's mass carries it through the night, and more of it comes f
 heatpump_day_heating (hp_day_heating.js next to this file) sets the offset to the day offset in the window (default
 9–19 h) and to −10 K outside it, where the setpoint stays at the controller's minimum of 20 °C and it never calls for
 heat. The season is decided once a day at the window's start: a 24-hour mean outdoor temperature
-(espaltherma_ext_ambient_temp_avg, the heating curve's basis, read from InfluxDB at that moment) of 6 °C or more makes
+(espaltherma_ext_ambient_temp_avg, the heating curve's basis, read from InfluxDB at that moment) of 8 °C or more makes
 the day and the night after it day mode, a lower one normal operation until the next window's start, so a mean
-swinging around 6 °C within a day never switches back and forth. In normal operation the offset goes back to 0 once and
+swinging around 8 °C within a day never switches back and forth. In normal operation the offset goes back to 0 once and
 the cycle guard
 (hp_cycle_guard.js) works as before; in day mode it locks starts in the window only after a charge or a short run (the
 rule waits for its lock to go) and keeps out at night, as it reads heatpump_day_heating_state.
