@@ -193,7 +193,7 @@ props:
     required: false
     context: item
   parameterGroups: []
-timestamp: Oct 29, 2026, 10:51:53 PM
+timestamp: Oct 29, 2026, 11:03:33 PM
 component: div
 config:
   style:
@@ -463,7 +463,7 @@ slots:
       title: ''
       style:
         height: calc(100% - 2 * var(--f7-card-margin-vertical))
-        overflow: hidden
+        clip-path: inset(0 round 14px)
         box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--f7-text-color) 8%, transparent)
       stylesheet: '.card-content { padding: 0 !important; }'
       visible: '=!!props.map && ((p) => p.length === 2 && p.every(Number.isFinite))(((items[props.map] ? items[props.map].state

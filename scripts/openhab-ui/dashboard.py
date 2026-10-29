@@ -10013,14 +10013,15 @@ def map_frame(src, height):
                                 "style": {"width": "100%", "border": "0", "display": "block"}})
 
 
-def map_card(content):
+def map_card(content, radius="14px"):
     """A card a map fills to its edges (user, 2026-10-29: no padding beside and below the map): oh-card always gives
     its content f7's class padding, whose padding is !important, so the card's own stylesheet takes it away with a
-    more specific rule; the card clips, so the map takes the card's corners, whatever its radius. Its edge line lies
-    inside it, under the map (user, 2026-10-29: outside it drew a grey rim around the map's rounded corners), so it
-    shows only where the map does not reach."""
+    more specific rule. The card is cut to its corners (radius: its own, CARD_STYLE's or f7's) by clip-path, the map
+    with it: overflow hidden left the map's corners square on a desktop. Its edge line lies inside it, under the map
+    (user, 2026-10-29: outside it drew a grey rim around the map's rounded corners), so it shows only where the map
+    does not reach."""
     out = card("", content)
-    out["config"]["style"].update({"overflow": "hidden", "box-shadow": f"inset {CARD_RING}"})
+    out["config"]["style"].update({"clip-path": f"inset(0 round {radius})", "box-shadow": f"inset {CARD_RING}"})
     out["config"]["stylesheet"] = ".card-content { padding: 0 !important; }"
     return out
 
@@ -10149,8 +10150,9 @@ def trip_popup():
                    "font-size": "14px"})
     places = comp("oh-repeater", {"for": "pt", "sourceType": "array", "in": f"={t}.p || []", "fragment": True},
                   default=[place])
+    # the trip popup has no CARD_STYLE: its cards keep f7's 8 px corners
     trip_map = map_card([frame, div([osm_credit(), div([places], **{"padding": "4px 2px 0"})],
-                                    **{"padding": "2px 14px 12px"})])
+                                    **{"padding": "2px 14px 12px"})], "8px")
 
     def row(name, value, visible=None):
         return div([label(name), label(f"={value}", **{"font-weight": "700", "text-align": "right",
