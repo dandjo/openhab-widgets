@@ -82,7 +82,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 30, 2026, 7:19:31 AM
+timestamp: Oct 30, 2026, 7:34:36 AM
 component: div
 config:
   style:
@@ -386,7 +386,7 @@ slots:
                 config:
                   item: =props.heatpumpManagement
                   title: Automatic
-                  icon: material:auto_mode
+                  icon: material:tune
                   color: '#fb8c00'
               - component: widget:switch-row
                 config:
