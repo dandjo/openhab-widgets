@@ -11,7 +11,8 @@
 // guard lowers it for a while in the window, after a hot-water charge or a short run (user, 2026-10-13: a hot
 // compressor's start ends within minutes); the rule waits for its lock to go, and at night the guard leaves its lock to
 // the rule as it stands. In normal operation the offset goes back to 0 once and the cycle guard works as before.
-// Offset, start and end of the window are items, so they can be changed without touching the rule.
+// Offset, start and end of the window are items, so they can be changed without touching the rule. Switched off
+// alone, while the rest of the heat pump's automation stays on, day heating pauses until the next window's start.
 // back to 8 °C since 2026-10-30 (user): the trial at 6 °C (from 2026-10-26) let the rooms fall about 0.5 K on the
 // cold days (27./28.10.: mornings 22.2 °C in the living room), at 8 to 9 °C the window held them within 0.1 K a day
 const SEASON_AVG = 8;    // °C 24-hour mean outdoors at the window's start from which the day is in day mode
@@ -22,6 +23,7 @@ const OFFSET_MIN = -10;  // the controller's offset range is −10..+10
 const OFFSET_MAX = 10;
 
 const SWITCH = 'heatpump_day_heating';
+const GUARD = 'heatpump_cycle_management';  // like the switch a member of Automatik (heatpump_management)
 const STATE = 'heatpump_day_heating_state';
 const AVG = 'espaltherma_ext_ambient_temp_avg';
 const offsetItem = items.getItem('pyaltherma_leaving_water_temp_offset_heating');
@@ -41,7 +43,6 @@ const setting = (name, fallback, lo, hi) => {
 const dayOffset = Math.round(setting('heatpump_day_heating_offset', 2, OFFSET_MIN, OFFSET_MAX));
 const start = setting('heatpump_day_heating_start', 9, 0, 24);
 const end = setting('heatpump_day_heating_end', 19, 0, 24);
-const enabled = state(SWITCH) === 'ON' && state('pyaltherma_climate_control_power') === 'ON';
 // while the offset is missing (NULL after a restart) it would compare as 0, so nothing is written on it
 const missing = offset === null;
 
@@ -50,6 +51,20 @@ const previous = state(STATE);
 const wasDay = previous === 'day' || previous === 'night';
 const decidedAt = clock.withHour(Math.floor(start) % 24).withMinute(Math.min(59, Math.round((start % 1) * 60)))
   .withSecond(0).withNano(0).minusDays(hour >= start ? 0 : 1);
+// a pause (user, 2026-10-30: "Pause bis 9 Uhr"): the switch off alone, while the rest of Automatik (the cycle guard)
+// stays on, gives normal operation round the clock until the next window start; once a window start lies after the
+// moment it went off, the rule switches it on again. With Automatik off it stays off. Without a time of its last
+// change (never changed since a restart) the pause ends, so it cannot hang on.
+let switchedOn = state(SWITCH) === 'ON';
+if (!switchedOn && state(GUARD) === 'ON') {
+  const off = items.getItem(SWITCH).lastStateChangeTimestamp;
+  if (off === null || off.isBefore(decidedAt)) {
+    items.getItem(SWITCH).sendCommand('ON');
+    switchedOn = true;
+    console.info(`day heating: pause over at the window's start ${decidedAt}, on again`);
+  }
+}
+const enabled = switchedOn && state('pyaltherma_climate_control_power') === 'ON';
 let decision = cache.private.get('decision');
 if (decision === null || decision.at !== decidedAt.toString()) {
   const persisted = items.getItem(AVG).persistence.persistedState(decidedAt, 'influxdb');

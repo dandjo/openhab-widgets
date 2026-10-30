@@ -3240,7 +3240,8 @@ price = [
 def switch_row_widget():
     """The widget every switch row is an instance of: icon, name, An or Aus and a switch in the card's colour. The
     switch is drawn, not Framework7's: a track that fills with the colour while on and a white knob that slides over;
-    the icon sits in a circle tinted in the colour while on, as on the sliders. A tap anywhere on the row switches."""
+    the icon sits in a circle tinted in the colour while on, as on the sliders. A tap anywhere on the row switches.
+    offText replaces Aus while off, e.g. when a pause ends."""
     on = "items[props.item].state === 'ON'"
     badge = div([comp("oh-icon", {"icon": "=props.icon || 'material:power_settings_new'", "width": 15, "height": 15})],
                 **{"width": "26px", "height": "26px", "flex": "0 0 auto", "border-radius": "50%", "display": "flex",
@@ -3259,17 +3260,21 @@ def switch_row_widget():
     return div([badge,
                 label("=props.title", **{"flex": "1", "font-size": "14px", "white-space": "nowrap", "overflow": "hidden",
                                          "text-overflow": "ellipsis"}),
-                label(f"={on} ? 'An' : 'Aus'", **{"font-size": "10px", "font-weight": "700", "opacity": "0.6",
-                                                  "min-width": "24px", "text-align": "right"}),
+                label(f"={on} ? 'An' : (props.offText || 'Aus')",
+                      **{"font-size": "10px", "font-weight": "700", "opacity": "0.6", "min-width": "24px",
+                         "text-align": "right", "white-space": "nowrap"}),
                 track, link],
                **{"--switch-color": "=props.color || '#78909c'", "position": "relative", "display": "flex",
                   "align-items": "center", "gap": "8px", "padding": "5px 2px",
                   "border-bottom": "1px solid rgba(127, 127, 127, 0.15)"})
 
 
-def switch_row(title, icon, item, color):
+def switch_row(title, icon, item, color, off_text=None):
     """One compact row with a switch in the card's colour, an instance of the switch row widget."""
-    return comp("widget:switch-row", {"item": item, "title": title, "icon": icon, "color": color})
+    cfg = {"item": item, "title": title, "icon": icon, "color": color}
+    if off_text:
+        cfg["offText"] = off_text
+    return comp("widget:switch-row", cfg)
 
 
 def watts(item):
@@ -3716,12 +3721,18 @@ def battery_period_slider():
                        "min", icon="material:hourglass_bottom", row=True)
 
 
-# hot water, heating and the hot-water automation as three switch pills side by side, named short to fit a phone
-# the heat pump's switches; Automatik switches the group heatpump_management, which passes the command on to its
-# members (the hot-water automation heatpump_dhw_management and the cycle guard heatpump_cycle_management)
+# heating and hot water as two switch pills side by side, named short to fit a phone; under them the automation's
+# switches as rows, one under the other as on the ventilation's page (user, 2026-10-30): Automatik switches the group
+# heatpump_management, which passes the command on to its members (the hot-water automation heatpump_dhw_management,
+# the cycle guard heatpump_cycle_management and the day heating); Tagheizung switches the day heating alone, off a pause
+# until the next window start, when its rule switches it on again (with Automatik off it stays off)
 HP_SWITCH_BAR = [("Heizung", "pyaltherma_climate_control_power", "material:local_fire_department"),
-                 ("Warmwasser", "pyaltherma_dhw_power", "material:shower"),
-                 ("Automatik", "heatpump_management", "material:auto_mode")]
+                 ("Warmwasser", "pyaltherma_dhw_power", "material:shower")]
+DAY_HEATING_PAUSE_END = ("=items.heatpump_cycle_management.state === 'ON' ? ((s) => Number.isFinite(s) ? 'Aus bis ' + "
+                         "Math.floor(s) + ':' + ('0' + Math.round(s % 1 * 60)).slice(-2) : 'Aus')"
+                         "(Number(items.heatpump_day_heating_start.state)) : 'Aus'")
+HP_AUTOMATION = [("Automatik", "material:auto_mode", "heatpump_management", None),
+                 ("Tagheizung", "material:wb_sunny", "heatpump_day_heating", DAY_HEATING_PAUSE_END)]
 HP_PILL_WIDTH = "120px"  # Warmwasser fits; three abreast in a wide panel, two and one on a phone
 
 
@@ -3730,10 +3741,12 @@ def hp_pill(title):
 
 
 def operation_section(*titles, row=False):
-    """Betrieb: the heat pump's switch pills under their title, all three or the ones given."""
+    """Betrieb: heating and hot water as switch pills under their title, both or the ones given, and under them the
+    automation's switches as rows, which draw their own dividers."""
     pills = [hp_pill(t) for t in (titles or [t for t, _, _ in HP_SWITCH_BAR])]
-    return section("material:toggle_on", "Betrieb", HP_ORANGE, [pill_switches(*pills, min_width=HP_PILL_WIDTH)],
-                   row=row)
+    rows = [switch_row(t, icon, item, HP_ORANGE, off) for t, icon, item, off in HP_AUTOMATION]
+    return section("material:toggle_on", "Betrieb", HP_ORANGE, [pill_switches(*pills, min_width=HP_PILL_WIDTH),
+                                                                 div(rows)], row=row, divider=False)
 
 
 # ---- the popups of the heat pump card's tiles (the only quick popups left, user 2026-10-06): Regelung all the heat
@@ -10539,7 +10552,8 @@ SWITCH_ROW_PARAMS = [
     dict(param("item", "Item", "The switch item", required=True), context="item"),
     param("title", "Title", "Name of the switch", required=True),
     param("icon", "Icon", "The icon, e.g. material:eco", default="material:power_settings_new"),
-    param("color", "Colour", "The card's colour as #rrggbb, of the switch while on", default="#78909c")]
+    param("color", "Colour", "The card's colour as #rrggbb, of the switch while on", default="#78909c"),
+    param("offText", "Text while off", "Shown instead of Aus while off, e.g. when a pause ends")]
 
 PILL_SWITCH_PARAMS = [
     dict(param("item", "Item", "The switch item", required=True), context="item"),

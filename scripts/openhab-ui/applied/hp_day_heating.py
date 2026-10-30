@@ -11,9 +11,11 @@ the day and the night after it day mode, a lower one normal operation until the 
 swinging around 8 °C within a day never switches back and forth. In normal operation the offset goes back to 0 once and
 the cycle guard
 (hp_cycle_guard.js) works as before; in day mode it locks starts in the window only after a charge or a short run (the
-rule waits for its lock to go) and keeps out at night, as it reads heatpump_day_heating_state.
+rule waits for its lock to go) and keeps out at night, as it reads heatpump_day_heating_state. The switch off alone,
+while Automatik's cycle guard stays on, pauses day heating (user, 2026-10-30): normal operation until the next window
+start, when the rule switches it on again; with Automatik off it stays off.
 Items: the switch heatpump_day_heating (a member of heatpump_management, like the two other heat pump automations, so
-the Automatik pill switches it too), heatpump_day_heating_state (day, night, normal, off), the settings
+the Automatik switch switches it too; its own switch row is the pause), heatpump_day_heating_state (day, night, normal, off), the settings
 heatpump_day_heating_offset (K, whole kelvins: the controller takes no others), heatpump_day_heating_start and _end
 (hours, decimals for minutes); all restored by MapDB after a restart, state and offset in InfluxDB on change.
 apply creates or updates items, metadata and the rule, sets the settings to their defaults where they have no state yet

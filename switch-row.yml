@@ -26,8 +26,13 @@ props:
     type: TEXT
     required: false
     default: '#78909c'
+  - name: offText
+    label: Text while off
+    description: Shown instead of Aus while off, e.g. when a pause ends
+    type: TEXT
+    required: false
   parameterGroups: []
-timestamp: Oct 25, 2026, 2:07:58 PM
+timestamp: Oct 30, 2026, 7:07:37 AM
 component: div
 config:
   style:
@@ -172,13 +177,14 @@ slots:
         text-overflow: ellipsis
   - component: Label
     config:
-      text: '=items[props.item].state === ''ON'' ? ''On'' : ''Off'''
+      text: '=items[props.item].state === ''ON'' ? ''On'' : (props.offText || ''Off'')'
       style:
         font-size: 10px
         font-weight: '700'
         opacity: '0.6'
         min-width: 24px
         text-align: right
+        white-space: nowrap
   - component: div
     config:
       style:

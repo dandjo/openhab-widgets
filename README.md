@@ -49,9 +49,9 @@ number formats come from the items.
 | `flow-node` | – |
 | `ground-floor-quick` | – |
 | `heating-card` | `flow-node`, `item-popup`, `trip-popup` |
-| `heatpump-card` | `boost-pill`, `flow-node`, `ground-floor-quick`, `heatpump-circuit-quick`, `heatpump-control-quick`, `heatpump-cop-quick`, `heatpump-electric-quick`, `heatpump-heat-quick`, `heatpump-indoor-quick`, `heatpump-outdoor-quick`, `heatpump-refrigerant-quick`, `heatpump-tank-quick`, `heatpump-valve-quick`, `item-popup`, `pill-slider`, `pill-switch`, `state-bar`, `trip-popup`, `upper-floor-quick`, `value-tile` |
+| `heatpump-card` | `boost-pill`, `flow-node`, `ground-floor-quick`, `heatpump-circuit-quick`, `heatpump-control-quick`, `heatpump-cop-quick`, `heatpump-electric-quick`, `heatpump-heat-quick`, `heatpump-indoor-quick`, `heatpump-outdoor-quick`, `heatpump-refrigerant-quick`, `heatpump-tank-quick`, `heatpump-valve-quick`, `item-popup`, `pill-slider`, `pill-switch`, `state-bar`, `switch-row`, `trip-popup`, `upper-floor-quick`, `value-tile` |
 | `heatpump-circuit-quick` | `pill-slider` |
-| `heatpump-control-quick` | `boost-pill`, `pill-slider`, `pill-switch`, `state-bar` |
+| `heatpump-control-quick` | `boost-pill`, `pill-slider`, `pill-switch`, `state-bar`, `switch-row` |
 | `heatpump-cop-quick` | – |
 | `heatpump-electric-quick` | – |
 | `heatpump-heat-quick` | – |
@@ -418,14 +418,14 @@ it with demo values (a space heating run).
 Needs `boost-pill`, `flow-node`, `ground-floor-quick`, `heatpump-circuit-quick`, `heatpump-control-quick`,
 `heatpump-cop-quick`, `heatpump-electric-quick`, `heatpump-heat-quick`, `heatpump-indoor-quick`,
 `heatpump-outdoor-quick`, `heatpump-refrigerant-quick`, `heatpump-tank-quick`, `heatpump-valve-quick`, `item-popup`,
-`pill-slider`, `pill-switch`, `state-bar`, `trip-popup`, `upper-floor-quick`, `value-tile`.
+`pill-slider`, `pill-switch`, `state-bar`, `switch-row`, `trip-popup`, `upper-floor-quick`, `value-tile`.
 
 ![Heat pump](screenshots/heatpump-card.gif)
 
 ![Heat pump in dark mode](screenshots/heatpump-card-dark.gif)
 
 <details>
-<summary>60 props</summary>
+<summary>63 props</summary>
 
 | Prop | Item | Item type |
 |---|---|---|
@@ -483,6 +483,9 @@ Needs `boost-pill`, `flow-node`, `ground-floor-quick`, `heatpump-circuit-quick`,
 | `heatpumpBshPower` | ESPAltherma Electrical Power Booster Heater | Number:Power |
 | `heatpumpWaterPressure` | ESPAltherma Water Pressure | Number:Pressure |
 | `heatpumpBuhPower` | ESPAltherma Electrical Power Backup Heater | Number:Power |
+| `heatpumpDayHeating` | Wärmepumpe Tagheizung-Automatik | Switch |
+| `heatpumpCycleManagement` | Wärmepumpe Taktschutz-Automatik | Switch |
+| `heatpumpDayHeatingStart` | Wärmepumpe Tagheizung Beginn | Number |
 | `heatpumpDhwTempHeating` | Pyaltherma DHW Temp Heating | Number:Temperature |
 | `heatpumpDhwManagement` | Heatpump DHW Management | Switch |
 | `heatpumpLeavingWaterTempOffsetHeating` | Pyaltherma Leaving Water Temp Offset Heating | Number:Temperature |
@@ -656,10 +659,10 @@ loops and the three figures at its top open them:
 | ![Three-way valve](screenshots/heatpump-valve-quick.png) | ![Upper floor](screenshots/upper-floor-quick.png) | ![Ground floor](screenshots/ground-floor-quick.png) |
 | ![Electricity](screenshots/heatpump-electric-quick.png) | ![Heat](screenshots/heatpump-heat-quick.png) | ![COP](screenshots/heatpump-cop-quick.png) |
 
-`heatpump-control-quick` needs `boost-pill`, `pill-slider`, `pill-switch`, `state-bar`.
+`heatpump-control-quick` needs `boost-pill`, `pill-slider`, `pill-switch`, `state-bar`, `switch-row`.
 
 <details>
-<summary><code>heatpump-control-quick</code>: 10 props</summary>
+<summary><code>heatpump-control-quick</code>: 13 props</summary>
 
 | Prop | Item | Item type |
 |---|---|---|
@@ -667,6 +670,9 @@ loops and the three figures at its top open them:
 | `heatpumpDhwPower` | Pyaltherma DHW Power | Switch |
 | `heatpumpSmartGrid` | ESPAltherma Smart Grid | String |
 | `heatpumpManagement` | Heatpump Management | Group |
+| `heatpumpDayHeating` | Wärmepumpe Tagheizung-Automatik | Switch |
+| `heatpumpCycleManagement` | Wärmepumpe Taktschutz-Automatik | Switch |
+| `heatpumpDayHeatingStart` | Wärmepumpe Tagheizung Beginn | Number |
 | `heatpumpDhwTempHeating` | Pyaltherma DHW Temp Heating | Number:Temperature |
 | `heatpumpDhwTankTemp` | ESPAltherma DHW Tank Temperature | Number:Temperature |
 | `heatpumpDhwManagement` | Heatpump DHW Management | Switch |
@@ -1047,6 +1053,7 @@ config:
 | `title` | Name of the switch | TEXT |  |
 | `icon` | The icon, e.g. material:eco | TEXT | `material:power_settings_new` |
 | `color` | The card's colour as #rrggbb, of the switch while on | TEXT | `#78909c` |
+| `offText` | Shown instead of Aus while off, e.g. when a pause ends | TEXT |  |
 
 ## Energy flow
 

@@ -327,6 +327,24 @@ props:
     type: TEXT
     required: true
     context: item
+  - name: heatpumpDayHeating
+    label: Wärmepumpe Tagheizung-Automatik
+    description: Switch item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpCycleManagement
+    label: Wärmepumpe Taktschutz-Automatik
+    description: Switch item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpDayHeatingStart
+    label: Wärmepumpe Tagheizung Beginn
+    description: Number item
+    type: TEXT
+    required: true
+    context: item
   - name: heatpumpDhwTempHeating
     label: Pyaltherma DHW Temp Heating
     description: Number:Temperature item
@@ -364,7 +382,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 25, 2026, 2:07:58 PM
+timestamp: Oct 30, 2026, 7:07:37 AM
 component: oh-card
 config:
   title: Heat Pump
@@ -3517,6 +3535,9 @@ slots:
                 heatpumpDhwPower: =props.heatpumpDhwPower
                 heatpumpSmartGrid: =props.heatpumpSmartGrid
                 heatpumpManagement: =props.heatpumpManagement
+                heatpumpDayHeating: =props.heatpumpDayHeating
+                heatpumpCycleManagement: =props.heatpumpCycleManagement
+                heatpumpDayHeatingStart: =props.heatpumpDayHeatingStart
                 heatpumpDhwTempHeating: =props.heatpumpDhwTempHeating
                 heatpumpDhwTankTemp: =props.heatpumpDhwTankTemp
                 heatpumpDhwManagement: =props.heatpumpDhwManagement
