@@ -23,7 +23,7 @@ const OFFSET_MIN = -10;  // the controller's offset range is −10..+10
 const OFFSET_MAX = 10;
 
 const SWITCH = 'heatpump_day_heating';
-const GUARD = 'heatpump_cycle_management';  // like the switch a member of Automatik (heatpump_management)
+const AUTOMATIK = 'heatpump_management';  // the group of the heat pump's automations, OR: on while one of them is
 const STATE = 'heatpump_day_heating_state';
 const AVG = 'espaltherma_ext_ambient_temp_avg';
 const offsetItem = items.getItem('pyaltherma_leaving_water_temp_offset_heating');
@@ -51,12 +51,12 @@ const previous = state(STATE);
 const wasDay = previous === 'day' || previous === 'night';
 const decidedAt = clock.withHour(Math.floor(start) % 24).withMinute(Math.min(59, Math.round((start % 1) * 60)))
   .withSecond(0).withNano(0).minusDays(hour >= start ? 0 : 1);
-// a pause (user, 2026-10-30: "Pause bis 9 Uhr"): the switch off alone, while the rest of Automatik (the cycle guard)
-// stays on, gives normal operation round the clock until the next window start; once a window start lies after the
-// moment it went off, the rule switches it on again. With Automatik off it stays off. Without a time of its last
-// change (never changed since a restart) the pause ends, so it cannot hang on.
+// a pause (user, 2026-10-30: "Pause bis 9 Uhr"): the switch off alone, while another of Automatik's automations stays
+// on (the group, OR, reads ON), gives normal operation round the clock until the next window start; once a window
+// start lies after the moment it went off, the rule switches it on again. With all of them off (Automatik off) it
+// stays off. Without a time of its last change (never changed since a restart) the pause ends, so it cannot hang on.
 let switchedOn = state(SWITCH) === 'ON';
-if (!switchedOn && state(GUARD) === 'ON') {
+if (!switchedOn && state(AUTOMATIK) === 'ON') {
   const off = items.getItem(SWITCH).lastStateChangeTimestamp;
   if (off === null || off.isBefore(decidedAt)) {
     items.getItem(SWITCH).sendCommand('ON');

@@ -3721,17 +3721,19 @@ def battery_period_slider():
                        "min", icon="material:hourglass_bottom", row=True)
 
 
-# heating and hot water as two switch pills side by side, named short to fit a phone; under them the automation's
-# switches as rows, one under the other as on the ventilation's page (user, 2026-10-30): Automatik switches the group
-# heatpump_management, which passes the command on to its members (the hot-water automation heatpump_dhw_management,
-# the cycle guard heatpump_cycle_management and the day heating); Tagheizung switches the day heating alone, off a pause
-# until the next window start, when its rule switches it on again (with Automatik off it stays off)
+# heating and hot water as two switch pills side by side, named short to fit a phone; under them the automations'
+# switches as rows, one under the other as on the ventilation's page (user, 2026-10-30): Automatik first, the group
+# heatpump_management (OR), which passes the command on to its members, then each of them alone, the hot-water
+# automation, the cycle guard and the day heating; the day heating off alone is a pause until the next window start,
+# when its rule switches it on again (with all automations off it stays off)
 HP_SWITCH_BAR = [("Heizung", "pyaltherma_climate_control_power", "material:local_fire_department"),
                  ("Warmwasser", "pyaltherma_dhw_power", "material:shower")]
-DAY_HEATING_PAUSE_END = ("=items.heatpump_cycle_management.state === 'ON' ? ((s) => Number.isFinite(s) ? 'Aus bis ' + "
+DAY_HEATING_PAUSE_END = ("=items.heatpump_management.state === 'ON' ? ((s) => Number.isFinite(s) ? 'Aus bis ' + "
                          "Math.floor(s) + ':' + ('0' + Math.round(s % 1 * 60)).slice(-2) : 'Aus')"
                          "(Number(items.heatpump_day_heating_start.state)) : 'Aus'")
 HP_AUTOMATION = [("Automatik", "material:auto_mode", "heatpump_management", None),
+                 ("Warmwasser-Automatik", "material:shower", "heatpump_dhw_management", None),
+                 ("Taktschutz", "material:timer", "heatpump_cycle_management", None),
                  ("Tagheizung", "material:wb_sunny", "heatpump_day_heating", DAY_HEATING_PAUSE_END)]
 HP_PILL_WIDTH = "120px"  # Warmwasser fits; three abreast in a wide panel, two and one on a phone
 

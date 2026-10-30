@@ -210,7 +210,7 @@ EN.update({"auffällig": "elevated", "außerhalb": "outside", "behaglich": "comf
 EN.update({"Kartendaten © OpenStreetMap": "Map data © OpenStreetMap", "Zwischenstopp": "Stop", "Batterie": "Battery", "Kilometerzähler": "Odometer", "Gesamtverbrauch": "Total consumption",
            "Ø Verbrauch": "Avg. consumption", "Entfernung": "Distance", "Fahrzeit": "Driving time",
            "Ø Geschwindigkeit": "Avg. speed", "Start": "Start", "Ende": "End",
-           "Fahrten": "Trips", "unterwegs": "on the way", "Ladestopp": "charging stop", "Ladestopps": "charging stops", "Tagheizung": "Day heating", "Aus bis": "Off until",
+           "Fahrten": "Trips", "unterwegs": "on the way", "Ladestopp": "charging stop", "Ladestopps": "charging stops", "Tagheizung": "Day heating", "Aus bis": "Off until", "Warmwasser-Automatik": "Hot water automation", "Taktschutz": "Cycle guard",
            "Fahrten mit weniger als 2 Stunden Abstand sind eine Sitzung, „~“: aus den Abfragen geschätzt":
            "Trips less than 2 hours apart are one session, „~“: estimated from the reads",
            "Parkposition": "Parking position", "Heizkurve": "Heating curve", "Heizkurve (fortgesetzt": "Heating curve (extrapolated",

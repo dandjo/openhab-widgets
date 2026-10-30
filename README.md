@@ -483,11 +483,11 @@ Needs `boost-pill`, `flow-node`, `ground-floor-quick`, `heatpump-circuit-quick`,
 | `heatpumpBshPower` | ESPAltherma Electrical Power Booster Heater | Number:Power |
 | `heatpumpWaterPressure` | ESPAltherma Water Pressure | Number:Pressure |
 | `heatpumpBuhPower` | ESPAltherma Electrical Power Backup Heater | Number:Power |
-| `heatpumpDayHeating` | Wärmepumpe Tagheizung-Automatik | Switch |
+| `heatpumpDhwManagement` | Heatpump DHW Management | Switch |
 | `heatpumpCycleManagement` | Wärmepumpe Taktschutz-Automatik | Switch |
+| `heatpumpDayHeating` | Wärmepumpe Tagheizung-Automatik | Switch |
 | `heatpumpDayHeatingStart` | Wärmepumpe Tagheizung Beginn | Number |
 | `heatpumpDhwTempHeating` | Pyaltherma DHW Temp Heating | Number:Temperature |
-| `heatpumpDhwManagement` | Heatpump DHW Management | Switch |
 | `heatpumpLeavingWaterTempOffsetHeating` | Pyaltherma Leaving Water Temp Offset Heating | Number:Temperature |
 | `heatpumpTargetDischargeTemp` | ESPAltherma Target Discharge Temperature | Number:Temperature |
 | `heatpumpHeatingPowerAfterBuh` | ESPAltherma Heating Power After BUH | Number:Power |
@@ -670,12 +670,12 @@ loops and the three figures at its top open them:
 | `heatpumpDhwPower` | Pyaltherma DHW Power | Switch |
 | `heatpumpSmartGrid` | ESPAltherma Smart Grid | String |
 | `heatpumpManagement` | Heatpump Management | Group |
-| `heatpumpDayHeating` | Wärmepumpe Tagheizung-Automatik | Switch |
+| `heatpumpDhwManagement` | Heatpump DHW Management | Switch |
 | `heatpumpCycleManagement` | Wärmepumpe Taktschutz-Automatik | Switch |
+| `heatpumpDayHeating` | Wärmepumpe Tagheizung-Automatik | Switch |
 | `heatpumpDayHeatingStart` | Wärmepumpe Tagheizung Beginn | Number |
 | `heatpumpDhwTempHeating` | Pyaltherma DHW Temp Heating | Number:Temperature |
 | `heatpumpDhwTankTemp` | ESPAltherma DHW Tank Temperature | Number:Temperature |
-| `heatpumpDhwManagement` | Heatpump DHW Management | Switch |
 | `heatpumpDhwBoost` | Pyaltherma DHW Powerful | Switch |
 | `heatpumpLeavingWaterTempOffsetHeating` | Pyaltherma Leaving Water Temp Offset Heating | Number:Temperature |
 | `heatpumpLeavingWaterSetpoint` | ESPAltherma Leaving Water Setpoint | Number:Temperature |

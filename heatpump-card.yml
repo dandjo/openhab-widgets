@@ -327,14 +327,20 @@ props:
     type: TEXT
     required: true
     context: item
-  - name: heatpumpDayHeating
-    label: Wärmepumpe Tagheizung-Automatik
+  - name: heatpumpDhwManagement
+    label: Heatpump DHW Management
     description: Switch item
     type: TEXT
     required: true
     context: item
   - name: heatpumpCycleManagement
     label: Wärmepumpe Taktschutz-Automatik
+    description: Switch item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpDayHeating
+    label: Wärmepumpe Tagheizung-Automatik
     description: Switch item
     type: TEXT
     required: true
@@ -348,12 +354,6 @@ props:
   - name: heatpumpDhwTempHeating
     label: Pyaltherma DHW Temp Heating
     description: Number:Temperature item
-    type: TEXT
-    required: true
-    context: item
-  - name: heatpumpDhwManagement
-    label: Heatpump DHW Management
-    description: Switch item
     type: TEXT
     required: true
     context: item
@@ -382,7 +382,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 30, 2026, 7:07:37 AM
+timestamp: Oct 30, 2026, 7:19:31 AM
 component: oh-card
 config:
   title: Heat Pump
@@ -3535,12 +3535,12 @@ slots:
                 heatpumpDhwPower: =props.heatpumpDhwPower
                 heatpumpSmartGrid: =props.heatpumpSmartGrid
                 heatpumpManagement: =props.heatpumpManagement
-                heatpumpDayHeating: =props.heatpumpDayHeating
+                heatpumpDhwManagement: =props.heatpumpDhwManagement
                 heatpumpCycleManagement: =props.heatpumpCycleManagement
+                heatpumpDayHeating: =props.heatpumpDayHeating
                 heatpumpDayHeatingStart: =props.heatpumpDayHeatingStart
                 heatpumpDhwTempHeating: =props.heatpumpDhwTempHeating
                 heatpumpDhwTankTemp: =props.heatpumpDhwTankTemp
-                heatpumpDhwManagement: =props.heatpumpDhwManagement
                 heatpumpDhwBoost: =props.heatpumpDhwBoost
                 heatpumpLeavingWaterTempOffsetHeating: =props.heatpumpLeavingWaterTempOffsetHeating
                 heatpumpLeavingWaterSetpoint: =props.heatpumpLeavingWaterSetpoint

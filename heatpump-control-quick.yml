@@ -27,14 +27,20 @@ props:
     type: TEXT
     required: true
     context: item
-  - name: heatpumpDayHeating
-    label: Wärmepumpe Tagheizung-Automatik
+  - name: heatpumpDhwManagement
+    label: Heatpump DHW Management
     description: Switch item
     type: TEXT
     required: true
     context: item
   - name: heatpumpCycleManagement
     label: Wärmepumpe Taktschutz-Automatik
+    description: Switch item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpDayHeating
+    label: Wärmepumpe Tagheizung-Automatik
     description: Switch item
     type: TEXT
     required: true
@@ -57,12 +63,6 @@ props:
     type: TEXT
     required: true
     context: item
-  - name: heatpumpDhwManagement
-    label: Heatpump DHW Management
-    description: Switch item
-    type: TEXT
-    required: true
-    context: item
   - name: heatpumpDhwBoost
     label: Pyaltherma DHW Powerful
     description: Switch item
@@ -82,7 +82,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 30, 2026, 7:07:37 AM
+timestamp: Oct 30, 2026, 7:19:31 AM
 component: div
 config:
   style:
@@ -390,12 +390,24 @@ slots:
                   color: '#fb8c00'
               - component: widget:switch-row
                 config:
+                  item: =props.heatpumpDhwManagement
+                  title: Hot water automation
+                  icon: material:shower
+                  color: '#fb8c00'
+              - component: widget:switch-row
+                config:
+                  item: =props.heatpumpCycleManagement
+                  title: Cycle guard
+                  icon: material:timer
+                  color: '#fb8c00'
+              - component: widget:switch-row
+                config:
                   item: =props.heatpumpDayHeating
                   title: Day heating
                   icon: material:wb_sunny
                   color: '#fb8c00'
-                  offText: '=items[props.heatpumpCycleManagement].state === ''ON'' ? ((s) => Number.isFinite(s) ? ''Off until
-                    '' + Math.floor(s) + '':'' + (''0'' + Math.round(s % 1 * 60)).slice(-2) : ''Off'')(Number(items[props.heatpumpDayHeatingStart].state))
+                  offText: '=items[props.heatpumpManagement].state === ''ON'' ? ((s) => Number.isFinite(s) ? ''Off until ''
+                    + Math.floor(s) + '':'' + (''0'' + Math.round(s % 1 * 60)).slice(-2) : ''Off'')(Number(items[props.heatpumpDayHeatingStart].state))
                     : ''Off'''
       - component: widget:pill-slider
         config:
