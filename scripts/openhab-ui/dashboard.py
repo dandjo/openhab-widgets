@@ -8975,9 +8975,11 @@ def e_car_now():
     icon = node_icon("e-car", ECAR_COLOR, flowing(power, ECAR_CHARGING), share=f"{num(soc)} / 100", power=power,
                      plugged=ecar_plugged(power))
     charge_type = skoda("charge_type")
-    # while it charges with its type and power; plugged in and unlocked without charging the API names no state
+    # while it charges with its type and power; plugged in and unlocked without charging the API names no state. The
+    # car reports its power in 0.5 kW steps, below what reaches the battery (user, 2026-10-30: 1.5 kW shown while the
+    # circuit's meter read 2.0 kW; 1.5 and 2 alternating overnight), so it is marked "~" like the trips' estimates
     state_text = (f"({SKODA_CHARGING} ? 'Lädt' + (['AC', 'DC'].includes(items.{charge_type}.state) ? ' ' + "
-                  f"items.{charge_type}.state : '') + ' · ' + {fixed(num(skoda('charge_power')), 1)} + ' kW' + "
+                  f"items.{charge_type}.state : '') + ' · ~ ' + {fixed(num(skoda('charge_power')), 1)} + ' kW' + "
                   # and the range a charging hour adds, the car's own figure (user, 2026-10-26)
                   f"({ok(skoda('charge_rate'))} && {num(skoda('charge_rate'))} > 0 ? ' · ' + "
                   f"Math.round({num(skoda('charge_rate'))}) + ' km/h' : '') : "
@@ -9064,7 +9066,7 @@ def e_car_controls():
     left = f"Math.max(0, Math.round(dayjs(items.{reached_at}.state).diff(dayjs(), 'minute', true)))"
     # with the charge power in front and the clock written out as "fertig" (user, 2026-10-26)
     power = skoda("charge_power")
-    kw = f"({ok(power)} && {num(power)} > 0 ? {fixed(num(power), 1)} + ' kW' : '')"
+    kw = f"({ok(power)} && {num(power)} > 0 ? '~ ' + {fixed(num(power), 1)} + ' kW' : '')"  # the car's, in 0.5 kW steps
     pill = boost_pill(charging, "material:ev_station", ECAR_COLOR, "Laden",
                       f"([{kw}, {ok(reached_at)} ? 'noch ' + {hm(left)} + ' · fertig ' + {clock_of(reached_at)} : '']"
                       f".filter((s) => s !== '').join(' · ') || 'lädt')")
