@@ -575,7 +575,9 @@ def pylon_node(cx, cy, color, power):
              (cx - 15, cy - 10, cx - 15, cy - 7), (cx + 15, cy - 10, cx + 15, cy - 7),
              (cx - 11, cy - 3, cx - 11, cy), (cx + 11, cy - 3, cx + 11, cy)]
     active = f"Math.abs({power}) > 10"
-    dur = steps(power, [500, 2000], [2, 1.2, 0.7])
+    # seconds across a wire, by the steps of the house's real grid power (user, 2026-10-31: too fast at 2.6 kW, when the
+    # top step began at 2 kW; import over 30 days: median 0.4 kW, 90 % below 2.3 kW, 99 % below 4.3 kW, top 9.5 kW)
+    dur = steps(power, [1000, 3000, 6000], [2, 1.4, 1.0, 0.7])
     wires = []
     for y_ins, sag in ((cy - 7, 4), (cy, 4)):
         d = (f"M{cx - 27},{y_ins + 2} Q{cx - 21},{y_ins + sag} {cx - 15 if y_ins == cy - 7 else cx - 11},{y_ins} "

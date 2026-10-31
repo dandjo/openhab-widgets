@@ -75,7 +75,7 @@ props:
     type: BOOLEAN
     required: false
   parameterGroups: []
-timestamp: Oct 25, 2026, 8:07:49 PM
+timestamp: Oct 31, 2026, 3:16:45 PM
 component: g
 config:
   transform: ='translate(' + props.x + ' ' + props.y + ')'
@@ -500,10 +500,10 @@ slots:
           visible: =Math.abs(Number(props.power)) > 10
           class: '=(Math.abs(Number(props.power)) > 10) ? ''a-route-df7a7e2a'' : '''''
           style:
-            animation-duration: '=(Math.abs(Number(props.power)) < 500 ? 2 : (Math.abs(Number(props.power)) < 2000 ? 1.2 :
-              (0.7))) + ''s'''
-            animation-delay: '=(-0 / 4 * (Math.abs(Number(props.power)) < 500 ? 2 : (Math.abs(Number(props.power)) < 2000
-              ? 1.2 : (0.7)))) + ''s'''
+            animation-duration: '=(Math.abs(Number(props.power)) < 1000 ? 2 : (Math.abs(Number(props.power)) < 3000 ? 1.4
+              : (Math.abs(Number(props.power)) < 6000 ? 1.0 : (0.7)))) + ''s'''
+            animation-delay: '=(-0 / 4 * (Math.abs(Number(props.power)) < 1000 ? 2 : (Math.abs(Number(props.power)) < 3000
+              ? 1.4 : (Math.abs(Number(props.power)) < 6000 ? 1.0 : (0.7))))) + ''s'''
             animation-direction: '=(Number(props.power) > 0) ? ''reverse'' : ''normal'''
       - component: circle
         config:
@@ -514,10 +514,10 @@ slots:
           visible: =Math.abs(Number(props.power)) > 10
           class: '=(Math.abs(Number(props.power)) > 10) ? ''a-route-df7a7e2a'' : '''''
           style:
-            animation-duration: '=(Math.abs(Number(props.power)) < 500 ? 2 : (Math.abs(Number(props.power)) < 2000 ? 1.2 :
-              (0.7))) + ''s'''
-            animation-delay: '=(-1 / 4 * (Math.abs(Number(props.power)) < 500 ? 2 : (Math.abs(Number(props.power)) < 2000
-              ? 1.2 : (0.7)))) + ''s'''
+            animation-duration: '=(Math.abs(Number(props.power)) < 1000 ? 2 : (Math.abs(Number(props.power)) < 3000 ? 1.4
+              : (Math.abs(Number(props.power)) < 6000 ? 1.0 : (0.7)))) + ''s'''
+            animation-delay: '=(-1 / 4 * (Math.abs(Number(props.power)) < 1000 ? 2 : (Math.abs(Number(props.power)) < 3000
+              ? 1.4 : (Math.abs(Number(props.power)) < 6000 ? 1.0 : (0.7))))) + ''s'''
             animation-direction: '=(Number(props.power) > 0) ? ''reverse'' : ''normal'''
       - component: circle
         config:
@@ -528,10 +528,10 @@ slots:
           visible: =Math.abs(Number(props.power)) > 10
           class: '=(Math.abs(Number(props.power)) > 10) ? ''a-route-df7a7e2a'' : '''''
           style:
-            animation-duration: '=(Math.abs(Number(props.power)) < 500 ? 2 : (Math.abs(Number(props.power)) < 2000 ? 1.2 :
-              (0.7))) + ''s'''
-            animation-delay: '=(-2 / 4 * (Math.abs(Number(props.power)) < 500 ? 2 : (Math.abs(Number(props.power)) < 2000
-              ? 1.2 : (0.7)))) + ''s'''
+            animation-duration: '=(Math.abs(Number(props.power)) < 1000 ? 2 : (Math.abs(Number(props.power)) < 3000 ? 1.4
+              : (Math.abs(Number(props.power)) < 6000 ? 1.0 : (0.7)))) + ''s'''
+            animation-delay: '=(-2 / 4 * (Math.abs(Number(props.power)) < 1000 ? 2 : (Math.abs(Number(props.power)) < 3000
+              ? 1.4 : (Math.abs(Number(props.power)) < 6000 ? 1.0 : (0.7))))) + ''s'''
             animation-direction: '=(Number(props.power) > 0) ? ''reverse'' : ''normal'''
       - component: circle
         config:
@@ -542,10 +542,10 @@ slots:
           visible: =Math.abs(Number(props.power)) > 10
           class: '=(Math.abs(Number(props.power)) > 10) ? ''a-route-df7a7e2a'' : '''''
           style:
-            animation-duration: '=(Math.abs(Number(props.power)) < 500 ? 2 : (Math.abs(Number(props.power)) < 2000 ? 1.2 :
-              (0.7))) + ''s'''
-            animation-delay: '=(-3 / 4 * (Math.abs(Number(props.power)) < 500 ? 2 : (Math.abs(Number(props.power)) < 2000
-              ? 1.2 : (0.7)))) + ''s'''
+            animation-duration: '=(Math.abs(Number(props.power)) < 1000 ? 2 : (Math.abs(Number(props.power)) < 3000 ? 1.4
+              : (Math.abs(Number(props.power)) < 6000 ? 1.0 : (0.7)))) + ''s'''
+            animation-delay: '=(-3 / 4 * (Math.abs(Number(props.power)) < 1000 ? 2 : (Math.abs(Number(props.power)) < 3000
+              ? 1.4 : (Math.abs(Number(props.power)) < 6000 ? 1.0 : (0.7))))) + ''s'''
             animation-direction: '=(Number(props.power) > 0) ? ''reverse'' : ''normal'''
       - component: path
         config:
@@ -564,10 +564,10 @@ slots:
           visible: =Math.abs(Number(props.power)) > 10
           class: '=(Math.abs(Number(props.power)) > 10) ? ''a-route-4a077550'' : '''''
           style:
-            animation-duration: '=(Math.abs(Number(props.power)) < 500 ? 2 : (Math.abs(Number(props.power)) < 2000 ? 1.2 :
-              (0.7))) + ''s'''
-            animation-delay: '=(-0 / 4 * (Math.abs(Number(props.power)) < 500 ? 2 : (Math.abs(Number(props.power)) < 2000
-              ? 1.2 : (0.7)))) + ''s'''
+            animation-duration: '=(Math.abs(Number(props.power)) < 1000 ? 2 : (Math.abs(Number(props.power)) < 3000 ? 1.4
+              : (Math.abs(Number(props.power)) < 6000 ? 1.0 : (0.7)))) + ''s'''
+            animation-delay: '=(-0 / 4 * (Math.abs(Number(props.power)) < 1000 ? 2 : (Math.abs(Number(props.power)) < 3000
+              ? 1.4 : (Math.abs(Number(props.power)) < 6000 ? 1.0 : (0.7))))) + ''s'''
             animation-direction: '=(Number(props.power) > 0) ? ''reverse'' : ''normal'''
       - component: circle
         config:
@@ -578,10 +578,10 @@ slots:
           visible: =Math.abs(Number(props.power)) > 10
           class: '=(Math.abs(Number(props.power)) > 10) ? ''a-route-4a077550'' : '''''
           style:
-            animation-duration: '=(Math.abs(Number(props.power)) < 500 ? 2 : (Math.abs(Number(props.power)) < 2000 ? 1.2 :
-              (0.7))) + ''s'''
-            animation-delay: '=(-1 / 4 * (Math.abs(Number(props.power)) < 500 ? 2 : (Math.abs(Number(props.power)) < 2000
-              ? 1.2 : (0.7)))) + ''s'''
+            animation-duration: '=(Math.abs(Number(props.power)) < 1000 ? 2 : (Math.abs(Number(props.power)) < 3000 ? 1.4
+              : (Math.abs(Number(props.power)) < 6000 ? 1.0 : (0.7)))) + ''s'''
+            animation-delay: '=(-1 / 4 * (Math.abs(Number(props.power)) < 1000 ? 2 : (Math.abs(Number(props.power)) < 3000
+              ? 1.4 : (Math.abs(Number(props.power)) < 6000 ? 1.0 : (0.7))))) + ''s'''
             animation-direction: '=(Number(props.power) > 0) ? ''reverse'' : ''normal'''
       - component: circle
         config:
@@ -592,10 +592,10 @@ slots:
           visible: =Math.abs(Number(props.power)) > 10
           class: '=(Math.abs(Number(props.power)) > 10) ? ''a-route-4a077550'' : '''''
           style:
-            animation-duration: '=(Math.abs(Number(props.power)) < 500 ? 2 : (Math.abs(Number(props.power)) < 2000 ? 1.2 :
-              (0.7))) + ''s'''
-            animation-delay: '=(-2 / 4 * (Math.abs(Number(props.power)) < 500 ? 2 : (Math.abs(Number(props.power)) < 2000
-              ? 1.2 : (0.7)))) + ''s'''
+            animation-duration: '=(Math.abs(Number(props.power)) < 1000 ? 2 : (Math.abs(Number(props.power)) < 3000 ? 1.4
+              : (Math.abs(Number(props.power)) < 6000 ? 1.0 : (0.7)))) + ''s'''
+            animation-delay: '=(-2 / 4 * (Math.abs(Number(props.power)) < 1000 ? 2 : (Math.abs(Number(props.power)) < 3000
+              ? 1.4 : (Math.abs(Number(props.power)) < 6000 ? 1.0 : (0.7))))) + ''s'''
             animation-direction: '=(Number(props.power) > 0) ? ''reverse'' : ''normal'''
       - component: circle
         config:
@@ -606,10 +606,10 @@ slots:
           visible: =Math.abs(Number(props.power)) > 10
           class: '=(Math.abs(Number(props.power)) > 10) ? ''a-route-4a077550'' : '''''
           style:
-            animation-duration: '=(Math.abs(Number(props.power)) < 500 ? 2 : (Math.abs(Number(props.power)) < 2000 ? 1.2 :
-              (0.7))) + ''s'''
-            animation-delay: '=(-3 / 4 * (Math.abs(Number(props.power)) < 500 ? 2 : (Math.abs(Number(props.power)) < 2000
-              ? 1.2 : (0.7)))) + ''s'''
+            animation-duration: '=(Math.abs(Number(props.power)) < 1000 ? 2 : (Math.abs(Number(props.power)) < 3000 ? 1.4
+              : (Math.abs(Number(props.power)) < 6000 ? 1.0 : (0.7)))) + ''s'''
+            animation-delay: '=(-3 / 4 * (Math.abs(Number(props.power)) < 1000 ? 2 : (Math.abs(Number(props.power)) < 3000
+              ? 1.4 : (Math.abs(Number(props.power)) < 6000 ? 1.0 : (0.7))))) + ''s'''
             animation-direction: '=(Number(props.power) > 0) ? ''reverse'' : ''normal'''
   - component: g
     config:
