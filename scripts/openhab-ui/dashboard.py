@@ -4574,15 +4574,19 @@ def gradient(rgb):
             "colorStops": [{"offset": 0, "color": f"rgba({rgb}, 0.45)"}, {"offset": 1, "color": f"rgba({rgb}, 0.02)"}]}
 
 
+TEMP_TREND_H = 6  # hours the overview's temperatures show their trend over
+
+
 def temp_stat(title, item, color, sub, pills=(), detail=None):
-    """A temperature large, its trend over the last hour and further pills right beside it (user, 2026-10-06), the
-    sensor and a detail line under it."""
-    track_history(item, t=1)
+    """A temperature large, its trend over the last 6 hours (user, 2026-10-31; over the last hour before) and further
+    pills right beside it (user, 2026-10-06), the sensor and a detail line under it. The history rule keeps one
+    trend per item, so no other tile may ask for another span of these items."""
+    track_history(item, t=TEMP_TREND_H)
     kids = [label(title, **{"font-size": "13px", "opacity": "0.7"}),
             # the pills one over the other right beside the value, the trend on top: side by side they did not fit
             # beside it in the overview's column and wrapped under it
             div([label(f"={disp(item)}", **{**HERO, "white-space": "nowrap"}),
-                 div([trend_chip(item, 1, "K"), *pills],
+                 div([trend_chip(item, 1, "K", TEMP_TREND_H), *pills],
                      **{"display": "flex", "flex-direction": "column", "align-items": "flex-start", "gap": "3px"})],
                 **{"display": "flex", "align-items": "center", "gap": "4px 10px", "flex-wrap": "wrap"}),
             label(sub, **{"font-size": "12px", "opacity": "0.6"})]
