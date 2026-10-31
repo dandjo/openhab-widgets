@@ -81,8 +81,14 @@ props:
     type: TEXT
     required: true
     context: item
+  - name: heatpumpDayHeatingState
+    label: Wärmepumpe Tagheizung Zustand
+    description: String item
+    type: TEXT
+    required: true
+    context: item
   parameterGroups: []
-timestamp: Oct 30, 2026, 7:34:36 AM
+timestamp: Oct 31, 2026, 3:32:16 PM
 component: div
 config:
   style:
@@ -447,7 +453,8 @@ slots:
             : '''') + Math.round((Number(items[props.heatpumpLeavingWaterTempOffsetHeating].numericState) || 0)) + '' °C'''
           context: '=''Flow target '' + ([''NULL'', ''UNDEF''].includes(items[props.heatpumpLeavingWaterSetpoint].state) ?
             ''–'' : (items[props.heatpumpLeavingWaterSetpoint].displayState || items[props.heatpumpLeavingWaterSetpoint].state))
-            + (items[props.heatpumpClimateControlPower].state === ''ON'' ? '''' : '' · Heating off'')'
+            + (items[props.heatpumpClimateControlPower].state === ''ON'' ? ([''day'', ''night''].includes(items[props.heatpumpDayHeatingState].state)
+            ? '' · Tagheizung regelt'' : '''') : '' · Heating off'')'
           marks: -10=−10 °C;-5=−5;0=0;5=+5;10=+10 °C
           icon: material:tune
           row: true

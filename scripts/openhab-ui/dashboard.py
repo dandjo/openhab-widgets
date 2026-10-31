@@ -3701,11 +3701,15 @@ def dhw_setpoint(dim=None, row=False):
 def lw_offset(dim=None, row=False):
     n = f"Math.round({num('pyaltherma_leaving_water_temp_offset_heating')})"
     heating = is_on("pyaltherma_climate_control_power")
+    # whether the day heating holds the offset by the day's decision (day or night phase), not whether its switch is
+    # on, as the hot water's "Automatik regelt" (user, 2026-10-31)
+    day_heating = "['day', 'night'].includes(items.heatpump_day_heating_state.state)"
     # the item is a Number:Temperature in °C; oh-slider sends its value with the unit, and "−2 K" would be taken as
     # an absolute temperature (−275.15 °C), so the offset is set and shown in °C like the item
     return pill_slider("pyaltherma_leaving_water_temp_offset_heating", HP_ORANGE, -10, 10, 1, "Vorlauf-Offset",
                        f"({n} > 0 ? '+' : '') + {n} + ' °C'",
-                       f"'Vorlauf-Soll ' + {disp('espaltherma_leaving_water_setpoint')} + ({heating} ? '' : ' · Heizung aus')",
+                       f"'Vorlauf-Soll ' + {disp('espaltherma_leaving_water_setpoint')} + "
+                       f"({heating} ? ({day_heating} ? ' · Tagheizung regelt' : '') : ' · Heizung aus')",
                        [(-10, "−10 °C"), (-5, "−5"), (0, "0"), (5, "+5"), (10, "+10 °C")], "°C", icon="material:tune",
                        dim=dim, row=row)
 

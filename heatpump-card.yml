@@ -363,6 +363,12 @@ props:
     type: TEXT
     required: true
     context: item
+  - name: heatpumpDayHeatingState
+    label: Wärmepumpe Tagheizung Zustand
+    description: String item
+    type: TEXT
+    required: true
+    context: item
   - name: heatpumpTargetDischargeTemp
     label: ESPAltherma Target Discharge Temperature
     description: Number:Temperature item
@@ -382,7 +388,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 30, 2026, 7:19:31 AM
+timestamp: Oct 31, 2026, 3:32:16 PM
 component: oh-card
 config:
   title: Heat Pump
@@ -3544,6 +3550,7 @@ slots:
                 heatpumpDhwBoost: =props.heatpumpDhwBoost
                 heatpumpLeavingWaterTempOffsetHeating: =props.heatpumpLeavingWaterTempOffsetHeating
                 heatpumpLeavingWaterSetpoint: =props.heatpumpLeavingWaterSetpoint
+                heatpumpDayHeatingState: =props.heatpumpDayHeatingState
               style:
                 position: absolute
                 display: block
@@ -3598,6 +3605,7 @@ slots:
                 heatpumpLeavingWaterTempOffsetHeating: =props.heatpumpLeavingWaterTempOffsetHeating
                 heatpumpLeavingWaterSetpoint: =props.heatpumpLeavingWaterSetpoint
                 heatpumpClimateControlPower: =props.heatpumpClimateControlPower
+                heatpumpDayHeatingState: =props.heatpumpDayHeatingState
                 heatpumpHeatingPowerAfterBuh: =props.heatpumpHeatingPowerAfterBuh
               style:
                 position: absolute

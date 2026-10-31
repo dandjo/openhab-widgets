@@ -425,7 +425,7 @@ Needs `boost-pill`, `flow-node`, `ground-floor-quick`, `heatpump-circuit-quick`,
 ![Heat pump in dark mode](screenshots/heatpump-card-dark.gif)
 
 <details>
-<summary>63 props</summary>
+<summary>64 props</summary>
 
 | Prop | Item | Item type |
 |---|---|---|
@@ -489,6 +489,7 @@ Needs `boost-pill`, `flow-node`, `ground-floor-quick`, `heatpump-circuit-quick`,
 | `heatpumpDayHeatingStart` | Wärmepumpe Tagheizung Beginn | Number |
 | `heatpumpDhwTempHeating` | Pyaltherma DHW Temp Heating | Number:Temperature |
 | `heatpumpLeavingWaterTempOffsetHeating` | Pyaltherma Leaving Water Temp Offset Heating | Number:Temperature |
+| `heatpumpDayHeatingState` | Wärmepumpe Tagheizung Zustand | String |
 | `heatpumpTargetDischargeTemp` | ESPAltherma Target Discharge Temperature | Number:Temperature |
 | `heatpumpHeatingPowerAfterBuh` | ESPAltherma Heating Power After BUH | Number:Power |
 | `heatpumpWaterPumpSignal` | ESPAltherma Water Pump Signal | Number:Dimensionless |
@@ -662,7 +663,7 @@ loops and the three figures at its top open them:
 `heatpump-control-quick` needs `boost-pill`, `pill-slider`, `pill-switch`, `state-bar`, `switch-row`.
 
 <details>
-<summary><code>heatpump-control-quick</code>: 13 props</summary>
+<summary><code>heatpump-control-quick</code>: 14 props</summary>
 
 | Prop | Item | Item type |
 |---|---|---|
@@ -679,6 +680,7 @@ loops and the three figures at its top open them:
 | `heatpumpDhwBoost` | Pyaltherma DHW Powerful | Switch |
 | `heatpumpLeavingWaterTempOffsetHeating` | Pyaltherma Leaving Water Temp Offset Heating | Number:Temperature |
 | `heatpumpLeavingWaterSetpoint` | ESPAltherma Leaving Water Setpoint | Number:Temperature |
+| `heatpumpDayHeatingState` | Wärmepumpe Tagheizung Zustand | String |
 
 </details>
 
@@ -729,7 +731,7 @@ loops and the three figures at its top open them:
 `heatpump-circuit-quick` needs `pill-slider`.
 
 <details>
-<summary><code>heatpump-circuit-quick</code>: 6 props</summary>
+<summary><code>heatpump-circuit-quick</code>: 7 props</summary>
 
 | Prop | Item | Item type |
 |---|---|---|
@@ -738,6 +740,7 @@ loops and the three figures at its top open them:
 | `heatpumpLeavingWaterTempOffsetHeating` | Pyaltherma Leaving Water Temp Offset Heating | Number:Temperature |
 | `heatpumpLeavingWaterSetpoint` | ESPAltherma Leaving Water Setpoint | Number:Temperature |
 | `heatpumpClimateControlPower` | Pyaltherma Climate Control Power | Switch |
+| `heatpumpDayHeatingState` | Wärmepumpe Tagheizung Zustand | String |
 | `heatpumpHeatingPowerAfterBuh` | ESPAltherma Heating Power After BUH | Number:Power |
 
 </details>
