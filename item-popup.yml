@@ -193,7 +193,7 @@ props:
     required: false
     context: item
   parameterGroups: []
-timestamp: Oct 29, 2026, 11:54:03 PM
+timestamp: Oct 31, 2026, 10:13:36 PM
 component: div
 config:
   style:
@@ -503,8 +503,8 @@ slots:
                 color: inherit
       - component: oh-webframe
         config:
-          src: '=((p) => ((p) => p.length === 2 && p.every(Number.isFinite))(p) ? ''/static/trip-map.html?v=f599ec19&p=''
-            + p[0] + '','' + p[1] + '',0&z=17&col=26a69a&dark='' + (themeOptions.dark === ''dark'' ? 1 : 0) : ''about:blank'')(((items[props.map]
+          src: '=((p) => ((p) => p.length === 2 && p.every(Number.isFinite))(p) ? ''/static/trip-map.html?v=b81dcf11&p=''
+            + p[0] + '','' + p[1] + '',0&z=17&me=1&col=26a69a&dark='' + (themeOptions.dark === ''dark'' ? 1 : 0) : ''about:blank'')(((items[props.map]
             ? items[props.map].state : '''') || '''').split('','').slice(0, 2).map(Number))'
           height: 300px
           frameborder: '0'

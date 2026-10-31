@@ -10059,10 +10059,11 @@ def location_map_card():
     (TRIP_MAP, a single plain mark), about the street it stands in (zoom 17; user: two levels closer than first shown),
     filling the card beside and below it, its title and OpenStreetMap's credit in one line above it. The position
     comes from the item when the popup opens, so no coordinates are in the widget; the browser loads the tiles from
-    openstreetmap.org."""
+    openstreetmap.org. With me=1 the page adds the viewer's own position live where the browser gives it (user,
+    2026-10-31; not in the openHAB Android app, whose web view answers no location request)."""
     pos = "((items[props.map] ? items[props.map].state : '') || '').split(',').slice(0, 2).map(Number)"
     valid = "((p) => p.length === 2 && p.every(Number.isFinite))"
-    url = (f"=((p) => {valid}(p) ? '{TRIP_MAP}&p=' + p[0] + ',' + p[1] + ',0&z=17&col={ECAR_COLOR[1:]}&dark=' + "
+    url = (f"=((p) => {valid}(p) ? '{TRIP_MAP}&p=' + p[0] + ',' + p[1] + ',0&z=17&me=1&col={ECAR_COLOR[1:]}&dark=' + "
            f"(themeOptions.dark === 'dark' ? 1 : 0) : 'about:blank')({pos})")
     # the card's title drawn as CARD_STYLE draws a card header, with the credit at its right: below the map, which
     # now reaches the card's bottom edge, there is no room for it

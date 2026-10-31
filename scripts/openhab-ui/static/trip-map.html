@@ -28,7 +28,8 @@
 // A trip's places on OpenStreetMap (user, 2026-10-26), numbered in order and joined by a dashed line, as the
 // MyŠkoda app draws a trip: only where the car stood, as no positions on the way are known. Everything comes in the
 // address, nothing is stored here: p=lat,lon,charged;lat,lon,charged… (charged 1 where the car charged), col=rrggbb,
-// dark=1 for the dark theme, z the zoom for a single place (a plain mark then, no number). The map carries no
+// dark=1 for the dark theme, z the zoom for a single place (a plain mark then, no number), me=1 for the viewer's own
+// position beside the places (see below). The map carries no
 // attribution of its own: the widget credits OpenStreetMap right under the frame, as its guidelines allow (user,
 // 2026-10-26: "Badges ausblenden"); Leaflet's licence asks for none.
 const q = new URLSearchParams(location.search);
@@ -76,6 +77,33 @@ if (places.length === 1) {
   map.setView([47.6, 13.8], 6);
 }
 draw();
+// the viewer's own position as a blue dot with its accuracy (user, 2026-10-31: on the car's location map): the
+// browser's, live while the map is open, once the viewer allowed it; it stays in the browser, only the tiles around
+// it are loaded. The first fix widens the view to hold both, later ones only move the dot. A browser that answers no
+// location request (outside a secure context, or the openHAB Android app's web view) leaves the map as it is.
+if (q.get('me') === '1' && window.isSecureContext && navigator.geolocation) {
+  let dot = null;
+  let ring = null;
+  navigator.geolocation.watchPosition((pos) => {
+    const at = [pos.coords.latitude, pos.coords.longitude];
+    const accuracy = pos.coords.accuracy;
+    if (!dot) {
+      ring = L.circle(at, { radius: accuracy, stroke: false, fillColor: '#1a73e8', interactive: false }).addTo(map);
+      dot = L.circleMarker(at, { radius: 7, color: '#fff', weight: 2, fillColor: '#1a73e8', fillOpacity: 1,
+        interactive: false }).addTo(map);
+      if (places.length) {
+        map.fitBounds([...places.map((a) => [a[0], a[1]]), at], { padding: [36, 36],
+          maxZoom: Math.min(19, Number(q.get('z')) || 17) });
+      } else {
+        map.setView(at, 15);
+      }
+    }
+    ring.setLatLng(at).setRadius(accuracy);
+    // a rough fix (by network, kilometres wide) would cover the map: its circle only up to 1 km
+    ring.setStyle({ fillOpacity: accuracy <= 1000 ? 0.15 : 0 });
+    dot.setLatLng(at);
+  }, () => {}, { enableHighAccuracy: true, maximumAge: 30000, timeout: 30000 });
+}
 </script>
 </body>
 </html>
