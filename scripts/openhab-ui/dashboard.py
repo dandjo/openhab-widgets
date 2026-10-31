@@ -4578,13 +4578,13 @@ def gradient(rgb):
             "colorStops": [{"offset": 0, "color": f"rgba({rgb}, 0.45)"}, {"offset": 1, "color": f"rgba({rgb}, 0.02)"}]}
 
 
-TEMP_TREND_H = 6  # hours the overview's temperatures show their trend over
+TEMP_TREND_H = 24  # hours the overview's temperatures show their trend over
 
 
 def temp_stat(title, item, color, sub, pills=(), detail=None):
-    """A temperature large, its trend over the last 6 hours (user, 2026-10-31; over the last hour before) and further
-    pills right beside it (user, 2026-10-06), the sensor and a detail line under it. The history rule keeps one
-    trend per item, so no other tile may ask for another span of these items."""
+    """A temperature large, its trend over the last 24 hours (user, 2026-10-31, as more telling; over the last hour
+    before, briefly 6 hours) and further pills right beside it (user, 2026-10-06), the sensor and a detail line under
+    it. The history rule keeps one trend per item, so no other tile may ask for another span of these items."""
     track_history(item, t=TEMP_TREND_H)
     kids = [label(title, **{"font-size": "13px", "opacity": "0.7"}),
             # the pills one over the other right beside the value, the trend on top: side by side they did not fit

@@ -64,7 +64,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 31, 2026, 3:26:37 PM
+timestamp: Oct 31, 2026, 3:40:25 PM
 component: oh-card
 config:
   title: Temperatures
@@ -275,7 +275,7 @@ slots:
                         config:
                           text: '=(Math.abs(((Number(items[props.heatpumpIndoorAmbientTemp].numericState) || 0) * 1 - (Number(((((((items[props.tileHistory].state)
                             || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpIndoorAmbientTemp]
-                            || {}).h)) * 1)))).toFixed(1) + '' K / 6 h'''
+                            || {}).h)) * 1)))).toFixed(1) + '' K / 24 h'''
                           style:
                             position: relative
                             top: 1px
@@ -418,7 +418,7 @@ slots:
                         config:
                           text: '=(Math.abs(((Number(items[props.heatpumpExtAmbientTemp].numericState) || 0) * 1 - (Number(((((((items[props.tileHistory].state)
                             || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpExtAmbientTemp]
-                            || {}).h)) * 1)))).toFixed(1) + '' K / 6 h'''
+                            || {}).h)) * 1)))).toFixed(1) + '' K / 24 h'''
                           style:
                             position: relative
                             top: 1px
