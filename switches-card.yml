@@ -3,100 +3,101 @@ tags:
 - overview
 props:
   parameters:
-  - context: item
-    description: Switch item
+  - name: coffeeMachineSwitch
     label: Coffee Machine Switch
-    name: coffeeMachineSwitch
-    required: true
+    description: Switch item
     type: TEXT
-  - context: item
-    description: Number:Power item
+    required: true
+    context: item
+  - name: coffeeMachinePower
     label: Coffee Machine Power
-    name: coffeeMachinePower
-    required: true
+    description: Number:Power item
     type: TEXT
-  - context: item
-    description: Number:Energy item
+    required: true
+    context: item
+  - name: coffeeMachineEnergyToday
     label: Coffee Machine Energy Today
-    name: coffeeMachineEnergyToday
-    required: true
+    description: Number:Energy item
     type: TEXT
-  - context: item
-    description: Switch item
+    required: true
+    context: item
+  - name: bicycleBatteriesSwitch
     label: Bicycle Batteries Switch
-    name: bicycleBatteriesSwitch
-    required: true
+    description: Switch item
     type: TEXT
-  - context: item
-    description: Number:Power item
+    required: true
+    context: item
+  - name: bicycleBatteriesPower
     label: Bicycle Batteries Power
-    name: bicycleBatteriesPower
-    required: true
+    description: Number:Power item
     type: TEXT
-  - context: item
-    description: Number:Energy item
+    required: true
+    context: item
+  - name: bicycleBatteriesEnergyToday
     label: Bicycle Batteries Energy Today
-    name: bicycleBatteriesEnergyToday
-    required: true
+    description: Number:Energy item
     type: TEXT
-  - context: item
-    description: Switch item
+    required: true
+    context: item
+  - name: office1Switch
     label: Office 1 Switch
-    name: office1Switch
-    required: true
+    description: Switch item
     type: TEXT
-  - context: item
-    description: Number:Power item
+    required: true
+    context: item
+  - name: office1Power
     label: Office 1 Power
-    name: office1Power
-    required: true
+    description: Number:Power item
     type: TEXT
-  - context: item
-    description: Number:Energy item
+    required: true
+    context: item
+  - name: office1EnergyToday
     label: Office 1 Energy Today
-    name: office1EnergyToday
-    required: true
+    description: Number:Energy item
     type: TEXT
-  - context: item
-    description: Switch item
+    required: true
+    context: item
+  - name: office2Switch
     label: Office 2 Switch
-    name: office2Switch
-    required: true
-    type: TEXT
-  - context: item
-    description: Number:Power item
-    label: Office 2 Power
-    name: office2Power
-    required: true
-    type: TEXT
-  - context: item
-    description: Number:Energy item
-    label: Office 2 Energy Today
-    name: office2EnergyToday
-    required: true
-    type: TEXT
-  - context: item
     description: Switch item
-    label: Terrace Light Switch
-    name: terraceLightSwitch
-    required: true
     type: TEXT
-  - context: item
+    required: true
+    context: item
+  - name: office2Power
+    label: Office 2 Power
     description: Number:Power item
-    label: Terrace Light Power
-    name: terraceLightPower
-    required: true
     type: TEXT
-  - context: item
+    required: true
+    context: item
+  - name: office2EnergyToday
+    label: Office 2 Energy Today
     description: Number:Energy item
-    label: Terrace Light Energy Today
-    name: terraceLightEnergyToday
-    required: true
     type: TEXT
+    required: true
+    context: item
+  - name: terraceLightSwitch
+    label: Terrace Light Switch
+    description: Switch item
+    type: TEXT
+    required: true
+    context: item
+  - name: terraceLightPower
+    label: Terrace Light Power
+    description: Number:Power item
+    type: TEXT
+    required: true
+    context: item
+  - name: terraceLightEnergyToday
+    label: Terrace Light Energy Today
+    description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
   parameterGroups: []
-timestamp: Oct 25, 2026, 1:50:27 PM
+timestamp: Oct 25, 2026, 2:07:58 PM
 component: oh-card
 config:
+  title: Switches
   style:
     height: calc(100% - 2 * var(--f7-card-margin-vertical))
   stylesheet: '@keyframes a-soft { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.06; } }
@@ -200,7 +201,6 @@ config:
     .a-bubble-r { transform-box: fill-box; transform-origin: center; animation: a-bubble-r 2.6s linear infinite; }
 
     '
-  title: Switches
 slots:
   content:
   - component: div
@@ -219,41 +219,41 @@ slots:
           default:
           - component: widget:switch-tile
             config:
-              color: '#8d6e63'
-              energy: =((Number(items[props.coffeeMachineEnergyToday].numericState) || 0)).toFixed(2) + ' kWh'
-              icon: material:coffee
               item: =props.coffeeMachineSwitch
               title: Coffee
+              icon: material:coffee
+              color: '#8d6e63'
               value: =Math.round((Number(items[props.coffeeMachinePower].numericState) || 0)) + ' W'
+              energy: =((Number(items[props.coffeeMachineEnergyToday].numericState) || 0)).toFixed(2) + ' kWh'
           - component: widget:switch-tile
             config:
-              color: '#7cb342'
-              energy: =((Number(items[props.bicycleBatteriesEnergyToday].numericState) || 0)).toFixed(2) + ' kWh'
-              icon: material:electric_bike
               item: =props.bicycleBatteriesSwitch
               title: E-Bikes
+              icon: material:electric_bike
+              color: '#7cb342'
               value: =Math.round((Number(items[props.bicycleBatteriesPower].numericState) || 0)) + ' W'
+              energy: =((Number(items[props.bicycleBatteriesEnergyToday].numericState) || 0)).toFixed(2) + ' kWh'
           - component: widget:switch-tile
             config:
-              color: '#ab47bc'
-              energy: =((Number(items[props.office1EnergyToday].numericState) || 0)).toFixed(2) + ' kWh'
-              icon: material:computer
               item: =props.office1Switch
               title: Office 1
+              icon: material:computer
+              color: '#ab47bc'
               value: =Math.round((Number(items[props.office1Power].numericState) || 0)) + ' W'
+              energy: =((Number(items[props.office1EnergyToday].numericState) || 0)).toFixed(2) + ' kWh'
           - component: widget:switch-tile
             config:
-              color: '#ab47bc'
-              energy: =((Number(items[props.office2EnergyToday].numericState) || 0)).toFixed(2) + ' kWh'
-              icon: material:computer
               item: =props.office2Switch
               title: Office 2
+              icon: material:computer
+              color: '#ab47bc'
               value: =Math.round((Number(items[props.office2Power].numericState) || 0)) + ' W'
+              energy: =((Number(items[props.office2EnergyToday].numericState) || 0)).toFixed(2) + ' kWh'
           - component: widget:switch-tile
             config:
-              color: '#fbc02d'
-              energy: =((Number(items[props.terraceLightEnergyToday].numericState) || 0)).toFixed(2) + ' kWh'
-              icon: material:light
               item: =props.terraceLightSwitch
               title: Terrace
+              icon: material:light
+              color: '#fbc02d'
               value: =Math.round((Number(items[props.terraceLightPower].numericState) || 0)) + ' W'
+              energy: =((Number(items[props.terraceLightEnergyToday].numericState) || 0)).toFixed(2) + ' kWh'

@@ -3,142 +3,144 @@ tags:
 - overview
 props:
   parameters:
-  - context: item
-    description: Number:Energy item
+  - name: homeEnergyToday
     label: Home Energy Day
-    name: homeEnergyToday
-    required: true
-    type: TEXT
-  - context: item
     description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  - name: homeFromPvToday
     label: Home from PV Today
-    name: homeFromPvToday
-    required: true
-    type: TEXT
-  - context: item
     description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  - name: homeFromBatteryToday
     label: Home from Battery Today
-    name: homeFromBatteryToday
-    required: true
+    description: Number:Energy item
     type: TEXT
-  - context: item
-    description: String item
+    required: true
+    context: item
+  - name: tileHistory
     label: Tile history
-    name: tileHistory
-    required: true
+    description: String item
     type: TEXT
-  - context: item
-    description: Number:Energy item
+    required: true
+    context: item
+  - name: homeFromGridToday
     label: Home from Grid Today
-    name: homeFromGridToday
-    required: true
-    type: TEXT
-  - context: item
     description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpEnergyToday
     label: ESPAltherma Energy Today
-    name: heatpumpEnergyToday
-    required: true
-    type: TEXT
-  - context: item
     description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  - name: ecarEnergyToday
     label: E-Car Energy Today
-    name: ecarEnergyToday
-    required: true
-    type: TEXT
-  - context: item
     description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  - name: acUnitEnergyToday
     label: Air Conditioning Unit Energy Today
-    name: acUnitEnergyToday
-    required: true
-    type: TEXT
-  - context: item
     description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  - name: office1EnergyToday
     label: Office 1 Energy Today
-    name: office1EnergyToday
-    required: true
-    type: TEXT
-  - context: item
     description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  - name: office2EnergyToday
     label: Office 2 Energy Today
-    name: office2EnergyToday
-    required: true
-    type: TEXT
-  - context: item
     description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  - name: networkEnergyToday
     label: Network Energy Today
-    name: networkEnergyToday
-    required: true
-    type: TEXT
-  - context: item
     description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  - name: ventilationEnergyToday
     label: Ventilation Energy Today
-    name: ventilationEnergyToday
-    required: true
-    type: TEXT
-  - context: item
     description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  - name: refrigeratorEnergyToday
     label: Refrigerator Energy Today
-    name: refrigeratorEnergyToday
-    required: true
-    type: TEXT
-  - context: item
     description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  - name: coffeeMachineEnergyToday
     label: Coffee Machine Energy Today
-    name: coffeeMachineEnergyToday
-    required: true
-    type: TEXT
-  - context: item
     description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  - name: livingRoomEntertainmentEnergyToday
     label: Living Room Entertainment Energy Today
-    name: livingRoomEntertainmentEnergyToday
-    required: true
-    type: TEXT
-  - context: item
     description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  - name: dishwasherEnergyToday
     label: Dishwasher Energy Today
-    name: dishwasherEnergyToday
-    required: true
-    type: TEXT
-  - context: item
     description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  - name: washingMachine1EnergyToday
     label: Washing Machine 1 Energy Today
-    name: washingMachine1EnergyToday
-    required: true
-    type: TEXT
-  - context: item
     description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  - name: washingMachine2EnergyToday
     label: Washing Machine 2 Energy Today
-    name: washingMachine2EnergyToday
-    required: true
-    type: TEXT
-  - context: item
     description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  - name: tumbleDryerEnergyToday
     label: Tumble Dryer Energy Today
-    name: tumbleDryerEnergyToday
-    required: true
-    type: TEXT
-  - context: item
     description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  - name: terraceLightEnergyToday
     label: Terrace Light Energy Today
-    name: terraceLightEnergyToday
-    required: true
-    type: TEXT
-  - context: item
     description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  - name: bicycleBatteriesEnergyToday
     label: Bicycle Batteries Energy Today
-    name: bicycleBatteriesEnergyToday
-    required: true
-    type: TEXT
-  - context: item
     description: Number:Energy item
-    label: Air Conditioning Energy Today
-    name: acMeterEnergyToday
-    required: true
     type: TEXT
+    required: true
+    context: item
+  - name: acMeterEnergyToday
+    label: Air Conditioning Energy Today
+    description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
   parameterGroups: []
-timestamp: Oct 25, 2026, 1:50:26 PM
+timestamp: Oct 25, 2026, 2:07:58 PM
 component: oh-card
 config:
+  title: '=''Consumption Today · '' + ([''NULL'', ''UNDEF''].includes(items[props.homeEnergyToday].state) ? ''–'' : (items[props.homeEnergyToday].displayState
+    || items[props.homeEnergyToday].state))'
   style:
     height: calc(100% - 2 * var(--f7-card-margin-vertical))
   stylesheet: '@keyframes a-soft { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.06; } }
@@ -242,8 +244,6 @@ config:
     .a-bubble-r { transform-box: fill-box; transform-origin: center; animation: a-bubble-r 2.6s linear infinite; }
 
     '
-  title: '=''Consumption Today · '' + ([''NULL'', ''UNDEF''].includes(items[props.homeEnergyToday].state) ? ''–'' : (items[props.homeEnergyToday].displayState
-    || items[props.homeEnergyToday].state))'
 slots:
   content:
   - component: div
@@ -254,7 +254,6 @@ slots:
       default:
       - component: div
         config:
-          style: {}
           stylesheet: '.k { transition: opacity 0.15s, transform 0.15s, background-color 0.15s; }
 
             .item { border-radius: 6px; padding: 3px 6px; margin: 0 -6px; }
@@ -272,15 +271,16 @@ slots:
             :host:has(.k-grid:hover) .item.k-grid { background-color: rgba(239, 154, 154, 0.4); font-weight: 700; }
 
             :host:has(.k-grid:hover) .seg.k-grid { transform: scaleY(1.5); }'
+          style: {}
         slots:
           default:
           - component: div
             config:
               style:
-                align-items: center
                 display: grid
-                gap: 8px
                 grid-template-columns: 1fr auto 1fr
+                align-items: center
+                gap: 8px
                 margin-bottom: 6px
             slots:
               default:
@@ -293,40 +293,44 @@ slots:
                   default:
                   - component: Label
                     config:
-                      style:
-                        color: '#43a047'
-                        font-size: '=screen.width < 600 ? ''26px'' : ''28px'''
-                        font-weight: '700'
-                        letter-spacing: -0.01em
-                        line-height: '=screen.width < 600 ? ''32px'' : ''34px'''
                       text: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? Math.round(100 * ((Number(items[props.homeFromPvToday].numericState)
                         || 0) + (Number(items[props.homeFromBatteryToday].numericState) || 0)) / (Number(items[props.homeEnergyToday].numericState)
                         || 0)) : 0) + '' %'''
+                      style:
+                        font-size: '=screen.width < 600 ? ''26px'' : ''28px'''
+                        font-weight: '700'
+                        line-height: '=screen.width < 600 ? ''32px'' : ''34px'''
+                        letter-spacing: -0.01em
+                        color: '#43a047'
                   - component: Label
                     config:
+                      text: ='from PV · ' + (((Number(items[props.homeFromPvToday].numericState) || 0) + (Number(items[props.homeFromBatteryToday].numericState)
+                        || 0))).toFixed(1) + ' kWh'
                       style:
                         font-size: 12px
                         opacity: '0.7'
-                      text: ='from PV · ' + (((Number(items[props.homeFromPvToday].numericState) || 0) + (Number(items[props.homeFromBatteryToday].numericState)
-                        || 0))).toFixed(1) + ' kWh'
               - component: Label
                 config:
+                  text: '=(Math.abs(((Number(items[props.homeEnergyToday].numericState) || 0) - Number(((h) => h.y2 === undefined
+                    || h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0,
+                    (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0)
+                    === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.homeEnergyToday] || {}))))) < 0.005
+                    ? ''±0'' : (((Number(items[props.homeEnergyToday].numericState) || 0) - Number(((h) => h.y2 === undefined
+                    || h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0,
+                    (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0)
+                    === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.homeEnergyToday] || {})))) > 0 ? ''+''
+                    : ''−'') + (Math.abs(((Number(items[props.homeEnergyToday].numericState) || 0) - Number(((h) => h.y2 ===
+                    undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1,
+                    Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0)
+                    === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.homeEnergyToday] || {})))))).toFixed(2))
+                    + '' kWh vs. yesterday'''
                   style:
-                    background: '=''color-mix(in srgb, '' + ((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''],
-                      caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''],
-                      info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[(Math.abs(((Number(items[props.homeEnergyToday].numericState)
-                      || 0) - Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y
-                      : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
-                      || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.homeEnergyToday]
-                      || {}))))) < 0.05 ? ''neutral'' : (((Number(items[props.homeEnergyToday].numericState) || 0) - Number(((h)
-                      => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y + (h.y2 - h.y)
-                      * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
-                      || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.homeEnergyToday]
-                      || {})))) > 0) === false ? ''good'' : ''warn'')] || (({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'',
-                      ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'',
-                      ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark
-                      === ''dark'') ? 1 : 0] + '' 16%, transparent)'''
+                    font-size: 11px
+                    font-weight: '600'
+                    padding: 3px 8px 2px
                     border-radius: 6px
+                    white-space: nowrap
+                    width: fit-content
                     color: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
                       ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
                       ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[(Math.abs(((Number(items[props.homeEnergyToday].numericState)
@@ -341,25 +345,21 @@ slots:
                       ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'',
                       ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark
                       === ''dark'') ? 1 : 0]'
-                    font-size: 11px
-                    font-weight: '600'
+                    background: '=''color-mix(in srgb, '' + ((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''],
+                      caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''],
+                      info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[(Math.abs(((Number(items[props.homeEnergyToday].numericState)
+                      || 0) - Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y
+                      : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
+                      || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.homeEnergyToday]
+                      || {}))))) < 0.05 ? ''neutral'' : (((Number(items[props.homeEnergyToday].numericState) || 0) - Number(((h)
+                      => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y + (h.y2 - h.y)
+                      * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
+                      || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.homeEnergyToday]
+                      || {})))) > 0) === false ? ''good'' : ''warn'')] || (({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'',
+                      ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'',
+                      ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark
+                      === ''dark'') ? 1 : 0] + '' 16%, transparent)'''
                     justify-self: center
-                    padding: 3px 8px 2px
-                    white-space: nowrap
-                    width: fit-content
-                  text: '=(Math.abs(((Number(items[props.homeEnergyToday].numericState) || 0) - Number(((h) => h.y2 === undefined
-                    || h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0,
-                    (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0)
-                    === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.homeEnergyToday] || {}))))) < 0.005
-                    ? ''±0'' : (((Number(items[props.homeEnergyToday].numericState) || 0) - Number(((h) => h.y2 === undefined
-                    || h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0,
-                    (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0)
-                    === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.homeEnergyToday] || {})))) > 0 ? ''+''
-                    : ''−'') + (Math.abs(((Number(items[props.homeEnergyToday].numericState) || 0) - Number(((h) => h.y2 ===
-                    undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1,
-                    Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0)
-                    === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.homeEnergyToday] || {})))))).toFixed(2))
-                    + '' kWh vs. yesterday'''
                   visible: '=(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y
                     + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
                     || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.homeEnergyToday]
@@ -376,21 +376,21 @@ slots:
                   default:
                   - component: Label
                     config:
-                      style:
-                        color: '#e53935'
-                        font-size: '=screen.width < 600 ? ''26px'' : ''28px'''
-                        font-weight: '700'
-                        letter-spacing: -0.01em
-                        line-height: '=screen.width < 600 ? ''32px'' : ''34px'''
                       text: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? Math.round(100 * (Number(items[props.homeFromGridToday].numericState)
                         || 0) / (Number(items[props.homeEnergyToday].numericState) || 0)) : 0) + '' %'''
+                      style:
+                        font-size: '=screen.width < 600 ? ''26px'' : ''28px'''
+                        font-weight: '700'
+                        line-height: '=screen.width < 600 ? ''32px'' : ''34px'''
+                        letter-spacing: -0.01em
+                        color: '#e53935'
                   - component: Label
                     config:
+                      text: ='from the grid · ' + ((Number(items[props.homeFromGridToday].numericState) || 0)).toFixed(1)
+                        + ' kWh'
                       style:
                         font-size: 12px
                         opacity: '0.7'
-                      text: ='from the grid · ' + ((Number(items[props.homeFromGridToday].numericState) || 0)).toFixed(1)
-                        + ' kWh'
           - component: div
             config:
               style:
@@ -402,44 +402,43 @@ slots:
               - component: div
                 config:
                   class: seg k k-pv
-                  style:
-                    background: '#a5d6a7'
-                    border-radius: 4px
-                    height: 100%
-                    width: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? 100 * ((Number(items[props.homeFromPvToday].numericState)
-                      || 0) + (Number(items[props.homeFromBatteryToday].numericState) || 0)) / (Number(items[props.homeEnergyToday].numericState)
-                      || 0) : 0).toFixed(2) + ''%'''
                   title: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? Math.round(100 * ((Number(items[props.homeFromPvToday].numericState)
                     || 0) + (Number(items[props.homeFromBatteryToday].numericState) || 0)) / (Number(items[props.homeEnergyToday].numericState)
                     || 0)) : 0) + '' % from PV'''
                   visible: =((Number(items[props.homeFromPvToday].numericState) || 0) + (Number(items[props.homeFromBatteryToday].numericState)
                     || 0)) > 0.005
+                  style:
+                    width: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? 100 * ((Number(items[props.homeFromPvToday].numericState)
+                      || 0) + (Number(items[props.homeFromBatteryToday].numericState) || 0)) / (Number(items[props.homeEnergyToday].numericState)
+                      || 0) : 0).toFixed(2) + ''%'''
+                    height: 100%
+                    background: '#a5d6a7'
+                    border-radius: 4px
                 slots:
                   default: []
               - component: div
                 config:
                   class: seg k k-grid
-                  style:
-                    background: '#ef9a9a'
-                    border-radius: 4px
-                    height: 100%
-                    width: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? 100 * (Number(items[props.homeFromGridToday].numericState)
-                      || 0) / (Number(items[props.homeEnergyToday].numericState) || 0) : 0).toFixed(2) + ''%'''
                   title: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? Math.round(100 * (Number(items[props.homeFromGridToday].numericState)
                     || 0) / (Number(items[props.homeEnergyToday].numericState) || 0)) : 0) + '' % from the grid'''
                   visible: =(Number(items[props.homeFromGridToday].numericState) || 0) > 0.005
+                  style:
+                    width: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? 100 * (Number(items[props.homeFromGridToday].numericState)
+                      || 0) / (Number(items[props.homeEnergyToday].numericState) || 0) : 0).toFixed(2) + ''%'''
+                    height: 100%
+                    background: '#ef9a9a'
+                    border-radius: 4px
                 slots:
                   default: []
       - component: Label
         config:
+          text: Consumers
           style:
             font-size: 13px
-            margin: 16px 0 6px
             opacity: '0.7'
-          text: Consumers
+            margin: 16px 0 6px
       - component: div
         config:
-          style: {}
           stylesheet: '.k { transition: opacity 0.15s, transform 0.15s, background-color 0.15s; }
 
             .item { border-radius: 6px; padding: 3px 6px; margin: 0 -6px; }
@@ -517,6 +516,7 @@ slots:
             :host:has(.k-c11:hover) .item.k-c11 { background-color: rgba(224, 224, 224, 0.4); font-weight: 700; }
 
             :host:has(.k-c11:hover) .seg.k-c11 { transform: scaleY(1.5); }'
+          style: {}
         slots:
           default:
           - component: div
@@ -530,153 +530,145 @@ slots:
               - component: div
                 config:
                   class: seg k k-c0
-                  style:
-                    background: '#ffb74d'
-                    border-radius: 4px
-                    height: 100%
-                    width: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? 100 * ((Number(items[props.heatpumpEnergyToday].numericState)
-                      || 0)) / (Number(items[props.homeEnergyToday].numericState) || 0) : 0).toFixed(2) + ''%'''
                   title: '=''Heat Pump · '' + (((Number(items[props.heatpumpEnergyToday].numericState) || 0))).toFixed(2)
                     + '' kWh · '' + ((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? Math.round(100 * ((Number(items[props.heatpumpEnergyToday].numericState)
                     || 0)) / (Number(items[props.homeEnergyToday].numericState) || 0)) : 0) + '' %'''
                   visible: =((Number(items[props.heatpumpEnergyToday].numericState) || 0)) > 0.005
+                  style:
+                    width: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? 100 * ((Number(items[props.heatpumpEnergyToday].numericState)
+                      || 0)) / (Number(items[props.homeEnergyToday].numericState) || 0) : 0).toFixed(2) + ''%'''
+                    height: 100%
+                    background: '#ffb74d'
+                    border-radius: 4px
                 slots:
                   default: []
               - component: div
                 config:
                   class: seg k k-c1
-                  style:
-                    background: '#26a69a'
-                    border-radius: 4px
-                    height: 100%
-                    width: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? 100 * (Number(items[props.ecarEnergyToday].numericState)
-                      || 0) / (Number(items[props.homeEnergyToday].numericState) || 0) : 0).toFixed(2) + ''%'''
                   title: '=''E-Car · '' + ((Number(items[props.ecarEnergyToday].numericState) || 0)).toFixed(2) + '' kWh ·
                     '' + ((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? Math.round(100 * (Number(items[props.ecarEnergyToday].numericState)
                     || 0) / (Number(items[props.homeEnergyToday].numericState) || 0)) : 0) + '' %'''
                   visible: =(Number(items[props.ecarEnergyToday].numericState) || 0) > 0.005
+                  style:
+                    width: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? 100 * (Number(items[props.ecarEnergyToday].numericState)
+                      || 0) / (Number(items[props.homeEnergyToday].numericState) || 0) : 0).toFixed(2) + ''%'''
+                    height: 100%
+                    background: '#26a69a'
+                    border-radius: 4px
                 slots:
                   default: []
               - component: div
                 config:
                   class: seg k k-c2
-                  style:
-                    background: '#4fc3f7'
-                    border-radius: 4px
-                    height: 100%
-                    width: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? 100 * (Number(items[props.acUnitEnergyToday].numericState)
-                      || 0) / (Number(items[props.homeEnergyToday].numericState) || 0) : 0).toFixed(2) + ''%'''
                   title: '=''Air Conditioner · '' + ((Number(items[props.acUnitEnergyToday].numericState) || 0)).toFixed(2)
                     + '' kWh · '' + ((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? Math.round(100 * (Number(items[props.acUnitEnergyToday].numericState)
                     || 0) / (Number(items[props.homeEnergyToday].numericState) || 0)) : 0) + '' %'''
                   visible: =(Number(items[props.acUnitEnergyToday].numericState) || 0) > 0.005
+                  style:
+                    width: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? 100 * (Number(items[props.acUnitEnergyToday].numericState)
+                      || 0) / (Number(items[props.homeEnergyToday].numericState) || 0) : 0).toFixed(2) + ''%'''
+                    height: 100%
+                    background: '#4fc3f7'
+                    border-radius: 4px
                 slots:
                   default: []
               - component: div
                 config:
                   class: seg k k-c3
-                  style:
-                    background: '#ce93d8'
-                    border-radius: 4px
-                    height: 100%
-                    width: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? 100 * ((Number(items[props.office1EnergyToday].numericState)
-                      || 0) + (Number(items[props.office2EnergyToday].numericState) || 0)) / (Number(items[props.homeEnergyToday].numericState)
-                      || 0) : 0).toFixed(2) + ''%'''
                   title: '=''Offices · '' + (((Number(items[props.office1EnergyToday].numericState) || 0) + (Number(items[props.office2EnergyToday].numericState)
                     || 0))).toFixed(2) + '' kWh · '' + ((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? Math.round(100
                     * ((Number(items[props.office1EnergyToday].numericState) || 0) + (Number(items[props.office2EnergyToday].numericState)
                     || 0)) / (Number(items[props.homeEnergyToday].numericState) || 0)) : 0) + '' %'''
                   visible: =((Number(items[props.office1EnergyToday].numericState) || 0) + (Number(items[props.office2EnergyToday].numericState)
                     || 0)) > 0.005
+                  style:
+                    width: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? 100 * ((Number(items[props.office1EnergyToday].numericState)
+                      || 0) + (Number(items[props.office2EnergyToday].numericState) || 0)) / (Number(items[props.homeEnergyToday].numericState)
+                      || 0) : 0).toFixed(2) + ''%'''
+                    height: 100%
+                    background: '#ce93d8'
+                    border-radius: 4px
                 slots:
                   default: []
               - component: div
                 config:
                   class: seg k k-c4
-                  style:
-                    background: '#9fa8da'
-                    border-radius: 4px
-                    height: 100%
-                    width: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? 100 * ((Number(items[props.networkEnergyToday].numericState)
-                      || 0)) / (Number(items[props.homeEnergyToday].numericState) || 0) : 0).toFixed(2) + ''%'''
                   title: '=''Network · '' + (((Number(items[props.networkEnergyToday].numericState) || 0))).toFixed(2) + ''
                     kWh · '' + ((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? Math.round(100 * ((Number(items[props.networkEnergyToday].numericState)
                     || 0)) / (Number(items[props.homeEnergyToday].numericState) || 0)) : 0) + '' %'''
                   visible: =((Number(items[props.networkEnergyToday].numericState) || 0)) > 0.005
+                  style:
+                    width: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? 100 * ((Number(items[props.networkEnergyToday].numericState)
+                      || 0)) / (Number(items[props.homeEnergyToday].numericState) || 0) : 0).toFixed(2) + ''%'''
+                    height: 100%
+                    background: '#9fa8da'
+                    border-radius: 4px
                 slots:
                   default: []
               - component: div
                 config:
                   class: seg k k-c5
-                  style:
-                    background: '#80cbc4'
-                    border-radius: 4px
-                    height: 100%
-                    width: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? 100 * ((Number(items[props.ventilationEnergyToday].numericState)
-                      || 0)) / (Number(items[props.homeEnergyToday].numericState) || 0) : 0).toFixed(2) + ''%'''
                   title: '=''Ventilation · '' + (((Number(items[props.ventilationEnergyToday].numericState) || 0))).toFixed(2)
                     + '' kWh · '' + ((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? Math.round(100 * ((Number(items[props.ventilationEnergyToday].numericState)
                     || 0)) / (Number(items[props.homeEnergyToday].numericState) || 0)) : 0) + '' %'''
                   visible: =((Number(items[props.ventilationEnergyToday].numericState) || 0)) > 0.005
+                  style:
+                    width: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? 100 * ((Number(items[props.ventilationEnergyToday].numericState)
+                      || 0)) / (Number(items[props.homeEnergyToday].numericState) || 0) : 0).toFixed(2) + ''%'''
+                    height: 100%
+                    background: '#80cbc4'
+                    border-radius: 4px
                 slots:
                   default: []
               - component: div
                 config:
                   class: seg k k-c6
-                  style:
-                    background: '#b0bec5'
-                    border-radius: 4px
-                    height: 100%
-                    width: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? 100 * ((Number(items[props.refrigeratorEnergyToday].numericState)
-                      || 0)) / (Number(items[props.homeEnergyToday].numericState) || 0) : 0).toFixed(2) + ''%'''
                   title: '=''Refrigerator · '' + (((Number(items[props.refrigeratorEnergyToday].numericState) || 0))).toFixed(2)
                     + '' kWh · '' + ((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? Math.round(100 * ((Number(items[props.refrigeratorEnergyToday].numericState)
                     || 0)) / (Number(items[props.homeEnergyToday].numericState) || 0)) : 0) + '' %'''
                   visible: =((Number(items[props.refrigeratorEnergyToday].numericState) || 0)) > 0.005
+                  style:
+                    width: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? 100 * ((Number(items[props.refrigeratorEnergyToday].numericState)
+                      || 0)) / (Number(items[props.homeEnergyToday].numericState) || 0) : 0).toFixed(2) + ''%'''
+                    height: 100%
+                    background: '#b0bec5'
+                    border-radius: 4px
                 slots:
                   default: []
               - component: div
                 config:
                   class: seg k k-c7
-                  style:
-                    background: '#bcaaa4'
-                    border-radius: 4px
-                    height: 100%
-                    width: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? 100 * ((Number(items[props.coffeeMachineEnergyToday].numericState)
-                      || 0)) / (Number(items[props.homeEnergyToday].numericState) || 0) : 0).toFixed(2) + ''%'''
                   title: '=''Coffee Machine · '' + (((Number(items[props.coffeeMachineEnergyToday].numericState) || 0))).toFixed(2)
                     + '' kWh · '' + ((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? Math.round(100 * ((Number(items[props.coffeeMachineEnergyToday].numericState)
                     || 0)) / (Number(items[props.homeEnergyToday].numericState) || 0)) : 0) + '' %'''
                   visible: =((Number(items[props.coffeeMachineEnergyToday].numericState) || 0)) > 0.005
+                  style:
+                    width: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? 100 * ((Number(items[props.coffeeMachineEnergyToday].numericState)
+                      || 0)) / (Number(items[props.homeEnergyToday].numericState) || 0) : 0).toFixed(2) + ''%'''
+                    height: 100%
+                    background: '#bcaaa4'
+                    border-radius: 4px
                 slots:
                   default: []
               - component: div
                 config:
                   class: seg k k-c8
-                  style:
-                    background: '#f48fb1'
-                    border-radius: 4px
-                    height: 100%
-                    width: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? 100 * ((Number(items[props.livingRoomEntertainmentEnergyToday].numericState)
-                      || 0)) / (Number(items[props.homeEnergyToday].numericState) || 0) : 0).toFixed(2) + ''%'''
                   title: '=''Living Room Media · '' + (((Number(items[props.livingRoomEntertainmentEnergyToday].numericState)
                     || 0))).toFixed(2) + '' kWh · '' + ((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? Math.round(100
                     * ((Number(items[props.livingRoomEntertainmentEnergyToday].numericState) || 0)) / (Number(items[props.homeEnergyToday].numericState)
                     || 0)) : 0) + '' %'''
                   visible: =((Number(items[props.livingRoomEntertainmentEnergyToday].numericState) || 0)) > 0.005
+                  style:
+                    width: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? 100 * ((Number(items[props.livingRoomEntertainmentEnergyToday].numericState)
+                      || 0)) / (Number(items[props.homeEnergyToday].numericState) || 0) : 0).toFixed(2) + ''%'''
+                    height: 100%
+                    background: '#f48fb1'
+                    border-radius: 4px
                 slots:
                   default: []
               - component: div
                 config:
                   class: seg k k-c9
-                  style:
-                    background: '#aed581'
-                    border-radius: 4px
-                    height: 100%
-                    width: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? 100 * ((Number(items[props.dishwasherEnergyToday].numericState)
-                      || 0) + (Number(items[props.washingMachine1EnergyToday].numericState) || 0) + (Number(items[props.washingMachine2EnergyToday].numericState)
-                      || 0) + (Number(items[props.tumbleDryerEnergyToday].numericState) || 0)) / (Number(items[props.homeEnergyToday].numericState)
-                      || 0) : 0).toFixed(2) + ''%'''
                   title: '=''Laundry & Dishes · '' + (((Number(items[props.dishwasherEnergyToday].numericState) || 0) + (Number(items[props.washingMachine1EnergyToday].numericState)
                     || 0) + (Number(items[props.washingMachine2EnergyToday].numericState) || 0) + (Number(items[props.tumbleDryerEnergyToday].numericState)
                     || 0))).toFixed(2) + '' kWh · '' + ((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? Math.round(100
@@ -686,43 +678,37 @@ slots:
                   visible: =((Number(items[props.dishwasherEnergyToday].numericState) || 0) + (Number(items[props.washingMachine1EnergyToday].numericState)
                     || 0) + (Number(items[props.washingMachine2EnergyToday].numericState) || 0) + (Number(items[props.tumbleDryerEnergyToday].numericState)
                     || 0)) > 0.005
+                  style:
+                    width: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? 100 * ((Number(items[props.dishwasherEnergyToday].numericState)
+                      || 0) + (Number(items[props.washingMachine1EnergyToday].numericState) || 0) + (Number(items[props.washingMachine2EnergyToday].numericState)
+                      || 0) + (Number(items[props.tumbleDryerEnergyToday].numericState) || 0)) / (Number(items[props.homeEnergyToday].numericState)
+                      || 0) : 0).toFixed(2) + ''%'''
+                    height: 100%
+                    background: '#aed581'
+                    border-radius: 4px
                 slots:
                   default: []
               - component: div
                 config:
                   class: seg k k-c10
-                  style:
-                    background: '#fff176'
-                    border-radius: 4px
-                    height: 100%
-                    width: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? 100 * ((Number(items[props.terraceLightEnergyToday].numericState)
-                      || 0) + (Number(items[props.bicycleBatteriesEnergyToday].numericState) || 0)) / (Number(items[props.homeEnergyToday].numericState)
-                      || 0) : 0).toFixed(2) + ''%'''
                   title: '=''Terrace & Bicycles · '' + (((Number(items[props.terraceLightEnergyToday].numericState) || 0)
                     + (Number(items[props.bicycleBatteriesEnergyToday].numericState) || 0))).toFixed(2) + '' kWh · '' + ((Number(items[props.homeEnergyToday].numericState)
                     || 0) > 0 ? Math.round(100 * ((Number(items[props.terraceLightEnergyToday].numericState) || 0) + (Number(items[props.bicycleBatteriesEnergyToday].numericState)
                     || 0)) / (Number(items[props.homeEnergyToday].numericState) || 0)) : 0) + '' %'''
                   visible: =((Number(items[props.terraceLightEnergyToday].numericState) || 0) + (Number(items[props.bicycleBatteriesEnergyToday].numericState)
                     || 0)) > 0.005
+                  style:
+                    width: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? 100 * ((Number(items[props.terraceLightEnergyToday].numericState)
+                      || 0) + (Number(items[props.bicycleBatteriesEnergyToday].numericState) || 0)) / (Number(items[props.homeEnergyToday].numericState)
+                      || 0) : 0).toFixed(2) + ''%'''
+                    height: 100%
+                    background: '#fff176'
+                    border-radius: 4px
                 slots:
                   default: []
               - component: div
                 config:
                   class: seg k k-c11
-                  style:
-                    background: '#e0e0e0'
-                    border-radius: 4px
-                    height: 100%
-                    width: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? 100 * Math.max(0, (Number(items[props.homeEnergyToday].numericState)
-                      || 0) - ((Number(items[props.heatpumpEnergyToday].numericState) || 0) + (Number(items[props.acMeterEnergyToday].numericState)
-                      || 0) + (Number(items[props.office1EnergyToday].numericState) || 0) + (Number(items[props.office2EnergyToday].numericState)
-                      || 0) + (Number(items[props.networkEnergyToday].numericState) || 0) + (Number(items[props.ventilationEnergyToday].numericState)
-                      || 0) + (Number(items[props.refrigeratorEnergyToday].numericState) || 0) + (Number(items[props.coffeeMachineEnergyToday].numericState)
-                      || 0) + (Number(items[props.livingRoomEntertainmentEnergyToday].numericState) || 0) + (Number(items[props.dishwasherEnergyToday].numericState)
-                      || 0) + (Number(items[props.washingMachine1EnergyToday].numericState) || 0) + (Number(items[props.washingMachine2EnergyToday].numericState)
-                      || 0) + (Number(items[props.tumbleDryerEnergyToday].numericState) || 0) + (Number(items[props.terraceLightEnergyToday].numericState)
-                      || 0) + (Number(items[props.bicycleBatteriesEnergyToday].numericState) || 0))) / (Number(items[props.homeEnergyToday].numericState)
-                      || 0) : 0).toFixed(2) + ''%'''
                   title: '=''Not measured · '' + (Math.max(0, (Number(items[props.homeEnergyToday].numericState) || 0) - ((Number(items[props.heatpumpEnergyToday].numericState)
                     || 0) + (Number(items[props.acMeterEnergyToday].numericState) || 0) + (Number(items[props.office1EnergyToday].numericState)
                     || 0) + (Number(items[props.office2EnergyToday].numericState) || 0) + (Number(items[props.networkEnergyToday].numericState)
@@ -750,13 +736,27 @@ slots:
                     || 0) + (Number(items[props.washingMachine2EnergyToday].numericState) || 0) + (Number(items[props.tumbleDryerEnergyToday].numericState)
                     || 0) + (Number(items[props.terraceLightEnergyToday].numericState) || 0) + (Number(items[props.bicycleBatteriesEnergyToday].numericState)
                     || 0))) > 0.005
+                  style:
+                    width: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? 100 * Math.max(0, (Number(items[props.homeEnergyToday].numericState)
+                      || 0) - ((Number(items[props.heatpumpEnergyToday].numericState) || 0) + (Number(items[props.acMeterEnergyToday].numericState)
+                      || 0) + (Number(items[props.office1EnergyToday].numericState) || 0) + (Number(items[props.office2EnergyToday].numericState)
+                      || 0) + (Number(items[props.networkEnergyToday].numericState) || 0) + (Number(items[props.ventilationEnergyToday].numericState)
+                      || 0) + (Number(items[props.refrigeratorEnergyToday].numericState) || 0) + (Number(items[props.coffeeMachineEnergyToday].numericState)
+                      || 0) + (Number(items[props.livingRoomEntertainmentEnergyToday].numericState) || 0) + (Number(items[props.dishwasherEnergyToday].numericState)
+                      || 0) + (Number(items[props.washingMachine1EnergyToday].numericState) || 0) + (Number(items[props.washingMachine2EnergyToday].numericState)
+                      || 0) + (Number(items[props.tumbleDryerEnergyToday].numericState) || 0) + (Number(items[props.terraceLightEnergyToday].numericState)
+                      || 0) + (Number(items[props.bicycleBatteriesEnergyToday].numericState) || 0))) / (Number(items[props.homeEnergyToday].numericState)
+                      || 0) : 0).toFixed(2) + ''%'''
+                    height: 100%
+                    background: '#e0e0e0'
+                    border-radius: 4px
                 slots:
                   default: []
           - component: div
             config:
               style:
-                column-gap: 24px
                 columns: 2 197px
+                column-gap: 24px
                 margin-top: 12px
             slots:
               default:
@@ -764,61 +764,41 @@ slots:
                 config:
                   class: item k k-c0
                   style:
-                    align-items: center
-                    break-inside: avoid
                     display: flex
-                    font-size: 13px
+                    align-items: center
                     gap: 8px
+                    font-size: 13px
+                    break-inside: avoid
                     margin-bottom: 2px
                 slots:
                   default:
                   - component: div
                     config:
                       style:
-                        background: '#ffb74d'
-                        border-radius: 50%
-                        flex: 0 0 auto
-                        height: 10px
                         width: 10px
+                        height: 10px
+                        border-radius: 50%
+                        background: '#ffb74d'
+                        flex: 0 0 auto
                     slots:
                       default: []
                   - component: Label
                     config:
+                      text: Heat Pump
                       style:
                         flex: '1'
                         min-width: '0'
+                        white-space: nowrap
                         overflow: hidden
                         text-overflow: ellipsis
-                        white-space: nowrap
-                      text: Heat Pump
                   - component: Label
                     config:
-                      style:
-                        font-weight: '600'
-                        white-space: nowrap
                       text: =(((Number(items[props.heatpumpEnergyToday].numericState) || 0))).toFixed(2) + ' kWh'
+                      style:
+                        font-weight: '600'
+                        white-space: nowrap
                   - component: Label
                     config:
-                      style:
-                        color: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
-                          ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
-                          ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[(Math.abs((((Number(items[props.heatpumpEnergyToday].numericState)
-                          || 0)) - ((Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
-                          ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
-                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpEnergyToday]
-                          || {}))) || 0)))) < 0.05 ? ''neutral'' : (((Number(items[props.heatpumpEnergyToday].numericState)
-                          || 0)) - ((Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
-                          ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
-                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpEnergyToday]
-                          || {}))) || 0))) > 0 ? ''warn'' : ''good'')] || (({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'',
-                          ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'',
-                          ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark
-                          === ''dark'') ? 1 : 0]'
-                        font-size: 12px
-                        font-weight: '600'
-                        min-width: 46px
-                        text-align: right
-                        white-space: nowrap
                       text: '=((((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y
                         + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
                         || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpEnergyToday]
@@ -838,65 +818,65 @@ slots:
                         ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
                         || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpEnergyToday]
                         || {}))) || 0))))).toFixed(2)) : ''–'''
+                      style:
+                        min-width: 46px
+                        text-align: right
+                        font-size: 12px
+                        font-weight: '600'
+                        white-space: nowrap
+                        color: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
+                          ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
+                          ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[(Math.abs((((Number(items[props.heatpumpEnergyToday].numericState)
+                          || 0)) - ((Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
+                          ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpEnergyToday]
+                          || {}))) || 0)))) < 0.05 ? ''neutral'' : (((Number(items[props.heatpumpEnergyToday].numericState)
+                          || 0)) - ((Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
+                          ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpEnergyToday]
+                          || {}))) || 0))) > 0 ? ''warn'' : ''good'')] || (({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'',
+                          ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'',
+                          ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark
+                          === ''dark'') ? 1 : 0]'
               - component: div
                 config:
                   class: item k k-c1
                   style:
-                    align-items: center
-                    break-inside: avoid
                     display: flex
-                    font-size: 13px
+                    align-items: center
                     gap: 8px
+                    font-size: 13px
+                    break-inside: avoid
                     margin-bottom: 2px
                 slots:
                   default:
                   - component: div
                     config:
                       style:
-                        background: '#26a69a'
-                        border-radius: 50%
-                        flex: 0 0 auto
-                        height: 10px
                         width: 10px
+                        height: 10px
+                        border-radius: 50%
+                        background: '#26a69a'
+                        flex: 0 0 auto
                     slots:
                       default: []
                   - component: Label
                     config:
+                      text: E-Car
                       style:
                         flex: '1'
                         min-width: '0'
+                        white-space: nowrap
                         overflow: hidden
                         text-overflow: ellipsis
-                        white-space: nowrap
-                      text: E-Car
                   - component: Label
                     config:
-                      style:
-                        font-weight: '600'
-                        white-space: nowrap
                       text: =((Number(items[props.ecarEnergyToday].numericState) || 0)).toFixed(2) + ' kWh'
+                      style:
+                        font-weight: '600'
+                        white-space: nowrap
                   - component: Label
                     config:
-                      style:
-                        color: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
-                          ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
-                          ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[(Math.abs((((Number(items[props.ecarEnergyToday].numericState)
-                          || 0)) - ((Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
-                          ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
-                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.ecarEnergyToday]
-                          || {}))) || 0)))) < 0.05 ? ''neutral'' : (((Number(items[props.ecarEnergyToday].numericState) ||
-                          0)) - ((Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
-                          ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
-                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.ecarEnergyToday]
-                          || {}))) || 0))) > 0 ? ''warn'' : ''good'')] || (({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'',
-                          ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'',
-                          ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark
-                          === ''dark'') ? 1 : 0]'
-                        font-size: 12px
-                        font-weight: '600'
-                        min-width: 46px
-                        text-align: right
-                        white-space: nowrap
                       text: '=((((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y
                         + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
                         || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.ecarEnergyToday]
@@ -916,65 +896,65 @@ slots:
                         ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
                         || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.ecarEnergyToday]
                         || {}))) || 0))))).toFixed(2)) : ''–'''
+                      style:
+                        min-width: 46px
+                        text-align: right
+                        font-size: 12px
+                        font-weight: '600'
+                        white-space: nowrap
+                        color: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
+                          ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
+                          ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[(Math.abs((((Number(items[props.ecarEnergyToday].numericState)
+                          || 0)) - ((Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
+                          ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.ecarEnergyToday]
+                          || {}))) || 0)))) < 0.05 ? ''neutral'' : (((Number(items[props.ecarEnergyToday].numericState) ||
+                          0)) - ((Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
+                          ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.ecarEnergyToday]
+                          || {}))) || 0))) > 0 ? ''warn'' : ''good'')] || (({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'',
+                          ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'',
+                          ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark
+                          === ''dark'') ? 1 : 0]'
               - component: div
                 config:
                   class: item k k-c2
                   style:
-                    align-items: center
-                    break-inside: avoid
                     display: flex
-                    font-size: 13px
+                    align-items: center
                     gap: 8px
+                    font-size: 13px
+                    break-inside: avoid
                     margin-bottom: 2px
                 slots:
                   default:
                   - component: div
                     config:
                       style:
-                        background: '#4fc3f7'
-                        border-radius: 50%
-                        flex: 0 0 auto
-                        height: 10px
                         width: 10px
+                        height: 10px
+                        border-radius: 50%
+                        background: '#4fc3f7'
+                        flex: 0 0 auto
                     slots:
                       default: []
                   - component: Label
                     config:
+                      text: Air Conditioner
                       style:
                         flex: '1'
                         min-width: '0'
+                        white-space: nowrap
                         overflow: hidden
                         text-overflow: ellipsis
-                        white-space: nowrap
-                      text: Air Conditioner
                   - component: Label
                     config:
-                      style:
-                        font-weight: '600'
-                        white-space: nowrap
                       text: =((Number(items[props.acUnitEnergyToday].numericState) || 0)).toFixed(2) + ' kWh'
+                      style:
+                        font-weight: '600'
+                        white-space: nowrap
                   - component: Label
                     config:
-                      style:
-                        color: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
-                          ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
-                          ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[(Math.abs((((Number(items[props.acUnitEnergyToday].numericState)
-                          || 0)) - ((Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
-                          ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
-                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.acUnitEnergyToday]
-                          || {}))) || 0)))) < 0.05 ? ''neutral'' : (((Number(items[props.acUnitEnergyToday].numericState)
-                          || 0)) - ((Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
-                          ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
-                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.acUnitEnergyToday]
-                          || {}))) || 0))) > 0 ? ''warn'' : ''good'')] || (({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'',
-                          ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'',
-                          ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark
-                          === ''dark'') ? 1 : 0]'
-                        font-size: 12px
-                        font-weight: '600'
-                        min-width: 46px
-                        text-align: right
-                        white-space: nowrap
                       text: '=((((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y
                         + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
                         || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.acUnitEnergyToday]
@@ -994,74 +974,66 @@ slots:
                         ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
                         || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.acUnitEnergyToday]
                         || {}))) || 0))))).toFixed(2)) : ''–'''
+                      style:
+                        min-width: 46px
+                        text-align: right
+                        font-size: 12px
+                        font-weight: '600'
+                        white-space: nowrap
+                        color: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
+                          ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
+                          ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[(Math.abs((((Number(items[props.acUnitEnergyToday].numericState)
+                          || 0)) - ((Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
+                          ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.acUnitEnergyToday]
+                          || {}))) || 0)))) < 0.05 ? ''neutral'' : (((Number(items[props.acUnitEnergyToday].numericState)
+                          || 0)) - ((Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
+                          ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.acUnitEnergyToday]
+                          || {}))) || 0))) > 0 ? ''warn'' : ''good'')] || (({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'',
+                          ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'',
+                          ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark
+                          === ''dark'') ? 1 : 0]'
               - component: div
                 config:
                   class: item k k-c3
                   style:
-                    align-items: center
-                    break-inside: avoid
                     display: flex
-                    font-size: 13px
+                    align-items: center
                     gap: 8px
+                    font-size: 13px
+                    break-inside: avoid
                     margin-bottom: 2px
                 slots:
                   default:
                   - component: div
                     config:
                       style:
-                        background: '#ce93d8'
-                        border-radius: 50%
-                        flex: 0 0 auto
-                        height: 10px
                         width: 10px
+                        height: 10px
+                        border-radius: 50%
+                        background: '#ce93d8'
+                        flex: 0 0 auto
                     slots:
                       default: []
                   - component: Label
                     config:
+                      text: Offices
                       style:
                         flex: '1'
                         min-width: '0'
+                        white-space: nowrap
                         overflow: hidden
                         text-overflow: ellipsis
-                        white-space: nowrap
-                      text: Offices
                   - component: Label
                     config:
-                      style:
-                        font-weight: '600'
-                        white-space: nowrap
                       text: =(((Number(items[props.office1EnergyToday].numericState) || 0) + (Number(items[props.office2EnergyToday].numericState)
                         || 0))).toFixed(2) + ' kWh'
+                      style:
+                        font-weight: '600'
+                        white-space: nowrap
                   - component: Label
                     config:
-                      style:
-                        color: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
-                          ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
-                          ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[(Math.abs((((Number(items[props.office1EnergyToday].numericState)
-                          || 0) + (Number(items[props.office2EnergyToday].numericState) || 0)) - ((Number(((h) => h.y2 ===
-                          undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1,
-                          Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state) ||
-                          '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.office1EnergyToday]
-                          || {}))) || 0) + (Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y ===
-                          undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1,
-                          h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
-                          : {}))[props.office2EnergyToday] || {}))) || 0)))) < 0.05 ? ''neutral'' : (((Number(items[props.office1EnergyToday].numericState)
-                          || 0) + (Number(items[props.office2EnergyToday].numericState) || 0)) - ((Number(((h) => h.y2 ===
-                          undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1,
-                          Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state) ||
-                          '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.office1EnergyToday]
-                          || {}))) || 0) + (Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y ===
-                          undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1,
-                          h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
-                          : {}))[props.office2EnergyToday] || {}))) || 0))) > 0 ? ''warn'' : ''good'')] || (({good: [''#2e7d32'',
-                          ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'',
-                          ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'',
-                          ''#c7c7cc'']})).neutral)[(themeOptions.dark === ''dark'') ? 1 : 0]'
-                        font-size: 12px
-                        font-weight: '600'
-                        min-width: 46px
-                        text-align: right
-                        white-space: nowrap
                       text: '=((((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y
                         + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
                         || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.office1EnergyToday]
@@ -1098,65 +1070,73 @@ slots:
                         : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
                         || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.office2EnergyToday]
                         || {}))) || 0))))).toFixed(2)) : ''–'''
+                      style:
+                        min-width: 46px
+                        text-align: right
+                        font-size: 12px
+                        font-weight: '600'
+                        white-space: nowrap
+                        color: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
+                          ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
+                          ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[(Math.abs((((Number(items[props.office1EnergyToday].numericState)
+                          || 0) + (Number(items[props.office2EnergyToday].numericState) || 0)) - ((Number(((h) => h.y2 ===
+                          undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1,
+                          Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state) ||
+                          '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.office1EnergyToday]
+                          || {}))) || 0) + (Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y ===
+                          undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1,
+                          h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                          : {}))[props.office2EnergyToday] || {}))) || 0)))) < 0.05 ? ''neutral'' : (((Number(items[props.office1EnergyToday].numericState)
+                          || 0) + (Number(items[props.office2EnergyToday].numericState) || 0)) - ((Number(((h) => h.y2 ===
+                          undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1,
+                          Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state) ||
+                          '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.office1EnergyToday]
+                          || {}))) || 0) + (Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y ===
+                          undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1,
+                          h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                          : {}))[props.office2EnergyToday] || {}))) || 0))) > 0 ? ''warn'' : ''good'')] || (({good: [''#2e7d32'',
+                          ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'',
+                          ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'',
+                          ''#c7c7cc'']})).neutral)[(themeOptions.dark === ''dark'') ? 1 : 0]'
               - component: div
                 config:
                   class: item k k-c4
                   style:
-                    align-items: center
-                    break-inside: avoid
                     display: flex
-                    font-size: 13px
+                    align-items: center
                     gap: 8px
+                    font-size: 13px
+                    break-inside: avoid
                     margin-bottom: 2px
                 slots:
                   default:
                   - component: div
                     config:
                       style:
-                        background: '#9fa8da'
-                        border-radius: 50%
-                        flex: 0 0 auto
-                        height: 10px
                         width: 10px
+                        height: 10px
+                        border-radius: 50%
+                        background: '#9fa8da'
+                        flex: 0 0 auto
                     slots:
                       default: []
                   - component: Label
                     config:
+                      text: Network
                       style:
                         flex: '1'
                         min-width: '0'
+                        white-space: nowrap
                         overflow: hidden
                         text-overflow: ellipsis
-                        white-space: nowrap
-                      text: Network
                   - component: Label
                     config:
-                      style:
-                        font-weight: '600'
-                        white-space: nowrap
                       text: =(((Number(items[props.networkEnergyToday].numericState) || 0))).toFixed(2) + ' kWh'
+                      style:
+                        font-weight: '600'
+                        white-space: nowrap
                   - component: Label
                     config:
-                      style:
-                        color: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
-                          ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
-                          ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[(Math.abs((((Number(items[props.networkEnergyToday].numericState)
-                          || 0)) - ((Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
-                          ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
-                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.networkEnergyToday]
-                          || {}))) || 0)))) < 0.05 ? ''neutral'' : (((Number(items[props.networkEnergyToday].numericState)
-                          || 0)) - ((Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
-                          ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
-                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.networkEnergyToday]
-                          || {}))) || 0))) > 0 ? ''warn'' : ''good'')] || (({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'',
-                          ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'',
-                          ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark
-                          === ''dark'') ? 1 : 0]'
-                        font-size: 12px
-                        font-weight: '600'
-                        min-width: 46px
-                        text-align: right
-                        white-space: nowrap
                       text: '=((((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y
                         + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
                         || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.networkEnergyToday]
@@ -1176,65 +1156,65 @@ slots:
                         ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
                         || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.networkEnergyToday]
                         || {}))) || 0))))).toFixed(2)) : ''–'''
+                      style:
+                        min-width: 46px
+                        text-align: right
+                        font-size: 12px
+                        font-weight: '600'
+                        white-space: nowrap
+                        color: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
+                          ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
+                          ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[(Math.abs((((Number(items[props.networkEnergyToday].numericState)
+                          || 0)) - ((Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
+                          ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.networkEnergyToday]
+                          || {}))) || 0)))) < 0.05 ? ''neutral'' : (((Number(items[props.networkEnergyToday].numericState)
+                          || 0)) - ((Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
+                          ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.networkEnergyToday]
+                          || {}))) || 0))) > 0 ? ''warn'' : ''good'')] || (({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'',
+                          ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'',
+                          ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark
+                          === ''dark'') ? 1 : 0]'
               - component: div
                 config:
                   class: item k k-c5
                   style:
-                    align-items: center
-                    break-inside: avoid
                     display: flex
-                    font-size: 13px
+                    align-items: center
                     gap: 8px
+                    font-size: 13px
+                    break-inside: avoid
                     margin-bottom: 2px
                 slots:
                   default:
                   - component: div
                     config:
                       style:
-                        background: '#80cbc4'
-                        border-radius: 50%
-                        flex: 0 0 auto
-                        height: 10px
                         width: 10px
+                        height: 10px
+                        border-radius: 50%
+                        background: '#80cbc4'
+                        flex: 0 0 auto
                     slots:
                       default: []
                   - component: Label
                     config:
+                      text: Ventilation
                       style:
                         flex: '1'
                         min-width: '0'
+                        white-space: nowrap
                         overflow: hidden
                         text-overflow: ellipsis
-                        white-space: nowrap
-                      text: Ventilation
                   - component: Label
                     config:
-                      style:
-                        font-weight: '600'
-                        white-space: nowrap
                       text: =(((Number(items[props.ventilationEnergyToday].numericState) || 0))).toFixed(2) + ' kWh'
+                      style:
+                        font-weight: '600'
+                        white-space: nowrap
                   - component: Label
                     config:
-                      style:
-                        color: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
-                          ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
-                          ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[(Math.abs((((Number(items[props.ventilationEnergyToday].numericState)
-                          || 0)) - ((Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
-                          ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
-                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.ventilationEnergyToday]
-                          || {}))) || 0)))) < 0.05 ? ''neutral'' : (((Number(items[props.ventilationEnergyToday].numericState)
-                          || 0)) - ((Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
-                          ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
-                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.ventilationEnergyToday]
-                          || {}))) || 0))) > 0 ? ''warn'' : ''good'')] || (({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'',
-                          ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'',
-                          ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark
-                          === ''dark'') ? 1 : 0]'
-                        font-size: 12px
-                        font-weight: '600'
-                        min-width: 46px
-                        text-align: right
-                        white-space: nowrap
                       text: '=((((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y
                         + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
                         || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.ventilationEnergyToday]
@@ -1254,65 +1234,65 @@ slots:
                         ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
                         || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.ventilationEnergyToday]
                         || {}))) || 0))))).toFixed(2)) : ''–'''
+                      style:
+                        min-width: 46px
+                        text-align: right
+                        font-size: 12px
+                        font-weight: '600'
+                        white-space: nowrap
+                        color: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
+                          ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
+                          ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[(Math.abs((((Number(items[props.ventilationEnergyToday].numericState)
+                          || 0)) - ((Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
+                          ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.ventilationEnergyToday]
+                          || {}))) || 0)))) < 0.05 ? ''neutral'' : (((Number(items[props.ventilationEnergyToday].numericState)
+                          || 0)) - ((Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
+                          ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.ventilationEnergyToday]
+                          || {}))) || 0))) > 0 ? ''warn'' : ''good'')] || (({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'',
+                          ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'',
+                          ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark
+                          === ''dark'') ? 1 : 0]'
               - component: div
                 config:
                   class: item k k-c6
                   style:
-                    align-items: center
-                    break-inside: avoid
                     display: flex
-                    font-size: 13px
+                    align-items: center
                     gap: 8px
+                    font-size: 13px
+                    break-inside: avoid
                     margin-bottom: 2px
                 slots:
                   default:
                   - component: div
                     config:
                       style:
-                        background: '#b0bec5'
-                        border-radius: 50%
-                        flex: 0 0 auto
-                        height: 10px
                         width: 10px
+                        height: 10px
+                        border-radius: 50%
+                        background: '#b0bec5'
+                        flex: 0 0 auto
                     slots:
                       default: []
                   - component: Label
                     config:
+                      text: Refrigerator
                       style:
                         flex: '1'
                         min-width: '0'
+                        white-space: nowrap
                         overflow: hidden
                         text-overflow: ellipsis
-                        white-space: nowrap
-                      text: Refrigerator
                   - component: Label
                     config:
-                      style:
-                        font-weight: '600'
-                        white-space: nowrap
                       text: =(((Number(items[props.refrigeratorEnergyToday].numericState) || 0))).toFixed(2) + ' kWh'
+                      style:
+                        font-weight: '600'
+                        white-space: nowrap
                   - component: Label
                     config:
-                      style:
-                        color: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
-                          ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
-                          ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[(Math.abs((((Number(items[props.refrigeratorEnergyToday].numericState)
-                          || 0)) - ((Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
-                          ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
-                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.refrigeratorEnergyToday]
-                          || {}))) || 0)))) < 0.05 ? ''neutral'' : (((Number(items[props.refrigeratorEnergyToday].numericState)
-                          || 0)) - ((Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
-                          ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
-                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.refrigeratorEnergyToday]
-                          || {}))) || 0))) > 0 ? ''warn'' : ''good'')] || (({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'',
-                          ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'',
-                          ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark
-                          === ''dark'') ? 1 : 0]'
-                        font-size: 12px
-                        font-weight: '600'
-                        min-width: 46px
-                        text-align: right
-                        white-space: nowrap
                       text: '=((((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y
                         + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
                         || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.refrigeratorEnergyToday]
@@ -1332,65 +1312,65 @@ slots:
                         ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
                         || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.refrigeratorEnergyToday]
                         || {}))) || 0))))).toFixed(2)) : ''–'''
+                      style:
+                        min-width: 46px
+                        text-align: right
+                        font-size: 12px
+                        font-weight: '600'
+                        white-space: nowrap
+                        color: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
+                          ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
+                          ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[(Math.abs((((Number(items[props.refrigeratorEnergyToday].numericState)
+                          || 0)) - ((Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
+                          ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.refrigeratorEnergyToday]
+                          || {}))) || 0)))) < 0.05 ? ''neutral'' : (((Number(items[props.refrigeratorEnergyToday].numericState)
+                          || 0)) - ((Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
+                          ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.refrigeratorEnergyToday]
+                          || {}))) || 0))) > 0 ? ''warn'' : ''good'')] || (({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'',
+                          ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'',
+                          ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark
+                          === ''dark'') ? 1 : 0]'
               - component: div
                 config:
                   class: item k k-c7
                   style:
-                    align-items: center
-                    break-inside: avoid
                     display: flex
-                    font-size: 13px
+                    align-items: center
                     gap: 8px
+                    font-size: 13px
+                    break-inside: avoid
                     margin-bottom: 2px
                 slots:
                   default:
                   - component: div
                     config:
                       style:
-                        background: '#bcaaa4'
-                        border-radius: 50%
-                        flex: 0 0 auto
-                        height: 10px
                         width: 10px
+                        height: 10px
+                        border-radius: 50%
+                        background: '#bcaaa4'
+                        flex: 0 0 auto
                     slots:
                       default: []
                   - component: Label
                     config:
+                      text: Coffee Machine
                       style:
                         flex: '1'
                         min-width: '0'
+                        white-space: nowrap
                         overflow: hidden
                         text-overflow: ellipsis
-                        white-space: nowrap
-                      text: Coffee Machine
                   - component: Label
                     config:
-                      style:
-                        font-weight: '600'
-                        white-space: nowrap
                       text: =(((Number(items[props.coffeeMachineEnergyToday].numericState) || 0))).toFixed(2) + ' kWh'
+                      style:
+                        font-weight: '600'
+                        white-space: nowrap
                   - component: Label
                     config:
-                      style:
-                        color: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
-                          ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
-                          ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[(Math.abs((((Number(items[props.coffeeMachineEnergyToday].numericState)
-                          || 0)) - ((Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
-                          ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
-                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.coffeeMachineEnergyToday]
-                          || {}))) || 0)))) < 0.05 ? ''neutral'' : (((Number(items[props.coffeeMachineEnergyToday].numericState)
-                          || 0)) - ((Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
-                          ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
-                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.coffeeMachineEnergyToday]
-                          || {}))) || 0))) > 0 ? ''warn'' : ''good'')] || (({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'',
-                          ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'',
-                          ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark
-                          === ''dark'') ? 1 : 0]'
-                        font-size: 12px
-                        font-weight: '600'
-                        min-width: 46px
-                        text-align: right
-                        white-space: nowrap
                       text: '=((((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y
                         + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
                         || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.coffeeMachineEnergyToday]
@@ -1410,66 +1390,66 @@ slots:
                         ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
                         || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.coffeeMachineEnergyToday]
                         || {}))) || 0))))).toFixed(2)) : ''–'''
+                      style:
+                        min-width: 46px
+                        text-align: right
+                        font-size: 12px
+                        font-weight: '600'
+                        white-space: nowrap
+                        color: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
+                          ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
+                          ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[(Math.abs((((Number(items[props.coffeeMachineEnergyToday].numericState)
+                          || 0)) - ((Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
+                          ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.coffeeMachineEnergyToday]
+                          || {}))) || 0)))) < 0.05 ? ''neutral'' : (((Number(items[props.coffeeMachineEnergyToday].numericState)
+                          || 0)) - ((Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
+                          ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.coffeeMachineEnergyToday]
+                          || {}))) || 0))) > 0 ? ''warn'' : ''good'')] || (({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'',
+                          ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'',
+                          ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark
+                          === ''dark'') ? 1 : 0]'
               - component: div
                 config:
                   class: item k k-c8
                   style:
-                    align-items: center
-                    break-inside: avoid
                     display: flex
-                    font-size: 13px
+                    align-items: center
                     gap: 8px
+                    font-size: 13px
+                    break-inside: avoid
                     margin-bottom: 2px
                 slots:
                   default:
                   - component: div
                     config:
                       style:
-                        background: '#f48fb1'
-                        border-radius: 50%
-                        flex: 0 0 auto
-                        height: 10px
                         width: 10px
+                        height: 10px
+                        border-radius: 50%
+                        background: '#f48fb1'
+                        flex: 0 0 auto
                     slots:
                       default: []
                   - component: Label
                     config:
+                      text: Living Room Media
                       style:
                         flex: '1'
                         min-width: '0'
+                        white-space: nowrap
                         overflow: hidden
                         text-overflow: ellipsis
-                        white-space: nowrap
-                      text: Living Room Media
                   - component: Label
                     config:
-                      style:
-                        font-weight: '600'
-                        white-space: nowrap
                       text: =(((Number(items[props.livingRoomEntertainmentEnergyToday].numericState) || 0))).toFixed(2) +
                         ' kWh'
+                      style:
+                        font-weight: '600'
+                        white-space: nowrap
                   - component: Label
                     config:
-                      style:
-                        color: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
-                          ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
-                          ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[(Math.abs((((Number(items[props.livingRoomEntertainmentEnergyToday].numericState)
-                          || 0)) - ((Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
-                          ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
-                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.livingRoomEntertainmentEnergyToday]
-                          || {}))) || 0)))) < 0.05 ? ''neutral'' : (((Number(items[props.livingRoomEntertainmentEnergyToday].numericState)
-                          || 0)) - ((Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
-                          ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
-                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.livingRoomEntertainmentEnergyToday]
-                          || {}))) || 0))) > 0 ? ''warn'' : ''good'')] || (({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'',
-                          ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'',
-                          ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark
-                          === ''dark'') ? 1 : 0]'
-                        font-size: 12px
-                        font-weight: '600'
-                        min-width: 46px
-                        text-align: right
-                        white-space: nowrap
                       text: '=((((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y
                         + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
                         || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.livingRoomEntertainmentEnergyToday]
@@ -1489,91 +1469,67 @@ slots:
                         ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
                         || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.livingRoomEntertainmentEnergyToday]
                         || {}))) || 0))))).toFixed(2)) : ''–'''
+                      style:
+                        min-width: 46px
+                        text-align: right
+                        font-size: 12px
+                        font-weight: '600'
+                        white-space: nowrap
+                        color: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
+                          ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
+                          ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[(Math.abs((((Number(items[props.livingRoomEntertainmentEnergyToday].numericState)
+                          || 0)) - ((Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
+                          ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.livingRoomEntertainmentEnergyToday]
+                          || {}))) || 0)))) < 0.05 ? ''neutral'' : (((Number(items[props.livingRoomEntertainmentEnergyToday].numericState)
+                          || 0)) - ((Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
+                          ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.livingRoomEntertainmentEnergyToday]
+                          || {}))) || 0))) > 0 ? ''warn'' : ''good'')] || (({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'',
+                          ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'',
+                          ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark
+                          === ''dark'') ? 1 : 0]'
               - component: div
                 config:
                   class: item k k-c9
                   style:
-                    align-items: center
-                    break-inside: avoid
                     display: flex
-                    font-size: 13px
+                    align-items: center
                     gap: 8px
+                    font-size: 13px
+                    break-inside: avoid
                     margin-bottom: 2px
                 slots:
                   default:
                   - component: div
                     config:
                       style:
-                        background: '#aed581'
-                        border-radius: 50%
-                        flex: 0 0 auto
-                        height: 10px
                         width: 10px
+                        height: 10px
+                        border-radius: 50%
+                        background: '#aed581'
+                        flex: 0 0 auto
                     slots:
                       default: []
                   - component: Label
                     config:
+                      text: Laundry & Dishes
                       style:
                         flex: '1'
                         min-width: '0'
+                        white-space: nowrap
                         overflow: hidden
                         text-overflow: ellipsis
-                        white-space: nowrap
-                      text: Laundry & Dishes
                   - component: Label
                     config:
-                      style:
-                        font-weight: '600'
-                        white-space: nowrap
                       text: =(((Number(items[props.dishwasherEnergyToday].numericState) || 0) + (Number(items[props.washingMachine1EnergyToday].numericState)
                         || 0) + (Number(items[props.washingMachine2EnergyToday].numericState) || 0) + (Number(items[props.tumbleDryerEnergyToday].numericState)
                         || 0))).toFixed(2) + ' kWh'
+                      style:
+                        font-weight: '600'
+                        white-space: nowrap
                   - component: Label
                     config:
-                      style:
-                        color: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
-                          ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
-                          ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[(Math.abs((((Number(items[props.dishwasherEnergyToday].numericState)
-                          || 0) + (Number(items[props.washingMachine1EnergyToday].numericState) || 0) + (Number(items[props.washingMachine2EnergyToday].numericState)
-                          || 0) + (Number(items[props.tumbleDryerEnergyToday].numericState) || 0)) - ((Number(((h) => h.y2
-                          === undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y + (h.y2 - h.y) *
-                          Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
-                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.dishwasherEnergyToday]
-                          || {}))) || 0) + (Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y ===
-                          undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1,
-                          h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
-                          : {}))[props.washingMachine1EnergyToday] || {}))) || 0) + (Number(((h) => h.y2 === undefined ||
-                          h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0,
-                          (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0)
-                          === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.washingMachine2EnergyToday]
-                          || {}))) || 0) + (Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y ===
-                          undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1,
-                          h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
-                          : {}))[props.tumbleDryerEnergyToday] || {}))) || 0)))) < 0.05 ? ''neutral'' : (((Number(items[props.dishwasherEnergyToday].numericState)
-                          || 0) + (Number(items[props.washingMachine1EnergyToday].numericState) || 0) + (Number(items[props.washingMachine2EnergyToday].numericState)
-                          || 0) + (Number(items[props.tumbleDryerEnergyToday].numericState) || 0)) - ((Number(((h) => h.y2
-                          === undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y + (h.y2 - h.y) *
-                          Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
-                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.dishwasherEnergyToday]
-                          || {}))) || 0) + (Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y ===
-                          undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1,
-                          h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
-                          : {}))[props.washingMachine1EnergyToday] || {}))) || 0) + (Number(((h) => h.y2 === undefined ||
-                          h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0,
-                          (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0)
-                          === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.washingMachine2EnergyToday]
-                          || {}))) || 0) + (Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y ===
-                          undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1,
-                          h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
-                          : {}))[props.tumbleDryerEnergyToday] || {}))) || 0))) > 0 ? ''warn'' : ''good'')] || (({good: [''#2e7d32'',
-                          ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'',
-                          ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'',
-                          ''#c7c7cc'']})).neutral)[(themeOptions.dark === ''dark'') ? 1 : 0]'
-                        font-size: 12px
-                        font-weight: '600'
-                        min-width: 46px
-                        text-align: right
-                        white-space: nowrap
                       text: '=((((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y
                         + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
                         || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.dishwasherEnergyToday]
@@ -1644,74 +1600,90 @@ slots:
                         ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
                         || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.tumbleDryerEnergyToday]
                         || {}))) || 0))))).toFixed(2)) : ''–'''
+                      style:
+                        min-width: 46px
+                        text-align: right
+                        font-size: 12px
+                        font-weight: '600'
+                        white-space: nowrap
+                        color: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
+                          ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
+                          ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[(Math.abs((((Number(items[props.dishwasherEnergyToday].numericState)
+                          || 0) + (Number(items[props.washingMachine1EnergyToday].numericState) || 0) + (Number(items[props.washingMachine2EnergyToday].numericState)
+                          || 0) + (Number(items[props.tumbleDryerEnergyToday].numericState) || 0)) - ((Number(((h) => h.y2
+                          === undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y + (h.y2 - h.y) *
+                          Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.dishwasherEnergyToday]
+                          || {}))) || 0) + (Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y ===
+                          undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1,
+                          h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                          : {}))[props.washingMachine1EnergyToday] || {}))) || 0) + (Number(((h) => h.y2 === undefined ||
+                          h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0,
+                          (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0)
+                          === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.washingMachine2EnergyToday]
+                          || {}))) || 0) + (Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y ===
+                          undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1,
+                          h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                          : {}))[props.tumbleDryerEnergyToday] || {}))) || 0)))) < 0.05 ? ''neutral'' : (((Number(items[props.dishwasherEnergyToday].numericState)
+                          || 0) + (Number(items[props.washingMachine1EnergyToday].numericState) || 0) + (Number(items[props.washingMachine2EnergyToday].numericState)
+                          || 0) + (Number(items[props.tumbleDryerEnergyToday].numericState) || 0)) - ((Number(((h) => h.y2
+                          === undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y + (h.y2 - h.y) *
+                          Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.dishwasherEnergyToday]
+                          || {}))) || 0) + (Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y ===
+                          undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1,
+                          h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                          : {}))[props.washingMachine1EnergyToday] || {}))) || 0) + (Number(((h) => h.y2 === undefined ||
+                          h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0,
+                          (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0)
+                          === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.washingMachine2EnergyToday]
+                          || {}))) || 0) + (Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y ===
+                          undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1,
+                          h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                          : {}))[props.tumbleDryerEnergyToday] || {}))) || 0))) > 0 ? ''warn'' : ''good'')] || (({good: [''#2e7d32'',
+                          ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'',
+                          ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'',
+                          ''#c7c7cc'']})).neutral)[(themeOptions.dark === ''dark'') ? 1 : 0]'
               - component: div
                 config:
                   class: item k k-c10
                   style:
-                    align-items: center
-                    break-inside: avoid
                     display: flex
-                    font-size: 13px
+                    align-items: center
                     gap: 8px
+                    font-size: 13px
+                    break-inside: avoid
                     margin-bottom: 2px
                 slots:
                   default:
                   - component: div
                     config:
                       style:
-                        background: '#fff176'
-                        border-radius: 50%
-                        flex: 0 0 auto
-                        height: 10px
                         width: 10px
+                        height: 10px
+                        border-radius: 50%
+                        background: '#fff176'
+                        flex: 0 0 auto
                     slots:
                       default: []
                   - component: Label
                     config:
+                      text: Terrace & Bicycles
                       style:
                         flex: '1'
                         min-width: '0'
+                        white-space: nowrap
                         overflow: hidden
                         text-overflow: ellipsis
-                        white-space: nowrap
-                      text: Terrace & Bicycles
                   - component: Label
                     config:
-                      style:
-                        font-weight: '600'
-                        white-space: nowrap
                       text: =(((Number(items[props.terraceLightEnergyToday].numericState) || 0) + (Number(items[props.bicycleBatteriesEnergyToday].numericState)
                         || 0))).toFixed(2) + ' kWh'
+                      style:
+                        font-weight: '600'
+                        white-space: nowrap
                   - component: Label
                     config:
-                      style:
-                        color: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
-                          ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
-                          ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[(Math.abs((((Number(items[props.terraceLightEnergyToday].numericState)
-                          || 0) + (Number(items[props.bicycleBatteriesEnergyToday].numericState) || 0)) - ((Number(((h) =>
-                          h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y + (h.y2 - h.y)
-                          * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
-                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.terraceLightEnergyToday]
-                          || {}))) || 0) + (Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y ===
-                          undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1,
-                          h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
-                          : {}))[props.bicycleBatteriesEnergyToday] || {}))) || 0)))) < 0.05 ? ''neutral'' : (((Number(items[props.terraceLightEnergyToday].numericState)
-                          || 0) + (Number(items[props.bicycleBatteriesEnergyToday].numericState) || 0)) - ((Number(((h) =>
-                          h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y + (h.y2 - h.y)
-                          * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
-                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.terraceLightEnergyToday]
-                          || {}))) || 0) + (Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y ===
-                          undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1,
-                          h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
-                          : {}))[props.bicycleBatteriesEnergyToday] || {}))) || 0))) > 0 ? ''warn'' : ''good'')] || (({good:
-                          [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''],
-                          warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''],
-                          neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark === ''dark'') ? 1 : 0]'
-                        font-size: 12px
-                        font-weight: '600'
-                        min-width: 46px
-                        text-align: right
-                        white-space: nowrap
                       text: '=((((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y
                         + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
                         || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.terraceLightEnergyToday]
@@ -1749,42 +1721,67 @@ slots:
                         ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
                         || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.bicycleBatteriesEnergyToday]
                         || {}))) || 0))))).toFixed(2)) : ''–'''
+                      style:
+                        min-width: 46px
+                        text-align: right
+                        font-size: 12px
+                        font-weight: '600'
+                        white-space: nowrap
+                        color: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
+                          ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
+                          ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[(Math.abs((((Number(items[props.terraceLightEnergyToday].numericState)
+                          || 0) + (Number(items[props.bicycleBatteriesEnergyToday].numericState) || 0)) - ((Number(((h) =>
+                          h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y + (h.y2 - h.y)
+                          * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.terraceLightEnergyToday]
+                          || {}))) || 0) + (Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y ===
+                          undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1,
+                          h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                          : {}))[props.bicycleBatteriesEnergyToday] || {}))) || 0)))) < 0.05 ? ''neutral'' : (((Number(items[props.terraceLightEnergyToday].numericState)
+                          || 0) + (Number(items[props.bicycleBatteriesEnergyToday].numericState) || 0)) - ((Number(((h) =>
+                          h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y + (h.y2 - h.y)
+                          * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.terraceLightEnergyToday]
+                          || {}))) || 0) + (Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y ===
+                          undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1,
+                          h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                          : {}))[props.bicycleBatteriesEnergyToday] || {}))) || 0))) > 0 ? ''warn'' : ''good'')] || (({good:
+                          [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''],
+                          warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''],
+                          neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark === ''dark'') ? 1 : 0]'
               - component: div
                 config:
                   class: item k k-c11
                   style:
-                    align-items: center
-                    break-inside: avoid
                     display: flex
-                    font-size: 13px
+                    align-items: center
                     gap: 8px
+                    font-size: 13px
+                    break-inside: avoid
                     margin-bottom: 2px
                 slots:
                   default:
                   - component: div
                     config:
                       style:
-                        background: '#e0e0e0'
-                        border-radius: 50%
-                        flex: 0 0 auto
-                        height: 10px
                         width: 10px
+                        height: 10px
+                        border-radius: 50%
+                        background: '#e0e0e0'
+                        flex: 0 0 auto
                     slots:
                       default: []
                   - component: Label
                     config:
+                      text: Not measured
                       style:
                         flex: '1'
                         min-width: '0'
+                        white-space: nowrap
                         overflow: hidden
                         text-overflow: ellipsis
-                        white-space: nowrap
-                      text: Not measured
                   - component: Label
                     config:
-                      style:
-                        font-weight: '600'
-                        white-space: nowrap
                       text: =(Math.max(0, (Number(items[props.homeEnergyToday].numericState) || 0) - ((Number(items[props.heatpumpEnergyToday].numericState)
                         || 0) + (Number(items[props.acMeterEnergyToday].numericState) || 0) + (Number(items[props.office1EnergyToday].numericState)
                         || 0) + (Number(items[props.office2EnergyToday].numericState) || 0) + (Number(items[props.networkEnergyToday].numericState)
@@ -1794,152 +1791,11 @@ slots:
                         || 0) + (Number(items[props.washingMachine2EnergyToday].numericState) || 0) + (Number(items[props.tumbleDryerEnergyToday].numericState)
                         || 0) + (Number(items[props.terraceLightEnergyToday].numericState) || 0) + (Number(items[props.bicycleBatteriesEnergyToday].numericState)
                         || 0)))).toFixed(2) + ' kWh'
+                      style:
+                        font-weight: '600'
+                        white-space: nowrap
                   - component: Label
                     config:
-                      style:
-                        color: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
-                          ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
-                          ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[(Math.abs((Math.max(0, (Number(items[props.homeEnergyToday].numericState)
-                          || 0) - ((Number(items[props.heatpumpEnergyToday].numericState) || 0) + (Number(items[props.ecarEnergyToday].numericState)
-                          || 0) + (Number(items[props.acUnitEnergyToday].numericState) || 0) + (Number(items[props.office1EnergyToday].numericState)
-                          || 0) + (Number(items[props.office2EnergyToday].numericState) || 0) + (Number(items[props.networkEnergyToday].numericState)
-                          || 0) + (Number(items[props.ventilationEnergyToday].numericState) || 0) + (Number(items[props.refrigeratorEnergyToday].numericState)
-                          || 0) + (Number(items[props.coffeeMachineEnergyToday].numericState) || 0) + (Number(items[props.livingRoomEntertainmentEnergyToday].numericState)
-                          || 0) + (Number(items[props.dishwasherEnergyToday].numericState) || 0) + (Number(items[props.washingMachine1EnergyToday].numericState)
-                          || 0) + (Number(items[props.washingMachine2EnergyToday].numericState) || 0) + (Number(items[props.tumbleDryerEnergyToday].numericState)
-                          || 0) + (Number(items[props.terraceLightEnergyToday].numericState) || 0) + (Number(items[props.bicycleBatteriesEnergyToday].numericState)
-                          || 0))) - Math.max(0, Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y
-                          === undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1,
-                          h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
-                          : {}))[props.homeEnergyToday] || {}))) - ((Number(((h) => h.y2 === undefined || h.y2 === null ||
-                          h.y === null || h.y === undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix()
-                          - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{''
-                          ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpEnergyToday] || {}))) || 0) +
-                          (Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y :
-                          h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
-                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.ecarEnergyToday]
-                          || {}))) || 0) + (Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y ===
-                          undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1,
-                          h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
-                          : {}))[props.acUnitEnergyToday] || {}))) || 0) + (Number(((h) => h.y2 === undefined || h.y2 ===
-                          null || h.y === null || h.y === undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix()
-                          - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{''
-                          ? JSON.parse(items[props.tileHistory].state) : {}))[props.office1EnergyToday] || {}))) || 0) + (Number(((h)
-                          => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y + (h.y2
-                          - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
-                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.office2EnergyToday]
-                          || {}))) || 0) + (Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y ===
-                          undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1,
-                          h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
-                          : {}))[props.networkEnergyToday] || {}))) || 0) + (Number(((h) => h.y2 === undefined || h.y2 ===
-                          null || h.y === null || h.y === undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix()
-                          - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{''
-                          ? JSON.parse(items[props.tileHistory].state) : {}))[props.ventilationEnergyToday] || {}))) || 0)
-                          + (Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y
-                          : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
-                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.refrigeratorEnergyToday]
-                          || {}))) || 0) + (Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y ===
-                          undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1,
-                          h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
-                          : {}))[props.coffeeMachineEnergyToday] || {}))) || 0) + (Number(((h) => h.y2 === undefined || h.y2
-                          === null || h.y === null || h.y === undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0,
-                          (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0)
-                          === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.livingRoomEntertainmentEnergyToday]
-                          || {}))) || 0) + (Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y ===
-                          undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1,
-                          h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
-                          : {}))[props.dishwasherEnergyToday] || {}))) || 0) + (Number(((h) => h.y2 === undefined || h.y2
-                          === null || h.y === null || h.y === undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0,
-                          (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0)
-                          === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.washingMachine1EnergyToday]
-                          || {}))) || 0) + (Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y ===
-                          undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1,
-                          h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
-                          : {}))[props.washingMachine2EnergyToday] || {}))) || 0) + (Number(((h) => h.y2 === undefined ||
-                          h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0,
-                          (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0)
-                          === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.tumbleDryerEnergyToday] || {})))
-                          || 0) + (Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
-                          ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
-                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.terraceLightEnergyToday]
-                          || {}))) || 0) + (Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y ===
-                          undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1,
-                          h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
-                          : {}))[props.bicycleBatteriesEnergyToday] || {}))) || 0))))) < 0.05 ? ''neutral'' : (Math.max(0,
-                          (Number(items[props.homeEnergyToday].numericState) || 0) - ((Number(items[props.heatpumpEnergyToday].numericState)
-                          || 0) + (Number(items[props.ecarEnergyToday].numericState) || 0) + (Number(items[props.acUnitEnergyToday].numericState)
-                          || 0) + (Number(items[props.office1EnergyToday].numericState) || 0) + (Number(items[props.office2EnergyToday].numericState)
-                          || 0) + (Number(items[props.networkEnergyToday].numericState) || 0) + (Number(items[props.ventilationEnergyToday].numericState)
-                          || 0) + (Number(items[props.refrigeratorEnergyToday].numericState) || 0) + (Number(items[props.coffeeMachineEnergyToday].numericState)
-                          || 0) + (Number(items[props.livingRoomEntertainmentEnergyToday].numericState) || 0) + (Number(items[props.dishwasherEnergyToday].numericState)
-                          || 0) + (Number(items[props.washingMachine1EnergyToday].numericState) || 0) + (Number(items[props.washingMachine2EnergyToday].numericState)
-                          || 0) + (Number(items[props.tumbleDryerEnergyToday].numericState) || 0) + (Number(items[props.terraceLightEnergyToday].numericState)
-                          || 0) + (Number(items[props.bicycleBatteriesEnergyToday].numericState) || 0))) - Math.max(0, Number(((h)
-                          => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y + (h.y2
-                          - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
-                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.homeEnergyToday]
-                          || {}))) - ((Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
-                          ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
-                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpEnergyToday]
-                          || {}))) || 0) + (Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y ===
-                          undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1,
-                          h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
-                          : {}))[props.ecarEnergyToday] || {}))) || 0) + (Number(((h) => h.y2 === undefined || h.y2 === null
-                          || h.y === null || h.y === undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix()
-                          - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{''
-                          ? JSON.parse(items[props.tileHistory].state) : {}))[props.acUnitEnergyToday] || {}))) || 0) + (Number(((h)
-                          => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y + (h.y2
-                          - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
-                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.office1EnergyToday]
-                          || {}))) || 0) + (Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y ===
-                          undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1,
-                          h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
-                          : {}))[props.office2EnergyToday] || {}))) || 0) + (Number(((h) => h.y2 === undefined || h.y2 ===
-                          null || h.y === null || h.y === undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix()
-                          - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{''
-                          ? JSON.parse(items[props.tileHistory].state) : {}))[props.networkEnergyToday] || {}))) || 0) + (Number(((h)
-                          => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y + (h.y2
-                          - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
-                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.ventilationEnergyToday]
-                          || {}))) || 0) + (Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y ===
-                          undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1,
-                          h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
-                          : {}))[props.refrigeratorEnergyToday] || {}))) || 0) + (Number(((h) => h.y2 === undefined || h.y2
-                          === null || h.y === null || h.y === undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0,
-                          (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0)
-                          === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.coffeeMachineEnergyToday] ||
-                          {}))) || 0) + (Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
-                          ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
-                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.livingRoomEntertainmentEnergyToday]
-                          || {}))) || 0) + (Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y ===
-                          undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1,
-                          h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
-                          : {}))[props.dishwasherEnergyToday] || {}))) || 0) + (Number(((h) => h.y2 === undefined || h.y2
-                          === null || h.y === null || h.y === undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0,
-                          (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0)
-                          === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.washingMachine1EnergyToday]
-                          || {}))) || 0) + (Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y ===
-                          undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1,
-                          h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
-                          : {}))[props.washingMachine2EnergyToday] || {}))) || 0) + (Number(((h) => h.y2 === undefined ||
-                          h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0,
-                          (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0)
-                          === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.tumbleDryerEnergyToday] || {})))
-                          || 0) + (Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
-                          ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
-                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.terraceLightEnergyToday]
-                          || {}))) || 0) + (Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y ===
-                          undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1,
-                          h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
-                          : {}))[props.bicycleBatteriesEnergyToday] || {}))) || 0)))) > 0 ? ''warn'' : ''good'')] || (({good:
-                          [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''],
-                          warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''],
-                          neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark === ''dark'') ? 1 : 0]'
-                        font-size: 12px
-                        font-weight: '600'
-                        min-width: 46px
-                        text-align: right
-                        white-space: nowrap
                       text: '=(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y
                         + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
                         || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.homeEnergyToday]
@@ -2130,3 +1986,147 @@ slots:
                         ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
                         || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.bicycleBatteriesEnergyToday]
                         || {}))) || 0)))))).toFixed(2)) : ''–'''
+                      style:
+                        min-width: 46px
+                        text-align: right
+                        font-size: 12px
+                        font-weight: '600'
+                        white-space: nowrap
+                        color: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
+                          ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
+                          ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[(Math.abs((Math.max(0, (Number(items[props.homeEnergyToday].numericState)
+                          || 0) - ((Number(items[props.heatpumpEnergyToday].numericState) || 0) + (Number(items[props.ecarEnergyToday].numericState)
+                          || 0) + (Number(items[props.acUnitEnergyToday].numericState) || 0) + (Number(items[props.office1EnergyToday].numericState)
+                          || 0) + (Number(items[props.office2EnergyToday].numericState) || 0) + (Number(items[props.networkEnergyToday].numericState)
+                          || 0) + (Number(items[props.ventilationEnergyToday].numericState) || 0) + (Number(items[props.refrigeratorEnergyToday].numericState)
+                          || 0) + (Number(items[props.coffeeMachineEnergyToday].numericState) || 0) + (Number(items[props.livingRoomEntertainmentEnergyToday].numericState)
+                          || 0) + (Number(items[props.dishwasherEnergyToday].numericState) || 0) + (Number(items[props.washingMachine1EnergyToday].numericState)
+                          || 0) + (Number(items[props.washingMachine2EnergyToday].numericState) || 0) + (Number(items[props.tumbleDryerEnergyToday].numericState)
+                          || 0) + (Number(items[props.terraceLightEnergyToday].numericState) || 0) + (Number(items[props.bicycleBatteriesEnergyToday].numericState)
+                          || 0))) - Math.max(0, Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y
+                          === undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1,
+                          h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                          : {}))[props.homeEnergyToday] || {}))) - ((Number(((h) => h.y2 === undefined || h.y2 === null ||
+                          h.y === null || h.y === undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix()
+                          - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{''
+                          ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpEnergyToday] || {}))) || 0) +
+                          (Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y :
+                          h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.ecarEnergyToday]
+                          || {}))) || 0) + (Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y ===
+                          undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1,
+                          h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                          : {}))[props.acUnitEnergyToday] || {}))) || 0) + (Number(((h) => h.y2 === undefined || h.y2 ===
+                          null || h.y === null || h.y === undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix()
+                          - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{''
+                          ? JSON.parse(items[props.tileHistory].state) : {}))[props.office1EnergyToday] || {}))) || 0) + (Number(((h)
+                          => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y + (h.y2
+                          - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.office2EnergyToday]
+                          || {}))) || 0) + (Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y ===
+                          undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1,
+                          h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                          : {}))[props.networkEnergyToday] || {}))) || 0) + (Number(((h) => h.y2 === undefined || h.y2 ===
+                          null || h.y === null || h.y === undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix()
+                          - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{''
+                          ? JSON.parse(items[props.tileHistory].state) : {}))[props.ventilationEnergyToday] || {}))) || 0)
+                          + (Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y
+                          : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.refrigeratorEnergyToday]
+                          || {}))) || 0) + (Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y ===
+                          undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1,
+                          h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                          : {}))[props.coffeeMachineEnergyToday] || {}))) || 0) + (Number(((h) => h.y2 === undefined || h.y2
+                          === null || h.y === null || h.y === undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0,
+                          (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0)
+                          === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.livingRoomEntertainmentEnergyToday]
+                          || {}))) || 0) + (Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y ===
+                          undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1,
+                          h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                          : {}))[props.dishwasherEnergyToday] || {}))) || 0) + (Number(((h) => h.y2 === undefined || h.y2
+                          === null || h.y === null || h.y === undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0,
+                          (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0)
+                          === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.washingMachine1EnergyToday]
+                          || {}))) || 0) + (Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y ===
+                          undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1,
+                          h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                          : {}))[props.washingMachine2EnergyToday] || {}))) || 0) + (Number(((h) => h.y2 === undefined ||
+                          h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0,
+                          (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0)
+                          === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.tumbleDryerEnergyToday] || {})))
+                          || 0) + (Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
+                          ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.terraceLightEnergyToday]
+                          || {}))) || 0) + (Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y ===
+                          undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1,
+                          h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                          : {}))[props.bicycleBatteriesEnergyToday] || {}))) || 0))))) < 0.05 ? ''neutral'' : (Math.max(0,
+                          (Number(items[props.homeEnergyToday].numericState) || 0) - ((Number(items[props.heatpumpEnergyToday].numericState)
+                          || 0) + (Number(items[props.ecarEnergyToday].numericState) || 0) + (Number(items[props.acUnitEnergyToday].numericState)
+                          || 0) + (Number(items[props.office1EnergyToday].numericState) || 0) + (Number(items[props.office2EnergyToday].numericState)
+                          || 0) + (Number(items[props.networkEnergyToday].numericState) || 0) + (Number(items[props.ventilationEnergyToday].numericState)
+                          || 0) + (Number(items[props.refrigeratorEnergyToday].numericState) || 0) + (Number(items[props.coffeeMachineEnergyToday].numericState)
+                          || 0) + (Number(items[props.livingRoomEntertainmentEnergyToday].numericState) || 0) + (Number(items[props.dishwasherEnergyToday].numericState)
+                          || 0) + (Number(items[props.washingMachine1EnergyToday].numericState) || 0) + (Number(items[props.washingMachine2EnergyToday].numericState)
+                          || 0) + (Number(items[props.tumbleDryerEnergyToday].numericState) || 0) + (Number(items[props.terraceLightEnergyToday].numericState)
+                          || 0) + (Number(items[props.bicycleBatteriesEnergyToday].numericState) || 0))) - Math.max(0, Number(((h)
+                          => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y + (h.y2
+                          - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.homeEnergyToday]
+                          || {}))) - ((Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
+                          ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpEnergyToday]
+                          || {}))) || 0) + (Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y ===
+                          undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1,
+                          h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                          : {}))[props.ecarEnergyToday] || {}))) || 0) + (Number(((h) => h.y2 === undefined || h.y2 === null
+                          || h.y === null || h.y === undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix()
+                          - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{''
+                          ? JSON.parse(items[props.tileHistory].state) : {}))[props.acUnitEnergyToday] || {}))) || 0) + (Number(((h)
+                          => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y + (h.y2
+                          - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.office1EnergyToday]
+                          || {}))) || 0) + (Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y ===
+                          undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1,
+                          h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                          : {}))[props.office2EnergyToday] || {}))) || 0) + (Number(((h) => h.y2 === undefined || h.y2 ===
+                          null || h.y === null || h.y === undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix()
+                          - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{''
+                          ? JSON.parse(items[props.tileHistory].state) : {}))[props.networkEnergyToday] || {}))) || 0) + (Number(((h)
+                          => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y + (h.y2
+                          - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.ventilationEnergyToday]
+                          || {}))) || 0) + (Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y ===
+                          undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1,
+                          h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                          : {}))[props.refrigeratorEnergyToday] || {}))) || 0) + (Number(((h) => h.y2 === undefined || h.y2
+                          === null || h.y === null || h.y === undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0,
+                          (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0)
+                          === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.coffeeMachineEnergyToday] ||
+                          {}))) || 0) + (Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
+                          ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.livingRoomEntertainmentEnergyToday]
+                          || {}))) || 0) + (Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y ===
+                          undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1,
+                          h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                          : {}))[props.dishwasherEnergyToday] || {}))) || 0) + (Number(((h) => h.y2 === undefined || h.y2
+                          === null || h.y === null || h.y === undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0,
+                          (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0)
+                          === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.washingMachine1EnergyToday]
+                          || {}))) || 0) + (Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y ===
+                          undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1,
+                          h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                          : {}))[props.washingMachine2EnergyToday] || {}))) || 0) + (Number(((h) => h.y2 === undefined ||
+                          h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0,
+                          (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0)
+                          === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.tumbleDryerEnergyToday] || {})))
+                          || 0) + (Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
+                          ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.terraceLightEnergyToday]
+                          || {}))) || 0) + (Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y ===
+                          undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1,
+                          h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                          : {}))[props.bicycleBatteriesEnergyToday] || {}))) || 0)))) > 0 ? ''warn'' : ''good'')] || (({good:
+                          [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''],
+                          warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''],
+                          neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark === ''dark'') ? 1 : 0]'

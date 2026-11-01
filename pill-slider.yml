@@ -3,106 +3,98 @@ tags:
 - slider
 props:
   parameters:
-  - context: item
-    description: The number item the slider sets
+  - name: item
     label: Item
-    name: item
-    required: true
+    description: The number item the slider sets
     type: TEXT
-  - default: '#78909c'
-    description: 'Device colour as #rrggbb'
+    required: true
+    context: item
+  - name: color
     label: Colour
-    name: color
-    required: false
+    description: 'Device colour as #rrggbb'
     type: TEXT
-  - default: '0'
-    description: The slider's lowest value
+    required: false
+    default: '#78909c'
+  - name: min
     label: Minimum
-    name: min
-    required: false
+    description: The slider's lowest value
     type: DECIMAL
-  - default: '100'
-    description: The slider's highest value
+    required: false
+    default: '0'
+  - name: max
     label: Maximum
-    name: max
-    required: false
+    description: The slider's highest value
     type: DECIMAL
-  - default: '1'
-    description: The slider's step
+    required: false
+    default: '100'
+  - name: step
     label: Step
-    name: step
-    required: false
+    description: The slider's step
     type: DECIMAL
-  - description: Unit on the label while dragging and of the command sent; must be the item's own (a difference in K sent
-      to a °C item is taken as an absolute temperature)
+    required: false
+    default: '1'
+  - name: unit
     label: Unit
-    name: unit
-    required: false
+    description: Unit on the label while dragging and of the command sent; must be the item's own (a difference in K sent
+      to a °C item is taken as an absolute temperature)
     type: TEXT
-  - description: Title above the slider
+    required: false
+  - name: title
     label: Title
-    name: title
-    required: true
+    description: Title above the slider
     type: TEXT
-  - default: material:tune
-    description: The badge's icon, e.g. material:thermostat
+    required: true
+  - name: icon
     label: Icon
-    name: icon
-    required: false
+    description: The badge's icon, e.g. material:thermostat
     type: TEXT
-  - description: A ring around a timer icon instead of the icon, emptying as the item runs down to 0
+    required: false
+    default: material:tune
+  - name: ring
     label: Timer ring
-    name: ring
-    required: false
+    description: A ring around a timer icon instead of the icon, emptying as the item runs down to 0
     type: BOOLEAN
-  - description: 'What a full timer ring stands for, e.g. an expression on the minutes the timer was last set to; empty: the
-      maximum'
+    required: false
+  - name: ringFull
     label: Full ring
-    name: ringFull
-    required: false
+    description: 'What a full timer ring stands for, e.g. an expression on the minutes the timer was last set to; empty: the
+      maximum'
     type: TEXT
-  - description: The value to show, usually an expression on the item
+    required: false
+  - name: value
     label: Value
-    name: value
+    description: The value to show, usually an expression on the item
+    type: TEXT
     required: true
-    type: TEXT
-  - description: 'Colour of the value where it is not the device colour; empty: the text colour'
+  - name: valueColor
     label: Value colour
-    name: valueColor
-    required: false
+    description: 'Colour of the value where it is not the device colour; empty: the text colour'
     type: TEXT
-  - description: A line under the title saying what the setting does, usually an expression
+    required: false
+  - name: context
     label: Context
-    name: context
-    required: false
+    description: A line under the title saying what the setting does, usually an expression
     type: TEXT
-  - description: value=label pairs below the bar, separated by semicolons, e.g. 0=0;60=1 h;120=2 h
+    required: false
+  - name: marks
     label: Marks
-    name: marks
-    required: false
+    description: value=label pairs below the bar, separated by semicolons, e.g. 0=0;60=1 h;120=2 h
     type: TEXT
-  - description: e.g. 0.6 while the device is off
+    required: false
+  - name: opacity
     label: Opacity
-    name: opacity
-    required: false
+    description: e.g. 0.6 while the device is off
     type: TEXT
-  - description: A row of a page's or popup's controls, with their divider
-    label: Row
-    name: row
     required: false
+  - name: row
+    label: Row
+    description: A row of a page's or popup's controls, with their divider
     type: BOOLEAN
+    required: false
   parameterGroups: []
-timestamp: Oct 25, 2026, 1:50:27 PM
+timestamp: Oct 25, 2026, 2:07:58 PM
 component: div
 config:
-  style:
-    --pill-color: =props.color || '#78909c'
-    border-bottom: '=props.row ? ''1px solid rgba(127, 127, 127, 0.15)'' : ''none'''
-    display: flex
-    flex-direction: column
-    gap: 6px
-    opacity: =props.opacity || '1'
-    padding: '=props.row ? ''8px 2px 10px'' : ''4px 0 0'''
   stylesheet: "@keyframes a-soft { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.06; } }\n@keyframes a-full { 0%, 100% { opacity:\
     \ 0.3; } 50% { opacity: 1; } }\n@keyframes a-arc { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }\n@keyframes a-halo\
     \ { 0%, 100% { opacity: 0; } 50% { opacity: 1; } }\n@keyframes a-halo-arc { 0%, 100% { opacity: 1; } 50% { opacity: 0;\
@@ -149,118 +141,126 @@ config:
     \ nowrap;\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35); transform: translate(-50%, 100%) scale(0) !important;\n  transform-origin:\
     \ 50% 100%; }\n.range-knob-label:before { display: none !important; }\n.range-knob-active-state .range-knob-label { transform:\
     \ translate(-50%, 0) scale(1) !important; }"
+  style:
+    --pill-color: =props.color || '#78909c'
+    display: flex
+    flex-direction: column
+    gap: 6px
+    padding: '=props.row ? ''8px 2px 10px'' : ''4px 0 0'''
+    border-bottom: '=props.row ? ''1px solid rgba(127, 127, 127, 0.15)'' : ''none'''
+    opacity: =props.opacity || '1'
 slots:
   default:
   - component: div
     config:
       style:
-        align-items: center
         display: flex
+        align-items: center
         gap: 8px
     slots:
       default:
       - component: div
         config:
           style:
-            align-items: center
-            display: flex
-            flex: 0 0 auto
-            height: 26px
-            justify-content: center
             position: relative
             width: 26px
+            height: 26px
+            flex: 0 0 auto
+            display: flex
+            align-items: center
+            justify-content: center
           visible: =!!props.ring
         slots:
           default:
           - component: svg
             config:
-              height: 26.0
-              style:
-                inset: '0'
-                position: absolute
               viewBox: 0 0 26 26
-              width: 26.0
+              width: 26
+              height: 26
+              style:
+                position: absolute
+                inset: '0'
             slots:
               default:
               - component: circle
                 config:
-                  cx: 13.0
-                  cy: 13.0
+                  cx: 13
+                  cy: 13
+                  r: 10
                   fill: none
-                  r: 10.0
                   stroke: =props.color
+                  stroke-width: 3
                   stroke-opacity: 0.25
-                  stroke-width: 3.0
               - component: circle
                 config:
-                  cx: 13.0
-                  cy: 13.0
+                  cx: 13
+                  cy: 13
+                  r: 10
                   fill: none
-                  opacity: '=Number(items[props.item].numericState) > 0 ? 1 : 0'
-                  r: 10.0
                   stroke: =props.color
+                  transform: rotate(-90 13 13)
+                  stroke-width: 3
+                  stroke-linecap: round
                   stroke-dasharray: =Math.min(1, Math.max(0, Number(items[props.item].numericState)) / (Number(props.ringFull)
                     || Number(props.max))) * 62.83 + ' 62.83'
-                  stroke-linecap: round
-                  stroke-width: 3.0
-                  transform: rotate(-90 13 13)
+                  opacity: '=Number(items[props.item].numericState) > 0 ? 1 : 0'
           - component: oh-icon
             config:
-              height: 14.0
               icon: material:timer
-              width: 14.0
+              width: 14
+              height: 14
       - component: div
         config:
           style:
-            align-items: center
-            background: color-mix(in srgb, var(--pill-color) 20%, transparent)
-            border-radius: 50%
-            display: flex
-            flex: 0 0 auto
-            height: 26px
-            justify-content: center
             width: 26px
+            height: 26px
+            flex: 0 0 auto
+            border-radius: 50%
+            background: color-mix(in srgb, var(--pill-color) 20%, transparent)
+            display: flex
+            align-items: center
+            justify-content: center
           visible: =!props.ring
         slots:
           default:
           - component: oh-icon
             config:
-              height: 15.0
               icon: =props.icon || 'material:tune'
-              width: 15.0
+              width: 15
+              height: 15
       - component: div
         config:
           style:
-            display: flex
             flex: '1'
-            flex-direction: column
             min-width: '0'
+            display: flex
+            flex-direction: column
         slots:
           default:
           - component: Label
             config:
+              text: =props.title
               style:
                 font-size: 13px
                 line-height: 16px
-              text: =props.title
           - component: Label
             config:
+              text: =props.context || ''
               style:
                 font-size: 11px
-                line-height: 14px
                 opacity: '0.7'
+                line-height: 14px
+                white-space: nowrap
                 overflow: hidden
                 text-overflow: ellipsis
-                white-space: nowrap
-              text: =props.context || ''
       - component: Label
         config:
+          text: =props.value
           style:
-            color: '=props.valueColor !== undefined ? props.valueColor : props.color'
             font-size: 15px
             font-weight: '700'
             white-space: nowrap
-          text: =props.value
+            color: '=props.valueColor !== undefined ? props.valueColor : props.color'
   - component: div
     config:
       style:
@@ -269,40 +269,40 @@ slots:
       default:
       - component: oh-slider
         config:
-          draggableBar: false
           item: =props.item
-          label: true
-          limitKnobPosition: true
-          max: =Number(props.max)
           min: =Number(props.min)
-          releaseOnly: true
+          max: =Number(props.max)
           step: =Number(props.step)
+          releaseOnly: true
+          label: true
           unit: =props.unit
+          limitKnobPosition: true
+          draggableBar: false
           visible: =!Number.isNaN(Number.parseFloat(items[props.item].state))
   - component: div
     config:
       style:
-        height: 13px
         position: relative
+        height: 13px
     slots:
       default:
       - component: oh-repeater
         config:
           for: mark
-          fragment: true
-          in: =(props.marks || '').split(';')
           sourceType: array
+          in: =(props.marks || '').split(';')
+          fragment: true
         slots:
           default:
           - component: Label
             config:
+              text: =loop.mark.split('=')[1]
               style:
-                font-size: 10px
+                position: absolute
                 left: =(Number(loop.mark.split('=')[0]) - Number(props.min)) / (Number(props.max) - Number(props.min)) * 100
                   + '%'
-                opacity: '0.55'
-                position: absolute
                 transform: '=loop.mark_idx === 0 ? ''translateX(0)'' : loop.mark_idx === loop.mark_source.length - 1 ? ''translateX(-100%)''
                   : ''translateX(-50%)'''
+                font-size: 10px
+                opacity: '0.55'
                 white-space: nowrap
-              text: =loop.mark.split('=')[1]

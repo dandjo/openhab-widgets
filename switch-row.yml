@@ -3,46 +3,46 @@ tags:
 - switch
 props:
   parameters:
-  - context: item
-    description: The switch item
+  - name: item
     label: Item
-    name: item
-    required: true
+    description: The switch item
     type: TEXT
-  - description: Name of the switch
+    required: true
+    context: item
+  - name: title
     label: Title
-    name: title
+    description: Name of the switch
+    type: TEXT
     required: true
-    type: TEXT
-  - default: material:power_settings_new
-    description: The icon, e.g. material:eco
+  - name: icon
     label: Icon
-    name: icon
-    required: false
+    description: The icon, e.g. material:eco
     type: TEXT
-  - default: '#78909c'
-    description: 'The card''s colour as #rrggbb, of the switch while on'
+    required: false
+    default: material:power_settings_new
+  - name: color
     label: Colour
-    name: color
-    required: false
+    description: 'The card''s colour as #rrggbb, of the switch while on'
     type: TEXT
-  - description: Shown instead of Aus while off, e.g. when a pause ends
+    required: false
+    default: '#78909c'
+  - name: offText
     label: Text while off
-    name: offText
-    required: false
+    description: Shown instead of Aus while off, e.g. when a pause ends
     type: TEXT
+    required: false
   parameterGroups: []
-timestamp: Oct 30, 2026, 7:08:44 AM
+timestamp: Oct 30, 2026, 7:07:37 AM
 component: div
 config:
   style:
     --switch-color: =props.color || '#78909c'
-    align-items: center
-    border-bottom: 1px solid rgba(127, 127, 127, 0.15)
+    position: relative
     display: flex
+    align-items: center
     gap: 8px
     padding: 5px 2px
-    position: relative
+    border-bottom: 1px solid rgba(127, 127, 127, 0.15)
   stylesheet: '@keyframes a-soft { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.06; } }
 
     @keyframes a-full { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
@@ -149,76 +149,76 @@ slots:
   - component: div
     config:
       style:
-        align-items: center
-        background: '=items[props.item].state === ''ON'' ? ''color-mix(in srgb, var(--switch-color) 22%, transparent)'' :
-          ''rgba(127, 127, 127, 0.12)'''
+        width: 26px
+        height: 26px
+        flex: 0 0 auto
         border-radius: 50%
         display: flex
-        flex: 0 0 auto
-        height: 26px
+        align-items: center
         justify-content: center
         transition: background 0.2s ease
-        width: 26px
+        background: '=items[props.item].state === ''ON'' ? ''color-mix(in srgb, var(--switch-color) 22%, transparent)'' :
+          ''rgba(127, 127, 127, 0.12)'''
     slots:
       default:
       - component: oh-icon
         config:
-          height: 15.0
           icon: =props.icon || 'material:power_settings_new'
-          width: 15.0
+          width: 15
+          height: 15
   - component: Label
     config:
+      text: =props.title
       style:
         flex: '1'
         font-size: 14px
+        white-space: nowrap
         overflow: hidden
         text-overflow: ellipsis
-        white-space: nowrap
-      text: =props.title
   - component: Label
     config:
+      text: '=items[props.item].state === ''ON'' ? ''On'' : (props.offText || ''Off'')'
       style:
         font-size: 10px
         font-weight: '700'
-        min-width: 24px
         opacity: '0.6'
+        min-width: 24px
         text-align: right
         white-space: nowrap
-      text: '=items[props.item].state === ''ON'' ? ''On'' : (props.offText || ''Off'')'
   - component: div
     config:
       style:
-        background: '=items[props.item].state === ''ON'' ? ''var(--switch-color)'' : ''rgba(127, 127, 127, 0.35)'''
-        border-radius: 8px
-        flex: 0 0 auto
-        height: 24px
         position: relative
-        transition: background 0.2s ease
         width: 42px
+        height: 24px
+        flex: 0 0 auto
+        border-radius: 8px
+        transition: background 0.2s ease
+        background: '=items[props.item].state === ''ON'' ? ''var(--switch-color)'' : ''rgba(127, 127, 127, 0.35)'''
     slots:
       default:
       - component: div
         config:
           style:
-            background: '#ffffff'
-            border-radius: 6px
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3)
-            height: 20px
-            left: '=items[props.item].state === ''ON'' ? ''20px'' : ''2px'''
             position: absolute
             top: 2px
-            transition: left 0.2s ease
+            left: '=items[props.item].state === ''ON'' ? ''20px'' : ''2px'''
             width: 20px
+            height: 20px
+            border-radius: 6px
+            background: '#ffffff'
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3)
+            transition: left 0.2s ease
         slots:
           default: []
   - component: oh-link
     config:
       action: toggle
+      actionItem: =props.item
       actionCommand: 'ON'
       actionCommandAlt: 'OFF'
-      actionItem: =props.item
       style:
-        border-radius: 8px
-        display: block
-        inset: '0'
         position: absolute
+        inset: '0'
+        display: block
+        border-radius: 8px

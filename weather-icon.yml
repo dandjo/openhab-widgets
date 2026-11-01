@@ -3,34 +3,34 @@ tags:
 - weather
 props:
   parameters:
-  - description: 'The weather drawn: clear, fair, partly, mostly, overcast, veil, fog, rain, snow, thunder, rain_sun, snow_sun,
-      thunder_sun; usually an expression'
+  - name: symbol
     label: Symbol
-    name: symbol
-    required: true
+    description: 'The weather drawn: clear, fair, partly, mostly, overcast, veil, fog, rain, snow, thunder, rain_sun, snow_sun,
+      thunder_sun; usually an expression'
     type: TEXT
-  - default: 'true'
-    description: Whether the sun is up; false draws the moon; usually an expression
+    required: true
+  - name: day
     label: Day
-    name: day
-    required: false
+    description: Whether the sun is up; false draws the moon; usually an expression
     type: BOOLEAN
-  - default: '36'
-    description: Width and height in px
-    label: Size
-    name: size
     required: false
+    default: 'true'
+  - name: size
+    label: Size
+    description: Width and height in px
     type: INTEGER
+    required: false
+    default: '36'
   parameterGroups: []
-timestamp: Oct 25, 2026, 1:50:27 PM
+timestamp: Oct 25, 2026, 2:07:58 PM
 component: svg
 config:
+  viewBox: 0 0 48 48
+  width: =props.size || 36
   height: =props.size || 36
   style:
     display: block
     flex: 0 0 auto
-  viewBox: 0 0 48 48
-  width: =props.size || 36
 slots:
   default:
   - component: g
@@ -52,97 +52,97 @@ slots:
               default:
               - component: circle
                 config:
-                  cx: 24.0
-                  cy: 24.0
-                  fill: none
+                  cx: 24
+                  cy: 24
                   r: 14.5
+                  fill: none
                   stroke: none
               - component: line
                 config:
-                  fill: none
-                  stroke: '#ffb300'
-                  stroke-linecap: round
-                  stroke-width: 2.2
                   x1: 34.5
+                  y1: 24.0
                   x2: 38.5
-                  y1: 24.0
                   y2: 24.0
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
               - component: line
                 config:
-                  fill: none
-                  stroke: '#ffb300'
-                  stroke-linecap: round
-                  stroke-width: 2.2
                   x1: 31.42
-                  x2: 34.25
                   y1: 31.42
+                  x2: 34.25
                   y2: 34.25
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
               - component: line
                 config:
-                  fill: none
-                  stroke: '#ffb300'
-                  stroke-linecap: round
-                  stroke-width: 2.2
                   x1: 24.0
-                  x2: 24.0
                   y1: 34.5
-                  y2: 38.5
-              - component: line
-                config:
-                  fill: none
-                  stroke: '#ffb300'
-                  stroke-linecap: round
-                  stroke-width: 2.2
-                  x1: 16.58
-                  x2: 13.75
-                  y1: 31.42
-                  y2: 34.25
-              - component: line
-                config:
-                  fill: none
-                  stroke: '#ffb300'
-                  stroke-linecap: round
-                  stroke-width: 2.2
-                  x1: 13.5
-                  x2: 9.5
-                  y1: 24.0
-                  y2: 24.0
-              - component: line
-                config:
-                  fill: none
-                  stroke: '#ffb300'
-                  stroke-linecap: round
-                  stroke-width: 2.2
-                  x1: 16.58
-                  x2: 13.75
-                  y1: 16.58
-                  y2: 13.75
-              - component: line
-                config:
-                  fill: none
-                  stroke: '#ffb300'
-                  stroke-linecap: round
-                  stroke-width: 2.2
-                  x1: 24.0
                   x2: 24.0
-                  y1: 13.5
-                  y2: 9.5
+                  y2: 38.5
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
               - component: line
                 config:
-                  fill: none
+                  x1: 16.58
+                  y1: 31.42
+                  x2: 13.75
+                  y2: 34.25
                   stroke: '#ffb300'
-                  stroke-linecap: round
                   stroke-width: 2.2
-                  x1: 31.42
-                  x2: 34.25
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 13.5
+                  y1: 24.0
+                  x2: 9.5
+                  y2: 24.0
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 16.58
                   y1: 16.58
+                  x2: 13.75
                   y2: 13.75
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 24.0
+                  y1: 13.5
+                  x2: 24.0
+                  y2: 9.5
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 31.42
+                  y1: 16.58
+                  x2: 34.25
+                  y2: 13.75
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
           - component: circle
             config:
-              cx: 24.0
-              cy: 24.0
+              cx: 24
+              cy: 24
+              r: 7
               fill: '#ffb300'
-              r: 7.0
   - component: g
     config:
       visible: =(props.symbol === 'clear') && props.day === false
@@ -172,97 +172,97 @@ slots:
               default:
               - component: circle
                 config:
-                  cx: 24.0
-                  cy: 24.0
-                  fill: none
+                  cx: 24
+                  cy: 24
                   r: 14.5
+                  fill: none
                   stroke: none
               - component: line
                 config:
-                  fill: none
-                  stroke: '#ffb300'
-                  stroke-linecap: round
-                  stroke-width: 2.2
                   x1: 34.5
+                  y1: 24.0
                   x2: 38.5
-                  y1: 24.0
                   y2: 24.0
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
               - component: line
                 config:
-                  fill: none
-                  stroke: '#ffb300'
-                  stroke-linecap: round
-                  stroke-width: 2.2
                   x1: 31.42
-                  x2: 34.25
                   y1: 31.42
+                  x2: 34.25
                   y2: 34.25
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
               - component: line
                 config:
-                  fill: none
-                  stroke: '#ffb300'
-                  stroke-linecap: round
-                  stroke-width: 2.2
                   x1: 24.0
-                  x2: 24.0
                   y1: 34.5
-                  y2: 38.5
-              - component: line
-                config:
-                  fill: none
-                  stroke: '#ffb300'
-                  stroke-linecap: round
-                  stroke-width: 2.2
-                  x1: 16.58
-                  x2: 13.75
-                  y1: 31.42
-                  y2: 34.25
-              - component: line
-                config:
-                  fill: none
-                  stroke: '#ffb300'
-                  stroke-linecap: round
-                  stroke-width: 2.2
-                  x1: 13.5
-                  x2: 9.5
-                  y1: 24.0
-                  y2: 24.0
-              - component: line
-                config:
-                  fill: none
-                  stroke: '#ffb300'
-                  stroke-linecap: round
-                  stroke-width: 2.2
-                  x1: 16.58
-                  x2: 13.75
-                  y1: 16.58
-                  y2: 13.75
-              - component: line
-                config:
-                  fill: none
-                  stroke: '#ffb300'
-                  stroke-linecap: round
-                  stroke-width: 2.2
-                  x1: 24.0
                   x2: 24.0
-                  y1: 13.5
-                  y2: 9.5
+                  y2: 38.5
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
               - component: line
                 config:
-                  fill: none
+                  x1: 16.58
+                  y1: 31.42
+                  x2: 13.75
+                  y2: 34.25
                   stroke: '#ffb300'
-                  stroke-linecap: round
                   stroke-width: 2.2
-                  x1: 31.42
-                  x2: 34.25
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 13.5
+                  y1: 24.0
+                  x2: 9.5
+                  y2: 24.0
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 16.58
                   y1: 16.58
+                  x2: 13.75
                   y2: 13.75
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 24.0
+                  y1: 13.5
+                  x2: 24.0
+                  y2: 9.5
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 31.42
+                  y1: 16.58
+                  x2: 34.25
+                  y2: 13.75
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
           - component: circle
             config:
-              cx: 24.0
-              cy: 24.0
+              cx: 24
+              cy: 24
+              r: 7
               fill: '#ffb300'
-              r: 7.0
   - component: g
     config:
       visible: =(props.symbol === 'fair') && props.day === false
@@ -281,12 +281,12 @@ slots:
       - component: path
         config:
           d: M14,38 H34 A6,6 0 0,0 35.5,26.2 A9,9 0 0,0 18.6,24.4 A7,7 0 0,0 14,38 Z
-          fill: '#cfd8dc'
-          stroke: '#90a4ae'
-          stroke-linecap: round
-          stroke-linejoin: round
-          stroke-width: 1.6
           transform: translate(34 37) scale(0.55) translate(-27 -31)
+          stroke: '#90a4ae'
+          stroke-width: 1.6
+          stroke-linecap: round
+          fill: '#cfd8dc'
+          stroke-linejoin: round
   - component: g
     config:
       visible: =(props.symbol === 'partly') && !(props.day === false)
@@ -306,97 +306,97 @@ slots:
               default:
               - component: circle
                 config:
-                  cx: 24.0
-                  cy: 24.0
-                  fill: none
+                  cx: 24
+                  cy: 24
                   r: 14.5
+                  fill: none
                   stroke: none
               - component: line
                 config:
-                  fill: none
-                  stroke: '#ffb300'
-                  stroke-linecap: round
-                  stroke-width: 2.2
                   x1: 34.5
+                  y1: 24.0
                   x2: 38.5
-                  y1: 24.0
                   y2: 24.0
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
               - component: line
                 config:
-                  fill: none
-                  stroke: '#ffb300'
-                  stroke-linecap: round
-                  stroke-width: 2.2
                   x1: 31.42
-                  x2: 34.25
                   y1: 31.42
+                  x2: 34.25
                   y2: 34.25
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
               - component: line
                 config:
-                  fill: none
-                  stroke: '#ffb300'
-                  stroke-linecap: round
-                  stroke-width: 2.2
                   x1: 24.0
-                  x2: 24.0
                   y1: 34.5
-                  y2: 38.5
-              - component: line
-                config:
-                  fill: none
-                  stroke: '#ffb300'
-                  stroke-linecap: round
-                  stroke-width: 2.2
-                  x1: 16.58
-                  x2: 13.75
-                  y1: 31.42
-                  y2: 34.25
-              - component: line
-                config:
-                  fill: none
-                  stroke: '#ffb300'
-                  stroke-linecap: round
-                  stroke-width: 2.2
-                  x1: 13.5
-                  x2: 9.5
-                  y1: 24.0
-                  y2: 24.0
-              - component: line
-                config:
-                  fill: none
-                  stroke: '#ffb300'
-                  stroke-linecap: round
-                  stroke-width: 2.2
-                  x1: 16.58
-                  x2: 13.75
-                  y1: 16.58
-                  y2: 13.75
-              - component: line
-                config:
-                  fill: none
-                  stroke: '#ffb300'
-                  stroke-linecap: round
-                  stroke-width: 2.2
-                  x1: 24.0
                   x2: 24.0
-                  y1: 13.5
-                  y2: 9.5
+                  y2: 38.5
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
               - component: line
                 config:
-                  fill: none
+                  x1: 16.58
+                  y1: 31.42
+                  x2: 13.75
+                  y2: 34.25
                   stroke: '#ffb300'
-                  stroke-linecap: round
                   stroke-width: 2.2
-                  x1: 31.42
-                  x2: 34.25
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 13.5
+                  y1: 24.0
+                  x2: 9.5
+                  y2: 24.0
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 16.58
                   y1: 16.58
+                  x2: 13.75
                   y2: 13.75
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 24.0
+                  y1: 13.5
+                  x2: 24.0
+                  y2: 9.5
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 31.42
+                  y1: 16.58
+                  x2: 34.25
+                  y2: 13.75
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
           - component: circle
             config:
-              cx: 24.0
-              cy: 24.0
+              cx: 24
+              cy: 24
+              r: 7
               fill: '#ffb300'
-              r: 7.0
   - component: g
     config:
       visible: =(props.symbol === 'partly') && props.day === false
@@ -415,12 +415,12 @@ slots:
       - component: path
         config:
           d: M14,38 H34 A6,6 0 0,0 35.5,26.2 A9,9 0 0,0 18.6,24.4 A7,7 0 0,0 14,38 Z
-          fill: '#cfd8dc'
-          stroke: '#90a4ae'
-          stroke-linecap: round
-          stroke-linejoin: round
-          stroke-width: 1.6
           transform: translate(27 34) scale(0.9) translate(-27 -31)
+          stroke: '#90a4ae'
+          stroke-width: 1.6
+          stroke-linecap: round
+          fill: '#cfd8dc'
+          stroke-linejoin: round
   - component: g
     config:
       visible: =(props.symbol === 'mostly') && !(props.day === false)
@@ -440,97 +440,97 @@ slots:
               default:
               - component: circle
                 config:
-                  cx: 24.0
-                  cy: 24.0
-                  fill: none
+                  cx: 24
+                  cy: 24
                   r: 14.5
+                  fill: none
                   stroke: none
               - component: line
                 config:
-                  fill: none
-                  stroke: '#ffb300'
-                  stroke-linecap: round
-                  stroke-width: 2.2
                   x1: 34.5
+                  y1: 24.0
                   x2: 38.5
-                  y1: 24.0
                   y2: 24.0
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
               - component: line
                 config:
-                  fill: none
-                  stroke: '#ffb300'
-                  stroke-linecap: round
-                  stroke-width: 2.2
                   x1: 31.42
-                  x2: 34.25
                   y1: 31.42
+                  x2: 34.25
                   y2: 34.25
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
               - component: line
                 config:
-                  fill: none
-                  stroke: '#ffb300'
-                  stroke-linecap: round
-                  stroke-width: 2.2
                   x1: 24.0
-                  x2: 24.0
                   y1: 34.5
-                  y2: 38.5
-              - component: line
-                config:
-                  fill: none
-                  stroke: '#ffb300'
-                  stroke-linecap: round
-                  stroke-width: 2.2
-                  x1: 16.58
-                  x2: 13.75
-                  y1: 31.42
-                  y2: 34.25
-              - component: line
-                config:
-                  fill: none
-                  stroke: '#ffb300'
-                  stroke-linecap: round
-                  stroke-width: 2.2
-                  x1: 13.5
-                  x2: 9.5
-                  y1: 24.0
-                  y2: 24.0
-              - component: line
-                config:
-                  fill: none
-                  stroke: '#ffb300'
-                  stroke-linecap: round
-                  stroke-width: 2.2
-                  x1: 16.58
-                  x2: 13.75
-                  y1: 16.58
-                  y2: 13.75
-              - component: line
-                config:
-                  fill: none
-                  stroke: '#ffb300'
-                  stroke-linecap: round
-                  stroke-width: 2.2
-                  x1: 24.0
                   x2: 24.0
-                  y1: 13.5
-                  y2: 9.5
+                  y2: 38.5
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
               - component: line
                 config:
-                  fill: none
+                  x1: 16.58
+                  y1: 31.42
+                  x2: 13.75
+                  y2: 34.25
                   stroke: '#ffb300'
-                  stroke-linecap: round
                   stroke-width: 2.2
-                  x1: 31.42
-                  x2: 34.25
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 13.5
+                  y1: 24.0
+                  x2: 9.5
+                  y2: 24.0
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 16.58
                   y1: 16.58
+                  x2: 13.75
                   y2: 13.75
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 24.0
+                  y1: 13.5
+                  x2: 24.0
+                  y2: 9.5
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 31.42
+                  y1: 16.58
+                  x2: 34.25
+                  y2: 13.75
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
           - component: circle
             config:
-              cx: 24.0
-              cy: 24.0
+              cx: 24
+              cy: 24
+              r: 7
               fill: '#ffb300'
-              r: 7.0
   - component: g
     config:
       visible: =(props.symbol === 'mostly') && props.day === false
@@ -549,21 +549,21 @@ slots:
       - component: path
         config:
           d: M14,38 H34 A6,6 0 0,0 35.5,26.2 A9,9 0 0,0 18.6,24.4 A7,7 0 0,0 14,38 Z
-          fill: '#b0bec5'
-          stroke: '#78909c'
-          stroke-linecap: round
-          stroke-linejoin: round
-          stroke-width: 1.6
           transform: translate(33 26) scale(0.72) translate(-27 -31)
+          stroke: '#78909c'
+          stroke-width: 1.6
+          stroke-linecap: round
+          fill: '#b0bec5'
+          stroke-linejoin: round
       - component: path
         config:
           d: M14,38 H34 A6,6 0 0,0 35.5,26.2 A9,9 0 0,0 18.6,24.4 A7,7 0 0,0 14,38 Z
-          fill: '#cfd8dc'
-          stroke: '#90a4ae'
-          stroke-linecap: round
-          stroke-linejoin: round
-          stroke-width: 1.6
           transform: translate(24 35) scale(0.95) translate(-27 -31)
+          stroke: '#90a4ae'
+          stroke-width: 1.6
+          stroke-linecap: round
+          fill: '#cfd8dc'
+          stroke-linejoin: round
   - component: g
     config:
       visible: =(props.symbol === 'overcast')
@@ -572,21 +572,21 @@ slots:
       - component: path
         config:
           d: M14,38 H34 A6,6 0 0,0 35.5,26.2 A9,9 0 0,0 18.6,24.4 A7,7 0 0,0 14,38 Z
-          fill: '#b0bec5'
-          stroke: '#78909c'
-          stroke-linecap: round
-          stroke-linejoin: round
-          stroke-width: 1.6
           transform: translate(32 25) scale(0.78) translate(-27 -31)
+          stroke: '#78909c'
+          stroke-width: 1.6
+          stroke-linecap: round
+          fill: '#b0bec5'
+          stroke-linejoin: round
       - component: path
         config:
           d: M14,38 H34 A6,6 0 0,0 35.5,26.2 A9,9 0 0,0 18.6,24.4 A7,7 0 0,0 14,38 Z
-          fill: '#cfd8dc'
-          stroke: '#90a4ae'
-          stroke-linecap: round
-          stroke-linejoin: round
-          stroke-width: 1.6
           transform: translate(22 35) scale(0.95) translate(-27 -31)
+          stroke: '#90a4ae'
+          stroke-width: 1.6
+          stroke-linecap: round
+          fill: '#cfd8dc'
+          stroke-linejoin: round
   - component: g
     config:
       visible: =(props.symbol === 'veil') && !(props.day === false)
@@ -606,97 +606,97 @@ slots:
               default:
               - component: circle
                 config:
-                  cx: 24.0
-                  cy: 24.0
-                  fill: none
+                  cx: 24
+                  cy: 24
                   r: 14.5
+                  fill: none
                   stroke: none
               - component: line
                 config:
-                  fill: none
-                  stroke: '#ffb300'
-                  stroke-linecap: round
-                  stroke-width: 2.2
                   x1: 34.5
+                  y1: 24.0
                   x2: 38.5
-                  y1: 24.0
                   y2: 24.0
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
               - component: line
                 config:
-                  fill: none
-                  stroke: '#ffb300'
-                  stroke-linecap: round
-                  stroke-width: 2.2
                   x1: 31.42
-                  x2: 34.25
                   y1: 31.42
+                  x2: 34.25
                   y2: 34.25
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
               - component: line
                 config:
-                  fill: none
-                  stroke: '#ffb300'
-                  stroke-linecap: round
-                  stroke-width: 2.2
                   x1: 24.0
-                  x2: 24.0
                   y1: 34.5
-                  y2: 38.5
-              - component: line
-                config:
-                  fill: none
-                  stroke: '#ffb300'
-                  stroke-linecap: round
-                  stroke-width: 2.2
-                  x1: 16.58
-                  x2: 13.75
-                  y1: 31.42
-                  y2: 34.25
-              - component: line
-                config:
-                  fill: none
-                  stroke: '#ffb300'
-                  stroke-linecap: round
-                  stroke-width: 2.2
-                  x1: 13.5
-                  x2: 9.5
-                  y1: 24.0
-                  y2: 24.0
-              - component: line
-                config:
-                  fill: none
-                  stroke: '#ffb300'
-                  stroke-linecap: round
-                  stroke-width: 2.2
-                  x1: 16.58
-                  x2: 13.75
-                  y1: 16.58
-                  y2: 13.75
-              - component: line
-                config:
-                  fill: none
-                  stroke: '#ffb300'
-                  stroke-linecap: round
-                  stroke-width: 2.2
-                  x1: 24.0
                   x2: 24.0
-                  y1: 13.5
-                  y2: 9.5
+                  y2: 38.5
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
               - component: line
                 config:
-                  fill: none
+                  x1: 16.58
+                  y1: 31.42
+                  x2: 13.75
+                  y2: 34.25
                   stroke: '#ffb300'
-                  stroke-linecap: round
                   stroke-width: 2.2
-                  x1: 31.42
-                  x2: 34.25
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 13.5
+                  y1: 24.0
+                  x2: 9.5
+                  y2: 24.0
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 16.58
                   y1: 16.58
+                  x2: 13.75
                   y2: 13.75
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 24.0
+                  y1: 13.5
+                  x2: 24.0
+                  y2: 9.5
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 31.42
+                  y1: 16.58
+                  x2: 34.25
+                  y2: 13.75
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
           - component: circle
             config:
-              cx: 24.0
-              cy: 24.0
+              cx: 24
+              cy: 24
+              r: 7
               fill: '#ffb300'
-              r: 7.0
   - component: g
     config:
       visible: =(props.symbol === 'veil') && props.day === false
@@ -714,37 +714,37 @@ slots:
       default:
       - component: line
         config:
-          fill: none
+          x1: 8
+          y1: 27
+          x2: 30
+          y2: 27
           opacity: 0.95
           stroke: '#b0bec5'
+          stroke-width: 2
           stroke-linecap: round
-          stroke-width: 2.0
-          x1: 8.0
-          x2: 30.0
-          y1: 27.0
-          y2: 27.0
+          fill: none
       - component: line
         config:
-          fill: none
+          x1: 16
+          y1: 32
+          x2: 40
+          y2: 32
           opacity: 0.95
           stroke: '#b0bec5'
+          stroke-width: 2
           stroke-linecap: round
-          stroke-width: 2.0
-          x1: 16.0
-          x2: 40.0
-          y1: 32.0
-          y2: 32.0
+          fill: none
       - component: line
         config:
-          fill: none
+          x1: 10
+          y1: 37
+          x2: 32
+          y2: 37
           opacity: 0.95
           stroke: '#b0bec5'
+          stroke-width: 2
           stroke-linecap: round
-          stroke-width: 2.0
-          x1: 10.0
-          x2: 32.0
-          y1: 37.0
-          y2: 37.0
+          fill: none
   - component: g
     config:
       visible: =(props.symbol === 'fog')
@@ -753,32 +753,32 @@ slots:
       - component: path
         config:
           d: M14,38 H34 A6,6 0 0,0 35.5,26.2 A9,9 0 0,0 18.6,24.4 A7,7 0 0,0 14,38 Z
-          fill: '#cfd8dc'
-          stroke: '#90a4ae'
-          stroke-linecap: round
-          stroke-linejoin: round
-          stroke-width: 1.6
           transform: translate(24 23) scale(0.9) translate(-24 -31)
+          stroke: '#90a4ae'
+          stroke-width: 1.6
+          stroke-linecap: round
+          fill: '#cfd8dc'
+          stroke-linejoin: round
       - component: line
         config:
-          fill: none
+          x1: 12
+          y1: 37
+          x2: 36
+          y2: 37
           stroke: '#90a4ae'
-          stroke-linecap: round
           stroke-width: 2.2
-          x1: 12.0
-          x2: 36.0
-          y1: 37.0
-          y2: 37.0
+          stroke-linecap: round
+          fill: none
       - component: line
         config:
-          fill: none
+          x1: 15
+          y1: 42
+          x2: 33
+          y2: 42
           stroke: '#90a4ae'
-          stroke-linecap: round
           stroke-width: 2.2
-          x1: 15.0
-          x2: 33.0
-          y1: 42.0
-          y2: 42.0
+          stroke-linecap: round
+          fill: none
   - component: g
     config:
       visible: =(props.symbol === 'rain_sun' || props.symbol === 'snow_sun' || props.symbol === 'thunder_sun') && !(props.day
@@ -799,97 +799,97 @@ slots:
               default:
               - component: circle
                 config:
-                  cx: 24.0
-                  cy: 24.0
-                  fill: none
+                  cx: 24
+                  cy: 24
                   r: 14.5
+                  fill: none
                   stroke: none
               - component: line
                 config:
-                  fill: none
-                  stroke: '#ffb300'
-                  stroke-linecap: round
-                  stroke-width: 2.2
                   x1: 34.5
+                  y1: 24.0
                   x2: 38.5
-                  y1: 24.0
                   y2: 24.0
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
               - component: line
                 config:
-                  fill: none
-                  stroke: '#ffb300'
-                  stroke-linecap: round
-                  stroke-width: 2.2
                   x1: 31.42
-                  x2: 34.25
                   y1: 31.42
+                  x2: 34.25
                   y2: 34.25
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
               - component: line
                 config:
-                  fill: none
-                  stroke: '#ffb300'
-                  stroke-linecap: round
-                  stroke-width: 2.2
                   x1: 24.0
-                  x2: 24.0
                   y1: 34.5
-                  y2: 38.5
-              - component: line
-                config:
-                  fill: none
-                  stroke: '#ffb300'
-                  stroke-linecap: round
-                  stroke-width: 2.2
-                  x1: 16.58
-                  x2: 13.75
-                  y1: 31.42
-                  y2: 34.25
-              - component: line
-                config:
-                  fill: none
-                  stroke: '#ffb300'
-                  stroke-linecap: round
-                  stroke-width: 2.2
-                  x1: 13.5
-                  x2: 9.5
-                  y1: 24.0
-                  y2: 24.0
-              - component: line
-                config:
-                  fill: none
-                  stroke: '#ffb300'
-                  stroke-linecap: round
-                  stroke-width: 2.2
-                  x1: 16.58
-                  x2: 13.75
-                  y1: 16.58
-                  y2: 13.75
-              - component: line
-                config:
-                  fill: none
-                  stroke: '#ffb300'
-                  stroke-linecap: round
-                  stroke-width: 2.2
-                  x1: 24.0
                   x2: 24.0
-                  y1: 13.5
-                  y2: 9.5
+                  y2: 38.5
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
               - component: line
                 config:
-                  fill: none
+                  x1: 16.58
+                  y1: 31.42
+                  x2: 13.75
+                  y2: 34.25
                   stroke: '#ffb300'
-                  stroke-linecap: round
                   stroke-width: 2.2
-                  x1: 31.42
-                  x2: 34.25
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 13.5
+                  y1: 24.0
+                  x2: 9.5
+                  y2: 24.0
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 16.58
                   y1: 16.58
+                  x2: 13.75
                   y2: 13.75
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 24.0
+                  y1: 13.5
+                  x2: 24.0
+                  y2: 9.5
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
+              - component: line
+                config:
+                  x1: 31.42
+                  y1: 16.58
+                  x2: 34.25
+                  y2: 13.75
+                  stroke: '#ffb300'
+                  stroke-width: 2.2
+                  stroke-linecap: round
+                  fill: none
           - component: circle
             config:
-              cx: 24.0
-              cy: 24.0
+              cx: 24
+              cy: 24
+              r: 7
               fill: '#ffb300'
-              r: 7.0
   - component: g
     config:
       visible: =(props.symbol === 'rain_sun' || props.symbol === 'snow_sun' || props.symbol === 'thunder_sun') && props.day
@@ -909,51 +909,51 @@ slots:
       - component: path
         config:
           d: M14,38 H34 A6,6 0 0,0 35.5,26.2 A9,9 0 0,0 18.6,24.4 A7,7 0 0,0 14,38 Z
-          fill: '#cfd8dc'
-          stroke: '#90a4ae'
-          stroke-linecap: round
-          stroke-linejoin: round
-          stroke-width: 1.6
           transform: translate(27 25) scale(1.0) translate(-27 -31)
+          stroke: '#90a4ae'
+          stroke-width: 1.6
+          stroke-linecap: round
+          fill: '#cfd8dc'
+          stroke-linejoin: round
       - component: line
         config:
-          class: a-drop
-          fill: none
+          x1: 18
+          y1: 36
+          x2: 17.05
+          y2: 38.85
           stroke: '#42a5f5'
-          stroke-linecap: round
           stroke-width: 2.2
+          stroke-linecap: round
+          fill: none
+          class: a-drop
           style:
             animation-delay: -0.0s
-          x1: 18.0
-          x2: 17.05
-          y1: 36.0
-          y2: 38.85
       - component: line
         config:
-          class: a-drop
-          fill: none
+          x1: 25
+          y1: 36
+          x2: 24.05
+          y2: 38.85
           stroke: '#42a5f5'
-          stroke-linecap: round
           stroke-width: 2.2
+          stroke-linecap: round
+          fill: none
+          class: a-drop
           style:
             animation-delay: -0.3s
-          x1: 25.0
-          x2: 24.05
-          y1: 36.0
-          y2: 38.85
       - component: line
         config:
-          class: a-drop
-          fill: none
+          x1: 32
+          y1: 36
+          x2: 31.05
+          y2: 38.85
           stroke: '#42a5f5'
-          stroke-linecap: round
           stroke-width: 2.2
+          stroke-linecap: round
+          fill: none
+          class: a-drop
           style:
             animation-delay: -0.6s
-          x1: 32.0
-          x2: 31.05
-          y1: 36.0
-          y2: 38.85
   - component: g
     config:
       visible: =(props.symbol === 'snow' || props.symbol === 'snow_sun')
@@ -962,43 +962,43 @@ slots:
       - component: path
         config:
           d: M14,38 H34 A6,6 0 0,0 35.5,26.2 A9,9 0 0,0 18.6,24.4 A7,7 0 0,0 14,38 Z
-          fill: '#cfd8dc'
-          stroke: '#90a4ae'
-          stroke-linecap: round
-          stroke-linejoin: round
-          stroke-width: 1.6
           transform: translate(27 25) scale(1.0) translate(-27 -31)
+          stroke: '#90a4ae'
+          stroke-width: 1.6
+          stroke-linecap: round
+          fill: '#cfd8dc'
+          stroke-linejoin: round
       - component: circle
         config:
-          class: a-wobble
-          cx: 18.0
+          cx: 18
           cy: 38.5
-          fill: '#ffffff'
           r: 2.6
+          fill: '#ffffff'
           stroke: '#90a4ae'
-          stroke-width: 1.0
+          stroke-width: 1
+          class: a-wobble
           style:
             animation-duration: 2.0s
       - component: circle
         config:
-          class: a-wobble
           cx: 25.5
-          cy: 42.0
-          fill: '#ffffff'
+          cy: 42
           r: 2.6
+          fill: '#ffffff'
           stroke: '#90a4ae'
-          stroke-width: 1.0
+          stroke-width: 1
+          class: a-wobble
           style:
             animation-duration: 2.4s
       - component: circle
         config:
-          class: a-wobble
-          cx: 33.0
+          cx: 33
           cy: 38.5
-          fill: '#ffffff'
           r: 2.6
+          fill: '#ffffff'
           stroke: '#90a4ae'
-          stroke-width: 1.0
+          stroke-width: 1
+          class: a-wobble
           style:
             animation-duration: 2.8s
   - component: g
@@ -1009,17 +1009,17 @@ slots:
       - component: path
         config:
           d: M14,38 H34 A6,6 0 0,0 35.5,26.2 A9,9 0 0,0 18.6,24.4 A7,7 0 0,0 14,38 Z
-          fill: '#cfd8dc'
-          stroke: '#90a4ae'
-          stroke-linecap: round
-          stroke-linejoin: round
-          stroke-width: 1.6
           transform: translate(27 23) scale(1.0) translate(-27 -31)
+          stroke: '#90a4ae'
+          stroke-width: 1.6
+          stroke-linecap: round
+          fill: '#cfd8dc'
+          stroke-linejoin: round
       - component: polygon
         config:
-          class: a-bolt
-          fill: '#ffca28'
           points: 26,31 20,40 24.5,40 22,47 30,37 25.5,37 28,31
+          fill: '#ffca28'
           stroke: '#f9a825'
-          stroke-linejoin: round
           stroke-width: 0.8
+          stroke-linejoin: round
+          class: a-bolt

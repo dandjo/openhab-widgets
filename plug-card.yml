@@ -3,135 +3,136 @@ tags:
 - plug
 props:
   parameters:
-  - description: 'Name prefix of the plug''s items: <prefix>_power, _switch, _energy_today, _energy_total, _voltage, _current,
-      _power_factor, _apparent_power, _reactive_power'
+  - name: prefix
     label: Item prefix
-    name: prefix
+    description: 'Name prefix of the plug''s items: <prefix>_power, _switch, _energy_today, _energy_total, _voltage, _current,
+      _power_factor, _apparent_power, _reactive_power'
+    type: TEXT
     required: true
-    type: TEXT
-  - default: Plug
-    description: Card title, the device's name where the card is not a plug
+  - name: title
     label: Title
-    name: title
-    required: false
+    description: Card title, the device's name where the card is not a plug
     type: TEXT
-  - default: material:power
-    description: Device icon, e.g. material:coffee
+    required: false
+    default: Plug
+  - name: icon
     label: Icon
-    name: icon
-    required: false
+    description: Device icon, e.g. material:coffee
     type: TEXT
-  - default: '#8d6e63'
-    description: 'Device colour as #rrggbb'
+    required: false
+    default: material:power
+  - name: color
     label: Colour
-    name: color
-    required: false
+    description: 'Device colour as #rrggbb'
     type: TEXT
-  - default: 'true'
-    description: Show the plug's switch
+    required: false
+    default: '#8d6e63'
+  - name: controllable
     label: Switchable
-    name: controllable
-    required: false
+    description: Show the plug's switch
     type: BOOLEAN
-  - description: Small print under the energies, hidden when empty
+    required: false
+    default: 'true'
+  - name: note
     label: Note
-    name: note
-    required: false
+    description: Small print under the energies, hidden when empty
     type: TEXT
-  - context: item
-    description: The switch's item where it is not <prefix>_switch, e.g. a shared meter's
+    required: false
+  - name: switch
     label: Switch item
-    name: switch
-    required: false
+    description: The switch's item where it is not <prefix>_switch, e.g. a shared meter's
     type: TEXT
-  - description: 'The device drawn in its icon: an energy-flow node or an appliance; empty: the icon above'
+    required: false
+    context: item
+  - name: kind
     label: Drawing
-    name: kind
-    required: false
+    description: 'The device drawn in its icon: an energy-flow node or an appliance; empty: the icon above'
     type: TEXT
+    required: false
     limitToOptions: true
     options:
-    - label: pv
-      value: pv
-    - label: grid
-      value: grid
-    - label: home
-      value: home
-    - label: heat-pump
-      value: heat-pump
-    - label: heat-pump-split
-      value: heat-pump-split
-    - label: air-conditioner
-      value: air-conditioner
-    - label: e-car
-      value: e-car
-    - label: battery
-      value: battery
-    - label: appliances
-      value: appliances
-    - label: ventilation
-      value: ventilation
-    - label: coffee-machine
-      value: coffee-machine
-    - label: refrigerator
-      value: refrigerator
-    - label: media
-      value: media
-    - label: office
-      value: office
-    - label: terrace-light
-      value: terrace-light
-    - label: e-bike
-      value: e-bike
-    - label: network-rack
-      value: network-rack
-    - label: washer
-      value: washer
-    - label: dryer
-      value: dryer
-    - label: dish-washer
-      value: dish-washer
-  - default: '10'
-    description: Watts above which the icon's ring pulses
+    - value: pv
+      label: pv
+    - value: grid
+      label: grid
+    - value: home
+      label: home
+    - value: heat-pump
+      label: heat-pump
+    - value: heat-pump-split
+      label: heat-pump-split
+    - value: air-conditioner
+      label: air-conditioner
+    - value: e-car
+      label: e-car
+    - value: battery
+      label: battery
+    - value: appliances
+      label: appliances
+    - value: ventilation
+      label: ventilation
+    - value: coffee-machine
+      label: coffee-machine
+    - value: refrigerator
+      label: refrigerator
+    - value: media
+      label: media
+    - value: office
+      label: office
+    - value: terrace-light
+      label: terrace-light
+    - value: e-bike
+      label: e-bike
+    - value: network-rack
+      label: network-rack
+    - value: washer
+      label: washer
+    - value: dryer
+      label: dryer
+    - value: dish-washer
+      label: dish-washer
+  - name: threshold
     label: Active from
-    name: threshold
-    required: false
+    description: Watts above which the icon's ring pulses
     type: INTEGER
-  - description: Whether the device works, instead of the threshold; usually an expression
+    required: false
+    default: '10'
+  - name: active
     label: Active
-    name: active
-    required: false
+    description: Whether the device works, instead of the threshold; usually an expression
     type: BOOLEAN
-  - description: The heat pump's compressor frequency, turning its drawing's fan; usually an expression
+    required: false
+  - name: frequency
     label: Frequency
-    name: frequency
-    required: false
+    description: The heat pump's compressor frequency, turning its drawing's fan; usually an expression
     type: DECIMAL
-  - description: An appliance's programme progress in %, filling its ring; usually an expression
+    required: false
+  - name: progress
     label: Progress
-    name: progress
-    required: false
+    description: An appliance's programme progress in %, filling its ring; usually an expression
     type: DECIMAL
-  - description: Whether a car's charging cable is plugged in, drawn on the e-car; usually an expression
+    required: false
+  - name: plugged
     label: Plugged in
-    name: plugged
-    required: false
+    description: Whether a car's charging cable is plugged in, drawn on the e-car; usually an expression
     type: BOOLEAN
-  - description: 'kWh per 100 km of a car: today''s charge shown as the kilometres it drives'
+    required: false
+  - name: range
     label: Range
-    name: range
-    required: false
+    description: 'kWh per 100 km of a car: today''s charge shown as the kilometres it drives'
     type: DECIMAL
-  - context: item
-    description: The String item the rule tile_history writes the tiles' history into (comparison with yesterday)
-    label: History item
-    name: history
     required: false
+  - name: history
+    label: History item
+    description: The String item the rule tile_history writes the tiles' history into (comparison with yesterday)
     type: TEXT
+    required: false
+    context: item
   parameterGroups: []
-timestamp: Oct 25, 2026, 7:20:47 PM
+timestamp: Oct 25, 2026, 7:19:28 PM
 component: oh-card
 config:
+  title: =props.title
   style:
     height: calc(100% - 2 * var(--f7-card-margin-vertical))
   stylesheet: '@keyframes a-soft { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.06; } }
@@ -308,14 +309,13 @@ config:
     .a-route-4221cc14 { animation: a-route-4221cc14 10s linear infinite; }
 
     '
-  title: =props.title
 slots:
   content:
   - component: div
     config:
       style:
-        align-items: center
         display: flex
+        align-items: center
         gap: 18px
         padding: 12px 16px 8px
     slots:
@@ -329,22 +329,22 @@ slots:
           - component: widget:appliance-icon
             config:
               kind: =props.kind
-              progress: =props.progress
               running: '=((props.active !== undefined && props.active !== null && props.active !== '''') ? (props.active ===
                 true || props.active === ''true'') : (Number(items[props.prefix + ''_power''].numericState) || 0) > (Number(props.threshold)
                 || 10))'
-              size: 104.0
+              progress: =props.progress
+              size: 104
               visible: =['washer', 'dryer', 'dish-washer'].includes(props.kind)
           - component: svg
             config:
-              height: 104.0
+              viewBox: -34 -34 68 68
+              width: 104
+              height: 104
               style:
                 display: block
                 flex: 0 0 auto
                 overflow: visible
-              viewBox: -34 -34 68 68
               visible: =!['washer', 'dryer', 'dish-washer'].includes(props.kind)
-              width: 104.0
             slots:
               default:
               - component: g
@@ -353,17 +353,17 @@ slots:
                   default:
                   - component: circle
                     config:
-                      cx: 0.0
-                      cy: 0.0
+                      cx: 0
+                      cy: 0
                       r: 32.25
                       style:
                         fill: 'var(--f7-card-bg-color, #fff)'
                   - component: circle
                     config:
-                      cx: 0.0
-                      cy: 0.0
-                      fill: none
+                      cx: 0
+                      cy: 0
                       r: 29.2
+                      fill: none
                       stroke: rgba(127, 127, 127, 0.28)
                       stroke-width: 2.9
               - component: g
@@ -372,51 +372,51 @@ slots:
                   default:
                   - component: circle
                     config:
-                      class: a-full
-                      cx: 0.0
-                      cy: 0.0
-                      fill: none
+                      cx: 0
+                      cy: 0
                       r: 29.2
+                      fill: none
                       stroke: =props.color
                       stroke-width: 2.9
                       visible: '=(((props.active !== undefined && props.active !== null && props.active !== '''') ? (props.active
                         === true || props.active === ''true'') : (Number(items[props.prefix + ''_power''].numericState) ||
                         0) > (Number(props.threshold) || 10))) && !(false)'
+                      class: a-full
                   - component: circle
                     config:
-                      class: a-halo
-                      cx: 0.0
-                      cy: 0.0
-                      fill: none
+                      cx: 0
+                      cy: 0
                       r: 29.2
                       stroke: =props.color
+                      fill: none
                       stroke-width: 4.5
                       visible: '=(((props.active !== undefined && props.active !== null && props.active !== '''') ? (props.active
                         === true || props.active === ''true'') : (Number(items[props.prefix + ''_power''].numericState) ||
                         0) > (Number(props.threshold) || 10))) && !(false)'
+                      class: a-halo
                   - component: circle
                     config:
-                      class: a-soft
-                      cx: 0.0
-                      cy: 0.0
-                      fill: none
+                      cx: 0
+                      cy: 0
                       r: 29.2
+                      fill: none
                       stroke: =props.color
                       stroke-width: 2.9
                       visible: '=(((props.active !== undefined && props.active !== null && props.active !== '''') ? (props.active
                         === true || props.active === ''true'') : (Number(items[props.prefix + ''_power''].numericState) ||
                         0) > (Number(props.threshold) || 10))) && (false)'
+                      class: a-soft
               - component: widget:flow-node
                 config:
-                  frequency: =props.frequency
                   kind: =props.kind
-                  plugged: =props.plugged
+                  x: 0
+                  y: 0
                   power: '=(((props.active !== undefined && props.active !== null && props.active !== '''') ? (props.active
                     === true || props.active === ''true'') : (Number(items[props.prefix + ''_power''].numericState) || 0)
                     > (Number(props.threshold) || 10))) ? (Number(items[props.prefix + ''_power''].numericState) || 0) : 0'
+                  frequency: =props.frequency
+                  plugged: =props.plugged
                   visible: =(!!props.kind && !['washer', 'dryer', 'dish-washer'].includes(props.kind))
-                  x: 0.0
-                  y: 0.0
               - component: g
                 config:
                   visible: =!(!!props.kind && !['washer', 'dryer', 'dish-washer'].includes(props.kind))
@@ -428,67 +428,67 @@ slots:
                       default:
                       - component: circle
                         config:
-                          cx: 0.0
-                          cy: 0.0
+                          cx: 0
+                          cy: 0
                           r: 27.75
                           style:
                             fill: 'var(--f7-card-bg-color, #fff)'
                       - component: circle
                         config:
-                          cx: 0.0
-                          cy: 0.0
+                          cx: 0
+                          cy: 0
+                          r: 27.75
                           fill: =props.color
                           fill-opacity: '0.12'
-                          r: 27.75
                   - component: text
                     config:
+                      x: 0
+                      y: 0
                       content: =(props.icon).replace('material:', '')
-                      dominant-baseline: central
                       fill: =props.color
-                      font-size: 30.0
+                      font-size: 30
+                      text-anchor: middle
+                      dominant-baseline: central
                       style:
                         font-family: '''Material Icons'''
                         font-feature-settings: '''liga'''
-                      text-anchor: middle
-                      x: 0.0
-                      y: 0.0
       - component: div
         config:
           style:
-            align-items: flex-start
             display: flex
             flex-direction: column
+            align-items: flex-start
             gap: 3px
             min-width: '0'
         slots:
           default:
           - component: Label
             config:
+              text: Power
               style:
                 font-size: 12px
                 opacity: '0.7'
-              text: Power
           - component: Label
             config:
+              text: '=([''NULL'', ''UNDEF''].includes(items[props.prefix + ''_power''].state) ? ''–'' : (items[props.prefix
+                + ''_power''].displayState || items[props.prefix + ''_power''].state))'
               style:
                 font-size: '=screen.width < 600 ? ''26px'' : ''28px'''
                 font-weight: '700'
-                letter-spacing: -0.01em
                 line-height: '=screen.width < 600 ? ''32px'' : ''34px'''
+                letter-spacing: -0.01em
                 white-space: nowrap
-              text: '=([''NULL'', ''UNDEF''].includes(items[props.prefix + ''_power''].state) ? ''–'' : (items[props.prefix
-                + ''_power''].displayState || items[props.prefix + ''_power''].state))'
           - component: Label
             config:
+              text: '=items[(props.switch || props.prefix + ''_switch'')].state === ''ON'' ? ''On'' : ''Off'''
               style:
                 background: '=items[(props.switch || props.prefix + ''_switch'')].state === ''ON'' ? props.color : ''#9e9e9e'''
-                border-radius: 6px
                 color: '#ffffff'
+                border-radius: 6px
+                padding: 2px 10px
                 font-size: 12px
                 font-weight: '600'
-                padding: 2px 10px
                 white-space: nowrap
-              text: '=items[(props.switch || props.prefix + ''_switch'')].state === ''ON'' ? ''On'' : ''Off'''
   - component: div
     config:
       style:
@@ -498,79 +498,60 @@ slots:
       default:
       - component: widget:power-pill
         config:
-          color: =props.color
           item: =(props.switch || props.prefix + '_switch')
+          color: =props.color
           onText: ='On'
   - component: div
     config:
       style:
         display: grid
-        gap: 10px
         grid-template-columns: repeat(auto-fill, minmax(220px, 1fr))
+        gap: 10px
         padding: 4px 16px 16px
     slots:
       default:
       - component: div
         config:
           style:
-            background: color-mix(in srgb, var(--f7-text-color) 6%, transparent)
-            border-radius: 12px
+            position: relative
             box-sizing: border-box
             min-width: '0'
-            overflow: hidden
+            border-radius: 12px
             padding: 10px 12px
-            position: relative
+            background: color-mix(in srgb, var(--f7-text-color) 6%, transparent)
+            overflow: hidden
         slots:
           default:
           - component: Label
             config:
+              text: Energy today
               style:
                 font-size: 12px
                 opacity: '0.65'
+                white-space: nowrap
                 overflow: hidden
                 text-overflow: ellipsis
-                white-space: nowrap
-              text: Energy today
           - component: div
             config:
               style:
-                align-items: center
                 display: flex
                 flex-wrap: wrap
-                gap: 2px 8px
+                align-items: center
                 justify-content: space-between
+                gap: 2px 8px
             slots:
               default:
               - component: Label
                 config:
+                  text: '=(([''NULL'', ''UNDEF''].includes(items[props.prefix + ''_energy_today''].state) ? ''–'' : (items[props.prefix
+                    + ''_energy_today''].displayState || items[props.prefix + ''_energy_today''].state)) || ''–'')'
                   style:
                     font-size: 20px
                     font-weight: '700'
                     line-height: '1.3'
                     white-space: nowrap
-                  text: '=(([''NULL'', ''UNDEF''].includes(items[props.prefix + ''_energy_today''].state) ? ''–'' : (items[props.prefix
-                    + ''_energy_today''].displayState || items[props.prefix + ''_energy_today''].state)) || ''–'')'
               - component: Label
                 config:
-                  style:
-                    background: '=''color-mix(in srgb, '' + ((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''],
-                      caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''],
-                      info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[''neutral''] || (({good: [''#2e7d32'',
-                      ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'',
-                      ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'',
-                      ''#c7c7cc'']})).neutral)[(themeOptions.dark === ''dark'') ? 1 : 0] + '' 16%, transparent)'''
-                    border-radius: 6px
-                    color: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
-                      ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
-                      ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[''neutral''] || (({good: [''#2e7d32'', ''#81c784''],
-                      ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''],
-                      bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark
-                      === ''dark'') ? 1 : 0]'
-                    font-size: 11px
-                    font-weight: '600'
-                    padding: 3px 8px 2px
-                    white-space: nowrap
-                    width: fit-content
                   text: '=(Math.abs((((Number(items[props.prefix + ''_energy_today''].numericState) || 0) * 1) - (Number(((h)
                     => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y + (h.y2 - h.y)
                     * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.history].state)
@@ -584,6 +565,25 @@ slots:
                     ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.history].state)
                     || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today'']
                     || {}))) * 1)))).toFixed(2)) + '' kWh vs. yesterday'''
+                  style:
+                    font-size: 11px
+                    font-weight: '600'
+                    padding: 3px 8px 2px
+                    border-radius: 6px
+                    white-space: nowrap
+                    width: fit-content
+                    color: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
+                      ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
+                      ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[''neutral''] || (({good: [''#2e7d32'', ''#81c784''],
+                      ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''],
+                      bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark
+                      === ''dark'') ? 1 : 0]'
+                    background: '=''color-mix(in srgb, '' + ((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''],
+                      caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''],
+                      info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[''neutral''] || (({good: [''#2e7d32'',
+                      ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'',
+                      ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'',
+                      ''#c7c7cc'']})).neutral)[(themeOptions.dark === ''dark'') ? 1 : 0] + '' 16%, transparent)'''
                   visible: '=(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y
                     + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.history].state)
                     || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today'']
@@ -594,37 +594,36 @@ slots:
           - component: div
             config:
               style:
-                align-items: center
                 display: grid
-                gap: 4px 8px
                 grid-template-columns: 58px minmax(0, 1fr) auto
+                align-items: center
+                gap: 4px 8px
                 margin-top: 6px
             slots:
               default:
               - component: Label
                 config:
+                  text: today
                   style:
                     font-size: 11px
                     opacity: '0.65'
-                  text: today
               - component: div
                 config:
                   style:
-                    background: rgba(127, 127, 127, 0.1)
-                    border-radius: 4px
-                    height: 8px
                     position: relative
+                    height: 8px
+                    border-radius: 4px
+                    background: rgba(127, 127, 127, 0.1)
                 slots:
                   default:
                   - component: div
                     config:
                       style:
-                        background: '#ffa726'
-                        border-radius: 4px
-                        height: 8px
-                        left: '0'
                         position: absolute
+                        left: '0'
                         top: '0'
+                        height: 8px
+                        border-radius: 4px
                         width: '=Math.max(0, Math.min(100, ((Number(items[props.prefix + ''_energy_today''].numericState)
                           || 0) * 1) / (Math.max(((Number(items[props.prefix + ''_energy_today''].numericState) || 0) * 1),
                           (((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y +
@@ -657,41 +656,41 @@ slots:
                           : {}))[props.prefix + ''_energy_today''] || {}).e) !== null) ? (Number(((((((items[props.history].state)
                           || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today'']
                           || {}).e)) * 1) : 0) * 1.08 || 1) * 100)) + ''%'''
+                        background: '#ffa726'
                       visible: =true
                     slots:
                       default: []
               - component: Label
                 config:
+                  text: =(((Number(items[props.prefix + '_energy_today'].numericState) || 0) * 1)).toFixed(2)
                   style:
                     font-size: 11px
-                    font-weight: '600'
                     text-align: right
                     white-space: nowrap
-                  text: =(((Number(items[props.prefix + '_energy_today'].numericState) || 0) * 1)).toFixed(2)
+                    font-weight: '600'
               - component: Label
                 config:
+                  text: yesterday
                   style:
                     font-size: 11px
                     opacity: '0.65'
-                  text: yesterday
               - component: div
                 config:
                   style:
-                    background: rgba(127, 127, 127, 0.1)
-                    border-radius: 4px
-                    height: 8px
                     position: relative
+                    height: 8px
+                    border-radius: 4px
+                    background: rgba(127, 127, 127, 0.1)
                 slots:
                   default:
                   - component: div
                     config:
                       style:
-                        background: rgba(127, 127, 127, 0.22)
-                        border-radius: 4px
-                        height: 8px
-                        left: '0'
                         position: absolute
+                        left: '0'
                         top: '0'
+                        height: 8px
+                        border-radius: 4px
                         width: '=Math.max(0, Math.min(100, (Number(((((((items[props.history].state) || '''').charAt(0) ===
                           ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today''] || {}).d))
                           * 1) / (Math.max(((Number(items[props.prefix + ''_energy_today''].numericState) || 0) * 1), (((h)
@@ -725,6 +724,7 @@ slots:
                           : {}))[props.prefix + ''_energy_today''] || {}).e) !== null) ? (Number(((((((items[props.history].state)
                           || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today'']
                           || {}).e)) * 1) : 0) * 1.08 || 1) * 100)) + ''%'''
+                        background: rgba(127, 127, 127, 0.22)
                       visible: '=(((((((items[props.history].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state)
                         : {}))[props.prefix + ''_energy_today''] || {}).d) !== undefined && ((((((items[props.history].state)
                         || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today'']
@@ -734,12 +734,11 @@ slots:
                   - component: div
                     config:
                       style:
-                        background: rgba(127, 127, 127, 0.55)
-                        border-radius: 4px
-                        height: 8px
-                        left: '0'
                         position: absolute
+                        left: '0'
                         top: '0'
+                        height: 8px
+                        border-radius: 4px
                         width: '=Math.max(0, Math.min(100, (Number(((h) => h.y2 === undefined || h.y2 === null || h.y ===
                           null || h.y === undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() -
                           h.t) / Math.max(1, h.dt))))((((((items[props.history].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state)
@@ -774,6 +773,7 @@ slots:
                           : {}))[props.prefix + ''_energy_today''] || {}).e) !== null) ? (Number(((((((items[props.history].state)
                           || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today'']
                           || {}).e)) * 1) : 0) * 1.08 || 1) * 100)) + ''%'''
+                        background: rgba(127, 127, 127, 0.55)
                       visible: '=(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y :
                         h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.history].state)
                         || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today'']
@@ -785,41 +785,39 @@ slots:
                       default: []
               - component: Label
                 config:
-                  style:
-                    font-size: 11px
-                    opacity: '0.75'
-                    text-align: right
-                    white-space: nowrap
                   text: '=(((((((items[props.history].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state)
                     : {}))[props.prefix + ''_energy_today''] || {}).d) !== undefined && ((((((items[props.history].state)
                     || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today'']
                     || {}).d) !== null) ? ((Number(((((((items[props.history].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state)
                     : {}))[props.prefix + ''_energy_today''] || {}).d)) * 1)).toFixed(2) : ''–'''
+                  style:
+                    font-size: 11px
+                    text-align: right
+                    white-space: nowrap
+                    opacity: '0.75'
               - component: Label
                 config:
+                  text: 7-day avg.
                   style:
                     font-size: 11px
                     opacity: '0.65'
-                  text: 7-day avg.
               - component: div
                 config:
                   style:
-                    background: rgba(127, 127, 127, 0.1)
-                    border-radius: 4px
-                    height: 8px
                     position: relative
+                    height: 8px
+                    border-radius: 4px
+                    background: rgba(127, 127, 127, 0.1)
                 slots:
                   default:
                   - component: div
                     config:
                       style:
-                        border: 1.5px dashed rgba(127, 127, 127, 0.7)
-                        border-radius: 4px
-                        box-sizing: border-box
-                        height: 8px
-                        left: '0'
                         position: absolute
+                        left: '0'
                         top: '0'
+                        height: 8px
+                        border-radius: 4px
                         width: '=Math.max(0, Math.min(100, (Number(((((((items[props.history].state) || '''').charAt(0) ===
                           ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today''] || {}).e))
                           * 1) / (Math.max(((Number(items[props.prefix + ''_energy_today''].numericState) || 0) * 1), (((h)
@@ -853,6 +851,8 @@ slots:
                           : {}))[props.prefix + ''_energy_today''] || {}).e) !== null) ? (Number(((((((items[props.history].state)
                           || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today'']
                           || {}).e)) * 1) : 0) * 1.08 || 1) * 100)) + ''%'''
+                        border: 1.5px dashed rgba(127, 127, 127, 0.7)
+                        box-sizing: border-box
                       visible: '=(((((((items[props.history].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state)
                         : {}))[props.prefix + ''_energy_today''] || {}).e) !== undefined && ((((((items[props.history].state)
                         || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today'']
@@ -862,12 +862,11 @@ slots:
                   - component: div
                     config:
                       style:
-                        background: rgba(127, 127, 127, 0.3)
-                        border-radius: 4px
-                        height: 8px
-                        left: '0'
                         position: absolute
+                        left: '0'
                         top: '0'
+                        height: 8px
+                        border-radius: 4px
                         width: '=Math.max(0, Math.min(100, (Number(((h) => h.a2 === undefined || h.a2 === null || h.a ===
                           null || h.a === undefined ? h.a : h.a + (h.a2 - h.a) * Math.min(1, Math.max(0, (dayjs().unix() -
                           h.t) / Math.max(1, h.dt))))((((((items[props.history].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state)
@@ -902,6 +901,7 @@ slots:
                           : {}))[props.prefix + ''_energy_today''] || {}).e) !== null) ? (Number(((((((items[props.history].state)
                           || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today'']
                           || {}).e)) * 1) : 0) * 1.08 || 1) * 100)) + ''%'''
+                        background: rgba(127, 127, 127, 0.3)
                       visible: '=(((h) => h.a2 === undefined || h.a2 === null || h.a === null || h.a === undefined ? h.a :
                         h.a + (h.a2 - h.a) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.history].state)
                         || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today'']
@@ -913,147 +913,147 @@ slots:
                       default: []
               - component: Label
                 config:
-                  style:
-                    font-size: 11px
-                    opacity: '0.75'
-                    text-align: right
-                    white-space: nowrap
                   text: '=(((((((items[props.history].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state)
                     : {}))[props.prefix + ''_energy_today''] || {}).e) !== undefined && ((((((items[props.history].state)
                     || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state) : {}))[props.prefix + ''_energy_today'']
                     || {}).e) !== null) ? ((Number(((((((items[props.history].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.history].state)
                     : {}))[props.prefix + ''_energy_today''] || {}).e)) * 1)).toFixed(2) : ''–'''
+                  style:
+                    font-size: 11px
+                    text-align: right
+                    white-space: nowrap
+                    opacity: '0.75'
           - component: oh-link
             config:
               action: popup
+              style:
+                position: absolute
+                inset: '0'
+                display: block
+                border-radius: 12px
               actionModal: widget:item-popup
               actionModalConfig:
-                color: '#ffa726'
                 item: =props.prefix + '_energy_today'
-                kind: number
                 title: Energy today
-              style:
-                border-radius: 12px
-                display: block
-                inset: '0'
-                position: absolute
+                color: '#ffa726'
+                kind: number
       - component: div
         config:
           style:
-            background: color-mix(in srgb, var(--f7-text-color) 6%, transparent)
-            border-radius: 12px
+            position: relative
             box-sizing: border-box
             min-width: '0'
-            overflow: hidden
+            border-radius: 12px
             padding: 10px 12px
-            position: relative
+            background: color-mix(in srgb, var(--f7-text-color) 6%, transparent)
+            overflow: hidden
         slots:
           default:
           - component: Label
             config:
+              text: Energy total
               style:
                 font-size: 12px
                 opacity: '0.65'
+                white-space: nowrap
                 overflow: hidden
                 text-overflow: ellipsis
-                white-space: nowrap
-              text: Energy total
           - component: div
             config:
               style:
-                align-items: center
                 display: flex
-                flex-wrap: wrap
+                align-items: center
                 gap: 8px
                 margin-top: 8px
+                flex-wrap: wrap
             slots:
               default:
               - component: div
                 config:
                   style:
-                    background: '#0b0b0c'
-                    border: 1px solid rgba(127, 127, 127, 0.35)
-                    border-radius: 8px
                     display: inline-flex
                     gap: 3px
                     padding: 5px
+                    background: '#0b0b0c'
+                    border-radius: 8px
+                    border: 1px solid rgba(127, 127, 127, 0.35)
                 slots:
                   default:
                   - component: Label
                     config:
-                      style:
-                        background: 'linear-gradient(#050505, #2b2b2e 28%, #2b2b2e 72%, #050505)'
-                        border-radius: 3px
-                        color: '#ffffff'
-                        font-size: 24px
-                        font-variant-numeric: tabular-nums
-                        font-weight: '700'
-                        height: 38px
-                        line-height: 38px
-                        text-align: center
-                        width: 26px
                       text: =('0000000000' + Math.floor(((Number(items[props.prefix + '_energy_total'].numericState) || 0)
                         * 1))).slice(-5).charAt(0)
-                  - component: Label
-                    config:
                       style:
-                        background: 'linear-gradient(#050505, #2b2b2e 28%, #2b2b2e 72%, #050505)'
-                        border-radius: 3px
-                        color: '#ffffff'
-                        font-size: 24px
-                        font-variant-numeric: tabular-nums
-                        font-weight: '700'
+                        width: 26px
                         height: 38px
                         line-height: 38px
                         text-align: center
-                        width: 26px
+                        border-radius: 3px
+                        background: 'linear-gradient(#050505, #2b2b2e 28%, #2b2b2e 72%, #050505)'
+                        color: '#ffffff'
+                        font-weight: '700'
+                        font-size: 24px
+                        font-variant-numeric: tabular-nums
+                  - component: Label
+                    config:
                       text: =('0000000000' + Math.floor(((Number(items[props.prefix + '_energy_total'].numericState) || 0)
                         * 1))).slice(-5).charAt(1)
-                  - component: Label
-                    config:
                       style:
-                        background: 'linear-gradient(#050505, #2b2b2e 28%, #2b2b2e 72%, #050505)'
-                        border-radius: 3px
-                        color: '#ffffff'
-                        font-size: 24px
-                        font-variant-numeric: tabular-nums
-                        font-weight: '700'
+                        width: 26px
                         height: 38px
                         line-height: 38px
                         text-align: center
-                        width: 26px
+                        border-radius: 3px
+                        background: 'linear-gradient(#050505, #2b2b2e 28%, #2b2b2e 72%, #050505)'
+                        color: '#ffffff'
+                        font-weight: '700'
+                        font-size: 24px
+                        font-variant-numeric: tabular-nums
+                  - component: Label
+                    config:
                       text: =('0000000000' + Math.floor(((Number(items[props.prefix + '_energy_total'].numericState) || 0)
                         * 1))).slice(-5).charAt(2)
-                  - component: Label
-                    config:
                       style:
-                        background: 'linear-gradient(#050505, #2b2b2e 28%, #2b2b2e 72%, #050505)'
-                        border-radius: 3px
-                        color: '#ffffff'
-                        font-size: 24px
-                        font-variant-numeric: tabular-nums
-                        font-weight: '700'
+                        width: 26px
                         height: 38px
                         line-height: 38px
                         text-align: center
-                        width: 26px
+                        border-radius: 3px
+                        background: 'linear-gradient(#050505, #2b2b2e 28%, #2b2b2e 72%, #050505)'
+                        color: '#ffffff'
+                        font-weight: '700'
+                        font-size: 24px
+                        font-variant-numeric: tabular-nums
+                  - component: Label
+                    config:
                       text: =('0000000000' + Math.floor(((Number(items[props.prefix + '_energy_total'].numericState) || 0)
                         * 1))).slice(-5).charAt(3)
-                  - component: Label
-                    config:
                       style:
-                        background: 'linear-gradient(#050505, #2b2b2e 28%, #2b2b2e 72%, #050505)'
-                        border-radius: 3px
-                        color: '#ffffff'
-                        font-size: 24px
-                        font-variant-numeric: tabular-nums
-                        font-weight: '700'
+                        width: 26px
                         height: 38px
                         line-height: 38px
                         text-align: center
-                        width: 26px
+                        border-radius: 3px
+                        background: 'linear-gradient(#050505, #2b2b2e 28%, #2b2b2e 72%, #050505)'
+                        color: '#ffffff'
+                        font-weight: '700'
+                        font-size: 24px
+                        font-variant-numeric: tabular-nums
+                  - component: Label
+                    config:
                       text: =('0000000000' + Math.floor(((Number(items[props.prefix + '_energy_total'].numericState) || 0)
                         * 1))).slice(-5).charAt(4)
+                      style:
+                        width: 26px
+                        height: 38px
+                        line-height: 38px
+                        text-align: center
+                        border-radius: 3px
+                        background: 'linear-gradient(#050505, #2b2b2e 28%, #2b2b2e 72%, #050505)'
+                        color: '#ffffff'
+                        font-weight: '700'
+                        font-size: 24px
+                        font-variant-numeric: tabular-nums
                   - component: div
                     config:
                       style:
@@ -1062,146 +1062,146 @@ slots:
                       default: []
                   - component: Label
                     config:
+                      text: =(((Number(items[props.prefix + '_energy_total'].numericState) || 0) * 1) - Math.floor(((Number(items[props.prefix
+                        + '_energy_total'].numericState) || 0) * 1))).toFixed(1).slice(2).charAt(0)
                       style:
-                        background: 'linear-gradient(#3a0606, #8e1b1b 28%, #8e1b1b 72%, #3a0606)'
-                        border-radius: 3px
-                        color: '#ffffff'
-                        font-size: 24px
-                        font-variant-numeric: tabular-nums
-                        font-weight: '700'
+                        width: 26px
                         height: 38px
                         line-height: 38px
                         text-align: center
-                        width: 26px
-                      text: =(((Number(items[props.prefix + '_energy_total'].numericState) || 0) * 1) - Math.floor(((Number(items[props.prefix
-                        + '_energy_total'].numericState) || 0) * 1))).toFixed(1).slice(2).charAt(0)
+                        border-radius: 3px
+                        background: 'linear-gradient(#3a0606, #8e1b1b 28%, #8e1b1b 72%, #3a0606)'
+                        color: '#ffffff'
+                        font-weight: '700'
+                        font-size: 24px
+                        font-variant-numeric: tabular-nums
               - component: Label
                 config:
+                  text: kWh
                   style:
                     font-size: 13px
                     opacity: '0.7'
-                  text: kWh
           - component: oh-link
             config:
               action: popup
+              style:
+                position: absolute
+                inset: '0'
+                display: block
+                border-radius: 12px
               actionModal: widget:item-popup
               actionModalConfig:
-                color: '#5c6bc0'
                 item: =props.prefix + '_energy_total'
-                kind: number
                 title: Energy total
-              style:
-                border-radius: 12px
-                display: block
-                inset: '0'
-                position: absolute
+                color: '#5c6bc0'
+                kind: number
       - component: div
         config:
           style:
-            background: color-mix(in srgb, var(--f7-text-color) 6%, transparent)
-            border-radius: 12px
-            box-sizing: border-box
-            grid-column: 1 / -1
-            min-width: '0'
-            overflow: hidden
-            padding: 10px 12px
             position: relative
+            box-sizing: border-box
+            min-width: '0'
+            border-radius: 12px
+            padding: 10px 12px
+            background: color-mix(in srgb, var(--f7-text-color) 6%, transparent)
+            overflow: hidden
+            grid-column: 1 / -1
           visible: =Number(props.range) > 0
         slots:
           default:
           - component: div
             config:
               style:
-                align-items: center
                 display: flex
+                align-items: center
                 gap: 8px
             slots:
               default:
               - component: Label
                 config:
+                  text: Range of today's charge
                   style:
-                    flex: 1 1 auto
                     font-size: 12px
                     opacity: '0.65'
+                    white-space: nowrap
                     overflow: hidden
                     text-overflow: ellipsis
-                    white-space: nowrap
-                  text: Range of today's charge
+                    flex: 1 1 auto
               - component: Label
                 config:
+                  text: =(Number(props.range) || 20) + ' kWh / 100 km'
                   style:
-                    background: '=''color-mix(in srgb, '' + ((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''],
-                      caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''],
-                      info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[''neutral''] || (({good: [''#2e7d32'',
-                      ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'',
-                      ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'',
-                      ''#c7c7cc'']})).neutral)[(themeOptions.dark === ''dark'') ? 1 : 0] + '' 16%, transparent)'''
+                    font-size: 11px
+                    font-weight: '600'
+                    padding: 3px 8px 2px
                     border-radius: 6px
+                    white-space: nowrap
+                    width: fit-content
                     color: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
                       ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
                       ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[''neutral''] || (({good: [''#2e7d32'', ''#81c784''],
                       ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''],
                       bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark
                       === ''dark'') ? 1 : 0]'
-                    font-size: 11px
-                    font-weight: '600'
-                    padding: 3px 8px 2px
-                    white-space: nowrap
-                    width: fit-content
-                  text: =(Number(props.range) || 20) + ' kWh / 100 km'
+                    background: '=''color-mix(in srgb, '' + ((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''],
+                      caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''],
+                      info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[''neutral''] || (({good: [''#2e7d32'',
+                      ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'',
+                      ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'',
+                      ''#c7c7cc'']})).neutral)[(themeOptions.dark === ''dark'') ? 1 : 0] + '' 16%, transparent)'''
           - component: Label
             config:
+              text: ='≈ ' + Math.round(((Number(items[props.prefix + '_energy_today'].numericState) || 0) / (Number(props.range)
+                || 20) * 100)) + ' km'
               style:
                 font-size: 20px
                 font-weight: '700'
                 line-height: '1.3'
                 white-space: nowrap
-              text: ='≈ ' + Math.round(((Number(items[props.prefix + '_energy_today'].numericState) || 0) / (Number(props.range)
-                || 20) * 100)) + ' km'
           - component: svg
             config:
+              viewBox: 0 0 300 58
               style:
                 display: block
-                height: auto
-                margin-top: 4px
-                max-width: 460px
                 width: 100%
-              viewBox: 0 0 300 58
+                height: auto
+                max-width: 460px
+                margin-top: 4px
             slots:
               default:
               - component: line
                 config:
+                  x1: 12
+                  y1: 38
+                  x2: 288
+                  y2: 38
                   stroke: currentColor
-                  stroke-linecap: round
                   stroke-opacity: '0.14'
                   stroke-width: '6'
-                  x1: 12.0
-                  x2: 288.0
-                  y1: 38.0
-                  y2: 38.0
+                  stroke-linecap: round
               - component: line
                 config:
-                  stroke: '#26a69a'
-                  stroke-linecap: round
-                  stroke-width: '6'
-                  x1: 12.0
+                  x1: 12
+                  y1: 38
                   x2: =(12 + 276 * Math.max(0, Math.min(1, (((Number(items[props.prefix + '_energy_today'].numericState) ||
                     0) / (Number(props.range) || 20) * 100)) / Math.max(50, Math.ceil(((Number(items[props.prefix + '_energy_today'].numericState)
                     || 0) / (Number(props.range) || 20) * 100) * 1.25 / 50) * 50)))).toFixed(1)
-                  y1: 38.0
-                  y2: 38.0
+                  y2: 38
+                  stroke: '#26a69a'
+                  stroke-width: '6'
+                  stroke-linecap: round
               - component: line
                 config:
-                  stroke-dasharray: 6 6
-                  stroke-width: '1.5'
-                  style:
-                    stroke: 'var(--f7-card-bg-color, #fff)'
-                  x1: 16.0
+                  x1: 16
+                  y1: 38
                   x2: =Math.max(16, (12 + 276 * Math.max(0, Math.min(1, (((Number(items[props.prefix + '_energy_today'].numericState)
                     || 0) / (Number(props.range) || 20) * 100)) / Math.max(50, Math.ceil(((Number(items[props.prefix + '_energy_today'].numericState)
                     || 0) / (Number(props.range) || 20) * 100) * 1.25 / 50) * 50)))) - 4).toFixed(1)
-                  y1: 38.0
-                  y2: 38.0
+                  y2: 38
+                  style:
+                    stroke: 'var(--f7-card-bg-color, #fff)'
+                  stroke-width: '1.5'
+                  stroke-dasharray: 6 6
               - component: g
                 config:
                   transform: ='translate(' + Math.max(28, (12 + 276 * Math.max(0, Math.min(1, (((Number(items[props.prefix
@@ -1214,128 +1214,128 @@ slots:
                     config:
                       d: M-9 -9 L-5 -16 H6 L10 -9 Z
                       fill: '#26a69a'
-                      fill-opacity: '0.35'
                       stroke: '#26a69a'
-                      stroke-linejoin: round
+                      fill-opacity: '0.35'
                       stroke-width: '1.4'
+                      stroke-linejoin: round
                   - component: rect
                     config:
-                      fill: '#26a69a'
-                      height: 9.0
-                      rx: 3.0
-                      width: 32.0
-                      x: -16.0
+                      x: -16
                       y: -9.5
+                      width: 32
+                      height: 9
+                      rx: 3
+                      fill: '#26a69a'
                   - component: circle
                     config:
-                      cx: -9.0
-                      cy: 0.0
-                      fill: '#26a69a'
+                      cx: -9
+                      cy: 0
                       r: 3.6
-                      stroke-width: '1.6'
+                      fill: '#26a69a'
                       style:
                         stroke: 'var(--f7-card-bg-color, #fff)'
+                      stroke-width: '1.6'
                   - component: circle
                     config:
-                      cx: 9.0
-                      cy: 0.0
-                      fill: '#26a69a'
+                      cx: 9
+                      cy: 0
                       r: 3.6
-                      stroke-width: '1.6'
+                      fill: '#26a69a'
                       style:
                         stroke: 'var(--f7-card-bg-color, #fff)'
+                      stroke-width: '1.6'
               - component: text
                 config:
-                  content: '=Math.round(Math.max(50, Math.ceil(((Number(items[props.prefix + ''_energy_today''].numericState)
-                    || 0) / (Number(props.range) || 20) * 100) * 1.25 / 50) * 50) * 0 / 5) + (0 === 5 ? '' km'' : '''')'
-                  fill: currentColor
-                  font-size: 10.0
-                  font-weight: normal
-                  opacity: '0.55'
-                  text-anchor: start
                   x: =(12 + 276 * Math.max(0, Math.min(1, (Math.max(50, Math.ceil(((Number(items[props.prefix + '_energy_today'].numericState)
                     || 0) / (Number(props.range) || 20) * 100) * 1.25 / 50) * 50) * 0 / 5) / Math.max(50, Math.ceil(((Number(items[props.prefix
                     + '_energy_today'].numericState) || 0) / (Number(props.range) || 20) * 100) * 1.25 / 50) * 50)))).toFixed(1)
-                  y: 54.0
+                  y: 54
+                  content: '=Math.round(Math.max(50, Math.ceil(((Number(items[props.prefix + ''_energy_today''].numericState)
+                    || 0) / (Number(props.range) || 20) * 100) * 1.25 / 50) * 50) * 0 / 5) + (0 === 5 ? '' km'' : '''')'
+                  fill: currentColor
+                  font-size: 10
+                  font-weight: normal
+                  text-anchor: start
+                  opacity: '0.55'
               - component: text
                 config:
-                  content: '=Math.round(Math.max(50, Math.ceil(((Number(items[props.prefix + ''_energy_today''].numericState)
-                    || 0) / (Number(props.range) || 20) * 100) * 1.25 / 50) * 50) * 1 / 5) + (1 === 5 ? '' km'' : '''')'
-                  fill: currentColor
-                  font-size: 10.0
-                  font-weight: normal
-                  opacity: '0.55'
-                  text-anchor: middle
                   x: =(12 + 276 * Math.max(0, Math.min(1, (Math.max(50, Math.ceil(((Number(items[props.prefix + '_energy_today'].numericState)
                     || 0) / (Number(props.range) || 20) * 100) * 1.25 / 50) * 50) * 1 / 5) / Math.max(50, Math.ceil(((Number(items[props.prefix
                     + '_energy_today'].numericState) || 0) / (Number(props.range) || 20) * 100) * 1.25 / 50) * 50)))).toFixed(1)
-                  y: 54.0
+                  y: 54
+                  content: '=Math.round(Math.max(50, Math.ceil(((Number(items[props.prefix + ''_energy_today''].numericState)
+                    || 0) / (Number(props.range) || 20) * 100) * 1.25 / 50) * 50) * 1 / 5) + (1 === 5 ? '' km'' : '''')'
+                  fill: currentColor
+                  font-size: 10
+                  font-weight: normal
+                  text-anchor: middle
+                  opacity: '0.55'
               - component: text
                 config:
-                  content: '=Math.round(Math.max(50, Math.ceil(((Number(items[props.prefix + ''_energy_today''].numericState)
-                    || 0) / (Number(props.range) || 20) * 100) * 1.25 / 50) * 50) * 2 / 5) + (2 === 5 ? '' km'' : '''')'
-                  fill: currentColor
-                  font-size: 10.0
-                  font-weight: normal
-                  opacity: '0.55'
-                  text-anchor: middle
                   x: =(12 + 276 * Math.max(0, Math.min(1, (Math.max(50, Math.ceil(((Number(items[props.prefix + '_energy_today'].numericState)
                     || 0) / (Number(props.range) || 20) * 100) * 1.25 / 50) * 50) * 2 / 5) / Math.max(50, Math.ceil(((Number(items[props.prefix
                     + '_energy_today'].numericState) || 0) / (Number(props.range) || 20) * 100) * 1.25 / 50) * 50)))).toFixed(1)
-                  y: 54.0
+                  y: 54
+                  content: '=Math.round(Math.max(50, Math.ceil(((Number(items[props.prefix + ''_energy_today''].numericState)
+                    || 0) / (Number(props.range) || 20) * 100) * 1.25 / 50) * 50) * 2 / 5) + (2 === 5 ? '' km'' : '''')'
+                  fill: currentColor
+                  font-size: 10
+                  font-weight: normal
+                  text-anchor: middle
+                  opacity: '0.55'
               - component: text
                 config:
-                  content: '=Math.round(Math.max(50, Math.ceil(((Number(items[props.prefix + ''_energy_today''].numericState)
-                    || 0) / (Number(props.range) || 20) * 100) * 1.25 / 50) * 50) * 3 / 5) + (3 === 5 ? '' km'' : '''')'
-                  fill: currentColor
-                  font-size: 10.0
-                  font-weight: normal
-                  opacity: '0.55'
-                  text-anchor: middle
                   x: =(12 + 276 * Math.max(0, Math.min(1, (Math.max(50, Math.ceil(((Number(items[props.prefix + '_energy_today'].numericState)
                     || 0) / (Number(props.range) || 20) * 100) * 1.25 / 50) * 50) * 3 / 5) / Math.max(50, Math.ceil(((Number(items[props.prefix
                     + '_energy_today'].numericState) || 0) / (Number(props.range) || 20) * 100) * 1.25 / 50) * 50)))).toFixed(1)
-                  y: 54.0
+                  y: 54
+                  content: '=Math.round(Math.max(50, Math.ceil(((Number(items[props.prefix + ''_energy_today''].numericState)
+                    || 0) / (Number(props.range) || 20) * 100) * 1.25 / 50) * 50) * 3 / 5) + (3 === 5 ? '' km'' : '''')'
+                  fill: currentColor
+                  font-size: 10
+                  font-weight: normal
+                  text-anchor: middle
+                  opacity: '0.55'
               - component: text
                 config:
-                  content: '=Math.round(Math.max(50, Math.ceil(((Number(items[props.prefix + ''_energy_today''].numericState)
-                    || 0) / (Number(props.range) || 20) * 100) * 1.25 / 50) * 50) * 4 / 5) + (4 === 5 ? '' km'' : '''')'
-                  fill: currentColor
-                  font-size: 10.0
-                  font-weight: normal
-                  opacity: '0.55'
-                  text-anchor: middle
                   x: =(12 + 276 * Math.max(0, Math.min(1, (Math.max(50, Math.ceil(((Number(items[props.prefix + '_energy_today'].numericState)
                     || 0) / (Number(props.range) || 20) * 100) * 1.25 / 50) * 50) * 4 / 5) / Math.max(50, Math.ceil(((Number(items[props.prefix
                     + '_energy_today'].numericState) || 0) / (Number(props.range) || 20) * 100) * 1.25 / 50) * 50)))).toFixed(1)
-                  y: 54.0
+                  y: 54
+                  content: '=Math.round(Math.max(50, Math.ceil(((Number(items[props.prefix + ''_energy_today''].numericState)
+                    || 0) / (Number(props.range) || 20) * 100) * 1.25 / 50) * 50) * 4 / 5) + (4 === 5 ? '' km'' : '''')'
+                  fill: currentColor
+                  font-size: 10
+                  font-weight: normal
+                  text-anchor: middle
+                  opacity: '0.55'
               - component: text
                 config:
-                  content: '=Math.round(Math.max(50, Math.ceil(((Number(items[props.prefix + ''_energy_today''].numericState)
-                    || 0) / (Number(props.range) || 20) * 100) * 1.25 / 50) * 50) * 5 / 5) + (5 === 5 ? '' km'' : '''')'
-                  fill: currentColor
-                  font-size: 10.0
-                  font-weight: normal
-                  opacity: '0.55'
-                  text-anchor: end
                   x: =(12 + 276 * Math.max(0, Math.min(1, (Math.max(50, Math.ceil(((Number(items[props.prefix + '_energy_today'].numericState)
                     || 0) / (Number(props.range) || 20) * 100) * 1.25 / 50) * 50) * 5 / 5) / Math.max(50, Math.ceil(((Number(items[props.prefix
                     + '_energy_today'].numericState) || 0) / (Number(props.range) || 20) * 100) * 1.25 / 50) * 50)))).toFixed(1)
-                  y: 54.0
+                  y: 54
+                  content: '=Math.round(Math.max(50, Math.ceil(((Number(items[props.prefix + ''_energy_today''].numericState)
+                    || 0) / (Number(props.range) || 20) * 100) * 1.25 / 50) * 50) * 5 / 5) + (5 === 5 ? '' km'' : '''')'
+                  fill: currentColor
+                  font-size: 10
+                  font-weight: normal
+                  text-anchor: end
+                  opacity: '0.55'
           - component: Label
             config:
-              style:
-                font-size: 11px
-                margin-top: 4px
-                opacity: '0.65'
               text: ='since the meter started ' + ((Number(items[props.prefix + '_energy_total'].numericState) || 0)).toFixed(0)
                 + ' kWh ≈ ' + Math.round(((Number(items[props.prefix + '_energy_total'].numericState) || 0) / (Number(props.range)
                 || 20) * 100)).toLocaleString('en-GB') + ' km'
+              style:
+                font-size: 11px
+                opacity: '0.65'
+                margin-top: 4px
   - component: Label
     config:
+      text: =props.note
       style:
         font-size: 12px
         opacity: '0.6'
         padding: 0 16px 14px
-      text: =props.note
       visible: =!!props.note

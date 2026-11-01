@@ -3,197 +3,197 @@ tags:
 - popup
 props:
   parameters:
-  - context: item
-    description: The item to show
+  - name: item
     label: Item
-    name: item
+    description: The item to show
+    type: TEXT
     required: true
-    type: TEXT
-  - description: Title of the popup, the tile's
+    context: item
+  - name: title
     label: Title
-    name: title
-    required: false
+    description: Title of the popup, the tile's
     type: TEXT
-  - default: '#5c6bc0'
-    description: 'Colour of the course as #rrggbb'
+    required: false
+  - name: color
     label: Colour
-    name: color
-    required: false
+    description: 'Colour of the course as #rrggbb'
     type: TEXT
-  - default: number
-    description: 'number: its course as a line; state: a band of its states; none: only the value'
+    required: false
+    default: '#5c6bc0'
+  - name: kind
     label: Kind
-    name: kind
-    required: false
+    description: 'number: its course as a line; state: a band of its states; none: only the value'
     type: TEXT
-  - description: value=label pairs, comma-separated, for the band of states
+    required: false
+    default: number
+  - name: states
     label: State labels
-    name: states
-    required: false
+    description: value=label pairs, comma-separated, for the band of states
     type: TEXT
-  - context: item
-    description: A second item, shown beside the first and as a second line
+    required: false
+  - name: item2
     label: Second item
-    name: item2
-    required: false
+    description: A second item, shown beside the first and as a second line
     type: TEXT
-  - description: 'The first item''s name beside a second item; empty: the title'
+    required: false
+    context: item
+  - name: name
     label: Name
-    name: name
-    required: false
+    description: 'The first item''s name beside a second item; empty: the title'
     type: TEXT
-  - description: The second item's name
+    required: false
+  - name: name2
     label: Second name
-    name: name2
-    required: false
+    description: The second item's name
     type: TEXT
-  - default: '#78909c'
-    description: 'Colour of the second item''s value and line as #rrggbb'
+    required: false
+  - name: color2
     label: Second colour
-    name: color2
-    required: false
+    description: 'Colour of the second item''s value and line as #rrggbb'
     type: TEXT
-  - default: 'false'
-    description: Draw the second item's line dashed, for a reference such as the first one's mean
+    required: false
+    default: '#78909c'
+  - name: dashed2
     label: Second dashed
-    name: dashed2
-    required: false
+    description: Draw the second item's line dashed, for a reference such as the first one's mean
     type: BOOLEAN
-  - context: item
-    description: A third item, such as a meter's third phase, beside the others and as a third line
+    required: false
+    default: 'false'
+  - name: item3
     label: Third item
-    name: item3
-    required: false
+    description: A third item, such as a meter's third phase, beside the others and as a third line
     type: TEXT
-  - description: The third item's name
+    required: false
+    context: item
+  - name: name3
     label: Third name
-    name: name3
-    required: false
+    description: The third item's name
     type: TEXT
-  - default: '#78909c'
-    description: 'Colour of the third item''s value and line as #rrggbb'
+    required: false
+  - name: color3
     label: Third colour
-    name: color3
-    required: false
+    description: 'Colour of the third item''s value and line as #rrggbb'
     type: TEXT
-  - context: item
-    description: A fourth item, such as the neutral conductor; four values stand two by two on a phone
+    required: false
+    default: '#78909c'
+  - name: item4
     label: Fourth item
-    name: item4
-    required: false
+    description: A fourth item, such as the neutral conductor; four values stand two by two on a phone
     type: TEXT
-  - description: The fourth item's name
+    required: false
+    context: item
+  - name: name4
     label: Fourth name
-    name: name4
-    required: false
+    description: The fourth item's name
     type: TEXT
-  - description: 'Colour of the fourth item''s value and line as #rrggbb; empty: a grey of the theme'
+    required: false
+  - name: color4
     label: Fourth colour
-    name: color4
-    required: false
+    description: 'Colour of the fourth item''s value and line as #rrggbb; empty: a grey of the theme'
     type: TEXT
-  - default: 'false'
-    description: Draw the fourth item's line dashed, for a reference such as the neutral conductor
-    label: Fourth dashed
-    name: dashed4
     required: false
+  - name: dashed4
+    label: Fourth dashed
+    description: Draw the fourth item's line dashed, for a reference such as the neutral conductor
     type: BOOLEAN
-  - default: 'false'
+    required: false
+    default: 'false'
+  - name: stacked
+    label: Stacked
     description: Each item's course in a chart of its own, one under the other on one time axis and one scale, with one pointer
       and tooltip; otherwise the lines overlap in one chart
-    label: Stacked
-    name: stacked
-    required: false
     type: BOOLEAN
-  - default: 'false'
+    required: false
+    default: 'false'
+  - name: abs
+    label: Amounts
     description: Show the values without their sign and draw their amounts from 0, e.g. the load of lines whose meter signs
       the direction
-    label: Amounts
-    name: abs
-    required: false
     type: BOOLEAN
-  - default: 'false'
-    description: Fit the value axis to the values instead of starting it at 0, e.g. for voltages
+    required: false
+    default: 'false'
+  - name: scale
     label: Fitted axis
-    name: scale
-    required: false
+    description: Fit the value axis to the values instead of starting it at 0, e.g. for voltages
     type: BOOLEAN
-  - default: 'false'
+    required: false
+    default: 'false'
+  - name: positive
+    label: Positive only
     description: 'Values of 0 and below are no reading: the course leaves them out and the tooltip gives a dash, e.g. a day''s
       COP before the day''s first run'
-    label: Positive only
-    name: positive
-    required: false
     type: BOOLEAN
-  - default: 'false'
+    required: false
+    default: 'false'
+  - name: today
+    label: Calendar day
     description: The course over the calendar day from midnight, its arrows a day each, instead of the last 24 hours, for
       a value that starts again at midnight
-    label: Calendar day
-    name: today
-    required: false
     type: BOOLEAN
-  - description: 'Show the value large inside a ring, as a device page''s head, the ring filled in the colour up to the value
-      / this, e.g. 6 for a COP; empty: the value alone'
+    required: false
+    default: 'false'
+  - name: ring
     label: Ring full at
-    name: ring
-    required: false
+    description: 'Show the value large inside a ring, as a device page''s head, the ring filled in the colour up to the value
+      / this, e.g. 6 for a COP; empty: the value alone'
     type: DECIMAL
-  - description: Small text under the value inside the ring, e.g. the day the value covers
+    required: false
+  - name: caption
     label: Caption
-    name: caption
-    required: false
+    description: Small text under the value inside the ring, e.g. the day the value covers
     type: TEXT
-  - context: item
-    description: An item shown beside the ring with one decimal, e.g. the heat a COP is the ratio of
+    required: false
+  - name: fact1
     label: First fact
-    name: fact1
-    required: false
+    description: An item shown beside the ring with one decimal, e.g. the heat a COP is the ratio of
     type: TEXT
-  - description: The first fact's name
+    required: false
+    context: item
+  - name: factName1
     label: First fact's name
-    name: factName1
-    required: false
+    description: The first fact's name
     type: TEXT
-  - context: item
-    description: A second item beside the ring, e.g. the electricity a COP is the ratio of
+    required: false
+  - name: fact2
     label: Second fact
-    name: fact2
-    required: false
+    description: A second item beside the ring, e.g. the electricity a COP is the ratio of
     type: TEXT
-  - description: The second fact's name
+    required: false
+    context: item
+  - name: factName2
     label: Second fact's name
-    name: factName2
-    required: false
+    description: The second fact's name
     type: TEXT
-  - context: item
+    required: false
+  - name: history
+    label: History item
     description: 'The String item the rule tile_history writes the tiles'' history into: beside the ring the value''s whole
       day yesterday'
-    label: History item
-    name: history
-    required: false
     type: TEXT
-  - context: item
-    description: 'A Location item: a map (OpenStreetMap) around where it stands, on top'
+    required: false
+    context: item
+  - name: map
     label: Location
-    name: map
-    required: false
+    description: 'A Location item: a map (OpenStreetMap) around where it stands, on top'
     type: TEXT
-  - context: item
+    required: false
+    context: item
+  - name: trips
+    label: Trips
     description: A String item holding trips by day as JSON (rule skoda_enyaq_status), listed under the map as the MyŠkoda
       app's travel history
-    label: Trips
-    name: trips
-    required: false
     type: TEXT
-  - context: item
+    required: false
+    context: item
+  - name: curve
+    label: Heating curve
     description: A String item holding a learnt heating curve as JSON (rule heatpump_heating_curve), drawn as a chart on top
       with item (outdoor) and item2 (setpoint) as the present point
-    label: Heating curve
-    name: curve
-    required: false
     type: TEXT
+    required: false
+    context: item
   parameterGroups: []
-timestamp: Oct 31, 2026, 10:14:42 PM
+timestamp: Oct 31, 2026, 10:13:36 PM
 component: div
 config:
   style:
@@ -245,147 +245,177 @@ slots:
   default:
   - component: oh-card
     config:
+      title: Heating curve
       style:
         height: calc(100% - 2 * var(--f7-card-margin-vertical))
-      title: Heating curve
       visible: =!!props.curve
     slots:
       content:
       - component: oh-chart
         config:
           chartType: ''
+          periodVisible: false
           height: 300px
           options:
             backgroundColor: transparent
-          periodVisible: false
         slots:
           grid:
           - component: oh-chart-grid
             config:
+              top: '35'
               bottom: '75'
               left: '45'
               right: '20'
-              top: '35'
-          legend:
-          - component: oh-chart-legend
+          xAxis:
+          - component: oh-value-axis
             config:
-              bottom: '0'
-              data:
-              - Measured
-              - Heating curve
-              - Now
-              show: true
-              type: scroll
+              gridIndex: 0
+              name: °C outdoor
+              nameLocation: middle
+              nameGap: 26
+              min: =(v) => v.min
+              max: =(v) => v.max
+              interval: 5
+              splitLine:
+                lineStyle:
+                  type: dashed
+                  opacity: 0.4
+              axisLine:
+                onZero: false
+          yAxis:
+          - component: oh-value-axis
+            config:
+              gridIndex: 0
+              name: °C
+              nameGap: 14
+              nameTextStyle:
+                align: right
+                padding:
+                - 0
+                - 8
+                - 0
+                - 0
+              splitLine:
+                lineStyle:
+                  type: dashed
+                  opacity: 0.4
+              min: =(v) => Math.floor((v.min - 1) / 2) * 2
+              max: =(v) => Math.ceil((v.max + 1) / 2) * 2
+              interval: 2
+              axisLine:
+                onZero: false
           series:
           - component: oh-data-series
             config:
+              name: Measured
+              type: scatter
+              symbolSize: 6
               data: '=(((((s) => (s || '''').charAt(0) === ''{'' ? JSON.parse(s) : null)(props.curve ? items[props.curve].state
                 : ''''))) || {b: []}).b'
               itemStyle:
                 color: rgba(127, 127, 127, 0.65)
-              name: Measured
-              symbolSize: 6.0
-              type: scatter
-              xAxisIndex: 0.0
-              yAxisIndex: 0.0
+              xAxisIndex: 0
+              yAxisIndex: 0
           - component: oh-data-series
             config:
+              name: Heating curve
+              type: line
+              symbol: circle
+              symbolSize: 5
               data: '=((c) => c ? c.p.slice(1, 5) : [])((((s) => (s || '''').charAt(0) === ''{'' ? JSON.parse(s) : null)(props.curve
                 ? items[props.curve].state : '''')))'
-              emphasis:
-                disabled: true
               itemStyle:
                 color: =props.color2
               lineStyle:
                 color: =props.color2
                 width: 2.5
-              name: Heating curve
               silent: true
-              symbol: circle
-              symbolSize: 5.0
-              type: line
-              xAxisIndex: 0.0
-              yAxisIndex: 0.0
+              emphasis:
+                disabled: true
+              xAxisIndex: 0
+              yAxisIndex: 0
           - component: oh-data-series
             config:
+              name: Heating curve
               data: '=((c) => c ? c.p.slice(0, 2) : [])((((s) => (s || '''').charAt(0) === ''{'' ? JSON.parse(s) : null)(props.curve
                 ? items[props.curve].state : '''')))'
-              emphasis:
-                disabled: true
+              type: line
+              symbol: none
               itemStyle:
                 color: =props.color2
               lineStyle:
                 color: =props.color2
-                opacity: 0.7
-                type: dashed
                 width: 1.6
-              name: Heating curve
+                type: dashed
+                opacity: 0.7
               silent: true
-              symbol: none
-              type: line
-              xAxisIndex: 0.0
-              yAxisIndex: 0.0
+              emphasis:
+                disabled: true
+              xAxisIndex: 0
+              yAxisIndex: 0
           - component: oh-data-series
             config:
+              name: Heating curve
               data: '=((c) => c ? c.p.slice(4, 6) : [])((((s) => (s || '''').charAt(0) === ''{'' ? JSON.parse(s) : null)(props.curve
                 ? items[props.curve].state : '''')))'
-              emphasis:
-                disabled: true
+              type: line
+              symbol: none
               itemStyle:
                 color: =props.color2
               lineStyle:
                 color: =props.color2
-                opacity: 0.7
-                type: dashed
                 width: 1.6
-              name: Heating curve
+                type: dashed
+                opacity: 0.7
               silent: true
-              symbol: none
-              type: line
-              xAxisIndex: 0.0
-              yAxisIndex: 0.0
+              emphasis:
+                disabled: true
+              xAxisIndex: 0
+              yAxisIndex: 0
           - component: oh-data-series
             config:
+              name: Now
+              type: scatter
+              symbolSize: 12
+              z: 5
               data: '=((x, y) => Number.isNaN(x) || Number.isNaN(y) ? [] : [[x, y]])(Number(items[props.item].numericState),
                 Number(items[props.item2].numericState))'
               itemStyle:
+                color: =props.color
                 borderColor: '#ffffff'
                 borderWidth: 1.5
-                color: =props.color
-              name: Now
-              symbolSize: 12.0
-              type: scatter
-              xAxisIndex: 0.0
-              yAxisIndex: 0.0
-              z: 5.0
+              xAxisIndex: 0
+              yAxisIndex: 0
           - component: oh-data-series
             config:
+              name: Curve
+              type: line
               data: '=((c) => c ? ((f) => '' ''.repeat(Math.round((c.p[5][0] - c.p[0][0]) * 10) + 1).split('''').map((s, i)
                 => ((x) => [x, Math.round(f(x) * 100) / 100, x < c.p[1][0] || x > c.p[4][0] ? 1 : 0])(Math.round(c.p[0][0]
                 * 10 + i) / 10)))((x) => c.p.reduce((y, q, i, a) => i > 0 && a[i - 1][0] < q[0] && x >= a[i - 1][0] && x <=
                 q[0] ? a[i - 1][1] + (x - a[i - 1][0]) * (q[1] - a[i - 1][1]) / (q[0] - a[i - 1][0]) : y, null)) : [])((((s)
                 => (s || '''').charAt(0) === ''{'' ? JSON.parse(s) : null)(props.curve ? items[props.curve].state : '''')))'
+              symbol: circle
+              showSymbol: false
+              symbolSize: 9
+              z: 4
               itemStyle:
                 color: =props.color2
               lineStyle:
-                opacity: 0.0
-                width: 0.0
-              name: Curve
-              showSymbol: false
-              symbol: circle
-              symbolSize: 9.0
-              type: line
-              xAxisIndex: 0.0
-              yAxisIndex: 0.0
-              z: 4.0
+                opacity: 0
+                width: 0
+              xAxisIndex: 0
+              yAxisIndex: 0
           tooltip:
           - component: oh-chart-tooltip
             config:
-              axisPointer:
-                snap: true
-                type: line
-              borderColor: '=themeOptions.dark === ''dark'' ? ''rgb(91, 94, 100)'' : ''rgb(183, 185, 190)'''
+              show: true
               confine: true
+              trigger: axis
+              axisPointer:
+                type: line
+                snap: true
+              smartFormatter: false
               formatter: '=((c, jx, jy) => (ps) => ((F, k) => k ? ((x, m) => ''<div'' + '' style="font-size: 12px; line-height:
                 18px; margin: 0 -10px 6px; padding: 0 10px 6px; border-bottom: 1px solid; border-bottom-color: inherit">''
                 + F(x) + '' °C outdoor'' + ''</div>'' + k.marker + '' '' + (k.value[2] ? ''Heating curve (extrapolated)''
@@ -399,6 +429,8 @@ slots:
                 < 0.25)[0]) : '''')(((v) => v.toFixed(1).replace(''-'', ''−'')), ps.filter((p) => p.seriesName === ''Curve'')[0]))((((s)
                 => (s || '''').charAt(0) === ''{'' ? JSON.parse(s) : null)(props.curve ? items[props.curve].state : '''')),
                 Number(items[props.item].numericState), Number(items[props.item2].numericState))'
+              transitionDuration: 0
+              borderColor: '=themeOptions.dark === ''dark'' ? ''rgb(91, 94, 100)'' : ''rgb(183, 185, 190)'''
               position: '=(pt, ps, dom, rect, size) => [dom.hasAttribute(''data-wt'') || [dom.parentNode.addEventListener(''mouseleave'',
                 () => [0].map((i) => dom.removeAttribute(''data-wt'' + i))), dom.setAttribute(''data-wt'', '''')], [0].map((i)
                 => ((b) => b.style.display === ''none'' ? 0 : ((w) => [b.style.setProperty(''box-sizing'', ''border-box''),
@@ -406,66 +438,34 @@ slots:
                 Number(dom.getAttribute(''data-wt'' + i)))))(dom)), ((w, h) => [pt[0] + w + 20 + 2 > size.viewSize[0] ? pt[0]
                 - w - 20 : pt[0] + 20, pt[1] + h + 20 > size.viewSize[1] ? pt[1] - h - 20 : pt[1] + 20])(dom.offsetWidth,
                 dom.offsetHeight)][2]'
+          legend:
+          - component: oh-chart-legend
+            config:
               show: true
-              smartFormatter: false
-              transitionDuration: 0.0
-              trigger: axis
-          xAxis:
-          - component: oh-value-axis
-            config:
-              axisLine:
-                onZero: false
-              gridIndex: 0.0
-              interval: 5.0
-              max: =(v) => v.max
-              min: =(v) => v.min
-              name: °C outdoor
-              nameGap: 26.0
-              nameLocation: middle
-              splitLine:
-                lineStyle:
-                  opacity: 0.4
-                  type: dashed
-          yAxis:
-          - component: oh-value-axis
-            config:
-              axisLine:
-                onZero: false
-              gridIndex: 0.0
-              interval: 2.0
-              max: =(v) => Math.ceil((v.max + 1) / 2) * 2
-              min: =(v) => Math.floor((v.min - 1) / 2) * 2
-              name: °C
-              nameGap: 14.0
-              nameTextStyle:
-                align: right
-                padding:
-                - 0.0
-                - 8.0
-                - 0.0
-                - 0.0
-              splitLine:
-                lineStyle:
-                  opacity: 0.4
-                  type: dashed
+              bottom: '0'
+              type: scroll
+              data:
+              - Measured
+              - Heating curve
+              - Now
       - component: Label
         config:
-          style:
-            font-size: 11px
-            opacity: '0.65'
-            padding: 0 16px 14px
           text: '=((c) => c ? Math.round(c.n / 4).toLocaleString(''en-GB'') + '' heating hours, '' + dayjs(c.from).format(''DD/MM/YY'')
             + ''–'' + dayjs(c.to).format(''DD/MM/YY'') + '' · mean deviation '' + c.rms.toFixed(2) + '' K'' : ''no heating
             season recorded yet'')((((s) => (s || '''').charAt(0) === ''{'' ? JSON.parse(s) : null)(props.curve ? items[props.curve].state
             : '''')))'
+          style:
+            font-size: 11px
+            opacity: '0.65'
+            padding: 0 16px 14px
   - component: oh-card
     config:
-      style:
-        box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--f7-text-color) 8%, transparent)
-        clip-path: inset(0 round 14px)
-        height: calc(100% - 2 * var(--f7-card-margin-vertical))
-      stylesheet: '.card-content { padding: 0 !important; }'
       title: ''
+      style:
+        height: calc(100% - 2 * var(--f7-card-margin-vertical))
+        clip-path: inset(0 round 14px)
+        box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--f7-text-color) 8%, transparent)
+      stylesheet: '.card-content { padding: 0 !important; }'
       visible: '=!!props.map && ((p) => p.length === 2 && p.every(Number.isFinite))(((items[props.map] ? items[props.map].state
         : '''') || '''').split('','').slice(0, 2).map(Number))'
     slots:
@@ -473,51 +473,51 @@ slots:
       - component: div
         config:
           style:
-            align-items: baseline
             display: flex
-            gap: 12px
             justify-content: space-between
+            align-items: baseline
+            gap: 12px
             padding: 16px 16px 10px
         slots:
           default:
           - component: Label
             config:
+              text: Parking position
               style:
                 font-size: 13px
                 font-weight: '600'
-                letter-spacing: 0.02em
                 opacity: '0.6'
-              text: Parking position
+                letter-spacing: 0.02em
           - component: oh-link
             config:
+              text: Map data © OpenStreetMap
               action: url
               actionUrl: https://www.openstreetmap.org/copyright
               actionUrlSameWindow: false
               style:
-                color: inherit
-                display: inline
                 font-size: 11px
                 opacity: '0.65'
-                padding-top: '0'
+                display: inline
                 text-align: right
-              text: Map data © OpenStreetMap
+                padding-top: '0'
+                color: inherit
       - component: oh-webframe
         config:
-          frameborder: '0'
-          height: 300px
-          scrolling: 'no'
           src: '=((p) => ((p) => p.length === 2 && p.every(Number.isFinite))(p) ? ''/static/trip-map.html?v=b81dcf11&p=''
             + p[0] + '','' + p[1] + '',0&z=17&me=1&col=26a69a&dark='' + (themeOptions.dark === ''dark'' ? 1 : 0) : ''about:blank'')(((items[props.map]
             ? items[props.map].state : '''') || '''').split('','').slice(0, 2).map(Number))'
+          height: 300px
+          frameborder: '0'
+          scrolling: 'no'
           style:
+            width: 100%
             border: '0'
             display: block
-            width: 100%
   - component: oh-card
     config:
+      title: Trips
       style:
         height: calc(100% - 2 * var(--f7-card-margin-vertical))
-      title: Trips
       visible: '=!!props.trips && (((s) => (s || '''').charAt(0) === ''['' ? JSON.parse(s) : [])(props.trips ? items[props.trips].state
         : '''')).length > 0'
     slots:
@@ -530,18 +530,18 @@ slots:
           default:
           - component: Label
             config:
+              text: 'Trips less than 2 hours apart are one session, „~“: estimated from the reads'
               style:
                 font-size: 11px
                 opacity: '0.65'
                 padding: 0 2px 4px
-              text: 'Trips less than 2 hours apart are one session, „~“: estimated from the reads'
           - component: oh-repeater
             config:
               for: day
-              fragment: true
+              sourceType: array
               in: '=(((s) => (s || '''').charAt(0) === ''['' ? JSON.parse(s) : [])(props.trips ? items[props.trips].state
                 : ''''))'
-              sourceType: array
+              fragment: true
             slots:
               default:
               - component: div
@@ -551,40 +551,40 @@ slots:
                   default:
                   - component: Label
                     config:
+                      text: =(['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October',
+                        'November', 'December'])[dayjs(loop.day.d).month()] + ' ' + dayjs(loop.day.d).year()
                       style:
                         font-size: 17px
                         font-weight: '700'
                         padding: 10px 2px 2px
-                      text: =(['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October',
-                        'November', 'December'])[dayjs(loop.day.d).month()] + ' ' + dayjs(loop.day.d).year()
                       visible: =!!loop.day.m
                   - component: div
                     config:
                       style:
-                        align-items: baseline
                         display: flex
-                        font-size: 15px
                         justify-content: space-between
+                        align-items: baseline
                         padding: 8px 2px 6px
+                        font-size: 15px
                     slots:
                       default:
                       - component: Label
                         config:
-                          style:
-                            font-weight: '700'
                           text: =(['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'])[dayjs(loop.day.d).day()]
                             + ', ' + dayjs(loop.day.d).date() + '.'
+                          style:
+                            font-weight: '700'
                       - component: Label
                         config:
+                          text: =loop.day.km + ' km'
                           style:
                             font-weight: '600'
-                          text: =loop.day.km + ' km'
                   - component: oh-repeater
                     config:
                       for: trip
-                      fragment: true
-                      in: =loop.day.t
                       sourceType: array
+                      in: =loop.day.t
+                      fragment: true
                     slots:
                       default:
                       - component: div
@@ -592,28 +592,28 @@ slots:
                           style:
                             background: rgba(127, 127, 127, 0.12)
                             border-radius: 12px
-                            margin-bottom: 8px
                             padding: 10px 12px
+                            margin-bottom: 8px
                             position: relative
                         slots:
                           default:
                           - component: div
                             config:
                               style:
-                                align-items: center
                                 display: flex
+                                align-items: center
                             slots:
                               default:
                               - component: div
                                 config:
                                   style:
-                                    border-right: 1px solid rgba(127, 127, 127, 0.4)
                                     flex: 0 0 auto
-                                    line-height: 21px
-                                    margin-right: 10px
                                     min-width: 44px
                                     padding-right: 10px
+                                    margin-right: 10px
+                                    border-right: 1px solid rgba(127, 127, 127, 0.4)
                                     text-align: right
+                                    line-height: 21px
                                     white-space: nowrap
                                 slots:
                                   default:
@@ -627,9 +627,9 @@ slots:
                                 config:
                                   style:
                                     flex: '1'
-                                    font-size: 14px
-                                    line-height: 21px
                                     min-width: '0'
+                                    line-height: 21px
+                                    font-size: 14px
                                     overflow-wrap: anywhere
                                 slots:
                                   default:
@@ -641,21 +641,21 @@ slots:
                                       text: =loop.trip.b || '…'
                               - component: Label
                                 config:
+                                  text: '=loop.trip.km === null || loop.trip.km === undefined ? '''' : loop.trip.km + '' km'''
                                   style:
                                     flex: 0 0 auto
                                     font-weight: '700'
                                     padding-left: 10px
                                     white-space: nowrap
-                                  text: '=loop.trip.km === null || loop.trip.km === undefined ? '''' : loop.trip.km + '' km'''
                           - component: div
                             config:
                               style:
-                                align-items: center
-                                display: flex
-                                flex-wrap: wrap
                                 font-size: 11px
-                                gap: 3px
                                 opacity: '0.65'
+                                display: flex
+                                align-items: center
+                                gap: 3px
+                                flex-wrap: wrap
                                 padding-top: 6px
                             slots:
                               default:
@@ -669,16 +669,16 @@ slots:
                                     ? '''' : loop.trip.s1) === '''' ? '' %'' : '''')'
                               - component: oh-icon
                                 config:
-                                  height: 11.0
                                   icon: material:arrow_forward
+                                  width: 11
+                                  height: 11
                                   style:
-                                    flex: 0 0 auto
-                                    height: 11px
                                     width: 11px
+                                    height: 11px
+                                    flex: 0 0 auto
                                   visible: '=((loop.trip.s0 === null || loop.trip.s0 === undefined ? '''' : loop.trip.s0)
                                     === '''' || loop.trip.s1 === null || loop.trip.s1 === undefined ? '''' : loop.trip.s1)
                                     !== '''''
-                                  width: 11.0
                               - component: Label
                                 config:
                                   text: '=(((loop.trip.s0 === null || loop.trip.s0 === undefined ? '''' : loop.trip.s0) ===
@@ -700,37 +700,37 @@ slots:
                               action: popup
                               actionModal: widget:trip-popup
                               actionModalConfig:
-                                id: =loop.trip.id
                                 trips: =props.trips
+                                id: =loop.trip.id
                               style:
-                                border-radius: 12px
-                                display: block
-                                inset: '0'
                                 position: absolute
+                                inset: '0'
+                                display: block
+                                border-radius: 12px
   - component: oh-card
     config:
+      title: '=props.curve ? ''Now'' : props.title'
       style:
         height: calc(100% - 2 * var(--f7-card-margin-vertical))
-      title: '=props.curve ? ''Now'' : props.title'
     slots:
       content:
       - component: Label
         config:
+          text: '=(([''NULL'', ''UNDEF''].includes(items[props.item].state) ? ''–'' : (items[props.item].displayState || items[props.item].state))
+            || ''–'')'
           style:
             font-size: '=screen.width < 600 ? ''26px'' : ''28px'''
             font-weight: '700'
-            letter-spacing: -0.01em
             line-height: '=screen.width < 600 ? ''32px'' : ''34px'''
+            letter-spacing: -0.01em
             overflow-wrap: anywhere
             padding: 4px 16px 18px
-          text: '=(([''NULL'', ''UNDEF''].includes(items[props.item].state) ? ''–'' : (items[props.item].displayState || items[props.item].state))
-            || ''–'')'
           visible: =!props.item2 && !props.ring
       - component: div
         config:
           style:
-            align-items: center
             display: flex
+            align-items: center
             gap: 18px
             padding: 4px 16px 14px
           visible: =!props.item2 && !!props.ring
@@ -738,13 +738,13 @@ slots:
           default:
           - component: svg
             config:
-              height: 104.0
+              viewBox: -34 -34 68 68
+              width: 104
+              height: 104
               style:
                 display: block
                 flex: 0 0 auto
                 overflow: visible
-              viewBox: -34 -34 68 68
-              width: 104.0
             slots:
               default:
               - component: g
@@ -753,17 +753,17 @@ slots:
                   default:
                   - component: circle
                     config:
-                      cx: 0.0
-                      cy: 0.0
+                      cx: 0
+                      cy: 0
                       r: 32.25
                       style:
                         fill: 'var(--f7-card-bg-color, #fff)'
                   - component: circle
                     config:
-                      cx: 0.0
-                      cy: 0.0
-                      fill: none
+                      cx: 0
+                      cy: 0
                       r: 29.2
+                      fill: none
                       stroke: rgba(127, 127, 127, 0.28)
                       stroke-width: 2.9
               - component: g
@@ -772,34 +772,34 @@ slots:
                   default:
                   - component: circle
                     config:
-                      class: a-full
-                      cx: 0.0
-                      cy: 0.0
-                      fill: none
+                      cx: 0
+                      cy: 0
                       r: 29.2
+                      fill: none
                       stroke: =props.color
                       stroke-width: 2.9
                       visible: =(false) && !(((Number(items[props.item].numericState) || 0) / Number(props.ring)) > 0)
+                      class: a-full
                   - component: circle
                     config:
-                      class: a-halo
-                      cx: 0.0
-                      cy: 0.0
-                      fill: none
+                      cx: 0
+                      cy: 0
                       r: 29.2
                       stroke: =props.color
+                      fill: none
                       stroke-width: 4.5
                       visible: =(false) && !(((Number(items[props.item].numericState) || 0) / Number(props.ring)) > 0)
+                      class: a-halo
                   - component: circle
                     config:
-                      class: a-soft
-                      cx: 0.0
-                      cy: 0.0
-                      fill: none
+                      cx: 0
+                      cy: 0
                       r: 29.2
+                      fill: none
                       stroke: =props.color
                       stroke-width: 2.9
                       visible: =(false) && (((Number(items[props.item].numericState) || 0) / Number(props.ring)) > 0)
+                      class: a-soft
               - component: g
                 config:
                   visible: =(Number(items[props.item].numericState) || 0) / Number(props.ring) > 0
@@ -807,153 +807,153 @@ slots:
                   default:
                   - component: circle
                     config:
-                      cx: 0.0
-                      cy: 0.0
-                      fill: none
-                      pathLength: 100.0
-                      r: 29.2
-                      stroke-dasharray: =(Math.min(1, (Number(items[props.item].numericState) || 0) / Number(props.ring))
-                        * 100).toFixed(2) + ' 100'
-                      stroke-linecap: round
-                      stroke-width: 4.9
                       style:
                         stroke: 'var(--f7-card-bg-color, #fff)'
-                      transform: rotate(-90 0 0)
-                  - component: circle
-                    config:
-                      class: '=(false) ? ''a-arc'' : '''''
-                      cx: 0.0
-                      cy: 0.0
-                      fill: none
-                      opacity: '0.9'
-                      pathLength: 100.0
+                      cx: 0
+                      cy: 0
                       r: 29.2
-                      stroke: =props.color
+                      fill: none
+                      transform: rotate(-90 0 0)
+                      stroke-linecap: round
                       stroke-dasharray: =(Math.min(1, (Number(items[props.item].numericState) || 0) / Number(props.ring))
                         * 100).toFixed(2) + ' 100'
+                      pathLength: 100
+                      stroke-width: 4.9
+                  - component: circle
+                    config:
+                      stroke: =props.color
+                      cx: 0
+                      cy: 0
+                      r: 29.2
+                      fill: none
+                      transform: rotate(-90 0 0)
                       stroke-linecap: round
+                      stroke-dasharray: =(Math.min(1, (Number(items[props.item].numericState) || 0) / Number(props.ring))
+                        * 100).toFixed(2) + ' 100'
+                      pathLength: 100
                       stroke-width: 2.9
-                      transform: rotate(-90 0 0)
+                      opacity: '0.9'
+                      class: '=(false) ? ''a-arc'' : '''''
                   - component: circle
                     config:
-                      class: a-halo-arc
-                      cx: 0.0
-                      cy: 0.0
-                      fill: none
-                      pathLength: 100.0
-                      r: 29.2
                       stroke: =props.color
+                      cx: 0
+                      cy: 0
+                      r: 29.2
+                      transform: rotate(-90 0 0)
+                      stroke-linecap: round
                       stroke-dasharray: =(Math.min(1, (Number(items[props.item].numericState) || 0) / Number(props.ring))
                         * 100).toFixed(2) + ' 100'
-                      stroke-linecap: round
+                      pathLength: 100
+                      fill: none
                       stroke-width: 4.5
-                      transform: rotate(-90 0 0)
                       visible: =false
+                      class: a-halo-arc
               - component: g
                 config: {}
                 slots:
                   default:
                   - component: circle
                     config:
-                      cx: 0.0
-                      cy: 0.0
+                      cx: 0
+                      cy: 0
                       r: 27.75
                       style:
                         fill: 'var(--f7-card-bg-color, #fff)'
                   - component: circle
                     config:
-                      cx: 0.0
-                      cy: 0.0
+                      cx: 0
+                      cy: 0
+                      r: 27.75
                       fill: =props.color
                       fill-opacity: '0.12'
-                      r: 27.75
               - component: text
                 config:
+                  x: 0
+                  y: '=props.caption ? -4 : 0'
                   content: '=(props.positive && (Number(items[props.item].numericState) || 0) <= 0 ? ''–'' : (([''NULL'',
                     ''UNDEF''].includes(items[props.item].state) ? ''–'' : (items[props.item].displayState || items[props.item].state))
                     || ''–''))'
-                  dominant-baseline: central
                   fill: currentColor
                   font-size: '=((props.positive && (Number(items[props.item].numericState) || 0) <= 0 ? ''–'' : (([''NULL'',
                     ''UNDEF''].includes(items[props.item].state) ? ''–'' : (items[props.item].displayState || items[props.item].state))
                     || ''–''))).length > 4 ? 14 : 18'
-                  font-weight: '700'
                   text-anchor: middle
-                  x: 0.0
-                  y: '=props.caption ? -4 : 0'
+                  dominant-baseline: central
+                  font-weight: '700'
               - component: text
                 config:
+                  x: 0
+                  y: 11.5
                   content: =props.caption || ''
-                  dominant-baseline: central
                   fill: currentColor
                   font-size: 7.5
-                  opacity: '0.6'
                   text-anchor: middle
+                  dominant-baseline: central
+                  opacity: '0.6'
                   visible: =!!props.caption
-                  x: 0.0
-                  y: 11.5
           - component: div
             config:
               style:
-                align-items: baseline
                 display: grid
-                gap: 4px 14px
                 grid-template-columns: auto auto
+                align-items: baseline
+                gap: 4px 14px
                 min-width: '0'
             slots:
               default:
               - component: Label
                 config:
+                  text: =props.factName1 || ''
                   style:
                     font-size: 12px
                     opacity: '0.65'
-                  text: =props.factName1 || ''
                   visible: =!!props.fact1
               - component: Label
                 config:
-                  style:
-                    font-size: 15px
-                    font-weight: '600'
-                    white-space: nowrap
                   text: '=((s) => !s || s.numericState === undefined || s.numericState === null ? ''–'' : (s.numericState).toFixed(1)
                     + ((u) => u ? '' '' + u : '''')(s.unit || (s.displayState || '''').split('' '').slice(1).join('' '')))(items[props.fact1])'
-                  visible: =!!props.fact1
-              - component: Label
-                config:
-                  style:
-                    font-size: 12px
-                    opacity: '0.65'
-                  text: =props.factName2 || ''
-                  visible: =!!props.fact2
-              - component: Label
-                config:
                   style:
                     font-size: 15px
                     font-weight: '600'
                     white-space: nowrap
-                  text: '=((s) => !s || s.numericState === undefined || s.numericState === null ? ''–'' : (s.numericState).toFixed(1)
-                    + ((u) => u ? '' '' + u : '''')(s.unit || (s.displayState || '''').split('' '').slice(1).join('' '')))(items[props.fact2])'
-                  visible: =!!props.fact2
+                  visible: =!!props.fact1
               - component: Label
                 config:
+                  text: =props.factName2 || ''
                   style:
                     font-size: 12px
                     opacity: '0.65'
+                  visible: =!!props.fact2
+              - component: Label
+                config:
+                  text: '=((s) => !s || s.numericState === undefined || s.numericState === null ? ''–'' : (s.numericState).toFixed(1)
+                    + ((u) => u ? '' '' + u : '''')(s.unit || (s.displayState || '''').split('' '').slice(1).join('' '')))(items[props.fact2])'
+                  style:
+                    font-size: 15px
+                    font-weight: '600'
+                    white-space: nowrap
+                  visible: =!!props.fact2
+              - component: Label
+                config:
                   text: Yesterday
+                  style:
+                    font-size: 12px
+                    opacity: '0.65'
                   visible: '=!!props.history && (((((s) => (s || '''').charAt(0) === ''{'' ? JSON.parse(s) : {})(items[props.history].state))[props.item]
                     || {}).d !== undefined && ((((s) => (s || '''').charAt(0) === ''{'' ? JSON.parse(s) : {})(items[props.history].state))[props.item]
                     || {}).d !== null) && (!props.positive || Number(((((s) => (s || '''').charAt(0) === ''{'' ? JSON.parse(s)
                     : {})(items[props.history].state))[props.item] || {}).d) > 0)'
               - component: Label
                 config:
-                  style:
-                    font-size: 15px
-                    font-weight: '600'
-                    white-space: nowrap
                   text: '=Number(((((s) => (s || '''').charAt(0) === ''{'' ? JSON.parse(s) : {})(items[props.history].state))[props.item]
                     || {}).d).toLocaleString(''en-GB'', {minimumFractionDigits: (((items[props.item].displayState || '''').match(/[.,](\d+)/)
                     || ['''', ''''])[1].length), maximumFractionDigits: (((items[props.item].displayState || '''').match(/[.,](\d+)/)
                     || ['''', ''''])[1].length)})'
+                  style:
+                    font-size: 15px
+                    font-weight: '600'
+                    white-space: nowrap
                   visible: '=!!props.history && (((((s) => (s || '''').charAt(0) === ''{'' ? JSON.parse(s) : {})(items[props.history].state))[props.item]
                     || {}).d !== undefined && ((((s) => (s || '''').charAt(0) === ''{'' ? JSON.parse(s) : {})(items[props.history].state))[props.item]
                     || {}).d !== null) && (!props.positive || Number(((((s) => (s || '''').charAt(0) === ''{'' ? JSON.parse(s)
@@ -961,11 +961,11 @@ slots:
       - component: div
         config:
           style:
-            align-items: end
             display: grid
-            gap: 10px 12px
             grid-template-columns: '=''repeat('' + (props.item4 ? (screen.width < 600 ? 2 : 4) : props.item3 ? 3 : 2) + '',
               minmax(0, 1fr))'''
+            align-items: end
+            gap: 10px 12px
             padding: 4px 16px 18px
           visible: =!!props.item2
         slots:
@@ -978,25 +978,25 @@ slots:
               default:
               - component: Label
                 config:
+                  text: ='' + (props.name || props.title) + ''
                   style:
                     font-size: 11px
                     opacity: '0.65'
                     text-align: left
-                  text: ='' + (props.name || props.title) + ''
               - component: Label
                 config:
-                  style:
-                    color: =props.color
-                    font-size: '=props.item3 ? (screen.width < 600 ? ''20px'' : ''22px'') : (screen.width < 600 ? ''26px''
-                      : ''28px'')'
-                    font-weight: '700'
-                    letter-spacing: -0.01em
-                    line-height: '=props.item3 ? ''28px'' : (screen.width < 600 ? ''32px'' : ''34px'')'
-                    text-align: left
-                    white-space: nowrap
                   text: '=((props.abs ? ([''NULL'', ''UNDEF''].includes(items[props.item].state) ? ''–'' : (items[props.item].displayState
                     || items[props.item].state)).replace(''-'', '''') : ([''NULL'', ''UNDEF''].includes(items[props.item].state)
                     ? ''–'' : (items[props.item].displayState || items[props.item].state))) || ''–'')'
+                  style:
+                    font-size: '=props.item3 ? (screen.width < 600 ? ''20px'' : ''22px'') : (screen.width < 600 ? ''26px''
+                      : ''28px'')'
+                    font-weight: '700'
+                    line-height: '=props.item3 ? ''28px'' : (screen.width < 600 ? ''32px'' : ''34px'')'
+                    letter-spacing: -0.01em
+                    color: =props.color
+                    white-space: nowrap
+                    text-align: left
           - component: div
             config:
               style:
@@ -1005,25 +1005,25 @@ slots:
               default:
               - component: Label
                 config:
+                  text: =props.name2
                   style:
                     font-size: 11px
                     opacity: '0.65'
                     text-align: '=props.item3 && !(screen.width < 600 && props.item4) ? ''center'' : ''right'''
-                  text: =props.name2
               - component: Label
                 config:
-                  style:
-                    color: =props.color2
-                    font-size: '=props.item3 ? (screen.width < 600 ? ''20px'' : ''22px'') : (screen.width < 600 ? ''26px''
-                      : ''28px'')'
-                    font-weight: '700'
-                    letter-spacing: -0.01em
-                    line-height: '=props.item3 ? ''28px'' : (screen.width < 600 ? ''32px'' : ''34px'')'
-                    text-align: '=props.item3 && !(screen.width < 600 && props.item4) ? ''center'' : ''right'''
-                    white-space: nowrap
                   text: '=((props.abs ? ([''NULL'', ''UNDEF''].includes(items[props.item2].state) ? ''–'' : (items[props.item2].displayState
                     || items[props.item2].state)).replace(''-'', '''') : ([''NULL'', ''UNDEF''].includes(items[props.item2].state)
                     ? ''–'' : (items[props.item2].displayState || items[props.item2].state))) || ''–'')'
+                  style:
+                    font-size: '=props.item3 ? (screen.width < 600 ? ''20px'' : ''22px'') : (screen.width < 600 ? ''26px''
+                      : ''28px'')'
+                    font-weight: '700'
+                    line-height: '=props.item3 ? ''28px'' : (screen.width < 600 ? ''32px'' : ''34px'')'
+                    letter-spacing: -0.01em
+                    color: =props.color2
+                    white-space: nowrap
+                    text-align: '=props.item3 && !(screen.width < 600 && props.item4) ? ''center'' : ''right'''
           - component: div
             config:
               style:
@@ -1033,25 +1033,25 @@ slots:
               default:
               - component: Label
                 config:
+                  text: =props.name3
                   style:
                     font-size: 11px
                     opacity: '0.65'
                     text-align: '=props.item4 ? (screen.width < 600 ? ''left'' : ''center'') : ''right'''
-                  text: =props.name3
               - component: Label
                 config:
-                  style:
-                    color: ='' + (props.color3 || '#78909c') + ''
-                    font-size: '=props.item3 ? (screen.width < 600 ? ''20px'' : ''22px'') : (screen.width < 600 ? ''26px''
-                      : ''28px'')'
-                    font-weight: '700'
-                    letter-spacing: -0.01em
-                    line-height: '=props.item3 ? ''28px'' : (screen.width < 600 ? ''32px'' : ''34px'')'
-                    text-align: '=props.item4 ? (screen.width < 600 ? ''left'' : ''center'') : ''right'''
-                    white-space: nowrap
                   text: '=((props.abs ? ([''NULL'', ''UNDEF''].includes(items[props.item3].state) ? ''–'' : (items[props.item3].displayState
                     || items[props.item3].state)).replace(''-'', '''') : ([''NULL'', ''UNDEF''].includes(items[props.item3].state)
                     ? ''–'' : (items[props.item3].displayState || items[props.item3].state))) || ''–'')'
+                  style:
+                    font-size: '=props.item3 ? (screen.width < 600 ? ''20px'' : ''22px'') : (screen.width < 600 ? ''26px''
+                      : ''28px'')'
+                    font-weight: '700'
+                    line-height: '=props.item3 ? ''28px'' : (screen.width < 600 ? ''32px'' : ''34px'')'
+                    letter-spacing: -0.01em
+                    color: ='' + (props.color3 || '#78909c') + ''
+                    white-space: nowrap
+                    text-align: '=props.item4 ? (screen.width < 600 ? ''left'' : ''center'') : ''right'''
           - component: div
             config:
               style:
@@ -1061,83 +1061,104 @@ slots:
               default:
               - component: Label
                 config:
+                  text: =props.name4
                   style:
                     font-size: 11px
                     opacity: '0.65'
                     text-align: right
-                  text: =props.name4
               - component: Label
                 config:
-                  style:
-                    color: '='''' + (props.color4 || (themeOptions.dark === ''dark'' ? ''#a8a8a8'' : ''#5a5a5a'')) + '''''
-                    font-size: '=props.item3 ? (screen.width < 600 ? ''20px'' : ''22px'') : (screen.width < 600 ? ''26px''
-                      : ''28px'')'
-                    font-weight: '700'
-                    letter-spacing: -0.01em
-                    line-height: '=props.item3 ? ''28px'' : (screen.width < 600 ? ''32px'' : ''34px'')'
-                    text-align: right
-                    white-space: nowrap
                   text: '=((props.abs ? ([''NULL'', ''UNDEF''].includes(items[props.item4].state) ? ''–'' : (items[props.item4].displayState
                     || items[props.item4].state)).replace(''-'', '''') : ([''NULL'', ''UNDEF''].includes(items[props.item4].state)
                     ? ''–'' : (items[props.item4].displayState || items[props.item4].state))) || ''–'')'
+                  style:
+                    font-size: '=props.item3 ? (screen.width < 600 ? ''20px'' : ''22px'') : (screen.width < 600 ? ''26px''
+                      : ''28px'')'
+                    font-weight: '700'
+                    line-height: '=props.item3 ? ''28px'' : (screen.width < 600 ? ''32px'' : ''34px'')'
+                    letter-spacing: -0.01em
+                    color: '='''' + (props.color4 || (themeOptions.dark === ''dark'' ? ''#a8a8a8'' : ''#5a5a5a'')) + '''''
+                    white-space: nowrap
+                    text-align: right
   - component: oh-card
     config:
+      title: History
       style:
         height: calc(100% - 2 * var(--f7-card-margin-vertical))
-      title: History
       visible: =!props.item2 && (!props.kind || props.kind === 'number') && !props.today
     slots:
       content:
       - component: oh-chart
         config:
           chartType: ''
+          periodVisible: true
+          period: D
           height: 260px
           options:
             backgroundColor: transparent
-          period: D
-          periodVisible: true
         slots:
           grid:
           - component: oh-chart-grid
             config:
+              top: '62'
               bottom: '35'
               left: '50'
               right: '20'
-              top: '62'
+          xAxis:
+          - component: oh-time-axis
+            config:
+              gridIndex: 0
+          yAxis:
+          - component: oh-value-axis
+            config:
+              gridIndex: 0
+              name: ''
+              nameGap: 14
+              nameTextStyle:
+                align: right
+                padding:
+                - 0
+                - 8
+                - 0
+                - 0
+              splitLine:
+                lineStyle:
+                  type: dashed
+                  opacity: 0.4
           series:
           - component: oh-time-series
             config:
-              areaStyle:
-                color:
-                  colorStops:
-                  - color: ='rgba(' + Number.parseInt(props.color.slice(1, 3), 16) + ', ' + Number.parseInt(props.color.slice(3,
-                      5), 16) + ', ' + Number.parseInt(props.color.slice(5, 7), 16) + ', 0.45)'
-                    offset: 0.0
-                  - color: ='rgba(' + Number.parseInt(props.color.slice(1, 3), 16) + ', ' + Number.parseInt(props.color.slice(3,
-                      5), 16) + ', ' + Number.parseInt(props.color.slice(5, 7), 16) + ', 0.02)'
-                    offset: 1.0
-                  type: linear
-                  x: 0.0
-                  x2: 0.0
-                  y: 0.0
-                  y2: 1.0
-              gridIndex: 0.0
+              name: =props.title
+              gridIndex: 0
+              xAxisIndex: 0
+              yAxisIndex: 0
+              type: line
               item: =props.item
+              symbol: none
+              sampling: lttb
               lineStyle:
                 width: 1.5
-              name: =props.title
-              sampling: lttb
-              symbol: none
-              type: line
-              xAxisIndex: 0.0
-              yAxisIndex: 0.0
+              areaStyle:
+                color:
+                  type: linear
+                  x: 0
+                  y: 0
+                  x2: 0
+                  y2: 1
+                  colorStops:
+                  - offset: 0
+                    color: ='rgba(' + Number.parseInt(props.color.slice(1, 3), 16) + ', ' + Number.parseInt(props.color.slice(3,
+                      5), 16) + ', ' + Number.parseInt(props.color.slice(5, 7), 16) + ', 0.45)'
+                  - offset: 1
+                    color: ='rgba(' + Number.parseInt(props.color.slice(1, 3), 16) + ', ' + Number.parseInt(props.color.slice(3,
+                      5), 16) + ', ' + Number.parseInt(props.color.slice(5, 7), 16) + ', 0.02)'
           tooltip:
           - component: oh-chart-tooltip
             config:
-              backgroundColor: transparent
-              borderWidth: 0.0
+              show: true
               confine: true
-              extraCssText: 'box-shadow: none;'
+              trigger: axis
+              smartFormatter: false
               formatter: '=(ps) => ((H) => ''<div style="display: flex; flex-direction: column; align-items: flex-start; height:
                 0">'' + [0].map((g) => ((r) => ''<div style="'' + (r ? ''border: 1px solid; border-radius: 4px; padding: 10px;
                 box-shadow: rgba(0, 0, 0, 0.2) 1px 2px 10px; '' + (themeOptions.dark === ''dark'' ? ''background-color: rgb(58,
@@ -1152,7 +1173,6 @@ slots:
                 + ((v) => ((x) => props.positive && Number(x) <= 0 ? ''–'' : Number(x).toLocaleString(''en-GB'') + '' '' +
                 p.seriesId.split(''#'')[2])(p.value[1]))(Number(p.value[1])) + ''</b></span><br/>'').join(''''))).join('''')
                 + ''</div>'')(ps[0].axisValue)'
-              padding: 0.0
               position: '=(pt, ps, dom, rect, size) => ((T, B) => ((c, left, h) => [c.style.setProperty(''align-items'', left
                 ? ''flex-end'' : ''flex-start''), dom.hasAttribute(''data-wb'') || [dom.parentNode.addEventListener(''mouseleave'',
                 () => [0].map((i) => dom.removeAttribute(''data-wb'' + i))), dom.setAttribute(''data-wb'', '''')], [0].map((i)
@@ -1164,116 +1184,129 @@ slots:
                 + 20, B[i] - b.offsetHeight)) : T[i])))(c.children[i]) : 0), [left ? pt[0] - 20 - c.offsetWidth : pt[0] +
                 20, 0]][4])(dom.firstChild, pt[0] > size.viewSize[0] / 2, T.filter((t) => t <= pt[1]).length - 1))([62], [size.viewSize[1]
                 - 35])'
-              show: true
-              smartFormatter: false
-              transitionDuration: 0.0
-              trigger: axis
+              backgroundColor: transparent
+              borderWidth: 0
+              padding: 0
+              transitionDuration: 0
+              extraCssText: 'box-shadow: none;'
           visualMap:
           - component: oh-chart-visualmap
             config:
-              dimension: 1.0
-              pieces: '=props.positive ? [{min: -1e12, max: 0.05, color: ''rgba(0,0,0,0)''},{gt: 0.05, lte: 1e12, color: props.color}]
-                : [{min: -1e12, max: 1e12, color: props.color}]'
-              seriesIndex: 0.0
               show: false
               type: piecewise
-          xAxis:
-          - component: oh-time-axis
-            config:
-              gridIndex: 0.0
-          yAxis:
-          - component: oh-value-axis
-            config:
-              gridIndex: 0.0
-              name: ''
-              nameGap: 14.0
-              nameTextStyle:
-                align: right
-                padding:
-                - 0.0
-                - 8.0
-                - 0.0
-                - 0.0
-              splitLine:
-                lineStyle:
-                  opacity: 0.4
-                  type: dashed
+              dimension: 1
+              seriesIndex: 0
+              pieces: '=props.positive ? [{min: -1e12, max: 0.05, color: ''rgba(0,0,0,0)''},{gt: 0.05, lte: 1e12, color: props.color}]
+                : [{min: -1e12, max: 1e12, color: props.color}]'
   - component: oh-card
     config:
+      title: History
       style:
         height: calc(100% - 2 * var(--f7-card-margin-vertical))
-      title: History
       visible: =!props.item2 && (!props.kind || props.kind === 'number') && !!props.today
     slots:
       content:
       - component: oh-chart
         config:
           chartType: day
+          periodVisible: true
+          period: D
           height: 260px
           options:
+            backgroundColor: transparent
             axisPointer:
               link:
               - xAxisIndex: all
-            backgroundColor: transparent
-          period: D
-          periodVisible: true
         slots:
           grid:
           - component: oh-chart-grid
             config:
+              top: '62'
               bottom: '35'
               left: '50'
               right: '20'
-              top: '62'
+          xAxis:
+          - component: oh-time-axis
+            config:
+              gridIndex: 0
+              axisPointer:
+                snap: false
+                label:
+                  show: false
+          - component: oh-time-axis
+            config:
+              gridIndex: 0
+              show: false
+              axisPointer:
+                snap: false
+                label:
+                  show: false
+          yAxis:
+          - component: oh-value-axis
+            config:
+              gridIndex: 0
+              name: ''
+              nameGap: 14
+              nameTextStyle:
+                align: right
+                padding:
+                - 0
+                - 8
+                - 0
+                - 0
+              splitLine:
+                lineStyle:
+                  type: dashed
+                  opacity: 0.4
           series:
           - component: oh-time-series
             config:
-              areaStyle:
-                color:
-                  colorStops:
-                  - color: ='rgba(' + Number.parseInt(props.color.slice(1, 3), 16) + ', ' + Number.parseInt(props.color.slice(3,
-                      5), 16) + ', ' + Number.parseInt(props.color.slice(5, 7), 16) + ', 0.45)'
-                    offset: 0.0
-                  - color: ='rgba(' + Number.parseInt(props.color.slice(1, 3), 16) + ', ' + Number.parseInt(props.color.slice(3,
-                      5), 16) + ', ' + Number.parseInt(props.color.slice(5, 7), 16) + ', 0.02)'
-                    offset: 1.0
-                  type: linear
-                  x: 0.0
-                  x2: 0.0
-                  y: 0.0
-                  y2: 1.0
-              gridIndex: 0.0
+              name: =props.title
+              gridIndex: 0
+              xAxisIndex: 0
+              yAxisIndex: 0
+              type: line
               item: =props.item
+              symbol: none
+              sampling: lttb
               lineStyle:
                 width: 1.5
-              name: =props.title
+              areaStyle:
+                color:
+                  type: linear
+                  x: 0
+                  y: 0
+                  x2: 0
+                  y2: 1
+                  colorStops:
+                  - offset: 0
+                    color: ='rgba(' + Number.parseInt(props.color.slice(1, 3), 16) + ', ' + Number.parseInt(props.color.slice(3,
+                      5), 16) + ', ' + Number.parseInt(props.color.slice(5, 7), 16) + ', 0.45)'
+                  - offset: 1
+                    color: ='rgba(' + Number.parseInt(props.color.slice(1, 3), 16) + ', ' + Number.parseInt(props.color.slice(3,
+                      5), 16) + ', ' + Number.parseInt(props.color.slice(5, 7), 16) + ', 0.02)'
               noBoundary: true
-              sampling: lttb
-              symbol: none
-              type: line
-              xAxisIndex: 0.0
-              yAxisIndex: 0.0
           - component: oh-data-series
             config:
-              animation: false
+              id: oh-data-series#clock
+              name: ''
+              type: line
+              xAxisIndex: 1
+              yAxisIndex: 0
               data: =((t0) => [0,1,2,3,4,5,6,7,8,9,10,11].map((a) => [0,1,2,3,4,5,6,7,8,9,10,11].map((b) => [0,1,2,3,4,5].map((c)
                 => [t0 + ((a * 12 + b) * 6 + c) * 300000, null]))).flat(2))(dayjs().startOf('hour').valueOf())
-              id: oh-data-series#clock
-              lineStyle:
-                opacity: 0.0
-              name: ''
-              silent: true
               symbol: none
-              type: line
-              xAxisIndex: 1.0
-              yAxisIndex: 0.0
+              silent: true
+              animation: false
+              lineStyle:
+                opacity: 0
           tooltip:
           - component: oh-chart-tooltip
             config:
-              backgroundColor: transparent
-              borderWidth: 0.0
+              show: true
               confine: true
-              extraCssText: 'box-shadow: none;'
+              trigger: axis
+              smartFormatter: false
               formatter: '=(ps) => ((H) => ''<div style="display: flex; flex-direction: column; align-items: flex-start; height:
                 0">'' + [0].map((g) => ((r) => ''<div style="'' + (r ? ''border: 1px solid; border-radius: 4px; padding: 10px;
                 box-shadow: rgba(0, 0, 0, 0.2) 1px 2px 10px; '' + (themeOptions.dark === ''dark'' ? ''background-color: rgb(58,
@@ -1289,7 +1322,6 @@ slots:
                 + '' '' + p.seriesId.split(''#'')[2])(p.value[1]))(Number(p.value[1])) + ''</b></span><br/>'').join(''''))).join('''')
                 + ''</div>'')(((c, now) => c && c.axisValue > now && ps[0].axisValue <= now && c.axisValue - ps[0].axisValue
                 > 600000 ? c.axisValue : ps[0].axisValue)(ps.filter((p) => p.seriesId === ''oh-data-series#clock'')[0], dayjs().valueOf()))'
-              padding: 0.0
               position: '=(pt, ps, dom, rect, size) => ((T, B) => ((c, left, h) => [c.style.setProperty(''align-items'', left
                 ? ''flex-end'' : ''flex-start''), dom.hasAttribute(''data-wb'') || [dom.parentNode.addEventListener(''mouseleave'',
                 () => [0].map((i) => dom.removeAttribute(''data-wb'' + i))), dom.setAttribute(''data-wb'', '''')], [0].map((i)
@@ -1301,199 +1333,213 @@ slots:
                 + 20, B[i] - b.offsetHeight)) : T[i])))(c.children[i]) : 0), [left ? pt[0] - 20 - c.offsetWidth : pt[0] +
                 20, 0]][4])(dom.firstChild, pt[0] > size.viewSize[0] / 2, T.filter((t) => t <= pt[1]).length - 1))([62], [size.viewSize[1]
                 - 35])'
-              show: true
-              smartFormatter: false
-              transitionDuration: 0.0
-              trigger: axis
+              backgroundColor: transparent
+              borderWidth: 0
+              padding: 0
+              transitionDuration: 0
+              extraCssText: 'box-shadow: none;'
           visualMap:
           - component: oh-chart-visualmap
             config:
-              dimension: 1.0
-              pieces: '=props.positive ? [{min: -1e12, max: 0.05, color: ''rgba(0,0,0,0)''},{gt: 0.05, lte: 1e12, color: props.color}]
-                : [{min: -1e12, max: 1e12, color: props.color}]'
-              seriesIndex: 0.0
               show: false
               type: piecewise
-          xAxis:
-          - component: oh-time-axis
-            config:
-              axisPointer:
-                label:
-                  show: false
-                snap: false
-              gridIndex: 0.0
-          - component: oh-time-axis
-            config:
-              axisPointer:
-                label:
-                  show: false
-                snap: false
-              gridIndex: 0.0
-              show: false
-          yAxis:
-          - component: oh-value-axis
-            config:
-              gridIndex: 0.0
-              name: ''
-              nameGap: 14.0
-              nameTextStyle:
-                align: right
-                padding:
-                - 0.0
-                - 8.0
-                - 0.0
-                - 0.0
-              splitLine:
-                lineStyle:
-                  opacity: 0.4
-                  type: dashed
+              dimension: 1
+              seriesIndex: 0
+              pieces: '=props.positive ? [{min: -1e12, max: 0.05, color: ''rgba(0,0,0,0)''},{gt: 0.05, lte: 1e12, color: props.color}]
+                : [{min: -1e12, max: 1e12, color: props.color}]'
   - component: oh-card
     config:
+      title: History
       style:
         height: calc(100% - 2 * var(--f7-card-margin-vertical))
-      title: History
       visible: =!!props.item2 && !props.stacked
     slots:
       content:
       - component: oh-chart
         config:
           chartType: ''
+          periodVisible: true
+          period: D
           height: 260px
           options:
+            backgroundColor: transparent
             axisPointer:
               link:
               - xAxisIndex: all
-            backgroundColor: transparent
-          period: D
-          periodVisible: true
         slots:
           grid:
           - component: oh-chart-grid
             config:
+              top: '62'
               bottom: '60'
               left: '50'
               right: '20'
-              top: '62'
-          legend:
-          - component: oh-chart-legend
+          xAxis:
+          - component: oh-time-axis
             config:
-              bottom: '0'
-              data: =['' + (props.name || props.title) + '', props.name2, props.name3, props.name4].filter((n) => n)
-              show: true
-              type: scroll
+              gridIndex: 0
+              axisPointer:
+                snap: false
+                label:
+                  show: false
+          - component: oh-time-axis
+            config:
+              gridIndex: 0
+              show: false
+              axisPointer:
+                snap: false
+                label:
+                  show: false
+          - component: oh-time-axis
+            config:
+              gridIndex: 0
+              show: false
+              axisPointer:
+                snap: false
+                label:
+                  show: false
+          - component: oh-time-axis
+            config:
+              gridIndex: 0
+              show: false
+              axisPointer:
+                snap: false
+                label:
+                  show: false
+          yAxis:
+          - component: oh-value-axis
+            config:
+              gridIndex: 0
+              name: ''
+              nameGap: 14
+              nameTextStyle:
+                align: right
+                padding:
+                - 0
+                - 8
+                - 0
+                - 0
+              splitLine:
+                lineStyle:
+                  type: dashed
+                  opacity: 0.4
+              scale: =!!props.scale
+              min: '=props.abs ? 0 : null'
+              max: '=props.abs ? ((v) => ((m) => ((p) => [1,1.2,1.5,2,2.5,3,4,5,6,8,10].map((f) => f * p).filter((x) => x
+                >= m)[0])(Math.pow(10, Math.floor(Math.log10(Math.max(m, 0.001))))))(Math.max(-v.min, v.max))) : null'
           series:
           - component: oh-time-series
             config:
-              clip: true
-              encode:
-                x: 0.0
-                y: 1.0
-              gridIndex: 0.0
+              name: ='' + (props.name || props.title) + ''
+              gridIndex: 0
+              xAxisIndex: 0
+              yAxisIndex: 0
+              type: '=props.abs ? ''custom'' : ''line'''
               item: =props.item
-              itemStyle:
-                color: =props.color
+              symbol: none
+              sampling: lttb
               lineStyle:
                 color: =props.color
                 type: '=false ? ''dashed'' : ''solid'''
                 width: '=false ? 1.5 : 2'
-              name: ='' + (props.name || props.title) + ''
-              progressive: 0.0
+              itemStyle:
+                color: =props.color
               renderItem: '=(params, api) => params.dataIndexInside === params.dataInsideLength - 1 ? ({type: ''polyline'',
                 shape: {points: '' ''.repeat(params.dataInsideLength).split('''').map((s, i) => api.coord([api.value(0, i),
                 Math.abs(api.value(1, i))]))}, style: {fill: ''none'', stroke: props.color, lineWidth: false ? 1.5 : 2, lineDash:
                 false ? [6,4] : null}}) : null'
-              sampling: lttb
+              encode:
+                x: 0
+                y: 1
               silent: true
-              symbol: none
-              type: '=props.abs ? ''custom'' : ''line'''
-              xAxisIndex: 0.0
-              yAxisIndex: 0.0
+              progressive: 0
+              clip: true
           - component: oh-time-series
             config:
-              clip: true
-              encode:
-                x: 0.0
-                y: 1.0
-              gridIndex: 0.0
+              name: =props.name2
+              gridIndex: 0
+              xAxisIndex: 1
+              yAxisIndex: 0
+              type: '=props.abs ? ''custom'' : ''line'''
               item: =props.item2
-              itemStyle:
-                color: =props.color2
+              symbol: none
+              sampling: lttb
               lineStyle:
                 color: =props.color2
                 type: '=(props.dashed2 && !props.stacked) ? ''dashed'' : ''solid'''
                 width: '=(props.dashed2 && !props.stacked) ? 1.5 : 2'
-              name: =props.name2
-              progressive: 0.0
+              itemStyle:
+                color: =props.color2
               renderItem: '=(params, api) => params.dataIndexInside === params.dataInsideLength - 1 ? ({type: ''polyline'',
                 shape: {points: '' ''.repeat(params.dataInsideLength).split('''').map((s, i) => api.coord([api.value(0, i),
                 Math.abs(api.value(1, i))]))}, style: {fill: ''none'', stroke: props.color2, lineWidth: (props.dashed2 &&
                 !props.stacked) ? 1.5 : 2, lineDash: (props.dashed2 && !props.stacked) ? [6,4] : null}}) : null'
-              sampling: lttb
+              encode:
+                x: 0
+                y: 1
               silent: true
-              symbol: none
-              type: '=props.abs ? ''custom'' : ''line'''
-              xAxisIndex: 1.0
-              yAxisIndex: 0.0
+              progressive: 0
+              clip: true
           - component: oh-time-series
             config:
-              clip: true
-              encode:
-                x: 0.0
-                y: 1.0
-              gridIndex: 0.0
+              name: =props.name3
+              gridIndex: 0
+              xAxisIndex: 2
+              yAxisIndex: 0
+              type: '=props.abs ? ''custom'' : ''line'''
               item: =props.item3
-              itemStyle:
-                color: ='' + (props.color3 || '#78909c') + ''
+              symbol: none
+              sampling: lttb
               lineStyle:
                 color: ='' + (props.color3 || '#78909c') + ''
                 type: '=false ? ''dashed'' : ''solid'''
                 width: '=false ? 1.5 : 2'
-              name: =props.name3
-              progressive: 0.0
+              itemStyle:
+                color: ='' + (props.color3 || '#78909c') + ''
               renderItem: '=(params, api) => params.dataIndexInside === params.dataInsideLength - 1 ? ({type: ''polyline'',
                 shape: {points: '' ''.repeat(params.dataInsideLength).split('''').map((s, i) => api.coord([api.value(0, i),
                 Math.abs(api.value(1, i))]))}, style: {fill: ''none'', stroke: '''' + (props.color3 || ''#78909c'') + '''',
                 lineWidth: false ? 1.5 : 2, lineDash: false ? [6,4] : null}}) : null'
-              sampling: lttb
+              encode:
+                x: 0
+                y: 1
               silent: true
-              symbol: none
-              type: '=props.abs ? ''custom'' : ''line'''
-              xAxisIndex: 2.0
-              yAxisIndex: 0.0
+              progressive: 0
+              clip: true
           - component: oh-time-series
             config:
-              clip: true
-              encode:
-                x: 0.0
-                y: 1.0
-              gridIndex: 0.0
+              name: =props.name4
+              gridIndex: 0
+              xAxisIndex: 3
+              yAxisIndex: 0
+              type: '=props.abs ? ''custom'' : ''line'''
               item: =props.item4
-              itemStyle:
-                color: '='''' + (props.color4 || (themeOptions.dark === ''dark'' ? ''#a8a8a8'' : ''#5a5a5a'')) + '''''
+              symbol: none
+              sampling: lttb
               lineStyle:
                 color: '='''' + (props.color4 || (themeOptions.dark === ''dark'' ? ''#a8a8a8'' : ''#5a5a5a'')) + '''''
                 type: '=(props.dashed4 && !props.stacked) ? ''dashed'' : ''solid'''
                 width: '=(props.dashed4 && !props.stacked) ? 1.5 : 2'
-              name: =props.name4
-              progressive: 0.0
+              itemStyle:
+                color: '='''' + (props.color4 || (themeOptions.dark === ''dark'' ? ''#a8a8a8'' : ''#5a5a5a'')) + '''''
               renderItem: '=(params, api) => params.dataIndexInside === params.dataInsideLength - 1 ? ({type: ''polyline'',
                 shape: {points: '' ''.repeat(params.dataInsideLength).split('''').map((s, i) => api.coord([api.value(0, i),
                 Math.abs(api.value(1, i))]))}, style: {fill: ''none'', stroke: '''' + (props.color4 || (themeOptions.dark
                 === ''dark'' ? ''#a8a8a8'' : ''#5a5a5a'')) + '''', lineWidth: (props.dashed4 && !props.stacked) ? 1.5 : 2,
                 lineDash: (props.dashed4 && !props.stacked) ? [6,4] : null}}) : null'
-              sampling: lttb
+              encode:
+                x: 0
+                y: 1
               silent: true
-              symbol: none
-              type: '=props.abs ? ''custom'' : ''line'''
-              xAxisIndex: 3.0
-              yAxisIndex: 0.0
+              progressive: 0
+              clip: true
           tooltip:
           - component: oh-chart-tooltip
             config:
-              backgroundColor: transparent
-              borderWidth: 0.0
+              show: true
               confine: true
-              extraCssText: 'box-shadow: none;'
+              trigger: axis
+              smartFormatter: false
               formatter: '=(ps) => ((H) => ''<div style="display: flex; flex-direction: column; align-items: flex-start; height:
                 0">'' + [0].map((g) => ((r) => ''<div style="'' + (r ? ''border: 1px solid; border-radius: 4px; padding: 10px;
                 box-shadow: rgba(0, 0, 0, 0.2) 1px 2px 10px; '' + (themeOptions.dark === ''dark'' ? ''background-color: rgb(58,
@@ -1507,7 +1553,6 @@ slots:
                 + '' '' + p.seriesName + ''<span style="float: right; margin-left: 20px"><b style="text-align: right;">''
                 + ((v) => ((x) => (props.abs ? Math.abs(Number(x)) : Number(x)).toLocaleString(''en-GB'') + '' '' + p.seriesId.split(''#'')[2])(p.value[1]))(Number(p.value[1]))
                 + ''</b></span><br/>'').join(''''))).join('''') + ''</div>'')(ps[0].axisValue)'
-              padding: 0.0
               position: '=(pt, ps, dom, rect, size) => ((T, B) => ((c, left, h) => [c.style.setProperty(''align-items'', left
                 ? ''flex-end'' : ''flex-start''), dom.hasAttribute(''data-wb'') || [dom.parentNode.addEventListener(''mouseleave'',
                 () => [0].map((i) => dom.removeAttribute(''data-wb'' + i))), dom.setAttribute(''data-wb'', '''')], [0].map((i)
@@ -1519,215 +1564,246 @@ slots:
                 + 20, B[i] - b.offsetHeight)) : T[i])))(c.children[i]) : 0), [left ? pt[0] - 20 - c.offsetWidth : pt[0] +
                 20, 0]][4])(dom.firstChild, pt[0] > size.viewSize[0] / 2, T.filter((t) => t <= pt[1]).length - 1))([62], [size.viewSize[1]
                 - 60])'
+              backgroundColor: transparent
+              borderWidth: 0
+              padding: 0
+              transitionDuration: 0
+              extraCssText: 'box-shadow: none;'
+          legend:
+          - component: oh-chart-legend
+            config:
               show: true
-              smartFormatter: false
-              transitionDuration: 0.0
-              trigger: axis
-          xAxis:
-          - component: oh-time-axis
-            config:
-              axisPointer:
-                label:
-                  show: false
-                snap: false
-              gridIndex: 0.0
-          - component: oh-time-axis
-            config:
-              axisPointer:
-                label:
-                  show: false
-                snap: false
-              gridIndex: 0.0
-              show: false
-          - component: oh-time-axis
-            config:
-              axisPointer:
-                label:
-                  show: false
-                snap: false
-              gridIndex: 0.0
-              show: false
-          - component: oh-time-axis
-            config:
-              axisPointer:
-                label:
-                  show: false
-                snap: false
-              gridIndex: 0.0
-              show: false
-          yAxis:
-          - component: oh-value-axis
-            config:
-              gridIndex: 0.0
-              max: '=props.abs ? ((v) => ((m) => ((p) => [1,1.2,1.5,2,2.5,3,4,5,6,8,10].map((f) => f * p).filter((x) => x
-                >= m)[0])(Math.pow(10, Math.floor(Math.log10(Math.max(m, 0.001))))))(Math.max(-v.min, v.max))) : null'
-              min: '=props.abs ? 0 : null'
-              name: ''
-              nameGap: 14.0
-              nameTextStyle:
-                align: right
-                padding:
-                - 0.0
-                - 8.0
-                - 0.0
-                - 0.0
-              scale: =!!props.scale
-              splitLine:
-                lineStyle:
-                  opacity: 0.4
-                  type: dashed
+              bottom: '0'
+              type: scroll
+              data: =['' + (props.name || props.title) + '', props.name2, props.name3, props.name4].filter((n) => n)
   - component: oh-card
     config:
+      title: History
       style:
         height: calc(100% - 2 * var(--f7-card-margin-vertical))
-      title: History
       visible: =!!props.stacked && !props.item3
     slots:
       content:
       - component: oh-chart
         config:
           chartType: ''
+          periodVisible: true
+          period: D
           height: 360px
           options:
+            backgroundColor: transparent
             axisPointer:
               link:
               - xAxisIndex: all
-            backgroundColor: transparent
-          period: D
-          periodVisible: true
         slots:
           grid:
           - component: oh-chart-grid
             config:
-              height: 116.0
+              top: 62
+              height: 116
               left: '50'
               right: '20'
-              top: 62.0
           - component: oh-chart-grid
             config:
-              height: 116.0
+              top: 214
+              height: 116
               left: '50'
               right: '20'
-              top: 214.0
+          xAxis:
+          - component: oh-time-axis
+            config:
+              gridIndex: 0
+              axisPointer:
+                snap: false
+                label:
+                  show: false
+              axisLabel:
+                show: false
+          - component: oh-time-axis
+            config:
+              gridIndex: 0
+              axisPointer:
+                snap: false
+                label:
+                  show: false
+              show: false
+          - component: oh-time-axis
+            config:
+              gridIndex: 1
+              axisPointer:
+                snap: false
+                label:
+                  show: false
+          - component: oh-time-axis
+            config:
+              gridIndex: 1
+              axisPointer:
+                snap: false
+                label:
+                  show: false
+              show: false
+          yAxis:
+          - component: oh-value-axis
+            config:
+              gridIndex: 0
+              name: ''
+              nameGap: 14
+              nameTextStyle:
+                align: right
+                padding:
+                - 0
+                - 8
+                - 0
+                - 0
+              splitLine:
+                lineStyle:
+                  type: dashed
+                  opacity: 0.4
+              scale: =!!props.scale
+              min: '=props.abs ? 0 : null'
+              max: '=props.abs ? ((v) => ((m) => ((p) => [1,1.2,1.5,2,2.5,3,4,5,6,8,10].map((f) => f * p).filter((x) => x
+                >= m)[0])(Math.pow(10, Math.floor(Math.log10(Math.max(m, 0.001))))))(Math.max(-v.min, v.max))) : null'
+              splitNumber: 3
+          - component: oh-value-axis
+            config:
+              gridIndex: 1
+              name: ''
+              nameGap: 14
+              nameTextStyle:
+                align: right
+                padding:
+                - 0
+                - 8
+                - 0
+                - 0
+              splitLine:
+                lineStyle:
+                  type: dashed
+                  opacity: 0.4
+              scale: =!!props.scale
+              min: '=props.abs ? 0 : null'
+              max: '=props.abs ? ((v) => ((m) => ((p) => [1,1.2,1.5,2,2.5,3,4,5,6,8,10].map((f) => f * p).filter((x) => x
+                >= m)[0])(Math.pow(10, Math.floor(Math.log10(Math.max(m, 0.001))))))(Math.max(-v.min, v.max))) : null'
+              splitNumber: 3
           series:
           - component: oh-time-series
             config:
-              clip: true
-              encode:
-                x: 0.0
-                y: 1.0
-              gridIndex: 0.0
+              name: ='' + (props.name || props.title) + ''
+              gridIndex: 0
+              xAxisIndex: 0
+              yAxisIndex: 0
+              type: '=props.abs ? ''custom'' : ''line'''
               item: =props.item
-              itemStyle:
-                color: =props.color
+              symbol: none
+              sampling: lttb
               lineStyle:
                 color: =props.color
                 type: '=false ? ''dashed'' : ''solid'''
                 width: '=false ? 1.5 : 2'
-              name: ='' + (props.name || props.title) + ''
-              progressive: 0.0
+              itemStyle:
+                color: =props.color
               renderItem: '=(params, api) => params.dataIndexInside === params.dataInsideLength - 1 ? ({type: ''polyline'',
                 shape: {points: '' ''.repeat(params.dataInsideLength).split('''').map((s, i) => api.coord([api.value(0, i),
                 Math.abs(api.value(1, i))]))}, style: {fill: ''none'', stroke: props.color, lineWidth: false ? 1.5 : 2, lineDash:
                 false ? [6,4] : null}}) : null'
-              sampling: lttb
+              encode:
+                x: 0
+                y: 1
               silent: true
-              symbol: none
-              type: '=props.abs ? ''custom'' : ''line'''
-              xAxisIndex: 0.0
-              yAxisIndex: 0.0
+              progressive: 0
+              clip: true
           - component: oh-time-series
             config:
-              gridIndex: 0.0
-              item: =props.item2
-              lineStyle:
-                opacity: 0.0
               name: =props.name2
-              sampling: minmax
-              silent: true
+              gridIndex: 0
+              xAxisIndex: 1
+              yAxisIndex: 0
+              type: line
+              item: =props.item2
               symbol: none
+              sampling: minmax
+              lineStyle:
+                opacity: 0
+              silent: true
               tooltip:
                 show: false
-              type: line
-              xAxisIndex: 1.0
-              yAxisIndex: 0.0
           - component: oh-time-series
             config:
-              clip: true
-              encode:
-                x: 0.0
-                y: 1.0
-              gridIndex: 1.0
+              name: =props.name2
+              gridIndex: 1
+              xAxisIndex: 2
+              yAxisIndex: 1
+              type: '=props.abs ? ''custom'' : ''line'''
               item: =props.item2
-              itemStyle:
-                color: =props.color2
+              symbol: none
+              sampling: lttb
               lineStyle:
                 color: =props.color2
                 type: '=(props.dashed2 && !props.stacked) ? ''dashed'' : ''solid'''
                 width: '=(props.dashed2 && !props.stacked) ? 1.5 : 2'
-              name: =props.name2
-              progressive: 0.0
+              itemStyle:
+                color: =props.color2
               renderItem: '=(params, api) => params.dataIndexInside === params.dataInsideLength - 1 ? ({type: ''polyline'',
                 shape: {points: '' ''.repeat(params.dataInsideLength).split('''').map((s, i) => api.coord([api.value(0, i),
                 Math.abs(api.value(1, i))]))}, style: {fill: ''none'', stroke: props.color2, lineWidth: (props.dashed2 &&
                 !props.stacked) ? 1.5 : 2, lineDash: (props.dashed2 && !props.stacked) ? [6,4] : null}}) : null'
-              sampling: lttb
+              encode:
+                x: 0
+                y: 1
               silent: true
-              symbol: none
-              type: '=props.abs ? ''custom'' : ''line'''
-              xAxisIndex: 2.0
-              yAxisIndex: 1.0
+              progressive: 0
+              clip: true
           - component: oh-time-series
             config:
-              gridIndex: 1.0
-              item: =props.item
-              lineStyle:
-                opacity: 0.0
               name: ='' + (props.name || props.title) + ''
-              sampling: minmax
-              silent: true
+              gridIndex: 1
+              xAxisIndex: 3
+              yAxisIndex: 1
+              type: line
+              item: =props.item
               symbol: none
+              sampling: minmax
+              lineStyle:
+                opacity: 0
+              silent: true
               tooltip:
                 show: false
-              type: line
-              xAxisIndex: 3.0
-              yAxisIndex: 1.0
           title:
           - component: oh-chart-title
             config:
-              left: 10.0
               show: true
               text: ='{s0|' + (props.name || props.title) + '}'
+              left: 10
+              top: 15
               textStyle:
-                fontSize: 13.0
-                fontWeight: 600.0
+                fontSize: 13
+                fontWeight: 600
                 rich:
                   s0:
+                    fontSize: 13
+                    fontWeight: 600
                     color: =props.color
-                    fontSize: 13.0
-                    fontWeight: 600.0
-              top: 15.0
           - component: oh-chart-title
             config:
-              left: 10.0
               show: true
               text: ='{s0|' + props.name2 + '}'
+              left: 10
+              top: 186
               textStyle:
-                fontSize: 13.0
-                fontWeight: 600.0
+                fontSize: 13
+                fontWeight: 600
                 rich:
                   s0:
+                    fontSize: 13
+                    fontWeight: 600
                     color: =props.color2
-                    fontSize: 13.0
-                    fontWeight: 600.0
-              top: 186.0
           tooltip:
           - component: oh-chart-tooltip
             config:
-              backgroundColor: transparent
-              borderWidth: 0.0
+              show: true
               confine: true
-              extraCssText: 'box-shadow: none;'
+              trigger: axis
+              smartFormatter: false
               formatter: '=(ps) => ((H) => ''<div style="display: flex; flex-direction: column; align-items: flex-start; height:
                 0">'' + [0,1].map((g) => ((r) => ''<div style="'' + (r ? ''border: 1px solid; border-radius: 4px; padding:
                 10px; box-shadow: rgba(0, 0, 0, 0.2) 1px 2px 10px; '' + (themeOptions.dark === ''dark'' ? ''background-color:
@@ -1742,7 +1818,6 @@ slots:
                 right;">'' + ((v) => ((x) => (props.abs ? Math.abs(Number(x)) : Number(x)).toLocaleString(''en-GB'') + ''
                 '' + p.seriesId.split(''#'')[2])(p.value[1]))(Number(p.value[1])) + ''</b></span><br/>'').join(''''))).join('''')
                 + ''</div>'')(ps[0].axisValue)'
-              padding: 0.0
               position: '=(pt, ps, dom, rect, size) => ((T, B) => ((c, left, h) => [c.style.setProperty(''align-items'', left
                 ? ''flex-end'' : ''flex-start''), dom.hasAttribute(''data-wb'') || [dom.parentNode.addEventListener(''mouseleave'',
                 () => [0,1].map((i) => dom.removeAttribute(''data-wb'' + i))), dom.setAttribute(''data-wb'', '''')], [0,1].map((i)
@@ -1754,344 +1829,407 @@ slots:
                 + 20, B[i] - b.offsetHeight)) : T[i])))(c.children[i]) : 0), [left ? pt[0] - 20 - c.offsetWidth : pt[0] +
                 20, 0]][4])(dom.firstChild, pt[0] > size.viewSize[0] / 2, T.filter((t) => t <= pt[1]).length - 1))([62,214],
                 [178,330])'
-              show: true
-              smartFormatter: false
-              transitionDuration: 0.0
-              trigger: axis
-          xAxis:
-          - component: oh-time-axis
-            config:
-              axisLabel:
-                show: false
-              axisPointer:
-                label:
-                  show: false
-                snap: false
-              gridIndex: 0.0
-          - component: oh-time-axis
-            config:
-              axisPointer:
-                label:
-                  show: false
-                snap: false
-              gridIndex: 0.0
-              show: false
-          - component: oh-time-axis
-            config:
-              axisPointer:
-                label:
-                  show: false
-                snap: false
-              gridIndex: 1.0
-          - component: oh-time-axis
-            config:
-              axisPointer:
-                label:
-                  show: false
-                snap: false
-              gridIndex: 1.0
-              show: false
-          yAxis:
-          - component: oh-value-axis
-            config:
-              gridIndex: 0.0
-              max: '=props.abs ? ((v) => ((m) => ((p) => [1,1.2,1.5,2,2.5,3,4,5,6,8,10].map((f) => f * p).filter((x) => x
-                >= m)[0])(Math.pow(10, Math.floor(Math.log10(Math.max(m, 0.001))))))(Math.max(-v.min, v.max))) : null'
-              min: '=props.abs ? 0 : null'
-              name: ''
-              nameGap: 14.0
-              nameTextStyle:
-                align: right
-                padding:
-                - 0.0
-                - 8.0
-                - 0.0
-                - 0.0
-              scale: =!!props.scale
-              splitLine:
-                lineStyle:
-                  opacity: 0.4
-                  type: dashed
-              splitNumber: 3.0
-          - component: oh-value-axis
-            config:
-              gridIndex: 1.0
-              max: '=props.abs ? ((v) => ((m) => ((p) => [1,1.2,1.5,2,2.5,3,4,5,6,8,10].map((f) => f * p).filter((x) => x
-                >= m)[0])(Math.pow(10, Math.floor(Math.log10(Math.max(m, 0.001))))))(Math.max(-v.min, v.max))) : null'
-              min: '=props.abs ? 0 : null'
-              name: ''
-              nameGap: 14.0
-              nameTextStyle:
-                align: right
-                padding:
-                - 0.0
-                - 8.0
-                - 0.0
-                - 0.0
-              scale: =!!props.scale
-              splitLine:
-                lineStyle:
-                  opacity: 0.4
-                  type: dashed
-              splitNumber: 3.0
+              backgroundColor: transparent
+              borderWidth: 0
+              padding: 0
+              transitionDuration: 0
+              extraCssText: 'box-shadow: none;'
   - component: oh-card
     config:
+      title: History
       style:
         height: calc(100% - 2 * var(--f7-card-margin-vertical))
-      title: History
       visible: =!!props.stacked && !!props.item3 && !props.item4
     slots:
       content:
       - component: oh-chart
         config:
           chartType: ''
+          periodVisible: true
+          period: D
           height: 450px
           options:
+            backgroundColor: transparent
             axisPointer:
               link:
               - xAxisIndex: all
-            backgroundColor: transparent
-          period: D
-          periodVisible: true
         slots:
           grid:
           - component: oh-chart-grid
             config:
-              height: 95.0
+              top: 62
+              height: 95
               left: '50'
               right: '20'
-              top: 62.0
           - component: oh-chart-grid
             config:
-              height: 95.0
+              top: 193
+              height: 95
               left: '50'
               right: '20'
-              top: 193.0
           - component: oh-chart-grid
             config:
-              height: 95.0
+              top: 325
+              height: 95
               left: '50'
               right: '20'
-              top: 325.0
+          xAxis:
+          - component: oh-time-axis
+            config:
+              gridIndex: 0
+              axisPointer:
+                snap: false
+                label:
+                  show: false
+              axisLabel:
+                show: false
+          - component: oh-time-axis
+            config:
+              gridIndex: 0
+              axisPointer:
+                snap: false
+                label:
+                  show: false
+              show: false
+          - component: oh-time-axis
+            config:
+              gridIndex: 0
+              axisPointer:
+                snap: false
+                label:
+                  show: false
+              show: false
+          - component: oh-time-axis
+            config:
+              gridIndex: 1
+              axisPointer:
+                snap: false
+                label:
+                  show: false
+              axisLabel:
+                show: false
+          - component: oh-time-axis
+            config:
+              gridIndex: 1
+              axisPointer:
+                snap: false
+                label:
+                  show: false
+              show: false
+          - component: oh-time-axis
+            config:
+              gridIndex: 1
+              axisPointer:
+                snap: false
+                label:
+                  show: false
+              show: false
+          - component: oh-time-axis
+            config:
+              gridIndex: 2
+              axisPointer:
+                snap: false
+                label:
+                  show: false
+          - component: oh-time-axis
+            config:
+              gridIndex: 2
+              axisPointer:
+                snap: false
+                label:
+                  show: false
+              show: false
+          - component: oh-time-axis
+            config:
+              gridIndex: 2
+              axisPointer:
+                snap: false
+                label:
+                  show: false
+              show: false
+          yAxis:
+          - component: oh-value-axis
+            config:
+              gridIndex: 0
+              name: ''
+              nameGap: 14
+              nameTextStyle:
+                align: right
+                padding:
+                - 0
+                - 8
+                - 0
+                - 0
+              splitLine:
+                lineStyle:
+                  type: dashed
+                  opacity: 0.4
+              scale: =!!props.scale
+              min: '=props.abs ? 0 : null'
+              max: '=props.abs ? ((v) => ((m) => ((p) => [1,1.2,1.5,2,2.5,3,4,5,6,8,10].map((f) => f * p).filter((x) => x
+                >= m)[0])(Math.pow(10, Math.floor(Math.log10(Math.max(m, 0.001))))))(Math.max(-v.min, v.max))) : null'
+              splitNumber: 3
+          - component: oh-value-axis
+            config:
+              gridIndex: 1
+              name: ''
+              nameGap: 14
+              nameTextStyle:
+                align: right
+                padding:
+                - 0
+                - 8
+                - 0
+                - 0
+              splitLine:
+                lineStyle:
+                  type: dashed
+                  opacity: 0.4
+              scale: =!!props.scale
+              min: '=props.abs ? 0 : null'
+              max: '=props.abs ? ((v) => ((m) => ((p) => [1,1.2,1.5,2,2.5,3,4,5,6,8,10].map((f) => f * p).filter((x) => x
+                >= m)[0])(Math.pow(10, Math.floor(Math.log10(Math.max(m, 0.001))))))(Math.max(-v.min, v.max))) : null'
+              splitNumber: 3
+          - component: oh-value-axis
+            config:
+              gridIndex: 2
+              name: ''
+              nameGap: 14
+              nameTextStyle:
+                align: right
+                padding:
+                - 0
+                - 8
+                - 0
+                - 0
+              splitLine:
+                lineStyle:
+                  type: dashed
+                  opacity: 0.4
+              scale: =!!props.scale
+              min: '=props.abs ? 0 : null'
+              max: '=props.abs ? ((v) => ((m) => ((p) => [1,1.2,1.5,2,2.5,3,4,5,6,8,10].map((f) => f * p).filter((x) => x
+                >= m)[0])(Math.pow(10, Math.floor(Math.log10(Math.max(m, 0.001))))))(Math.max(-v.min, v.max))) : null'
+              splitNumber: 3
           series:
           - component: oh-time-series
             config:
-              clip: true
-              encode:
-                x: 0.0
-                y: 1.0
-              gridIndex: 0.0
+              name: ='' + (props.name || props.title) + ''
+              gridIndex: 0
+              xAxisIndex: 0
+              yAxisIndex: 0
+              type: '=props.abs ? ''custom'' : ''line'''
               item: =props.item
-              itemStyle:
-                color: =props.color
+              symbol: none
+              sampling: lttb
               lineStyle:
                 color: =props.color
                 type: '=false ? ''dashed'' : ''solid'''
                 width: '=false ? 1.5 : 2'
-              name: ='' + (props.name || props.title) + ''
-              progressive: 0.0
+              itemStyle:
+                color: =props.color
               renderItem: '=(params, api) => params.dataIndexInside === params.dataInsideLength - 1 ? ({type: ''polyline'',
                 shape: {points: '' ''.repeat(params.dataInsideLength).split('''').map((s, i) => api.coord([api.value(0, i),
                 Math.abs(api.value(1, i))]))}, style: {fill: ''none'', stroke: props.color, lineWidth: false ? 1.5 : 2, lineDash:
                 false ? [6,4] : null}}) : null'
-              sampling: lttb
-              silent: true
-              symbol: none
-              type: '=props.abs ? ''custom'' : ''line'''
-              xAxisIndex: 0.0
-              yAxisIndex: 0.0
-          - component: oh-time-series
-            config:
-              gridIndex: 0.0
-              item: =props.item2
-              lineStyle:
-                opacity: 0.0
-              name: =props.name2
-              sampling: minmax
-              silent: true
-              symbol: none
-              tooltip:
-                show: false
-              type: line
-              xAxisIndex: 1.0
-              yAxisIndex: 0.0
-          - component: oh-time-series
-            config:
-              gridIndex: 0.0
-              item: =props.item3
-              lineStyle:
-                opacity: 0.0
-              name: =props.name3
-              sampling: minmax
-              silent: true
-              symbol: none
-              tooltip:
-                show: false
-              type: line
-              xAxisIndex: 2.0
-              yAxisIndex: 0.0
-          - component: oh-time-series
-            config:
-              clip: true
               encode:
-                x: 0.0
-                y: 1.0
-              gridIndex: 1.0
+                x: 0
+                y: 1
+              silent: true
+              progressive: 0
+              clip: true
+          - component: oh-time-series
+            config:
+              name: =props.name2
+              gridIndex: 0
+              xAxisIndex: 1
+              yAxisIndex: 0
+              type: line
               item: =props.item2
-              itemStyle:
-                color: =props.color2
+              symbol: none
+              sampling: minmax
+              lineStyle:
+                opacity: 0
+              silent: true
+              tooltip:
+                show: false
+          - component: oh-time-series
+            config:
+              name: =props.name3
+              gridIndex: 0
+              xAxisIndex: 2
+              yAxisIndex: 0
+              type: line
+              item: =props.item3
+              symbol: none
+              sampling: minmax
+              lineStyle:
+                opacity: 0
+              silent: true
+              tooltip:
+                show: false
+          - component: oh-time-series
+            config:
+              name: =props.name2
+              gridIndex: 1
+              xAxisIndex: 3
+              yAxisIndex: 1
+              type: '=props.abs ? ''custom'' : ''line'''
+              item: =props.item2
+              symbol: none
+              sampling: lttb
               lineStyle:
                 color: =props.color2
                 type: '=(props.dashed2 && !props.stacked) ? ''dashed'' : ''solid'''
                 width: '=(props.dashed2 && !props.stacked) ? 1.5 : 2'
-              name: =props.name2
-              progressive: 0.0
+              itemStyle:
+                color: =props.color2
               renderItem: '=(params, api) => params.dataIndexInside === params.dataInsideLength - 1 ? ({type: ''polyline'',
                 shape: {points: '' ''.repeat(params.dataInsideLength).split('''').map((s, i) => api.coord([api.value(0, i),
                 Math.abs(api.value(1, i))]))}, style: {fill: ''none'', stroke: props.color2, lineWidth: (props.dashed2 &&
                 !props.stacked) ? 1.5 : 2, lineDash: (props.dashed2 && !props.stacked) ? [6,4] : null}}) : null'
-              sampling: lttb
-              silent: true
-              symbol: none
-              type: '=props.abs ? ''custom'' : ''line'''
-              xAxisIndex: 3.0
-              yAxisIndex: 1.0
-          - component: oh-time-series
-            config:
-              gridIndex: 1.0
-              item: =props.item
-              lineStyle:
-                opacity: 0.0
-              name: ='' + (props.name || props.title) + ''
-              sampling: minmax
-              silent: true
-              symbol: none
-              tooltip:
-                show: false
-              type: line
-              xAxisIndex: 4.0
-              yAxisIndex: 1.0
-          - component: oh-time-series
-            config:
-              gridIndex: 1.0
-              item: =props.item3
-              lineStyle:
-                opacity: 0.0
-              name: =props.name3
-              sampling: minmax
-              silent: true
-              symbol: none
-              tooltip:
-                show: false
-              type: line
-              xAxisIndex: 5.0
-              yAxisIndex: 1.0
-          - component: oh-time-series
-            config:
-              clip: true
               encode:
-                x: 0.0
-                y: 1.0
-              gridIndex: 2.0
+                x: 0
+                y: 1
+              silent: true
+              progressive: 0
+              clip: true
+          - component: oh-time-series
+            config:
+              name: ='' + (props.name || props.title) + ''
+              gridIndex: 1
+              xAxisIndex: 4
+              yAxisIndex: 1
+              type: line
+              item: =props.item
+              symbol: none
+              sampling: minmax
+              lineStyle:
+                opacity: 0
+              silent: true
+              tooltip:
+                show: false
+          - component: oh-time-series
+            config:
+              name: =props.name3
+              gridIndex: 1
+              xAxisIndex: 5
+              yAxisIndex: 1
+              type: line
               item: =props.item3
-              itemStyle:
-                color: ='' + (props.color3 || '#78909c') + ''
+              symbol: none
+              sampling: minmax
+              lineStyle:
+                opacity: 0
+              silent: true
+              tooltip:
+                show: false
+          - component: oh-time-series
+            config:
+              name: =props.name3
+              gridIndex: 2
+              xAxisIndex: 6
+              yAxisIndex: 2
+              type: '=props.abs ? ''custom'' : ''line'''
+              item: =props.item3
+              symbol: none
+              sampling: lttb
               lineStyle:
                 color: ='' + (props.color3 || '#78909c') + ''
                 type: '=false ? ''dashed'' : ''solid'''
                 width: '=false ? 1.5 : 2'
-              name: =props.name3
-              progressive: 0.0
+              itemStyle:
+                color: ='' + (props.color3 || '#78909c') + ''
               renderItem: '=(params, api) => params.dataIndexInside === params.dataInsideLength - 1 ? ({type: ''polyline'',
                 shape: {points: '' ''.repeat(params.dataInsideLength).split('''').map((s, i) => api.coord([api.value(0, i),
                 Math.abs(api.value(1, i))]))}, style: {fill: ''none'', stroke: '''' + (props.color3 || ''#78909c'') + '''',
                 lineWidth: false ? 1.5 : 2, lineDash: false ? [6,4] : null}}) : null'
-              sampling: lttb
+              encode:
+                x: 0
+                y: 1
               silent: true
-              symbol: none
-              type: '=props.abs ? ''custom'' : ''line'''
-              xAxisIndex: 6.0
-              yAxisIndex: 2.0
+              progressive: 0
+              clip: true
           - component: oh-time-series
             config:
-              gridIndex: 2.0
-              item: =props.item
-              lineStyle:
-                opacity: 0.0
               name: ='' + (props.name || props.title) + ''
-              sampling: minmax
-              silent: true
+              gridIndex: 2
+              xAxisIndex: 7
+              yAxisIndex: 2
+              type: line
+              item: =props.item
               symbol: none
+              sampling: minmax
+              lineStyle:
+                opacity: 0
+              silent: true
               tooltip:
                 show: false
-              type: line
-              xAxisIndex: 7.0
-              yAxisIndex: 2.0
           - component: oh-time-series
             config:
-              gridIndex: 2.0
-              item: =props.item2
-              lineStyle:
-                opacity: 0.0
               name: =props.name2
-              sampling: minmax
-              silent: true
+              gridIndex: 2
+              xAxisIndex: 8
+              yAxisIndex: 2
+              type: line
+              item: =props.item2
               symbol: none
+              sampling: minmax
+              lineStyle:
+                opacity: 0
+              silent: true
               tooltip:
                 show: false
-              type: line
-              xAxisIndex: 8.0
-              yAxisIndex: 2.0
           title:
           - component: oh-chart-title
             config:
-              left: 10.0
               show: true
               text: ='{s0|' + (props.name || props.title) + '}'
+              left: 10
+              top: 15
               textStyle:
-                fontSize: 13.0
-                fontWeight: 600.0
+                fontSize: 13
+                fontWeight: 600
                 rich:
                   s0:
+                    fontSize: 13
+                    fontWeight: 600
                     color: =props.color
-                    fontSize: 13.0
-                    fontWeight: 600.0
-              top: 15.0
           - component: oh-chart-title
             config:
-              left: 10.0
               show: true
               text: ='{s0|' + props.name2 + '}'
+              left: 10
+              top: 165
               textStyle:
-                fontSize: 13.0
-                fontWeight: 600.0
+                fontSize: 13
+                fontWeight: 600
                 rich:
                   s0:
+                    fontSize: 13
+                    fontWeight: 600
                     color: =props.color2
-                    fontSize: 13.0
-                    fontWeight: 600.0
-              top: 165.0
           - component: oh-chart-title
             config:
-              left: 10.0
               show: true
               text: ='{s0|' + props.name3 + '}'
+              left: 10
+              top: 297
               textStyle:
-                fontSize: 13.0
-                fontWeight: 600.0
+                fontSize: 13
+                fontWeight: 600
                 rich:
                   s0:
+                    fontSize: 13
+                    fontWeight: 600
                     color: ='' + (props.color3 || '#78909c') + ''
-                    fontSize: 13.0
-                    fontWeight: 600.0
-              top: 297.0
           tooltip:
           - component: oh-chart-tooltip
             config:
-              backgroundColor: transparent
-              borderWidth: 0.0
+              show: true
               confine: true
-              extraCssText: 'box-shadow: none;'
+              trigger: axis
+              smartFormatter: false
               formatter: '=(ps) => ((H) => ''<div style="display: flex; flex-direction: column; align-items: flex-start; height:
                 0">'' + [0,1,2].map((g) => ((r) => ''<div style="'' + (r ? ''border: 1px solid; border-radius: 4px; padding:
                 10px; box-shadow: rgba(0, 0, 0, 0.2) 1px 2px 10px; '' + (themeOptions.dark === ''dark'' ? ''background-color:
@@ -2106,7 +2244,6 @@ slots:
                 right; margin-left: 20px"><b style="text-align: right;">'' + ((v) => ((x) => (props.abs ? Math.abs(Number(x))
                 : Number(x)).toLocaleString(''en-GB'') + '' '' + p.seriesId.split(''#'')[2])(p.value[1]))(Number(p.value[1]))
                 + ''</b></span><br/>'').join(''''))).join('''') + ''</div>'')(ps[0].axisValue)'
-              padding: 0.0
               position: '=(pt, ps, dom, rect, size) => ((T, B) => ((c, left, h) => [c.style.setProperty(''align-items'', left
                 ? ''flex-end'' : ''flex-start''), dom.hasAttribute(''data-wb'') || [dom.parentNode.addEventListener(''mouseleave'',
                 () => [0,1,2].map((i) => dom.removeAttribute(''data-wb'' + i))), dom.setAttribute(''data-wb'', '''')], [0,1,2].map((i)
@@ -2118,543 +2255,622 @@ slots:
                 + 20, B[i] - b.offsetHeight)) : T[i])))(c.children[i]) : 0), [left ? pt[0] - 20 - c.offsetWidth : pt[0] +
                 20, 0]][4])(dom.firstChild, pt[0] > size.viewSize[0] / 2, T.filter((t) => t <= pt[1]).length - 1))([62,193,325],
                 [157,288,420])'
-              show: true
-              smartFormatter: false
-              transitionDuration: 0.0
-              trigger: axis
-          xAxis:
-          - component: oh-time-axis
-            config:
-              axisLabel:
-                show: false
-              axisPointer:
-                label:
-                  show: false
-                snap: false
-              gridIndex: 0.0
-          - component: oh-time-axis
-            config:
-              axisPointer:
-                label:
-                  show: false
-                snap: false
-              gridIndex: 0.0
-              show: false
-          - component: oh-time-axis
-            config:
-              axisPointer:
-                label:
-                  show: false
-                snap: false
-              gridIndex: 0.0
-              show: false
-          - component: oh-time-axis
-            config:
-              axisLabel:
-                show: false
-              axisPointer:
-                label:
-                  show: false
-                snap: false
-              gridIndex: 1.0
-          - component: oh-time-axis
-            config:
-              axisPointer:
-                label:
-                  show: false
-                snap: false
-              gridIndex: 1.0
-              show: false
-          - component: oh-time-axis
-            config:
-              axisPointer:
-                label:
-                  show: false
-                snap: false
-              gridIndex: 1.0
-              show: false
-          - component: oh-time-axis
-            config:
-              axisPointer:
-                label:
-                  show: false
-                snap: false
-              gridIndex: 2.0
-          - component: oh-time-axis
-            config:
-              axisPointer:
-                label:
-                  show: false
-                snap: false
-              gridIndex: 2.0
-              show: false
-          - component: oh-time-axis
-            config:
-              axisPointer:
-                label:
-                  show: false
-                snap: false
-              gridIndex: 2.0
-              show: false
-          yAxis:
-          - component: oh-value-axis
-            config:
-              gridIndex: 0.0
-              max: '=props.abs ? ((v) => ((m) => ((p) => [1,1.2,1.5,2,2.5,3,4,5,6,8,10].map((f) => f * p).filter((x) => x
-                >= m)[0])(Math.pow(10, Math.floor(Math.log10(Math.max(m, 0.001))))))(Math.max(-v.min, v.max))) : null'
-              min: '=props.abs ? 0 : null'
-              name: ''
-              nameGap: 14.0
-              nameTextStyle:
-                align: right
-                padding:
-                - 0.0
-                - 8.0
-                - 0.0
-                - 0.0
-              scale: =!!props.scale
-              splitLine:
-                lineStyle:
-                  opacity: 0.4
-                  type: dashed
-              splitNumber: 3.0
-          - component: oh-value-axis
-            config:
-              gridIndex: 1.0
-              max: '=props.abs ? ((v) => ((m) => ((p) => [1,1.2,1.5,2,2.5,3,4,5,6,8,10].map((f) => f * p).filter((x) => x
-                >= m)[0])(Math.pow(10, Math.floor(Math.log10(Math.max(m, 0.001))))))(Math.max(-v.min, v.max))) : null'
-              min: '=props.abs ? 0 : null'
-              name: ''
-              nameGap: 14.0
-              nameTextStyle:
-                align: right
-                padding:
-                - 0.0
-                - 8.0
-                - 0.0
-                - 0.0
-              scale: =!!props.scale
-              splitLine:
-                lineStyle:
-                  opacity: 0.4
-                  type: dashed
-              splitNumber: 3.0
-          - component: oh-value-axis
-            config:
-              gridIndex: 2.0
-              max: '=props.abs ? ((v) => ((m) => ((p) => [1,1.2,1.5,2,2.5,3,4,5,6,8,10].map((f) => f * p).filter((x) => x
-                >= m)[0])(Math.pow(10, Math.floor(Math.log10(Math.max(m, 0.001))))))(Math.max(-v.min, v.max))) : null'
-              min: '=props.abs ? 0 : null'
-              name: ''
-              nameGap: 14.0
-              nameTextStyle:
-                align: right
-                padding:
-                - 0.0
-                - 8.0
-                - 0.0
-                - 0.0
-              scale: =!!props.scale
-              splitLine:
-                lineStyle:
-                  opacity: 0.4
-                  type: dashed
-              splitNumber: 3.0
+              backgroundColor: transparent
+              borderWidth: 0
+              padding: 0
+              transitionDuration: 0
+              extraCssText: 'box-shadow: none;'
   - component: oh-card
     config:
+      title: History
       style:
         height: calc(100% - 2 * var(--f7-card-margin-vertical))
-      title: History
       visible: =!!props.stacked && !!props.item4
     slots:
       content:
       - component: oh-chart
         config:
           chartType: ''
+          periodVisible: true
+          period: D
           height: 520px
           options:
+            backgroundColor: transparent
             axisPointer:
               link:
               - xAxisIndex: all
-            backgroundColor: transparent
-          period: D
-          periodVisible: true
         slots:
           grid:
           - component: oh-chart-grid
             config:
-              height: 80.0
+              top: 62
+              height: 80
               left: '50'
               right: '20'
-              top: 62.0
           - component: oh-chart-grid
             config:
-              height: 80.0
+              top: 178
+              height: 80
               left: '50'
               right: '20'
-              top: 178.0
           - component: oh-chart-grid
             config:
-              height: 80.0
+              top: 294
+              height: 80
               left: '50'
               right: '20'
-              top: 294.0
           - component: oh-chart-grid
             config:
-              height: 80.0
+              top: 410
+              height: 80
               left: '50'
               right: '20'
-              top: 410.0
+          xAxis:
+          - component: oh-time-axis
+            config:
+              gridIndex: 0
+              axisPointer:
+                snap: false
+                label:
+                  show: false
+              axisLabel:
+                show: false
+          - component: oh-time-axis
+            config:
+              gridIndex: 0
+              axisPointer:
+                snap: false
+                label:
+                  show: false
+              show: false
+          - component: oh-time-axis
+            config:
+              gridIndex: 0
+              axisPointer:
+                snap: false
+                label:
+                  show: false
+              show: false
+          - component: oh-time-axis
+            config:
+              gridIndex: 0
+              axisPointer:
+                snap: false
+                label:
+                  show: false
+              show: false
+          - component: oh-time-axis
+            config:
+              gridIndex: 1
+              axisPointer:
+                snap: false
+                label:
+                  show: false
+              axisLabel:
+                show: false
+          - component: oh-time-axis
+            config:
+              gridIndex: 1
+              axisPointer:
+                snap: false
+                label:
+                  show: false
+              show: false
+          - component: oh-time-axis
+            config:
+              gridIndex: 1
+              axisPointer:
+                snap: false
+                label:
+                  show: false
+              show: false
+          - component: oh-time-axis
+            config:
+              gridIndex: 1
+              axisPointer:
+                snap: false
+                label:
+                  show: false
+              show: false
+          - component: oh-time-axis
+            config:
+              gridIndex: 2
+              axisPointer:
+                snap: false
+                label:
+                  show: false
+              axisLabel:
+                show: false
+          - component: oh-time-axis
+            config:
+              gridIndex: 2
+              axisPointer:
+                snap: false
+                label:
+                  show: false
+              show: false
+          - component: oh-time-axis
+            config:
+              gridIndex: 2
+              axisPointer:
+                snap: false
+                label:
+                  show: false
+              show: false
+          - component: oh-time-axis
+            config:
+              gridIndex: 2
+              axisPointer:
+                snap: false
+                label:
+                  show: false
+              show: false
+          - component: oh-time-axis
+            config:
+              gridIndex: 3
+              axisPointer:
+                snap: false
+                label:
+                  show: false
+          - component: oh-time-axis
+            config:
+              gridIndex: 3
+              axisPointer:
+                snap: false
+                label:
+                  show: false
+              show: false
+          - component: oh-time-axis
+            config:
+              gridIndex: 3
+              axisPointer:
+                snap: false
+                label:
+                  show: false
+              show: false
+          - component: oh-time-axis
+            config:
+              gridIndex: 3
+              axisPointer:
+                snap: false
+                label:
+                  show: false
+              show: false
+          yAxis:
+          - component: oh-value-axis
+            config:
+              gridIndex: 0
+              name: ''
+              nameGap: 14
+              nameTextStyle:
+                align: right
+                padding:
+                - 0
+                - 8
+                - 0
+                - 0
+              splitLine:
+                lineStyle:
+                  type: dashed
+                  opacity: 0.4
+              scale: =!!props.scale
+              min: '=props.abs ? 0 : null'
+              max: '=props.abs ? ((v) => ((m) => ((p) => [1,1.2,1.5,2,2.5,3,4,5,6,8,10].map((f) => f * p).filter((x) => x
+                >= m)[0])(Math.pow(10, Math.floor(Math.log10(Math.max(m, 0.001))))))(Math.max(-v.min, v.max))) : null'
+              splitNumber: 3
+          - component: oh-value-axis
+            config:
+              gridIndex: 1
+              name: ''
+              nameGap: 14
+              nameTextStyle:
+                align: right
+                padding:
+                - 0
+                - 8
+                - 0
+                - 0
+              splitLine:
+                lineStyle:
+                  type: dashed
+                  opacity: 0.4
+              scale: =!!props.scale
+              min: '=props.abs ? 0 : null'
+              max: '=props.abs ? ((v) => ((m) => ((p) => [1,1.2,1.5,2,2.5,3,4,5,6,8,10].map((f) => f * p).filter((x) => x
+                >= m)[0])(Math.pow(10, Math.floor(Math.log10(Math.max(m, 0.001))))))(Math.max(-v.min, v.max))) : null'
+              splitNumber: 3
+          - component: oh-value-axis
+            config:
+              gridIndex: 2
+              name: ''
+              nameGap: 14
+              nameTextStyle:
+                align: right
+                padding:
+                - 0
+                - 8
+                - 0
+                - 0
+              splitLine:
+                lineStyle:
+                  type: dashed
+                  opacity: 0.4
+              scale: =!!props.scale
+              min: '=props.abs ? 0 : null'
+              max: '=props.abs ? ((v) => ((m) => ((p) => [1,1.2,1.5,2,2.5,3,4,5,6,8,10].map((f) => f * p).filter((x) => x
+                >= m)[0])(Math.pow(10, Math.floor(Math.log10(Math.max(m, 0.001))))))(Math.max(-v.min, v.max))) : null'
+              splitNumber: 3
+          - component: oh-value-axis
+            config:
+              gridIndex: 3
+              name: ''
+              nameGap: 14
+              nameTextStyle:
+                align: right
+                padding:
+                - 0
+                - 8
+                - 0
+                - 0
+              splitLine:
+                lineStyle:
+                  type: dashed
+                  opacity: 0.4
+              scale: =!!props.scale
+              min: '=props.abs ? 0 : null'
+              max: '=props.abs ? ((v) => ((m) => ((p) => [1,1.2,1.5,2,2.5,3,4,5,6,8,10].map((f) => f * p).filter((x) => x
+                >= m)[0])(Math.pow(10, Math.floor(Math.log10(Math.max(m, 0.001))))))(Math.max(-v.min, v.max))) : null'
+              splitNumber: 3
           series:
           - component: oh-time-series
             config:
-              clip: true
-              encode:
-                x: 0.0
-                y: 1.0
-              gridIndex: 0.0
+              name: ='' + (props.name || props.title) + ''
+              gridIndex: 0
+              xAxisIndex: 0
+              yAxisIndex: 0
+              type: '=props.abs ? ''custom'' : ''line'''
               item: =props.item
-              itemStyle:
-                color: =props.color
+              symbol: none
+              sampling: lttb
               lineStyle:
                 color: =props.color
                 type: '=false ? ''dashed'' : ''solid'''
                 width: '=false ? 1.5 : 2'
-              name: ='' + (props.name || props.title) + ''
-              progressive: 0.0
+              itemStyle:
+                color: =props.color
               renderItem: '=(params, api) => params.dataIndexInside === params.dataInsideLength - 1 ? ({type: ''polyline'',
                 shape: {points: '' ''.repeat(params.dataInsideLength).split('''').map((s, i) => api.coord([api.value(0, i),
                 Math.abs(api.value(1, i))]))}, style: {fill: ''none'', stroke: props.color, lineWidth: false ? 1.5 : 2, lineDash:
                 false ? [6,4] : null}}) : null'
-              sampling: lttb
-              silent: true
-              symbol: none
-              type: '=props.abs ? ''custom'' : ''line'''
-              xAxisIndex: 0.0
-              yAxisIndex: 0.0
-          - component: oh-time-series
-            config:
-              gridIndex: 0.0
-              item: =props.item2
-              lineStyle:
-                opacity: 0.0
-              name: =props.name2
-              sampling: minmax
-              silent: true
-              symbol: none
-              tooltip:
-                show: false
-              type: line
-              xAxisIndex: 1.0
-              yAxisIndex: 0.0
-          - component: oh-time-series
-            config:
-              gridIndex: 0.0
-              item: =props.item3
-              lineStyle:
-                opacity: 0.0
-              name: =props.name3
-              sampling: minmax
-              silent: true
-              symbol: none
-              tooltip:
-                show: false
-              type: line
-              xAxisIndex: 2.0
-              yAxisIndex: 0.0
-          - component: oh-time-series
-            config:
-              gridIndex: 0.0
-              item: =props.item4
-              lineStyle:
-                opacity: 0.0
-              name: =props.name4
-              sampling: minmax
-              silent: true
-              symbol: none
-              tooltip:
-                show: false
-              type: line
-              xAxisIndex: 3.0
-              yAxisIndex: 0.0
-          - component: oh-time-series
-            config:
-              clip: true
               encode:
-                x: 0.0
-                y: 1.0
-              gridIndex: 1.0
+                x: 0
+                y: 1
+              silent: true
+              progressive: 0
+              clip: true
+          - component: oh-time-series
+            config:
+              name: =props.name2
+              gridIndex: 0
+              xAxisIndex: 1
+              yAxisIndex: 0
+              type: line
               item: =props.item2
-              itemStyle:
-                color: =props.color2
+              symbol: none
+              sampling: minmax
+              lineStyle:
+                opacity: 0
+              silent: true
+              tooltip:
+                show: false
+          - component: oh-time-series
+            config:
+              name: =props.name3
+              gridIndex: 0
+              xAxisIndex: 2
+              yAxisIndex: 0
+              type: line
+              item: =props.item3
+              symbol: none
+              sampling: minmax
+              lineStyle:
+                opacity: 0
+              silent: true
+              tooltip:
+                show: false
+          - component: oh-time-series
+            config:
+              name: =props.name4
+              gridIndex: 0
+              xAxisIndex: 3
+              yAxisIndex: 0
+              type: line
+              item: =props.item4
+              symbol: none
+              sampling: minmax
+              lineStyle:
+                opacity: 0
+              silent: true
+              tooltip:
+                show: false
+          - component: oh-time-series
+            config:
+              name: =props.name2
+              gridIndex: 1
+              xAxisIndex: 4
+              yAxisIndex: 1
+              type: '=props.abs ? ''custom'' : ''line'''
+              item: =props.item2
+              symbol: none
+              sampling: lttb
               lineStyle:
                 color: =props.color2
                 type: '=(props.dashed2 && !props.stacked) ? ''dashed'' : ''solid'''
                 width: '=(props.dashed2 && !props.stacked) ? 1.5 : 2'
-              name: =props.name2
-              progressive: 0.0
+              itemStyle:
+                color: =props.color2
               renderItem: '=(params, api) => params.dataIndexInside === params.dataInsideLength - 1 ? ({type: ''polyline'',
                 shape: {points: '' ''.repeat(params.dataInsideLength).split('''').map((s, i) => api.coord([api.value(0, i),
                 Math.abs(api.value(1, i))]))}, style: {fill: ''none'', stroke: props.color2, lineWidth: (props.dashed2 &&
                 !props.stacked) ? 1.5 : 2, lineDash: (props.dashed2 && !props.stacked) ? [6,4] : null}}) : null'
-              sampling: lttb
-              silent: true
-              symbol: none
-              type: '=props.abs ? ''custom'' : ''line'''
-              xAxisIndex: 4.0
-              yAxisIndex: 1.0
-          - component: oh-time-series
-            config:
-              gridIndex: 1.0
-              item: =props.item
-              lineStyle:
-                opacity: 0.0
-              name: ='' + (props.name || props.title) + ''
-              sampling: minmax
-              silent: true
-              symbol: none
-              tooltip:
-                show: false
-              type: line
-              xAxisIndex: 5.0
-              yAxisIndex: 1.0
-          - component: oh-time-series
-            config:
-              gridIndex: 1.0
-              item: =props.item3
-              lineStyle:
-                opacity: 0.0
-              name: =props.name3
-              sampling: minmax
-              silent: true
-              symbol: none
-              tooltip:
-                show: false
-              type: line
-              xAxisIndex: 6.0
-              yAxisIndex: 1.0
-          - component: oh-time-series
-            config:
-              gridIndex: 1.0
-              item: =props.item4
-              lineStyle:
-                opacity: 0.0
-              name: =props.name4
-              sampling: minmax
-              silent: true
-              symbol: none
-              tooltip:
-                show: false
-              type: line
-              xAxisIndex: 7.0
-              yAxisIndex: 1.0
-          - component: oh-time-series
-            config:
-              clip: true
               encode:
-                x: 0.0
-                y: 1.0
-              gridIndex: 2.0
+                x: 0
+                y: 1
+              silent: true
+              progressive: 0
+              clip: true
+          - component: oh-time-series
+            config:
+              name: ='' + (props.name || props.title) + ''
+              gridIndex: 1
+              xAxisIndex: 5
+              yAxisIndex: 1
+              type: line
+              item: =props.item
+              symbol: none
+              sampling: minmax
+              lineStyle:
+                opacity: 0
+              silent: true
+              tooltip:
+                show: false
+          - component: oh-time-series
+            config:
+              name: =props.name3
+              gridIndex: 1
+              xAxisIndex: 6
+              yAxisIndex: 1
+              type: line
               item: =props.item3
-              itemStyle:
-                color: ='' + (props.color3 || '#78909c') + ''
+              symbol: none
+              sampling: minmax
+              lineStyle:
+                opacity: 0
+              silent: true
+              tooltip:
+                show: false
+          - component: oh-time-series
+            config:
+              name: =props.name4
+              gridIndex: 1
+              xAxisIndex: 7
+              yAxisIndex: 1
+              type: line
+              item: =props.item4
+              symbol: none
+              sampling: minmax
+              lineStyle:
+                opacity: 0
+              silent: true
+              tooltip:
+                show: false
+          - component: oh-time-series
+            config:
+              name: =props.name3
+              gridIndex: 2
+              xAxisIndex: 8
+              yAxisIndex: 2
+              type: '=props.abs ? ''custom'' : ''line'''
+              item: =props.item3
+              symbol: none
+              sampling: lttb
               lineStyle:
                 color: ='' + (props.color3 || '#78909c') + ''
                 type: '=false ? ''dashed'' : ''solid'''
                 width: '=false ? 1.5 : 2'
-              name: =props.name3
-              progressive: 0.0
+              itemStyle:
+                color: ='' + (props.color3 || '#78909c') + ''
               renderItem: '=(params, api) => params.dataIndexInside === params.dataInsideLength - 1 ? ({type: ''polyline'',
                 shape: {points: '' ''.repeat(params.dataInsideLength).split('''').map((s, i) => api.coord([api.value(0, i),
                 Math.abs(api.value(1, i))]))}, style: {fill: ''none'', stroke: '''' + (props.color3 || ''#78909c'') + '''',
                 lineWidth: false ? 1.5 : 2, lineDash: false ? [6,4] : null}}) : null'
-              sampling: lttb
-              silent: true
-              symbol: none
-              type: '=props.abs ? ''custom'' : ''line'''
-              xAxisIndex: 8.0
-              yAxisIndex: 2.0
-          - component: oh-time-series
-            config:
-              gridIndex: 2.0
-              item: =props.item
-              lineStyle:
-                opacity: 0.0
-              name: ='' + (props.name || props.title) + ''
-              sampling: minmax
-              silent: true
-              symbol: none
-              tooltip:
-                show: false
-              type: line
-              xAxisIndex: 9.0
-              yAxisIndex: 2.0
-          - component: oh-time-series
-            config:
-              gridIndex: 2.0
-              item: =props.item2
-              lineStyle:
-                opacity: 0.0
-              name: =props.name2
-              sampling: minmax
-              silent: true
-              symbol: none
-              tooltip:
-                show: false
-              type: line
-              xAxisIndex: 10.0
-              yAxisIndex: 2.0
-          - component: oh-time-series
-            config:
-              gridIndex: 2.0
-              item: =props.item4
-              lineStyle:
-                opacity: 0.0
-              name: =props.name4
-              sampling: minmax
-              silent: true
-              symbol: none
-              tooltip:
-                show: false
-              type: line
-              xAxisIndex: 11.0
-              yAxisIndex: 2.0
-          - component: oh-time-series
-            config:
-              clip: true
               encode:
-                x: 0.0
-                y: 1.0
-              gridIndex: 3.0
+                x: 0
+                y: 1
+              silent: true
+              progressive: 0
+              clip: true
+          - component: oh-time-series
+            config:
+              name: ='' + (props.name || props.title) + ''
+              gridIndex: 2
+              xAxisIndex: 9
+              yAxisIndex: 2
+              type: line
+              item: =props.item
+              symbol: none
+              sampling: minmax
+              lineStyle:
+                opacity: 0
+              silent: true
+              tooltip:
+                show: false
+          - component: oh-time-series
+            config:
+              name: =props.name2
+              gridIndex: 2
+              xAxisIndex: 10
+              yAxisIndex: 2
+              type: line
+              item: =props.item2
+              symbol: none
+              sampling: minmax
+              lineStyle:
+                opacity: 0
+              silent: true
+              tooltip:
+                show: false
+          - component: oh-time-series
+            config:
+              name: =props.name4
+              gridIndex: 2
+              xAxisIndex: 11
+              yAxisIndex: 2
+              type: line
               item: =props.item4
-              itemStyle:
-                color: '='''' + (props.color4 || (themeOptions.dark === ''dark'' ? ''#a8a8a8'' : ''#5a5a5a'')) + '''''
+              symbol: none
+              sampling: minmax
+              lineStyle:
+                opacity: 0
+              silent: true
+              tooltip:
+                show: false
+          - component: oh-time-series
+            config:
+              name: =props.name4
+              gridIndex: 3
+              xAxisIndex: 12
+              yAxisIndex: 3
+              type: '=props.abs ? ''custom'' : ''line'''
+              item: =props.item4
+              symbol: none
+              sampling: lttb
               lineStyle:
                 color: '='''' + (props.color4 || (themeOptions.dark === ''dark'' ? ''#a8a8a8'' : ''#5a5a5a'')) + '''''
                 type: '=(props.dashed4 && !props.stacked) ? ''dashed'' : ''solid'''
                 width: '=(props.dashed4 && !props.stacked) ? 1.5 : 2'
-              name: =props.name4
-              progressive: 0.0
+              itemStyle:
+                color: '='''' + (props.color4 || (themeOptions.dark === ''dark'' ? ''#a8a8a8'' : ''#5a5a5a'')) + '''''
               renderItem: '=(params, api) => params.dataIndexInside === params.dataInsideLength - 1 ? ({type: ''polyline'',
                 shape: {points: '' ''.repeat(params.dataInsideLength).split('''').map((s, i) => api.coord([api.value(0, i),
                 Math.abs(api.value(1, i))]))}, style: {fill: ''none'', stroke: '''' + (props.color4 || (themeOptions.dark
                 === ''dark'' ? ''#a8a8a8'' : ''#5a5a5a'')) + '''', lineWidth: (props.dashed4 && !props.stacked) ? 1.5 : 2,
                 lineDash: (props.dashed4 && !props.stacked) ? [6,4] : null}}) : null'
-              sampling: lttb
+              encode:
+                x: 0
+                y: 1
               silent: true
-              symbol: none
-              type: '=props.abs ? ''custom'' : ''line'''
-              xAxisIndex: 12.0
-              yAxisIndex: 3.0
+              progressive: 0
+              clip: true
           - component: oh-time-series
             config:
-              gridIndex: 3.0
-              item: =props.item
-              lineStyle:
-                opacity: 0.0
               name: ='' + (props.name || props.title) + ''
-              sampling: minmax
-              silent: true
+              gridIndex: 3
+              xAxisIndex: 13
+              yAxisIndex: 3
+              type: line
+              item: =props.item
               symbol: none
+              sampling: minmax
+              lineStyle:
+                opacity: 0
+              silent: true
               tooltip:
                 show: false
-              type: line
-              xAxisIndex: 13.0
-              yAxisIndex: 3.0
           - component: oh-time-series
             config:
-              gridIndex: 3.0
-              item: =props.item2
-              lineStyle:
-                opacity: 0.0
               name: =props.name2
-              sampling: minmax
-              silent: true
+              gridIndex: 3
+              xAxisIndex: 14
+              yAxisIndex: 3
+              type: line
+              item: =props.item2
               symbol: none
+              sampling: minmax
+              lineStyle:
+                opacity: 0
+              silent: true
               tooltip:
                 show: false
-              type: line
-              xAxisIndex: 14.0
-              yAxisIndex: 3.0
           - component: oh-time-series
             config:
-              gridIndex: 3.0
-              item: =props.item3
-              lineStyle:
-                opacity: 0.0
               name: =props.name3
-              sampling: minmax
-              silent: true
+              gridIndex: 3
+              xAxisIndex: 15
+              yAxisIndex: 3
+              type: line
+              item: =props.item3
               symbol: none
+              sampling: minmax
+              lineStyle:
+                opacity: 0
+              silent: true
               tooltip:
                 show: false
-              type: line
-              xAxisIndex: 15.0
-              yAxisIndex: 3.0
           title:
           - component: oh-chart-title
             config:
-              left: 10.0
               show: true
               text: ='{s0|' + (props.name || props.title) + '}'
+              left: 10
+              top: 15
               textStyle:
-                fontSize: 13.0
-                fontWeight: 600.0
+                fontSize: 13
+                fontWeight: 600
                 rich:
                   s0:
+                    fontSize: 13
+                    fontWeight: 600
                     color: =props.color
-                    fontSize: 13.0
-                    fontWeight: 600.0
-              top: 15.0
           - component: oh-chart-title
             config:
-              left: 10.0
               show: true
               text: ='{s0|' + props.name2 + '}'
+              left: 10
+              top: 150
               textStyle:
-                fontSize: 13.0
-                fontWeight: 600.0
+                fontSize: 13
+                fontWeight: 600
                 rich:
                   s0:
+                    fontSize: 13
+                    fontWeight: 600
                     color: =props.color2
-                    fontSize: 13.0
-                    fontWeight: 600.0
-              top: 150.0
           - component: oh-chart-title
             config:
-              left: 10.0
               show: true
               text: ='{s0|' + props.name3 + '}'
+              left: 10
+              top: 266
               textStyle:
-                fontSize: 13.0
-                fontWeight: 600.0
+                fontSize: 13
+                fontWeight: 600
                 rich:
                   s0:
+                    fontSize: 13
+                    fontWeight: 600
                     color: ='' + (props.color3 || '#78909c') + ''
-                    fontSize: 13.0
-                    fontWeight: 600.0
-              top: 266.0
           - component: oh-chart-title
             config:
-              left: 10.0
               show: true
               text: ='{s0|' + props.name4 + '}'
+              left: 10
+              top: 382
               textStyle:
-                fontSize: 13.0
-                fontWeight: 600.0
+                fontSize: 13
+                fontWeight: 600
                 rich:
                   s0:
+                    fontSize: 13
+                    fontWeight: 600
                     color: '='''' + (props.color4 || (themeOptions.dark === ''dark'' ? ''#a8a8a8'' : ''#5a5a5a'')) + '''''
-                    fontSize: 13.0
-                    fontWeight: 600.0
-              top: 382.0
           tooltip:
           - component: oh-chart-tooltip
             config:
-              backgroundColor: transparent
-              borderWidth: 0.0
+              show: true
               confine: true
-              extraCssText: 'box-shadow: none;'
+              trigger: axis
+              smartFormatter: false
               formatter: '=(ps) => ((H) => ''<div style="display: flex; flex-direction: column; align-items: flex-start; height:
                 0">'' + [0,1,2,3].map((g) => ((r) => ''<div style="'' + (r ? ''border: 1px solid; border-radius: 4px; padding:
                 10px; box-shadow: rgba(0, 0, 0, 0.2) 1px 2px 10px; '' + (themeOptions.dark === ''dark'' ? ''background-color:
@@ -2669,7 +2885,6 @@ slots:
                 right; margin-left: 20px"><b style="text-align: right;">'' + ((v) => ((x) => (props.abs ? Math.abs(Number(x))
                 : Number(x)).toLocaleString(''en-GB'') + '' '' + p.seriesId.split(''#'')[2])(p.value[1]))(Number(p.value[1]))
                 + ''</b></span><br/>'').join(''''))).join('''') + ''</div>'')(ps[0].axisValue)'
-              padding: 0.0
               position: '=(pt, ps, dom, rect, size) => ((T, B) => ((c, left, h) => [c.style.setProperty(''align-items'', left
                 ? ''flex-end'' : ''flex-start''), dom.hasAttribute(''data-wb'') || [dom.parentNode.addEventListener(''mouseleave'',
                 () => [0,1,2,3].map((i) => dom.removeAttribute(''data-wb'' + i))), dom.setAttribute(''data-wb'', '''')], [0,1,2,3].map((i)
@@ -2681,257 +2896,56 @@ slots:
                 + 20, B[i] - b.offsetHeight)) : T[i])))(c.children[i]) : 0), [left ? pt[0] - 20 - c.offsetWidth : pt[0] +
                 20, 0]][4])(dom.firstChild, pt[0] > size.viewSize[0] / 2, T.filter((t) => t <= pt[1]).length - 1))([62,178,294,410],
                 [142,258,374,490])'
-              show: true
-              smartFormatter: false
-              transitionDuration: 0.0
-              trigger: axis
-          xAxis:
-          - component: oh-time-axis
-            config:
-              axisLabel:
-                show: false
-              axisPointer:
-                label:
-                  show: false
-                snap: false
-              gridIndex: 0.0
-          - component: oh-time-axis
-            config:
-              axisPointer:
-                label:
-                  show: false
-                snap: false
-              gridIndex: 0.0
-              show: false
-          - component: oh-time-axis
-            config:
-              axisPointer:
-                label:
-                  show: false
-                snap: false
-              gridIndex: 0.0
-              show: false
-          - component: oh-time-axis
-            config:
-              axisPointer:
-                label:
-                  show: false
-                snap: false
-              gridIndex: 0.0
-              show: false
-          - component: oh-time-axis
-            config:
-              axisLabel:
-                show: false
-              axisPointer:
-                label:
-                  show: false
-                snap: false
-              gridIndex: 1.0
-          - component: oh-time-axis
-            config:
-              axisPointer:
-                label:
-                  show: false
-                snap: false
-              gridIndex: 1.0
-              show: false
-          - component: oh-time-axis
-            config:
-              axisPointer:
-                label:
-                  show: false
-                snap: false
-              gridIndex: 1.0
-              show: false
-          - component: oh-time-axis
-            config:
-              axisPointer:
-                label:
-                  show: false
-                snap: false
-              gridIndex: 1.0
-              show: false
-          - component: oh-time-axis
-            config:
-              axisLabel:
-                show: false
-              axisPointer:
-                label:
-                  show: false
-                snap: false
-              gridIndex: 2.0
-          - component: oh-time-axis
-            config:
-              axisPointer:
-                label:
-                  show: false
-                snap: false
-              gridIndex: 2.0
-              show: false
-          - component: oh-time-axis
-            config:
-              axisPointer:
-                label:
-                  show: false
-                snap: false
-              gridIndex: 2.0
-              show: false
-          - component: oh-time-axis
-            config:
-              axisPointer:
-                label:
-                  show: false
-                snap: false
-              gridIndex: 2.0
-              show: false
-          - component: oh-time-axis
-            config:
-              axisPointer:
-                label:
-                  show: false
-                snap: false
-              gridIndex: 3.0
-          - component: oh-time-axis
-            config:
-              axisPointer:
-                label:
-                  show: false
-                snap: false
-              gridIndex: 3.0
-              show: false
-          - component: oh-time-axis
-            config:
-              axisPointer:
-                label:
-                  show: false
-                snap: false
-              gridIndex: 3.0
-              show: false
-          - component: oh-time-axis
-            config:
-              axisPointer:
-                label:
-                  show: false
-                snap: false
-              gridIndex: 3.0
-              show: false
-          yAxis:
-          - component: oh-value-axis
-            config:
-              gridIndex: 0.0
-              max: '=props.abs ? ((v) => ((m) => ((p) => [1,1.2,1.5,2,2.5,3,4,5,6,8,10].map((f) => f * p).filter((x) => x
-                >= m)[0])(Math.pow(10, Math.floor(Math.log10(Math.max(m, 0.001))))))(Math.max(-v.min, v.max))) : null'
-              min: '=props.abs ? 0 : null'
-              name: ''
-              nameGap: 14.0
-              nameTextStyle:
-                align: right
-                padding:
-                - 0.0
-                - 8.0
-                - 0.0
-                - 0.0
-              scale: =!!props.scale
-              splitLine:
-                lineStyle:
-                  opacity: 0.4
-                  type: dashed
-              splitNumber: 3.0
-          - component: oh-value-axis
-            config:
-              gridIndex: 1.0
-              max: '=props.abs ? ((v) => ((m) => ((p) => [1,1.2,1.5,2,2.5,3,4,5,6,8,10].map((f) => f * p).filter((x) => x
-                >= m)[0])(Math.pow(10, Math.floor(Math.log10(Math.max(m, 0.001))))))(Math.max(-v.min, v.max))) : null'
-              min: '=props.abs ? 0 : null'
-              name: ''
-              nameGap: 14.0
-              nameTextStyle:
-                align: right
-                padding:
-                - 0.0
-                - 8.0
-                - 0.0
-                - 0.0
-              scale: =!!props.scale
-              splitLine:
-                lineStyle:
-                  opacity: 0.4
-                  type: dashed
-              splitNumber: 3.0
-          - component: oh-value-axis
-            config:
-              gridIndex: 2.0
-              max: '=props.abs ? ((v) => ((m) => ((p) => [1,1.2,1.5,2,2.5,3,4,5,6,8,10].map((f) => f * p).filter((x) => x
-                >= m)[0])(Math.pow(10, Math.floor(Math.log10(Math.max(m, 0.001))))))(Math.max(-v.min, v.max))) : null'
-              min: '=props.abs ? 0 : null'
-              name: ''
-              nameGap: 14.0
-              nameTextStyle:
-                align: right
-                padding:
-                - 0.0
-                - 8.0
-                - 0.0
-                - 0.0
-              scale: =!!props.scale
-              splitLine:
-                lineStyle:
-                  opacity: 0.4
-                  type: dashed
-              splitNumber: 3.0
-          - component: oh-value-axis
-            config:
-              gridIndex: 3.0
-              max: '=props.abs ? ((v) => ((m) => ((p) => [1,1.2,1.5,2,2.5,3,4,5,6,8,10].map((f) => f * p).filter((x) => x
-                >= m)[0])(Math.pow(10, Math.floor(Math.log10(Math.max(m, 0.001))))))(Math.max(-v.min, v.max))) : null'
-              min: '=props.abs ? 0 : null'
-              name: ''
-              nameGap: 14.0
-              nameTextStyle:
-                align: right
-                padding:
-                - 0.0
-                - 8.0
-                - 0.0
-                - 0.0
-              scale: =!!props.scale
-              splitLine:
-                lineStyle:
-                  opacity: 0.4
-                  type: dashed
-              splitNumber: 3.0
+              backgroundColor: transparent
+              borderWidth: 0
+              padding: 0
+              transitionDuration: 0
+              extraCssText: 'box-shadow: none;'
   - component: oh-card
     config:
+      title: History
       style:
         height: calc(100% - 2 * var(--f7-card-margin-vertical))
-      title: History
       visible: =props.kind === 'state'
     slots:
       content:
       - component: oh-chart
         config:
           chartType: ''
+          periodVisible: true
+          period: D
           height: 150px
           options:
             backgroundColor: transparent
-          period: D
-          periodVisible: true
         slots:
           grid:
           - component: oh-chart-grid
             config:
+              top: '62'
               bottom: '35'
               left: '20'
               right: '20'
-              top: '62'
+          xAxis:
+          - component: oh-time-axis
+            config:
+              gridIndex: 0
+          yAxis:
+          - component: oh-category-axis
+            config:
+              gridIndex: 0
+              categoryType: values
+              data: =[props.title]
+              show: false
           series:
           - component: oh-state-series
             config:
+              name: =props.title
               item: =props.item
+              xAxisIndex: 0
+              yAxisIndex: 0
+              yValue: 0
               mapState: =(s) => ((props.states || 'ON=On,OFF=Off').split(',').map((o) => o.trim().split('=')).find((o) =>
                 o[0] === s) || [s, s])[1]
-              name: =props.title
               tooltip:
                 formatter: '=(p) => p.value && p.value.length > 3 ? ''<div'' + '' style="font-size: 12px; line-height: 18px;
                   margin: 0 -10px 6px; padding: 0 10px 6px; border-bottom: 1px solid; border-bottom-color: inherit">'' + dayjs(p.value[1]).format(''llll'')
@@ -2941,14 +2955,13 @@ slots:
                   / 60000) / 60) + '':'' + (Math.floor(((p.value[2] - p.value[1]) / 60000) % 60) < 10 ? ''0'' : '''') + Math.floor(((p.value[2]
                   - p.value[1]) / 60000) % 60) + '' h'' : Math.round(((p.value[2] - p.value[1]) / 60000)) + '' min'') + ''</b></span>''
                   : '''''
-              xAxisIndex: 0.0
-              yAxisIndex: 0.0
-              yValue: 0.0
           tooltip:
           - component: oh-chart-tooltip
             config:
-              borderColor: '=themeOptions.dark === ''dark'' ? ''rgb(91, 94, 100)'' : ''rgb(183, 185, 190)'''
+              show: true
               confine: true
+              transitionDuration: 0
+              borderColor: '=themeOptions.dark === ''dark'' ? ''rgb(91, 94, 100)'' : ''rgb(183, 185, 190)'''
               position: '=(pt, ps, dom, rect, size) => [dom.hasAttribute(''data-wt'') || [dom.parentNode.addEventListener(''mouseleave'',
                 () => [0].map((i) => dom.removeAttribute(''data-wt'' + i))), dom.setAttribute(''data-wt'', '''')], [0].map((i)
                 => ((b) => b.style.display === ''none'' ? 0 : ((w) => [b.style.setProperty(''box-sizing'', ''border-box''),
@@ -2956,16 +2969,3 @@ slots:
                 Number(dom.getAttribute(''data-wt'' + i)))))(dom)), ((w, h) => [pt[0] + w + 20 + 2 > size.viewSize[0] ? pt[0]
                 - w - 20 : pt[0] + 20, pt[1] + h + 20 > size.viewSize[1] ? pt[1] - h - 20 : pt[1] + 20])(dom.offsetWidth,
                 dom.offsetHeight)][2]'
-              show: true
-              transitionDuration: 0.0
-          xAxis:
-          - component: oh-time-axis
-            config:
-              gridIndex: 0.0
-          yAxis:
-          - component: oh-category-axis
-            config:
-              categoryType: values
-              data: =[props.title]
-              gridIndex: 0.0
-              show: false

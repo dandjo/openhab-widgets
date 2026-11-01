@@ -3,109 +3,109 @@ tags:
 - controls
 props:
   parameters:
-  - context: item
-    description: Switch item
+  - name: heatpumpClimateControlPower
     label: Pyaltherma Climate Control Power
-    name: heatpumpClimateControlPower
-    required: true
-    type: TEXT
-  - context: item
     description: Switch item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpDhwPower
     label: Pyaltherma DHW Power
-    name: heatpumpDhwPower
-    required: true
+    description: Switch item
     type: TEXT
-  - context: item
-    description: String item
+    required: true
+    context: item
+  - name: heatpumpSmartGrid
     label: ESPAltherma Smart Grid
-    name: heatpumpSmartGrid
-    required: true
-    type: TEXT
-  - context: item
-    description: Group item
-    label: Heatpump Management
-    name: heatpumpManagement
-    required: true
-    type: TEXT
-  - context: item
-    description: Switch item
-    label: Heatpump DHW Management
-    name: heatpumpDhwManagement
-    required: true
-    type: TEXT
-  - context: item
-    description: Switch item
-    label: Wärmepumpe Taktschutz-Automatik
-    name: heatpumpCycleManagement
-    required: true
-    type: TEXT
-  - context: item
-    description: Switch item
-    label: Wärmepumpe Tagheizung-Automatik
-    name: heatpumpDayHeating
-    required: true
-    type: TEXT
-  - context: item
-    description: Number item
-    label: Wärmepumpe Tagheizung Beginn
-    name: heatpumpDayHeatingStart
-    required: true
-    type: TEXT
-  - context: item
-    description: Number:Temperature item
-    label: Pyaltherma DHW Temp Heating
-    name: heatpumpDhwTempHeating
-    required: true
-    type: TEXT
-  - context: item
-    description: Number:Temperature item
-    label: ESPAltherma DHW Tank Temperature
-    name: heatpumpDhwTankTemp
-    required: true
-    type: TEXT
-  - context: item
-    description: Switch item
-    label: Pyaltherma DHW Powerful
-    name: heatpumpDhwBoost
-    required: true
-    type: TEXT
-  - context: item
-    description: Number:Temperature item
-    label: Pyaltherma Leaving Water Temp Offset Heating
-    name: heatpumpLeavingWaterTempOffsetHeating
-    required: true
-    type: TEXT
-  - context: item
-    description: Number:Temperature item
-    label: ESPAltherma Leaving Water Setpoint
-    name: heatpumpLeavingWaterSetpoint
-    required: true
-    type: TEXT
-  - context: item
     description: String item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpManagement
+    label: Heatpump Management
+    description: Group item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpDhwManagement
+    label: Heatpump DHW Management
+    description: Switch item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpCycleManagement
+    label: Wärmepumpe Taktschutz-Automatik
+    description: Switch item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpDayHeating
+    label: Wärmepumpe Tagheizung-Automatik
+    description: Switch item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpDayHeatingStart
+    label: Wärmepumpe Tagheizung Beginn
+    description: Number item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpDhwTempHeating
+    label: Pyaltherma DHW Temp Heating
+    description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpDhwTankTemp
+    label: ESPAltherma DHW Tank Temperature
+    description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpDhwBoost
+    label: Pyaltherma DHW Powerful
+    description: Switch item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpLeavingWaterTempOffsetHeating
+    label: Pyaltherma Leaving Water Temp Offset Heating
+    description: Number item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpLeavingWaterSetpoint
+    label: ESPAltherma Leaving Water Setpoint
+    description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpDayHeatingState
     label: Wärmepumpe Tagheizung Zustand
-    name: heatpumpDayHeatingState
-    required: true
+    description: String item
     type: TEXT
-  - context: item
-    description: Number item
+    required: true
+    context: item
+  - name: heatpumpDayHeatingOffset
     label: Wärmepumpe Tagheizung Offset
-    name: heatpumpDayHeatingOffset
-    required: true
-    type: TEXT
-  - context: item
     description: Number item
-    label: Wärmepumpe Tagheizung Ende
-    name: heatpumpDayHeatingEnd
-    required: true
     type: TEXT
+    required: true
+    context: item
+  - name: heatpumpDayHeatingEnd
+    label: Wärmepumpe Tagheizung Ende
+    description: Number item
+    type: TEXT
+    required: true
+    context: item
   parameterGroups: []
-timestamp: Nov 1, 2026, 7:20:58 PM
+timestamp: Nov 1, 2026, 7:25:19 PM
 component: div
 config:
-  label: Control
   style:
     --quick-popup: panel
+  label: Control
   stylesheet: "@keyframes a-soft { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.06; } }\n@keyframes a-full { 0%, 100% { opacity:\
     \ 0.3; } 50% { opacity: 1; } }\n@keyframes a-arc { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }\n@keyframes a-halo\
     \ { 0%, 100% { opacity: 0; } 50% { opacity: 1; } }\n@keyframes a-halo-arc { 0%, 100% { opacity: 1; } 50% { opacity: 0;\
@@ -164,21 +164,21 @@ slots:
       - component: div
         config:
           style:
-            align-items: center
             display: flex
+            align-items: center
             gap: 18px
             padding-bottom: 4px
         slots:
           default:
           - component: svg
             config:
-              height: 104.0
+              viewBox: -34 -34 68 68
+              width: 104
+              height: 104
               style:
                 display: block
                 flex: 0 0 auto
                 overflow: visible
-              viewBox: -34 -34 68 68
-              width: 104.0
             slots:
               default:
               - component: g
@@ -187,17 +187,17 @@ slots:
                   default:
                   - component: circle
                     config:
-                      cx: 0.0
-                      cy: 0.0
+                      cx: 0
+                      cy: 0
                       r: 32.25
                       style:
                         fill: 'var(--f7-card-bg-color, #fff)'
                   - component: circle
                     config:
-                      cx: 0.0
-                      cy: 0.0
-                      fill: none
+                      cx: 0
+                      cy: 0
                       r: 29.2
+                      fill: none
                       stroke: rgba(127, 127, 127, 0.28)
                       stroke-width: 2.9
               - component: g
@@ -206,64 +206,64 @@ slots:
                   default:
                   - component: circle
                     config:
-                      class: a-full
-                      cx: 0.0
-                      cy: 0.0
-                      fill: none
+                      cx: 0
+                      cy: 0
                       r: 29.2
+                      fill: none
                       stroke: '#fb8c00'
                       stroke-width: 2.9
                       visible: =(false) && !(false)
+                      class: a-full
                   - component: circle
                     config:
-                      class: a-halo
-                      cx: 0.0
-                      cy: 0.0
-                      fill: none
+                      cx: 0
+                      cy: 0
                       r: 29.2
                       stroke: '#fb8c00'
+                      fill: none
                       stroke-width: 4.5
                       visible: =(false) && !(false)
+                      class: a-halo
                   - component: circle
                     config:
-                      class: a-soft
-                      cx: 0.0
-                      cy: 0.0
-                      fill: none
+                      cx: 0
+                      cy: 0
                       r: 29.2
+                      fill: none
                       stroke: '#fb8c00'
                       stroke-width: 2.9
                       visible: =(false) && (false)
+                      class: a-soft
               - component: g
                 config: {}
                 slots:
                   default:
                   - component: circle
                     config:
-                      cx: 0.0
-                      cy: 0.0
+                      cx: 0
+                      cy: 0
                       r: 27.75
                       style:
                         fill: 'var(--f7-card-bg-color, #fff)'
                   - component: circle
                     config:
-                      cx: 0.0
-                      cy: 0.0
+                      cx: 0
+                      cy: 0
+                      r: 27.75
                       fill: '#fb8c00'
                       fill-opacity: '0.12'
-                      r: 27.75
               - component: text
                 config:
+                  x: 0
+                  y: 0
                   content: tune
-                  dominant-baseline: central
                   fill: '#fb8c00'
-                  font-size: 30.0
+                  font-size: 30
+                  text-anchor: middle
+                  dominant-baseline: central
                   style:
                     font-family: '''Material Icons'''
                     font-feature-settings: '''liga'''
-                  text-anchor: middle
-                  x: 0.0
-                  y: 0.0
           - component: div
             config:
               style:
@@ -275,65 +275,65 @@ slots:
               default:
               - component: Label
                 config:
+                  text: Control
                   style:
                     font-size: 15px
                     font-weight: '600'
-                  text: Control
               - component: Label
                 config:
+                  text: '=''Heating '' + (items[props.heatpumpClimateControlPower].state === ''ON'' ? ''on'' : ''off'') +
+                    '' · Hot water '' + (items[props.heatpumpDhwPower].state === ''ON'' ? ''on'' : ''off'')'
                   style:
                     font-size: 12px
                     opacity: '0.7'
-                  text: '=''Heating '' + (items[props.heatpumpClimateControlPower].state === ''ON'' ? ''on'' : ''off'') +
-                    '' · Hot water '' + (items[props.heatpumpDhwPower].state === ''ON'' ? ''on'' : ''off'')'
       - component: div
         config:
           style:
-            border-bottom: 1px solid rgba(127, 127, 127, 0.15)
             display: flex
             flex-direction: column
             gap: 6px
             padding: 8px 2px 10px
+            border-bottom: 1px solid rgba(127, 127, 127, 0.15)
         slots:
           default:
           - component: div
             config:
               style:
-                align-items: center
                 display: flex
+                align-items: center
                 gap: 8px
             slots:
               default:
               - component: div
                 config:
                   style:
-                    align-items: center
-                    background: 'color-mix(in srgb, #fb8c00 20%, transparent)'
-                    border-radius: 50%
-                    display: flex
-                    flex: 0 0 auto
-                    height: 26px
-                    justify-content: center
                     width: 26px
+                    height: 26px
+                    flex: 0 0 auto
+                    border-radius: 50%
+                    background: 'color-mix(in srgb, #fb8c00 20%, transparent)'
+                    display: flex
+                    align-items: center
+                    justify-content: center
                 slots:
                   default:
                   - component: oh-icon
                     config:
-                      height: 15.0
                       icon: material:power
-                      width: 15.0
+                      width: 15
+                      height: 15
               - component: Label
                 config:
+                  text: Smart Grid
                   style:
                     font-size: 13px
                     line-height: 16px
-                  text: Smart Grid
           - component: widget:state-bar
             config:
-              byText: true
-              color: '#fb8c00'
               item: =props.heatpumpSmartGrid
               options: 0=Normal;1=Blocked;2=Recommended;3=Forced
+              color: '#fb8c00'
+              byText: true
       - component: div
         config:
           style:
@@ -346,55 +346,55 @@ slots:
           - component: div
             config:
               style:
-                align-items: center
                 display: flex
+                align-items: center
                 gap: 8px
             slots:
               default:
               - component: div
                 config:
                   style:
-                    align-items: center
-                    background: 'color-mix(in srgb, #fb8c00 20%, transparent)'
-                    border-radius: 50%
-                    display: flex
-                    flex: 0 0 auto
-                    height: 26px
-                    justify-content: center
                     width: 26px
+                    height: 26px
+                    flex: 0 0 auto
+                    border-radius: 50%
+                    background: 'color-mix(in srgb, #fb8c00 20%, transparent)'
+                    display: flex
+                    align-items: center
+                    justify-content: center
                 slots:
                   default:
                   - component: oh-icon
                     config:
-                      height: 15.0
                       icon: material:toggle_on
-                      width: 15.0
+                      width: 15
+                      height: 15
               - component: Label
                 config:
+                  text: Operation
                   style:
                     font-size: 13px
                     line-height: 16px
-                  text: Operation
           - component: div
             config:
               style:
                 display: grid
-                gap: 6px
                 grid-template-columns: repeat(auto-fit, minmax(120px, 1fr))
+                gap: 6px
             slots:
               default:
               - component: widget:pill-switch
                 config:
-                  color: '#fb8c00'
-                  icon: material:local_fire_department
                   item: =props.heatpumpClimateControlPower
                   title: Heating
+                  color: '#fb8c00'
+                  icon: material:local_fire_department
               - component: widget:pill-switch
                 config:
-                  color: '#fb8c00'
-                  icon: material:shower
                   item: =props.heatpumpDhwPower
                   title: Hot water
+                  color: '#fb8c00'
+                  icon: material:shower
           - component: div
             config:
               style: {}
@@ -402,90 +402,90 @@ slots:
               default:
               - component: widget:switch-row
                 config:
-                  color: '#fb8c00'
-                  icon: material:tune
                   item: =props.heatpumpManagement
                   title: Automatic
+                  icon: material:tune
+                  color: '#fb8c00'
               - component: widget:switch-row
                 config:
-                  color: '#fb8c00'
-                  icon: material:shower
                   item: =props.heatpumpDhwManagement
                   title: Hot water automation
+                  icon: material:shower
+                  color: '#fb8c00'
               - component: widget:switch-row
                 config:
-                  color: '#fb8c00'
-                  icon: material:timer
                   item: =props.heatpumpCycleManagement
                   title: Cycle guard automation
+                  icon: material:timer
+                  color: '#fb8c00'
               - component: widget:switch-row
                 config:
-                  color: '#fb8c00'
-                  icon: material:wb_sunny
                   item: =props.heatpumpDayHeating
+                  title: Day heating automation
+                  icon: material:wb_sunny
+                  color: '#fb8c00'
                   offText: '=items[props.heatpumpManagement].state === ''ON'' ? ((s) => Number.isFinite(s) ? ''Off until ''
                     + Math.floor(s) + '':'' + (''0'' + Math.round(s % 1 * 60)).slice(-2) : ''Off'')(Number(items[props.heatpumpDayHeatingStart].state))
                     : ''Off'''
-                  title: Day heating automation
       - component: widget:pill-slider
         config:
+          item: =props.heatpumpDhwTempHeating
           color: '#fb8c00'
+          min: 30
+          max: 60
+          step: 5
+          unit: °C
+          title: Hot water target
+          value: '=((Number(items[props.heatpumpDhwTempHeating].numericState) || 0) % 1 ? ((Number(items[props.heatpumpDhwTempHeating].numericState)
+            || 0)).toFixed(1) : (Number(items[props.heatpumpDhwTempHeating].numericState) || 0)) + '' °C'''
           context: '=''Tank '' + ([''NULL'', ''UNDEF''].includes(items[props.heatpumpDhwTankTemp].state) ? ''–'' : (items[props.heatpumpDhwTankTemp].displayState
             || items[props.heatpumpDhwTankTemp].state)) + (items[props.heatpumpDhwManagement].state === ''ON'' ? '' · Automatic
             controls'' : '''')'
-          icon: material:shower
-          item: =props.heatpumpDhwTempHeating
           marks: 30=30 °C;40=40;50=50;60=60 °C
-          max: 60.0
-          min: 30.0
+          icon: material:shower
           row: true
-          step: 5.0
-          title: Hot water target
-          unit: °C
-          value: '=((Number(items[props.heatpumpDhwTempHeating].numericState) || 0) % 1 ? ((Number(items[props.heatpumpDhwTempHeating].numericState)
-            || 0)).toFixed(1) : (Number(items[props.heatpumpDhwTempHeating].numericState) || 0)) + '' °C'''
       - component: widget:boost-pill
         config:
-          color: '#fb8c00'
-          icon: material:rocket_launch
           item: =props.heatpumpDhwBoost
+          icon: material:rocket_launch
+          color: '#fb8c00'
+          title: Hot water boost
           running: '=''running · tank '' + ([''NULL'', ''UNDEF''].includes(items[props.heatpumpDhwTankTemp].state) ? ''–''
             : (items[props.heatpumpDhwTankTemp].displayState || items[props.heatpumpDhwTankTemp].state))'
-          title: Hot water boost
       - component: widget:pill-slider
         config:
+          item: =props.heatpumpLeavingWaterTempOffsetHeating
           color: '#fb8c00'
+          min: -10
+          max: 10
+          step: 1
+          unit: ''
+          title: Flow offset
+          value: '=(Math.round((Number(items[props.heatpumpLeavingWaterTempOffsetHeating].numericState) || 0)) > 0 ? ''+''
+            : '''') + Math.round((Number(items[props.heatpumpLeavingWaterTempOffsetHeating].numericState) || 0)) + '' K'''
           context: '=''Flow target '' + ([''NULL'', ''UNDEF''].includes(items[props.heatpumpLeavingWaterSetpoint].state) ?
             ''–'' : (items[props.heatpumpLeavingWaterSetpoint].displayState || items[props.heatpumpLeavingWaterSetpoint].state))
             + (items[props.heatpumpClimateControlPower].state === ''ON'' ? ([''day'', ''night''].includes(items[props.heatpumpDayHeatingState].state)
             ? '' · Day heating controls'' : '''') : '' · Heating off'')'
-          icon: material:tune
-          item: =props.heatpumpLeavingWaterTempOffsetHeating
           marks: -10=−10 K;-5=−5;0=0;5=+5;10=+10 K
-          max: 10.0
-          min: -10.0
+          icon: material:tune
           row: true
-          step: 1.0
-          title: Flow offset
-          unit: ''
-          value: '=(Math.round((Number(items[props.heatpumpLeavingWaterTempOffsetHeating].numericState) || 0)) > 0 ? ''+''
-            : '''') + Math.round((Number(items[props.heatpumpLeavingWaterTempOffsetHeating].numericState) || 0)) + '' K'''
       - component: widget:pill-slider
         config:
-          color: '#fb8c00'
-          context: ='Day window ' + Math.round((Number(items[props.heatpumpDayHeatingStart].numericState) || 0)) + ':00–'
-            + Math.round((Number(items[props.heatpumpDayHeatingEnd].numericState) || 0)) + ':00'
-          icon: material:wb_sunny
           item: =props.heatpumpDayHeatingOffset
-          marks: 0=0;1=+1;2=+2;3=+3;4=+4;5=+5 K
-          max: 5.0
-          min: 0.0
-          row: true
-          step: 1.0
-          title: Day heating offset
+          color: '#fb8c00'
+          min: 0
+          max: 5
+          step: 1
           unit: ''
+          title: Day heating offset
           value: '=(Math.round((Number(items[props.heatpumpDayHeatingOffset].numericState) || 0)) > 0 ? ''+'' : '''') + Math.round((Number(items[props.heatpumpDayHeatingOffset].numericState)
             || 0)) + '' K'''
+          context: ='Day window ' + Math.round((Number(items[props.heatpumpDayHeatingStart].numericState) || 0)) + ':00–'
+            + Math.round((Number(items[props.heatpumpDayHeatingEnd].numericState) || 0)) + ':00'
+          marks: 0=0;1=+1;2=+2;3=+3;4=+4;5=+5 K
+          icon: material:wb_sunny
+          row: true
       - component: div
         config:
           style:
@@ -496,13 +496,13 @@ slots:
           default:
           - component: oh-button
             config:
+              text: All details
               action: popup
               actionModal: page:heatpump
               outline: true
               small: true
               style:
-                border-color: '#fb8c00'
                 color: '#fb8c00'
-                padding: 0 12px
+                border-color: '#fb8c00'
                 width: auto
-              text: All details
+                padding: 0 12px

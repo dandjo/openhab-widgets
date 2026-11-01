@@ -3,98 +3,98 @@ tags:
 - appliance
 props:
   parameters:
-  - description: The appliance drawn
+  - name: kind
     label: Kind
-    name: kind
-    required: true
+    description: The appliance drawn
     type: TEXT
+    required: true
     limitToOptions: true
     options:
-    - label: washer
-      value: washer
-    - label: dryer
-      value: dryer
-    - label: dish-washer
-      value: dish-washer
-  - description: The appliance's name
+    - value: washer
+      label: washer
+    - value: dryer
+      label: dryer
+    - value: dish-washer
+      label: dish-washer
+  - name: title
     label: Title
-    name: title
-    required: true
+    description: The appliance's name
     type: TEXT
-  - description: The uid of the page a tap opens as a popup
+    required: true
+  - name: popup
     label: Popup
-    name: popup
+    description: The uid of the page a tap opens as a popup
+    type: TEXT
     required: true
-    type: TEXT
-  - context: item
-    description: Miele item _program_progress, e.g. miele_washing_machine_program_progress; set for a Miele machine
+  - name: progress
     label: Progress
-    name: progress
-    required: false
+    description: Miele item _program_progress, e.g. miele_washing_machine_program_progress; set for a Miele machine
     type: TEXT
-  - context: item
-    description: Miele item _operation_state, e.g. miele_washing_machine_operation_state; set for a Miele machine
+    required: false
+    context: item
+  - name: state
     label: State
-    name: state
-    required: false
+    description: Miele item _operation_state, e.g. miele_washing_machine_operation_state; set for a Miele machine
     type: TEXT
-  - context: item
-    description: Miele item _active_program, e.g. miele_washing_machine_active_program; set for a Miele machine
+    required: false
+    context: item
+  - name: program
     label: Program
-    name: program
-    required: false
+    description: Miele item _active_program, e.g. miele_washing_machine_active_program; set for a Miele machine
     type: TEXT
-  - context: item
-    description: Miele item _program_phase, e.g. miele_washing_machine_program_phase; set for a Miele machine
+    required: false
+    context: item
+  - name: phase
     label: Phase
-    name: phase
-    required: false
+    description: Miele item _program_phase, e.g. miele_washing_machine_program_phase; set for a Miele machine
     type: TEXT
-  - context: item
-    description: Miele item _program_finished_time, e.g. miele_washing_machine_program_finished_time; set for a Miele machine
+    required: false
+    context: item
+  - name: finished
     label: Finished
-    name: finished
-    required: false
+    description: Miele item _program_finished_time, e.g. miele_washing_machine_program_finished_time; set for a Miele machine
     type: TEXT
-  - context: item
-    description: Miele item _program_remaining_time, e.g. miele_washing_machine_program_remaining_time; set for a Miele machine
+    required: false
+    context: item
+  - name: remaining
     label: Remaining
-    name: remaining
-    required: false
+    description: Miele item _program_remaining_time, e.g. miele_washing_machine_program_remaining_time; set for a Miele machine
     type: TEXT
-  - context: item
-    description: The plug's power item, for a machine without program data
+    required: false
+    context: item
+  - name: power
     label: Power item
-    name: power
-    required: false
+    description: The plug's power item, for a machine without program data
     type: TEXT
-  - context: item
-    description: Switch item that is on while the plug machine is finished
+    required: false
+    context: item
+  - name: done
     label: Finished item
-    name: done
-    required: false
+    description: Switch item that is on while the plug machine is finished
     type: TEXT
-  - context: item
-    description: DateTime item holding since when the plug machine runs (UNDEF at rest)
+    required: false
+    context: item
+  - name: since
     label: Running since item
-    name: since
-    required: false
+    description: DateTime item holding since when the plug machine runs (UNDEF at rest)
     type: TEXT
+    required: false
+    context: item
   parameterGroups: []
-timestamp: Oct 25, 2026, 1:50:26 PM
+timestamp: Oct 25, 2026, 2:07:58 PM
 component: div
 config:
   style:
-    align-items: center
-    background: color-mix(in srgb, var(--f7-text-color) 6%, transparent)
-    border-radius: 12px
+    position: relative
     display: flex
     flex-direction: column
-    gap: 6px
+    align-items: center
     justify-content: center
+    gap: 6px
     padding: 12px 8px
-    position: relative
+    border-radius: 12px
     text-align: center
+    background: color-mix(in srgb, var(--f7-text-color) 6%, transparent)
   stylesheet: '@keyframes a-soft { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.06; } }
 
     @keyframes a-full { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
@@ -201,38 +201,27 @@ slots:
   - component: widget:appliance-icon
     config:
       kind: =props.kind
-      progress: '=!!props.progress ? Number(items[props.progress].numericState) || 0 : '''''
       running: '=(!!props.progress ? (!!props.progress && items[props.progress].state !== ''UNDEF'' && items[props.progress].state
         !== ''NULL'') : (Number(items[props.power].numericState) || 0) > 10)'
+      progress: '=!!props.progress ? Number(items[props.progress].numericState) || 0 : '''''
   - component: Label
     config:
+      text: =props.title
       style:
         font-weight: '600'
         margin-top: -2px
-      text: =props.title
   - component: div
     config:
       style:
         display: flex
         flex-wrap: wrap
-        gap: 6px
         justify-content: center
+        gap: 6px
       visible: =!!props.progress
     slots:
       default:
       - component: Label
         config:
-          style:
-            background: '=(!!props.progress ? (!!props.progress && items[props.progress].state !== ''UNDEF'' && items[props.progress].state
-              !== ''NULL'') : (Number(items[props.power].numericState) || 0) > 10) ? ''#1e88e5'' : (!!props.progress ? ([''beendet'',
-              ''finish'', ''end''].some((w) => ('''' + items[props.state].state).toLowerCase().indexOf(w) >= 0)) : (!!props.done
-              && items[props.done].state === ''ON'')) ? ''#43a047'' : ''#9e9e9e'''
-            border-radius: 6px
-            color: '#ffffff'
-            font-size: 12px
-            font-weight: '600'
-            padding: 2px 10px
-            white-space: nowrap
           text: '=!!props.progress ? ((!!props.progress ? (!!props.progress && items[props.progress].state !== ''UNDEF'' &&
             items[props.progress].state !== ''NULL'') : (Number(items[props.power].numericState) || 0) > 10) ? ([''NULL'',
             ''UNDEF''].includes(items[props.progress].state) ? ''–'' : (items[props.progress].displayState || items[props.progress].state))
@@ -242,18 +231,29 @@ slots:
             ''finish'', ''end''].some((w) => ('''' + items[props.state].state).toLowerCase().indexOf(w) >= 0)) : (!!props.done
             && items[props.done].state === ''ON'')) ? ''done'' : (Number(items[props.power].numericState) || 0) >= 1 ? ''On''
             : ''Off'')'
+          style:
+            background: '=(!!props.progress ? (!!props.progress && items[props.progress].state !== ''UNDEF'' && items[props.progress].state
+              !== ''NULL'') : (Number(items[props.power].numericState) || 0) > 10) ? ''#1e88e5'' : (!!props.progress ? ([''beendet'',
+              ''finish'', ''end''].some((w) => ('''' + items[props.state].state).toLowerCase().indexOf(w) >= 0)) : (!!props.done
+              && items[props.done].state === ''ON'')) ? ''#43a047'' : ''#9e9e9e'''
+            color: '#ffffff'
+            border-radius: 6px
+            padding: 2px 10px
+            font-size: 12px
+            font-weight: '600'
+            white-space: nowrap
       - component: div
         config:
           style:
+            display: inline-flex
             align-items: center
+            gap: 4px
+            color: '=themeOptions.dark === ''dark'' ? ''#64b5f6'' : ''#1565c0'''
             background: rgba(30, 136, 229, 0.16)
             border-radius: 6px
-            color: '=themeOptions.dark === ''dark'' ? ''#64b5f6'' : ''#1565c0'''
-            display: inline-flex
+            padding: 2px 8px
             font-size: 12px
             font-weight: '600'
-            gap: 4px
-            padding: 2px 8px
             white-space: nowrap
           visible: '=!!props.progress && (!!props.progress ? (!!props.progress && items[props.progress].state !== ''UNDEF''
             && items[props.progress].state !== ''NULL'') : (Number(items[props.power].numericState) || 0) > 10) && (!!props.remaining
@@ -263,7 +263,7 @@ slots:
           - component: f7-icon
             config:
               f7: timer
-              size: 13.0
+              size: 13
           - component: Label
             config:
               text: '=((Number(items[props.remaining].numericState) || 0) >= 3600 ? Math.floor((Number(items[props.remaining].numericState)
@@ -274,24 +274,13 @@ slots:
       style:
         display: flex
         flex-wrap: wrap
-        gap: 6px
         justify-content: center
+        gap: 6px
       visible: =!!!props.progress
     slots:
       default:
       - component: Label
         config:
-          style:
-            background: '=(!!props.progress ? (!!props.progress && items[props.progress].state !== ''UNDEF'' && items[props.progress].state
-              !== ''NULL'') : (Number(items[props.power].numericState) || 0) > 10) ? ''#1e88e5'' : (!!props.progress ? ([''beendet'',
-              ''finish'', ''end''].some((w) => ('''' + items[props.state].state).toLowerCase().indexOf(w) >= 0)) : (!!props.done
-              && items[props.done].state === ''ON'')) ? ''#43a047'' : ''#9e9e9e'''
-            border-radius: 6px
-            color: '#ffffff'
-            font-size: 12px
-            font-weight: '600'
-            padding: 2px 10px
-            white-space: nowrap
           text: '=!!props.progress ? ((!!props.progress ? (!!props.progress && items[props.progress].state !== ''UNDEF'' &&
             items[props.progress].state !== ''NULL'') : (Number(items[props.power].numericState) || 0) > 10) ? ([''NULL'',
             ''UNDEF''].includes(items[props.progress].state) ? ''–'' : (items[props.progress].displayState || items[props.progress].state))
@@ -301,18 +290,29 @@ slots:
             ''finish'', ''end''].some((w) => ('''' + items[props.state].state).toLowerCase().indexOf(w) >= 0)) : (!!props.done
             && items[props.done].state === ''ON'')) ? ''done'' : (Number(items[props.power].numericState) || 0) >= 1 ? ''On''
             : ''Off'')'
+          style:
+            background: '=(!!props.progress ? (!!props.progress && items[props.progress].state !== ''UNDEF'' && items[props.progress].state
+              !== ''NULL'') : (Number(items[props.power].numericState) || 0) > 10) ? ''#1e88e5'' : (!!props.progress ? ([''beendet'',
+              ''finish'', ''end''].some((w) => ('''' + items[props.state].state).toLowerCase().indexOf(w) >= 0)) : (!!props.done
+              && items[props.done].state === ''ON'')) ? ''#43a047'' : ''#9e9e9e'''
+            color: '#ffffff'
+            border-radius: 6px
+            padding: 2px 10px
+            font-size: 12px
+            font-weight: '600'
+            white-space: nowrap
       - component: div
         config:
           style:
+            display: inline-flex
             align-items: center
+            gap: 4px
+            color: '=themeOptions.dark === ''dark'' ? ''#64b5f6'' : ''#1565c0'''
             background: rgba(30, 136, 229, 0.16)
             border-radius: 6px
-            color: '=themeOptions.dark === ''dark'' ? ''#64b5f6'' : ''#1565c0'''
-            display: inline-flex
+            padding: 2px 8px
             font-size: 12px
             font-weight: '600'
-            gap: 4px
-            padding: 2px 8px
             white-space: nowrap
           visible: '=(!!props.progress ? (!!props.progress && items[props.progress].state !== ''UNDEF'' && items[props.progress].state
             !== ''NULL'') : (Number(items[props.power].numericState) || 0) > 10)'
@@ -321,15 +321,12 @@ slots:
           - component: f7-icon
             config:
               f7: bolt_fill
-              size: 13.0
+              size: 13
           - component: Label
             config:
               text: =Math.round((Number(items[props.power].numericState) || 0)) + ' W'
   - component: Label
     config:
-      style:
-        font-size: 12px
-        opacity: '0.75'
       text: '=((!!props.program && items[props.program].state !== ''UNDEF'' && items[props.program].state !== ''NULL'') ?
         items[props.program].state : '''') + ((!!props.program && items[props.program].state !== ''UNDEF'' && items[props.program].state
         !== ''NULL'') && (!!props.phase && items[props.phase].state !== ''UNDEF'' && items[props.phase].state !== ''NULL'')
@@ -338,11 +335,11 @@ slots:
         !== ''NULL'') ? '' · done '' + dayjs(items[props.finished].state).format(''HH:mm'') : '''')'
       visible: '=!!props.progress && (!!props.progress ? (!!props.progress && items[props.progress].state !== ''UNDEF'' &&
         items[props.progress].state !== ''NULL'') : (Number(items[props.power].numericState) || 0) > 10)'
-  - component: Label
-    config:
       style:
         font-size: 12px
         opacity: '0.75'
+  - component: Label
+    config:
       text: '=''Running since '' + dayjs(items[props.since].state).format(''HH:mm'') + '' · '' + (dayjs().diff(dayjs(items[props.since].state),
         ''minute'') >= 60 ? Math.floor(dayjs().diff(dayjs(items[props.since].state), ''minute'') / 60) + '':'' + (Math.floor(dayjs().diff(dayjs(items[props.since].state),
         ''minute'') % 60) < 10 ? ''0'' : '''') + Math.floor(dayjs().diff(dayjs(items[props.since].state), ''minute'') % 60)
@@ -350,12 +347,15 @@ slots:
       visible: '=!!!props.progress && (!!props.progress ? (!!props.progress && items[props.progress].state !== ''UNDEF'' &&
         items[props.progress].state !== ''NULL'') : (Number(items[props.power].numericState) || 0) > 10) && (!!props.since
         && items[props.since].state !== ''UNDEF'' && items[props.since].state !== ''NULL'')'
+      style:
+        font-size: 12px
+        opacity: '0.75'
   - component: oh-link
     config:
       action: popup
       actionModal: ='page:' + props.popup
       style:
-        border-radius: 12px
-        display: block
-        inset: '0'
         position: absolute
+        inset: '0'
+        display: block
+        border-radius: 12px

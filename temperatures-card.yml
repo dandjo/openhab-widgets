@@ -3,70 +3,71 @@ tags:
 - overview
 props:
   parameters:
-  - context: item
-    description: Number:Temperature item
+  - name: heatpumpIndoorAmbientTemp
     label: ESPAltherma Indoor Ambient Temperature
-    name: heatpumpIndoorAmbientTemp
-    required: true
+    description: Number:Temperature item
     type: TEXT
-  - context: item
-    description: String item
+    required: true
+    context: item
+  - name: tileHistory
     label: Tile history
-    name: tileHistory
-    required: true
+    description: String item
     type: TEXT
-  - context: item
-    description: Number:Dimensionless item
+    required: true
+    context: item
+  - name: netatmoWeatherstationAtmosphericHumidity
     label: Netatmo Weatherstation Atmospheric Humidity
-    name: netatmoWeatherstationAtmosphericHumidity
-    required: true
-    type: TEXT
-  - context: item
-    description: Number:Temperature item
-    label: ESPAltherma External Ambient Temperature
-    name: heatpumpExtAmbientTemp
-    required: true
-    type: TEXT
-  - context: item
-    description: Number:Temperature item
-    label: Netatmo Outdoor Temperature
-    name: netatmoOutdoorTemperature
-    required: true
-    type: TEXT
-  - context: item
     description: Number:Dimensionless item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpExtAmbientTemp
+    label: ESPAltherma External Ambient Temperature
+    description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
+  - name: netatmoOutdoorTemperature
+    label: Netatmo Outdoor Temperature
+    description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
+  - name: netatmoOutdoorAtmosphericHumidity
     label: Netatmo Outdoor Atmospheric Humidity
-    name: netatmoOutdoorAtmosphericHumidity
-    required: true
+    description: Number:Dimensionless item
     type: TEXT
-  - context: item
-    description: Number:Temperature item
+    required: true
+    context: item
+  - name: netatmoWeatherstationTemperature
     label: Netatmo Weatherstation Temperature
-    name: netatmoWeatherstationTemperature
-    required: true
-    type: TEXT
-  - context: item
     description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
+  - name: temperatureIndoor15min
     label: Temperature Indoor 15 min
-    name: temperatureIndoor15min
-    required: true
-    type: TEXT
-  - context: item
     description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
+  - name: temperatureOutdoor15min
     label: Temperature Outdoor 15 min
-    name: temperatureOutdoor15min
-    required: true
-    type: TEXT
-  - context: item
     description: Number:Temperature item
-    label: ESPAltherma External Ambient Temperature Average
-    name: heatpumpExtAmbientTempAvg
-    required: true
     type: TEXT
+    required: true
+    context: item
+  - name: heatpumpExtAmbientTempAvg
+    label: ESPAltherma External Ambient Temperature Average
+    description: Number:Temperature item
+    type: TEXT
+    required: true
+    context: item
   parameterGroups: []
-timestamp: Oct 31, 2026, 3:41:33 PM
+timestamp: Oct 31, 2026, 3:40:25 PM
 component: oh-card
 config:
+  title: Temperatures
   style:
     height: calc(100% - 2 * var(--f7-card-margin-vertical))
   stylesheet: '@keyframes a-soft { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.06; } }
@@ -173,15 +174,14 @@ config:
     .menu-item-dropdown:not(.menu-item-dropdown-opened) .menu-dropdown { display: none; }
 
     .oh-chart-container > .menu.padding { padding-top: 6px !important; }'
-  title: Temperatures
 slots:
   content:
   - component: div
     config:
       style:
         display: grid
-        gap: 12px
         grid-template-columns: '=screen.width < 600 ? ''1fr'' : ''1fr 1fr'''
+        gap: 12px
         padding: 4px 16px 0
     slots:
       default:
@@ -189,48 +189,59 @@ slots:
         config:
           style:
             border-left: '2px solid #fb8c00'
-            min-width: '0'
             padding: 4px 12px
+            min-width: '0'
         slots:
           default:
           - component: Label
             config:
+              text: Indoor
               style:
                 font-size: 13px
                 opacity: '0.7'
-              text: Indoor
           - component: div
             config:
               style:
-                align-items: center
                 display: flex
-                flex-wrap: wrap
+                align-items: center
                 gap: 4px 10px
+                flex-wrap: wrap
             slots:
               default:
               - component: Label
                 config:
+                  text: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpIndoorAmbientTemp].state) ? ''–'' : (items[props.heatpumpIndoorAmbientTemp].displayState
+                    || items[props.heatpumpIndoorAmbientTemp].state))'
                   style:
                     font-size: '=screen.width < 600 ? ''26px'' : ''28px'''
                     font-weight: '700'
-                    letter-spacing: -0.01em
                     line-height: '=screen.width < 600 ? ''32px'' : ''34px'''
+                    letter-spacing: -0.01em
                     white-space: nowrap
-                  text: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpIndoorAmbientTemp].state) ? ''–'' : (items[props.heatpumpIndoorAmbientTemp].displayState
-                    || items[props.heatpumpIndoorAmbientTemp].state))'
               - component: div
                 config:
                   style:
-                    align-items: flex-start
                     display: flex
                     flex-direction: column
+                    align-items: flex-start
                     gap: 3px
                 slots:
                   default:
                   - component: div
                     config:
                       style:
-                        align-items: center
+                        font-size: 11px
+                        font-weight: '600'
+                        padding: 1px 8px 1px 6px
+                        border-radius: 6px
+                        white-space: nowrap
+                        width: fit-content
+                        color: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
+                          ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
+                          ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[''neutral''] || (({good: [''#2e7d32'', ''#81c784''],
+                          ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''],
+                          bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark
+                          === ''dark'') ? 1 : 0]'
                         background: '=''color-mix(in srgb, '' + ((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''],
                           caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''],
                           info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[''neutral''] || (({good:
@@ -238,20 +249,9 @@ slots:
                           warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''],
                           neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark === ''dark'') ? 1 : 0] + '' 16%,
                           transparent)'''
-                        border-radius: 6px
-                        color: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
-                          ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
-                          ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[''neutral''] || (({good: [''#2e7d32'', ''#81c784''],
-                          ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''],
-                          bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark
-                          === ''dark'') ? 1 : 0]'
                         display: inline-flex
-                        font-size: 11px
-                        font-weight: '600'
+                        align-items: center
                         gap: 3px
-                        padding: 1px 8px 1px 6px
-                        white-space: nowrap
-                        width: fit-content
                       visible: '=(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
                         : {}))[props.heatpumpIndoorAmbientTemp] || {}).h) !== undefined && ((((((items[props.tileHistory].state)
                         || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpIndoorAmbientTemp]
@@ -260,40 +260,39 @@ slots:
                       default:
                       - component: oh-icon
                         config:
-                          height: 13.0
                           icon: '=''material:'' + (Math.abs(((Number(items[props.heatpumpIndoorAmbientTemp].numericState)
                             || 0) * 1 - (Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
                             : {}))[props.heatpumpIndoorAmbientTemp] || {}).h)) * 1))) < 0.05 ? ''trending_flat'' : ((Number(items[props.heatpumpIndoorAmbientTemp].numericState)
                             || 0) * 1 - (Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
                             : {}))[props.heatpumpIndoorAmbientTemp] || {}).h)) * 1)) > 0 ? ''trending_up'' : ''trending_down'')'
+                          width: 13
+                          height: 13
                           style:
-                            flex: 0 0 auto
-                            height: 13px
                             width: 13px
-                          width: 13.0
+                            height: 13px
+                            flex: 0 0 auto
                       - component: Label
                         config:
-                          style:
-                            position: relative
-                            top: 1px
                           text: '=(Math.abs(((Number(items[props.heatpumpIndoorAmbientTemp].numericState) || 0) * 1 - (Number(((((((items[props.tileHistory].state)
                             || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpIndoorAmbientTemp]
                             || {}).h)) * 1)))).toFixed(1) + '' K / 24 h'''
+                          style:
+                            position: relative
+                            top: 1px
                   - component: Label
                     config:
+                      text: '=[''too dry'', ''dry'', ''comfortable'', ''humid'', ''too humid''][(((Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState)
+                        || 0)) < 30 ? 0 : ((Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState) ||
+                        0)) < 40 ? 1 : ((Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState) || 0))
+                        < 60 ? 2 : ((Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState) || 0)) < 70
+                        ? 3 : 4)]'
                       style:
-                        background: '=''color-mix(in srgb, '' + ((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''],
-                          caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''],
-                          info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[[''warn'', ''caution'',
-                          ''good'', ''info'', ''bad''][(((Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState)
-                          || 0)) < 30 ? 0 : ((Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState) ||
-                          0)) < 40 ? 1 : ((Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState) || 0))
-                          < 60 ? 2 : ((Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState) || 0)) <
-                          70 ? 3 : 4)]] || (({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
-                          ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
-                          ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark === ''dark'') ?
-                          1 : 0] + '' 16%, transparent)'''
+                        font-size: 11px
+                        font-weight: '600'
+                        padding: 3px 8px 2px
                         border-radius: 6px
+                        white-space: nowrap
+                        width: fit-content
                         color: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
                           ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
                           ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[[''warn'', ''caution'', ''good'', ''info'',
@@ -305,75 +304,87 @@ slots:
                           ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
                           ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark === ''dark'') ?
                           1 : 0]'
-                        font-size: 11px
-                        font-weight: '600'
-                        padding: 3px 8px 2px
-                        white-space: nowrap
-                        width: fit-content
-                      text: '=[''too dry'', ''dry'', ''comfortable'', ''humid'', ''too humid''][(((Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState)
-                        || 0)) < 30 ? 0 : ((Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState) ||
-                        0)) < 40 ? 1 : ((Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState) || 0))
-                        < 60 ? 2 : ((Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState) || 0)) < 70
-                        ? 3 : 4)]'
+                        background: '=''color-mix(in srgb, '' + ((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''],
+                          caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''],
+                          info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[[''warn'', ''caution'',
+                          ''good'', ''info'', ''bad''][(((Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState)
+                          || 0)) < 30 ? 0 : ((Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState) ||
+                          0)) < 40 ? 1 : ((Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState) || 0))
+                          < 60 ? 2 : ((Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState) || 0)) <
+                          70 ? 3 : 4)]] || (({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
+                          ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
+                          ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark === ''dark'') ?
+                          1 : 0] + '' 16%, transparent)'''
           - component: Label
             config:
-              style:
-                font-size: 12px
-                opacity: '0.6'
               text: Heat pump sensor
-          - component: Label
-            config:
               style:
                 font-size: 12px
                 opacity: '0.6'
+          - component: Label
+            config:
               text: '=''Room climate · humidity '' + ([''NULL'', ''UNDEF''].includes(items[props.netatmoWeatherstationAtmosphericHumidity].state)
                 ? ''–'' : (items[props.netatmoWeatherstationAtmosphericHumidity].displayState || items[props.netatmoWeatherstationAtmosphericHumidity].state))'
+              style:
+                font-size: 12px
+                opacity: '0.6'
       - component: div
         config:
           style:
             border-left: '2px solid #29b6f6'
-            min-width: '0'
             padding: 4px 12px
+            min-width: '0'
         slots:
           default:
           - component: Label
             config:
+              text: Outdoor
               style:
                 font-size: 13px
                 opacity: '0.7'
-              text: Outdoor
           - component: div
             config:
               style:
-                align-items: center
                 display: flex
-                flex-wrap: wrap
+                align-items: center
                 gap: 4px 10px
+                flex-wrap: wrap
             slots:
               default:
               - component: Label
                 config:
+                  text: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpExtAmbientTemp].state) ? ''–'' : (items[props.heatpumpExtAmbientTemp].displayState
+                    || items[props.heatpumpExtAmbientTemp].state))'
                   style:
                     font-size: '=screen.width < 600 ? ''26px'' : ''28px'''
                     font-weight: '700'
-                    letter-spacing: -0.01em
                     line-height: '=screen.width < 600 ? ''32px'' : ''34px'''
+                    letter-spacing: -0.01em
                     white-space: nowrap
-                  text: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpExtAmbientTemp].state) ? ''–'' : (items[props.heatpumpExtAmbientTemp].displayState
-                    || items[props.heatpumpExtAmbientTemp].state))'
               - component: div
                 config:
                   style:
-                    align-items: flex-start
                     display: flex
                     flex-direction: column
+                    align-items: flex-start
                     gap: 3px
                 slots:
                   default:
                   - component: div
                     config:
                       style:
-                        align-items: center
+                        font-size: 11px
+                        font-weight: '600'
+                        padding: 1px 8px 1px 6px
+                        border-radius: 6px
+                        white-space: nowrap
+                        width: fit-content
+                        color: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
+                          ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
+                          ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[''neutral''] || (({good: [''#2e7d32'', ''#81c784''],
+                          ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''],
+                          bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark
+                          === ''dark'') ? 1 : 0]'
                         background: '=''color-mix(in srgb, '' + ((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''],
                           caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''],
                           info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[''neutral''] || (({good:
@@ -381,20 +392,9 @@ slots:
                           warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''],
                           neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark === ''dark'') ? 1 : 0] + '' 16%,
                           transparent)'''
-                        border-radius: 6px
-                        color: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
-                          ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
-                          ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[''neutral''] || (({good: [''#2e7d32'', ''#81c784''],
-                          ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''],
-                          bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark
-                          === ''dark'') ? 1 : 0]'
                         display: inline-flex
-                        font-size: 11px
-                        font-weight: '600'
+                        align-items: center
                         gap: 3px
-                        padding: 1px 8px 1px 6px
-                        white-space: nowrap
-                        width: fit-content
                       visible: '=(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
                         : {}))[props.heatpumpExtAmbientTemp] || {}).h) !== undefined && ((((((items[props.tileHistory].state)
                         || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpExtAmbientTemp]
@@ -403,28 +403,65 @@ slots:
                       default:
                       - component: oh-icon
                         config:
-                          height: 13.0
                           icon: '=''material:'' + (Math.abs(((Number(items[props.heatpumpExtAmbientTemp].numericState) ||
                             0) * 1 - (Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
                             : {}))[props.heatpumpExtAmbientTemp] || {}).h)) * 1))) < 0.05 ? ''trending_flat'' : ((Number(items[props.heatpumpExtAmbientTemp].numericState)
                             || 0) * 1 - (Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
                             : {}))[props.heatpumpExtAmbientTemp] || {}).h)) * 1)) > 0 ? ''trending_up'' : ''trending_down'')'
+                          width: 13
+                          height: 13
                           style:
-                            flex: 0 0 auto
-                            height: 13px
                             width: 13px
-                          width: 13.0
+                            height: 13px
+                            flex: 0 0 auto
                       - component: Label
                         config:
-                          style:
-                            position: relative
-                            top: 1px
                           text: '=(Math.abs(((Number(items[props.heatpumpExtAmbientTemp].numericState) || 0) * 1 - (Number(((((((items[props.tileHistory].state)
                             || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpExtAmbientTemp]
                             || {}).h)) * 1)))).toFixed(1) + '' K / 24 h'''
+                          style:
+                            position: relative
+                            top: 1px
                   - component: Label
                     config:
+                      text: '=((6.112 * Math.exp(17.67 * (Number(items[props.netatmoOutdoorTemperature].numericState) || 0)
+                        / ((Number(items[props.netatmoOutdoorTemperature].numericState) || 0) + 243.5)) * (Number(items[props.netatmoOutdoorAtmosphericHumidity].numericState)
+                        || 0) * 2.1674 / (273.15 + (Number(items[props.netatmoOutdoorTemperature].numericState) || 0))) -
+                        (6.112 * Math.exp(17.67 * (Number(items[props.netatmoWeatherstationTemperature].numericState) || 0)
+                        / ((Number(items[props.netatmoWeatherstationTemperature].numericState) || 0) + 243.5)) * (Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState)
+                        || 0) * 2.1674 / (273.15 + (Number(items[props.netatmoWeatherstationTemperature].numericState) ||
+                        0)))) < -1 ? ''Airing dries'' : ((6.112 * Math.exp(17.67 * (Number(items[props.netatmoOutdoorTemperature].numericState)
+                        || 0) / ((Number(items[props.netatmoOutdoorTemperature].numericState) || 0) + 243.5)) * (Number(items[props.netatmoOutdoorAtmosphericHumidity].numericState)
+                        || 0) * 2.1674 / (273.15 + (Number(items[props.netatmoOutdoorTemperature].numericState) || 0))) -
+                        (6.112 * Math.exp(17.67 * (Number(items[props.netatmoWeatherstationTemperature].numericState) || 0)
+                        / ((Number(items[props.netatmoWeatherstationTemperature].numericState) || 0) + 243.5)) * (Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState)
+                        || 0) * 2.1674 / (273.15 + (Number(items[props.netatmoWeatherstationTemperature].numericState) ||
+                        0)))) > 1 ? ''Airing dampens'' : ''Airing neutral'''
                       style:
+                        font-size: 11px
+                        font-weight: '600'
+                        padding: 3px 8px 2px
+                        border-radius: 6px
+                        white-space: nowrap
+                        width: fit-content
+                        color: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
+                          ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
+                          ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[(((6.112 * Math.exp(17.67 * (Number(items[props.netatmoOutdoorTemperature].numericState)
+                          || 0) / ((Number(items[props.netatmoOutdoorTemperature].numericState) || 0) + 243.5)) * (Number(items[props.netatmoOutdoorAtmosphericHumidity].numericState)
+                          || 0) * 2.1674 / (273.15 + (Number(items[props.netatmoOutdoorTemperature].numericState) || 0)))
+                          - (6.112 * Math.exp(17.67 * (Number(items[props.netatmoWeatherstationTemperature].numericState)
+                          || 0) / ((Number(items[props.netatmoWeatherstationTemperature].numericState) || 0) + 243.5)) * (Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState)
+                          || 0) * 2.1674 / (273.15 + (Number(items[props.netatmoWeatherstationTemperature].numericState) ||
+                          0)))) < -1 ? ''good'' : ((6.112 * Math.exp(17.67 * (Number(items[props.netatmoOutdoorTemperature].numericState)
+                          || 0) / ((Number(items[props.netatmoOutdoorTemperature].numericState) || 0) + 243.5)) * (Number(items[props.netatmoOutdoorAtmosphericHumidity].numericState)
+                          || 0) * 2.1674 / (273.15 + (Number(items[props.netatmoOutdoorTemperature].numericState) || 0)))
+                          - (6.112 * Math.exp(17.67 * (Number(items[props.netatmoWeatherstationTemperature].numericState)
+                          || 0) / ((Number(items[props.netatmoWeatherstationTemperature].numericState) || 0) + 243.5)) * (Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState)
+                          || 0) * 2.1674 / (273.15 + (Number(items[props.netatmoWeatherstationTemperature].numericState) ||
+                          0)))) > 1 ? ''warn'' : ''neutral'')] || (({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''],
+                          caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''],
+                          info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark
+                          === ''dark'') ? 1 : 0]'
                         background: '=''color-mix(in srgb, '' + ((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''],
                           caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''],
                           info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[(((6.112 * Math.exp(17.67
@@ -444,54 +481,14 @@ slots:
                           caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''],
                           info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark
                           === ''dark'') ? 1 : 0] + '' 16%, transparent)'''
-                        border-radius: 6px
-                        color: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
-                          ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
-                          ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[(((6.112 * Math.exp(17.67 * (Number(items[props.netatmoOutdoorTemperature].numericState)
-                          || 0) / ((Number(items[props.netatmoOutdoorTemperature].numericState) || 0) + 243.5)) * (Number(items[props.netatmoOutdoorAtmosphericHumidity].numericState)
-                          || 0) * 2.1674 / (273.15 + (Number(items[props.netatmoOutdoorTemperature].numericState) || 0)))
-                          - (6.112 * Math.exp(17.67 * (Number(items[props.netatmoWeatherstationTemperature].numericState)
-                          || 0) / ((Number(items[props.netatmoWeatherstationTemperature].numericState) || 0) + 243.5)) * (Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState)
-                          || 0) * 2.1674 / (273.15 + (Number(items[props.netatmoWeatherstationTemperature].numericState) ||
-                          0)))) < -1 ? ''good'' : ((6.112 * Math.exp(17.67 * (Number(items[props.netatmoOutdoorTemperature].numericState)
-                          || 0) / ((Number(items[props.netatmoOutdoorTemperature].numericState) || 0) + 243.5)) * (Number(items[props.netatmoOutdoorAtmosphericHumidity].numericState)
-                          || 0) * 2.1674 / (273.15 + (Number(items[props.netatmoOutdoorTemperature].numericState) || 0)))
-                          - (6.112 * Math.exp(17.67 * (Number(items[props.netatmoWeatherstationTemperature].numericState)
-                          || 0) / ((Number(items[props.netatmoWeatherstationTemperature].numericState) || 0) + 243.5)) * (Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState)
-                          || 0) * 2.1674 / (273.15 + (Number(items[props.netatmoWeatherstationTemperature].numericState) ||
-                          0)))) > 1 ? ''warn'' : ''neutral'')] || (({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''],
-                          caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''],
-                          info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark
-                          === ''dark'') ? 1 : 0]'
-                        font-size: 11px
-                        font-weight: '600'
-                        padding: 3px 8px 2px
-                        white-space: nowrap
-                        width: fit-content
-                      text: '=((6.112 * Math.exp(17.67 * (Number(items[props.netatmoOutdoorTemperature].numericState) || 0)
-                        / ((Number(items[props.netatmoOutdoorTemperature].numericState) || 0) + 243.5)) * (Number(items[props.netatmoOutdoorAtmosphericHumidity].numericState)
-                        || 0) * 2.1674 / (273.15 + (Number(items[props.netatmoOutdoorTemperature].numericState) || 0))) -
-                        (6.112 * Math.exp(17.67 * (Number(items[props.netatmoWeatherstationTemperature].numericState) || 0)
-                        / ((Number(items[props.netatmoWeatherstationTemperature].numericState) || 0) + 243.5)) * (Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState)
-                        || 0) * 2.1674 / (273.15 + (Number(items[props.netatmoWeatherstationTemperature].numericState) ||
-                        0)))) < -1 ? ''Airing dries'' : ((6.112 * Math.exp(17.67 * (Number(items[props.netatmoOutdoorTemperature].numericState)
-                        || 0) / ((Number(items[props.netatmoOutdoorTemperature].numericState) || 0) + 243.5)) * (Number(items[props.netatmoOutdoorAtmosphericHumidity].numericState)
-                        || 0) * 2.1674 / (273.15 + (Number(items[props.netatmoOutdoorTemperature].numericState) || 0))) -
-                        (6.112 * Math.exp(17.67 * (Number(items[props.netatmoWeatherstationTemperature].numericState) || 0)
-                        / ((Number(items[props.netatmoWeatherstationTemperature].numericState) || 0) + 243.5)) * (Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState)
-                        || 0) * 2.1674 / (273.15 + (Number(items[props.netatmoWeatherstationTemperature].numericState) ||
-                        0)))) > 1 ? ''Airing dampens'' : ''Airing neutral'''
           - component: Label
             config:
-              style:
-                font-size: 12px
-                opacity: '0.6'
               text: Heat pump sensor
-          - component: Label
-            config:
               style:
                 font-size: 12px
                 opacity: '0.6'
+          - component: Label
+            config:
               text: ='absolute ' + ((6.112 * Math.exp(17.67 * (Number(items[props.netatmoOutdoorTemperature].numericState)
                 || 0) / ((Number(items[props.netatmoOutdoorTemperature].numericState) || 0) + 243.5)) * (Number(items[props.netatmoOutdoorAtmosphericHumidity].numericState)
                 || 0) * 2.1674 / (273.15 + (Number(items[props.netatmoOutdoorTemperature].numericState) || 0)))).toFixed(1)
@@ -499,190 +496,229 @@ slots:
                 || 0) / ((Number(items[props.netatmoWeatherstationTemperature].numericState) || 0) + 243.5)) * (Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState)
                 || 0) * 2.1674 / (273.15 + (Number(items[props.netatmoWeatherstationTemperature].numericState) || 0)))).toFixed(1)
                 + ' g/m³'
+              style:
+                font-size: 12px
+                opacity: '0.6'
   - component: oh-chart
     config:
       chartType: ''
+      periodVisible: false
+      period: D
       height: 320px
       options:
+        backgroundColor: transparent
         axisPointer:
           link:
           - xAxisIndex: all
-        backgroundColor: transparent
-      period: D
-      periodVisible: false
     slots:
       grid:
       - component: oh-chart-grid
         config:
+          top: '40'
           bottom: '56'
           left: '40'
           right: '15'
-          top: '40'
-      legend:
-      - component: oh-chart-legend
+      xAxis:
+      - component: oh-time-axis
         config:
-          bottom: '0'
-          show: true
-          type: scroll
+          gridIndex: 0
+          axisPointer:
+            snap: false
+            label:
+              show: false
+      - component: oh-time-axis
+        config:
+          gridIndex: 0
+          show: false
+          axisPointer:
+            snap: false
+            label:
+              show: false
+      - component: oh-time-axis
+        config:
+          gridIndex: 0
+          show: false
+          axisPointer:
+            snap: false
+            label:
+              show: false
+      yAxis:
+      - component: oh-value-axis
+        config:
+          gridIndex: 0
+          name: °C
+          scale: true
+          nameGap: 14
+          nameTextStyle:
+            align: right
+            padding:
+            - 0
+            - 8
+            - 0
+            - 0
+          splitLine:
+            lineStyle:
+              type: dashed
+              opacity: 0.4
       series:
       - component: oh-time-series
         config:
-          gridIndex: 0.0
+          name: Indoor
+          gridIndex: 0
+          xAxisIndex: 0
+          yAxisIndex: 0
+          type: line
           item: =props.temperatureIndoor15min
+          smooth: 0.5
+          lineStyle:
+            width: 2.5
+            color: '#fb8c00'
           itemStyle:
             color: '#fb8c00'
-          lineStyle:
-            color: '#fb8c00'
-            width: 2.5
           markPoint:
             data:
-            - name: max
-              type: max
-            - label:
-                position: bottom
+            - type: max
+              name: max
+            - type: min
               name: min
-              type: min
+              label:
+                position: bottom
+            symbol: circle
+            symbolSize: 12
             itemStyle:
+              color: '#fb8c00'
               borderColor: '#ffffff'
               borderWidth: 2.5
-              color: '#fb8c00'
             label:
-              backgroundColor: '#fb8c00'
-              borderRadius: 6.0
-              color: '#ffffff'
-              distance: 10.0
-              fontSize: 14.0
-              fontWeight: 700.0
-              formatter: =(p) => (Number(p.value)).toFixed(1) + ' °C'
-              padding:
-              - 5.0
-              - 7.0
-              - 3.0
-              - 7.0
-              position: top
               show: true
-            symbol: circle
-            symbolSize: 12.0
-          name: Indoor
-          smooth: 0.5
-          type: line
-          xAxisIndex: 0.0
-          yAxisIndex: 0.0
+              position: top
+              distance: 10
+              formatter: =(p) => (Number(p.value)).toFixed(1) + ' °C'
+              fontSize: 14
+              fontWeight: 700
+              color: '#ffffff'
+              backgroundColor: '#fb8c00'
+              padding:
+              - 5
+              - 7
+              - 3
+              - 7
+              borderRadius: 6
       - component: oh-time-series
         config:
+          name: Outdoor
+          gridIndex: 0
+          xAxisIndex: 1
+          yAxisIndex: 0
+          type: line
+          item: =props.temperatureOutdoor15min
+          smooth: 0.5
+          lineStyle:
+            width: 2.5
+            color: '#29b6f6'
+          itemStyle:
+            color: '#29b6f6'
           areaStyle:
             color:
-              colorStops:
-              - color: rgba(41, 182, 246, 0.45)
-                offset: 0.0
-              - color: rgba(41, 182, 246, 0.02)
-                offset: 1.0
               type: linear
-              x: 0.0
-              x2: 0.0
-              y: 0.0
-              y2: 1.0
-          gridIndex: 0.0
-          item: =props.temperatureOutdoor15min
-          itemStyle:
-            color: '#29b6f6'
-          lineStyle:
-            color: '#29b6f6'
-            width: 2.5
+              x: 0
+              y: 0
+              x2: 0
+              y2: 1
+              colorStops:
+              - offset: 0
+                color: rgba(41, 182, 246, 0.45)
+              - offset: 1
+                color: rgba(41, 182, 246, 0.02)
           markPoint:
             data:
-            - name: max
-              type: max
-            - label:
-                position: bottom
+            - type: max
+              name: max
+            - type: min
               name: min
-              type: min
+              label:
+                position: bottom
+            symbol: circle
+            symbolSize: 12
             itemStyle:
+              color: '#29b6f6'
               borderColor: '#ffffff'
               borderWidth: 2.5
-              color: '#29b6f6'
             label:
-              backgroundColor: '#29b6f6'
-              borderRadius: 6.0
-              color: '#ffffff'
-              distance: 10.0
-              fontSize: 14.0
-              fontWeight: 700.0
-              formatter: =(p) => (Number(p.value)).toFixed(1) + ' °C'
-              padding:
-              - 5.0
-              - 7.0
-              - 3.0
-              - 7.0
-              position: top
               show: true
-            symbol: circle
-            symbolSize: 12.0
-          name: Outdoor
-          smooth: 0.5
-          type: line
-          xAxisIndex: 1.0
-          yAxisIndex: 0.0
+              position: top
+              distance: 10
+              formatter: =(p) => (Number(p.value)).toFixed(1) + ' °C'
+              fontSize: 14
+              fontWeight: 700
+              color: '#ffffff'
+              backgroundColor: '#29b6f6'
+              padding:
+              - 5
+              - 7
+              - 3
+              - 7
+              borderRadius: 6
       - component: oh-time-series
         config:
-          gridIndex: 0.0
+          name: Ø 24 h
+          gridIndex: 0
+          xAxisIndex: 2
+          yAxisIndex: 0
+          type: line
           item: =props.heatpumpExtAmbientTempAvg
+          symbol: none
+          lineStyle:
+            width: 1.5
+            type: dashed
+            color: '#29b6f6'
           itemStyle:
             color: '#29b6f6'
-          lineStyle:
-            color: '#29b6f6'
-            type: dashed
-            width: 1.5
           markPoint:
             data:
-            - name: max
-              type: max
-            - label:
-                position: bottom
+            - type: max
+              name: max
+            - type: min
               name: min
-              type: min
+              label:
+                position: bottom
+            symbol: circle
+            symbolSize: 8
             itemStyle:
+              color: rgba(41, 182, 246, 0.35)
               borderColor: '#29b6f6'
               borderWidth: 1.5
-              color: rgba(41, 182, 246, 0.35)
             label:
-              distance: 8.0
+              show: true
+              position: top
+              distance: 8
               formatter: '=(p) => ((f, t) => f < 0.12 ? ''{s| }{b|'' + t + ''}'' : f > 0.88 ? ''{b|'' + t + ''}{s| }'' : ''{b|''
                 + t + ''}'')((p.data.coord[0] - dayjs().valueOf()) / 86400000 + 1, ''Ø '' + (Number(p.value)).toFixed(1) +
                 '' °C'')'
-              position: top
               rich:
                 b:
+                  fontSize: 12
+                  fontWeight: 600
+                  color: '=themeOptions.dark === ''dark'' ? ''#b3e5fc'' : ''#01579b'''
                   backgroundColor: '=themeOptions.dark === ''dark'' ? ''#1f3b48'' : ''#d4f0fd'''
                   borderColor: '#29b6f6'
-                  borderRadius: 6.0
+                  borderWidth: 1
                   borderType: dashed
-                  borderWidth: 1.0
-                  color: '=themeOptions.dark === ''dark'' ? ''#b3e5fc'' : ''#01579b'''
-                  fontSize: 12.0
-                  fontWeight: 600.0
                   padding:
-                  - 5.0
-                  - 6.0
-                  - 3.0
-                  - 6.0
+                  - 5
+                  - 6
+                  - 3
+                  - 6
+                  borderRadius: 6
                 s:
-                  width: 64.0
-              show: true
-            symbol: circle
-            symbolSize: 8.0
-          name: Ø 24 h
-          symbol: none
-          type: line
-          xAxisIndex: 2.0
-          yAxisIndex: 0.0
+                  width: 64
       tooltip:
       - component: oh-chart-tooltip
         config:
-          backgroundColor: transparent
-          borderWidth: 0.0
+          show: true
           confine: true
-          extraCssText: 'box-shadow: none;'
+          trigger: axis
+          smartFormatter: false
           formatter: '=(ps) => ((H) => ''<div style="display: flex; flex-direction: column; align-items: flex-start; height:
             0">'' + [0].map((g) => ((r) => ''<div style="'' + (r ? ''border: 1px solid; border-radius: 4px; padding: 10px;
             box-shadow: rgba(0, 0, 0, 0.2) 1px 2px 10px; '' + (themeOptions.dark === ''dark'' ? ''background-color: rgb(58,
@@ -696,7 +732,6 @@ slots:
             '' + p.seriesName + ''<span style="float: right; margin-left: 20px"><b style="text-align: right;">'' + ((v) =>
             v.toLocaleString(''en-GB'') + '' '' + p.seriesId.split(''#'')[2])(Number(p.value[1])) + ''</b></span><br/>'').join(''''))).join('''')
             + ''</div>'')(ps[0].axisValue)'
-          padding: 0.0
           position: '=(pt, ps, dom, rect, size) => ((T, B) => ((c, left, h) => [c.style.setProperty(''align-items'', left
             ? ''flex-end'' : ''flex-start''), dom.hasAttribute(''data-wb'') || [dom.parentNode.addEventListener(''mouseleave'',
             () => [0].map((i) => dom.removeAttribute(''data-wb'' + i))), dom.setAttribute(''data-wb'', '''')], [0].map((i)
@@ -707,49 +742,14 @@ slots:
             ? y + 4 : 0, i === h ? Math.max(T[i], Math.min(pt[1] + 20, B[i] - b.offsetHeight)) : T[i])))(c.children[i]) :
             0), [left ? pt[0] - 20 - c.offsetWidth : pt[0] + 20, 0]][4])(dom.firstChild, pt[0] > size.viewSize[0] / 2, T.filter((t)
             => t <= pt[1]).length - 1))([40], [size.viewSize[1] - 56])'
+          backgroundColor: transparent
+          borderWidth: 0
+          padding: 0
+          transitionDuration: 0
+          extraCssText: 'box-shadow: none;'
+      legend:
+      - component: oh-chart-legend
+        config:
           show: true
-          smartFormatter: false
-          transitionDuration: 0.0
-          trigger: axis
-      xAxis:
-      - component: oh-time-axis
-        config:
-          axisPointer:
-            label:
-              show: false
-            snap: false
-          gridIndex: 0.0
-      - component: oh-time-axis
-        config:
-          axisPointer:
-            label:
-              show: false
-            snap: false
-          gridIndex: 0.0
-          show: false
-      - component: oh-time-axis
-        config:
-          axisPointer:
-            label:
-              show: false
-            snap: false
-          gridIndex: 0.0
-          show: false
-      yAxis:
-      - component: oh-value-axis
-        config:
-          gridIndex: 0.0
-          name: °C
-          nameGap: 14.0
-          nameTextStyle:
-            align: right
-            padding:
-            - 0.0
-            - 8.0
-            - 0.0
-            - 0.0
-          scale: true
-          splitLine:
-            lineStyle:
-              opacity: 0.4
-              type: dashed
+          bottom: '0'
+          type: scroll

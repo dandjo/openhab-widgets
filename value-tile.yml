@@ -3,69 +3,69 @@ tags:
 - tile
 props:
   parameters:
-  - description: Title above the value
+  - name: title
     label: Title
-    name: title
-    required: true
+    description: Title above the value
     type: TEXT
-  - description: The text to show, usually an expression on an item
+    required: true
+  - name: value
     label: Value
-    name: value
+    description: The text to show, usually an expression on an item
+    type: TEXT
     required: true
-    type: TEXT
-  - description: 'Colour of the item popup''s course as #rrggbb'
+  - name: color
     label: Colour
-    name: color
-    required: false
+    description: 'Colour of the item popup''s course as #rrggbb'
     type: TEXT
-  - context: item
-    description: 'The item whose popup a tap opens; empty: no tap'
+    required: false
+  - name: item
     label: Item
-    name: item
-    required: false
+    description: 'The item whose popup a tap opens; empty: no tap'
     type: TEXT
-  - default: popup
-    description: 'popup: the item popup (widget item-popup); options: the item''s command options'
+    required: false
+    context: item
+  - name: action
     label: Action
-    name: action
-    required: false
+    description: 'popup: the item popup (widget item-popup); options: the item''s command options'
     type: TEXT
-  - default: number
-    description: 'What the item popup shows: number, state or none'
+    required: false
+    default: popup
+  - name: kind
     label: Kind
-    name: kind
-    required: false
+    description: 'What the item popup shows: number, state or none'
     type: TEXT
-  - description: value=label pairs, comma-separated, for the item popup's band of states
+    required: false
+    default: number
+  - name: states
     label: State labels
-    name: states
-    required: false
+    description: value=label pairs, comma-separated, for the item popup's band of states
     type: TEXT
-  - description: A long text wraps across the whole row of the grid instead of being cut
+    required: false
+  - name: wrap
     label: Wrap
-    name: wrap
-    required: false
+    description: A long text wraps across the whole row of the grid instead of being cut
     type: BOOLEAN
-  - description: The tile's base size, e.g. 1.1em to grow with its card; default 14px
-    label: Font size
-    name: fontSize
     required: false
+  - name: fontSize
+    label: Font size
+    description: The tile's base size, e.g. 1.1em to grow with its card; default 14px
     type: TEXT
+    required: false
   parameterGroups: []
-timestamp: Oct 25, 2026, 1:50:27 PM
+timestamp: Oct 25, 2026, 2:07:58 PM
 component: div
 config:
   style:
-    background: color-mix(in srgb, var(--f7-text-color) 6%, transparent)
-    border-radius: 0.8571em
+    position: relative
+    overflow: hidden
     box-sizing: border-box
-    font-size: =props.fontSize || '14px'
-    grid-column: '=props.wrap ? ''1 / -1'' : ''auto'''
     height: 100%
     min-width: '0'
-    overflow: hidden
+    font-size: =props.fontSize || '14px'
     padding: 0.7143em 0.8571em
-    position: relative
+    border-radius: 0.8571em
+    grid-column: '=props.wrap ? ''1 / -1'' : ''auto'''
+    background: color-mix(in srgb, var(--f7-text-color) 6%, transparent)
   stylesheet: '@keyframes a-soft { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.06; } }
 
     @keyframes a-full { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
@@ -177,35 +177,35 @@ slots:
       default:
       - component: Label
         config:
+          text: =props.title
           style:
             font-size: 0.8571em
             opacity: '0.65'
-          text: =props.title
       - component: Label
         config:
+          text: =props.value
           style:
             font-size: '=props.wrap ? ''1em'' : ''1.429em'''
             font-weight: '=props.wrap ? 600 : 700'
             line-height: '=props.wrap ? ''1.357'' : ''1.3'''
-            overflow: hidden
-            overflow-wrap: anywhere
-            text-overflow: '=props.wrap ? ''clip'' : ''ellipsis'''
             white-space: '=props.wrap ? ''normal'' : ''nowrap'''
-          text: =props.value
+            overflow: hidden
+            text-overflow: '=props.wrap ? ''clip'' : ''ellipsis'''
+            overflow-wrap: anywhere
   - component: oh-link
     config:
+      visible: =!!props.item
       action: =props.action || 'popup'
       actionItem: =props.item
       actionModal: widget:item-popup
       actionModalConfig:
-        color: =props.color || '#5c6bc0'
         item: =props.item
+        title: =props.title
+        color: =props.color || '#5c6bc0'
         kind: =props.kind || 'number'
         states: =props.states || ''
-        title: =props.title
       style:
-        border-radius: 0.8571em
-        display: block
-        inset: '0'
         position: absolute
-      visible: =!!props.item
+        inset: '0'
+        display: block
+        border-radius: 0.8571em

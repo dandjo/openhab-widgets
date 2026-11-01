@@ -3,31 +3,31 @@ tags:
 - controls
 props:
   parameters:
-  - context: item
-    description: Switch item
+  - name: heatpumpWaterPumpOperation
     label: ESPAltherma Water Pump Operation
-    name: heatpumpWaterPumpOperation
-    required: true
+    description: Switch item
     type: TEXT
-  - context: item
-    description: Number:VolumetricFlowRate item
+    required: true
+    context: item
+  - name: heatpumpFlowSensor
     label: ESPAltherma Flow Sensor (l/min)
-    name: heatpumpFlowSensor
-    required: true
+    description: Number:VolumetricFlowRate item
     type: TEXT
-  - context: item
-    description: String item
+    required: true
+    context: item
+  - name: heatpumpValve
     label: ESPAltherma 3-Way Valve Mode
-    name: heatpumpValve
-    required: true
+    description: String item
     type: TEXT
+    required: true
+    context: item
   parameterGroups: []
-timestamp: Oct 25, 2026, 1:50:26 PM
+timestamp: Oct 25, 2026, 2:07:58 PM
 component: div
 config:
-  label: 3-Way Valve
   style:
     --quick-popup: panel
+  label: 3-Way Valve
   stylesheet: "@keyframes a-soft { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.06; } }\n@keyframes a-full { 0%, 100% { opacity:\
     \ 0.3; } 50% { opacity: 1; } }\n@keyframes a-arc { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }\n@keyframes a-halo\
     \ { 0%, 100% { opacity: 0; } 50% { opacity: 1; } }\n@keyframes a-halo-arc { 0%, 100% { opacity: 1; } 50% { opacity: 0;\
@@ -86,20 +86,20 @@ slots:
       - component: div
         config:
           style:
-            align-items: center
             display: flex
+            align-items: center
             gap: 18px
             padding-bottom: 4px
         slots:
           default:
           - component: svg
             config:
-              height: 104.0
+              viewBox: -34.0 -34.0 68 68
+              width: 104
+              height: 104
               style:
                 display: block
                 overflow: visible
-              viewBox: -34.0 -34.0 68 68
-              width: 104.0
             slots:
               default:
               - component: g
@@ -108,17 +108,17 @@ slots:
                   default:
                   - component: circle
                     config:
-                      cx: 0.0
-                      cy: 0.0
+                      cx: 0
+                      cy: 0
                       r: 32.25
                       style:
                         fill: 'var(--f7-card-bg-color, #fff)'
                   - component: circle
                     config:
-                      cx: 0.0
-                      cy: 0.0
-                      fill: none
+                      cx: 0
+                      cy: 0
                       r: 29.2
+                      fill: none
                       stroke: rgba(127, 127, 127, 0.28)
                       stroke-width: 2.9
               - component: g
@@ -127,99 +127,99 @@ slots:
                   default:
                   - component: circle
                     config:
-                      class: a-full
-                      cx: 0.0
-                      cy: 0.0
-                      fill: none
+                      cx: 0
+                      cy: 0
                       r: 29.2
+                      fill: none
                       stroke: '#ffb74d'
                       stroke-width: 2.9
                       visible: =((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
                         || 0) > 0)) && !(false)
+                      class: a-full
                   - component: circle
                     config:
-                      class: a-halo
-                      cx: 0.0
-                      cy: 0.0
-                      fill: none
+                      cx: 0
+                      cy: 0
                       r: 29.2
                       stroke: '#ffb74d'
+                      fill: none
                       stroke-width: 4.5
                       visible: =((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
                         || 0) > 0)) && !(false)
+                      class: a-halo
                   - component: circle
                     config:
-                      class: a-soft
-                      cx: 0.0
-                      cy: 0.0
-                      fill: none
+                      cx: 0
+                      cy: 0
                       r: 29.2
+                      fill: none
                       stroke: '#ffb74d'
                       stroke-width: 2.9
                       visible: =((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
                         || 0) > 0)) && (false)
+                      class: a-soft
               - component: g
                 config: {}
                 slots:
                   default:
                   - component: circle
                     config:
-                      cx: 0.0
-                      cy: 0.0
+                      cx: 0
+                      cy: 0
                       r: 27.75
                       style:
                         fill: 'var(--f7-card-bg-color, #fff)'
                   - component: circle
                     config:
-                      cx: 0.0
-                      cy: 0.0
+                      cx: 0
+                      cy: 0
+                      r: 27.75
                       fill: '#ffb74d'
                       fill-opacity: '0.12'
-                      r: 27.75
               - component: polygon
                 config:
-                  fill: '=items[props.heatpumpValve].state === ''DHW'' ? ''#fb8c00'' : ''none'''
                   points: -12,-6 0,0 -12,6
                   stroke: currentColor
-                  stroke-linecap: round
-                  stroke-opacity: '=items[props.heatpumpValve].state === ''DHW'' ? ''1'' : ''0.4'''
                   stroke-width: 1.4
+                  stroke-linecap: round
+                  fill: '=items[props.heatpumpValve].state === ''DHW'' ? ''#fb8c00'' : ''none'''
+                  stroke-opacity: '=items[props.heatpumpValve].state === ''DHW'' ? ''1'' : ''0.4'''
               - component: polygon
                 config:
-                  fill: '#ffe0b2'
                   points: 12,-6 0,0 12,6
                   stroke: currentColor
-                  stroke-linecap: round
                   stroke-width: 1.4
+                  stroke-linecap: round
+                  fill: '#ffe0b2'
               - component: polygon
                 config:
-                  fill: '=items[props.heatpumpValve].state === ''DHW'' ? ''none'' : ''#fb8c00'''
                   points: -6,-12 0,0 6,-12
                   stroke: currentColor
-                  stroke-linecap: round
-                  stroke-opacity: '=items[props.heatpumpValve].state === ''DHW'' ? ''0.4'' : ''1'''
                   stroke-width: 1.4
+                  stroke-linecap: round
+                  fill: '=items[props.heatpumpValve].state === ''DHW'' ? ''none'' : ''#fb8c00'''
+                  stroke-opacity: '=items[props.heatpumpValve].state === ''DHW'' ? ''0.4'' : ''1'''
               - component: line
                 config:
-                  fill: none
+                  x1: 0
+                  y1: 0
+                  x2: 0
+                  y2: 11
                   stroke: currentColor
-                  stroke-linecap: round
                   stroke-width: 1.6
-                  x1: 0.0
-                  x2: 0.0
-                  y1: 0.0
-                  y2: 11.0
+                  stroke-linecap: round
+                  fill: none
               - component: rect
                 config:
-                  fill: none
-                  height: 5.0
-                  rx: 1.0
+                  x: -5
+                  y: 11
+                  width: 10
+                  height: 5
+                  rx: 1
                   stroke: currentColor
-                  stroke-linecap: round
                   stroke-width: 1.4
-                  width: 10.0
-                  x: -5.0
-                  y: 11.0
+                  stroke-linecap: round
+                  fill: none
           - component: div
             config:
               style:
@@ -231,45 +231,62 @@ slots:
               default:
               - component: Label
                 config:
+                  text: 3-Way Valve
                   style:
                     font-size: 15px
                     font-weight: '600'
-                  text: 3-Way Valve
               - component: Label
                 config:
+                  text: '=(items[props.heatpumpValve].state === ''DHW'' ? ''Hot water'' : ''Heating'')'
                   style:
                     font-size: 12px
                     opacity: '0.7'
-                  text: '=(items[props.heatpumpValve].state === ''DHW'' ? ''Hot water'' : ''Heating'')'
       - component: oh-chart
         config:
           chartType: ''
+          periodVisible: true
+          period: D
           height: 120px
           options:
+            backgroundColor: transparent
             axisPointer:
               link:
               - xAxisIndex: all
-            backgroundColor: transparent
-          period: D
-          periodVisible: true
         slots:
           grid:
           - component: oh-chart-grid
             config:
-              backgroundColor: rgba(127, 127, 127, 0.13)
-              borderWidth: 0.0
-              height: 16.0
+              top: '62'
+              height: 16
               left: '50'
               right: '20'
               show: true
-              top: '62'
+              backgroundColor: rgba(127, 127, 127, 0.13)
+              borderWidth: 0
+          xAxis:
+          - component: oh-time-axis
+            config:
+              gridIndex: 0
+              axisPointer:
+                snap: false
+                label:
+                  show: false
+          yAxis:
+          - component: oh-category-axis
+            config:
+              categoryType: values
+              data:
+              - Position
+              show: false
+              gridIndex: 0
           series:
           - component: oh-state-series
             config:
-              gridIndex: 0.0
-              item: =props.heatpumpValve
-              mapState: '=(s) => s === ''DHW'' || s === ''​'' ? ''​'' : ''UNDEF'''
               name: Position
+              item: =props.heatpumpValve
+              yValue: 0
+              yHeight: 1
+              mapState: '=(s) => s === ''DHW'' || s === ''​'' ? ''​'' : ''UNDEF'''
               stateColor:
                 ​: '#e57373'
               tooltip:
@@ -281,30 +298,31 @@ slots:
                   60 ? Math.floor(((p.value[2] - p.value[1]) / 60000) / 60) + '':'' + (Math.floor(((p.value[2] - p.value[1])
                   / 60000) % 60) < 10 ? ''0'' : '''') + Math.floor(((p.value[2] - p.value[1]) / 60000) % 60) + '' h'' : Math.round(((p.value[2]
                   - p.value[1]) / 60000)) + '' min'') + ''</b></span>'' : '''''
-              xAxisIndex: 0.0
-              yAxisIndex: 0.0
-              yHeight: 1.0
-              yValue: 0.0
+              xAxisIndex: 0
+              yAxisIndex: 0
+              gridIndex: 0
           title:
           - component: oh-chart-title
             config:
-              left: 10.0
               show: true
               text: '{s0|On hot water}'
+              left: 10
+              top: 15
               textStyle:
-                fontSize: 13.0
-                fontWeight: 600.0
+                fontSize: 13
+                fontWeight: 600
                 rich:
                   s0:
+                    fontSize: 13
+                    fontWeight: 600
                     color: '#e57373'
-                    fontSize: 13.0
-                    fontWeight: 600.0
-              top: 15.0
           tooltip:
           - component: oh-chart-tooltip
             config:
-              borderColor: '=themeOptions.dark === ''dark'' ? ''rgb(91, 94, 100)'' : ''rgb(183, 185, 190)'''
+              show: true
               confine: true
+              transitionDuration: 0
+              borderColor: '=themeOptions.dark === ''dark'' ? ''rgb(91, 94, 100)'' : ''rgb(183, 185, 190)'''
               position: '=(pt, ps, dom, rect, size) => [dom.hasAttribute(''data-wt'') || [dom.parentNode.addEventListener(''mouseleave'',
                 () => [0].map((i) => dom.removeAttribute(''data-wt'' + i))), dom.setAttribute(''data-wt'', '''')], [0].map((i)
                 => ((b) => b.style.display === ''none'' ? 0 : ((w) => [b.style.setProperty(''box-sizing'', ''border-box''),
@@ -312,24 +330,6 @@ slots:
                 Number(dom.getAttribute(''data-wt'' + i)))))(dom)), ((w, h) => [pt[0] + w + 20 + 2 > size.viewSize[0] ? pt[0]
                 - w - 20 : pt[0] + 20, pt[1] + h + 20 > size.viewSize[1] ? pt[1] - h - 20 : pt[1] + 20])(dom.offsetWidth,
                 dom.offsetHeight)][2]'
-              show: true
-              transitionDuration: 0.0
-          xAxis:
-          - component: oh-time-axis
-            config:
-              axisPointer:
-                label:
-                  show: false
-                snap: false
-              gridIndex: 0.0
-          yAxis:
-          - component: oh-category-axis
-            config:
-              categoryType: values
-              data:
-              - Position
-              gridIndex: 0.0
-              show: false
       - component: div
         config:
           style:
@@ -340,13 +340,13 @@ slots:
           default:
           - component: oh-button
             config:
+              text: All details
               action: popup
               actionModal: page:heatpump
               outline: true
               small: true
               style:
-                border-color: '#ffb74d'
                 color: '#ffb74d'
-                padding: 0 12px
+                border-color: '#ffb74d'
                 width: auto
-              text: All details
+                padding: 0 12px

@@ -3,42 +3,43 @@ tags:
 - overview
 props:
   parameters:
-  - context: item
-    description: Number:Energy item
+  - name: dailyHousePv
     label: Energy Daily Home from PV
-    name: dailyHousePv
-    required: true
-    type: TEXT
-  - context: item
     description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  - name: dailyHouseBattery
     label: Energy Daily Home from Battery
-    name: dailyHouseBattery
-    required: true
-    type: TEXT
-  - context: item
     description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
+  - name: dailyHouseGrid
     label: Energy Daily Home from Grid
-    name: dailyHouseGrid
-    required: true
-    type: TEXT
-  - context: item
     description: Number:Energy item
-    label: Energy Daily PV Generation
-    name: dailyPvGeneration
-    required: true
     type: TEXT
+    required: true
+    context: item
+  - name: dailyPvGeneration
+    label: Energy Daily PV Generation
+    description: Number:Energy item
+    type: TEXT
+    required: true
+    context: item
   parameterGroups: []
-timestamp: Oct 25, 2026, 1:50:26 PM
+timestamp: Oct 25, 2026, 2:07:58 PM
 component: oh-card
 config:
-  contentStyle:
-    display: flex
-    flex: 1 1 auto
-    flex-direction: column
+  title: Energy per Day
   style:
+    height: calc(100% - 2 * var(--f7-card-margin-vertical))
     display: flex
     flex-direction: column
-    height: calc(100% - 2 * var(--f7-card-margin-vertical))
+  contentStyle:
+    flex: 1 1 auto
+    display: flex
+    flex-direction: column
   stylesheet: '@keyframes a-soft { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.06; } }
 
     @keyframes a-full { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
@@ -143,115 +144,134 @@ config:
     .menu-item-dropdown:not(.menu-item-dropdown-opened) .menu-dropdown { display: none; }
 
     .oh-chart-container > .menu.padding { padding-top: 6px !important; }'
-  title: Energy per Day
 slots:
   content:
   - component: div
     config:
       style:
+        position: relative
         flex: 1 1 auto
         min-height: 340px
-        position: relative
     slots:
       default:
       - component: div
         config:
           style:
-            inset: '0'
             position: absolute
+            inset: '0'
         slots:
           default:
           - component: oh-chart
             config:
               chartType: month
+              periodVisible: true
               height: 100%
               options:
                 backgroundColor: transparent
-              periodVisible: true
             slots:
               grid:
               - component: oh-chart-grid
                 config:
+                  top: '62'
                   bottom: '70'
                   left: '45'
                   right: '20'
-                  top: '62'
-              legend:
-              - component: oh-chart-legend
+              xAxis:
+              - component: oh-category-axis
                 config:
-                  bottom: '0'
-                  show: true
-                  type: scroll
+                  gridIndex: 0
+                  categoryType: month
+                  name: Day
+                  nameGap: 12
+                  axisTick:
+                    show: false
+              yAxis:
+              - component: oh-value-axis
+                config:
+                  gridIndex: 0
+                  name: kWh
+                  nameGap: 14
+                  nameTextStyle:
+                    align: right
+                    padding:
+                    - 0
+                    - 8
+                    - 0
+                    - 0
+                  splitLine:
+                    lineStyle:
+                      type: dashed
+                      opacity: 0.4
               series:
               - component: oh-aggregate-series
                 config:
+                  name: From PV
+                  gridIndex: 0
+                  xAxisIndex: 0
+                  yAxisIndex: 0
+                  type: bar
+                  item: =props.dailyHousePv
                   aggregationFunction: last
                   dimension1: date
-                  gridIndex: 0.0
-                  item: =props.dailyHousePv
                   itemStyle:
                     color: '#81c784'
-                  name: From PV
                   stack: home
-                  type: bar
-                  xAxisIndex: 0.0
-                  yAxisIndex: 0.0
               - component: oh-aggregate-series
                 config:
+                  name: From Battery
+                  gridIndex: 0
+                  xAxisIndex: 0
+                  yAxisIndex: 0
+                  type: bar
+                  item: =props.dailyHouseBattery
                   aggregationFunction: last
                   dimension1: date
-                  gridIndex: 0.0
-                  item: =props.dailyHouseBattery
                   itemStyle:
                     color: '#4db6ac'
-                  name: From Battery
                   stack: home
-                  type: bar
-                  xAxisIndex: 0.0
-                  yAxisIndex: 0.0
               - component: oh-aggregate-series
                 config:
-                  aggregationFunction: last
-                  dimension1: date
-                  gridIndex: 0.0
-                  item: =props.dailyHouseGrid
-                  itemStyle:
-                    borderRadius:
-                    - 4.0
-                    - 4.0
-                    - 0.0
-                    - 0.0
-                    color: '#e57373'
                   name: From the grid
-                  stack: home
+                  gridIndex: 0
+                  xAxisIndex: 0
+                  yAxisIndex: 0
                   type: bar
-                  xAxisIndex: 0.0
-                  yAxisIndex: 0.0
-              - component: oh-aggregate-series
-                config:
+                  item: =props.dailyHouseGrid
                   aggregationFunction: last
                   dimension1: date
-                  gridIndex: 0.0
+                  itemStyle:
+                    color: '#e57373'
+                    borderRadius:
+                    - 4
+                    - 4
+                    - 0
+                    - 0
+                  stack: home
+              - component: oh-aggregate-series
+                config:
+                  name: PV yield
+                  gridIndex: 0
+                  xAxisIndex: 0
+                  yAxisIndex: 0
+                  type: line
                   item: =props.dailyPvGeneration
+                  aggregationFunction: last
+                  dimension1: date
                   itemStyle:
                     color: '#ffa000'
-                  lineStyle:
-                    color: '#ffa000'
-                    width: 2.5
-                  name: PV yield
                   symbol: circle
-                  symbolSize: 7.0
-                  type: line
-                  xAxisIndex: 0.0
-                  yAxisIndex: 0.0
-                  z: 3.0
+                  symbolSize: 7
+                  lineStyle:
+                    width: 2.5
+                    color: '#ffa000'
+                  z: 3
               tooltip:
               - component: oh-chart-tooltip
                 config:
-                  backgroundColor: transparent
-                  borderWidth: 0.0
+                  show: true
                   confine: true
-                  extraCssText: 'box-shadow: none;'
+                  trigger: axis
+                  smartFormatter: false
                   formatter: '=(ps) => ((H) => ''<div style="display: flex; flex-direction: column; align-items: flex-start;
                     height: 0">'' + [0].map((g) => ((r) => ''<div style="'' + (r ? ''border: 1px solid; border-radius: 4px;
                     padding: 10px; box-shadow: rgba(0, 0, 0, 0.2) 1px 2px 10px; '' + (themeOptions.dark === ''dark'' ? ''background-color:
@@ -266,7 +286,6 @@ slots:
                     style="float: right; margin-left: 20px"><b style="text-align: right;">'' + ((v) => v.toLocaleString(''en-GB'')
                     + '' '' + p.seriesId.split(''#'')[2])(Number(p.value[1])) + ''</b></span><br/>'').join(''''))).join('''')
                     + ''</div>'')(ps[0].axisValue)'
-                  padding: 0.0
                   position: '=(pt, ps, dom, rect, size) => ((T, B) => ((c, left, h) => [((hd, per) => hd && per ? ((w) =>
                     ((k) => k === undefined ? 0 : hd.replaceChildren(dayjs().date(1).year(Number(w[1])).month(k).date(Number(hd.getAttribute(''data-head''))).format(''ddd,
                     ll'')))([0,1,2,3,4,5,6,7,8,9,10,11].filter((k) => dayjs().date(1).month(k).format(''MMM'') === w[0])[0]))(per.textContent.trim().split(''
@@ -281,33 +300,14 @@ slots:
                     + b.offsetHeight)][1])(Math.max(y ? y + 4 : 0, i === h ? Math.max(T[i], Math.min(pt[1] + 20, B[i] - b.offsetHeight))
                     : T[i])))(c.children[i]) : 0), [left ? pt[0] - 20 - c.offsetWidth : pt[0] + 20, 0]][5])(dom.firstChild,
                     pt[0] > size.viewSize[0] / 2, T.filter((t) => t <= pt[1]).length - 1))([62], [size.viewSize[1] - 70])'
+                  backgroundColor: transparent
+                  borderWidth: 0
+                  padding: 0
+                  transitionDuration: 0
+                  extraCssText: 'box-shadow: none;'
+              legend:
+              - component: oh-chart-legend
+                config:
                   show: true
-                  smartFormatter: false
-                  transitionDuration: 0.0
-                  trigger: axis
-              xAxis:
-              - component: oh-category-axis
-                config:
-                  axisTick:
-                    show: false
-                  categoryType: month
-                  gridIndex: 0.0
-                  name: Day
-                  nameGap: 12.0
-              yAxis:
-              - component: oh-value-axis
-                config:
-                  gridIndex: 0.0
-                  name: kWh
-                  nameGap: 14.0
-                  nameTextStyle:
-                    align: right
-                    padding:
-                    - 0.0
-                    - 8.0
-                    - 0.0
-                    - 0.0
-                  splitLine:
-                    lineStyle:
-                      opacity: 0.4
-                      type: dashed
+                  bottom: '0'
+                  type: scroll

@@ -3,54 +3,54 @@ tags:
 - switch
 props:
   parameters:
-  - context: item
-    description: The switch item
+  - name: item
     label: Item
-    name: item
-    required: true
+    description: The switch item
     type: TEXT
-  - description: Name of the plug or device
+    required: true
+    context: item
+  - name: title
     label: Title
-    name: title
+    description: Name of the plug or device
+    type: TEXT
     required: true
-    type: TEXT
-  - description: Icon, e.g. material:coffee (its state follows the item)
+  - name: icon
     label: Icon
-    name: icon
-    required: false
+    description: Icon, e.g. material:coffee (its state follows the item)
     type: TEXT
-  - default: '#78909c'
-    description: 'Colour of the tile while on as #rrggbb'
+    required: false
+  - name: color
     label: Colour
-    name: color
-    required: false
+    description: 'Colour of the tile while on as #rrggbb'
     type: TEXT
-  - description: A line under the name, e.g. the power; usually an expression
+    required: false
+    default: '#78909c'
+  - name: value
     label: Value
-    name: value
-    required: false
+    description: A line under the name, e.g. the power; usually an expression
     type: TEXT
-  - description: 'A line under the value, e.g. today''s energy; usually an expression; empty: none'
+    required: false
+  - name: energy
     label: Second value
-    name: energy
-    required: false
+    description: 'A line under the value, e.g. today''s energy; usually an expression; empty: none'
     type: TEXT
+    required: false
   parameterGroups: []
-timestamp: Oct 25, 2026, 1:50:27 PM
+timestamp: Oct 25, 2026, 2:07:58 PM
 component: div
 config:
   style:
     --tile-color: =props.color || '#78909c'
-    background: '=items[props.item].state === ''ON'' ? ''color-mix(in srgb, var(--tile-color) 20%, transparent)'' : ''color-mix(in
-      srgb, var(--f7-text-color) 6%, transparent)'''
+    position: relative
+    padding: 8px 9px
     border-radius: 12px
-    box-shadow: '=items[props.item].state === ''ON'' ? ''inset 0 0 0 1.5px color-mix(in srgb, var(--tile-color) 60%, transparent)''
-      : ''none'''
+    min-width: '0'
     display: flex
     flex-direction: column
-    min-width: '0'
-    padding: 8px 9px
-    position: relative
+    background: '=items[props.item].state === ''ON'' ? ''color-mix(in srgb, var(--tile-color) 20%, transparent)'' : ''color-mix(in
+      srgb, var(--f7-text-color) 6%, transparent)'''
+    box-shadow: '=items[props.item].state === ''ON'' ? ''inset 0 0 0 1.5px color-mix(in srgb, var(--tile-color) 60%, transparent)''
+      : ''none'''
   stylesheet: '@keyframes a-soft { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.06; } }
 
     @keyframes a-full { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
@@ -157,64 +157,64 @@ slots:
   - component: div
     config:
       style:
-        align-items: flex-start
         display: flex
         justify-content: space-between
+        align-items: flex-start
     slots:
       default:
       - component: oh-icon
         config:
-          height: 22.0
           icon: =props.icon
           state: =items[props.item].state
-          width: 22.0
+          width: 22
+          height: 22
       - component: Label
         config:
+          text: '=items[props.item].state === ''ON'' ? ''On'' : ''Off'''
           style:
             font-size: 11px
             font-weight: '700'
             opacity: '0.7'
-          text: '=items[props.item].state === ''ON'' ? ''On'' : ''Off'''
   - component: Label
     config:
+      text: =props.title
       style:
+        white-space: nowrap
+        overflow: hidden
+        text-overflow: ellipsis
         font-size: 13px
         font-weight: '600'
-        line-height: 16px
         margin-top: 5px
-        overflow: hidden
-        text-overflow: ellipsis
-        white-space: nowrap
-      text: =props.title
+        line-height: 16px
   - component: Label
     config:
-      style:
-        font-size: 12px
-        line-height: 15px
-        opacity: '0.7'
-        overflow: hidden
-        text-overflow: ellipsis
-        white-space: nowrap
       text: =props.value || ''
-  - component: Label
-    config:
       style:
-        font-size: 11px
-        line-height: 14px
-        opacity: '0.55'
+        white-space: nowrap
         overflow: hidden
         text-overflow: ellipsis
-        white-space: nowrap
+        font-size: 12px
+        opacity: '0.7'
+        line-height: 15px
+  - component: Label
+    config:
       text: =props.energy || ''
+      style:
+        white-space: nowrap
+        overflow: hidden
+        text-overflow: ellipsis
+        font-size: 11px
+        opacity: '0.55'
+        line-height: 14px
       visible: =!!props.energy
   - component: oh-link
     config:
       action: toggle
+      actionItem: =props.item
       actionCommand: 'ON'
       actionCommandAlt: 'OFF'
-      actionItem: =props.item
       style:
-        border-radius: 12px
-        display: block
-        inset: '0'
         position: absolute
+        inset: '0'
+        display: block
+        border-radius: 12px

@@ -3,25 +3,25 @@ tags:
 - controls
 props:
   parameters:
-  - context: item
-    description: String item
+  - name: weatherQuarterHours
     label: Weather Quarter Hours of the Five Days
-    name: weatherQuarterHours
-    required: true
-    type: TEXT
-  - context: item
     description: String item
-    label: Weather Hours of the Five Days
-    name: weatherHourlyDays
-    required: true
     type: TEXT
+    required: true
+    context: item
+  - name: weatherHourlyDays
+    label: Weather Hours of the Five Days
+    description: String item
+    type: TEXT
+    required: true
+    context: item
   parameterGroups: []
-timestamp: Oct 25, 2026, 1:50:27 PM
+timestamp: Oct 25, 2026, 2:07:58 PM
 component: div
 config:
-  label: Weather
   style:
     --day-popup: wide
+  label: Weather
   stylesheet: "@keyframes a-soft { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.06; } }\n@keyframes a-full { 0%, 100% { opacity:\
     \ 0.3; } 50% { opacity: 1; } }\n@keyframes a-arc { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }\n@keyframes a-halo\
     \ { 0%, 100% { opacity: 0; } 50% { opacity: 1; } }\n@keyframes a-halo-arc { 0%, 100% { opacity: 1; } 50% { opacity: 0;\
@@ -72,56 +72,54 @@ slots:
   - component: oh-context
     config:
       variables:
-        wxShift: 0.0
+        wxShift: 0
     slots:
       default:
       - component: div
         config:
           style:
-            display: flex
-            height: var(--f7-navbar-height)
             position: fixed
-            right: 4px
             top: var(--f7-safe-area-top, 0px)
+            right: 4px
+            height: var(--f7-navbar-height)
+            display: flex
             z-index: '600'
         slots:
           default:
           - component: oh-link
             config:
+              iconF7: chevron_left
+              iconSize: 22
               action: variable
               actionVariable: wxShift
               actionVariableValue: =(vars.wxShift || 0) + (-1)
-              iconF7: chevron_left
-              iconSize: 22.0
               style:
-                align-items: center
                 display: flex
+                align-items: center
                 height: 100%
+                padding: 0 10px
                 opacity: '=(Math.round((dayjs(Number(props.date) * 1000).add(vars.wxShift || 0, ''day'').unix() * 1000 - dayjs().startOf(''day'').valueOf())
                   / 86400000) > 0) ? 1 : 0.3'
-                padding: 0 10px
                 pointer-events: '=(Math.round((dayjs(Number(props.date) * 1000).add(vars.wxShift || 0, ''day'').unix() * 1000
                   - dayjs().startOf(''day'').valueOf()) / 86400000) > 0) ? ''auto'' : ''none'''
           - component: oh-link
             config:
+              iconF7: chevron_right
+              iconSize: 22
               action: variable
               actionVariable: wxShift
               actionVariableValue: =(vars.wxShift || 0) + (1)
-              iconF7: chevron_right
-              iconSize: 22.0
               style:
-                align-items: center
                 display: flex
+                align-items: center
                 height: 100%
+                padding: 0 10px
                 opacity: '=(Math.round((dayjs(Number(props.date) * 1000).add(vars.wxShift || 0, ''day'').unix() * 1000 - dayjs().startOf(''day'').valueOf())
                   / 86400000) < 4) ? 1 : 0.3'
-                padding: 0 10px
                 pointer-events: '=(Math.round((dayjs(Number(props.date) * 1000).add(vars.wxShift || 0, ''day'').unix() * 1000
                   - dayjs().startOf(''day'').valueOf()) / 86400000) < 4) ? ''auto'' : ''none'''
       - component: oh-card
         config:
-          style:
-            height: calc(100% - 2 * var(--f7-card-margin-vertical))
           title: '=''Quarter hours · '' + (dayjs(dayjs(Number(props.date) * 1000).add(vars.wxShift || 0, ''day'').unix() *
             1000).isSame(dayjs(), ''day'') ? ''Today'' : [''Sunday'', ''Monday'', ''Tuesday'', ''Wednesday'', ''Thursday'',
             ''Friday'', ''Saturday''][dayjs(dayjs(Number(props.date) * 1000).add(vars.wxShift || 0, ''day'').unix() * 1000).day()])
@@ -129,6 +127,8 @@ slots:
             '' + [''January'', ''February'', ''March'', ''April'', ''May'', ''June'', ''July'', ''August'', ''September'',
             ''October'', ''November'', ''December''][dayjs(dayjs(Number(props.date) * 1000).add(vars.wxShift || 0, ''day'').unix()
             * 1000).month()]'
+          style:
+            height: calc(100% - 2 * var(--f7-card-margin-vertical))
         slots:
           content:
           - component: div
@@ -140,73 +140,173 @@ slots:
               - component: oh-chart
                 config:
                   chartType: day
+                  periodVisible: false
+                  period: D
+                  height: 480px
                   future: =Math.round((dayjs(Number(props.date) * 1000).add(vars.wxShift || 0, 'day').unix() * 1000 - dayjs().startOf('day').valueOf())
                     / 86400000)
-                  height: 480px
                   options:
+                    backgroundColor: transparent
                     axisPointer:
                       link:
                       - xAxisIndex: all
-                    backgroundColor: transparent
-                  period: D
-                  periodVisible: false
                 slots:
                   grid:
                   - component: oh-chart-grid
                     config:
+                      top: '35'
                       height: '140'
                       left: '45'
                       right: '20'
-                      top: '35'
                   - component: oh-chart-grid
                     config:
+                      top: '230'
                       height: '60'
                       left: '45'
                       right: '20'
-                      top: '230'
                   - component: oh-chart-grid
                     config:
+                      top: '345'
                       bottom: '60'
                       left: '45'
                       right: '20'
-                      top: '345'
-                  legend:
-                  - component: oh-chart-legend
+                  xAxis:
+                  - component: oh-time-axis
                     config:
-                      bottom: '0'
-                      data:
-                      - Temperature
-                      - Precipitation
-                      - Wind
-                      show: true
-                      type: scroll
+                      gridIndex: 0
+                      axisLabel:
+                        show: false
+                      axisPointer:
+                        snap: false
+                        label:
+                          show: false
+                  - component: oh-time-axis
+                    config:
+                      gridIndex: 1
+                      axisLabel:
+                        show: false
+                      axisPointer:
+                        snap: false
+                        label:
+                          show: false
+                  - component: oh-time-axis
+                    config:
+                      gridIndex: 2
+                      axisLabel:
+                        formatter: '=(v) => dayjs(v).minute() === 0 && dayjs(v).hour() % 6 === 0 ? dayjs(v).format(''HH:mm'')
+                          : '''''
+                      axisPointer:
+                        snap: false
+                        label:
+                          show: false
+                  - component: oh-time-axis
+                    config:
+                      gridIndex: 0
+                      axisLabel:
+                        show: false
+                      show: false
+                      axisPointer:
+                        snap: false
+                        label:
+                          show: false
+                  yAxis:
+                  - component: oh-value-axis
+                    config:
+                      gridIndex: 0
+                      name: °C
+                      nameGap: 14
+                      nameTextStyle:
+                        align: right
+                        padding:
+                        - 0
+                        - 8
+                        - 0
+                        - 0
+                      splitLine:
+                        lineStyle:
+                          type: dashed
+                          opacity: 0.4
+                      scale: true
+                      minInterval: 1
+                      max: =(v) => Math.ceil(v.max + Math.max(1, (v.max - v.min) * 0.25))
+                      axisLabel:
+                        showMaxLabel: false
+                  - component: oh-value-axis
+                    config:
+                      gridIndex: 1
+                      name: mm
+                      nameGap: 10
+                      nameTextStyle:
+                        align: right
+                        padding:
+                        - 0
+                        - 8
+                        - 0
+                        - 0
+                      min: 0
+                      max: =(v) => Math.max(0.5, Math.ceil(v.max * 2) / 2)
+                      splitNumber: 2
+                      splitLine:
+                        lineStyle:
+                          type: dashed
+                          opacity: 0.4
+                  - component: oh-value-axis
+                    config:
+                      gridIndex: 2
+                      name: km/h
+                      nameGap: 10
+                      nameTextStyle:
+                        align: right
+                        padding:
+                        - 0
+                        - 8
+                        - 0
+                        - 0
+                      min: 0
+                      max: =(v) => Math.max(20, Math.ceil(v.max / 20) * 20)
+                      splitNumber: 2
+                      splitLine:
+                        lineStyle:
+                          type: dashed
+                          opacity: 0.4
                   series:
                   - component: oh-data-series
                     config:
+                      id: oh-data-series#1#°C
+                      name: Temperature
+                      xAxisIndex: 0
+                      yAxisIndex: 0
                       data: '=(('''' + items[props.weatherQuarterHours].state).startsWith(''['') ? JSON.parse(items[props.weatherQuarterHours].state)
                         : []).filter((r) => r[0] >= dayjs(Number(props.date) * 1000).add(vars.wxShift || 0, ''day'').unix()
                         && r[0] < dayjs(dayjs(Number(props.date) * 1000).add(vars.wxShift || 0, ''day'').unix() * 1000).add(1,
                         ''day'').unix()).map((r) => [r[0] * 1000, r[1]])'
-                      id: oh-data-series#1#°C
                       itemStyle:
                         color: '#f4511e'
+                      type: line
+                      smooth: 0.5
+                      symbol: none
                       lineStyle:
-                        color: '#f4511e'
                         width: 2.5
+                        color: '#f4511e'
                       markLine:
-                        data:
-                        - xAxis: =dayjs().valueOf()
+                        symbol:
+                        - none
+                        - none
+                        silent: true
                         label:
                           show: false
                         lineStyle:
                           color: '#888'
-                          opacity: 0.6
                           type: dashed
-                        silent: true
-                        symbol:
-                        - none
-                        - none
+                          opacity: 0.6
+                        data:
+                        - xAxis: =dayjs().valueOf()
                       markPoint:
+                        symbolSize: '=screen.width < 600 ? 20 : 24'
+                        symbolOffset: '=screen.width < 600 ? [0, -10] : [0, -12]'
+                        silent: true
+                        label:
+                          show: false
                         data: '=((S) => (('''' + items[props.weatherHourlyDays].state).startsWith(''['') ? JSON.parse(items[props.weatherHourlyDays].state)
                           : []).filter((r) => r[0] >= dayjs(Number(props.date) * 1000).add(vars.wxShift || 0, ''day'').unix()
                           && r[0] < dayjs(dayjs(Number(props.date) * 1000).add(vars.wxShift || 0, ''day'').unix() * 1000).add(1,
@@ -234,90 +334,96 @@ slots:
                           rain_sun_night: ''image://data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OCA0OCIgd2lkdGg9IjQ4IiBoZWlnaHQ9IjQ4Ij48Zz48cGF0aCBkPSJNMjIuMTksMTQuMTcgQTEwLDEwIDAgMSwwIDMzLjgzLDI1LjgxIEE4LjUsOC41IDAgMSwxIDIyLjE5LDE0LjE3IFoiIGZpbGw9IiM5ZmE4ZGEiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDE0IDExKSBzY2FsZSgwLjU4KSB0cmFuc2xhdGUoLTI0IC0yNCkiPjwvcGF0aD48L2c+PGc+PHBhdGggZD0iTTE0LDM4IEgzNCBBNiw2IDAgMCwwIDM1LjUsMjYuMiBBOSw5IDAgMCwwIDE4LjYsMjQuNCBBNyw3IDAgMCwwIDE0LDM4IFoiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDI3IDI1KSBzY2FsZSgxLjApIHRyYW5zbGF0ZSgtMjcgLTMxKSIgc3Ryb2tlPSIjOTBhNGFlIiBzdHJva2Utd2lkdGg9IjEuNiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBmaWxsPSIjY2ZkOGRjIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48L3BhdGg+PGxpbmUgeDE9IjE4IiB5MT0iMzYiIHgyPSIxNy4wNSIgeTI9IjM4Ljg1IiBzdHJva2U9IiM0MmE1ZjUiIHN0cm9rZS13aWR0aD0iMi4yIiBzdHJva2UtbGluZWNhcD0icm91bmQiIGZpbGw9Im5vbmUiIGNsYXNzPSJhLWRyb3AiIHN0eWxlPSJ7J2FuaW1hdGlvbi1kZWxheSc6ICctMC4wcyd9Ij48L2xpbmU+PGxpbmUgeDE9IjI1IiB5MT0iMzYiIHgyPSIyNC4wNSIgeTI9IjM4Ljg1IiBzdHJva2U9IiM0MmE1ZjUiIHN0cm9rZS13aWR0aD0iMi4yIiBzdHJva2UtbGluZWNhcD0icm91bmQiIGZpbGw9Im5vbmUiIGNsYXNzPSJhLWRyb3AiIHN0eWxlPSJ7J2FuaW1hdGlvbi1kZWxheSc6ICctMC4zcyd9Ij48L2xpbmU+PGxpbmUgeDE9IjMyIiB5MT0iMzYiIHgyPSIzMS4wNSIgeTI9IjM4Ljg1IiBzdHJva2U9IiM0MmE1ZjUiIHN0cm9rZS13aWR0aD0iMi4yIiBzdHJva2UtbGluZWNhcD0icm91bmQiIGZpbGw9Im5vbmUiIGNsYXNzPSJhLWRyb3AiIHN0eWxlPSJ7J2FuaW1hdGlvbi1kZWxheSc6ICctMC42cyd9Ij48L2xpbmU+PC9nPjwvc3ZnPg=='',
                           snow_sun_night: ''image://data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OCA0OCIgd2lkdGg9IjQ4IiBoZWlnaHQ9IjQ4Ij48Zz48cGF0aCBkPSJNMjIuMTksMTQuMTcgQTEwLDEwIDAgMSwwIDMzLjgzLDI1LjgxIEE4LjUsOC41IDAgMSwxIDIyLjE5LDE0LjE3IFoiIGZpbGw9IiM5ZmE4ZGEiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDE0IDExKSBzY2FsZSgwLjU4KSB0cmFuc2xhdGUoLTI0IC0yNCkiPjwvcGF0aD48L2c+PGc+PHBhdGggZD0iTTE0LDM4IEgzNCBBNiw2IDAgMCwwIDM1LjUsMjYuMiBBOSw5IDAgMCwwIDE4LjYsMjQuNCBBNyw3IDAgMCwwIDE0LDM4IFoiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDI3IDI1KSBzY2FsZSgxLjApIHRyYW5zbGF0ZSgtMjcgLTMxKSIgc3Ryb2tlPSIjOTBhNGFlIiBzdHJva2Utd2lkdGg9IjEuNiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBmaWxsPSIjY2ZkOGRjIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48L3BhdGg+PGNpcmNsZSBjeD0iMTgiIGN5PSIzOC41IiByPSIyLjYiIGZpbGw9IiNmZmZmZmYiIHN0cm9rZT0iIzkwYTRhZSIgc3Ryb2tlLXdpZHRoPSIxIiBjbGFzcz0iYS13b2JibGUiIHN0eWxlPSJ7J2FuaW1hdGlvbi1kdXJhdGlvbic6ICcyLjBzJ30iPjwvY2lyY2xlPjxjaXJjbGUgY3g9IjI1LjUiIGN5PSI0MiIgcj0iMi42IiBmaWxsPSIjZmZmZmZmIiBzdHJva2U9IiM5MGE0YWUiIHN0cm9rZS13aWR0aD0iMSIgY2xhc3M9ImEtd29iYmxlIiBzdHlsZT0ieydhbmltYXRpb24tZHVyYXRpb24nOiAnMi40cyd9Ij48L2NpcmNsZT48Y2lyY2xlIGN4PSIzMyIgY3k9IjM4LjUiIHI9IjIuNiIgZmlsbD0iI2ZmZmZmZiIgc3Ryb2tlPSIjOTBhNGFlIiBzdHJva2Utd2lkdGg9IjEiIGNsYXNzPSJhLXdvYmJsZSIgc3R5bGU9InsnYW5pbWF0aW9uLWR1cmF0aW9uJzogJzIuOHMnfSI+PC9jaXJjbGU+PC9nPjwvc3ZnPg=='',
                           thunder_sun_night: ''image://data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OCA0OCIgd2lkdGg9IjQ4IiBoZWlnaHQ9IjQ4Ij48Zz48cGF0aCBkPSJNMjIuMTksMTQuMTcgQTEwLDEwIDAgMSwwIDMzLjgzLDI1LjgxIEE4LjUsOC41IDAgMSwxIDIyLjE5LDE0LjE3IFoiIGZpbGw9IiM5ZmE4ZGEiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDE0IDExKSBzY2FsZSgwLjU4KSB0cmFuc2xhdGUoLTI0IC0yNCkiPjwvcGF0aD48L2c+PGc+PHBhdGggZD0iTTE0LDM4IEgzNCBBNiw2IDAgMCwwIDM1LjUsMjYuMiBBOSw5IDAgMCwwIDE4LjYsMjQuNCBBNyw3IDAgMCwwIDE0LDM4IFoiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDI3IDIzKSBzY2FsZSgxLjApIHRyYW5zbGF0ZSgtMjcgLTMxKSIgc3Ryb2tlPSIjOTBhNGFlIiBzdHJva2Utd2lkdGg9IjEuNiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBmaWxsPSIjY2ZkOGRjIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48L3BhdGg+PHBvbHlnb24gcG9pbnRzPSIyNiwzMSAyMCw0MCAyNC41LDQwIDIyLDQ3IDMwLDM3IDI1LjUsMzcgMjgsMzEiIGZpbGw9IiNmZmNhMjgiIHN0cm9rZT0iI2Y5YTgyNSIgc3Ryb2tlLXdpZHRoPSIwLjgiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJhLWJvbHQiPjwvcG9seWdvbj48L2c+PC9zdmc+''})'
-                        label:
-                          show: false
-                        silent: true
-                        symbolOffset: '=screen.width < 600 ? [0, -10] : [0, -12]'
-                        symbolSize: '=screen.width < 600 ? 20 : 24'
-                      name: Temperature
-                      smooth: 0.5
-                      symbol: none
-                      type: line
-                      xAxisIndex: 0.0
-                      yAxisIndex: 0.0
-                      z: 3.0
+                      z: 3
                   - component: oh-data-series
                     config:
-                      clip: true
+                      id: oh-data-series#2#mm
+                      name: Precipitation
+                      xAxisIndex: 1
+                      yAxisIndex: 1
                       data: '=(('''' + items[props.weatherQuarterHours].state).startsWith(''['') ? JSON.parse(items[props.weatherQuarterHours].state)
                         : []).filter((r) => r[0] >= dayjs(Number(props.date) * 1000).add(vars.wxShift || 0, ''day'').unix()
                         && r[0] < dayjs(dayjs(Number(props.date) * 1000).add(vars.wxShift || 0, ''day'').unix() * 1000).add(1,
                         ''day'').unix()).map((r) => [r[0] * 1000, r[2]])'
-                      encode:
-                        x: 0.0
-                        y: 1.0
-                      id: oh-data-series#2#mm
                       itemStyle:
                         color: '#42a5f5'
-                      markLine:
-                        data:
-                        - xAxis: =dayjs().valueOf()
-                        label:
-                          show: false
-                        lineStyle:
-                          color: '#888'
-                          opacity: 0.6
-                          type: dashed
-                        silent: true
-                        symbol:
-                        - none
-                        - none
-                      name: Precipitation
+                      type: custom
                       renderItem: '=(params, api) => api.value(1) > 0 ? ((w, top, base) => ({type: ''rect'', shape: {x: top[0]
                         - w / 2, y: top[1], width: w, height: base[1] - top[1], r: [2, 2, 0, 0]}, style: {fill: ''#42a5f5''}}))(Math.min(4,
                         api.size([900000, 0])[0] * 0.68), api.coord([api.value(0), api.value(1)]), api.coord([api.value(0),
                         0])) : null'
-                      type: custom
-                      xAxisIndex: 1.0
-                      yAxisIndex: 1.0
-                  - component: oh-data-series
-                    config:
-                      areaStyle:
-                        color:
-                          colorStops:
-                          - color: rgba(120, 144, 156, 0.45)
-                            offset: 0.0
-                          - color: rgba(120, 144, 156, 0.02)
-                            offset: 1.0
-                          type: linear
-                          x: 0.0
-                          x2: 0.0
-                          y: 0.0
-                          y2: 1.0
-                      data: '=(('''' + items[props.weatherQuarterHours].state).startsWith(''['') ? JSON.parse(items[props.weatherQuarterHours].state)
-                        : []).filter((r) => r[0] >= dayjs(Number(props.date) * 1000).add(vars.wxShift || 0, ''day'').unix()
-                        && r[0] < dayjs(dayjs(Number(props.date) * 1000).add(vars.wxShift || 0, ''day'').unix() * 1000).add(1,
-                        ''day'').unix()).map((r) => [r[0] * 1000, r[3]])'
-                      id: oh-data-series#3#km/h
-                      itemStyle:
-                        color: '#78909c'
-                      lineStyle:
-                        color: '#78909c'
-                        width: 2.0
+                      encode:
+                        x: 0
+                        y: 1
+                      clip: true
                       markLine:
-                        data:
-                        - xAxis: =dayjs().valueOf()
+                        symbol:
+                        - none
+                        - none
+                        silent: true
                         label:
                           show: false
                         lineStyle:
                           color: '#888'
-                          opacity: 0.6
                           type: dashed
-                        silent: true
+                          opacity: 0.6
+                        data:
+                        - xAxis: =dayjs().valueOf()
+                  - component: oh-data-series
+                    config:
+                      id: oh-data-series#3#km/h
+                      name: Wind
+                      xAxisIndex: 2
+                      yAxisIndex: 2
+                      data: '=(('''' + items[props.weatherQuarterHours].state).startsWith(''['') ? JSON.parse(items[props.weatherQuarterHours].state)
+                        : []).filter((r) => r[0] >= dayjs(Number(props.date) * 1000).add(vars.wxShift || 0, ''day'').unix()
+                        && r[0] < dayjs(dayjs(Number(props.date) * 1000).add(vars.wxShift || 0, ''day'').unix() * 1000).add(1,
+                        ''day'').unix()).map((r) => [r[0] * 1000, r[3]])'
+                      itemStyle:
+                        color: '#78909c'
+                      type: line
+                      smooth: 0.5
+                      symbol: none
+                      lineStyle:
+                        width: 2
+                        color: '#78909c'
+                      areaStyle:
+                        color:
+                          type: linear
+                          x: 0
+                          y: 0
+                          x2: 0
+                          y2: 1
+                          colorStops:
+                          - offset: 0
+                            color: rgba(120, 144, 156, 0.45)
+                          - offset: 1
+                            color: rgba(120, 144, 156, 0.02)
+                      markLine:
                         symbol:
                         - none
                         - none
+                        silent: true
+                        label:
+                          show: false
+                        lineStyle:
+                          color: '#888'
+                          type: dashed
+                          opacity: 0.6
+                        data:
+                        - xAxis: =dayjs().valueOf()
                       markPoint:
+                        symbol: path://M12,3 L18.5,19.5 L12,15.5 L5.5,19.5 Z
+                        symbolSize: 11
+                        symbolKeepAspect: true
+                        symbolOffset:
+                        - 0
+                        - -13
+                        silent: true
+                        label:
+                          show: false
+                        itemStyle:
+                          color: '=themeOptions.dark === ''dark'' ? ''#b0bec5'' : ''#546e7a'''
                         data: '=(('''' + items[props.weatherQuarterHours].state).startsWith(''['') ? JSON.parse(items[props.weatherQuarterHours].state)
                           : []).filter((r) => r[0] >= dayjs(Number(props.date) * 1000).add(vars.wxShift || 0, ''day'').unix()
                           && r[0] < dayjs(dayjs(Number(props.date) * 1000).add(vars.wxShift || 0, ''day'').unix() * 1000).add(1,
@@ -325,44 +431,27 @@ slots:
                           0 && dayjs(r[0] * 1000).hour() % (screen.width < 600 ? 3 : 2) === 0 ? ({coord: [r[0] * 1000, a.slice(Math.max(0,
                           i - 8), i + 9).reduce((m, x) => Math.max(m, x[3] || 0), 0)], symbolRotate: -(r[4] + 180)}) : null).filter((p)
                           => p)'
-                        itemStyle:
-                          color: '=themeOptions.dark === ''dark'' ? ''#b0bec5'' : ''#546e7a'''
-                        label:
-                          show: false
-                        silent: true
-                        symbol: path://M12,3 L18.5,19.5 L12,15.5 L5.5,19.5 Z
-                        symbolKeepAspect: true
-                        symbolOffset:
-                        - 0.0
-                        - -13.0
-                        symbolSize: 11.0
-                      name: Wind
-                      smooth: 0.5
-                      symbol: none
-                      type: line
-                      xAxisIndex: 2.0
-                      yAxisIndex: 2.0
                   - component: oh-data-series
                     config:
-                      animation: false
+                      id: oh-data-series#clock
+                      name: ''
+                      type: line
+                      xAxisIndex: 3
+                      yAxisIndex: 0
                       data: =((t0) => [0,1,2,3,4,5,6,7,8,9,10,11].map((a) => [0,1,2,3,4,5,6,7,8,9,10,11].map((b) => [0,1,2,3,4,5].map((c)
                         => [t0 + ((a * 12 + b) * 6 + c) * 300000, null]))).flat(2))(dayjs().startOf('hour').valueOf())
-                      id: oh-data-series#clock
-                      lineStyle:
-                        opacity: 0.0
-                      name: ''
-                      silent: true
                       symbol: none
-                      type: line
-                      xAxisIndex: 3.0
-                      yAxisIndex: 0.0
+                      silent: true
+                      animation: false
+                      lineStyle:
+                        opacity: 0
                   tooltip:
                   - component: oh-chart-tooltip
                     config:
-                      backgroundColor: transparent
-                      borderWidth: 0.0
+                      show: true
                       confine: true
-                      extraCssText: 'box-shadow: none;'
+                      trigger: axis
+                      smartFormatter: false
                       formatter: '=(ps) => ((H) => ''<div style="display: flex; flex-direction: column; align-items: flex-start;
                         height: 0">'' + [0,1,2].map((g) => ((r) => ''<div style="'' + (r ? ''border: 1px solid; border-radius:
                         4px; padding: 10px; box-shadow: rgba(0, 0, 0, 0.2) 1px 2px 10px; '' + (themeOptions.dark === ''dark''
@@ -380,7 +469,6 @@ slots:
                         + ''</div>'')(((c, now) => c && c.axisValue > now && ps[0].axisValue <= now && c.axisValue - ps[0].axisValue
                         > 600000 ? c.axisValue : ps[0].axisValue)(ps.filter((p) => p.seriesId === ''oh-data-series#clock'')[0],
                         dayjs().valueOf()))'
-                      padding: 0.0
                       position: '=(pt, ps, dom, rect, size) => ((T, B) => ((c, left, h) => [c.style.setProperty(''align-items'',
                         left ? ''flex-end'' : ''flex-start''), dom.hasAttribute(''data-wb'') || [dom.parentNode.addEventListener(''mouseleave'',
                         () => [0,1,2].map((i) => dom.removeAttribute(''data-wb'' + i))), dom.setAttribute(''data-wb'', '''')],
@@ -392,191 +480,103 @@ slots:
                         ? y + 4 : 0, i === h ? Math.max(T[i], Math.min(pt[1] + 20, B[i] - b.offsetHeight)) : T[i])))(c.children[i])
                         : 0), [left ? pt[0] - 20 - c.offsetWidth : pt[0] + 20, 0]][4])(dom.firstChild, pt[0] > size.viewSize[0]
                         / 2, T.filter((t) => t <= pt[1]).length - 1))([35,230,345], [175,290,size.viewSize[1] - 60])'
+                      backgroundColor: transparent
+                      borderWidth: 0
+                      padding: 0
+                      transitionDuration: 0
+                      extraCssText: 'box-shadow: none;'
+                  legend:
+                  - component: oh-chart-legend
+                    config:
                       show: true
-                      smartFormatter: false
-                      transitionDuration: 0.0
-                      trigger: axis
-                  xAxis:
-                  - component: oh-time-axis
-                    config:
-                      axisLabel:
-                        show: false
-                      axisPointer:
-                        label:
-                          show: false
-                        snap: false
-                      gridIndex: 0.0
-                  - component: oh-time-axis
-                    config:
-                      axisLabel:
-                        show: false
-                      axisPointer:
-                        label:
-                          show: false
-                        snap: false
-                      gridIndex: 1.0
-                  - component: oh-time-axis
-                    config:
-                      axisLabel:
-                        formatter: '=(v) => dayjs(v).minute() === 0 && dayjs(v).hour() % 6 === 0 ? dayjs(v).format(''HH:mm'')
-                          : '''''
-                      axisPointer:
-                        label:
-                          show: false
-                        snap: false
-                      gridIndex: 2.0
-                  - component: oh-time-axis
-                    config:
-                      axisLabel:
-                        show: false
-                      axisPointer:
-                        label:
-                          show: false
-                        snap: false
-                      gridIndex: 0.0
-                      show: false
-                  yAxis:
-                  - component: oh-value-axis
-                    config:
-                      axisLabel:
-                        showMaxLabel: false
-                      gridIndex: 0.0
-                      max: =(v) => Math.ceil(v.max + Math.max(1, (v.max - v.min) * 0.25))
-                      minInterval: 1.0
-                      name: °C
-                      nameGap: 14.0
-                      nameTextStyle:
-                        align: right
-                        padding:
-                        - 0.0
-                        - 8.0
-                        - 0.0
-                        - 0.0
-                      scale: true
-                      splitLine:
-                        lineStyle:
-                          opacity: 0.4
-                          type: dashed
-                  - component: oh-value-axis
-                    config:
-                      gridIndex: 1.0
-                      max: =(v) => Math.max(0.5, Math.ceil(v.max * 2) / 2)
-                      min: 0.0
-                      name: mm
-                      nameGap: 10.0
-                      nameTextStyle:
-                        align: right
-                        padding:
-                        - 0.0
-                        - 8.0
-                        - 0.0
-                        - 0.0
-                      splitLine:
-                        lineStyle:
-                          opacity: 0.4
-                          type: dashed
-                      splitNumber: 2.0
-                  - component: oh-value-axis
-                    config:
-                      gridIndex: 2.0
-                      max: =(v) => Math.max(20, Math.ceil(v.max / 20) * 20)
-                      min: 0.0
-                      name: km/h
-                      nameGap: 10.0
-                      nameTextStyle:
-                        align: right
-                        padding:
-                        - 0.0
-                        - 8.0
-                        - 0.0
-                        - 0.0
-                      splitLine:
-                        lineStyle:
-                          opacity: 0.4
-                          type: dashed
-                      splitNumber: 2.0
+                      bottom: '0'
+                      type: scroll
+                      data:
+                      - Temperature
+                      - Precipitation
+                      - Wind
       - component: oh-card
         config:
-          style:
-            height: calc(100% - 2 * var(--f7-card-margin-vertical))
           title: '=''Hours · '' + (dayjs(dayjs(Number(props.date) * 1000).add(vars.wxShift || 0, ''day'').unix() * 1000).isSame(dayjs(),
             ''day'') ? ''Today'' : [''Sunday'', ''Monday'', ''Tuesday'', ''Wednesday'', ''Thursday'', ''Friday'', ''Saturday''][dayjs(dayjs(Number(props.date)
             * 1000).add(vars.wxShift || 0, ''day'').unix() * 1000).day()]) + '', '' + dayjs(dayjs(Number(props.date) * 1000).add(vars.wxShift
             || 0, ''day'').unix() * 1000).date() + ''. '' + [''January'', ''February'', ''March'', ''April'', ''May'', ''June'',
             ''July'', ''August'', ''September'', ''October'', ''November'', ''December''][dayjs(dayjs(Number(props.date) *
             1000).add(vars.wxShift || 0, ''day'').unix() * 1000).month()]'
+          style:
+            height: calc(100% - 2 * var(--f7-card-margin-vertical))
         slots:
           content:
           - component: div
             config:
               style:
-                padding-bottom: 6px
                 padding-top: 2px
+                padding-bottom: 6px
             slots:
               default:
               - component: oh-repeater
                 config:
                   for: hour
-                  fragment: true
+                  sourceType: array
                   in: '=(('''' + items[props.weatherHourlyDays].state).startsWith(''['') ? JSON.parse(items[props.weatherHourlyDays].state)
                     : []).filter((r) => r[0] >= dayjs(Number(props.date) * 1000).add(vars.wxShift || 0, ''day'').unix() &&
                     r[0] < dayjs(dayjs(Number(props.date) * 1000).add(vars.wxShift || 0, ''day'').unix() * 1000).add(1, ''day'').unix())'
-                  sourceType: array
+                  fragment: true
                 slots:
                   default:
                   - component: div
                     config:
                       style:
-                        align-items: center
-                        background: '=loop.hour[0] === dayjs().startOf(''hour'').unix() ? ''color-mix(in srgb, var(--f7-text-color)
-                          6%, transparent)'' : ''transparent'''
-                        border-top: 1px solid rgba(127, 127, 127, 0.15)
-                        column-gap: '=screen.width < 600 ? ''5px'' : ''8px'''
                         display: grid
+                        align-items: center
                         grid-template-columns: '=screen.width < 600 ? ''38px 28px 30px 52px 1fr auto'' : ''40px 32px 30px
                           58px 1fr auto'''
+                        column-gap: '=screen.width < 600 ? ''5px'' : ''8px'''
                         min-height: 40px
-                        opacity: '=loop.hour[0] < dayjs().startOf(''hour'').unix() ? ''0.55'' : ''1'''
                         padding: '=screen.width < 600 ? ''4px 12px'' : ''4px 16px'''
+                        border-top: 1px solid rgba(127, 127, 127, 0.15)
+                        opacity: '=loop.hour[0] < dayjs().startOf(''hour'').unix() ? ''0.55'' : ''1'''
+                        background: '=loop.hour[0] === dayjs().startOf(''hour'').unix() ? ''color-mix(in srgb, var(--f7-text-color)
+                          6%, transparent)'' : ''transparent'''
                     slots:
                       default:
                       - component: Label
                         config:
+                          text: =dayjs(loop.hour[0] * 1000).format('HH:mm')
                           style:
                             font-size: '=screen.width < 600 ? ''12px'' : ''13px'''
                             font-weight: '600'
-                          text: =dayjs(loop.hour[0] * 1000).format('HH:mm')
                       - component: widget:weather-icon
                         config:
+                          symbol: =loop.hour[5]
                           day: =loop.hour[6] !== 0
                           size: '=screen.width < 600 ? 28 : 32'
-                          symbol: =loop.hour[5]
                       - component: Label
                         config:
+                          text: '=loop.hour[1] == null ? ''–'' : Math.round(loop.hour[1]) + ''°'''
                           style:
                             font-size: 14px
                             font-weight: '700'
                             white-space: nowrap
-                          text: '=loop.hour[1] == null ? ''–'' : Math.round(loop.hour[1]) + ''°'''
                       - component: div
                         config:
                           style:
-                            align-items: center
                             display: flex
-                            font-size: '=screen.width < 600 ? ''12px'' : ''13px'''
+                            align-items: center
                             gap: '=screen.width < 600 ? ''4px'' : ''5px'''
-                            opacity: '=(loop.hour[6] === 0 || !loop.hour[8]) ? ''0.55'' : ''1'''
+                            font-size: '=screen.width < 600 ? ''12px'' : ''13px'''
                             white-space: nowrap
+                            opacity: '=(loop.hour[6] === 0 || !loop.hour[8]) ? ''0.55'' : ''1'''
                         slots:
                           default:
                           - component: oh-icon
                             config:
-                              height: '=screen.width < 600 ? 13 : 15'
                               icon: material:wb_sunny
+                              width: '=screen.width < 600 ? 13 : 15'
+                              height: '=screen.width < 600 ? 13 : 15'
                               style:
                                 color: '#ffb300'
                                 flex: 0 0 auto
-                              width: '=screen.width < 600 ? 13 : 15'
                           - component: div
                             config:
                               style:
@@ -586,36 +586,36 @@ slots:
                               default:
                               - component: Label
                                 config:
+                                  text: '=(loop.hour[6] === 0 || loop.hour[8] == null ? ''–'' : loop.hour[8] + '' min'')'
                                   style:
                                     line-height: 16px
-                                  text: '=(loop.hour[6] === 0 || loop.hour[8] == null ? ''–'' : loop.hour[8] + '' min'')'
                               - component: Label
                                 config:
+                                  text: =''
                                   style:
                                     font-size: 11px
-                                    line-height: 13px
                                     opacity: '0.65'
-                                  text: =''
+                                    line-height: 13px
                                   visible: =false
                       - component: div
                         config:
                           style:
-                            align-items: center
                             display: flex
-                            font-size: '=screen.width < 600 ? ''12px'' : ''13px'''
+                            align-items: center
                             gap: '=screen.width < 600 ? ''4px'' : ''5px'''
-                            opacity: '=(loop.hour[2] || 0) < 0.05 ? ''0.55'' : ''1'''
+                            font-size: '=screen.width < 600 ? ''12px'' : ''13px'''
                             white-space: nowrap
+                            opacity: '=(loop.hour[2] || 0) < 0.05 ? ''0.55'' : ''1'''
                         slots:
                           default:
                           - component: oh-icon
                             config:
-                              height: '=screen.width < 600 ? 13 : 15'
                               icon: material:water_drop
+                              width: '=screen.width < 600 ? 13 : 15'
+                              height: '=screen.width < 600 ? 13 : 15'
                               style:
                                 color: '#42a5f5'
                                 flex: 0 0 auto
-                              width: '=screen.width < 600 ? 13 : 15'
                           - component: div
                             config:
                               style:
@@ -625,38 +625,38 @@ slots:
                               default:
                               - component: Label
                                 config:
-                                  style:
-                                    line-height: 16px
                                   text: '=(loop.hour[2] == null ? ''–'' : loop.hour[2] < 0.05 ? ''0 mm'' : (loop.hour[2]).toFixed(1)
                                     + '' mm'')'
+                                  style:
+                                    line-height: 16px
                               - component: Label
                                 config:
+                                  text: =loop.hour[7] + ' %'
                                   style:
                                     font-size: 11px
-                                    line-height: 13px
                                     opacity: '0.65'
-                                  text: =loop.hour[7] + ' %'
+                                    line-height: 13px
                                   visible: =loop.hour[7] != null
                       - component: div
                         config:
                           style:
-                            align-items: center
                             display: flex
-                            font-size: '=screen.width < 600 ? ''12px'' : ''13px'''
+                            align-items: center
                             gap: '=screen.width < 600 ? ''4px'' : ''5px'''
-                            justify-content: flex-end
+                            font-size: '=screen.width < 600 ? ''12px'' : ''13px'''
                             white-space: nowrap
+                            justify-content: flex-end
                         slots:
                           default:
                           - component: svg
                             config:
+                              viewBox: 0 0 24 24
+                              width: '=screen.width < 600 ? 13 : 15'
                               height: '=screen.width < 600 ? 13 : 15'
                               style:
                                 display: block
                                 flex: 0 0 auto
-                              viewBox: 0 0 24 24
                               visible: =loop.hour[4] != null
-                              width: '=screen.width < 600 ? 13 : 15'
                             slots:
                               default:
                               - component: path
@@ -666,13 +666,13 @@ slots:
                                   transform: ='rotate(' + (loop.hour[4] + 180) + ' 12 12)'
                           - component: oh-icon
                             config:
-                              height: '=screen.width < 600 ? 13 : 15'
                               icon: material:air
+                              width: '=screen.width < 600 ? 13 : 15'
+                              height: '=screen.width < 600 ? 13 : 15'
+                              visible: =loop.hour[4] == null
                               style:
                                 color: '#78909c'
                                 flex: 0 0 auto
-                              visible: =loop.hour[4] == null
-                              width: '=screen.width < 600 ? 13 : 15'
                           - component: div
                             config:
                               style:
@@ -682,34 +682,34 @@ slots:
                               default:
                               - component: Label
                                 config:
+                                  text: '=(loop.hour[3] == null ? ''–'' : loop.hour[3]) + '' km/h'''
                                   style:
                                     line-height: 16px
-                                  text: '=(loop.hour[3] == null ? ''–'' : loop.hour[3]) + '' km/h'''
                               - component: Label
                                 config:
-                                  style:
-                                    font-size: 11px
-                                    line-height: 13px
-                                    opacity: '0.65'
                                   text: =['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W',
                                     'WNW', 'NW', 'NNW'][Math.round(loop.hour[4] / 22.5) % 16]
+                                  style:
+                                    font-size: 11px
+                                    opacity: '0.65'
+                                    line-height: 13px
                                   visible: =loop.hour[4] != null
           - component: Label
             config:
+              text: No hours for this day yet.
               style:
                 font-size: 13px
                 opacity: '0.7'
                 padding: 4px 16px 14px
-              text: No hours for this day yet.
               visible: '=(('''' + items[props.weatherHourlyDays].state).startsWith(''['') ? JSON.parse(items[props.weatherHourlyDays].state)
                 : []).filter((r) => r[0] >= dayjs(Number(props.date) * 1000).add(vars.wxShift || 0, ''day'').unix() && r[0]
                 < dayjs(dayjs(Number(props.date) * 1000).add(vars.wxShift || 0, ''day'').unix() * 1000).add(1, ''day'').unix()).length
                 === 0'
       - component: Label
         config:
+          text: Quarter hours from GeoSphere AROME Austria for about two and a half days, then from Open-Meteo's best match,
+            interpolated from its hours; the probability of precipitation from the best match.
           style:
             font-size: 12px
             opacity: '0.6'
             padding: 0 16px 10px
-          text: Quarter hours from GeoSphere AROME Austria for about two and a half days, then from Open-Meteo's best match,
-            interpolated from its hours; the probability of precipitation from the best match.
