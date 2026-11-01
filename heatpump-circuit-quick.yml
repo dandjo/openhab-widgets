@@ -46,7 +46,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 31, 2026, 3:32:16 PM
+timestamp: Nov 1, 2026, 3:29:37 PM
 component: div
 config:
   style:
@@ -248,7 +248,7 @@ slots:
           context: '=''Flow target '' + ([''NULL'', ''UNDEF''].includes(items[props.heatpumpLeavingWaterSetpoint].state) ?
             ''–'' : (items[props.heatpumpLeavingWaterSetpoint].displayState || items[props.heatpumpLeavingWaterSetpoint].state))
             + (items[props.heatpumpClimateControlPower].state === ''ON'' ? ([''day'', ''night''].includes(items[props.heatpumpDayHeatingState].state)
-            ? '' · Tagheizung regelt'' : '''') : '' · Heating off'')'
+            ? '' · Day heating controls'' : '''') : '' · Heating off'')'
           marks: -10=−10 °C;-5=−5;0=0;5=+5;10=+10 °C
           icon: material:tune
           row: true

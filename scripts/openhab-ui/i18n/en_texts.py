@@ -211,6 +211,8 @@ EN.update({"Kartendaten © OpenStreetMap": "Map data © OpenStreetMap", "Zwische
            "Ø Verbrauch": "Avg. consumption", "Entfernung": "Distance", "Fahrzeit": "Driving time",
            "Ø Geschwindigkeit": "Avg. speed", "Start": "Start", "Ende": "End",
            "Fahrten": "Trips", "unterwegs": "on the way", "Ladestopp": "charging stop", "Ladestopps": "charging stops", "Tagheizung": "Day heating", "Aus bis": "Off until", "Warmwasser-Automatik": "Hot water automation", "Taktschutz": "Cycle guard",
+           "Taktschutz-Automatik": "Cycle guard automation", "Tagheizung-Automatik": "Day heating automation",
+           "Tagheizung regelt": "Day heating controls",
            "Fahrten mit weniger als 2 Stunden Abstand sind eine Sitzung, „~“: aus den Abfragen geschätzt":
            "Trips less than 2 hours apart are one session, „~“: estimated from the reads",
            "Parkposition": "Parking position", "Heizkurve": "Heating curve", "Heizkurve (fortgesetzt": "Heating curve (extrapolated",

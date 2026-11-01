@@ -3740,8 +3740,9 @@ DAY_HEATING_PAUSE_END = ("=items.heatpump_management.state === 'ON' ? ((s) => Nu
 # Automatik with the ventilation's icon for its Automatik (user, 2026-10-30)
 HP_AUTOMATION = [("Automatik", "material:tune", "heatpump_management", None),
                  ("Warmwasser-Automatik", "material:shower", "heatpump_dhw_management", None),
-                 ("Taktschutz", "material:timer", "heatpump_cycle_management", None),
-                 ("Tagheizung", "material:wb_sunny", "heatpump_day_heating", DAY_HEATING_PAUSE_END)]
+                 # named as the hot water's, "-Automatik" (user, 2026-11-01)
+                 ("Taktschutz-Automatik", "material:timer", "heatpump_cycle_management", None),
+                 ("Tagheizung-Automatik", "material:wb_sunny", "heatpump_day_heating", DAY_HEATING_PAUSE_END)]
 HP_PILL_WIDTH = "120px"  # Warmwasser fits; three abreast in a wide panel, two and one on a phone
 
 
