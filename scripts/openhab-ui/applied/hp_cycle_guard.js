@@ -132,8 +132,9 @@ const cold = outdoor < COLD;
 const mild = !cold || dayState === 'day';
 
 const write = (value, newLock, why) => {
-  // in °C like the item: a quantity in K would be taken as an absolute temperature (−272.15 °C)
-  offsetItem.sendCommand(Quantity(value + ' °C'));
+  // a bare number: the item is a plain Number in K (user, 2026-11-01), which the MQTT channel takes in its °C, as a
+  // difference; a quantity in K sent to a °C item would have been an absolute temperature (−272.15 °C)
+  offsetItem.sendCommand(value);
   lockItem.postUpdate(newLock);
   cache.private.put('write', now);
   cache.private.put('previous', offset);

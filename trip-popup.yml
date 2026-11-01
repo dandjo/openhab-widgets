@@ -3,25 +3,25 @@ tags:
 - popup
 props:
   parameters:
-  - name: trips
-    label: Trips
+  - context: item
     description: The String item holding trips by day as JSON (rule skoda_enyaq_status)
-    type: TEXT
+    label: Trips
+    name: trips
     required: true
-    context: item
-  - name: id
+    type: TEXT
+  - description: The trip's id, its start in ms
     label: Trip
-    description: The trip's id, its start in ms
-    type: TEXT
+    name: id
     required: true
-  - name: color
-    label: Colour
-    description: 'Colour of the map''s places and line as #rrggbb'
     type: TEXT
+  - default: '#26a69a'
+    description: 'Colour of the map''s places and line as #rrggbb'
+    label: Colour
+    name: color
     required: false
-    default: '#26a69a'
+    type: TEXT
   parameterGroups: []
-timestamp: Oct 31, 2026, 10:13:36 PM
+timestamp: Oct 31, 2026, 10:14:42 PM
 component: div
 config:
   style:
@@ -137,14 +137,17 @@ slots:
       default:
       - component: Label
         config:
-          text: =((d) => (['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'])[d.day()] + ', '
-            + d.date() + '. ' + (['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October',
-            'November', 'December'])[d.month()])(dayjs(Number(props.id)))
           style:
             font-size: 20px
             font-weight: '700'
+          text: =((d) => (['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'])[d.day()] + ', '
+            + d.date() + '. ' + (['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October',
+            'November', 'December'])[d.month()])(dayjs(Number(props.id)))
       - component: Label
         config:
+          style:
+            font-size: 14px
+            opacity: '0.65'
           text: '=(((((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) => t.id ===
             Number(props.id)) || {})(props.trips ? items[props.trips].state : '''')).x ? ''~ '' : '''') + ((((s) => ((s ||
             '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) => t.id === Number(props.id)) ||
@@ -152,32 +155,29 @@ slots:
             JSON.parse(s) : []).flatMap((d) => d.t).find((t) => t.id === Number(props.id)) || {})(props.trips ? items[props.trips].state
             : '''')).e ? '' – '' + (((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t)
             => t.id === Number(props.id)) || {})(props.trips ? items[props.trips].state : '''')).e : '' · on the way''))'
-          style:
-            font-size: 14px
-            opacity: '0.65'
   - component: oh-card
     config:
-      title: ''
       style:
-        height: calc(100% - 2 * var(--f7-card-margin-vertical))
-        clip-path: inset(0 round 8px)
         box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--f7-text-color) 8%, transparent)
+        clip-path: inset(0 round 8px)
+        height: calc(100% - 2 * var(--f7-card-margin-vertical))
       stylesheet: '.card-content { padding: 0 !important; }'
+      title: ''
     slots:
       content:
       - component: oh-webframe
         config:
+          frameborder: '0'
+          height: 320px
+          scrolling: 'no'
           src: '=''/static/trip-map.html?v=b81dcf11&p='' + ((((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d)
             => d.t).find((t) => t.id === Number(props.id)) || {})(props.trips ? items[props.trips].state : '''')).p || []).map((q)
             => q[0] + '','' + q[1] + '','' + (q[4] > 0 ? 1 : 0)).join('';'') + ''&col='' + ((props.color || ''#26a69a'').replace(''#'',
             '''')) + ''&dark='' + (themeOptions.dark === ''dark'' ? 1 : 0)'
-          height: 320px
-          frameborder: '0'
-          scrolling: 'no'
           style:
-            width: 100%
             border: '0'
             display: block
+            width: 100%
       - component: div
         config:
           style:
@@ -186,17 +186,17 @@ slots:
           default:
           - component: oh-link
             config:
-              text: Map data © OpenStreetMap
               action: url
               actionUrl: https://www.openstreetmap.org/copyright
               actionUrlSameWindow: false
               style:
+                color: inherit
+                display: block
                 font-size: 11px
                 opacity: '0.65'
-                display: block
-                text-align: right
                 padding-top: 4px
-                color: inherit
+                text-align: right
+              text: Map data © OpenStreetMap
           - component: div
             config:
               style:
@@ -206,62 +206,62 @@ slots:
               - component: oh-repeater
                 config:
                   for: pt
-                  sourceType: array
+                  fragment: true
                   in: '=(((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) => t.id
                     === Number(props.id)) || {})(props.trips ? items[props.trips].state : '''')).p || []'
-                  fragment: true
+                  sourceType: array
                 slots:
                   default:
                   - component: div
                     config:
                       style:
-                        display: flex
                         align-items: center
+                        display: flex
+                        font-size: 14px
                         gap: 10px
                         padding: 6px 2px
-                        font-size: 14px
                     slots:
                       default:
                       - component: Label
                         config:
-                          text: =loop.pt_idx + 1
                           style:
-                            flex: 0 0 auto
-                            width: 24px
-                            height: 24px
-                            line-height: 24px
+                            background: =props.color || '#26a69a'
                             border-radius: 50%
-                            text-align: center
+                            color: '#fff'
+                            flex: 0 0 auto
                             font-size: 12px
                             font-weight: '700'
-                            color: '#fff'
-                            background: =props.color || '#26a69a'
+                            height: 24px
+                            line-height: 24px
+                            text-align: center
+                            width: 24px
+                          text: =loop.pt_idx + 1
                       - component: Label
                         config:
-                          text: =loop.pt[2]
                           style:
                             flex: 0 0 auto
-                            min-width: 44px
                             font-weight: '600'
+                            min-width: 44px
+                          text: =loop.pt[2]
                       - component: Label
                         config:
-                          text: =loop.pt[3] || 'Stop'
                           style:
                             flex: '1'
                             min-width: '0'
                             overflow-wrap: anywhere
+                          text: =loop.pt[3] || 'Stop'
                       - component: Label
                         config:
-                          text: '=loop.pt[4] > 0 ? ''⚡ +'' + loop.pt[4] + '' %'' : '''''
                           style:
                             flex: 0 0 auto
                             font-size: 11px
                             opacity: '0.65'
+                          text: '=loop.pt[4] > 0 ? ''⚡ +'' + loop.pt[4] + '' %'' : '''''
   - component: oh-card
     config:
-      title: Overview
       style:
         height: calc(100% - 2 * var(--f7-card-margin-vertical))
+      title: Overview
     slots:
       content:
       - component: div
@@ -272,17 +272,21 @@ slots:
           default:
           - component: Label
             config:
+              style:
+                font-size: 17px
+                font-weight: '700'
               text: '=((((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) => t.id
                 === Number(props.id)) || {})(props.trips ? items[props.trips].state : '''')).a || '''') + ((((s) => ((s ||
                 '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) => t.id === Number(props.id))
                 || {})(props.trips ? items[props.trips].state : '''')).b ? '' – '' + (((s) => ((s || '''').charAt(0) === ''[''
                 ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) => t.id === Number(props.id)) || {})(props.trips ? items[props.trips].state
                 : '''')).b : '''')'
-              style:
-                font-size: 17px
-                font-weight: '700'
           - component: Label
             config:
+              style:
+                font-size: 14px
+                opacity: '0.65'
+                padding: 2px 0 6px
               text: '=((m) => m == null ? ''–'' : (m >= 60 ? Math.floor(m / 60) + '' h '' : '''') + (m % 60) + '' min'')((((s)
                 => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) => t.id === Number(props.id))
                 || {})(props.trips ? items[props.trips].state : '''')).tr) + '' · '' + ((((s) => ((s || '''').charAt(0) ===
@@ -290,19 +294,15 @@ slots:
                 ? items[props.trips].state : '''')).km == null ? ''–'' : (((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s)
                 : []).flatMap((d) => d.t).find((t) => t.id === Number(props.id)) || {})(props.trips ? items[props.trips].state
                 : '''')).km + '' km'')'
-              style:
-                font-size: 14px
-                opacity: '0.65'
-                padding: 2px 0 6px
           - component: div
             config:
               style:
-                display: flex
-                justify-content: space-between
-                gap: 12px
-                padding: 11px 4px
                 border-bottom: 1px solid rgba(127, 127, 127, 0.2)
+                display: flex
                 font-size: 15px
+                gap: 12px
+                justify-content: space-between
+                padding: 11px 4px
             slots:
               default:
               - component: Label
@@ -310,24 +310,24 @@ slots:
                   text: Total consumption
               - component: Label
                 config:
+                  style:
+                    font-weight: '700'
+                    text-align: right
+                    white-space: nowrap
                   text: '=(((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) =>
                     t.id === Number(props.id)) || {})(props.trips ? items[props.trips].state : '''')).kwh == null ? ''–''
                     : ''~ '' + ((((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t)
                     => t.id === Number(props.id)) || {})(props.trips ? items[props.trips].state : '''')).kwh).toFixed(1) +
                     '' kWh'''
-                  style:
-                    font-weight: '700'
-                    text-align: right
-                    white-space: nowrap
           - component: div
             config:
               style:
-                display: flex
-                justify-content: space-between
-                gap: 12px
-                padding: 11px 4px
                 border-bottom: 1px solid rgba(127, 127, 127, 0.2)
+                display: flex
                 font-size: 15px
+                gap: 12px
+                justify-content: space-between
+                padding: 11px 4px
             slots:
               default:
               - component: Label
@@ -335,6 +335,10 @@ slots:
                   text: Avg. consumption
               - component: Label
                 config:
+                  style:
+                    font-weight: '700'
+                    text-align: right
+                    white-space: nowrap
                   text: '=((((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) =>
                     t.id === Number(props.id)) || {})(props.trips ? items[props.trips].state : '''')).k1 != null ? ''~ ''
                     + ((((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) => t.id
@@ -347,19 +351,15 @@ slots:
                     ? items[props.trips].state : '''')).kwh / (((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) :
                     []).flatMap((d) => d.t).find((t) => t.id === Number(props.id)) || {})(props.trips ? items[props.trips].state
                     : '''')).km * 100).toFixed(1) + '' kWh/100 km'' : ''–'')'
-                  style:
-                    font-weight: '700'
-                    text-align: right
-                    white-space: nowrap
           - component: div
             config:
               style:
-                display: flex
-                justify-content: space-between
-                gap: 12px
-                padding: 11px 4px
                 border-bottom: 1px solid rgba(127, 127, 127, 0.2)
+                display: flex
                 font-size: 15px
+                gap: 12px
+                justify-content: space-between
+                padding: 11px 4px
             slots:
               default:
               - component: Label
@@ -367,23 +367,23 @@ slots:
                   text: Distance
               - component: Label
                 config:
-                  text: '=(((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) =>
-                    t.id === Number(props.id)) || {})(props.trips ? items[props.trips].state : '''')).km == null ? ''–'' :
-                    (((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) => t.id ===
-                    Number(props.id)) || {})(props.trips ? items[props.trips].state : '''')).km + '' km'''
                   style:
                     font-weight: '700'
                     text-align: right
                     white-space: nowrap
+                  text: '=(((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) =>
+                    t.id === Number(props.id)) || {})(props.trips ? items[props.trips].state : '''')).km == null ? ''–'' :
+                    (((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) => t.id ===
+                    Number(props.id)) || {})(props.trips ? items[props.trips].state : '''')).km + '' km'''
           - component: div
             config:
               style:
-                display: flex
-                justify-content: space-between
-                gap: 12px
-                padding: 11px 4px
                 border-bottom: 1px solid rgba(127, 127, 127, 0.2)
+                display: flex
                 font-size: 15px
+                gap: 12px
+                justify-content: space-between
+                padding: 11px 4px
             slots:
               default:
               - component: Label
@@ -391,6 +391,10 @@ slots:
                   text: Driving time
               - component: Label
                 config:
+                  style:
+                    font-weight: '700'
+                    text-align: right
+                    white-space: nowrap
                   text: '=((((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) =>
                     t.id === Number(props.id)) || {})(props.trips ? items[props.trips].state : '''')).x && (((s) => ((s ||
                     '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) => t.id === Number(props.id))
@@ -398,19 +402,15 @@ slots:
                     ? ''–'' : (m >= 60 ? Math.floor(m / 60) + '' h '' : '''') + (m % 60) + '' min'')((((s) => ((s || '''').charAt(0)
                     === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) => t.id === Number(props.id)) || {})(props.trips
                     ? items[props.trips].state : '''')).dr)'
-                  style:
-                    font-weight: '700'
-                    text-align: right
-                    white-space: nowrap
           - component: div
             config:
               style:
-                display: flex
-                justify-content: space-between
-                gap: 12px
-                padding: 11px 4px
                 border-bottom: 1px solid rgba(127, 127, 127, 0.2)
+                display: flex
                 font-size: 15px
+                gap: 12px
+                justify-content: space-between
+                padding: 11px 4px
             slots:
               default:
               - component: Label
@@ -418,23 +418,23 @@ slots:
                   text: Avg. speed
               - component: Label
                 config:
-                  text: '=(((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) =>
-                    t.id === Number(props.id)) || {})(props.trips ? items[props.trips].state : '''')).sp == null ? ''–'' :
-                    ''~ '' + (((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t)
-                    => t.id === Number(props.id)) || {})(props.trips ? items[props.trips].state : '''')).sp + '' km/h'''
                   style:
                     font-weight: '700'
                     text-align: right
                     white-space: nowrap
+                  text: '=(((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) =>
+                    t.id === Number(props.id)) || {})(props.trips ? items[props.trips].state : '''')).sp == null ? ''–'' :
+                    ''~ '' + (((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t)
+                    => t.id === Number(props.id)) || {})(props.trips ? items[props.trips].state : '''')).sp + '' km/h'''
           - component: div
             config:
               style:
-                display: flex
-                justify-content: space-between
-                gap: 12px
-                padding: 11px 4px
                 border-bottom: 1px solid rgba(127, 127, 127, 0.2)
+                display: flex
                 font-size: 15px
+                gap: 12px
+                justify-content: space-between
+                padding: 11px 4px
               visible: '=(((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) => t.id
                 === Number(props.id)) || {})(props.trips ? items[props.trips].state : '''')).c > 0'
             slots:
@@ -444,21 +444,21 @@ slots:
                   text: charging stops
               - component: Label
                 config:
+                  style:
+                    font-weight: '700'
+                    text-align: right
+                    white-space: nowrap
                   text: '=(((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) =>
                     t.id === Number(props.id)) || {})(props.trips ? items[props.trips].state : '''')).c + ((((s) => ((s ||
                     '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) => t.id === Number(props.id))
                     || {})(props.trips ? items[props.trips].state : '''')).g > 0 ? '' (+'' + (((s) => ((s || '''').charAt(0)
                     === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) => t.id === Number(props.id)) || {})(props.trips
                     ? items[props.trips].state : '''')).g + '' %)'' : '''')'
-                  style:
-                    font-weight: '700'
-                    text-align: right
-                    white-space: nowrap
   - component: oh-card
     config:
-      title: Battery
       style:
         height: calc(100% - 2 * var(--f7-card-margin-vertical))
+      title: Battery
     slots:
       content:
       - component: div
@@ -470,12 +470,12 @@ slots:
           - component: div
             config:
               style:
-                display: flex
-                justify-content: space-between
-                gap: 12px
-                padding: 11px 4px
                 border-bottom: 1px solid rgba(127, 127, 127, 0.2)
+                display: flex
                 font-size: 15px
+                gap: 12px
+                justify-content: space-between
+                padding: 11px 4px
             slots:
               default:
               - component: Label
@@ -483,23 +483,23 @@ slots:
                   text: Start
               - component: Label
                 config:
-                  text: '=(((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) =>
-                    t.id === Number(props.id)) || {})(props.trips ? items[props.trips].state : '''')).s0 == null ? ''–'' :
-                    (((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) => t.id ===
-                    Number(props.id)) || {})(props.trips ? items[props.trips].state : '''')).s0 + '' %'''
                   style:
                     font-weight: '700'
                     text-align: right
                     white-space: nowrap
+                  text: '=(((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) =>
+                    t.id === Number(props.id)) || {})(props.trips ? items[props.trips].state : '''')).s0 == null ? ''–'' :
+                    (((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) => t.id ===
+                    Number(props.id)) || {})(props.trips ? items[props.trips].state : '''')).s0 + '' %'''
           - component: div
             config:
               style:
-                display: flex
-                justify-content: space-between
-                gap: 12px
-                padding: 11px 4px
                 border-bottom: 1px solid rgba(127, 127, 127, 0.2)
+                display: flex
                 font-size: 15px
+                gap: 12px
+                justify-content: space-between
+                padding: 11px 4px
             slots:
               default:
               - component: Label
@@ -507,19 +507,19 @@ slots:
                   text: End
               - component: Label
                 config:
-                  text: '=(((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) =>
-                    t.id === Number(props.id)) || {})(props.trips ? items[props.trips].state : '''')).s1 == null ? ''–'' :
-                    (((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) => t.id ===
-                    Number(props.id)) || {})(props.trips ? items[props.trips].state : '''')).s1 + '' %'''
                   style:
                     font-weight: '700'
                     text-align: right
                     white-space: nowrap
+                  text: '=(((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) =>
+                    t.id === Number(props.id)) || {})(props.trips ? items[props.trips].state : '''')).s1 == null ? ''–'' :
+                    (((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) => t.id ===
+                    Number(props.id)) || {})(props.trips ? items[props.trips].state : '''')).s1 + '' %'''
   - component: oh-card
     config:
-      title: Odometer
       style:
         height: calc(100% - 2 * var(--f7-card-margin-vertical))
+      title: Odometer
     slots:
       content:
       - component: div
@@ -531,12 +531,12 @@ slots:
           - component: div
             config:
               style:
-                display: flex
-                justify-content: space-between
-                gap: 12px
-                padding: 11px 4px
                 border-bottom: 1px solid rgba(127, 127, 127, 0.2)
+                display: flex
                 font-size: 15px
+                gap: 12px
+                justify-content: space-between
+                padding: 11px 4px
             slots:
               default:
               - component: Label
@@ -544,24 +544,24 @@ slots:
                   text: Start
               - component: Label
                 config:
+                  style:
+                    font-weight: '700'
+                    text-align: right
+                    white-space: nowrap
                   text: '=(((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) =>
                     t.id === Number(props.id)) || {})(props.trips ? items[props.trips].state : '''')).o0 == null ? ''–'' :
                     (((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) => t.id ===
                     Number(props.id)) || {})(props.trips ? items[props.trips].state : '''')).o0.toLocaleString(''en-GB'')
                     + '' km'''
-                  style:
-                    font-weight: '700'
-                    text-align: right
-                    white-space: nowrap
           - component: div
             config:
               style:
-                display: flex
-                justify-content: space-between
-                gap: 12px
-                padding: 11px 4px
                 border-bottom: 1px solid rgba(127, 127, 127, 0.2)
+                display: flex
                 font-size: 15px
+                gap: 12px
+                justify-content: space-between
+                padding: 11px 4px
             slots:
               default:
               - component: Label
@@ -569,12 +569,12 @@ slots:
                   text: End
               - component: Label
                 config:
+                  style:
+                    font-weight: '700'
+                    text-align: right
+                    white-space: nowrap
                   text: '=(((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) =>
                     t.id === Number(props.id)) || {})(props.trips ? items[props.trips].state : '''')).o1 == null ? ''–'' :
                     (((s) => ((s || '''').charAt(0) === ''['' ? JSON.parse(s) : []).flatMap((d) => d.t).find((t) => t.id ===
                     Number(props.id)) || {})(props.trips ? items[props.trips].state : '''')).o1.toLocaleString(''en-GB'')
                     + '' km'''
-                  style:
-                    font-weight: '700'
-                    text-align: right
-                    white-space: nowrap

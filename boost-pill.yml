@@ -3,51 +3,51 @@ tags:
 - switch
 props:
   parameters:
-  - name: item
-    label: Item
+  - context: item
     description: The switch item
-    type: TEXT
+    label: Item
+    name: item
     required: true
-    context: item
-  - name: title
-    label: Title
+    type: TEXT
+  - default: Boost
     description: Name of the boost
-    type: TEXT
+    label: Title
+    name: title
     required: false
-    default: Boost
-  - name: icon
-    label: Icon
+    type: TEXT
+  - default: material:bolt
     description: Icon, e.g. material:rocket_launch; a classic openHAB icon follows the item's state
-    type: TEXT
+    label: Icon
+    name: icon
     required: false
-    default: material:bolt
-  - name: color
-    label: Colour
+    type: TEXT
+  - default: '#fb8c00'
     description: 'Device colour as #rrggbb'
-    type: TEXT
+    label: Colour
+    name: color
     required: false
-    default: '#fb8c00'
-  - name: running
-    label: Text while on
+    type: TEXT
+  - default: running
     description: The line under the title while the boost runs; usually an expression
-    type: TEXT
+    label: Text while on
+    name: running
     required: false
-    default: running
+    type: TEXT
   parameterGroups: []
-timestamp: Nov 1, 2026, 2:26:50 AM
+timestamp: Nov 1, 2026, 2:27:57 AM
 component: div
 config:
   style:
     --boost-color: =props.color || '#fb8c00'
-    position: relative
-    display: flex
     align-items: center
-    gap: 10px
-    padding: 6px 10px 6px 6px
-    border-radius: 10px
     background: '=items[props.item].state === ''ON'' ? ''linear-gradient(135deg, var(--boost-color), color-mix(in srgb, var(--boost-color)
       75%, transparent))'' : ''rgba(127, 127, 127, 0.1)'''
+    border-radius: 10px
     color: '=items[props.item].state === ''ON'' ? ''#ffffff'' : '''''
+    display: flex
+    gap: 10px
+    padding: 6px 10px 6px 6px
+    position: relative
     transition: background 0.3s ease
   stylesheet: '@keyframes a-soft { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.06; } }
 
@@ -155,101 +155,101 @@ slots:
   - component: div
     config:
       style:
-        position: relative
-        width: 40px
-        height: 40px
-        flex: 0 0 auto
-        border-radius: 50%
-        display: flex
         align-items: center
-        justify-content: center
         background: '=items[props.item].state === ''ON'' ? ''rgba(255, 255, 255, 0.22)'' : ''color-mix(in srgb, var(--boost-color)
           15%, transparent)'''
+        border-radius: 50%
+        display: flex
+        flex: 0 0 auto
+        height: 40px
+        justify-content: center
+        position: relative
+        width: 40px
     slots:
       default:
       - component: svg
         config:
-          viewBox: 0 0 40 40
-          width: 40
-          height: 40
+          height: 40.0
           style:
-            position: absolute
             inset: '0'
+            position: absolute
+          viewBox: 0 0 40 40
           visible: =items[props.item].state === 'ON'
+          width: 40.0
         slots:
           default:
           - component: circle
             config:
-              cx: 20
-              cy: 20
-              r: 11
-              fill: none
-              stroke: '#ffffff'
-              stroke-width: 2
               class: a-ripple
+              cx: 20.0
+              cy: 20.0
+              fill: none
+              r: 11.0
+              stroke: '#ffffff'
+              stroke-width: 2.0
               style:
                 --grow: '1.727'
                 animation-delay: 0s
           - component: circle
             config:
-              cx: 20
-              cy: 20
-              r: 11
-              fill: none
-              stroke: '#ffffff'
-              stroke-width: 2
               class: a-ripple
+              cx: 20.0
+              cy: 20.0
+              fill: none
+              r: 11.0
+              stroke: '#ffffff'
+              stroke-width: 2.0
               style:
                 --grow: '1.727'
                 animation-delay: -0.8s
       - component: oh-icon
         config:
+          height: 22.0
           icon: =props.icon || 'material:bolt'
           state: =items[props.item].state
-          width: 22
-          height: 22
+          width: 22.0
   - component: div
     config:
       style:
-        flex: '1'
-        min-width: '0'
         display: flex
+        flex: '1'
         flex-direction: column
+        min-width: '0'
     slots:
       default:
       - component: Label
         config:
-          text: =props.title || 'Boost'
           style:
             font-size: 14px
             font-weight: '600'
             line-height: 18px
+          text: =props.title || 'Boost'
       - component: Label
         config:
-          text: '=items[props.item].state === ''ON'' ? (props.running || ''running'') : ''Off'''
           style:
             font-size: 11px
-            opacity: '0.8'
             line-height: 15px
+            opacity: '0.8'
+          text: '=items[props.item].state === ''ON'' ? (props.running || ''running'') : ''Off'''
   - component: Label
     config:
-      text: '=items[props.item].state === ''ON'' ? ''Stop'' : ''Start'''
       style:
-        flex: 0 0 auto
-        padding: 3px 12px
+        border: '=(items[props.item].state === ''ON'' ? ''1.5px solid #ffffff'' : ''1.5px solid var(--boost-color)'')'
         border-radius: 6px
+        color: '=items[props.item].state === ''ON'' ? ''#ffffff'' : ''var(--boost-color)'''
+        flex: 0 0 auto
         font-size: 12px
         font-weight: '700'
-        border: '=(items[props.item].state === ''ON'' ? ''1.5px solid #ffffff'' : ''1.5px solid var(--boost-color)'')'
-        color: '=items[props.item].state === ''ON'' ? ''#ffffff'' : ''var(--boost-color)'''
+        padding: 3px 12px
+      text: '=items[props.item].state === ''ON'' ? ''Stop'' : ''Start'''
   - component: oh-link
     config:
       action: toggle
-      actionItem: =props.item
       actionCommand: 'ON'
       actionCommandAlt: 'OFF'
+      actionItem: =props.item
       style:
-        position: absolute
-        inset: '0'
-        display: block
         border-radius: 10px
+        display: block
+        inset: '0'
+        position: absolute

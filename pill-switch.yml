@@ -3,42 +3,42 @@ tags:
 - switch
 props:
   parameters:
-  - name: item
-    label: Item
+  - context: item
     description: The switch item
-    type: TEXT
+    label: Item
+    name: item
     required: true
-    context: item
-  - name: title
+    type: TEXT
+  - description: Name of the switch, in the pill
     label: Title
-    description: Name of the switch, in the pill
-    type: TEXT
+    name: title
     required: true
-  - name: icon
-    label: Icon
+    type: TEXT
+  - default: material:power_settings_new
     description: Icon on the knob, of what it switches, e.g. material:shower
-    type: TEXT
+    label: Icon
+    name: icon
     required: false
-    default: material:power_settings_new
-  - name: color
-    label: Colour
+    type: TEXT
+  - default: '#78909c'
     description: 'The card''s colour as #rrggbb, of the pill while on'
-    type: TEXT
+    label: Colour
+    name: color
     required: false
-    default: '#78909c'
+    type: TEXT
   parameterGroups: []
-timestamp: Oct 25, 2026, 2:07:58 PM
+timestamp: Oct 25, 2026, 1:50:27 PM
 component: div
 config:
   style:
     --pill-color: =props.color || '#78909c'
-    position: relative
-    display: flex
     align-items: center
+    background: '=items[props.item].state === ''ON'' ? ''var(--pill-color)'' : ''rgba(127, 127, 127, 0.18)'''
+    border-radius: 10px
+    display: flex
     height: 34px
     min-width: '0'
-    border-radius: 10px
-    background: '=items[props.item].state === ''ON'' ? ''var(--pill-color)'' : ''rgba(127, 127, 127, 0.18)'''
+    position: relative
     transition: background 0.25s ease
   stylesheet: '@keyframes a-soft { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.06; } }
 
@@ -145,50 +145,50 @@ slots:
   default:
   - component: Label
     config:
-      text: =props.title
       style:
-        width: 100%
-        text-align: center
         box-sizing: border-box
-        padding: '=items[props.item].state === ''ON'' ? ''0 34px 0 5px'' : ''0 5px 0 34px'''
+        color: '=items[props.item].state === ''ON'' ? ''#ffffff'' : '''''
         font-size: 12px
         font-weight: '600'
-        white-space: nowrap
         overflow: hidden
+        padding: '=items[props.item].state === ''ON'' ? ''0 34px 0 5px'' : ''0 5px 0 34px'''
+        text-align: center
         text-overflow: ellipsis
-        color: '=items[props.item].state === ''ON'' ? ''#ffffff'' : '''''
         transition: padding 0.25s ease
+        white-space: nowrap
+        width: 100%
+      text: =props.title
   - component: div
     config:
       style:
+        align-items: center
+        background: '#ffffff'
+        border-radius: 6px
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3)
+        color: '=items[props.item].state === ''ON'' ? ''var(--pill-color)'' : ''#9e9e9e'''
+        display: flex
+        height: 26px
+        justify-content: center
+        left: '=items[props.item].state === ''ON'' ? ''calc(100% - 30px)'' : ''4px'''
         position: absolute
         top: 4px
-        left: '=items[props.item].state === ''ON'' ? ''calc(100% - 30px)'' : ''4px'''
-        width: 26px
-        height: 26px
-        border-radius: 6px
-        display: flex
-        align-items: center
-        justify-content: center
-        background: '#ffffff'
-        color: '=items[props.item].state === ''ON'' ? ''var(--pill-color)'' : ''#9e9e9e'''
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3)
         transition: left 0.25s ease, color 0.25s ease
+        width: 26px
     slots:
       default:
       - component: oh-icon
         config:
+          height: 16.0
           icon: =props.icon || 'material:power_settings_new'
-          width: 16
-          height: 16
+          width: 16.0
   - component: oh-link
     config:
       action: toggle
-      actionItem: =props.item
       actionCommand: 'ON'
       actionCommandAlt: 'OFF'
+      actionItem: =props.item
       style:
-        position: absolute
-        inset: '0'
-        display: block
         border-radius: 10px
+        display: block
+        inset: '0'
+        position: absolute

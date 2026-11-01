@@ -3,31 +3,30 @@ tags:
 - plug
 props:
   parameters:
-  - name: prefix
-    label: Item prefix
-    description: 'Name prefix of the plug''s items: <prefix>_power, _switch, _energy_today, _energy_total, _voltage, _current,
+  - description: 'Name prefix of the plug''s items: <prefix>_power, _switch, _energy_today, _energy_total, _voltage, _current,
       _power_factor, _apparent_power, _reactive_power'
-    type: TEXT
+    label: Item prefix
+    name: prefix
     required: true
-  - name: title
-    label: Title
-    description: Card title
     type: TEXT
+  - default: Electrical
+    description: Card title
+    label: Title
+    name: title
     required: false
-    default: Electrical
+    type: TEXT
   parameterGroups: []
-timestamp: Oct 25, 2026, 2:07:58 PM
+timestamp: Oct 25, 2026, 1:50:27 PM
 component: oh-card
 config:
-  title: =props.title
-  style:
-    height: calc(100% - 2 * var(--f7-card-margin-vertical))
-    display: flex
-    flex-direction: column
   contentStyle:
+    display: flex
     flex: 1 1 auto
+    flex-direction: column
+  style:
     display: flex
     flex-direction: column
+    height: calc(100% - 2 * var(--f7-card-margin-vertical))
   stylesheet: '@keyframes a-soft { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.06; } }
 
     @keyframes a-full { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
@@ -129,14 +128,15 @@ config:
     .a-bubble-r { transform-box: fill-box; transform-origin: center; animation: a-bubble-r 2.6s linear infinite; }
 
     '
+  title: =props.title
 slots:
   content:
   - component: div
     config:
       style:
         display: grid
-        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr))
         gap: 10px
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr))
         padding: 4px 16px 16px
         padding-bottom: 10px
     slots:
@@ -144,52 +144,36 @@ slots:
       - component: div
         config:
           style:
-            position: relative
+            background: color-mix(in srgb, var(--f7-text-color) 6%, transparent)
+            border-radius: 12px
             box-sizing: border-box
             min-width: '0'
-            border-radius: 12px
-            padding: 10px 12px
-            background: color-mix(in srgb, var(--f7-text-color) 6%, transparent)
             overflow: hidden
+            padding: 10px 12px
+            position: relative
         slots:
           default:
           - component: div
             config:
               style:
-                display: flex
                 align-items: center
+                display: flex
                 gap: 8px
             slots:
               default:
               - component: Label
                 config:
-                  text: Voltage
                   style:
+                    flex: 1 1 auto
                     font-size: 12px
                     opacity: '0.65'
-                    white-space: nowrap
                     overflow: hidden
                     text-overflow: ellipsis
-                    flex: 1 1 auto
+                    white-space: nowrap
+                  text: Voltage
               - component: Label
                 config:
-                  text: '=((Number(items[props.prefix + ''_voltage''].numericState) || 0) >= 207 && (Number(items[props.prefix
-                    + ''_voltage''].numericState) || 0) <= 253) ? ''230 V ± 10 %'' : ''outside'''
                   style:
-                    font-size: 11px
-                    font-weight: '600'
-                    padding: 3px 8px 2px
-                    border-radius: 6px
-                    white-space: nowrap
-                    width: fit-content
-                    color: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
-                      ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
-                      ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[((Number(items[props.prefix + ''_voltage''].numericState)
-                      || 0) >= 207 && (Number(items[props.prefix + ''_voltage''].numericState) || 0) <= 253) ? ''good'' :
-                      ''bad''] || (({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
-                      ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
-                      ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark === ''dark'') ? 1 :
-                      0]'
                     background: '=''color-mix(in srgb, '' + ((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''],
                       caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''],
                       info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[((Number(items[props.prefix
@@ -198,80 +182,96 @@ slots:
                       caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''],
                       info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark
                       === ''dark'') ? 1 : 0] + '' 16%, transparent)'''
+                    border-radius: 6px
+                    color: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
+                      ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
+                      ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[((Number(items[props.prefix + ''_voltage''].numericState)
+                      || 0) >= 207 && (Number(items[props.prefix + ''_voltage''].numericState) || 0) <= 253) ? ''good'' :
+                      ''bad''] || (({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
+                      ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
+                      ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark === ''dark'') ? 1 :
+                      0]'
+                    font-size: 11px
+                    font-weight: '600'
+                    padding: 3px 8px 2px
+                    white-space: nowrap
+                    width: fit-content
+                  text: '=((Number(items[props.prefix + ''_voltage''].numericState) || 0) >= 207 && (Number(items[props.prefix
+                    + ''_voltage''].numericState) || 0) <= 253) ? ''230 V ± 10 %'' : ''outside'''
           - component: Label
             config:
-              text: '=(([''NULL'', ''UNDEF''].includes(items[props.prefix + ''_voltage''].state) ? ''–'' : (items[props.prefix
-                + ''_voltage''].displayState || items[props.prefix + ''_voltage''].state)) || ''–'')'
               style:
                 font-size: 20px
                 font-weight: '700'
                 line-height: '1.3'
                 white-space: nowrap
+              text: '=(([''NULL'', ''UNDEF''].includes(items[props.prefix + ''_voltage''].state) ? ''–'' : (items[props.prefix
+                + ''_voltage''].displayState || items[props.prefix + ''_voltage''].state)) || ''–'')'
           - component: div
             config:
               style:
-                position: relative
                 height: 8px
                 margin: 10px 0 0
+                position: relative
             slots:
               default:
               - component: div
                 config:
                   style:
-                    position: absolute
-                    inset: '0'
-                    border-radius: 4px
                     background: rgba(127, 127, 127, 0.18)
+                    border-radius: 4px
+                    inset: '0'
+                    position: absolute
                 slots:
                   default: []
               - component: div
                 config:
                   style:
+                    background: rgba(102, 187, 106, 0.28)
+                    border-radius: 5px
+                    height: 18px
+                    left: 11.67%
                     position: absolute
                     top: -5px
-                    height: 18px
-                    border-radius: 5px
-                    background: rgba(102, 187, 106, 0.28)
-                    left: 11.67%
                     width: 76.67%
                 slots:
                   default: []
               - component: div
                 config:
                   style:
+                    background: currentColor
+                    height: 18px
+                    left: 50.00%
+                    opacity: '0.5'
                     position: absolute
                     top: -5px
-                    height: 18px
                     width: 1px
-                    background: currentColor
-                    opacity: '0.5'
-                    left: 50.00%
                 slots:
                   default: []
               - component: div
                 config:
                   style:
+                    background: '#7986cb'
+                    border: '2px solid var(--f7-card-bg-color, #fff)'
+                    border-radius: 50%
+                    box-sizing: border-box
+                    height: 14px
+                    left: =Math.max(0, Math.min(100, (((Number(items[props.prefix + '_voltage'].numericState) || 0)) - (200))
+                      / ((260) - (200)) * 100)) + '%'
+                    margin-left: -7px
                     position: absolute
                     top: -3px
                     width: 14px
-                    height: 14px
-                    margin-left: -7px
-                    border-radius: 50%
-                    box-sizing: border-box
-                    background: '#7986cb'
-                    border: '2px solid var(--f7-card-bg-color, #fff)'
-                    left: =Math.max(0, Math.min(100, (((Number(items[props.prefix + '_voltage'].numericState) || 0)) - (200))
-                      / ((260) - (200)) * 100)) + '%'
                 slots:
                   default: []
           - component: div
             config:
               style:
                 display: flex
-                justify-content: space-between
                 font-size: 11px
-                opacity: '0.65'
+                justify-content: space-between
                 margin-top: 8px
+                opacity: '0.65'
             slots:
               default:
               - component: Label
@@ -286,66 +286,50 @@ slots:
           - component: oh-link
             config:
               action: popup
-              style:
-                position: absolute
-                inset: '0'
-                display: block
-                border-radius: 12px
               actionModal: widget:item-popup
               actionModalConfig:
-                item: =props.prefix + '_voltage'
-                title: Voltage
                 color: '#7986cb'
+                item: =props.prefix + '_voltage'
                 kind: number
+                title: Voltage
+              style:
+                border-radius: 12px
+                display: block
+                inset: '0'
+                position: absolute
       - component: div
         config:
           style:
-            position: relative
+            background: color-mix(in srgb, var(--f7-text-color) 6%, transparent)
+            border-radius: 12px
             box-sizing: border-box
             min-width: '0'
-            border-radius: 12px
-            padding: 10px 12px
-            background: color-mix(in srgb, var(--f7-text-color) 6%, transparent)
             overflow: hidden
+            padding: 10px 12px
+            position: relative
         slots:
           default:
           - component: div
             config:
               style:
-                display: flex
                 align-items: center
+                display: flex
                 gap: 8px
             slots:
               default:
               - component: Label
                 config:
-                  text: Current
                   style:
+                    flex: 1 1 auto
                     font-size: 12px
                     opacity: '0.65'
-                    white-space: nowrap
                     overflow: hidden
                     text-overflow: ellipsis
-                    flex: 1 1 auto
+                    white-space: nowrap
+                  text: Current
               - component: Label
                 config:
-                  text: =(Math.max(0, Math.min(100, (Number(items[props.prefix + '_current'].numericState) || 0) / 16 * 100))).toFixed(0)
-                    + ' % of 16 A'
                   style:
-                    font-size: 11px
-                    font-weight: '600'
-                    padding: 3px 8px 2px
-                    border-radius: 6px
-                    white-space: nowrap
-                    width: fit-content
-                    color: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
-                      ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
-                      ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[(Math.max(0, Math.min(100, (Number(items[props.prefix
-                      + ''_current''].numericState) || 0) / 16 * 100)) < 60 ? ''good'' : Math.max(0, Math.min(100, (Number(items[props.prefix
-                      + ''_current''].numericState) || 0) / 16 * 100)) < 85 ? ''warn'' : ''bad'')] || (({good: [''#2e7d32'',
-                      ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'',
-                      ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'',
-                      ''#c7c7cc'']})).neutral)[(themeOptions.dark === ''dark'') ? 1 : 0]'
                     background: '=''color-mix(in srgb, '' + ((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''],
                       caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''],
                       info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[(Math.max(0, Math.min(100,
@@ -355,40 +339,51 @@ slots:
                       ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
                       ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark === ''dark'') ? 1 :
                       0] + '' 16%, transparent)'''
+                    border-radius: 6px
+                    color: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
+                      ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
+                      ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[(Math.max(0, Math.min(100, (Number(items[props.prefix
+                      + ''_current''].numericState) || 0) / 16 * 100)) < 60 ? ''good'' : Math.max(0, Math.min(100, (Number(items[props.prefix
+                      + ''_current''].numericState) || 0) / 16 * 100)) < 85 ? ''warn'' : ''bad'')] || (({good: [''#2e7d32'',
+                      ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'',
+                      ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'',
+                      ''#c7c7cc'']})).neutral)[(themeOptions.dark === ''dark'') ? 1 : 0]'
+                    font-size: 11px
+                    font-weight: '600'
+                    padding: 3px 8px 2px
+                    white-space: nowrap
+                    width: fit-content
+                  text: =(Math.max(0, Math.min(100, (Number(items[props.prefix + '_current'].numericState) || 0) / 16 * 100))).toFixed(0)
+                    + ' % of 16 A'
           - component: Label
             config:
-              text: '=(([''NULL'', ''UNDEF''].includes(items[props.prefix + ''_current''].state) ? ''–'' : (items[props.prefix
-                + ''_current''].displayState || items[props.prefix + ''_current''].state)) || ''–'')'
               style:
                 font-size: 20px
                 font-weight: '700'
                 line-height: '1.3'
                 white-space: nowrap
+              text: '=(([''NULL'', ''UNDEF''].includes(items[props.prefix + ''_current''].state) ? ''–'' : (items[props.prefix
+                + ''_current''].displayState || items[props.prefix + ''_current''].state)) || ''–'')'
           - component: div
             config:
               style:
-                position: relative
                 height: 8px
                 margin: 10px 0 2px
+                position: relative
             slots:
               default:
               - component: div
                 config:
                   style:
-                    position: absolute
-                    inset: '0'
-                    border-radius: 4px
                     background: rgba(127, 127, 127, 0.18)
+                    border-radius: 4px
+                    inset: '0'
+                    position: absolute
                 slots:
                   default: []
               - component: div
                 config:
                   style:
-                    position: absolute
-                    left: '0'
-                    top: '0'
-                    height: 8px
-                    border-radius: 4px
                     background: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
                       ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
                       ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[(Math.max(0, Math.min(100, (Number(items[props.prefix
@@ -397,6 +392,11 @@ slots:
                       ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'',
                       ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'',
                       ''#c7c7cc'']})).neutral)[(themeOptions.dark === ''dark'') ? 1 : 0]'
+                    border-radius: 4px
+                    height: 8px
+                    left: '0'
+                    position: absolute
+                    top: '0'
                     width: =Math.max(0, Math.min(100, (Number(items[props.prefix + '_current'].numericState) || 0) / 16 *
                       100)) + '%'
                 slots:
@@ -404,22 +404,22 @@ slots:
           - component: oh-link
             config:
               action: popup
-              style:
-                position: absolute
-                inset: '0'
-                display: block
-                border-radius: 12px
               actionModal: widget:item-popup
               actionModalConfig:
-                item: =props.prefix + '_current'
-                title: Current
                 color: '#5c6bc0'
+                item: =props.prefix + '_current'
                 kind: number
+                title: Current
+              style:
+                border-radius: 12px
+                display: block
+                inset: '0'
+                position: absolute
   - component: div
     config:
       style:
-        flex: 1 1 auto
         display: flex
+        flex: 1 1 auto
         flex-direction: column
         padding: 0 16px 16px
     slots:
@@ -427,72 +427,55 @@ slots:
       - component: div
         config:
           style:
-            position: relative
-            box-sizing: border-box
-            min-width: '0'
-            border-radius: 12px
-            padding: 10px 12px
             background: color-mix(in srgb, var(--f7-text-color) 6%, transparent)
-            overflow: hidden
-            grid-column: 1 / -1
+            border-radius: 12px
+            box-sizing: border-box
             display: flex
-            flex-direction: column
             flex: 1 1 auto
+            flex-direction: column
+            grid-column: 1 / -1
+            min-width: '0'
+            overflow: hidden
+            padding: 10px 12px
+            position: relative
         slots:
           default:
           - component: div
             config:
               style:
-                display: flex
                 align-items: center
+                display: flex
                 gap: 8px
             slots:
               default:
               - component: Label
                 config:
-                  text: Power triangle
                   style:
+                    flex: 1 1 auto
                     font-size: 12px
                     opacity: '0.65'
-                    white-space: nowrap
                     overflow: hidden
                     text-overflow: ellipsis
-                    flex: 1 1 auto
+                    white-space: nowrap
+                  text: Power triangle
               - component: div
                 config:
                   style:
-                    display: flex
                     align-items: center
+                    display: flex
                     gap: 8px
                   visible: =((Number(items[props.prefix + '_apparent_power'].numericState) || 0) > 1)
                 slots:
                   default:
                   - component: Label
                     config:
-                      text: ='cos φ ' + (Math.abs((Number(items[props.prefix + '_power_factor'].numericState) || 0))).toFixed(2)
                       style:
                         font-size: 13px
                         font-weight: '700'
+                      text: ='cos φ ' + (Math.abs((Number(items[props.prefix + '_power_factor'].numericState) || 0))).toFixed(2)
                   - component: Label
                     config:
-                      text: '=[''low'', ''moderate'', ''good''][((Math.abs((Number(items[props.prefix + ''_power_factor''].numericState)
-                        || 0))) < 0.7 ? 0 : (Math.abs((Number(items[props.prefix + ''_power_factor''].numericState) || 0)))
-                        < 0.9 ? 1 : 2)]'
                       style:
-                        font-size: 11px
-                        font-weight: '600'
-                        padding: 3px 8px 2px
-                        border-radius: 6px
-                        white-space: nowrap
-                        width: fit-content
-                        color: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
-                          ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
-                          ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[[''warn'', ''caution'', ''good''][((Math.abs((Number(items[props.prefix
-                          + ''_power_factor''].numericState) || 0))) < 0.7 ? 0 : (Math.abs((Number(items[props.prefix + ''_power_factor''].numericState)
-                          || 0))) < 0.9 ? 1 : 2)]] || (({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''],
-                          caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''],
-                          info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark
-                          === ''dark'') ? 1 : 0]'
                         background: '=''color-mix(in srgb, '' + ((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''],
                           caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''],
                           info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[[''warn'', ''caution'',
@@ -502,12 +485,29 @@ slots:
                           ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
                           ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark === ''dark'') ?
                           1 : 0] + '' 16%, transparent)'''
+                        border-radius: 6px
+                        color: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
+                          ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
+                          ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[[''warn'', ''caution'', ''good''][((Math.abs((Number(items[props.prefix
+                          + ''_power_factor''].numericState) || 0))) < 0.7 ? 0 : (Math.abs((Number(items[props.prefix + ''_power_factor''].numericState)
+                          || 0))) < 0.9 ? 1 : 2)]] || (({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''],
+                          caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''],
+                          info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark
+                          === ''dark'') ? 1 : 0]'
+                        font-size: 11px
+                        font-weight: '600'
+                        padding: 3px 8px 2px
+                        white-space: nowrap
+                        width: fit-content
+                      text: '=[''low'', ''moderate'', ''good''][((Math.abs((Number(items[props.prefix + ''_power_factor''].numericState)
+                        || 0))) < 0.7 ? 0 : (Math.abs((Number(items[props.prefix + ''_power_factor''].numericState) || 0)))
+                        < 0.9 ? 1 : 2)]'
           - component: div
             config:
               style:
-                flex: 1 1 auto
-                display: flex
                 align-items: center
+                display: flex
+                flex: 1 1 auto
                 justify-content: center
                 padding-top: 4px
             slots:
@@ -515,19 +515,19 @@ slots:
               - component: div
                 config:
                   style:
+                    aspect-ratio: 280 / 94
+                    max-width: 380px
                     position: relative
                     width: 100%
-                    max-width: 380px
-                    aspect-ratio: 280 / 94
                 slots:
                   default:
                   - component: svg
                     config:
-                      viewBox: 0 0 280 94
                       style:
                         display: block
-                        width: 100%
                         height: auto
+                        width: 100%
+                      viewBox: 0 0 280 94
                       visible: =((Number(items[props.prefix + '_apparent_power'].numericState) || 0) > 1)
                     slots:
                       default:
@@ -561,18 +561,19 @@ slots:
                             Math.abs((Number(items[props.prefix + '_power_factor'].numericState) || 0))))))))).toFixed(1)
                             + ' Z'
                           fill: '#7986cb'
-                          stroke: '#9fa8da'
                           fill-opacity: '0.2'
-                          stroke-width: '1.6'
+                          stroke: '#9fa8da'
                           stroke-linejoin: round
+                          stroke-width: '1.6'
                       - component: line
                         config:
+                          stroke: '#fb8c00'
+                          stroke-width: '3'
                           x1: =((140 - (Math.min(200 / Math.max(Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix
                             + '_power_factor'].numericState) || 0)))))), 0.05), 58 / Math.max(Math.sin(Math.acos(Math.max(0,
                             Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState) || 0)))))), 0.05))
                             * Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState)
                             || 0))))))) / 2)).toFixed(1)
-                          y1: 72
                           x2: =(((140 - (Math.min(200 / Math.max(Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix
                             + '_power_factor'].numericState) || 0)))))), 0.05), 58 / Math.max(Math.sin(Math.acos(Math.max(0,
                             Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState) || 0)))))), 0.05))
@@ -582,11 +583,12 @@ slots:
                             Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState) || 0)))))), 0.05))
                             * Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState)
                             || 0))))))))).toFixed(1)
-                          y2: 72
-                          stroke: '#fb8c00'
-                          stroke-width: '3'
+                          y1: 72.0
+                          y2: 72.0
                       - component: line
                         config:
+                          stroke: '#90a4ae'
+                          stroke-width: '3'
                           x1: =(((140 - (Math.min(200 / Math.max(Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix
                             + '_power_factor'].numericState) || 0)))))), 0.05), 58 / Math.max(Math.sin(Math.acos(Math.max(0,
                             Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState) || 0)))))), 0.05))
@@ -596,7 +598,6 @@ slots:
                             Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState) || 0)))))), 0.05))
                             * Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState)
                             || 0))))))))).toFixed(1)
-                          y1: 72
                           x2: =(((140 - (Math.min(200 / Math.max(Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix
                             + '_power_factor'].numericState) || 0)))))), 0.05), 58 / Math.max(Math.sin(Math.acos(Math.max(0,
                             Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState) || 0)))))), 0.05))
@@ -606,15 +607,20 @@ slots:
                             Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState) || 0)))))), 0.05))
                             * Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState)
                             || 0))))))))).toFixed(1)
+                          y1: 72.0
                           y2: =((72 - (Math.min(200 / Math.max(Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix
                             + '_power_factor'].numericState) || 0)))))), 0.05), 58 / Math.max(Math.sin(Math.acos(Math.max(0,
                             Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState) || 0)))))), 0.05))
                             * Math.sin(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState)
                             || 0))))))))).toFixed(1)
-                          stroke: '#90a4ae'
-                          stroke-width: '3'
                       - component: text
                         config:
+                          content: ='P ' + ((Number(items[props.prefix + '_power'].numericState) || 0)).toFixed(0) + ' W'
+                          fill: currentColor
+                          font-size: 11.0
+                          font-weight: '700'
+                          opacity: '1'
+                          text-anchor: middle
                           x: =((140 - (Math.min(200 / Math.max(Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix
                             + '_power_factor'].numericState) || 0)))))), 0.05), 58 / Math.max(Math.sin(Math.acos(Math.max(0,
                             Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState) || 0)))))), 0.05))
@@ -624,15 +630,16 @@ slots:
                             Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState) || 0)))))), 0.05))
                             * Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState)
                             || 0))))))) / 2).toFixed(1)
-                          y: 88
-                          content: ='P ' + ((Number(items[props.prefix + '_power'].numericState) || 0)).toFixed(0) + ' W'
-                          fill: currentColor
-                          font-size: 11
-                          font-weight: '700'
-                          text-anchor: middle
-                          opacity: '1'
+                          y: 88.0
                       - component: text
                         config:
+                          content: ='Q ' + ((Number(items[props.prefix + '_reactive_power'].numericState) || 0)).toFixed(0)
+                            + ' var'
+                          fill: currentColor
+                          font-size: 11.0
+                          font-weight: normal
+                          opacity: '1'
+                          text-anchor: start
                           x: =(((140 - (Math.min(200 / Math.max(Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix
                             + '_power_factor'].numericState) || 0)))))), 0.05), 58 / Math.max(Math.sin(Math.acos(Math.max(0,
                             Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState) || 0)))))), 0.05))
@@ -647,15 +654,15 @@ slots:
                             Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState) || 0)))))), 0.05))
                             * Math.sin(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState)
                             || 0))))))) / 2 + 4).toFixed(1)
-                          content: ='Q ' + ((Number(items[props.prefix + '_reactive_power'].numericState) || 0)).toFixed(0)
-                            + ' var'
-                          fill: currentColor
-                          font-size: 11
-                          font-weight: normal
-                          text-anchor: start
-                          opacity: '1'
                       - component: text
                         config:
+                          content: ='S ' + ((Number(items[props.prefix + '_apparent_power'].numericState) || 0)).toFixed(0)
+                            + ' VA'
+                          fill: currentColor
+                          font-size: 11.0
+                          font-weight: normal
+                          opacity: '0.8'
+                          text-anchor: end
                           x: =((140 - (Math.min(200 / Math.max(Math.cos(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix
                             + '_power_factor'].numericState) || 0)))))), 0.05), 58 / Math.max(Math.sin(Math.acos(Math.max(0,
                             Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState) || 0)))))), 0.05))
@@ -670,36 +677,29 @@ slots:
                             Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState) || 0)))))), 0.05))
                             * Math.sin(Math.acos(Math.max(0, Math.min(1, Math.abs((Number(items[props.prefix + '_power_factor'].numericState)
                             || 0))))))) / 2 - 4).toFixed(1)
-                          content: ='S ' + ((Number(items[props.prefix + '_apparent_power'].numericState) || 0)).toFixed(0)
-                            + ' VA'
-                          fill: currentColor
-                          font-size: 11
-                          font-weight: normal
-                          text-anchor: end
-                          opacity: '0.8'
                   - component: Label
                     config:
-                      text: no load
                       style:
+                        align-items: center
+                        display: flex
                         font-size: 11px
+                        inset: '0'
+                        justify-content: center
                         opacity: '0.65'
                         position: absolute
-                        inset: '0'
-                        display: flex
-                        align-items: center
-                        justify-content: center
+                      text: no load
                       visible: =!((Number(items[props.prefix + '_apparent_power'].numericState) || 0) > 1)
           - component: oh-link
             config:
               action: popup
-              style:
-                position: absolute
-                inset: '0'
-                display: block
-                border-radius: 12px
               actionModal: widget:item-popup
               actionModalConfig:
-                item: =props.prefix + '_power_factor'
-                title: Power triangle
                 color: '#5c6bc0'
+                item: =props.prefix + '_power_factor'
                 kind: number
+                title: Power triangle
+              style:
+                border-radius: 12px
+                display: block
+                inset: '0'
+                position: absolute

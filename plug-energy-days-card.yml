@@ -3,23 +3,22 @@ tags:
 - plug
 props:
   parameters:
-  - name: prefix
-    label: Item prefix
-    description: 'Name prefix of the plug''s items: <prefix>_power, _switch, _energy_today, _energy_total, _voltage, _current,
+  - description: 'Name prefix of the plug''s items: <prefix>_power, _switch, _energy_today, _energy_total, _voltage, _current,
       _power_factor, _apparent_power, _reactive_power'
-    type: TEXT
+    label: Item prefix
+    name: prefix
     required: true
-  - name: color
-    label: Colour
-    description: 'Device colour as #rrggbb'
     type: TEXT
+  - default: '#8d6e63'
+    description: 'Device colour as #rrggbb'
+    label: Colour
+    name: color
     required: false
-    default: '#8d6e63'
+    type: TEXT
   parameterGroups: []
-timestamp: Oct 25, 2026, 2:07:58 PM
+timestamp: Oct 25, 2026, 1:50:27 PM
 component: oh-card
 config:
-  title: Energy per Day
   style:
     height: calc(100% - 2 * var(--f7-card-margin-vertical))
   stylesheet: '@keyframes a-soft { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.06; } }
@@ -126,74 +125,49 @@ config:
     .menu-item-dropdown:not(.menu-item-dropdown-opened) .menu-dropdown { display: none; }
 
     .oh-chart-container > .menu.padding { padding-top: 6px !important; }'
+  title: Energy per Day
 slots:
   content:
   - component: oh-chart
     config:
       chartType: month
-      periodVisible: true
       height: 260px
       options:
         backgroundColor: transparent
+      periodVisible: true
     slots:
       grid:
       - component: oh-chart-grid
         config:
-          top: '62'
           bottom: '35'
           left: '45'
           right: '20'
-      xAxis:
-      - component: oh-category-axis
-        config:
-          gridIndex: 0
-          categoryType: month
-          name: Day
-          nameGap: 12
-          axisTick:
-            show: false
-      yAxis:
-      - component: oh-value-axis
-        config:
-          gridIndex: 0
-          name: kWh
-          nameGap: 14
-          nameTextStyle:
-            align: right
-            padding:
-            - 0
-            - 8
-            - 0
-            - 0
-          splitLine:
-            lineStyle:
-              type: dashed
-              opacity: 0.4
+          top: '62'
       series:
       - component: oh-aggregate-series
         config:
-          name: Energy
-          gridIndex: 0
-          xAxisIndex: 0
-          yAxisIndex: 0
-          type: bar
-          item: =props.prefix + '_energy_today'
           aggregationFunction: last
           dimension1: date
+          gridIndex: 0.0
+          item: =props.prefix + '_energy_today'
           itemStyle:
-            color: =props.color
             borderRadius:
-            - 4
-            - 4
-            - 0
-            - 0
+            - 4.0
+            - 4.0
+            - 0.0
+            - 0.0
+            color: =props.color
+          name: Energy
+          type: bar
+          xAxisIndex: 0.0
+          yAxisIndex: 0.0
       tooltip:
       - component: oh-chart-tooltip
         config:
-          show: true
+          backgroundColor: transparent
+          borderWidth: 0.0
           confine: true
-          trigger: axis
-          smartFormatter: false
+          extraCssText: 'box-shadow: none;'
           formatter: '=(ps) => ((H) => ''<div style="display: flex; flex-direction: column; align-items: flex-start; height:
             0">'' + [0].map((g) => ((r) => ''<div style="'' + (r ? ''border: 1px solid; border-radius: 4px; padding: 10px;
             box-shadow: rgba(0, 0, 0, 0.2) 1px 2px 10px; '' + (themeOptions.dark === ''dark'' ? ''background-color: rgb(58,
@@ -207,6 +181,7 @@ slots:
             '' + p.seriesName + ''<span style="float: right; margin-left: 20px"><b style="text-align: right;">'' + ((v) =>
             v.toLocaleString(''en-GB'') + '' '' + p.seriesId.split(''#'')[2])(Number(p.value[1])) + ''</b></span><br/>'').join(''''))).join('''')
             + ''</div>'')(ps[0].axisValue)'
+          padding: 0.0
           position: '=(pt, ps, dom, rect, size) => ((T, B) => ((c, left, h) => [((hd, per) => hd && per ? ((w) => ((k) =>
             k === undefined ? 0 : hd.replaceChildren(dayjs().date(1).year(Number(w[1])).month(k).date(Number(hd.getAttribute(''data-head''))).format(''ddd,
             ll'')))([0,1,2,3,4,5,6,7,8,9,10,11].filter((k) => dayjs().date(1).month(k).format(''MMM'') === w[0])[0]))(per.textContent.trim().split(''
@@ -220,8 +195,33 @@ slots:
             ? y + 4 : 0, i === h ? Math.max(T[i], Math.min(pt[1] + 20, B[i] - b.offsetHeight)) : T[i])))(c.children[i]) :
             0), [left ? pt[0] - 20 - c.offsetWidth : pt[0] + 20, 0]][5])(dom.firstChild, pt[0] > size.viewSize[0] / 2, T.filter((t)
             => t <= pt[1]).length - 1))([62], [size.viewSize[1] - 35])'
-          backgroundColor: transparent
-          borderWidth: 0
-          padding: 0
-          transitionDuration: 0
-          extraCssText: 'box-shadow: none;'
+          show: true
+          smartFormatter: false
+          transitionDuration: 0.0
+          trigger: axis
+      xAxis:
+      - component: oh-category-axis
+        config:
+          axisTick:
+            show: false
+          categoryType: month
+          gridIndex: 0.0
+          name: Day
+          nameGap: 12.0
+      yAxis:
+      - component: oh-value-axis
+        config:
+          gridIndex: 0.0
+          name: kWh
+          nameGap: 14.0
+          nameTextStyle:
+            align: right
+            padding:
+            - 0.0
+            - 8.0
+            - 0.0
+            - 0.0
+          splitLine:
+            lineStyle:
+              opacity: 0.4
+              type: dashed

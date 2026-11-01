@@ -3698,20 +3698,16 @@ def dhw_setpoint(dim=None, row=False):
                        row=row)
 
 
-# the leaving water offset in kelvins (user, 2026-11-01, as the day heating's): the plain Number of
-# applied/lw_offset_kelvin.py on the same MQTT channel as the Number:Temperature in °C, whose slider would send "3 K",
-# an absolute temperature (−270.15 °C); the plain one sends a bare number, which the channel takes in °C
-LW_OFFSET_K = "pyaltherma_leaving_water_temp_offset_heating_k"
-
-
 def lw_offset(dim=None, row=False):
-    n = f"Math.round({num(LW_OFFSET_K)})"
+    n = f"Math.round({num('pyaltherma_leaving_water_temp_offset_heating')})"
     heating = is_on("pyaltherma_climate_control_power")
     # whether the day heating holds the offset by the day's decision (day or night phase), not whether its switch is
     # on, as the hot water's "Automatik regelt" (user, 2026-10-31)
     day_heating = "['day', 'night'].includes(items.heatpump_day_heating_state.state)"
-    # no unit given: the slider's label takes "K" from the item's display state and sends a bare number
-    return pill_slider(LW_OFFSET_K, HP_ORANGE, -10, 10, 1, "Vorlauf-Offset",
+    # the item is a plain Number in K (applied/lw_offset_kelvin.py; user, 2026-11-01, as the day heating's offset): no
+    # unit given, the slider's label takes "K" from the item's display state and sends a bare number, which the MQTT
+    # channel takes in its °C, as a difference
+    return pill_slider("pyaltherma_leaving_water_temp_offset_heating", HP_ORANGE, -10, 10, 1, "Vorlauf-Offset",
                        f"({n} > 0 ? '+' : '') + {n} + ' K'",
                        f"'Vorlauf-Soll ' + {disp('espaltherma_leaving_water_setpoint')} + "
                        f"({heating} ? ({day_heating} ? ' · Tagheizung regelt' : '') : ' · Heizung aus')",

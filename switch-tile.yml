@@ -3,54 +3,54 @@ tags:
 - switch
 props:
   parameters:
-  - name: item
-    label: Item
+  - context: item
     description: The switch item
-    type: TEXT
+    label: Item
+    name: item
     required: true
-    context: item
-  - name: title
+    type: TEXT
+  - description: Name of the plug or device
     label: Title
-    description: Name of the plug or device
-    type: TEXT
+    name: title
     required: true
-  - name: icon
+    type: TEXT
+  - description: Icon, e.g. material:coffee (its state follows the item)
     label: Icon
-    description: Icon, e.g. material:coffee (its state follows the item)
-    type: TEXT
+    name: icon
     required: false
-  - name: color
-    label: Colour
+    type: TEXT
+  - default: '#78909c'
     description: 'Colour of the tile while on as #rrggbb'
-    type: TEXT
+    label: Colour
+    name: color
     required: false
-    default: '#78909c'
-  - name: value
+    type: TEXT
+  - description: A line under the name, e.g. the power; usually an expression
     label: Value
-    description: A line under the name, e.g. the power; usually an expression
-    type: TEXT
+    name: value
     required: false
-  - name: energy
+    type: TEXT
+  - description: 'A line under the value, e.g. today''s energy; usually an expression; empty: none'
     label: Second value
-    description: 'A line under the value, e.g. today''s energy; usually an expression; empty: none'
-    type: TEXT
+    name: energy
     required: false
+    type: TEXT
   parameterGroups: []
-timestamp: Oct 25, 2026, 2:07:58 PM
+timestamp: Oct 25, 2026, 1:50:27 PM
 component: div
 config:
   style:
     --tile-color: =props.color || '#78909c'
-    position: relative
-    padding: 8px 9px
-    border-radius: 12px
-    min-width: '0'
-    display: flex
-    flex-direction: column
     background: '=items[props.item].state === ''ON'' ? ''color-mix(in srgb, var(--tile-color) 20%, transparent)'' : ''color-mix(in
       srgb, var(--f7-text-color) 6%, transparent)'''
+    border-radius: 12px
     box-shadow: '=items[props.item].state === ''ON'' ? ''inset 0 0 0 1.5px color-mix(in srgb, var(--tile-color) 60%, transparent)''
       : ''none'''
+    display: flex
+    flex-direction: column
+    min-width: '0'
+    padding: 8px 9px
+    position: relative
   stylesheet: '@keyframes a-soft { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.06; } }
 
     @keyframes a-full { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
@@ -157,64 +157,64 @@ slots:
   - component: div
     config:
       style:
+        align-items: flex-start
         display: flex
         justify-content: space-between
-        align-items: flex-start
     slots:
       default:
       - component: oh-icon
         config:
+          height: 22.0
           icon: =props.icon
           state: =items[props.item].state
-          width: 22
-          height: 22
+          width: 22.0
       - component: Label
         config:
-          text: '=items[props.item].state === ''ON'' ? ''On'' : ''Off'''
           style:
             font-size: 11px
             font-weight: '700'
             opacity: '0.7'
+          text: '=items[props.item].state === ''ON'' ? ''On'' : ''Off'''
   - component: Label
     config:
-      text: =props.title
       style:
-        white-space: nowrap
-        overflow: hidden
-        text-overflow: ellipsis
         font-size: 13px
         font-weight: '600'
-        margin-top: 5px
         line-height: 16px
-  - component: Label
-    config:
-      text: =props.value || ''
-      style:
-        white-space: nowrap
+        margin-top: 5px
         overflow: hidden
         text-overflow: ellipsis
+        white-space: nowrap
+      text: =props.title
+  - component: Label
+    config:
+      style:
         font-size: 12px
-        opacity: '0.7'
         line-height: 15px
-  - component: Label
-    config:
-      text: =props.energy || ''
-      style:
-        white-space: nowrap
+        opacity: '0.7'
         overflow: hidden
         text-overflow: ellipsis
+        white-space: nowrap
+      text: =props.value || ''
+  - component: Label
+    config:
+      style:
         font-size: 11px
-        opacity: '0.55'
         line-height: 14px
+        opacity: '0.55'
+        overflow: hidden
+        text-overflow: ellipsis
+        white-space: nowrap
+      text: =props.energy || ''
       visible: =!!props.energy
   - component: oh-link
     config:
       action: toggle
-      actionItem: =props.item
       actionCommand: 'ON'
       actionCommandAlt: 'OFF'
+      actionItem: =props.item
       style:
-        position: absolute
-        inset: '0'
-        display: block
         border-radius: 12px
+        display: block
+        inset: '0'
+        position: absolute

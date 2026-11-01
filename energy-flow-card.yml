@@ -3,301 +3,300 @@ tags:
 - overview
 props:
   parameters:
-  - name: pvPower
+  - context: item
+    description: Number:Power item
     label: Huawei Inverter Input Power
-    description: Number:Power item
-    type: TEXT
+    name: pvPower
     required: true
-    context: item
-  - name: gridPower
+    type: TEXT
+  - context: item
+    description: Number:Power item
     label: Huawei Inverter Power Meter Active Power
-    description: Number:Power item
-    type: TEXT
+    name: gridPower
     required: true
-    context: item
-  - name: heatpumpPower
+    type: TEXT
+  - context: item
+    description: Number:Power item
     label: ESPAltherma Electrical Power
-    description: Number:Power item
-    type: TEXT
+    name: heatpumpPower
     required: true
-    context: item
-  - name: acSwitch
+    type: TEXT
+  - context: item
+    description: Switch item
     label: Faikout Perfera Switch
-    description: Switch item
-    type: TEXT
+    name: acSwitch
     required: true
-    context: item
-  - name: acUnitPower
+    type: TEXT
+  - context: item
+    description: Number:Power item
     label: Air Conditioning Unit Power
-    description: Number:Power item
-    type: TEXT
+    name: acUnitPower
     required: true
-    context: item
-  - name: ecarPower
+    type: TEXT
+  - context: item
+    description: Number:Power item
     label: E-Car Power
-    description: Number:Power item
-    type: TEXT
+    name: ecarPower
     required: true
-    context: item
-  - name: washingMachine1Power
+    type: TEXT
+  - context: item
+    description: Number:Power item
     label: Washing Machine 1 Power
-    description: Number:Power item
-    type: TEXT
+    name: washingMachine1Power
     required: true
-    context: item
-  - name: washingMachine2Power
+    type: TEXT
+  - context: item
+    description: Number:Power item
     label: Washing Machine 2 Power
-    description: Number:Power item
-    type: TEXT
+    name: washingMachine2Power
     required: true
-    context: item
-  - name: tumbleDryerPower
+    type: TEXT
+  - context: item
+    description: Number:Power item
     label: Tumble Dryer Power
-    description: Number:Power item
-    type: TEXT
+    name: tumbleDryerPower
     required: true
-    context: item
-  - name: dishwasherPower
+    type: TEXT
+  - context: item
+    description: Number:Power item
     label: Dishwasher Power
-    description: Number:Power item
-    type: TEXT
+    name: dishwasherPower
     required: true
-    context: item
-  - name: batteryPower
+    type: TEXT
+  - context: item
+    description: Number:Power item
     label: Huawei Inverter Energy Storage Power
-    description: Number:Power item
-    type: TEXT
+    name: batteryPower
     required: true
-    context: item
-  - name: ventilationPower
+    type: TEXT
+  - context: item
+    description: Number:Power item
     label: Ventilation Power
-    description: Number:Power item
-    type: TEXT
+    name: ventilationPower
     required: true
-    context: item
-  - name: batterySoc
-    label: Huawei Inverter Energy Storage SOC
+    type: TEXT
+  - context: item
     description: Number:Dimensionless item
-    type: TEXT
+    label: Huawei Inverter Energy Storage SOC
+    name: batterySoc
     required: true
-    context: item
-  - name: heatpumpDhwEta
+    type: TEXT
+  - context: item
+    description: DateTime item
     label: Heatpump DHW Done At
-    description: DateTime item
-    type: TEXT
+    name: heatpumpDhwEta
     required: true
-    context: item
-  - name: heatpumpDhwSince
+    type: TEXT
+  - context: item
+    description: DateTime item
     label: Heatpump DHW Charging Since
-    description: DateTime item
-    type: TEXT
+    name: heatpumpDhwSince
     required: true
-    context: item
-  - name: homePower
-    label: Home Active Power
+    type: TEXT
+  - context: item
     description: Number:Power item
-    type: TEXT
+    label: Home Active Power
+    name: homePower
     required: true
-    context: item
-  - name: acTimer
+    type: TEXT
+  - context: item
+    description: Number:Time item
     label: Air Conditioning Timer
-    description: Number:Time item
-    type: TEXT
+    name: acTimer
     required: true
-    context: item
-  - name: acTimerSet
+    type: TEXT
+  - context: item
+    description: Number:Time item
     label: Air Conditioning Timer Set
-    description: Number:Time item
-    type: TEXT
+    name: acTimerSet
     required: true
-    context: item
-  - name: ventilationTimer
+    type: TEXT
+  - context: item
+    description: Number:Time item
     label: Ventilation Timer
-    description: Number:Time item
-    type: TEXT
+    name: ventilationTimer
     required: true
-    context: item
-  - name: ventilationTimerSet
+    type: TEXT
+  - context: item
+    description: Number:Time item
     label: Ventilation Timer Set
-    description: Number:Time item
-    type: TEXT
+    name: ventilationTimerSet
     required: true
-    context: item
-  - name: heatpumpInvFrequency
-    label: ESPAltherma Inverter Frequency
+    type: TEXT
+  - context: item
     description: Number:Frequency item
-    type: TEXT
+    label: ESPAltherma Inverter Frequency
+    name: heatpumpInvFrequency
     required: true
-    context: item
-  - name: ecarPlug
+    type: TEXT
+  - context: item
+    description: Switch item
     label: Škoda Enyaq Charging Cable
-    description: Switch item
-    type: TEXT
+    name: ecarPlug
     required: true
-    context: item
-  - name: heatpumpBuhStep1Mode
+    type: TEXT
+  - context: item
+    description: Switch item
     label: ESPAltherma Backup Heater (BUH) Step 1 Mode
-    description: Switch item
-    type: TEXT
+    name: heatpumpBuhStep1Mode
     required: true
-    context: item
-  - name: heatpumpBuhStep2Mode
+    type: TEXT
+  - context: item
+    description: Switch item
     label: ESPAltherma Backup Heater (BUH) Step 2 Mode
-    description: Switch item
-    type: TEXT
+    name: heatpumpBuhStep2Mode
     required: true
-    context: item
-  - name: heatpumpBshMode
+    type: TEXT
+  - context: item
+    description: Switch item
     label: ESPAltherma Booster Heater (BSH) Mode
-    description: Switch item
-    type: TEXT
+    name: heatpumpBshMode
     required: true
-    context: item
-  - name: heatpumpWaterPumpOperation
+    type: TEXT
+  - context: item
+    description: Switch item
     label: ESPAltherma Water Pump Operation
-    description: Switch item
-    type: TEXT
+    name: heatpumpWaterPumpOperation
     required: true
-    context: item
-  - name: heatpumpFlowSensor
-    label: ESPAltherma Flow Sensor (l/min)
+    type: TEXT
+  - context: item
     description: Number:VolumetricFlowRate item
-    type: TEXT
+    label: ESPAltherma Flow Sensor (l/min)
+    name: heatpumpFlowSensor
     required: true
-    context: item
-  - name: heatpumpDefrostOperaton
-    label: ESPAltherma Defrost Operation
+    type: TEXT
+  - context: item
     description: Switch item
-    type: TEXT
+    label: ESPAltherma Defrost Operation
+    name: heatpumpDefrostOperaton
     required: true
-    context: item
-  - name: heatpumpValve
+    type: TEXT
+  - context: item
+    description: String item
     label: ESPAltherma 3-Way Valve Mode
-    description: String item
-    type: TEXT
+    name: heatpumpValve
     required: true
-    context: item
-  - name: acMode
+    type: TEXT
+  - context: item
+    description: String item
     label: Faikout Perfera Mode
-    description: String item
-    type: TEXT
+    name: acMode
     required: true
-    context: item
-  - name: ventilationLevel
+    type: TEXT
+  - context: item
+    description: String item
     label: ESPLyfterl Level
-    description: String item
-    type: TEXT
+    name: ventilationLevel
     required: true
-    context: item
-  - name: pvGenerationToday
+    type: TEXT
+  - context: item
+    description: Number:Energy item
     label: PV Generation Today
-    description: Number:Energy item
-    type: TEXT
+    name: pvGenerationToday
     required: true
-    context: item
-  - name: ventilationEnergyToday
+    type: TEXT
+  - context: item
+    description: Number:Energy item
     label: Ventilation Energy Today
-    description: Number:Energy item
-    type: TEXT
+    name: ventilationEnergyToday
     required: true
-    context: item
-  - name: gridImportToday
+    type: TEXT
+  - context: item
+    description: Number:Energy item
     label: Huawei Inverter Power Meter Ec-Day
-    description: Number:Energy item
-    type: TEXT
+    name: gridImportToday
     required: true
-    context: item
-  - name: gridExportToday
+    type: TEXT
+  - context: item
+    description: Number:Energy item
     label: Huawei Inverter Power Meter Ep-Day
-    description: Number:Energy item
-    type: TEXT
+    name: gridExportToday
     required: true
-    context: item
-  - name: heatpumpEnergyToday
+    type: TEXT
+  - context: item
+    description: Number:Energy item
     label: ESPAltherma Energy Today
-    description: Number:Energy item
-    type: TEXT
+    name: heatpumpEnergyToday
     required: true
-    context: item
-  - name: acUnitEnergyToday
+    type: TEXT
+  - context: item
+    description: Number:Energy item
     label: Air Conditioning Unit Energy Today
-    description: Number:Energy item
-    type: TEXT
+    name: acUnitEnergyToday
     required: true
-    context: item
-  - name: ecarEnergyToday
+    type: TEXT
+  - context: item
+    description: Number:Energy item
     label: E-Car Energy Today
-    description: Number:Energy item
-    type: TEXT
+    name: ecarEnergyToday
     required: true
-    context: item
-  - name: washingMachine1EnergyToday
+    type: TEXT
+  - context: item
+    description: Number:Energy item
     label: Washing Machine 1 Energy Today
-    description: Number:Energy item
-    type: TEXT
+    name: washingMachine1EnergyToday
     required: true
-    context: item
-  - name: washingMachine2EnergyToday
+    type: TEXT
+  - context: item
+    description: Number:Energy item
     label: Washing Machine 2 Energy Today
-    description: Number:Energy item
-    type: TEXT
+    name: washingMachine2EnergyToday
     required: true
-    context: item
-  - name: tumbleDryerEnergyToday
+    type: TEXT
+  - context: item
+    description: Number:Energy item
     label: Tumble Dryer Energy Today
-    description: Number:Energy item
-    type: TEXT
+    name: tumbleDryerEnergyToday
     required: true
-    context: item
-  - name: dishwasherEnergyToday
+    type: TEXT
+  - context: item
+    description: Number:Energy item
     label: Dishwasher Energy Today
-    description: Number:Energy item
-    type: TEXT
+    name: dishwasherEnergyToday
     required: true
-    context: item
-  - name: batteryDischargeToday
+    type: TEXT
+  - context: item
+    description: Number:Energy item
     label: Huawei Inverter Energy Storage Day Discharge
-    description: Number:Energy item
-    type: TEXT
+    name: batteryDischargeToday
     required: true
-    context: item
-  - name: batteryChargeToday
+    type: TEXT
+  - context: item
+    description: Number:Energy item
     label: Huawei Inverter Energy Storage Day Charge
-    description: Number:Energy item
-    type: TEXT
+    name: batteryChargeToday
     required: true
-    context: item
-  - name: homeEnergyToday
+    type: TEXT
+  - context: item
+    description: Number:Energy item
     label: Home Energy Day
-    description: Number:Energy item
-    type: TEXT
+    name: homeEnergyToday
     required: true
-    context: item
-  - name: tileHistory
-    label: Tile history
+    type: TEXT
+  - context: item
     description: String item
-    type: TEXT
+    label: Tile history
+    name: tileHistory
     required: true
-    context: item
-  - name: pvSelfUseToday
-    label: Photovoltaics Own Ec-Day
+    type: TEXT
+  - context: item
     description: Number:Energy item
-    type: TEXT
+    label: Photovoltaics Own Ec-Day
+    name: pvSelfUseToday
     required: true
-    context: item
+    type: TEXT
   parameterGroups: []
-timestamp: Oct 25, 2026, 7:19:28 PM
+timestamp: Oct 25, 2026, 7:20:47 PM
 component: oh-card
 config:
-  title: Energy Flow
-  style:
-    height: calc(100% - 2 * var(--f7-card-margin-vertical))
-    display: flex
-    flex-direction: column
   contentStyle:
+    display: flex
     flex: 1 1 auto
+    flex-direction: column
+  style:
     display: flex
     flex-direction: column
+    height: calc(100% - 2 * var(--f7-card-margin-vertical))
   stylesheet: '@keyframes a-soft { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.06; } }
 
     @keyframes a-full { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
@@ -472,119 +471,120 @@ config:
     .a-route-4221cc14 { animation: a-route-4221cc14 10s linear infinite; }
 
     '
+  title: Energy Flow
 slots:
   content:
   - component: div
     config:
       style:
-        padding: '=screen.width < 600 ? ''4px'' : ''12px'''
-        flex: 1 1 auto
         display: flex
+        flex: 1 1 auto
         flex-direction: column
         justify-content: center
+        padding: '=screen.width < 600 ? ''4px'' : ''12px'''
     slots:
       default:
       - component: div
         config:
           style:
-            position: relative
-            max-width: 461px
-            width: '=screen.width < 600 ? ''100%'' : ''461px'''
             margin: '=screen.width < 600 ? ''0 auto'' : ''0 calc((100% - 461px) / 2)'''
+            max-width: 461px
+            position: relative
+            width: '=screen.width < 600 ? ''100%'' : ''461px'''
         slots:
           default:
           - component: svg
             config:
-              viewBox: 0 0 461 461
-              width: 100%
               style:
                 display: block
                 overflow: visible
+              viewBox: 0 0 461 461
+              width: 100%
             slots:
               default:
               - component: widget:flow-link
                 config:
-                  x1: 157.7
-                  y1: 98.4
-                  x2: 223.8
-                  y2: 186.2
                   color: '#ffb300'
-                  power: =(Number(items[props.pvPower].numericState) || 0)
                   forward: =true
-                  threshold: 10
+                  power: =(Number(items[props.pvPower].numericState) || 0)
+                  threshold: 10.0
+                  x1: 157.7
+                  x2: 223.8
+                  y1: 98.4
+                  y2: 186.2
               - component: widget:flow-link
                 config:
-                  x1: 103.3
-                  y1: 190.7
-                  x2: 212.2
-                  y2: 206.0
                   color: '=(Number(items[props.gridPower].numericState) || 0) < 0 ? ''#43a047'' : ''#e53935'''
-                  power: =(Number(items[props.gridPower].numericState) || 0)
                   forward: =(Number(items[props.gridPower].numericState) || 0) > 0
-                  threshold: 10
+                  power: =(Number(items[props.gridPower].numericState) || 0)
+                  threshold: 10.0
+                  x1: 103.3
+                  x2: 212.2
+                  y1: 190.7
+                  y2: 206.0
               - component: widget:flow-link
                 config:
-                  x1: 353.7
-                  y1: 126.0
-                  x2: 265.9
-                  y2: 192.1
                   color: '#fb8c00'
-                  power: =(Number(items[props.heatpumpPower].numericState) || 0)
                   forward: =false
-                  threshold: 28
+                  power: =(Number(items[props.heatpumpPower].numericState) || 0)
+                  threshold: 28.0
+                  x1: 353.7
+                  x2: 265.9
+                  y1: 126.0
+                  y2: 192.1
               - component: widget:flow-link
                 config:
-                  x1: 380.5
-                  y1: 229.7
-                  x2: 271.6
-                  y2: 214.4
                   color: '#29b6f6'
+                  forward: =false
                   power: '=(items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState) || 0)
                     : 0)'
-                  forward: =false
-                  threshold: 5
+                  threshold: 5.0
+                  x1: 380.5
+                  x2: 271.6
+                  y1: 229.7
+                  y2: 214.4
               - component: widget:flow-link
                 config:
-                  x1: 326.1
-                  y1: 322.0
-                  x2: 260.0
-                  y2: 234.2
                   color: '#26a69a'
-                  power: =(Number(items[props.ecarPower].numericState) || 0)
                   forward: =false
-                  threshold: 100
+                  power: =(Number(items[props.ecarPower].numericState) || 0)
+                  threshold: 100.0
+                  x1: 326.1
+                  x2: 260.0
+                  y1: 322.0
+                  y2: 234.2
               - component: widget:flow-link
                 config:
-                  x1: 222.4
-                  y1: 348.8
-                  x2: 237.7
-                  y2: 239.9
                   color: '#5c6bc0'
+                  forward: =false
                   power: =((Number(items[props.washingMachine1Power].numericState) || 0) + (Number(items[props.washingMachine2Power].numericState)
                     || 0) + (Number(items[props.tumbleDryerPower].numericState) || 0) + (Number(items[props.dishwasherPower].numericState)
                     || 0))
-                  forward: =false
-                  threshold: 10
+                  threshold: 10.0
+                  x1: 222.4
+                  x2: 237.7
+                  y1: 348.8
+                  y2: 239.9
               - component: widget:flow-link
                 config:
-                  x1: 130.1
-                  y1: 294.4
-                  x2: 217.9
-                  y2: 228.3
                   color: '#7cb342'
-                  power: =(Number(items[props.batteryPower].numericState) || 0)
                   forward: =(Number(items[props.batteryPower].numericState) || 0) > 0
-                  threshold: 10
+                  power: =(Number(items[props.batteryPower].numericState) || 0)
+                  threshold: 10.0
+                  x1: 130.1
+                  x2: 217.9
+                  y1: 294.4
+                  y2: 228.3
               - component: widget:flow-link
                 config:
-                  x1: 261.4
-                  y1: 71.6
-                  x2: 246.1
-                  y2: 180.5
                   color: '#26a69a'
-                  power: =(Number(items[props.ventilationPower].numericState) || 0)
                   forward: =false
-                  threshold: 5
+                  power: =(Number(items[props.ventilationPower].numericState) || 0)
+                  threshold: 5.0
+                  x1: 261.4
+                  x2: 246.1
+                  y1: 71.6
+                  y2: 180.5
               - component: g
                 config: {}
                 slots:
@@ -600,8 +600,8 @@ slots:
                     config:
                       cx: 265.6
                       cy: 41.9
-                      r: 29.2
                       fill: none
+                      r: 29.2
                       stroke: rgba(127, 127, 127, 0.28)
                       stroke-width: 2.9
               - component: g
@@ -619,8 +619,8 @@ slots:
                     config:
                       cx: 377.7
                       cy: 107.9
-                      r: 29.2
                       fill: none
+                      r: 29.2
                       stroke: rgba(127, 127, 127, 0.28)
                       stroke-width: 2.9
               - component: g
@@ -638,8 +638,8 @@ slots:
                     config:
                       cx: 410.2
                       cy: 233.9
-                      r: 29.2
                       fill: none
+                      r: 29.2
                       stroke: rgba(127, 127, 127, 0.28)
                       stroke-width: 2.9
               - component: g
@@ -657,8 +657,8 @@ slots:
                     config:
                       cx: 344.2
                       cy: 346.0
-                      r: 29.2
                       fill: none
+                      r: 29.2
                       stroke: rgba(127, 127, 127, 0.28)
                       stroke-width: 2.9
               - component: g
@@ -676,8 +676,8 @@ slots:
                     config:
                       cx: 218.2
                       cy: 378.5
-                      r: 29.2
                       fill: none
+                      r: 29.2
                       stroke: rgba(127, 127, 127, 0.28)
                       stroke-width: 2.9
               - component: g
@@ -695,8 +695,8 @@ slots:
                     config:
                       cx: 106.1
                       cy: 312.5
-                      r: 29.2
                       fill: none
+                      r: 29.2
                       stroke: rgba(127, 127, 127, 0.28)
                       stroke-width: 2.9
               - component: g
@@ -714,8 +714,8 @@ slots:
                     config:
                       cx: 73.6
                       cy: 186.5
-                      r: 29.2
                       fill: none
+                      r: 29.2
                       stroke: rgba(127, 127, 127, 0.28)
                       stroke-width: 2.9
               - component: g
@@ -733,8 +733,8 @@ slots:
                     config:
                       cx: 139.6
                       cy: 74.4
-                      r: 29.2
                       fill: none
+                      r: 29.2
                       stroke: rgba(127, 127, 127, 0.28)
                       stroke-width: 2.9
               - component: g
@@ -752,8 +752,8 @@ slots:
                     config:
                       cx: 241.9
                       cy: 210.2
-                      r: 29.2
                       fill: none
+                      r: 29.2
                       stroke: rgba(127, 127, 127, 0.28)
                       stroke-width: 2.9
               - component: g
@@ -762,115 +762,116 @@ slots:
                   default:
                   - component: circle
                     config:
+                      class: a-full
                       cx: 139.6
                       cy: 74.4
-                      r: 29.2
                       fill: none
+                      r: 29.2
                       stroke: '#ffb300'
                       stroke-width: 2.9
                       visible: =(Math.abs((Number(items[props.pvPower].numericState) || 0)) > 10) && !(false)
-                      class: a-full
                   - component: circle
                     config:
+                      class: a-halo
                       cx: 139.6
                       cy: 74.4
+                      fill: none
                       r: 29.2
                       stroke: '#ffb300'
-                      fill: none
                       stroke-width: 4.5
                       visible: =(Math.abs((Number(items[props.pvPower].numericState) || 0)) > 10) && !(false)
-                      class: a-halo
                   - component: circle
                     config:
+                      class: a-soft
                       cx: 139.6
                       cy: 74.4
-                      r: 29.2
                       fill: none
+                      r: 29.2
                       stroke: '#ffb300'
                       stroke-width: 2.9
                       visible: =(Math.abs((Number(items[props.pvPower].numericState) || 0)) > 10) && (false)
-                      class: a-soft
               - component: g
                 config: {}
                 slots:
                   default:
                   - component: circle
                     config:
+                      class: a-full
                       cx: 73.6
                       cy: 186.5
-                      r: 29.2
                       fill: none
+                      r: 29.2
                       stroke: '=(Number(items[props.gridPower].numericState) || 0) < 0 ? ''#43a047'' : ''#e53935'''
                       stroke-width: 2.9
                       visible: =(Math.abs((Number(items[props.gridPower].numericState) || 0)) > 10) && !(false)
-                      class: a-full
                   - component: circle
                     config:
+                      class: a-halo
                       cx: 73.6
                       cy: 186.5
+                      fill: none
                       r: 29.2
                       stroke: '=(Number(items[props.gridPower].numericState) || 0) < 0 ? ''#43a047'' : ''#e53935'''
-                      fill: none
                       stroke-width: 4.5
                       visible: =(Math.abs((Number(items[props.gridPower].numericState) || 0)) > 10) && !(false)
-                      class: a-halo
                   - component: circle
                     config:
+                      class: a-soft
                       cx: 73.6
                       cy: 186.5
-                      r: 29.2
                       fill: none
+                      r: 29.2
                       stroke: '=(Number(items[props.gridPower].numericState) || 0) < 0 ? ''#43a047'' : ''#e53935'''
                       stroke-width: 2.9
                       visible: =(Math.abs((Number(items[props.gridPower].numericState) || 0)) > 10) && (false)
-                      class: a-soft
               - component: g
                 config: {}
                 slots:
                   default:
                   - component: circle
                     config:
+                      class: a-full
                       cx: 106.1
                       cy: 312.5
-                      r: 29.2
                       fill: none
+                      r: 29.2
                       stroke: '#7cb342'
                       stroke-width: 2.9
                       visible: =(Math.abs((Number(items[props.batteryPower].numericState) || 0)) > 10) && !(((Number(items[props.batterySoc].numericState)
                         || 0) / 100) > 0)
-                      class: a-full
                   - component: circle
                     config:
+                      class: a-halo
                       cx: 106.1
                       cy: 312.5
+                      fill: none
                       r: 29.2
                       stroke: '#7cb342'
-                      fill: none
                       stroke-width: 4.5
                       visible: =(Math.abs((Number(items[props.batteryPower].numericState) || 0)) > 10) && !(((Number(items[props.batterySoc].numericState)
                         || 0) / 100) > 0)
-                      class: a-halo
                   - component: circle
                     config:
+                      class: a-soft
                       cx: 106.1
                       cy: 312.5
-                      r: 29.2
                       fill: none
+                      r: 29.2
                       stroke: '#7cb342'
                       stroke-width: 2.9
                       visible: =(Math.abs((Number(items[props.batteryPower].numericState) || 0)) > 10) && (((Number(items[props.batterySoc].numericState)
                         || 0) / 100) > 0)
-                      class: a-soft
               - component: g
                 config: {}
                 slots:
                   default:
                   - component: circle
                     config:
+                      class: a-full
                       cx: 377.7
                       cy: 107.9
-                      r: 29.2
                       fill: none
+                      r: 29.2
                       stroke: '#fb8c00'
                       stroke-width: 2.9
                       visible: '=(Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) > 28) && !((((items[props.heatpumpDhwEta].state
@@ -878,27 +879,27 @@ slots:
                         !== ''UNDEF'' && items[props.heatpumpDhwSince].state !== ''NULL'') ? Math.max(0, dayjs().diff(dayjs(items[props.heatpumpDhwSince].state)))
                         / Math.max(1, dayjs(items[props.heatpumpDhwEta].state).diff(dayjs(items[props.heatpumpDhwSince].state)))
                         : 0)) > 0)'
-                      class: a-full
                   - component: circle
                     config:
+                      class: a-halo
                       cx: 377.7
                       cy: 107.9
+                      fill: none
                       r: 29.2
                       stroke: '#fb8c00'
-                      fill: none
                       stroke-width: 4.5
                       visible: '=(Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) > 28) && !((((items[props.heatpumpDhwEta].state
                         !== ''UNDEF'' && items[props.heatpumpDhwEta].state !== ''NULL'' && items[props.heatpumpDhwSince].state
                         !== ''UNDEF'' && items[props.heatpumpDhwSince].state !== ''NULL'') ? Math.max(0, dayjs().diff(dayjs(items[props.heatpumpDhwSince].state)))
                         / Math.max(1, dayjs(items[props.heatpumpDhwEta].state).diff(dayjs(items[props.heatpumpDhwSince].state)))
                         : 0)) > 0)'
-                      class: a-halo
                   - component: circle
                     config:
+                      class: a-soft
                       cx: 377.7
                       cy: 107.9
-                      r: 29.2
                       fill: none
+                      r: 29.2
                       stroke: '#fb8c00'
                       stroke-width: 2.9
                       visible: '=(Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) > 28) && ((((items[props.heatpumpDhwEta].state
@@ -906,103 +907,97 @@ slots:
                         !== ''UNDEF'' && items[props.heatpumpDhwSince].state !== ''NULL'') ? Math.max(0, dayjs().diff(dayjs(items[props.heatpumpDhwSince].state)))
                         / Math.max(1, dayjs(items[props.heatpumpDhwEta].state).diff(dayjs(items[props.heatpumpDhwSince].state)))
                         : 0)) > 0)'
-                      class: a-soft
               - component: g
                 config: {}
                 slots:
                   default:
                   - component: circle
                     config:
+                      class: a-full
                       cx: 344.2
                       cy: 346.0
-                      r: 29.2
                       fill: none
+                      r: 29.2
                       stroke: '#26a69a'
                       stroke-width: 2.9
                       visible: =(Math.abs((Number(items[props.ecarPower].numericState) || 0)) > 100) && !(false)
-                      class: a-full
                   - component: circle
                     config:
+                      class: a-halo
                       cx: 344.2
                       cy: 346.0
+                      fill: none
                       r: 29.2
                       stroke: '#26a69a'
-                      fill: none
                       stroke-width: 4.5
                       visible: =(Math.abs((Number(items[props.ecarPower].numericState) || 0)) > 100) && !(false)
-                      class: a-halo
                   - component: circle
                     config:
+                      class: a-soft
                       cx: 344.2
                       cy: 346.0
-                      r: 29.2
                       fill: none
+                      r: 29.2
                       stroke: '#26a69a'
                       stroke-width: 2.9
                       visible: =(Math.abs((Number(items[props.ecarPower].numericState) || 0)) > 100) && (false)
-                      class: a-soft
               - component: g
                 config: {}
                 slots:
                   default:
                   - component: circle
                     config:
+                      class: a-full
                       cx: 218.2
                       cy: 378.5
-                      r: 29.2
                       fill: none
+                      r: 29.2
                       stroke: '#5c6bc0'
                       stroke-width: 2.9
                       visible: =(Math.abs(((Number(items[props.washingMachine1Power].numericState) || 0) + (Number(items[props.washingMachine2Power].numericState)
                         || 0) + (Number(items[props.tumbleDryerPower].numericState) || 0) + (Number(items[props.dishwasherPower].numericState)
                         || 0))) > 10) && !(false)
-                      class: a-full
                   - component: circle
                     config:
+                      class: a-halo
                       cx: 218.2
                       cy: 378.5
+                      fill: none
                       r: 29.2
                       stroke: '#5c6bc0'
-                      fill: none
                       stroke-width: 4.5
                       visible: =(Math.abs(((Number(items[props.washingMachine1Power].numericState) || 0) + (Number(items[props.washingMachine2Power].numericState)
                         || 0) + (Number(items[props.tumbleDryerPower].numericState) || 0) + (Number(items[props.dishwasherPower].numericState)
                         || 0))) > 10) && !(false)
-                      class: a-halo
                   - component: circle
                     config:
+                      class: a-soft
                       cx: 218.2
                       cy: 378.5
-                      r: 29.2
                       fill: none
+                      r: 29.2
                       stroke: '#5c6bc0'
                       stroke-width: 2.9
                       visible: =(Math.abs(((Number(items[props.washingMachine1Power].numericState) || 0) + (Number(items[props.washingMachine2Power].numericState)
                         || 0) + (Number(items[props.tumbleDryerPower].numericState) || 0) + (Number(items[props.dishwasherPower].numericState)
                         || 0))) > 10) && (false)
-                      class: a-soft
               - component: circle
                 config:
-                  stroke: '#9e9e9e'
+                  class: a-soft
                   cx: 241.9
                   cy: 210.2
-                  r: 29.2
                   fill: none
+                  r: 29.2
+                  stroke: '#9e9e9e'
                   stroke-width: 2.9
                   visible: =Math.abs((Number(items[props.homePower].numericState) || 0)) > 10
-                  class: a-soft
               - component: circle
                 config:
-                  style:
-                    stroke: 'var(--f7-card-bg-color, #fff)'
                   cx: 241.9
                   cy: 210.2
-                  r: 29.2
                   fill: none
-                  pathLength: 100
-                  transform: rotate(-90 241.9 210.2)
-                  stroke-width: 4.9
-                  stroke-linecap: round
+                  pathLength: 100.0
+                  r: 29.2
                   stroke-dasharray: '=((((((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
                     || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0,
                     Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1,
@@ -1059,6 +1054,11 @@ slots:
                     || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
                     || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))))))))))))))))))).toFixed(2)
                     + '' 100'''
+                  stroke-linecap: round
+                  stroke-width: 4.9
+                  style:
+                    stroke: 'var(--f7-card-bg-color, #fff)'
+                  transform: rotate(-90 241.9 210.2)
                   visible: '=((((((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
                     || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0,
                     Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1,
@@ -1117,89 +1117,87 @@ slots:
                     > 0.05'
               - component: circle
                 config:
-                  stroke: '#26a69a'
                   cx: 241.9
                   cy: 210.2
-                  r: 29.2
                   fill: none
-                  pathLength: 100
-                  transform: rotate(-90 241.9 210.2)
-                  stroke-width: 2.9
+                  pathLength: 100.0
+                  r: 29.2
+                  stroke: '#26a69a'
                   stroke-dasharray: =(Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
                     || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))).toFixed(2)
                     + ' 100'
                   stroke-dashoffset: =(-(0)).toFixed(2)
+                  stroke-width: 2.9
+                  transform: rotate(-90 241.9 210.2)
                   visible: =(Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
                     || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) > 0.05
               - component: circle
                 config:
-                  stroke: '#26a69a'
+                  class: a-halo-arc
                   cx: 241.9
                   cy: 210.2
+                  fill: none
+                  pathLength: 100.0
                   r: 29.2
-                  pathLength: 100
-                  transform: rotate(-90 241.9 210.2)
+                  stroke: '#26a69a'
                   stroke-dasharray: =(Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
                     || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))).toFixed(2)
                     + ' 100'
                   stroke-dashoffset: =(-(0)).toFixed(2)
-                  fill: none
                   stroke-width: 4.5
+                  transform: rotate(-90 241.9 210.2)
                   visible: =(Math.abs((Number(items[props.homePower].numericState) || 0)) > 10) && (Math.max(0, Math.min(Math.min(100,
                     Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
                     || 0)) * 100), 100 - (0)))) > 0.05
-                  class: a-halo-arc
               - component: circle
                 config:
-                  stroke: '#fb8c00'
                   cx: 241.9
                   cy: 210.2
-                  r: 29.2
                   fill: none
-                  pathLength: 100
-                  transform: rotate(-90 241.9 210.2)
-                  stroke-width: 2.9
+                  pathLength: 100.0
+                  r: 29.2
+                  stroke: '#fb8c00'
                   stroke-dasharray: =(Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState)
                     || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0,
                     Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1,
                     (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))))))).toFixed(2) + ' 100'
                   stroke-dashoffset: =(-((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
                     || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))))).toFixed(2)
+                  stroke-width: 2.9
+                  transform: rotate(-90 241.9 210.2)
                   visible: =(Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState)
                     || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0,
                     Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1,
                     (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))))))) > 0.05
               - component: circle
                 config:
-                  stroke: '#fb8c00'
+                  class: a-halo-arc
                   cx: 241.9
                   cy: 210.2
+                  fill: none
+                  pathLength: 100.0
                   r: 29.2
-                  pathLength: 100
-                  transform: rotate(-90 241.9 210.2)
+                  stroke: '#fb8c00'
                   stroke-dasharray: =(Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState)
                     || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0,
                     Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1,
                     (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))))))).toFixed(2) + ' 100'
                   stroke-dashoffset: =(-((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
                     || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))))).toFixed(2)
-                  fill: none
                   stroke-width: 4.5
+                  transform: rotate(-90 241.9 210.2)
                   visible: =(Math.abs((Number(items[props.homePower].numericState) || 0)) > 10) && (Math.max(0, Math.min(Math.min(100,
                     Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
                     || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
                     || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))))))) > 0.05
-                  class: a-halo-arc
               - component: circle
                 config:
-                  stroke: '#29b6f6'
                   cx: 241.9
                   cy: 210.2
-                  r: 29.2
                   fill: none
-                  pathLength: 100
-                  transform: rotate(-90 241.9 210.2)
-                  stroke-width: 2.9
+                  pathLength: 100.0
+                  r: 29.2
+                  stroke: '#29b6f6'
                   stroke-dasharray: '=(Math.max(0, Math.min(Math.min(100, Math.max(0, (items[props.acSwitch].state === ''ON''
                     ? (Number(items[props.acUnitPower].numericState) || 0) : 0)) / Math.max(1, (Number(items[props.homePower].numericState)
                     || 0)) * 100), 100 - (((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
@@ -1214,6 +1212,8 @@ slots:
                     (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100,
                     Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
                     || 0)) * 100), 100 - (0)))))))))).toFixed(2)
+                  stroke-width: 2.9
+                  transform: rotate(-90 241.9 210.2)
                   visible: '=(Math.max(0, Math.min(Math.min(100, Math.max(0, (items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
                     || 0) : 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (((0 + Math.max(0,
                     Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1,
@@ -1224,12 +1224,13 @@ slots:
                     > 0.05'
               - component: circle
                 config:
-                  stroke: '#29b6f6'
+                  class: a-halo-arc
                   cx: 241.9
                   cy: 210.2
+                  fill: none
+                  pathLength: 100.0
                   r: 29.2
-                  pathLength: 100
-                  transform: rotate(-90 241.9 210.2)
+                  stroke: '#29b6f6'
                   stroke-dasharray: '=(Math.max(0, Math.min(Math.min(100, Math.max(0, (items[props.acSwitch].state === ''ON''
                     ? (Number(items[props.acUnitPower].numericState) || 0) : 0)) / Math.max(1, (Number(items[props.homePower].numericState)
                     || 0)) * 100), 100 - (((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
@@ -1244,8 +1245,8 @@ slots:
                     (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100,
                     Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
                     || 0)) * 100), 100 - (0)))))))))).toFixed(2)
-                  fill: none
                   stroke-width: 4.5
+                  transform: rotate(-90 241.9 210.2)
                   visible: '=(Math.abs((Number(items[props.homePower].numericState) || 0)) > 10) && (Math.max(0, Math.min(Math.min(100,
                     Math.max(0, (items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState) ||
                     0) : 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (((0 + Math.max(0,
@@ -1255,17 +1256,14 @@ slots:
                     || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
                     || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))))))))))
                     > 0.05'
-                  class: a-halo-arc
               - component: circle
                 config:
-                  stroke: '#26a69a'
                   cx: 241.9
                   cy: 210.2
-                  r: 29.2
                   fill: none
-                  pathLength: 100
-                  transform: rotate(-90 241.9 210.2)
-                  stroke-width: 2.9
+                  pathLength: 100.0
+                  r: 29.2
+                  stroke: '#26a69a'
                   stroke-dasharray: '=(Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ecarPower].numericState)
                     || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((((0 + Math.max(0,
                     Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1,
@@ -1294,6 +1292,8 @@ slots:
                     (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100,
                     Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
                     || 0)) * 100), 100 - (0)))))))))))))).toFixed(2)'
+                  stroke-width: 2.9
+                  transform: rotate(-90 241.9 210.2)
                   visible: '=(Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ecarPower].numericState)
                     || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((((0 + Math.max(0,
                     Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1,
@@ -1311,12 +1311,13 @@ slots:
                     > 0.05'
               - component: circle
                 config:
-                  stroke: '#26a69a'
+                  class: a-halo-arc
                   cx: 241.9
                   cy: 210.2
+                  fill: none
+                  pathLength: 100.0
                   r: 29.2
-                  pathLength: 100
-                  transform: rotate(-90 241.9 210.2)
+                  stroke: '#26a69a'
                   stroke-dasharray: '=(Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ecarPower].numericState)
                     || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((((0 + Math.max(0,
                     Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1,
@@ -1345,8 +1346,8 @@ slots:
                     (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100,
                     Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
                     || 0)) * 100), 100 - (0)))))))))))))).toFixed(2)'
-                  fill: none
                   stroke-width: 4.5
+                  transform: rotate(-90 241.9 210.2)
                   visible: '=(Math.abs((Number(items[props.homePower].numericState) || 0)) > 10) && (Math.max(0, Math.min(Math.min(100,
                     Math.max(0, (Number(items[props.ecarPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
                     || 0)) * 100), 100 - ((((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
@@ -1362,17 +1363,14 @@ slots:
                     (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100,
                     Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
                     || 0)) * 100), 100 - (0)))))))))))))))) > 0.05'
-                  class: a-halo-arc
               - component: circle
                 config:
-                  stroke: '#5c6bc0'
                   cx: 241.9
                   cy: 210.2
-                  r: 29.2
                   fill: none
-                  pathLength: 100
-                  transform: rotate(-90 241.9 210.2)
-                  stroke-width: 2.9
+                  pathLength: 100.0
+                  r: 29.2
+                  stroke: '#5c6bc0'
                   stroke-dasharray: '=(Math.max(0, Math.min(Math.min(100, Math.max(0, ((Number(items[props.washingMachine1Power].numericState)
                     || 0) + (Number(items[props.washingMachine2Power].numericState) || 0) + (Number(items[props.tumbleDryerPower].numericState)
                     || 0) + (Number(items[props.dishwasherPower].numericState) || 0))) / Math.max(1, (Number(items[props.homePower].numericState)
@@ -1429,6 +1427,8 @@ slots:
                     Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
                     || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
                     || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))))))))))))))))).toFixed(2)'
+                  stroke-width: 2.9
+                  transform: rotate(-90 241.9 210.2)
                   visible: '=(Math.max(0, Math.min(Math.min(100, Math.max(0, ((Number(items[props.washingMachine1Power].numericState)
                     || 0) + (Number(items[props.washingMachine2Power].numericState) || 0) + (Number(items[props.tumbleDryerPower].numericState)
                     || 0) + (Number(items[props.dishwasherPower].numericState) || 0))) / Math.max(1, (Number(items[props.homePower].numericState)
@@ -1461,12 +1461,13 @@ slots:
                     > 0.05'
               - component: circle
                 config:
-                  stroke: '#5c6bc0'
+                  class: a-halo-arc
                   cx: 241.9
                   cy: 210.2
+                  fill: none
+                  pathLength: 100.0
                   r: 29.2
-                  pathLength: 100
-                  transform: rotate(-90 241.9 210.2)
+                  stroke: '#5c6bc0'
                   stroke-dasharray: '=(Math.max(0, Math.min(Math.min(100, Math.max(0, ((Number(items[props.washingMachine1Power].numericState)
                     || 0) + (Number(items[props.washingMachine2Power].numericState) || 0) + (Number(items[props.tumbleDryerPower].numericState)
                     || 0) + (Number(items[props.dishwasherPower].numericState) || 0))) / Math.max(1, (Number(items[props.homePower].numericState)
@@ -1523,8 +1524,8 @@ slots:
                     Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
                     || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
                     || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))))))))))))))))).toFixed(2)'
-                  fill: none
                   stroke-width: 4.5
+                  transform: rotate(-90 241.9 210.2)
                   visible: '=(Math.abs((Number(items[props.homePower].numericState) || 0)) > 10) && (Math.max(0, Math.min(Math.min(100,
                     Math.max(0, ((Number(items[props.washingMachine1Power].numericState) || 0) + (Number(items[props.washingMachine2Power].numericState)
                     || 0) + (Number(items[props.tumbleDryerPower].numericState) || 0) + (Number(items[props.dishwasherPower].numericState)
@@ -1556,9 +1557,13 @@ slots:
                     || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
                     || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))))))))))))))))))
                     > 0.05'
-                  class: a-halo-arc
               - component: circle
                 config:
+                  cx: 241.9
+                  cy: 210.2
+                  fill: none
+                  pathLength: 100.0
+                  r: 29.2
                   stroke: '=(Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
                     || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) > 0.05 ?
                     ''#26a69a'' : (Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState)
@@ -1616,16 +1621,11 @@ slots:
                     || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
                     || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))))))))))))))))))
                     > 0.05 ? ''#5c6bc0'' : ''#5c6bc0'''
-                  cx: 241.9
-                  cy: 210.2
-                  r: 29.2
-                  fill: none
-                  pathLength: 100
-                  transform: rotate(-90 241.9 210.2)
-                  stroke-width: 2.9
-                  stroke-linecap: round
                   stroke-dasharray: 0.001 100
                   stroke-dashoffset: '0'
+                  stroke-linecap: round
+                  stroke-width: 2.9
+                  transform: rotate(-90 241.9 210.2)
                   visible: '=((((((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
                     || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0,
                     Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1,
@@ -1684,6 +1684,12 @@ slots:
                     > 0.05'
               - component: circle
                 config:
+                  class: a-halo-arc
+                  cx: 241.9
+                  cy: 210.2
+                  fill: none
+                  pathLength: 100.0
+                  r: 29.2
                   stroke: '=(Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
                     || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) > 0.05 ?
                     ''#26a69a'' : (Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState)
@@ -1741,16 +1747,11 @@ slots:
                     || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
                     || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))))))))))))))))))
                     > 0.05 ? ''#5c6bc0'' : ''#5c6bc0'''
-                  cx: 241.9
-                  cy: 210.2
-                  r: 29.2
-                  pathLength: 100
-                  transform: rotate(-90 241.9 210.2)
-                  stroke-linecap: round
                   stroke-dasharray: 0.001 100
                   stroke-dashoffset: '0'
-                  fill: none
+                  stroke-linecap: round
                   stroke-width: 4.5
+                  transform: rotate(-90 241.9 210.2)
                   visible: '=(Math.abs((Number(items[props.homePower].numericState) || 0)) > 10) && ((((((0 + Math.max(0,
                     Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1,
                     (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0, Math.min(Math.min(100,
@@ -1808,9 +1809,13 @@ slots:
                     || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
                     || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))))))))))))))))))))
                     > 0.05'
-                  class: a-halo-arc
               - component: circle
                 config:
+                  cx: 241.9
+                  cy: 210.2
+                  fill: none
+                  pathLength: 100.0
+                  r: 29.2
                   stroke: '=(Math.max(0, Math.min(Math.min(100, Math.max(0, ((Number(items[props.washingMachine1Power].numericState)
                     || 0) + (Number(items[props.washingMachine2Power].numericState) || 0) + (Number(items[props.tumbleDryerPower].numericState)
                     || 0) + (Number(items[props.dishwasherPower].numericState) || 0))) / Math.max(1, (Number(items[props.homePower].numericState)
@@ -1868,14 +1873,6 @@ slots:
                     ? ''#fb8c00'' : (Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
                     || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) > 0.05 ?
                     ''#26a69a'' : ''#26a69a'''
-                  cx: 241.9
-                  cy: 210.2
-                  r: 29.2
-                  fill: none
-                  pathLength: 100
-                  transform: rotate(-90 241.9 210.2)
-                  stroke-width: 2.9
-                  stroke-linecap: round
                   stroke-dasharray: 0.001 100
                   stroke-dashoffset: '=(-((((((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
                     || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0,
@@ -1932,6 +1929,9 @@ slots:
                     Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
                     || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
                     || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))))))))))))))))))))).toFixed(2)'
+                  stroke-linecap: round
+                  stroke-width: 2.9
+                  transform: rotate(-90 241.9 210.2)
                   visible: '=((((((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
                     || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0,
                     Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1,
@@ -1990,6 +1990,12 @@ slots:
                     > 0.05'
               - component: circle
                 config:
+                  class: a-halo-arc
+                  cx: 241.9
+                  cy: 210.2
+                  fill: none
+                  pathLength: 100.0
+                  r: 29.2
                   stroke: '=(Math.max(0, Math.min(Math.min(100, Math.max(0, ((Number(items[props.washingMachine1Power].numericState)
                     || 0) + (Number(items[props.washingMachine2Power].numericState) || 0) + (Number(items[props.tumbleDryerPower].numericState)
                     || 0) + (Number(items[props.dishwasherPower].numericState) || 0))) / Math.max(1, (Number(items[props.homePower].numericState)
@@ -2047,12 +2053,6 @@ slots:
                     ? ''#fb8c00'' : (Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
                     || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) > 0.05 ?
                     ''#26a69a'' : ''#26a69a'''
-                  cx: 241.9
-                  cy: 210.2
-                  r: 29.2
-                  pathLength: 100
-                  transform: rotate(-90 241.9 210.2)
-                  stroke-linecap: round
                   stroke-dasharray: 0.001 100
                   stroke-dashoffset: '=(-((((((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
                     || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0,
@@ -2109,8 +2109,9 @@ slots:
                     Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
                     || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
                     || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))))))))))))))))))))).toFixed(2)'
-                  fill: none
+                  stroke-linecap: round
                   stroke-width: 4.5
+                  transform: rotate(-90 241.9 210.2)
                   visible: '=(Math.abs((Number(items[props.homePower].numericState) || 0)) > 10) && ((((((0 + Math.max(0,
                     Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1,
                     (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0, Math.min(Math.min(100,
@@ -2168,87 +2169,86 @@ slots:
                     || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
                     || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))))))))))))))))))))
                     > 0.05'
-                  class: a-halo-arc
               - component: g
                 config: {}
                 slots:
                   default:
                   - component: circle
                     config:
+                      class: a-full
                       cx: 410.2
                       cy: 233.9
-                      r: 29.2
                       fill: none
+                      r: 29.2
                       stroke: '#29b6f6'
                       stroke-width: 2.9
                       visible: '=(Math.abs((items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
                         || 0) : 0)) > 5) && !(((Number(items[props.acTimer].numericState) || 0) / Math.max((Number(items[props.acTimer].numericState)
                         || 0), (Number(items[props.acTimerSet].numericState) || 0) || 720)) > 0)'
-                      class: a-full
                   - component: circle
                     config:
+                      class: a-halo
                       cx: 410.2
                       cy: 233.9
+                      fill: none
                       r: 29.2
                       stroke: '#29b6f6'
-                      fill: none
                       stroke-width: 4.5
                       visible: '=(Math.abs((items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
                         || 0) : 0)) > 5) && !(((Number(items[props.acTimer].numericState) || 0) / Math.max((Number(items[props.acTimer].numericState)
                         || 0), (Number(items[props.acTimerSet].numericState) || 0) || 720)) > 0)'
-                      class: a-halo
                   - component: circle
                     config:
+                      class: a-soft
                       cx: 410.2
                       cy: 233.9
-                      r: 29.2
                       fill: none
+                      r: 29.2
                       stroke: '#29b6f6'
                       stroke-width: 2.9
                       visible: '=(Math.abs((items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
                         || 0) : 0)) > 5) && (((Number(items[props.acTimer].numericState) || 0) / Math.max((Number(items[props.acTimer].numericState)
                         || 0), (Number(items[props.acTimerSet].numericState) || 0) || 720)) > 0)'
-                      class: a-soft
               - component: g
                 config: {}
                 slots:
                   default:
                   - component: circle
                     config:
+                      class: a-full
                       cx: 265.6
                       cy: 41.9
-                      r: 29.2
                       fill: none
+                      r: 29.2
                       stroke: '#26a69a'
                       stroke-width: 2.9
                       visible: =(Math.abs((Number(items[props.ventilationPower].numericState) || 0)) > 5) && !(((Number(items[props.ventilationTimer].numericState)
                         || 0) / Math.max((Number(items[props.ventilationTimer].numericState) || 0), (Number(items[props.ventilationTimerSet].numericState)
                         || 0) || 360)) > 0)
-                      class: a-full
                   - component: circle
                     config:
+                      class: a-halo
                       cx: 265.6
                       cy: 41.9
+                      fill: none
                       r: 29.2
                       stroke: '#26a69a'
-                      fill: none
                       stroke-width: 4.5
                       visible: =(Math.abs((Number(items[props.ventilationPower].numericState) || 0)) > 5) && !(((Number(items[props.ventilationTimer].numericState)
                         || 0) / Math.max((Number(items[props.ventilationTimer].numericState) || 0), (Number(items[props.ventilationTimerSet].numericState)
                         || 0) || 360)) > 0)
-                      class: a-halo
                   - component: circle
                     config:
+                      class: a-soft
                       cx: 265.6
                       cy: 41.9
-                      r: 29.2
                       fill: none
+                      r: 29.2
                       stroke: '#26a69a'
                       stroke-width: 2.9
                       visible: =(Math.abs((Number(items[props.ventilationPower].numericState) || 0)) > 5) && (((Number(items[props.ventilationTimer].numericState)
                         || 0) / Math.max((Number(items[props.ventilationTimer].numericState) || 0), (Number(items[props.ventilationTimerSet].numericState)
                         || 0) || 360)) > 0)
-                      class: a-soft
               - component: g
                 config:
                   visible: =(Number(items[props.acTimer].numericState) || 0) / Math.max((Number(items[props.acTimer].numericState)
@@ -2257,50 +2257,50 @@ slots:
                   default:
                   - component: circle
                     config:
+                      cx: 410.2
+                      cy: 233.9
+                      fill: none
+                      pathLength: 100.0
+                      r: 29.2
+                      stroke-dasharray: =(Math.min(1, (Number(items[props.acTimer].numericState) || 0) / Math.max((Number(items[props.acTimer].numericState)
+                        || 0), (Number(items[props.acTimerSet].numericState) || 0) || 720)) * 100).toFixed(2) + ' 100'
+                      stroke-linecap: round
+                      stroke-width: 4.9
                       style:
                         stroke: 'var(--f7-card-bg-color, #fff)'
-                      cx: 410.2
-                      cy: 233.9
-                      r: 29.2
-                      fill: none
                       transform: rotate(-90 410.2 233.9)
-                      stroke-linecap: round
-                      stroke-dasharray: =(Math.min(1, (Number(items[props.acTimer].numericState) || 0) / Math.max((Number(items[props.acTimer].numericState)
-                        || 0), (Number(items[props.acTimerSet].numericState) || 0) || 720)) * 100).toFixed(2) + ' 100'
-                      pathLength: 100
-                      stroke-width: 4.9
                   - component: circle
                     config:
-                      stroke: '#29b6f6'
-                      cx: 410.2
-                      cy: 233.9
-                      r: 29.2
-                      fill: none
-                      transform: rotate(-90 410.2 233.9)
-                      stroke-linecap: round
-                      stroke-dasharray: =(Math.min(1, (Number(items[props.acTimer].numericState) || 0) / Math.max((Number(items[props.acTimer].numericState)
-                        || 0), (Number(items[props.acTimerSet].numericState) || 0) || 720)) * 100).toFixed(2) + ' 100'
-                      pathLength: 100
-                      stroke-width: 2.9
-                      opacity: '0.9'
                       class: '=(Math.abs((items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
                         || 0) : 0)) > 5) ? ''a-arc'' : '''''
-                  - component: circle
-                    config:
-                      stroke: '#29b6f6'
                       cx: 410.2
                       cy: 233.9
+                      fill: none
+                      opacity: '0.9'
+                      pathLength: 100.0
                       r: 29.2
-                      transform: rotate(-90 410.2 233.9)
-                      stroke-linecap: round
+                      stroke: '#29b6f6'
                       stroke-dasharray: =(Math.min(1, (Number(items[props.acTimer].numericState) || 0) / Math.max((Number(items[props.acTimer].numericState)
                         || 0), (Number(items[props.acTimerSet].numericState) || 0) || 720)) * 100).toFixed(2) + ' 100'
-                      pathLength: 100
+                      stroke-linecap: round
+                      stroke-width: 2.9
+                      transform: rotate(-90 410.2 233.9)
+                  - component: circle
+                    config:
+                      class: a-halo-arc
+                      cx: 410.2
+                      cy: 233.9
                       fill: none
+                      pathLength: 100.0
+                      r: 29.2
+                      stroke: '#29b6f6'
+                      stroke-dasharray: =(Math.min(1, (Number(items[props.acTimer].numericState) || 0) / Math.max((Number(items[props.acTimer].numericState)
+                        || 0), (Number(items[props.acTimerSet].numericState) || 0) || 720)) * 100).toFixed(2) + ' 100'
+                      stroke-linecap: round
                       stroke-width: 4.5
+                      transform: rotate(-90 410.2 233.9)
                       visible: '=Math.abs((items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
                         || 0) : 0)) > 5'
-                      class: a-halo-arc
               - component: g
                 config:
                   visible: =(Number(items[props.ventilationTimer].numericState) || 0) / Math.max((Number(items[props.ventilationTimer].numericState)
@@ -2309,51 +2309,51 @@ slots:
                   default:
                   - component: circle
                     config:
+                      cx: 265.6
+                      cy: 41.9
+                      fill: none
+                      pathLength: 100.0
+                      r: 29.2
+                      stroke-dasharray: =(Math.min(1, (Number(items[props.ventilationTimer].numericState) || 0) / Math.max((Number(items[props.ventilationTimer].numericState)
+                        || 0), (Number(items[props.ventilationTimerSet].numericState) || 0) || 360)) * 100).toFixed(2) + '
+                        100'
+                      stroke-linecap: round
+                      stroke-width: 4.9
                       style:
                         stroke: 'var(--f7-card-bg-color, #fff)'
-                      cx: 265.6
-                      cy: 41.9
-                      r: 29.2
-                      fill: none
                       transform: rotate(-90 265.6 41.9)
-                      stroke-linecap: round
-                      stroke-dasharray: =(Math.min(1, (Number(items[props.ventilationTimer].numericState) || 0) / Math.max((Number(items[props.ventilationTimer].numericState)
-                        || 0), (Number(items[props.ventilationTimerSet].numericState) || 0) || 360)) * 100).toFixed(2) + '
-                        100'
-                      pathLength: 100
-                      stroke-width: 4.9
                   - component: circle
                     config:
-                      stroke: '#26a69a'
-                      cx: 265.6
-                      cy: 41.9
-                      r: 29.2
-                      fill: none
-                      transform: rotate(-90 265.6 41.9)
-                      stroke-linecap: round
-                      stroke-dasharray: =(Math.min(1, (Number(items[props.ventilationTimer].numericState) || 0) / Math.max((Number(items[props.ventilationTimer].numericState)
-                        || 0), (Number(items[props.ventilationTimerSet].numericState) || 0) || 360)) * 100).toFixed(2) + '
-                        100'
-                      pathLength: 100
-                      stroke-width: 2.9
-                      opacity: '0.9'
                       class: '=(Math.abs((Number(items[props.ventilationPower].numericState) || 0)) > 5) ? ''a-arc'' : '''''
-                  - component: circle
-                    config:
-                      stroke: '#26a69a'
                       cx: 265.6
                       cy: 41.9
+                      fill: none
+                      opacity: '0.9'
+                      pathLength: 100.0
                       r: 29.2
-                      transform: rotate(-90 265.6 41.9)
-                      stroke-linecap: round
+                      stroke: '#26a69a'
                       stroke-dasharray: =(Math.min(1, (Number(items[props.ventilationTimer].numericState) || 0) / Math.max((Number(items[props.ventilationTimer].numericState)
                         || 0), (Number(items[props.ventilationTimerSet].numericState) || 0) || 360)) * 100).toFixed(2) + '
                         100'
-                      pathLength: 100
-                      fill: none
-                      stroke-width: 4.5
-                      visible: =Math.abs((Number(items[props.ventilationPower].numericState) || 0)) > 5
+                      stroke-linecap: round
+                      stroke-width: 2.9
+                      transform: rotate(-90 265.6 41.9)
+                  - component: circle
+                    config:
                       class: a-halo-arc
+                      cx: 265.6
+                      cy: 41.9
+                      fill: none
+                      pathLength: 100.0
+                      r: 29.2
+                      stroke: '#26a69a'
+                      stroke-dasharray: =(Math.min(1, (Number(items[props.ventilationTimer].numericState) || 0) / Math.max((Number(items[props.ventilationTimer].numericState)
+                        || 0), (Number(items[props.ventilationTimerSet].numericState) || 0) || 360)) * 100).toFixed(2) + '
+                        100'
+                      stroke-linecap: round
+                      stroke-width: 4.5
+                      transform: rotate(-90 265.6 41.9)
+                      visible: =Math.abs((Number(items[props.ventilationPower].numericState) || 0)) > 5
               - component: g
                 config:
                   visible: =(Number(items[props.batterySoc].numericState) || 0) / 100 > 0
@@ -2361,48 +2361,48 @@ slots:
                   default:
                   - component: circle
                     config:
+                      cx: 106.1
+                      cy: 312.5
+                      fill: none
+                      pathLength: 100.0
+                      r: 29.2
+                      stroke-dasharray: =(Math.min(1, (Number(items[props.batterySoc].numericState) || 0) / 100) * 100).toFixed(2)
+                        + ' 100'
+                      stroke-linecap: round
+                      stroke-width: 4.9
                       style:
                         stroke: 'var(--f7-card-bg-color, #fff)'
-                      cx: 106.1
-                      cy: 312.5
-                      r: 29.2
-                      fill: none
                       transform: rotate(-90 106.1 312.5)
-                      stroke-linecap: round
-                      stroke-dasharray: =(Math.min(1, (Number(items[props.batterySoc].numericState) || 0) / 100) * 100).toFixed(2)
-                        + ' 100'
-                      pathLength: 100
-                      stroke-width: 4.9
                   - component: circle
                     config:
-                      stroke: '#7cb342'
-                      cx: 106.1
-                      cy: 312.5
-                      r: 29.2
-                      fill: none
-                      transform: rotate(-90 106.1 312.5)
-                      stroke-linecap: round
-                      stroke-dasharray: =(Math.min(1, (Number(items[props.batterySoc].numericState) || 0) / 100) * 100).toFixed(2)
-                        + ' 100'
-                      pathLength: 100
-                      stroke-width: 2.9
-                      opacity: '0.9'
                       class: '=(Math.abs((Number(items[props.batteryPower].numericState) || 0)) > 10) ? ''a-arc'' : '''''
-                  - component: circle
-                    config:
-                      stroke: '#7cb342'
                       cx: 106.1
                       cy: 312.5
+                      fill: none
+                      opacity: '0.9'
+                      pathLength: 100.0
                       r: 29.2
-                      transform: rotate(-90 106.1 312.5)
-                      stroke-linecap: round
+                      stroke: '#7cb342'
                       stroke-dasharray: =(Math.min(1, (Number(items[props.batterySoc].numericState) || 0) / 100) * 100).toFixed(2)
                         + ' 100'
-                      pathLength: 100
-                      fill: none
-                      stroke-width: 4.5
-                      visible: =Math.abs((Number(items[props.batteryPower].numericState) || 0)) > 10
+                      stroke-linecap: round
+                      stroke-width: 2.9
+                      transform: rotate(-90 106.1 312.5)
+                  - component: circle
+                    config:
                       class: a-halo-arc
+                      cx: 106.1
+                      cy: 312.5
+                      fill: none
+                      pathLength: 100.0
+                      r: 29.2
+                      stroke: '#7cb342'
+                      stroke-dasharray: =(Math.min(1, (Number(items[props.batterySoc].numericState) || 0) / 100) * 100).toFixed(2)
+                        + ' 100'
+                      stroke-linecap: round
+                      stroke-width: 4.5
+                      transform: rotate(-90 106.1 312.5)
+                      visible: =Math.abs((Number(items[props.batteryPower].numericState) || 0)) > 10
               - component: g
                 config:
                   visible: '=((items[props.heatpumpDhwEta].state !== ''UNDEF'' && items[props.heatpumpDhwEta].state !== ''NULL''
@@ -2413,227 +2413,225 @@ slots:
                   default:
                   - component: circle
                     config:
+                      cx: 377.7
+                      cy: 107.9
+                      fill: none
+                      pathLength: 100.0
+                      r: 29.2
+                      stroke-dasharray: '=(Math.min(1, ((items[props.heatpumpDhwEta].state !== ''UNDEF'' && items[props.heatpumpDhwEta].state
+                        !== ''NULL'' && items[props.heatpumpDhwSince].state !== ''UNDEF'' && items[props.heatpumpDhwSince].state
+                        !== ''NULL'') ? Math.max(0, dayjs().diff(dayjs(items[props.heatpumpDhwSince].state))) / Math.max(1,
+                        dayjs(items[props.heatpumpDhwEta].state).diff(dayjs(items[props.heatpumpDhwSince].state))) : 0)) *
+                        100).toFixed(2) + '' 100'''
+                      stroke-linecap: round
+                      stroke-width: 4.9
                       style:
                         stroke: 'var(--f7-card-bg-color, #fff)'
-                      cx: 377.7
-                      cy: 107.9
-                      r: 29.2
-                      fill: none
                       transform: rotate(-90 377.7 107.9)
-                      stroke-linecap: round
-                      stroke-dasharray: '=(Math.min(1, ((items[props.heatpumpDhwEta].state !== ''UNDEF'' && items[props.heatpumpDhwEta].state
-                        !== ''NULL'' && items[props.heatpumpDhwSince].state !== ''UNDEF'' && items[props.heatpumpDhwSince].state
-                        !== ''NULL'') ? Math.max(0, dayjs().diff(dayjs(items[props.heatpumpDhwSince].state))) / Math.max(1,
-                        dayjs(items[props.heatpumpDhwEta].state).diff(dayjs(items[props.heatpumpDhwSince].state))) : 0)) *
-                        100).toFixed(2) + '' 100'''
-                      pathLength: 100
-                      stroke-width: 4.9
                   - component: circle
                     config:
-                      stroke: '#fb8c00'
-                      cx: 377.7
-                      cy: 107.9
-                      r: 29.2
-                      fill: none
-                      transform: rotate(-90 377.7 107.9)
-                      stroke-linecap: round
-                      stroke-dasharray: '=(Math.min(1, ((items[props.heatpumpDhwEta].state !== ''UNDEF'' && items[props.heatpumpDhwEta].state
-                        !== ''NULL'' && items[props.heatpumpDhwSince].state !== ''UNDEF'' && items[props.heatpumpDhwSince].state
-                        !== ''NULL'') ? Math.max(0, dayjs().diff(dayjs(items[props.heatpumpDhwSince].state))) / Math.max(1,
-                        dayjs(items[props.heatpumpDhwEta].state).diff(dayjs(items[props.heatpumpDhwSince].state))) : 0)) *
-                        100).toFixed(2) + '' 100'''
-                      pathLength: 100
-                      stroke-width: 2.9
-                      opacity: '0.9'
                       class: '=(Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) > 28) ? ''a-arc'' : '''''
-                  - component: circle
-                    config:
-                      stroke: '#fb8c00'
                       cx: 377.7
                       cy: 107.9
+                      fill: none
+                      opacity: '0.9'
+                      pathLength: 100.0
                       r: 29.2
-                      transform: rotate(-90 377.7 107.9)
-                      stroke-linecap: round
+                      stroke: '#fb8c00'
                       stroke-dasharray: '=(Math.min(1, ((items[props.heatpumpDhwEta].state !== ''UNDEF'' && items[props.heatpumpDhwEta].state
                         !== ''NULL'' && items[props.heatpumpDhwSince].state !== ''UNDEF'' && items[props.heatpumpDhwSince].state
                         !== ''NULL'') ? Math.max(0, dayjs().diff(dayjs(items[props.heatpumpDhwSince].state))) / Math.max(1,
                         dayjs(items[props.heatpumpDhwEta].state).diff(dayjs(items[props.heatpumpDhwSince].state))) : 0)) *
                         100).toFixed(2) + '' 100'''
-                      pathLength: 100
-                      fill: none
-                      stroke-width: 4.5
-                      visible: =Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) > 28
+                      stroke-linecap: round
+                      stroke-width: 2.9
+                      transform: rotate(-90 377.7 107.9)
+                  - component: circle
+                    config:
                       class: a-halo-arc
+                      cx: 377.7
+                      cy: 107.9
+                      fill: none
+                      pathLength: 100.0
+                      r: 29.2
+                      stroke: '#fb8c00'
+                      stroke-dasharray: '=(Math.min(1, ((items[props.heatpumpDhwEta].state !== ''UNDEF'' && items[props.heatpumpDhwEta].state
+                        !== ''NULL'' && items[props.heatpumpDhwSince].state !== ''UNDEF'' && items[props.heatpumpDhwSince].state
+                        !== ''NULL'') ? Math.max(0, dayjs().diff(dayjs(items[props.heatpumpDhwSince].state))) / Math.max(1,
+                        dayjs(items[props.heatpumpDhwEta].state).diff(dayjs(items[props.heatpumpDhwSince].state))) : 0)) *
+                        100).toFixed(2) + '' 100'''
+                      stroke-linecap: round
+                      stroke-width: 4.5
+                      transform: rotate(-90 377.7 107.9)
+                      visible: =Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) > 28
               - component: g
                 config: {}
                 slots:
                   default:
                   - component: rect
                     config:
-                      x: 233.8
-                      y: 117.0
-                      width: 40
-                      height: 18
-                      rx: 6
+                      height: 18.0
+                      rx: 6.0
                       style:
                         fill: 'var(--f7-card-bg-color, #fff)'
-                  - component: rect
-                    config:
+                      width: 40.0
                       x: 233.8
                       y: 117.0
-                      width: 40
-                      height: 18
-                      rx: 6
+                  - component: rect
+                    config:
                       fill: '=Math.abs((Number(items[props.ventilationPower].numericState) || 0)) > 5 ? ''#26a69a'' : ''rgba(158,
                         158, 158, 0.18)'''
+                      height: 18.0
+                      rx: 6.0
                       stroke: '=Math.abs((Number(items[props.ventilationPower].numericState) || 0)) > 5 ? ''#26a69a'' : ''#9e9e9e'''
-                      stroke-width: 1
+                      stroke-width: 1.0
+                      width: 40.0
+                      x: 233.8
+                      y: 117.0
                   - component: text
                     config:
-                      x: 253.8
-                      y: 130.0
                       content: '=((v) => v > 0 && v < 1 ? ''<1 %'' : Math.round(v) + '' %'')(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
                         || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100))'
                       fill: '=Math.abs((Number(items[props.ventilationPower].numericState) || 0)) > 5 ? ''#ffffff'' : ''#9e9e9e'''
-                      font-size: 11
+                      font-size: 11.0
                       font-weight: '700'
                       text-anchor: middle
+                      x: 253.8
+                      y: 130.0
               - component: g
                 config: {}
                 slots:
                   default:
                   - component: rect
                     config:
-                      x: 289.8
-                      y: 150.1
-                      width: 40
-                      height: 18
-                      rx: 6
+                      height: 18.0
+                      rx: 6.0
                       style:
                         fill: 'var(--f7-card-bg-color, #fff)'
-                  - component: rect
-                    config:
+                      width: 40.0
                       x: 289.8
                       y: 150.1
-                      width: 40
-                      height: 18
-                      rx: 6
+                  - component: rect
+                    config:
                       fill: '=Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) > 28 ? ''#fb8c00'' : ''rgba(158,
                         158, 158, 0.18)'''
+                      height: 18.0
+                      rx: 6.0
                       stroke: '=Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) > 28 ? ''#fb8c00'' : ''#9e9e9e'''
-                      stroke-width: 1
+                      stroke-width: 1.0
+                      width: 40.0
+                      x: 289.8
+                      y: 150.1
                   - component: text
                     config:
-                      x: 309.8
-                      y: 163.1
                       content: '=((v) => v > 0 && v < 1 ? ''<1 %'' : Math.round(v) + '' %'')(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState)
                         || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100))'
                       fill: '=Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) > 28 ? ''#ffffff'' : ''#9e9e9e'''
-                      font-size: 11
+                      font-size: 11.0
                       font-weight: '700'
                       text-anchor: middle
+                      x: 309.8
+                      y: 163.1
               - component: g
                 config: {}
                 slots:
                   default:
                   - component: rect
                     config:
-                      x: 306.1
-                      y: 213.1
-                      width: 40
-                      height: 18
-                      rx: 6
+                      height: 18.0
+                      rx: 6.0
                       style:
                         fill: 'var(--f7-card-bg-color, #fff)'
-                  - component: rect
-                    config:
+                      width: 40.0
                       x: 306.1
                       y: 213.1
-                      width: 40
-                      height: 18
-                      rx: 6
+                  - component: rect
+                    config:
                       fill: '=Math.abs((items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
                         || 0) : 0)) > 5 ? ''#29b6f6'' : ''rgba(158, 158, 158, 0.18)'''
+                      height: 18.0
+                      rx: 6.0
                       stroke: '=Math.abs((items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
                         || 0) : 0)) > 5 ? ''#29b6f6'' : ''#9e9e9e'''
-                      stroke-width: 1
+                      stroke-width: 1.0
+                      width: 40.0
+                      x: 306.1
+                      y: 213.1
                   - component: text
                     config:
-                      x: 326.1
-                      y: 226.1
                       content: '=((v) => v > 0 && v < 1 ? ''<1 %'' : Math.round(v) + '' %'')(Math.min(100, Math.max(0, (items[props.acSwitch].state
                         === ''ON'' ? (Number(items[props.acUnitPower].numericState) || 0) : 0)) / Math.max(1, (Number(items[props.homePower].numericState)
                         || 0)) * 100))'
                       fill: '=Math.abs((items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
                         || 0) : 0)) > 5 ? ''#ffffff'' : ''#9e9e9e'''
-                      font-size: 11
+                      font-size: 11.0
                       font-weight: '700'
                       text-anchor: middle
+                      x: 326.1
+                      y: 226.1
               - component: g
                 config: {}
                 slots:
                   default:
                   - component: rect
                     config:
-                      x: 273.1
-                      y: 269.1
-                      width: 40
-                      height: 18
-                      rx: 6
+                      height: 18.0
+                      rx: 6.0
                       style:
                         fill: 'var(--f7-card-bg-color, #fff)'
-                  - component: rect
-                    config:
+                      width: 40.0
                       x: 273.1
                       y: 269.1
-                      width: 40
-                      height: 18
-                      rx: 6
+                  - component: rect
+                    config:
                       fill: '=Math.abs((Number(items[props.ecarPower].numericState) || 0)) > 100 ? ''#26a69a'' : ''rgba(158,
                         158, 158, 0.18)'''
+                      height: 18.0
+                      rx: 6.0
                       stroke: '=Math.abs((Number(items[props.ecarPower].numericState) || 0)) > 100 ? ''#26a69a'' : ''#9e9e9e'''
-                      stroke-width: 1
+                      stroke-width: 1.0
+                      width: 40.0
+                      x: 273.1
+                      y: 269.1
                   - component: text
                     config:
-                      x: 293.1
-                      y: 282.1
                       content: '=((v) => v > 0 && v < 1 ? ''<1 %'' : Math.round(v) + '' %'')(Math.min(100, Math.max(0, (Number(items[props.ecarPower].numericState)
                         || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100))'
                       fill: '=Math.abs((Number(items[props.ecarPower].numericState) || 0)) > 100 ? ''#ffffff'' : ''#9e9e9e'''
-                      font-size: 11
+                      font-size: 11.0
                       font-weight: '700'
                       text-anchor: middle
+                      x: 293.1
+                      y: 282.1
               - component: g
                 config: {}
                 slots:
                   default:
                   - component: rect
                     config:
-                      x: 210.1
-                      y: 285.4
-                      width: 40
-                      height: 18
-                      rx: 6
+                      height: 18.0
+                      rx: 6.0
                       style:
                         fill: 'var(--f7-card-bg-color, #fff)'
-                  - component: rect
-                    config:
+                      width: 40.0
                       x: 210.1
                       y: 285.4
-                      width: 40
-                      height: 18
-                      rx: 6
+                  - component: rect
+                    config:
                       fill: '=Math.abs(((Number(items[props.washingMachine1Power].numericState) || 0) + (Number(items[props.washingMachine2Power].numericState)
                         || 0) + (Number(items[props.tumbleDryerPower].numericState) || 0) + (Number(items[props.dishwasherPower].numericState)
                         || 0))) > 10 ? ''#5c6bc0'' : ''rgba(158, 158, 158, 0.18)'''
+                      height: 18.0
+                      rx: 6.0
                       stroke: '=Math.abs(((Number(items[props.washingMachine1Power].numericState) || 0) + (Number(items[props.washingMachine2Power].numericState)
                         || 0) + (Number(items[props.tumbleDryerPower].numericState) || 0) + (Number(items[props.dishwasherPower].numericState)
                         || 0))) > 10 ? ''#5c6bc0'' : ''#9e9e9e'''
-                      stroke-width: 1
+                      stroke-width: 1.0
+                      width: 40.0
+                      x: 210.1
+                      y: 285.4
                   - component: text
                     config:
-                      x: 230.1
-                      y: 298.4
                       content: '=((v) => v > 0 && v < 1 ? ''<1 %'' : Math.round(v) + '' %'')(Math.min(100, Math.max(0, ((Number(items[props.washingMachine1Power].numericState)
                         || 0) + (Number(items[props.washingMachine2Power].numericState) || 0) + (Number(items[props.tumbleDryerPower].numericState)
                         || 0) + (Number(items[props.dishwasherPower].numericState) || 0))) / Math.max(1, (Number(items[props.homePower].numericState)
@@ -2641,69 +2639,71 @@ slots:
                       fill: '=Math.abs(((Number(items[props.washingMachine1Power].numericState) || 0) + (Number(items[props.washingMachine2Power].numericState)
                         || 0) + (Number(items[props.tumbleDryerPower].numericState) || 0) + (Number(items[props.dishwasherPower].numericState)
                         || 0))) > 10 ? ''#ffffff'' : ''#9e9e9e'''
-                      font-size: 11
+                      font-size: 11.0
                       font-weight: '700'
                       text-anchor: middle
+                      x: 230.1
+                      y: 298.4
               - component: widget:flow-node
                 config:
                   kind: pv
+                  power: =(Number(items[props.pvPower].numericState) || 0)
                   x: 139.6
                   y: 74.4
-                  power: =(Number(items[props.pvPower].numericState) || 0)
               - component: widget:flow-node
                 config:
                   kind: grid
+                  power: =(Number(items[props.gridPower].numericState) || 0)
                   x: 73.6
                   y: 186.5
-                  power: =(Number(items[props.gridPower].numericState) || 0)
               - component: widget:flow-node
                 config:
                   kind: home
+                  power: =(Number(items[props.homePower].numericState) || 0)
                   x: 241.9
                   y: 210.2
-                  power: =(Number(items[props.homePower].numericState) || 0)
               - component: widget:flow-node
                 config:
+                  frequency: =(Number(items[props.heatpumpInvFrequency].numericState) || 0)
                   kind: heat-pump-split
+                  power: =(Number(items[props.heatpumpPower].numericState) || 0)
                   x: 377.7
                   y: 107.9
-                  power: =(Number(items[props.heatpumpPower].numericState) || 0)
-                  frequency: =(Number(items[props.heatpumpInvFrequency].numericState) || 0)
               - component: widget:flow-node
                 config:
                   kind: air-conditioner
-                  x: 410.2
-                  y: 233.9
                   power: '=(items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState) || 0)
                     : 0)'
+                  x: 410.2
+                  y: 233.9
               - component: widget:flow-node
                 config:
                   kind: e-car
-                  x: 344.2
-                  y: 346.0
                   plugged: =(items[props.ecarPlug].state === 'ON' || Math.abs((Number(items[props.ecarPower].numericState)
                     || 0)) > 500)
                   power: =(Number(items[props.ecarPower].numericState) || 0)
+                  x: 344.2
+                  y: 346.0
               - component: widget:flow-node
                 config:
                   kind: appliances
-                  x: 218.2
-                  y: 378.5
                   power: =((Number(items[props.washingMachine1Power].numericState) || 0) + (Number(items[props.washingMachine2Power].numericState)
                     || 0) + (Number(items[props.tumbleDryerPower].numericState) || 0) + (Number(items[props.dishwasherPower].numericState)
                     || 0))
+                  x: 218.2
+                  y: 378.5
               - component: widget:flow-node
                 config:
                   kind: battery
+                  soc: =(Number(items[props.batterySoc].numericState) || 0)
                   x: 106.1
                   y: 312.5
-                  soc: =(Number(items[props.batterySoc].numericState) || 0)
               - component: widget:flow-node
                 config:
                   kind: ventilation
+                  power: =(Number(items[props.ventilationPower].numericState) || 0)
                   x: 265.6
                   y: 41.9
-                  power: =(Number(items[props.ventilationPower].numericState) || 0)
               - component: g
                 config:
                   visible: =!(((items[props.heatpumpBuhStep1Mode].state === 'ON' || items[props.heatpumpBuhStep2Mode].state
@@ -2718,31 +2718,31 @@ slots:
                     config:
                       cx: 404.6
                       cy: 81.0
-                      r: 12
+                      r: 12.0
                       style:
                         fill: 'var(--f7-card-bg-color, #fff)'
                   - component: circle
                     config:
                       cx: 404.6
                       cy: 81.0
-                      r: 12
                       fill: '=(Number(items[props.heatpumpPower].numericState) || 0) > 50 ? ''#fb8c00'' : ''rgba(158, 158,
                         158, 0.14)'''
+                      r: 12.0
                       stroke: '=(Number(items[props.heatpumpPower].numericState) || 0) > 50 ? ''#fb8c00'' : ''#9e9e9e'''
-                      stroke-width: 2
+                      stroke-width: 2.0
                   - component: text
                     config:
-                      x: 404.6
-                      y: 81.5
                       content: '=items[props.heatpumpDefrostOperaton].state === ''ON'' ? ''ac_unit'' : items[props.heatpumpValve].state
                         === ''DHW'' ? ''shower'' : ''local_fire_department'''
-                      fill: '=(Number(items[props.heatpumpPower].numericState) || 0) > 50 ? ''#ffffff'' : ''#9e9e9e'''
-                      font-size: 15
-                      text-anchor: middle
                       dominant-baseline: central
+                      fill: '=(Number(items[props.heatpumpPower].numericState) || 0) > 50 ? ''#ffffff'' : ''#9e9e9e'''
+                      font-size: 15.0
                       style:
                         font-family: '''Material Icons'''
                         font-feature-settings: '''liga'''
+                      text-anchor: middle
+                      x: 404.6
+                      y: 81.5
               - component: g
                 config:
                   visible: =(((items[props.heatpumpBuhStep1Mode].state === 'ON' || items[props.heatpumpBuhStep2Mode].state
@@ -2754,29 +2754,29 @@ slots:
                     config:
                       cx: 404.6
                       cy: 81.0
-                      r: 12
+                      r: 12.0
                       style:
                         fill: 'var(--f7-card-bg-color, #fff)'
                   - component: circle
                     config:
                       cx: 404.6
                       cy: 81.0
-                      r: 12
                       fill: '=true ? ''#e53935'' : ''rgba(158, 158, 158, 0.14)'''
+                      r: 12.0
                       stroke: '=true ? ''#e53935'' : ''#9e9e9e'''
-                      stroke-width: 2
+                      stroke-width: 2.0
                   - component: text
                     config:
-                      x: 404.6
-                      y: 81.5
                       content: electric_bolt
-                      fill: '=true ? ''#ffffff'' : ''#9e9e9e'''
-                      font-size: 15
-                      text-anchor: middle
                       dominant-baseline: central
+                      fill: '=true ? ''#ffffff'' : ''#9e9e9e'''
+                      font-size: 15.0
                       style:
                         font-family: '''Material Icons'''
                         font-feature-settings: '''liga'''
+                      text-anchor: middle
+                      x: 404.6
+                      y: 81.5
               - component: g
                 config:
                   visible: =((items[props.heatpumpWaterPumpOperation].state === 'ON' || (Number(items[props.heatpumpFlowSensor].numericState)
@@ -2789,29 +2789,29 @@ slots:
                     config:
                       cx: 404.6
                       cy: 81.0
-                      r: 12
+                      r: 12.0
                       style:
                         fill: 'var(--f7-card-bg-color, #fff)'
                   - component: circle
                     config:
                       cx: 404.6
                       cy: 81.0
-                      r: 12
                       fill: '=true ? ''#fb8c00'' : ''rgba(158, 158, 158, 0.14)'''
+                      r: 12.0
                       stroke: '=true ? ''#fb8c00'' : ''#9e9e9e'''
-                      stroke-width: 2
+                      stroke-width: 2.0
                   - component: text
                     config:
-                      x: 404.6
-                      y: 81.5
                       content: water
-                      fill: '=true ? ''#ffffff'' : ''#9e9e9e'''
-                      font-size: 15
-                      text-anchor: middle
                       dominant-baseline: central
+                      fill: '=true ? ''#ffffff'' : ''#9e9e9e'''
+                      font-size: 15.0
                       style:
                         font-family: '''Material Icons'''
                         font-feature-settings: '''liga'''
+                      text-anchor: middle
+                      x: 404.6
+                      y: 81.5
               - component: g
                 config: {}
                 slots:
@@ -2820,31 +2820,31 @@ slots:
                     config:
                       cx: 383.3
                       cy: 207.0
-                      r: 12
+                      r: 12.0
                       style:
                         fill: 'var(--f7-card-bg-color, #fff)'
                   - component: circle
                     config:
                       cx: 383.3
                       cy: 207.0
-                      r: 12
                       fill: '=items[props.acSwitch].state === ''ON'' ? ''#29b6f6'' : ''rgba(158, 158, 158, 0.14)'''
+                      r: 12.0
                       stroke: '=items[props.acSwitch].state === ''ON'' ? ''#29b6f6'' : ''#9e9e9e'''
-                      stroke-width: 2
+                      stroke-width: 2.0
                   - component: text
                     config:
-                      x: 383.3
-                      y: 207.5
                       content: '=items[props.acMode].state === ''H'' ? ''local_fire_department'' : items[props.acMode].state
                         === ''C'' ? ''ac_unit'' : items[props.acMode].state === ''D'' ? ''water_drop'' : items[props.acMode].state
                         === ''F'' ? ''air'' : ''autorenew'''
-                      fill: '=items[props.acSwitch].state === ''ON'' ? ''#ffffff'' : ''#9e9e9e'''
-                      font-size: 15
-                      text-anchor: middle
                       dominant-baseline: central
+                      fill: '=items[props.acSwitch].state === ''ON'' ? ''#ffffff'' : ''#9e9e9e'''
+                      font-size: 15.0
                       style:
                         font-family: '''Material Icons'''
                         font-feature-settings: '''liga'''
+                      text-anchor: middle
+                      x: 383.3
+                      y: 207.5
               - component: g
                 config: {}
                 slots:
@@ -2853,301 +2853,301 @@ slots:
                     config:
                       cx: 238.7
                       cy: 15.0
-                      r: 12
                       fill: '#26a69a'
+                      r: 12.0
                   - component: text
                     config:
-                      x: 238.7
-                      y: 15.0
                       content: =items[props.ventilationLevel].state
+                      dominant-baseline: central
                       fill: '#ffffff'
-                      font-size: 13
+                      font-size: 13.0
                       font-weight: '700'
                       text-anchor: middle
-                      dominant-baseline: central
+                      x: 238.7
+                      y: 15.0
               - component: text
                 config:
-                  x: 99.6
-                  y: 73.4
                   content: =(Math.abs((Number(items[props.pvPower].numericState) || 0)) / 1000).toFixed(3) + ' kW'
                   fill: currentColor
-                  font-size: 18
+                  font-size: 18.0
                   font-weight: '700'
-                  text-anchor: end
                   opacity: '1'
+                  text-anchor: end
+                  x: 99.6
+                  y: 73.4
               - component: text
                 config:
-                  x: 99.6
-                  y: 90.4
                   content: '=([''NULL'', ''UNDEF''].includes(items[props.pvGenerationToday].state) ? ''–'' : (items[props.pvGenerationToday].displayState
                     || items[props.pvGenerationToday].state)) + '' today'''
                   fill: currentColor
-                  font-size: 12
+                  font-size: 12.0
                   font-weight: normal
-                  text-anchor: end
                   opacity: '0.7'
+                  text-anchor: end
+                  x: 99.6
+                  y: 90.4
               - component: text
                 config:
-                  x: 305.6
-                  y: 40.9
                   content: =((Number(items[props.ventilationPower].numericState) || 0) / 1000).toFixed(3) + ' kW'
                   fill: currentColor
-                  font-size: 18
+                  font-size: 18.0
                   font-weight: '700'
-                  text-anchor: start
                   opacity: '1'
+                  text-anchor: start
+                  x: 305.6
+                  y: 40.9
               - component: text
                 config:
-                  x: 305.6
-                  y: 57.9
                   content: '=(Number(items[props.ventilationTimer].numericState) || 0) > 0 ? ''Timer '' + ((Number(items[props.ventilationTimer].numericState)
                     || 0) >= 60 ? Math.floor((Number(items[props.ventilationTimer].numericState) || 0) / 60) + '':'' + (Math.floor((Number(items[props.ventilationTimer].numericState)
                     || 0) % 60) < 10 ? ''0'' : '''') + Math.floor((Number(items[props.ventilationTimer].numericState) || 0)
                     % 60) + '' h'' : Math.round((Number(items[props.ventilationTimer].numericState) || 0)) + '' min'') : (''''
                     + ((Number(items[props.ventilationEnergyToday].numericState) || 0)).toFixed(2) + '' kWh today'')'
                   fill: '=(Number(items[props.ventilationTimer].numericState) || 0) > 0 ? ''#26a69a'' : ''currentColor'''
-                  font-size: 12
+                  font-size: 12.0
                   font-weight: normal
-                  text-anchor: start
                   opacity: '=(Number(items[props.ventilationTimer].numericState) || 0) > 0 ? ''1'' : ''0.7'''
+                  text-anchor: start
+                  x: 305.6
+                  y: 57.9
               - component: text
                 config:
-                  x: 73.6
-                  y: 240.5
                   content: =((Number(items[props.gridPower].numericState) || 0) / 1000).toFixed(3) + ' kW'
                   fill: currentColor
-                  font-size: 18
+                  font-size: 18.0
                   font-weight: '700'
-                  text-anchor: middle
                   opacity: '1'
+                  text-anchor: middle
+                  x: 73.6
+                  y: 240.5
               - component: text
                 config:
-                  x: 73.6
-                  y: 256.5
                   content: ='Import ' + ((Number(items[props.gridImportToday].numericState) || 0)).toFixed(2) + ' · Export
                     ' + ((Number(items[props.gridExportToday].numericState) || 0)).toFixed(2)
                   fill: currentColor
-                  font-size: 12
+                  font-size: 12.0
                   font-weight: normal
-                  text-anchor: middle
                   opacity: '0.7'
+                  text-anchor: middle
+                  x: 73.6
+                  y: 256.5
               - component: text
                 config:
-                  x: 382.7
-                  y: 161.9
                   content: =(Math.abs((Number(items[props.heatpumpPower].numericState) || 0)) / 1000).toFixed(3) + ' kW'
                   fill: currentColor
-                  font-size: 18
+                  font-size: 18.0
                   font-weight: '700'
-                  text-anchor: middle
                   opacity: '1'
+                  text-anchor: middle
+                  x: 382.7
+                  y: 161.9
               - component: text
                 config:
-                  x: 382.7
-                  y: 177.9
                   content: ='' + ((Number(items[props.heatpumpEnergyToday].numericState) || 0)).toFixed(2) + ' kWh today'
                   fill: currentColor
-                  font-size: 12
+                  font-size: 12.0
                   font-weight: normal
-                  text-anchor: middle
                   opacity: '0.7'
+                  text-anchor: middle
+                  x: 382.7
+                  y: 177.9
               - component: text
                 config:
-                  x: 410.2
-                  y: 287.9
                   content: =((Number(items[props.acUnitPower].numericState) || 0) / 1000).toFixed(3) + ' kW'
                   fill: currentColor
-                  font-size: 18
+                  font-size: 18.0
                   font-weight: '700'
-                  text-anchor: middle
                   opacity: '1'
+                  text-anchor: middle
+                  x: 410.2
+                  y: 287.9
               - component: text
                 config:
-                  x: 410.2
-                  y: 303.9
                   content: '=(Number(items[props.acTimer].numericState) || 0) > 0 ? ''Timer '' + ((Number(items[props.acTimer].numericState)
                     || 0) >= 60 ? Math.floor((Number(items[props.acTimer].numericState) || 0) / 60) + '':'' + (Math.floor((Number(items[props.acTimer].numericState)
                     || 0) % 60) < 10 ? ''0'' : '''') + Math.floor((Number(items[props.acTimer].numericState) || 0) % 60) +
                     '' h'' : Math.round((Number(items[props.acTimer].numericState) || 0)) + '' min'') : ('''' + ((Number(items[props.acUnitEnergyToday].numericState)
                     || 0)).toFixed(2) + '' kWh today'')'
                   fill: '=(Number(items[props.acTimer].numericState) || 0) > 0 ? ''#29b6f6'' : ''currentColor'''
-                  font-size: 12
+                  font-size: 12.0
                   font-weight: normal
-                  text-anchor: middle
                   opacity: '=(Number(items[props.acTimer].numericState) || 0) > 0 ? ''1'' : ''0.7'''
+                  text-anchor: middle
+                  x: 410.2
+                  y: 303.9
               - component: text
                 config:
-                  x: 344.2
-                  y: 400.0
                   content: =(Math.abs((Number(items[props.ecarPower].numericState) || 0)) / 1000).toFixed(3) + ' kW'
                   fill: currentColor
-                  font-size: 18
+                  font-size: 18.0
                   font-weight: '700'
-                  text-anchor: middle
                   opacity: '1'
+                  text-anchor: middle
+                  x: 344.2
+                  y: 400.0
               - component: text
                 config:
-                  x: 344.2
-                  y: 416.0
                   content: ='' + ((Number(items[props.ecarEnergyToday].numericState) || 0)).toFixed(2) + ' kWh today'
                   fill: currentColor
-                  font-size: 12
+                  font-size: 12.0
                   font-weight: normal
-                  text-anchor: middle
                   opacity: '0.7'
+                  text-anchor: middle
+                  x: 344.2
+                  y: 416.0
               - component: text
                 config:
-                  x: 218.2
-                  y: 432.5
                   content: =(((Number(items[props.washingMachine1Power].numericState) || 0) + (Number(items[props.washingMachine2Power].numericState)
                     || 0) + (Number(items[props.tumbleDryerPower].numericState) || 0) + (Number(items[props.dishwasherPower].numericState)
                     || 0)) / 1000).toFixed(3) + ' kW'
                   fill: currentColor
-                  font-size: 18
+                  font-size: 18.0
                   font-weight: '700'
-                  text-anchor: middle
                   opacity: '1'
+                  text-anchor: middle
+                  x: 218.2
+                  y: 432.5
               - component: text
                 config:
-                  x: 218.2
-                  y: 448.5
                   content: ='' + (((Number(items[props.washingMachine1EnergyToday].numericState) || 0) + (Number(items[props.washingMachine2EnergyToday].numericState)
                     || 0) + (Number(items[props.tumbleDryerEnergyToday].numericState) || 0) + (Number(items[props.dishwasherEnergyToday].numericState)
                     || 0))).toFixed(2) + ' kWh today'
                   fill: currentColor
-                  font-size: 12
+                  font-size: 12.0
                   font-weight: normal
-                  text-anchor: middle
                   opacity: '0.7'
+                  text-anchor: middle
+                  x: 218.2
+                  y: 448.5
               - component: text
                 config:
-                  x: 106.1
-                  y: 366.5
                   content: =((Number(items[props.batteryPower].numericState) || 0) / 1000).toFixed(3) + ' kW'
                   fill: currentColor
-                  font-size: 18
+                  font-size: 18.0
                   font-weight: '700'
-                  text-anchor: middle
                   opacity: '1'
+                  text-anchor: middle
+                  x: 106.1
+                  y: 366.5
               - component: text
                 config:
-                  x: 106.1
-                  y: 382.5
                   content: ='Disch. ' + ((Number(items[props.batteryDischargeToday].numericState) || 0)).toFixed(2) + ' ·
                     Chg. ' + ((Number(items[props.batteryChargeToday].numericState) || 0)).toFixed(2)
                   fill: currentColor
-                  font-size: 12
+                  font-size: 12.0
                   font-weight: normal
-                  text-anchor: middle
                   opacity: '0.7'
+                  text-anchor: middle
+                  x: 106.1
+                  y: 382.5
           - component: oh-link
             config:
               action: popup
               actionModal: page:photovoltaics
               style:
-                position: absolute
-                display: block
                 border-radius: 50%
+                display: block
+                height: 14.75%
                 left: 22.91%
+                position: absolute
                 top: 8.76%
                 width: 14.75%
-                height: 14.75%
           - component: oh-link
             config:
               action: popup
               actionModal: page:power_meter
               style:
-                position: absolute
-                display: block
                 border-radius: 50%
+                display: block
+                height: 14.75%
                 left: 8.59%
+                position: absolute
                 top: 33.08%
                 width: 14.75%
-                height: 14.75%
           - component: oh-link
             config:
               action: popup
               actionModal: page:flow_home
               style:
-                position: absolute
-                display: block
                 border-radius: 50%
+                display: block
+                height: 14.75%
                 left: 45.10%
+                position: absolute
                 top: 38.22%
                 width: 14.75%
-                height: 14.75%
           - component: oh-link
             config:
               action: popup
               actionModal: page:energy_storage
               style:
-                position: absolute
-                display: block
                 border-radius: 50%
+                display: block
+                height: 14.75%
                 left: 15.64%
+                position: absolute
                 top: 60.41%
                 width: 14.75%
-                height: 14.75%
           - component: oh-link
             config:
               action: popup
               actionModal: page:e_car
               style:
-                position: absolute
-                display: block
                 border-radius: 50%
+                display: block
+                height: 14.75%
                 left: 67.29%
+                position: absolute
                 top: 67.68%
                 width: 14.75%
-                height: 14.75%
           - component: oh-link
             config:
               action: popup
               actionModal: page:flow_appliances
               style:
-                position: absolute
-                display: block
                 border-radius: 50%
+                display: block
+                height: 14.75%
                 left: 39.96%
+                position: absolute
                 top: 74.73%
                 width: 14.75%
-                height: 14.75%
           - component: oh-link
             config:
               action: popup
               actionModal: page:heatpump
               style:
-                position: absolute
-                display: block
                 border-radius: 50%
+                display: block
+                height: 14.75%
                 left: 74.56%
+                position: absolute
                 top: 16.03%
                 width: 14.75%
-                height: 14.75%
           - component: oh-link
             config:
               action: popup
               actionModal: page:air_conditioning
               style:
-                position: absolute
-                display: block
                 border-radius: 50%
+                display: block
+                height: 14.75%
                 left: 81.61%
+                position: absolute
                 top: 43.36%
                 width: 14.75%
-                height: 14.75%
           - component: oh-link
             config:
               action: popup
               actionModal: page:ventilation
               style:
-                position: absolute
-                display: block
                 border-radius: 50%
+                display: block
+                height: 14.75%
                 left: 50.24%
+                position: absolute
                 top: 1.71%
                 width: 14.75%
-                height: 14.75%
   - component: div
     config:
       style:
@@ -3165,99 +3165,97 @@ slots:
           - component: div
             config:
               style:
-                position: relative
+                align-items: center
+                background: color-mix(in srgb, var(--f7-text-color) 6%, transparent)
+                border-radius: 12px
+                display: flex
+                grid-column: '=screen.width < 600 ? ''1 / -1'' : ''auto'''
+                min-width: '0'
                 overflow: hidden
                 padding: 8px 10px
-                border-radius: 12px
-                background: color-mix(in srgb, var(--f7-text-color) 6%, transparent)
-                min-width: '0'
-                display: flex
-                align-items: center
-                grid-column: '=screen.width < 600 ? ''1 / -1'' : ''auto'''
+                position: relative
             slots:
               default:
               - component: div
                 config:
                   style:
-                    position: relative
-                    min-width: '0'
                     flex: 1 1 auto
+                    min-width: '0'
+                    position: relative
                 slots:
                   default:
                   - component: svg
                     config:
-                      viewBox: 0 0 150 50
-                      width: 100%
                       style:
                         display: block
-                        overflow: visible
                         max-width: 170px
+                        overflow: visible
                         width: '=screen.width < 600 ? ''calc(50% - 14px)'' : ''100%'''
+                      viewBox: 0 0 150 50
+                      width: 100%
                     slots:
                       default:
                       - component: circle
                         config:
-                          cx: 24
-                          cy: 25
-                          r: 21.115
+                          cx: 24.0
+                          cy: 25.0
                           fill: none
+                          r: 21.115
                           stroke: rgba(127, 127, 127, 0.28)
                           stroke-width: 3.23
                       - component: circle
                         config:
-                          stroke: '#9e9e9e'
-                          cx: 24
-                          cy: 25
-                          r: 21.115
+                          class: a-soft
+                          cx: 24.0
+                          cy: 25.0
                           fill: none
+                          r: 21.115
+                          stroke: '#9e9e9e'
                           stroke-width: 3.23
                           visible: =Math.abs((Number(items[props.homePower].numericState) || 0)) > 10
-                          class: a-soft
                       - component: circle
                         config:
-                          stroke: '#26a69a'
-                          cx: 24
-                          cy: 25
-                          r: 21.115
+                          cx: 24.0
+                          cy: 25.0
                           fill: none
-                          pathLength: 100
-                          transform: rotate(-90 24 25)
-                          stroke-width: 3.23
+                          pathLength: 100.0
+                          r: 21.115
+                          stroke: '#26a69a'
                           stroke-dasharray: =(Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
                             || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))).toFixed(2)
                             + ' 100'
                           stroke-dashoffset: =(-(0)).toFixed(2)
+                          stroke-width: 3.23
+                          transform: rotate(-90 24 25)
                           visible: =(Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
                             || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))
                             > 0.05
                       - component: circle
                         config:
-                          stroke: '#26a69a'
-                          cx: 24
-                          cy: 25
+                          class: a-halo-arc
+                          cx: 24.0
+                          cy: 25.0
+                          fill: none
+                          pathLength: 100.0
                           r: 21.115
-                          pathLength: 100
-                          transform: rotate(-90 24 25)
+                          stroke: '#26a69a'
                           stroke-dasharray: =(Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
                             || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))).toFixed(2)
                             + ' 100'
                           stroke-dashoffset: =(-(0)).toFixed(2)
-                          fill: none
-                          stroke-width: 5
+                          stroke-width: 5.0
+                          transform: rotate(-90 24 25)
                           visible: =(Math.abs((Number(items[props.homePower].numericState) || 0)) > 10) && (Math.max(0, Math.min(Math.min(100,
                             Math.max(0, (Number(items[props.ventilationPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
                             || 0)) * 100), 100 - (0)))) > 0.05
-                          class: a-halo-arc
                       - component: circle
                         config:
-                          stroke: '#fb8c00'
-                          cx: 24
-                          cy: 25
-                          r: 21.115
+                          cx: 24.0
+                          cy: 25.0
                           fill: none
-                          pathLength: 100
-                          transform: rotate(-90 24 25)
-                          stroke-width: 3.23
+                          pathLength: 100.0
+                          r: 21.115
+                          stroke: '#fb8c00'
                           stroke-dasharray: =(Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState)
                             || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0,
                             Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0))
@@ -3265,18 +3263,21 @@ slots:
                             + ' 100'
                           stroke-dashoffset: =(-((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
                             || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))))).toFixed(2)
+                          stroke-width: 3.23
+                          transform: rotate(-90 24 25)
                           visible: =(Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState)
                             || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0,
                             Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0))
                             / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))))))) > 0.05
                       - component: circle
                         config:
-                          stroke: '#fb8c00'
-                          cx: 24
-                          cy: 25
+                          class: a-halo-arc
+                          cx: 24.0
+                          cy: 25.0
+                          fill: none
+                          pathLength: 100.0
                           r: 21.115
-                          pathLength: 100
-                          transform: rotate(-90 24 25)
+                          stroke: '#fb8c00'
                           stroke-dasharray: =(Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState)
                             || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0,
                             Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0))
@@ -3284,24 +3285,21 @@ slots:
                             + ' 100'
                           stroke-dashoffset: =(-((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
                             || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))))).toFixed(2)
-                          fill: none
-                          stroke-width: 5
+                          stroke-width: 5.0
+                          transform: rotate(-90 24 25)
                           visible: =(Math.abs((Number(items[props.homePower].numericState) || 0)) > 10) && (Math.max(0, Math.min(Math.min(100,
                             Math.max(0, (Number(items[props.heatpumpPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
                             || 0)) * 100), 100 - ((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
                             || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))))))
                             > 0.05
-                          class: a-halo-arc
                       - component: circle
                         config:
-                          stroke: '#29b6f6'
-                          cx: 24
-                          cy: 25
-                          r: 21.115
+                          cx: 24.0
+                          cy: 25.0
                           fill: none
-                          pathLength: 100
-                          transform: rotate(-90 24 25)
-                          stroke-width: 3.23
+                          pathLength: 100.0
+                          r: 21.115
+                          stroke: '#29b6f6'
                           stroke-dasharray: '=(Math.max(0, Math.min(Math.min(100, Math.max(0, (items[props.acSwitch].state
                             === ''ON'' ? (Number(items[props.acUnitPower].numericState) || 0) : 0)) / Math.max(1, (Number(items[props.homePower].numericState)
                             || 0)) * 100), 100 - (((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
@@ -3317,6 +3315,8 @@ slots:
                             || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0,
                             Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0))
                             / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))))))))).toFixed(2)
+                          stroke-width: 3.23
+                          transform: rotate(-90 24 25)
                           visible: '=(Math.max(0, Math.min(Math.min(100, Math.max(0, (items[props.acSwitch].state === ''ON''
                             ? (Number(items[props.acUnitPower].numericState) || 0) : 0)) / Math.max(1, (Number(items[props.homePower].numericState)
                             || 0)) * 100), 100 - (((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
@@ -3328,12 +3328,13 @@ slots:
                             > 0.05'
                       - component: circle
                         config:
-                          stroke: '#29b6f6'
-                          cx: 24
-                          cy: 25
+                          class: a-halo-arc
+                          cx: 24.0
+                          cy: 25.0
+                          fill: none
+                          pathLength: 100.0
                           r: 21.115
-                          pathLength: 100
-                          transform: rotate(-90 24 25)
+                          stroke: '#29b6f6'
                           stroke-dasharray: '=(Math.max(0, Math.min(Math.min(100, Math.max(0, (items[props.acSwitch].state
                             === ''ON'' ? (Number(items[props.acUnitPower].numericState) || 0) : 0)) / Math.max(1, (Number(items[props.homePower].numericState)
                             || 0)) * 100), 100 - (((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
@@ -3349,8 +3350,8 @@ slots:
                             || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0,
                             Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0))
                             / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))))))))).toFixed(2)
-                          fill: none
-                          stroke-width: 5
+                          stroke-width: 5.0
+                          transform: rotate(-90 24 25)
                           visible: '=(Math.abs((Number(items[props.homePower].numericState) || 0)) > 10) && (Math.max(0, Math.min(Math.min(100,
                             Math.max(0, (items[props.acSwitch].state === ''ON'' ? (Number(items[props.acUnitPower].numericState)
                             || 0) : 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (((0
@@ -3361,17 +3362,14 @@ slots:
                             Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0))
                             / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))))))))))
                             > 0.05'
-                          class: a-halo-arc
                       - component: circle
                         config:
-                          stroke: '#26a69a'
-                          cx: 24
-                          cy: 25
-                          r: 21.115
+                          cx: 24.0
+                          cy: 25.0
                           fill: none
-                          pathLength: 100
-                          transform: rotate(-90 24 25)
-                          stroke-width: 3.23
+                          pathLength: 100.0
+                          r: 21.115
+                          stroke: '#26a69a'
                           stroke-dasharray: '=(Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ecarPower].numericState)
                             || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((((0 +
                             Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
@@ -3403,6 +3401,8 @@ slots:
                             || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0,
                             Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0))
                             / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))))))))))))).toFixed(2)'
+                          stroke-width: 3.23
+                          transform: rotate(-90 24 25)
                           visible: '=(Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ecarPower].numericState)
                             || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((((0 +
                             Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
@@ -3422,12 +3422,13 @@ slots:
                             > 0.05'
                       - component: circle
                         config:
-                          stroke: '#26a69a'
-                          cx: 24
-                          cy: 25
+                          class: a-halo-arc
+                          cx: 24.0
+                          cy: 25.0
+                          fill: none
+                          pathLength: 100.0
                           r: 21.115
-                          pathLength: 100
-                          transform: rotate(-90 24 25)
+                          stroke: '#26a69a'
                           stroke-dasharray: '=(Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ecarPower].numericState)
                             || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((((0 +
                             Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
@@ -3459,8 +3460,8 @@ slots:
                             || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0,
                             Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0))
                             / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))))))))))))).toFixed(2)'
-                          fill: none
-                          stroke-width: 5
+                          stroke-width: 5.0
+                          transform: rotate(-90 24 25)
                           visible: '=(Math.abs((Number(items[props.homePower].numericState) || 0)) > 10) && (Math.max(0, Math.min(Math.min(100,
                             Math.max(0, (Number(items[props.ecarPower].numericState) || 0)) / Math.max(1, (Number(items[props.homePower].numericState)
                             || 0)) * 100), 100 - ((((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
@@ -3478,17 +3479,14 @@ slots:
                             Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0))
                             / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))))))))))))))
                             > 0.05'
-                          class: a-halo-arc
                       - component: circle
                         config:
-                          stroke: '#5c6bc0'
-                          cx: 24
-                          cy: 25
-                          r: 21.115
+                          cx: 24.0
+                          cy: 25.0
                           fill: none
-                          pathLength: 100
-                          transform: rotate(-90 24 25)
-                          stroke-width: 3.23
+                          pathLength: 100.0
+                          r: 21.115
+                          stroke: '#5c6bc0'
                           stroke-dasharray: '=(Math.max(0, Math.min(Math.min(100, Math.max(0, ((Number(items[props.washingMachine1Power].numericState)
                             || 0) + (Number(items[props.washingMachine2Power].numericState) || 0) + (Number(items[props.tumbleDryerPower].numericState)
                             || 0) + (Number(items[props.dishwasherPower].numericState) || 0))) / Math.max(1, (Number(items[props.homePower].numericState)
@@ -3553,6 +3551,8 @@ slots:
                             || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0,
                             Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0))
                             / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))))))))))))))))).toFixed(2)'
+                          stroke-width: 3.23
+                          transform: rotate(-90 24 25)
                           visible: '=(Math.max(0, Math.min(Math.min(100, Math.max(0, ((Number(items[props.washingMachine1Power].numericState)
                             || 0) + (Number(items[props.washingMachine2Power].numericState) || 0) + (Number(items[props.tumbleDryerPower].numericState)
                             || 0) + (Number(items[props.dishwasherPower].numericState) || 0))) / Math.max(1, (Number(items[props.homePower].numericState)
@@ -3589,12 +3589,13 @@ slots:
                             > 0.05'
                       - component: circle
                         config:
-                          stroke: '#5c6bc0'
-                          cx: 24
-                          cy: 25
+                          class: a-halo-arc
+                          cx: 24.0
+                          cy: 25.0
+                          fill: none
+                          pathLength: 100.0
                           r: 21.115
-                          pathLength: 100
-                          transform: rotate(-90 24 25)
+                          stroke: '#5c6bc0'
                           stroke-dasharray: '=(Math.max(0, Math.min(Math.min(100, Math.max(0, ((Number(items[props.washingMachine1Power].numericState)
                             || 0) + (Number(items[props.washingMachine2Power].numericState) || 0) + (Number(items[props.tumbleDryerPower].numericState)
                             || 0) + (Number(items[props.dishwasherPower].numericState) || 0))) / Math.max(1, (Number(items[props.homePower].numericState)
@@ -3659,8 +3660,8 @@ slots:
                             || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0,
                             Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0))
                             / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))))))))))))))))).toFixed(2)'
-                          fill: none
-                          stroke-width: 5
+                          stroke-width: 5.0
+                          transform: rotate(-90 24 25)
                           visible: '=(Math.abs((Number(items[props.homePower].numericState) || 0)) > 10) && (Math.max(0, Math.min(Math.min(100,
                             Math.max(0, ((Number(items[props.washingMachine1Power].numericState) || 0) + (Number(items[props.washingMachine2Power].numericState)
                             || 0) + (Number(items[props.tumbleDryerPower].numericState) || 0) + (Number(items[props.dishwasherPower].numericState)
@@ -3696,9 +3697,13 @@ slots:
                             Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0))
                             / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))))))))))))))))))
                             > 0.05'
-                          class: a-halo-arc
                       - component: circle
                         config:
+                          cx: 24.0
+                          cy: 25.0
+                          fill: none
+                          pathLength: 100.0
+                          r: 21.115
                           stroke: '=(Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
                             || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))
                             > 0.05 ? ''#26a69a'' : (Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState)
@@ -3763,16 +3768,11 @@ slots:
                             Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0))
                             / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))))))))))))))))))
                             > 0.05 ? ''#5c6bc0'' : ''#5c6bc0'''
-                          cx: 24
-                          cy: 25
-                          r: 21.115
-                          fill: none
-                          pathLength: 100
-                          transform: rotate(-90 24 25)
-                          stroke-width: 3.23
-                          stroke-linecap: round
                           stroke-dasharray: 0.001 100
                           stroke-dashoffset: '0'
+                          stroke-linecap: round
+                          stroke-width: 3.23
+                          transform: rotate(-90 24 25)
                           visible: '=((((((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
                             || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))
                             + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState)
@@ -3839,6 +3839,12 @@ slots:
                             > 0.05'
                       - component: circle
                         config:
+                          class: a-halo-arc
+                          cx: 24.0
+                          cy: 25.0
+                          fill: none
+                          pathLength: 100.0
+                          r: 21.115
                           stroke: '=(Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
                             || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))
                             > 0.05 ? ''#26a69a'' : (Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState)
@@ -3903,16 +3909,11 @@ slots:
                             Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0))
                             / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))))))))))))))))))
                             > 0.05 ? ''#5c6bc0'' : ''#5c6bc0'''
-                          cx: 24
-                          cy: 25
-                          r: 21.115
-                          pathLength: 100
-                          transform: rotate(-90 24 25)
-                          stroke-linecap: round
                           stroke-dasharray: 0.001 100
                           stroke-dashoffset: '0'
-                          fill: none
-                          stroke-width: 5
+                          stroke-linecap: round
+                          stroke-width: 5.0
+                          transform: rotate(-90 24 25)
                           visible: '=(Math.abs((Number(items[props.homePower].numericState) || 0)) > 10) && ((((((0 + Math.max(0,
                             Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0))
                             / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0,
@@ -3977,9 +3978,13 @@ slots:
                             Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0))
                             / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))))))))))))))))))))
                             > 0.05'
-                          class: a-halo-arc
                       - component: circle
                         config:
+                          cx: 24.0
+                          cy: 25.0
+                          fill: none
+                          pathLength: 100.0
+                          r: 21.115
                           stroke: '=(Math.max(0, Math.min(Math.min(100, Math.max(0, ((Number(items[props.washingMachine1Power].numericState)
                             || 0) + (Number(items[props.washingMachine2Power].numericState) || 0) + (Number(items[props.tumbleDryerPower].numericState)
                             || 0) + (Number(items[props.dishwasherPower].numericState) || 0))) / Math.max(1, (Number(items[props.homePower].numericState)
@@ -4044,14 +4049,6 @@ slots:
                             ? ''#fb8c00'' : (Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
                             || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))
                             > 0.05 ? ''#26a69a'' : ''#26a69a'''
-                          cx: 24
-                          cy: 25
-                          r: 21.115
-                          fill: none
-                          pathLength: 100
-                          transform: rotate(-90 24 25)
-                          stroke-width: 3.23
-                          stroke-linecap: round
                           stroke-dasharray: 0.001 100
                           stroke-dashoffset: '=(-((((((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
                             || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))
@@ -4116,6 +4113,9 @@ slots:
                             || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0,
                             Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0))
                             / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))))))))))))))))))))).toFixed(2)'
+                          stroke-linecap: round
+                          stroke-width: 3.23
+                          transform: rotate(-90 24 25)
                           visible: '=((((((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
                             || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))
                             + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.heatpumpPower].numericState)
@@ -4182,6 +4182,12 @@ slots:
                             > 0.05'
                       - component: circle
                         config:
+                          class: a-halo-arc
+                          cx: 24.0
+                          cy: 25.0
+                          fill: none
+                          pathLength: 100.0
+                          r: 21.115
                           stroke: '=(Math.max(0, Math.min(Math.min(100, Math.max(0, ((Number(items[props.washingMachine1Power].numericState)
                             || 0) + (Number(items[props.washingMachine2Power].numericState) || 0) + (Number(items[props.tumbleDryerPower].numericState)
                             || 0) + (Number(items[props.dishwasherPower].numericState) || 0))) / Math.max(1, (Number(items[props.homePower].numericState)
@@ -4246,12 +4252,6 @@ slots:
                             ? ''#fb8c00'' : (Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
                             || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))
                             > 0.05 ? ''#26a69a'' : ''#26a69a'''
-                          cx: 24
-                          cy: 25
-                          r: 21.115
-                          pathLength: 100
-                          transform: rotate(-90 24 25)
-                          stroke-linecap: round
                           stroke-dasharray: 0.001 100
                           stroke-dashoffset: '=(-((((((0 + Math.max(0, Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState)
                             || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0))))
@@ -4316,8 +4316,9 @@ slots:
                             || 0)) / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - ((0 + Math.max(0,
                             Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0))
                             / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))))))))))))))))))))).toFixed(2)'
-                          fill: none
-                          stroke-width: 5
+                          stroke-linecap: round
+                          stroke-width: 5.0
+                          transform: rotate(-90 24 25)
                           visible: '=(Math.abs((Number(items[props.homePower].numericState) || 0)) > 10) && ((((((0 + Math.max(0,
                             Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0))
                             / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))) + Math.max(0,
@@ -4382,7 +4383,6 @@ slots:
                             Math.min(Math.min(100, Math.max(0, (Number(items[props.ventilationPower].numericState) || 0))
                             / Math.max(1, (Number(items[props.homePower].numericState) || 0)) * 100), 100 - (0)))))))))))))))))))))
                             > 0.05'
-                          class: a-halo-arc
                       - component: g
                         config:
                           transform: translate(24 25) scale(0.703)
@@ -4391,29 +4391,29 @@ slots:
                           - component: widget:flow-node
                             config:
                               kind: home
-                              x: 0
-                              y: 0
                               power: =(Number(items[props.homePower].numericState) || 0)
+                              x: 0.0
+                              y: 0.0
                       - component: text
                         config:
-                          x: 56
-                          y: 13
                           content: =(Math.abs((Number(items[props.homePower].numericState) || 0)) / 1000).toFixed(3) + ' kW'
                           fill: currentColor
-                          font-size: 13
+                          font-size: 13.0
                           font-weight: '700'
-                          text-anchor: start
                           opacity: '1'
+                          text-anchor: start
+                          x: 56.0
+                          y: 13.0
                       - component: text
                         config:
-                          x: 56
-                          y: 29
                           content: ='' + ((Number(items[props.homeEnergyToday].numericState) || 0)).toFixed(2) + ' kWh today'
                           fill: currentColor
-                          font-size: 11
+                          font-size: 11.0
                           font-weight: normal
-                          text-anchor: start
                           opacity: '0.5'
+                          text-anchor: start
+                          x: 56.0
+                          y: 29.0
                       - component: g
                         config:
                           visible: '=(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y
@@ -4427,24 +4427,6 @@ slots:
                           default:
                           - component: rect
                             config:
-                              x: 56
-                              y: 34
-                              height: 13
-                              rx: 4
-                              width: '=(((Math.abs(((Number(items[props.homeEnergyToday].numericState) || 0) - Number(((h)
-                                => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y +
-                                (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
-                                || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.homeEnergyToday]
-                                || {}))))) < 0.005 ? ''±0'' : (((Number(items[props.homeEnergyToday].numericState) || 0) -
-                                Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined ?
-                                h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
-                                || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.homeEnergyToday]
-                                || {})))) > 0 ? ''+'' : ''−'') + (Math.abs(((Number(items[props.homeEnergyToday].numericState)
-                                || 0) - Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
-                                ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1,
-                                h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
-                                : {}))[props.homeEnergyToday] || {})))))).toFixed(2)) + '' vs. yesterday'').length * 5.2 +
-                                12).toFixed(1)'
                               fill: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
                                 ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
                                 ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[(Math.abs(((Number(items[props.homeEnergyToday].numericState)
@@ -4460,10 +4442,26 @@ slots:
                                 warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''],
                                 neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark === ''dark'') ? 1 : 0]'
                               fill-opacity: '0.16'
+                              height: 13.0
+                              rx: 4.0
+                              width: '=(((Math.abs(((Number(items[props.homeEnergyToday].numericState) || 0) - Number(((h)
+                                => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y +
+                                (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
+                                || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.homeEnergyToday]
+                                || {}))))) < 0.005 ? ''±0'' : (((Number(items[props.homeEnergyToday].numericState) || 0) -
+                                Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined ?
+                                h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
+                                || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.homeEnergyToday]
+                                || {})))) > 0 ? ''+'' : ''−'') + (Math.abs(((Number(items[props.homeEnergyToday].numericState)
+                                || 0) - Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
+                                ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1,
+                                h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                                : {}))[props.homeEnergyToday] || {})))))).toFixed(2)) + '' vs. yesterday'').length * 5.2 +
+                                12).toFixed(1)'
+                              x: 56.0
+                              y: 34.0
                           - component: text
                             config:
-                              x: 62
-                              y: 43.3
                               content: '=(Math.abs(((Number(items[props.homeEnergyToday].numericState) || 0) - Number(((h)
                                 => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y +
                                 (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
@@ -4493,44 +4491,46 @@ slots:
                                 neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark === ''dark'') ? 1 : 0]'
                               font-size: '9.5'
                               font-weight: '600'
+                              x: 62.0
+                              y: 43.3
               - component: oh-link
                 config:
                   action: popup
                   actionModal: page:flow_home
                   style:
-                    position: absolute
-                    inset: '0'
-                    display: block
                     border-radius: 12px
+                    display: block
+                    inset: '0'
+                    position: absolute
           - component: div
             config:
               style:
-                position: relative
+                align-items: center
+                background: color-mix(in srgb, var(--f7-text-color) 6%, transparent)
+                border-radius: 12px
+                display: flex
+                min-width: '0'
                 overflow: hidden
                 padding: 8px 10px
-                border-radius: 12px
-                background: color-mix(in srgb, var(--f7-text-color) 6%, transparent)
-                min-width: '0'
-                display: flex
-                align-items: center
+                position: relative
             slots:
               default:
               - component: div
                 config:
                   style:
-                    position: relative
-                    min-width: '0'
                     flex: 1 1 auto
+                    min-width: '0'
+                    position: relative
                 slots:
                   default:
                   - component: svg
                     config:
-                      viewBox: 0 0 150 50
-                      width: 100%
                       style:
                         display: block
-                        overflow: visible
                         max-width: 170px
+                        overflow: visible
+                      viewBox: 0 0 150 50
+                      width: 100%
                     slots:
                       default:
                       - component: g
@@ -4539,60 +4539,60 @@ slots:
                           default:
                           - component: circle
                             config:
-                              cx: 24
-                              cy: 25
-                              r: 22
-                              stroke: '#9e9e9e'
-                              stroke-width: 5
-                              stroke-linecap: round
+                              cx: 24.0
+                              cy: 25.0
                               fill: none
+                              r: 22.0
+                              stroke: '#9e9e9e'
+                              stroke-linecap: round
                               stroke-opacity: '0.25'
+                              stroke-width: 5.0
                           - component: circle
                             config:
-                              cx: 24
-                              cy: 25
-                              r: 22
-                              transform: rotate(-90 24 25)
-                              stroke: '#43a047'
-                              stroke-width: 5
-                              stroke-linecap: round
+                              cx: 24.0
+                              cy: 25.0
                               fill: none
+                              r: 22.0
+                              stroke: '#43a047'
                               stroke-dasharray: '=(138.23 * ((Number(items[props.pvGenerationToday].numericState) || 0) >
                                 0 ? Math.min(100, Math.round(100 * (Number(items[props.pvSelfUseToday].numericState) || 0)
                                 / (Number(items[props.pvGenerationToday].numericState) || 0))) : 0) / 100).toFixed(1) + ''
                                 138.23'''
+                              stroke-linecap: round
+                              stroke-width: 5.0
+                              transform: rotate(-90 24 25)
                           - component: text
                             config:
-                              x: 24
-                              y: 30
                               content: '=((Number(items[props.pvGenerationToday].numericState) || 0) > 0 ? Math.min(100, Math.round(100
                                 * (Number(items[props.pvSelfUseToday].numericState) || 0) / (Number(items[props.pvGenerationToday].numericState)
                                 || 0))) : 0) + ''%'''
                               fill: currentColor
-                              font-size: 13
+                              font-size: 13.0
                               font-weight: '700'
-                              text-anchor: middle
                               opacity: '1'
+                              text-anchor: middle
+                              x: 24.0
+                              y: 30.0
                           - component: text
                             config:
-                              x: 56
-                              y: 13
                               content: Self-consumption
                               fill: currentColor
-                              font-size: 12
+                              font-size: 12.0
                               font-weight: normal
-                              text-anchor: start
                               opacity: '0.7'
+                              text-anchor: start
+                              x: 56.0
+                              y: 13.0
                           - component: text
                             config:
-                              x: 56
-                              y: 29
                               content: today
                               fill: currentColor
-                              font-size: 11
+                              font-size: 11.0
                               font-weight: normal
-                              text-anchor: start
                               opacity: '0.5'
+                              text-anchor: start
+                              x: 56.0
+                              y: 29.0
                       - component: g
                         config:
                           visible: '=(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
@@ -4607,15 +4607,6 @@ slots:
                           default:
                           - component: rect
                             config:
-                              x: 56
-                              y: 34
-                              height: 13
-                              rx: 4
-                              width: '=((''yesterday '' + Math.round(Math.min(100, Math.max(0, Number(((((((items[props.tileHistory].state)
-                                || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.pvSelfUseToday]
-                                || {}).d))) / Math.max(Number(((((((items[props.tileHistory].state) || '''').charAt(0) ===
-                                ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.pvGenerationToday] || {}).d)),
-                                0.001) * 100)) + '' %'').length * 5.2 + 12).toFixed(1)'
                               fill: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
                                 ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
                                 ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[((Number(items[props.pvGenerationToday].numericState)
@@ -4635,10 +4626,17 @@ slots:
                                 [''#c62828'', ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark
                                 === ''dark'') ? 1 : 0]'
                               fill-opacity: '0.16'
+                              height: 13.0
+                              rx: 4.0
+                              width: '=((''yesterday '' + Math.round(Math.min(100, Math.max(0, Number(((((((items[props.tileHistory].state)
+                                || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.pvSelfUseToday]
+                                || {}).d))) / Math.max(Number(((((((items[props.tileHistory].state) || '''').charAt(0) ===
+                                ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.pvGenerationToday] || {}).d)),
+                                0.001) * 100)) + '' %'').length * 5.2 + 12).toFixed(1)'
+                              x: 56.0
+                              y: 34.0
                           - component: text
                             config:
-                              x: 62
-                              y: 43.3
                               content: '=''yesterday '' + Math.round(Math.min(100, Math.max(0, Number(((((((items[props.tileHistory].state)
                                 || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.pvSelfUseToday]
                                 || {}).d))) / Math.max(Number(((((((items[props.tileHistory].state) || '''').charAt(0) ===
@@ -4664,44 +4662,46 @@ slots:
                                 === ''dark'') ? 1 : 0]'
                               font-size: '9.5'
                               font-weight: '600'
+                              x: 62.0
+                              y: 43.3
               - component: oh-link
                 config:
                   action: popup
                   actionModal: page:flow_self_consumption
                   style:
-                    position: absolute
-                    inset: '0'
-                    display: block
                     border-radius: 12px
+                    display: block
+                    inset: '0'
+                    position: absolute
           - component: div
             config:
               style:
-                position: relative
+                align-items: center
+                background: color-mix(in srgb, var(--f7-text-color) 6%, transparent)
+                border-radius: 12px
+                display: flex
+                min-width: '0'
                 overflow: hidden
                 padding: 8px 10px
-                border-radius: 12px
-                background: color-mix(in srgb, var(--f7-text-color) 6%, transparent)
-                min-width: '0'
-                display: flex
-                align-items: center
+                position: relative
             slots:
               default:
               - component: div
                 config:
                   style:
-                    position: relative
-                    min-width: '0'
                     flex: 1 1 auto
+                    min-width: '0'
+                    position: relative
                 slots:
                   default:
                   - component: svg
                     config:
-                      viewBox: 0 0 150 50
-                      width: 100%
                       style:
                         display: block
-                        overflow: visible
                         max-width: 170px
+                        overflow: visible
+                      viewBox: 0 0 150 50
+                      width: 100%
                     slots:
                       default:
                       - component: g
@@ -4710,60 +4710,60 @@ slots:
                           default:
                           - component: circle
                             config:
-                              cx: 24
-                              cy: 25
-                              r: 22
-                              stroke: '#9e9e9e'
-                              stroke-width: 5
-                              stroke-linecap: round
+                              cx: 24.0
+                              cy: 25.0
                               fill: none
+                              r: 22.0
+                              stroke: '#9e9e9e'
+                              stroke-linecap: round
                               stroke-opacity: '0.25'
+                              stroke-width: 5.0
                           - component: circle
                             config:
-                              cx: 24
-                              cy: 25
-                              r: 22
-                              transform: rotate(-90 24 25)
-                              stroke: '#43a047'
-                              stroke-width: 5
-                              stroke-linecap: round
+                              cx: 24.0
+                              cy: 25.0
                               fill: none
+                              r: 22.0
+                              stroke: '#43a047'
                               stroke-dasharray: '=(138.23 * ((Number(items[props.homeEnergyToday].numericState) || 0) > 0
                                 ? Math.min(100, Math.round(100 * Math.max(0, (Number(items[props.homeEnergyToday].numericState)
                                 || 0) - (Number(items[props.gridImportToday].numericState) || 0)) / (Number(items[props.homeEnergyToday].numericState)
                                 || 0))) : 0) / 100).toFixed(1) + '' 138.23'''
+                              stroke-linecap: round
+                              stroke-width: 5.0
+                              transform: rotate(-90 24 25)
                           - component: text
                             config:
-                              x: 24
-                              y: 30
                               content: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? Math.min(100, Math.round(100
                                 * Math.max(0, (Number(items[props.homeEnergyToday].numericState) || 0) - (Number(items[props.gridImportToday].numericState)
                                 || 0)) / (Number(items[props.homeEnergyToday].numericState) || 0))) : 0) + ''%'''
                               fill: currentColor
-                              font-size: 13
+                              font-size: 13.0
                               font-weight: '700'
-                              text-anchor: middle
                               opacity: '1'
+                              text-anchor: middle
+                              x: 24.0
+                              y: 30.0
                           - component: text
                             config:
-                              x: 56
-                              y: 13
                               content: Self-sufficiency
                               fill: currentColor
-                              font-size: 12
+                              font-size: 12.0
                               font-weight: normal
-                              text-anchor: start
                               opacity: '0.7'
+                              text-anchor: start
+                              x: 56.0
+                              y: 13.0
                           - component: text
                             config:
-                              x: 56
-                              y: 29
                               content: today
                               fill: currentColor
-                              font-size: 11
+                              font-size: 11.0
                               font-weight: normal
-                              text-anchor: start
                               opacity: '0.5'
+                              text-anchor: start
+                              x: 56.0
+                              y: 29.0
                       - component: g
                         config:
                           visible: '=(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
@@ -4781,16 +4781,6 @@ slots:
                           default:
                           - component: rect
                             config:
-                              x: 56
-                              y: 34
-                              height: 13
-                              rx: 4
-                              width: '=((''yesterday '' + Math.round(Math.min(100, Math.max(0, (Number(((((((items[props.tileHistory].state)
-                                || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.homeEnergyToday]
-                                || {}).d)) - Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
-                                : {}))[props.gridImportToday] || {}).d)))) / Math.max(Number(((((((items[props.tileHistory].state)
-                                || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.homeEnergyToday]
-                                || {}).d)), 0.001) * 100)) + '' %'').length * 5.2 + 12).toFixed(1)'
                               fill: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
                                 ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
                                 ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[((Number(items[props.homeEnergyToday].numericState)
@@ -4813,10 +4803,18 @@ slots:
                                 bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'',
                                 ''#c7c7cc'']})).neutral)[(themeOptions.dark === ''dark'') ? 1 : 0]'
                               fill-opacity: '0.16'
+                              height: 13.0
+                              rx: 4.0
+                              width: '=((''yesterday '' + Math.round(Math.min(100, Math.max(0, (Number(((((((items[props.tileHistory].state)
+                                || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.homeEnergyToday]
+                                || {}).d)) - Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
+                                : {}))[props.gridImportToday] || {}).d)))) / Math.max(Number(((((((items[props.tileHistory].state)
+                                || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.homeEnergyToday]
+                                || {}).d)), 0.001) * 100)) + '' %'').length * 5.2 + 12).toFixed(1)'
+                              x: 56.0
+                              y: 34.0
                           - component: text
                             config:
-                              x: 62
-                              y: 43.3
                               content: '=''yesterday '' + Math.round(Math.min(100, Math.max(0, (Number(((((((items[props.tileHistory].state)
                                 || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.homeEnergyToday]
                                 || {}).d)) - Number(((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
@@ -4846,12 +4844,14 @@ slots:
                                 ''#c7c7cc'']})).neutral)[(themeOptions.dark === ''dark'') ? 1 : 0]'
                               font-size: '9.5'
                               font-weight: '600'
+                              x: 62.0
+                              y: 43.3
               - component: oh-link
                 config:
                   action: popup
                   actionModal: page:flow_self_sufficiency
                   style:
-                    position: absolute
-                    inset: '0'
-                    display: block
                     border-radius: 12px
+                    display: block
+                    inset: '0'
+                    position: absolute

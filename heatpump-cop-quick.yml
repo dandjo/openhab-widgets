@@ -3,79 +3,79 @@ tags:
 - controls
 props:
   parameters:
-  - name: heatpumpCop
+  - context: item
+    description: Number item
     label: ESPAltherma COP
-    description: Number item
-    type: TEXT
+    name: heatpumpCop
     required: true
-    context: item
-  - name: heatpumpDcop
+    type: TEXT
+  - context: item
+    description: Number item
     label: ESPAltherma DCOP
-    description: Number item
-    type: TEXT
+    name: heatpumpDcop
     required: true
-    context: item
-  - name: heatpumpHeatPower
+    type: TEXT
+  - context: item
+    description: Number:Power item
     label: ESPAltherma Heating Power
-    description: Number:Power item
-    type: TEXT
+    name: heatpumpHeatPower
     required: true
-    context: item
-  - name: heatpumpPower
+    type: TEXT
+  - context: item
+    description: Number:Power item
     label: ESPAltherma Electrical Power
-    description: Number:Power item
-    type: TEXT
+    name: heatpumpPower
     required: true
-    context: item
-  - name: heatpumpCopSpace
+    type: TEXT
+  - context: item
+    description: Number item
     label: ESPAltherma COP Space
-    description: Number item
-    type: TEXT
+    name: heatpumpCopSpace
     required: true
-    context: item
-  - name: heatpumpCopDhw
+    type: TEXT
+  - context: item
+    description: Number item
     label: ESPAltherma COP DHW
-    description: Number item
-    type: TEXT
+    name: heatpumpCopDhw
     required: true
-    context: item
-  - name: heatpumpHeatingEnergyToday
+    type: TEXT
+  - context: item
+    description: Number:Energy item
     label: ESPAltherma Heating Energy Today
-    description: Number:Energy item
-    type: TEXT
+    name: heatpumpHeatingEnergyToday
     required: true
-    context: item
-  - name: heatpumpEnergyToday
+    type: TEXT
+  - context: item
+    description: Number:Energy item
     label: ESPAltherma Energy Today
-    description: Number:Energy item
-    type: TEXT
+    name: heatpumpEnergyToday
     required: true
-    context: item
-  - name: heatpumpDcopSpace
+    type: TEXT
+  - context: item
+    description: Number item
     label: ESPAltherma DCOP Space
-    description: Number item
-    type: TEXT
+    name: heatpumpDcopSpace
     required: true
-    context: item
-  - name: heatpumpDcopDhw
+    type: TEXT
+  - context: item
+    description: Number item
     label: ESPAltherma DCOP DHW
-    description: Number item
-    type: TEXT
+    name: heatpumpDcopDhw
     required: true
-    context: item
-  - name: heatpumpExtAmbientTemp
-    label: ESPAltherma External Ambient Temperature
+    type: TEXT
+  - context: item
     description: Number:Temperature item
-    type: TEXT
+    label: ESPAltherma External Ambient Temperature
+    name: heatpumpExtAmbientTemp
     required: true
-    context: item
+    type: TEXT
   parameterGroups: []
-timestamp: Oct 25, 2026, 2:07:58 PM
+timestamp: Oct 25, 2026, 1:50:26 PM
 component: div
 config:
+  label: COP
   style:
     --quick-popup: panel
-  label: COP
   stylesheet: "@keyframes a-soft { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.06; } }\n@keyframes a-full { 0%, 100% { opacity:\
     \ 0.3; } 50% { opacity: 1; } }\n@keyframes a-arc { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }\n@keyframes a-halo\
     \ { 0%, 100% { opacity: 0; } 50% { opacity: 1; } }\n@keyframes a-halo-arc { 0%, 100% { opacity: 1; } 50% { opacity: 0;\
@@ -134,21 +134,21 @@ slots:
       - component: div
         config:
           style:
-            display: flex
             align-items: center
+            display: flex
             gap: 18px
             padding-bottom: 4px
         slots:
           default:
           - component: svg
             config:
-              viewBox: -34 -34 68 68
-              width: 104
-              height: 104
+              height: 104.0
               style:
                 display: block
                 flex: 0 0 auto
                 overflow: visible
+              viewBox: -34 -34 68 68
+              width: 104.0
             slots:
               default:
               - component: g
@@ -157,17 +157,17 @@ slots:
                   default:
                   - component: circle
                     config:
-                      cx: 0
-                      cy: 0
+                      cx: 0.0
+                      cy: 0.0
                       r: 32.25
                       style:
                         fill: 'var(--f7-card-bg-color, #fff)'
                   - component: circle
                     config:
-                      cx: 0
-                      cy: 0
-                      r: 29.2
+                      cx: 0.0
+                      cy: 0.0
                       fill: none
+                      r: 29.2
                       stroke: rgba(127, 127, 127, 0.28)
                       stroke-width: 2.9
               - component: g
@@ -176,64 +176,64 @@ slots:
                   default:
                   - component: circle
                     config:
-                      cx: 0
-                      cy: 0
-                      r: 29.2
+                      class: a-full
+                      cx: 0.0
+                      cy: 0.0
                       fill: none
+                      r: 29.2
                       stroke: '#66bb6a'
                       stroke-width: 2.9
                       visible: =(false) && !(false)
-                      class: a-full
                   - component: circle
                     config:
-                      cx: 0
-                      cy: 0
+                      class: a-halo
+                      cx: 0.0
+                      cy: 0.0
+                      fill: none
                       r: 29.2
                       stroke: '#66bb6a'
-                      fill: none
                       stroke-width: 4.5
                       visible: =(false) && !(false)
-                      class: a-halo
                   - component: circle
                     config:
-                      cx: 0
-                      cy: 0
-                      r: 29.2
+                      class: a-soft
+                      cx: 0.0
+                      cy: 0.0
                       fill: none
+                      r: 29.2
                       stroke: '#66bb6a'
                       stroke-width: 2.9
                       visible: =(false) && (false)
-                      class: a-soft
               - component: g
                 config: {}
                 slots:
                   default:
                   - component: circle
                     config:
-                      cx: 0
-                      cy: 0
+                      cx: 0.0
+                      cy: 0.0
                       r: 27.75
                       style:
                         fill: 'var(--f7-card-bg-color, #fff)'
                   - component: circle
                     config:
-                      cx: 0
-                      cy: 0
-                      r: 27.75
+                      cx: 0.0
+                      cy: 0.0
                       fill: '#66bb6a'
                       fill-opacity: '0.12'
+                      r: 27.75
               - component: text
                 config:
-                  x: 0
-                  y: 0
                   content: eco
-                  fill: '#66bb6a'
-                  font-size: 30
-                  text-anchor: middle
                   dominant-baseline: central
+                  fill: '#66bb6a'
+                  font-size: 30.0
                   style:
                     font-family: '''Material Icons'''
                     font-feature-settings: '''liga'''
+                  text-anchor: middle
+                  x: 0.0
+                  y: 0.0
           - component: div
             config:
               style:
@@ -245,37 +245,37 @@ slots:
               default:
               - component: Label
                 config:
-                  text: COP
                   style:
                     font-size: 15px
                     font-weight: '600'
+                  text: COP
               - component: Label
                 config:
-                  text: '=''now '' + ((Number(items[props.heatpumpCop].numericState) || 0) > 0 ? ((Number(items[props.heatpumpCop].numericState)
-                    || 0)).toFixed(2) : ''–'') + '' · today '' + ((Number(items[props.heatpumpDcop].numericState) || 0) >
-                    0 ? ((Number(items[props.heatpumpDcop].numericState) || 0)).toFixed(2) : ''–'')'
                   style:
                     font-size: 12px
                     opacity: '0.7'
+                  text: '=''now '' + ((Number(items[props.heatpumpCop].numericState) || 0) > 0 ? ((Number(items[props.heatpumpCop].numericState)
+                    || 0)).toFixed(2) : ''–'') + '' · today '' + ((Number(items[props.heatpumpDcop].numericState) || 0) >
+                    0 ? ((Number(items[props.heatpumpDcop].numericState) || 0)).toFixed(2) : ''–'')'
       - component: div
         config:
           style:
             display: grid
-            grid-template-columns: repeat(auto-fill, minmax(170px, 1fr))
             gap: 8px
+            grid-template-columns: repeat(auto-fill, minmax(170px, 1fr))
         slots:
           default:
           - component: div
             config:
               style:
-                position: relative
-                box-sizing: border-box
-                min-width: '0'
-                border-radius: 12px
-                padding: 10px 12px
                 background: color-mix(in srgb, var(--f7-text-color) 6%, transparent)
-                overflow: hidden
+                border-radius: 12px
+                box-sizing: border-box
                 grid-column: 1 / -1
+                min-width: '0'
+                overflow: hidden
+                padding: 10px 12px
+                position: relative
               visible: =((Number(items[props.heatpumpHeatPower].numericState) || 0) * 0.001) > ((Number(items[props.heatpumpPower].numericState)
                 || 0) * 0.001) && ((Number(items[props.heatpumpPower].numericState) || 0) * 0.001) > 0
             slots:
@@ -283,23 +283,23 @@ slots:
               - component: div
                 config:
                   style:
-                    display: flex
                     align-items: center
+                    display: flex
                     gap: 8px
                 slots:
                   default:
                   - component: div
                     config:
                       style:
+                        align-items: center
+                        display: flex
+                        flex: 1 1 auto
                         font-size: 12px
+                        gap: 3px
                         opacity: '0.65'
-                        white-space: nowrap
                         overflow: hidden
                         text-overflow: ellipsis
-                        display: flex
-                        align-items: center
-                        gap: 3px
-                        flex: 1 1 auto
+                        white-space: nowrap
                     slots:
                       default:
                       - component: Label
@@ -307,25 +307,25 @@ slots:
                           text: Electricity
                       - component: oh-icon
                         config:
+                          height: 12.0
                           icon: material:arrow_forward
-                          width: 12
-                          height: 12
                           style:
-                            width: 12px
-                            height: 12px
                             flex: 0 0 auto
+                            height: 12px
+                            width: 12px
+                          width: 12.0
                       - component: Label
                         config:
                           text: Heat now
               - component: svg
                 config:
-                  viewBox: 0 0 340 126
                   style:
                     display: block
-                    width: 100%
                     height: auto
-                    max-width: 460px
                     margin-top: 4px
+                    max-width: 460px
+                    width: 100%
+                  viewBox: 0 0 340 126
                   visible: =((Number(items[props.heatpumpHeatPower].numericState) || 0) * 0.001) > ((Number(items[props.heatpumpPower].numericState)
                     || 0) * 0.001) && ((Number(items[props.heatpumpPower].numericState) || 0) * 0.001) > 0
                 slots:
@@ -358,108 +358,108 @@ slots:
                       fill-opacity: '0.4'
                   - component: rect
                     config:
-                      x: 62
-                      y: 10
-                      width: 8
+                      fill: '#fb8c00'
                       height: =((Math.max(6, Math.min(92, ((Number(items[props.heatpumpPower].numericState) || 0) * 0.001)
                         / Math.max(((Number(items[props.heatpumpHeatPower].numericState) || 0) * 0.001), ((Number(items[props.heatpumpPower].numericState)
                         || 0) * 0.001), 0.0001) * 92)))).toFixed(1)
-                      rx: 2
-                      fill: '#fb8c00'
+                      rx: 2.0
+                      width: 8.0
+                      x: 62.0
+                      y: 10.0
                   - component: rect
                     config:
-                      x: 62
-                      y: =(24 + (Math.max(6, Math.min(92, ((Number(items[props.heatpumpPower].numericState) || 0) * 0.001)
-                        / Math.max(((Number(items[props.heatpumpHeatPower].numericState) || 0) * 0.001), ((Number(items[props.heatpumpPower].numericState)
-                        || 0) * 0.001), 0.0001) * 92)))).toFixed(1)
-                      width: 8
+                      fill: '#26a69a'
                       height: =(92 - (Math.max(6, Math.min(92, ((Number(items[props.heatpumpPower].numericState) || 0) * 0.001)
                         / Math.max(((Number(items[props.heatpumpHeatPower].numericState) || 0) * 0.001), ((Number(items[props.heatpumpPower].numericState)
                         || 0) * 0.001), 0.0001) * 92)))).toFixed(1)
-                      rx: 2
-                      fill: '#26a69a'
+                      rx: 2.0
+                      width: 8.0
+                      x: 62.0
+                      y: =(24 + (Math.max(6, Math.min(92, ((Number(items[props.heatpumpPower].numericState) || 0) * 0.001)
+                        / Math.max(((Number(items[props.heatpumpHeatPower].numericState) || 0) * 0.001), ((Number(items[props.heatpumpPower].numericState)
+                        || 0) * 0.001), 0.0001) * 92)))).toFixed(1)
                   - component: rect
                     config:
-                      x: 250
-                      y: 17
-                      width: 8
-                      height: 92
-                      rx: 2
                       fill: '#e53935'
+                      height: 92.0
+                      rx: 2.0
+                      width: 8.0
+                      x: 250.0
+                      y: 17.0
                   - component: text
                     config:
-                      x: 56
-                      y: =(10 + (Math.max(6, Math.min(92, ((Number(items[props.heatpumpPower].numericState) || 0) * 0.001)
-                        / Math.max(((Number(items[props.heatpumpHeatPower].numericState) || 0) * 0.001), ((Number(items[props.heatpumpPower].numericState)
-                        || 0) * 0.001), 0.0001) * 92))) / 2 - 1).toFixed(1)
                       content: Electricity
                       fill: currentColor
                       font-size: '10.5'
-                      text-anchor: end
                       opacity: '0.65'
-                  - component: text
-                    config:
-                      x: 56
+                      text-anchor: end
+                      x: 56.0
                       y: =(10 + (Math.max(6, Math.min(92, ((Number(items[props.heatpumpPower].numericState) || 0) * 0.001)
                         / Math.max(((Number(items[props.heatpumpHeatPower].numericState) || 0) * 0.001), ((Number(items[props.heatpumpPower].numericState)
-                        || 0) * 0.001), 0.0001) * 92))) / 2 + 12).toFixed(1)
+                        || 0) * 0.001), 0.0001) * 92))) / 2 - 1).toFixed(1)
+                  - component: text
+                    config:
                       content: =(((Number(items[props.heatpumpPower].numericState) || 0) * 0.001)).toFixed(2)
                       fill: '#ffb74d'
                       font-size: '13'
                       font-weight: '700'
                       text-anchor: end
+                      x: 56.0
+                      y: =(10 + (Math.max(6, Math.min(92, ((Number(items[props.heatpumpPower].numericState) || 0) * 0.001)
+                        / Math.max(((Number(items[props.heatpumpHeatPower].numericState) || 0) * 0.001), ((Number(items[props.heatpumpPower].numericState)
+                        || 0) * 0.001), 0.0001) * 92))) / 2 + 12).toFixed(1)
                   - component: text
                     config:
-                      x: 56
+                      content: Ambient
+                      fill: currentColor
+                      font-size: '10.5'
+                      opacity: '0.65'
+                      text-anchor: end
+                      x: 56.0
                       y: =(Math.min(108, 24 + (Math.max(6, Math.min(92, ((Number(items[props.heatpumpPower].numericState)
                         || 0) * 0.001) / Math.max(((Number(items[props.heatpumpHeatPower].numericState) || 0) * 0.001), ((Number(items[props.heatpumpPower].numericState)
                         || 0) * 0.001), 0.0001) * 92))) + (92 - (Math.max(6, Math.min(92, ((Number(items[props.heatpumpPower].numericState)
                         || 0) * 0.001) / Math.max(((Number(items[props.heatpumpHeatPower].numericState) || 0) * 0.001), ((Number(items[props.heatpumpPower].numericState)
                         || 0) * 0.001), 0.0001) * 92)))) / 2) - 3).toFixed(1)
-                      content: Ambient
-                      fill: currentColor
-                      font-size: '10.5'
-                      text-anchor: end
-                      opacity: '0.65'
                   - component: text
                     config:
-                      x: 56
-                      y: =(Math.min(108, 24 + (Math.max(6, Math.min(92, ((Number(items[props.heatpumpPower].numericState)
-                        || 0) * 0.001) / Math.max(((Number(items[props.heatpumpHeatPower].numericState) || 0) * 0.001), ((Number(items[props.heatpumpPower].numericState)
-                        || 0) * 0.001), 0.0001) * 92))) + (92 - (Math.max(6, Math.min(92, ((Number(items[props.heatpumpPower].numericState)
-                        || 0) * 0.001) / Math.max(((Number(items[props.heatpumpHeatPower].numericState) || 0) * 0.001), ((Number(items[props.heatpumpPower].numericState)
-                        || 0) * 0.001), 0.0001) * 92)))) / 2) + 11).toFixed(1)
                       content: =(Math.max(0, ((Number(items[props.heatpumpHeatPower].numericState) || 0) * 0.001) - ((Number(items[props.heatpumpPower].numericState)
                         || 0) * 0.001))).toFixed(2)
                       fill: '#4db6ac'
                       font-size: '13'
                       font-weight: '700'
                       text-anchor: end
+                      x: 56.0
+                      y: =(Math.min(108, 24 + (Math.max(6, Math.min(92, ((Number(items[props.heatpumpPower].numericState)
+                        || 0) * 0.001) / Math.max(((Number(items[props.heatpumpHeatPower].numericState) || 0) * 0.001), ((Number(items[props.heatpumpPower].numericState)
+                        || 0) * 0.001), 0.0001) * 92))) + (92 - (Math.max(6, Math.min(92, ((Number(items[props.heatpumpPower].numericState)
+                        || 0) * 0.001) / Math.max(((Number(items[props.heatpumpHeatPower].numericState) || 0) * 0.001), ((Number(items[props.heatpumpPower].numericState)
+                        || 0) * 0.001), 0.0001) * 92)))) / 2) + 11).toFixed(1)
                   - component: text
                     config:
-                      x: 264
-                      y: 58
                       content: Heat
                       fill: currentColor
                       font-size: 10.5
                       font-weight: normal
-                      text-anchor: start
                       opacity: '0.65'
+                      text-anchor: start
+                      x: 264.0
+                      y: 58.0
                   - component: text
                     config:
-                      x: 264
-                      y: 72
                       content: =(((Number(items[props.heatpumpHeatPower].numericState) || 0) * 0.001)).toFixed(2) + ' kW'
                       fill: '#ef5350'
                       font-size: '13'
                       font-weight: '700'
+                      x: 264.0
+                      y: 72.0
               - component: div
                 config:
                   style:
                     display: flex
                     flex-wrap: wrap
-                    justify-content: space-around
                     gap: 6px 14px
+                    justify-content: space-around
                     margin-top: 8px
                   visible: =((Number(items[props.heatpumpHeatPower].numericState) || 0) * 0.001) > ((Number(items[props.heatpumpPower].numericState)
                     || 0) * 0.001) && ((Number(items[props.heatpumpPower].numericState) || 0) * 0.001) > 0
@@ -468,240 +468,240 @@ slots:
                   - component: div
                     config:
                       style:
-                        display: flex
                         align-items: center
+                        display: flex
                         gap: 6px
                     slots:
                       default:
                       - component: div
                         config:
                           style:
+                            flex: 0 0 auto
+                            height: 26px
                             position: relative
                             width: 26px
-                            height: 26px
-                            flex: 0 0 auto
                         slots:
                           default:
                           - component: svg
                             config:
-                              viewBox: 0 0 64 64
                               style:
-                                width: 26px
-                                height: 26px
                                 flex: 0 0 auto
+                                height: 26px
+                                width: 26px
+                              viewBox: 0 0 64 64
                             slots:
                               default:
                               - component: circle
                                 config:
-                                  cx: 32
-                                  cy: 32
-                                  r: 26
+                                  cx: 32.0
+                                  cy: 32.0
                                   fill: none
+                                  r: 26.0
                                   stroke: rgba(127, 127, 127, 0.22)
-                                  stroke-width: 8
+                                  stroke-width: 8.0
                               - component: circle
                                 config:
-                                  cx: 32
-                                  cy: 32
-                                  r: 26
+                                  cx: 32.0
+                                  cy: 32.0
                                   fill: none
+                                  pathLength: 100.0
+                                  r: 26.0
                                   stroke: '#ffb74d'
-                                  pathLength: 100
-                                  transform: rotate(-90 32 32)
-                                  stroke-width: 8
-                                  stroke-linecap: round
                                   stroke-dasharray: =(Math.max(0, Math.min(100, (Number(items[props.heatpumpCopSpace].numericState)
                                     || 0) / 6 * 100))).toFixed(1) + ' 100'
+                                  stroke-linecap: round
+                                  stroke-width: 8.0
+                                  transform: rotate(-90 32 32)
                           - component: oh-icon
                             config:
+                              height: 12.0
                               icon: material:local_fire_department
-                              width: 12
-                              height: 12
                               style:
-                                position: absolute
-                                left: 50%
-                                top: 50%
-                                width: 12px
-                                height: 12px
-                                transform: translate(-50%, -50%)
                                 color: '#ffb74d'
+                                height: 12px
+                                left: 50%
+                                position: absolute
+                                top: 50%
+                                transform: translate(-50%, -50%)
+                                width: 12px
+                              width: 12.0
                       - component: Label
                         config:
+                          style:
+                            font-size: 12px
+                            font-weight: '600'
+                            white-space: nowrap
                           text: '=''COP heating '' + ((Number(items[props.heatpumpCopSpace].numericState) || 0) > 0 ? ((Number(items[props.heatpumpCopSpace].numericState)
                             || 0)).toFixed(2) : ''–'')'
-                          style:
-                            font-size: 12px
-                            font-weight: '600'
-                            white-space: nowrap
                   - component: div
                     config:
                       style:
-                        display: flex
                         align-items: center
+                        display: flex
                         gap: 6px
                     slots:
                       default:
                       - component: div
                         config:
                           style:
+                            flex: 0 0 auto
+                            height: 26px
                             position: relative
                             width: 26px
-                            height: 26px
-                            flex: 0 0 auto
                         slots:
                           default:
                           - component: svg
                             config:
-                              viewBox: 0 0 64 64
                               style:
-                                width: 26px
-                                height: 26px
                                 flex: 0 0 auto
+                                height: 26px
+                                width: 26px
+                              viewBox: 0 0 64 64
                             slots:
                               default:
                               - component: circle
                                 config:
-                                  cx: 32
-                                  cy: 32
-                                  r: 26
+                                  cx: 32.0
+                                  cy: 32.0
                                   fill: none
+                                  r: 26.0
                                   stroke: rgba(127, 127, 127, 0.22)
-                                  stroke-width: 8
+                                  stroke-width: 8.0
                               - component: circle
                                 config:
-                                  cx: 32
-                                  cy: 32
-                                  r: 26
+                                  cx: 32.0
+                                  cy: 32.0
                                   fill: none
+                                  pathLength: 100.0
+                                  r: 26.0
                                   stroke: '#e57373'
-                                  pathLength: 100
-                                  transform: rotate(-90 32 32)
-                                  stroke-width: 8
-                                  stroke-linecap: round
                                   stroke-dasharray: =(Math.max(0, Math.min(100, (Number(items[props.heatpumpCopDhw].numericState)
                                     || 0) / 6 * 100))).toFixed(1) + ' 100'
+                                  stroke-linecap: round
+                                  stroke-width: 8.0
+                                  transform: rotate(-90 32 32)
                           - component: oh-icon
                             config:
+                              height: 12.0
                               icon: material:water_drop
-                              width: 12
-                              height: 12
                               style:
-                                position: absolute
-                                left: 50%
-                                top: 50%
-                                width: 12px
-                                height: 12px
-                                transform: translate(-50%, -50%)
                                 color: '#e57373'
+                                height: 12px
+                                left: 50%
+                                position: absolute
+                                top: 50%
+                                transform: translate(-50%, -50%)
+                                width: 12px
+                              width: 12.0
                       - component: Label
                         config:
-                          text: '=''COP DHW '' + ((Number(items[props.heatpumpCopDhw].numericState) || 0) > 0 ? ((Number(items[props.heatpumpCopDhw].numericState)
-                            || 0)).toFixed(2) : ''–'')'
                           style:
                             font-size: 12px
                             font-weight: '600'
                             white-space: nowrap
+                          text: '=''COP DHW '' + ((Number(items[props.heatpumpCopDhw].numericState) || 0) > 0 ? ((Number(items[props.heatpumpCopDhw].numericState)
+                            || 0)).toFixed(2) : ''–'')'
                   - component: div
                     config:
                       style:
-                        display: flex
                         align-items: center
+                        display: flex
                         gap: 6px
                     slots:
                       default:
                       - component: div
                         config:
                           style:
+                            flex: 0 0 auto
+                            height: 26px
                             position: relative
                             width: 26px
-                            height: 26px
-                            flex: 0 0 auto
                         slots:
                           default:
                           - component: svg
                             config:
-                              viewBox: 0 0 64 64
                               style:
-                                width: 26px
-                                height: 26px
                                 flex: 0 0 auto
+                                height: 26px
+                                width: 26px
+                              viewBox: 0 0 64 64
                             slots:
                               default:
                               - component: circle
                                 config:
-                                  cx: 32
-                                  cy: 32
-                                  r: 26
+                                  cx: 32.0
+                                  cy: 32.0
                                   fill: none
+                                  r: 26.0
                                   stroke: rgba(127, 127, 127, 0.22)
-                                  stroke-width: 8
+                                  stroke-width: 8.0
                               - component: circle
                                 config:
-                                  cx: 32
-                                  cy: 32
-                                  r: 26
+                                  cx: 32.0
+                                  cy: 32.0
                                   fill: none
+                                  pathLength: 100.0
+                                  r: 26.0
                                   stroke: '#66bb6a'
-                                  pathLength: 100
-                                  transform: rotate(-90 32 32)
-                                  stroke-width: 8
-                                  stroke-linecap: round
                                   stroke-dasharray: =(Math.max(0, Math.min(100, (Number(items[props.heatpumpCop].numericState)
                                     || 0) / 6 * 100))).toFixed(1) + ' 100'
+                                  stroke-linecap: round
+                                  stroke-width: 8.0
+                                  transform: rotate(-90 32 32)
                           - component: oh-icon
                             config:
+                              height: 12.0
                               icon: material:eco
-                              width: 12
-                              height: 12
                               style:
-                                position: absolute
-                                left: 50%
-                                top: 50%
-                                width: 12px
-                                height: 12px
-                                transform: translate(-50%, -50%)
                                 color: '#66bb6a'
+                                height: 12px
+                                left: 50%
+                                position: absolute
+                                top: 50%
+                                transform: translate(-50%, -50%)
+                                width: 12px
+                              width: 12.0
                       - component: Label
                         config:
-                          text: '=''COP total '' + ((Number(items[props.heatpumpCop].numericState) || 0) > 0 ? ((Number(items[props.heatpumpCop].numericState)
-                            || 0)).toFixed(2) : ''–'')'
                           style:
                             font-size: 12px
                             font-weight: '600'
                             white-space: nowrap
+                          text: '=''COP total '' + ((Number(items[props.heatpumpCop].numericState) || 0) > 0 ? ((Number(items[props.heatpumpCop].numericState)
+                            || 0)).toFixed(2) : ''–'')'
           - component: div
             config:
               style:
-                position: relative
-                box-sizing: border-box
-                min-width: '0'
-                border-radius: 12px
-                padding: 10px 12px
                 background: color-mix(in srgb, var(--f7-text-color) 6%, transparent)
-                overflow: hidden
+                border-radius: 12px
+                box-sizing: border-box
                 grid-column: 1 / -1
+                min-width: '0'
+                overflow: hidden
+                padding: 10px 12px
+                position: relative
             slots:
               default:
               - component: div
                 config:
                   style:
-                    display: flex
                     align-items: center
+                    display: flex
                     gap: 8px
                 slots:
                   default:
                   - component: div
                     config:
                       style:
+                        align-items: center
+                        display: flex
+                        flex: 1 1 auto
                         font-size: 12px
+                        gap: 3px
                         opacity: '0.65'
-                        white-space: nowrap
                         overflow: hidden
                         text-overflow: ellipsis
-                        display: flex
-                        align-items: center
-                        gap: 3px
-                        flex: 1 1 auto
+                        white-space: nowrap
                     slots:
                       default:
                       - component: Label
@@ -709,25 +709,25 @@ slots:
                           text: Electricity
                       - component: oh-icon
                         config:
+                          height: 12.0
                           icon: material:arrow_forward
-                          width: 12
-                          height: 12
                           style:
-                            width: 12px
-                            height: 12px
                             flex: 0 0 auto
+                            height: 12px
+                            width: 12px
+                          width: 12.0
                       - component: Label
                         config:
                           text: Heat today
               - component: svg
                 config:
-                  viewBox: 0 0 340 126
                   style:
                     display: block
-                    width: 100%
                     height: auto
-                    max-width: 460px
                     margin-top: 4px
+                    max-width: 460px
+                    width: 100%
+                  viewBox: 0 0 340 126
                   visible: =((Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0) * 1) > ((Number(items[props.heatpumpEnergyToday].numericState)
                     || 0) * 1) && ((Number(items[props.heatpumpEnergyToday].numericState) || 0) * 1) > 0
                 slots:
@@ -760,110 +760,110 @@ slots:
                       fill-opacity: '0.4'
                   - component: rect
                     config:
-                      x: 62
-                      y: 10
-                      width: 8
+                      fill: '#fb8c00'
                       height: =((Math.max(6, Math.min(92, ((Number(items[props.heatpumpEnergyToday].numericState) || 0) *
                         1) / Math.max(((Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0) * 1), ((Number(items[props.heatpumpEnergyToday].numericState)
                         || 0) * 1), 0.0001) * 92)))).toFixed(1)
-                      rx: 2
-                      fill: '#fb8c00'
+                      rx: 2.0
+                      width: 8.0
+                      x: 62.0
+                      y: 10.0
                   - component: rect
                     config:
-                      x: 62
-                      y: =(24 + (Math.max(6, Math.min(92, ((Number(items[props.heatpumpEnergyToday].numericState) || 0) *
-                        1) / Math.max(((Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0) * 1), ((Number(items[props.heatpumpEnergyToday].numericState)
-                        || 0) * 1), 0.0001) * 92)))).toFixed(1)
-                      width: 8
+                      fill: '#26a69a'
                       height: =(92 - (Math.max(6, Math.min(92, ((Number(items[props.heatpumpEnergyToday].numericState) ||
                         0) * 1) / Math.max(((Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0) * 1), ((Number(items[props.heatpumpEnergyToday].numericState)
                         || 0) * 1), 0.0001) * 92)))).toFixed(1)
-                      rx: 2
-                      fill: '#26a69a'
+                      rx: 2.0
+                      width: 8.0
+                      x: 62.0
+                      y: =(24 + (Math.max(6, Math.min(92, ((Number(items[props.heatpumpEnergyToday].numericState) || 0) *
+                        1) / Math.max(((Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0) * 1), ((Number(items[props.heatpumpEnergyToday].numericState)
+                        || 0) * 1), 0.0001) * 92)))).toFixed(1)
                   - component: rect
                     config:
-                      x: 250
-                      y: 17
-                      width: 8
-                      height: 92
-                      rx: 2
                       fill: '#e53935'
+                      height: 92.0
+                      rx: 2.0
+                      width: 8.0
+                      x: 250.0
+                      y: 17.0
                   - component: text
                     config:
-                      x: 56
-                      y: =(10 + (Math.max(6, Math.min(92, ((Number(items[props.heatpumpEnergyToday].numericState) || 0) *
-                        1) / Math.max(((Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0) * 1), ((Number(items[props.heatpumpEnergyToday].numericState)
-                        || 0) * 1), 0.0001) * 92))) / 2 - 1).toFixed(1)
                       content: Electricity
                       fill: currentColor
                       font-size: '10.5'
-                      text-anchor: end
                       opacity: '0.65'
-                  - component: text
-                    config:
-                      x: 56
+                      text-anchor: end
+                      x: 56.0
                       y: =(10 + (Math.max(6, Math.min(92, ((Number(items[props.heatpumpEnergyToday].numericState) || 0) *
                         1) / Math.max(((Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0) * 1), ((Number(items[props.heatpumpEnergyToday].numericState)
-                        || 0) * 1), 0.0001) * 92))) / 2 + 12).toFixed(1)
+                        || 0) * 1), 0.0001) * 92))) / 2 - 1).toFixed(1)
+                  - component: text
+                    config:
                       content: =(((Number(items[props.heatpumpEnergyToday].numericState) || 0) * 1)).toFixed(2)
                       fill: '#ffb74d'
                       font-size: '13'
                       font-weight: '700'
                       text-anchor: end
+                      x: 56.0
+                      y: =(10 + (Math.max(6, Math.min(92, ((Number(items[props.heatpumpEnergyToday].numericState) || 0) *
+                        1) / Math.max(((Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0) * 1), ((Number(items[props.heatpumpEnergyToday].numericState)
+                        || 0) * 1), 0.0001) * 92))) / 2 + 12).toFixed(1)
                   - component: text
                     config:
-                      x: 56
+                      content: Ambient
+                      fill: currentColor
+                      font-size: '10.5'
+                      opacity: '0.65'
+                      text-anchor: end
+                      x: 56.0
                       y: =(Math.min(108, 24 + (Math.max(6, Math.min(92, ((Number(items[props.heatpumpEnergyToday].numericState)
                         || 0) * 1) / Math.max(((Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0) * 1), ((Number(items[props.heatpumpEnergyToday].numericState)
                         || 0) * 1), 0.0001) * 92))) + (92 - (Math.max(6, Math.min(92, ((Number(items[props.heatpumpEnergyToday].numericState)
                         || 0) * 1) / Math.max(((Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0) * 1), ((Number(items[props.heatpumpEnergyToday].numericState)
                         || 0) * 1), 0.0001) * 92)))) / 2) - 3).toFixed(1)
-                      content: Ambient
-                      fill: currentColor
-                      font-size: '10.5'
-                      text-anchor: end
-                      opacity: '0.65'
                   - component: text
                     config:
-                      x: 56
-                      y: =(Math.min(108, 24 + (Math.max(6, Math.min(92, ((Number(items[props.heatpumpEnergyToday].numericState)
-                        || 0) * 1) / Math.max(((Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0) * 1), ((Number(items[props.heatpumpEnergyToday].numericState)
-                        || 0) * 1), 0.0001) * 92))) + (92 - (Math.max(6, Math.min(92, ((Number(items[props.heatpumpEnergyToday].numericState)
-                        || 0) * 1) / Math.max(((Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0) * 1), ((Number(items[props.heatpumpEnergyToday].numericState)
-                        || 0) * 1), 0.0001) * 92)))) / 2) + 11).toFixed(1)
                       content: =(Math.max(0, ((Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0) * 1) - ((Number(items[props.heatpumpEnergyToday].numericState)
                         || 0) * 1))).toFixed(2)
                       fill: '#4db6ac'
                       font-size: '13'
                       font-weight: '700'
                       text-anchor: end
+                      x: 56.0
+                      y: =(Math.min(108, 24 + (Math.max(6, Math.min(92, ((Number(items[props.heatpumpEnergyToday].numericState)
+                        || 0) * 1) / Math.max(((Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0) * 1), ((Number(items[props.heatpumpEnergyToday].numericState)
+                        || 0) * 1), 0.0001) * 92))) + (92 - (Math.max(6, Math.min(92, ((Number(items[props.heatpumpEnergyToday].numericState)
+                        || 0) * 1) / Math.max(((Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0) * 1), ((Number(items[props.heatpumpEnergyToday].numericState)
+                        || 0) * 1), 0.0001) * 92)))) / 2) + 11).toFixed(1)
                   - component: text
                     config:
-                      x: 264
-                      y: 58
                       content: Heat
                       fill: currentColor
                       font-size: 10.5
                       font-weight: normal
-                      text-anchor: start
                       opacity: '0.65'
+                      text-anchor: start
+                      x: 264.0
+                      y: 58.0
                   - component: text
                     config:
-                      x: 264
-                      y: 72
                       content: =(((Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0) * 1)).toFixed(2) + '
                         kWh'
                       fill: '#ef5350'
                       font-size: '13'
                       font-weight: '700'
+                      x: 264.0
+                      y: 72.0
               - component: Label
                 config:
-                  text: not running yet today
                   style:
                     font-size: 11px
-                    opacity: '0.65'
                     margin: 18px 0
+                    opacity: '0.65'
                     text-align: center
+                  text: not running yet today
                   visible: =!(((Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0) * 1) > ((Number(items[props.heatpumpEnergyToday].numericState)
                     || 0) * 1) && ((Number(items[props.heatpumpEnergyToday].numericState) || 0) * 1) > 0)
               - component: div
@@ -871,8 +871,8 @@ slots:
                   style:
                     display: flex
                     flex-wrap: wrap
-                    justify-content: space-around
                     gap: 6px 14px
+                    justify-content: space-around
                     margin-top: 8px
                   visible: =((Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0) * 1) > ((Number(items[props.heatpumpEnergyToday].numericState)
                     || 0) * 1) && ((Number(items[props.heatpumpEnergyToday].numericState) || 0) * 1) > 0
@@ -881,354 +881,300 @@ slots:
                   - component: div
                     config:
                       style:
-                        display: flex
                         align-items: center
+                        display: flex
                         gap: 6px
                     slots:
                       default:
                       - component: div
                         config:
                           style:
+                            flex: 0 0 auto
+                            height: 26px
                             position: relative
                             width: 26px
-                            height: 26px
-                            flex: 0 0 auto
                         slots:
                           default:
                           - component: svg
                             config:
-                              viewBox: 0 0 64 64
                               style:
-                                width: 26px
-                                height: 26px
                                 flex: 0 0 auto
+                                height: 26px
+                                width: 26px
+                              viewBox: 0 0 64 64
                             slots:
                               default:
                               - component: circle
                                 config:
-                                  cx: 32
-                                  cy: 32
-                                  r: 26
+                                  cx: 32.0
+                                  cy: 32.0
                                   fill: none
+                                  r: 26.0
                                   stroke: rgba(127, 127, 127, 0.22)
-                                  stroke-width: 8
+                                  stroke-width: 8.0
                               - component: circle
                                 config:
-                                  cx: 32
-                                  cy: 32
-                                  r: 26
+                                  cx: 32.0
+                                  cy: 32.0
                                   fill: none
+                                  pathLength: 100.0
+                                  r: 26.0
                                   stroke: '#ffb74d'
-                                  pathLength: 100
-                                  transform: rotate(-90 32 32)
-                                  stroke-width: 8
-                                  stroke-linecap: round
                                   stroke-dasharray: =(Math.max(0, Math.min(100, (Number(items[props.heatpumpDcopSpace].numericState)
                                     || 0) / 6 * 100))).toFixed(1) + ' 100'
+                                  stroke-linecap: round
+                                  stroke-width: 8.0
+                                  transform: rotate(-90 32 32)
                           - component: oh-icon
                             config:
+                              height: 12.0
                               icon: material:local_fire_department
-                              width: 12
-                              height: 12
                               style:
-                                position: absolute
-                                left: 50%
-                                top: 50%
-                                width: 12px
-                                height: 12px
-                                transform: translate(-50%, -50%)
                                 color: '#ffb74d'
+                                height: 12px
+                                left: 50%
+                                position: absolute
+                                top: 50%
+                                transform: translate(-50%, -50%)
+                                width: 12px
+                              width: 12.0
                       - component: Label
                         config:
+                          style:
+                            font-size: 12px
+                            font-weight: '600'
+                            white-space: nowrap
                           text: '=''COP heating '' + ((Number(items[props.heatpumpDcopSpace].numericState) || 0) > 0 ? ((Number(items[props.heatpumpDcopSpace].numericState)
                             || 0)).toFixed(2) : ''–'')'
-                          style:
-                            font-size: 12px
-                            font-weight: '600'
-                            white-space: nowrap
                   - component: div
                     config:
                       style:
-                        display: flex
                         align-items: center
+                        display: flex
                         gap: 6px
                     slots:
                       default:
                       - component: div
                         config:
                           style:
+                            flex: 0 0 auto
+                            height: 26px
                             position: relative
                             width: 26px
-                            height: 26px
-                            flex: 0 0 auto
                         slots:
                           default:
                           - component: svg
                             config:
-                              viewBox: 0 0 64 64
                               style:
-                                width: 26px
-                                height: 26px
                                 flex: 0 0 auto
+                                height: 26px
+                                width: 26px
+                              viewBox: 0 0 64 64
                             slots:
                               default:
                               - component: circle
                                 config:
-                                  cx: 32
-                                  cy: 32
-                                  r: 26
+                                  cx: 32.0
+                                  cy: 32.0
                                   fill: none
+                                  r: 26.0
                                   stroke: rgba(127, 127, 127, 0.22)
-                                  stroke-width: 8
+                                  stroke-width: 8.0
                               - component: circle
                                 config:
-                                  cx: 32
-                                  cy: 32
-                                  r: 26
+                                  cx: 32.0
+                                  cy: 32.0
                                   fill: none
+                                  pathLength: 100.0
+                                  r: 26.0
                                   stroke: '#e57373'
-                                  pathLength: 100
-                                  transform: rotate(-90 32 32)
-                                  stroke-width: 8
-                                  stroke-linecap: round
                                   stroke-dasharray: =(Math.max(0, Math.min(100, (Number(items[props.heatpumpDcopDhw].numericState)
                                     || 0) / 6 * 100))).toFixed(1) + ' 100'
+                                  stroke-linecap: round
+                                  stroke-width: 8.0
+                                  transform: rotate(-90 32 32)
                           - component: oh-icon
                             config:
+                              height: 12.0
                               icon: material:water_drop
-                              width: 12
-                              height: 12
                               style:
-                                position: absolute
-                                left: 50%
-                                top: 50%
-                                width: 12px
-                                height: 12px
-                                transform: translate(-50%, -50%)
                                 color: '#e57373'
+                                height: 12px
+                                left: 50%
+                                position: absolute
+                                top: 50%
+                                transform: translate(-50%, -50%)
+                                width: 12px
+                              width: 12.0
                       - component: Label
                         config:
-                          text: '=''COP DHW '' + ((Number(items[props.heatpumpDcopDhw].numericState) || 0) > 0 ? ((Number(items[props.heatpumpDcopDhw].numericState)
-                            || 0)).toFixed(2) : ''–'')'
                           style:
                             font-size: 12px
                             font-weight: '600'
                             white-space: nowrap
+                          text: '=''COP DHW '' + ((Number(items[props.heatpumpDcopDhw].numericState) || 0) > 0 ? ((Number(items[props.heatpumpDcopDhw].numericState)
+                            || 0)).toFixed(2) : ''–'')'
                   - component: div
                     config:
                       style:
-                        display: flex
                         align-items: center
+                        display: flex
                         gap: 6px
                     slots:
                       default:
                       - component: div
                         config:
                           style:
+                            flex: 0 0 auto
+                            height: 26px
                             position: relative
                             width: 26px
-                            height: 26px
-                            flex: 0 0 auto
                         slots:
                           default:
                           - component: svg
                             config:
-                              viewBox: 0 0 64 64
                               style:
-                                width: 26px
-                                height: 26px
                                 flex: 0 0 auto
+                                height: 26px
+                                width: 26px
+                              viewBox: 0 0 64 64
                             slots:
                               default:
                               - component: circle
                                 config:
-                                  cx: 32
-                                  cy: 32
-                                  r: 26
+                                  cx: 32.0
+                                  cy: 32.0
                                   fill: none
+                                  r: 26.0
                                   stroke: rgba(127, 127, 127, 0.22)
-                                  stroke-width: 8
+                                  stroke-width: 8.0
                               - component: circle
                                 config:
-                                  cx: 32
-                                  cy: 32
-                                  r: 26
+                                  cx: 32.0
+                                  cy: 32.0
                                   fill: none
+                                  pathLength: 100.0
+                                  r: 26.0
                                   stroke: '#66bb6a'
-                                  pathLength: 100
-                                  transform: rotate(-90 32 32)
-                                  stroke-width: 8
-                                  stroke-linecap: round
                                   stroke-dasharray: =(Math.max(0, Math.min(100, (Number(items[props.heatpumpDcop].numericState)
                                     || 0) / 6 * 100))).toFixed(1) + ' 100'
+                                  stroke-linecap: round
+                                  stroke-width: 8.0
+                                  transform: rotate(-90 32 32)
                           - component: oh-icon
                             config:
+                              height: 12.0
                               icon: material:eco
-                              width: 12
-                              height: 12
                               style:
-                                position: absolute
-                                left: 50%
-                                top: 50%
-                                width: 12px
-                                height: 12px
-                                transform: translate(-50%, -50%)
                                 color: '#66bb6a'
+                                height: 12px
+                                left: 50%
+                                position: absolute
+                                top: 50%
+                                transform: translate(-50%, -50%)
+                                width: 12px
+                              width: 12.0
                       - component: Label
                         config:
-                          text: '=''COP total '' + ((Number(items[props.heatpumpDcop].numericState) || 0) > 0 ? ((Number(items[props.heatpumpDcop].numericState)
-                            || 0)).toFixed(2) : ''–'')'
                           style:
                             font-size: 12px
                             font-weight: '600'
                             white-space: nowrap
+                          text: '=''COP total '' + ((Number(items[props.heatpumpDcop].numericState) || 0) > 0 ? ((Number(items[props.heatpumpDcop].numericState)
+                            || 0)).toFixed(2) : ''–'')'
       - component: oh-chart
         config:
           chartType: ''
-          periodVisible: true
-          period: D
           height: 392px
           options:
-            backgroundColor: transparent
             axisPointer:
               link:
               - xAxisIndex: all
+            backgroundColor: transparent
+          period: D
+          periodVisible: true
         slots:
           grid:
           - component: oh-chart-grid
             config:
-              top: 62
-              height: 120
+              height: 120.0
               left: '50'
               right: '20'
+              top: 62.0
           - component: oh-chart-grid
             config:
-              top: 242
-              height: 120
+              height: 120.0
               left: '50'
               right: '20'
-          xAxis:
-          - component: oh-time-axis
-            config:
-              gridIndex: 0
-              axisPointer:
-                snap: false
-                label:
-                  show: false
-              axisLabel:
-                show: false
-          - component: oh-time-axis
-            config:
-              gridIndex: 1
-              axisPointer:
-                snap: false
-                label:
-                  show: false
-          yAxis:
-          - component: oh-value-axis
-            config:
-              gridIndex: 0
-              name: COP
-              nameGap: 14
-              nameTextStyle:
-                align: right
-                padding:
-                - 0
-                - 8
-                - 0
-                - 0
-              splitLine:
-                lineStyle:
-                  type: dashed
-                  opacity: 0.4
-              min: 0
-          - component: oh-value-axis
-            config:
-              gridIndex: 1
-              name: °C
-              nameGap: 14
-              nameTextStyle:
-                align: right
-                padding:
-                - 0
-                - 8
-                - 0
-                - 0
-              splitLine:
-                lineStyle:
-                  type: dashed
-                  opacity: 0.4
-              scale: true
-              min: =(v) => Math.floor(Math.min(v.min, (v.min + v.max - 4) / 2))
-              max: =(v) => Math.ceil(Math.max(v.max, (v.min + v.max + 4) / 2))
+              top: 242.0
           series:
           - component: oh-time-series
             config:
-              name: COP
-              gridIndex: 0
-              xAxisIndex: 0
-              yAxisIndex: 0
-              type: line
-              item: =props.heatpumpCop
-              symbol: none
-              sampling: lttb
-              lineStyle:
-                width: 1.5
-                color: '#66bb6a'
-              itemStyle:
-                color: '#66bb6a'
               areaStyle:
                 color:
-                  type: linear
-                  x: 0
-                  y: 0
-                  x2: 0
-                  y2: 1
                   colorStops:
-                  - offset: 0
-                    color: rgba(102, 187, 106, 0.45)
-                  - offset: 1
-                    color: rgba(102, 187, 106, 0.02)
+                  - color: rgba(102, 187, 106, 0.45)
+                    offset: 0.0
+                  - color: rgba(102, 187, 106, 0.02)
+                    offset: 1.0
+                  type: linear
+                  x: 0.0
+                  x2: 0.0
+                  y: 0.0
+                  y2: 1.0
+              gridIndex: 0.0
+              item: =props.heatpumpCop
+              itemStyle:
+                color: '#66bb6a'
+              lineStyle:
+                color: '#66bb6a'
+                width: 1.5
+              name: COP
+              sampling: lttb
+              symbol: none
+              type: line
+              xAxisIndex: 0.0
+              yAxisIndex: 0.0
           - component: oh-time-series
             config:
-              name: Outdoor
-              gridIndex: 1
-              xAxisIndex: 1
-              yAxisIndex: 1
-              type: line
+              gridIndex: 1.0
               item: =props.heatpumpExtAmbientTemp
-              symbol: none
-              lineStyle:
-                width: 2
-                color: '#26a69a'
               itemStyle:
                 color: '#26a69a'
+              lineStyle:
+                color: '#26a69a'
+                width: 2.0
+              name: Outdoor
+              symbol: none
+              type: line
+              xAxisIndex: 1.0
+              yAxisIndex: 1.0
           title:
           - component: oh-chart-title
             config:
+              left: 10.0
               show: true
               text: COP
-              left: 10
-              top: 15
               textStyle:
-                fontSize: 13
-                fontWeight: 600
+                fontSize: 13.0
+                fontWeight: 600.0
+              top: 15.0
           - component: oh-chart-title
             config:
+              left: 10.0
               show: true
               text: Outdoor temperature
-              left: 10
-              top: 190
               textStyle:
-                fontSize: 13
-                fontWeight: 600
+                fontSize: 13.0
+                fontWeight: 600.0
+              top: 190.0
           tooltip:
           - component: oh-chart-tooltip
             config:
-              show: true
+              backgroundColor: transparent
+              borderWidth: 0.0
               confine: true
-              trigger: axis
-              smartFormatter: false
+              extraCssText: 'box-shadow: none;'
               formatter: '=(ps) => ((H) => ''<div style="display: flex; flex-direction: column; align-items: flex-start; height:
                 0">'' + [0,1].map((g) => ((r) => ''<div style="'' + (r ? ''border: 1px solid; border-radius: 4px; padding:
                 10px; box-shadow: rgba(0, 0, 0, 0.2) 1px 2px 10px; '' + (themeOptions.dark === ''dark'' ? ''background-color:
@@ -1242,6 +1188,7 @@ slots:
                 !== 0)).map((p) => p.marker + '' '' + p.seriesName + ''<span style="float: right; margin-left: 20px"><b style="text-align:
                 right;">'' + ((v) => v.toLocaleString(''en-GB'') + '' '' + p.seriesId.split(''#'')[2])(Number(p.value[1]))
                 + ''</b></span><br/>'').join(''''))).join('''') + ''</div>'')(ps[0].axisValue)'
+              padding: 0.0
               position: '=(pt, ps, dom, rect, size) => ((T, B) => ((c, left, h) => [c.style.setProperty(''align-items'', left
                 ? ''flex-end'' : ''flex-start''), dom.hasAttribute(''data-wb'') || [dom.parentNode.addEventListener(''mouseleave'',
                 () => [0,1].map((i) => dom.removeAttribute(''data-wb'' + i))), dom.setAttribute(''data-wb'', '''')], [0,1].map((i)
@@ -1253,129 +1200,166 @@ slots:
                 + 20, B[i] - b.offsetHeight)) : T[i])))(c.children[i]) : 0), [left ? pt[0] - 20 - c.offsetWidth : pt[0] +
                 20, 0]][4])(dom.firstChild, pt[0] > size.viewSize[0] / 2, T.filter((t) => t <= pt[1]).length - 1))([62,242],
                 [182,362])'
-              backgroundColor: transparent
-              borderWidth: 0
-              padding: 0
-              transitionDuration: 0
-              extraCssText: 'box-shadow: none;'
+              show: true
+              smartFormatter: false
+              transitionDuration: 0.0
+              trigger: axis
+          xAxis:
+          - component: oh-time-axis
+            config:
+              axisLabel:
+                show: false
+              axisPointer:
+                label:
+                  show: false
+                snap: false
+              gridIndex: 0.0
+          - component: oh-time-axis
+            config:
+              axisPointer:
+                label:
+                  show: false
+                snap: false
+              gridIndex: 1.0
+          yAxis:
+          - component: oh-value-axis
+            config:
+              gridIndex: 0.0
+              min: 0.0
+              name: COP
+              nameGap: 14.0
+              nameTextStyle:
+                align: right
+                padding:
+                - 0.0
+                - 8.0
+                - 0.0
+                - 0.0
+              splitLine:
+                lineStyle:
+                  opacity: 0.4
+                  type: dashed
+          - component: oh-value-axis
+            config:
+              gridIndex: 1.0
+              max: =(v) => Math.ceil(Math.max(v.max, (v.min + v.max + 4) / 2))
+              min: =(v) => Math.floor(Math.min(v.min, (v.min + v.max - 4) / 2))
+              name: °C
+              nameGap: 14.0
+              nameTextStyle:
+                align: right
+                padding:
+                - 0.0
+                - 8.0
+                - 0.0
+                - 0.0
+              scale: true
+              splitLine:
+                lineStyle:
+                  opacity: 0.4
+                  type: dashed
       - component: oh-chart
         config:
           chartType: month
-          periodVisible: true
           height: 270px
           options:
             backgroundColor: transparent
+          periodVisible: true
         slots:
           grid:
           - component: oh-chart-grid
             config:
-              top: '62'
               bottom: '60'
               left: '45'
               right: '20'
-          xAxis:
-          - component: oh-category-axis
+              top: '62'
+          legend:
+          - component: oh-chart-legend
             config:
-              gridIndex: 0
-              categoryType: month
-              name: Day
-              nameGap: 12
-              axisTick:
-                show: false
-          yAxis:
-          - component: oh-value-axis
-            config:
-              gridIndex: 0
-              name: COP
-              nameGap: 14
-              nameTextStyle:
-                align: right
-                padding:
-                - 0
-                - 8
-                - 0
-                - 0
-              splitLine:
-                lineStyle:
-                  type: dashed
-                  opacity: 0.4
+              bottom: '0'
+              show: true
+              type: scroll
           series:
           - component: oh-aggregate-series
             config:
-              name: Heating
-              gridIndex: 0
-              xAxisIndex: 0
-              yAxisIndex: 0
-              type: custom
-              item: =props.heatpumpDcopSpace
               aggregationFunction: last
               dimension1: date
+              encode:
+                x: 0.0
+                y: 1.0
+              gridIndex: 0.0
+              item: =props.heatpumpDcopSpace
               itemStyle:
                 color: '#ffb74d'
+              name: Heating
+              progressive: 0.0
               renderItem: '=(params, api) => params.dataIndexInside === params.dataInsideLength - 1 ? ((pts) => ({type: ''group'',
                 children: [{type: ''polyline'', shape: {points: pts}, style: {fill: ''none'', stroke: ''#ffb74d'', lineWidth:
                 2}}].concat(pts.map((p) => ({type: ''circle'', shape: {cx: p[0], cy: p[1], r: 3}, style: {fill: ''#ffb74d''}})))}))(''
                 ''.repeat(params.dataInsideLength).split('''').map((s, i) => [api.value(0, i), api.value(1, i)]).filter((v)
                 => v[1] > 0).map((v) => api.coord(v))) : null'
-              encode:
-                x: 0
-                y: 1
-              progressive: 0
+              type: custom
+              xAxisIndex: 0.0
+              yAxisIndex: 0.0
           - component: oh-aggregate-series
             config:
-              name: Hot water
-              gridIndex: 0
-              xAxisIndex: 0
-              yAxisIndex: 0
-              type: custom
-              item: =props.heatpumpDcopDhw
               aggregationFunction: last
               dimension1: date
+              encode:
+                x: 0.0
+                y: 1.0
+              gridIndex: 0.0
+              item: =props.heatpumpDcopDhw
               itemStyle:
                 color: '#e57373'
+              name: Hot water
+              progressive: 0.0
               renderItem: '=(params, api) => params.dataIndexInside === params.dataInsideLength - 1 ? ((pts) => ({type: ''group'',
                 children: [{type: ''polyline'', shape: {points: pts}, style: {fill: ''none'', stroke: ''#e57373'', lineWidth:
                 2}}].concat(pts.map((p) => ({type: ''circle'', shape: {cx: p[0], cy: p[1], r: 3}, style: {fill: ''#e57373''}})))}))(''
                 ''.repeat(params.dataInsideLength).split('''').map((s, i) => [api.value(0, i), api.value(1, i)]).filter((v)
                 => v[1] > 0).map((v) => api.coord(v))) : null'
-              encode:
-                x: 0
-                y: 1
-              progressive: 0
+              type: custom
+              xAxisIndex: 0.0
+              yAxisIndex: 0.0
           - component: oh-aggregate-series
             config:
-              name: Total
-              gridIndex: 0
-              xAxisIndex: 0
-              yAxisIndex: 0
-              type: custom
-              item: =props.heatpumpDcop
               aggregationFunction: last
               dimension1: date
+              encode:
+                x: 0.0
+                y: 1.0
+              gridIndex: 0.0
+              item: =props.heatpumpDcop
               itemStyle:
                 color: '#66bb6a'
+              name: Total
+              progressive: 0.0
               renderItem: '=(params, api) => params.dataIndexInside === params.dataInsideLength - 1 ? ((pts) => ({type: ''group'',
                 children: [{type: ''polyline'', shape: {points: pts}, style: {fill: ''none'', stroke: ''#66bb6a'', lineWidth:
                 2}}].concat(pts.map((p) => ({type: ''circle'', shape: {cx: p[0], cy: p[1], r: 3}, style: {fill: ''#66bb6a''}})))}))(''
                 ''.repeat(params.dataInsideLength).split('''').map((s, i) => [api.value(0, i), api.value(1, i)]).filter((v)
                 => v[1] > 0).map((v) => api.coord(v))) : null'
-              encode:
-                x: 0
-                y: 1
-              progressive: 0
-          legend:
-          - component: oh-chart-legend
+              type: custom
+              xAxisIndex: 0.0
+              yAxisIndex: 0.0
+          title:
+          - component: oh-chart-title
             config:
+              left: 10.0
               show: true
-              bottom: '0'
-              type: scroll
+              text: COP per day
+              textStyle:
+                fontSize: 13.0
+                fontWeight: 600.0
+              top: 15.0
           tooltip:
           - component: oh-chart-tooltip
             config:
-              show: true
+              backgroundColor: transparent
+              borderWidth: 0.0
               confine: true
-              trigger: axis
-              smartFormatter: false
+              extraCssText: 'box-shadow: none;'
               formatter: '=(ps) => ((H) => ''<div style="display: flex; flex-direction: column; align-items: flex-start; height:
                 0">'' + [0].map((g) => ((r) => ''<div style="'' + (r ? ''border: 1px solid; border-radius: 4px; padding: 10px;
                 box-shadow: rgba(0, 0, 0, 0.2) 1px 2px 10px; '' + (themeOptions.dark === ''dark'' ? ''background-color: rgb(58,
@@ -1393,6 +1377,7 @@ slots:
                 {minimumFractionDigits: 2, maximumFractionDigits: 2}) : ''–'') : p.seriesName === ''Total'' ? (v > 0 ? v.toLocaleString(''en-GB'',
                 {minimumFractionDigits: 2, maximumFractionDigits: 2}) : ''–'') : v.toLocaleString(''en-GB'') + '' '' + p.seriesId.split(''#'')[2])(Number(p.value[1]))
                 + ''</b></span><br/>'').join(''''))).join('''') + ''</div>'')(ps[0].axisValue)'
+              padding: 0.0
               position: '=(pt, ps, dom, rect, size) => ((T, B) => ((c, left, h) => [((hd, per) => hd && per ? ((w) => ((k)
                 => k === undefined ? 0 : hd.replaceChildren(dayjs().date(1).year(Number(w[1])).month(k).date(Number(hd.getAttribute(''data-head''))).format(''ddd,
                 ll'')))([0,1,2,3,4,5,6,7,8,9,10,11].filter((k) => dayjs().date(1).month(k).format(''MMM'') === w[0])[0]))(per.textContent.trim().split(''
@@ -1407,21 +1392,36 @@ slots:
                 Math.min(pt[1] + 20, B[i] - b.offsetHeight)) : T[i])))(c.children[i]) : 0), [left ? pt[0] - 20 - c.offsetWidth
                 : pt[0] + 20, 0]][5])(dom.firstChild, pt[0] > size.viewSize[0] / 2, T.filter((t) => t <= pt[1]).length - 1))([62],
                 [size.viewSize[1] - 60])'
-              backgroundColor: transparent
-              borderWidth: 0
-              padding: 0
-              transitionDuration: 0
-              extraCssText: 'box-shadow: none;'
-          title:
-          - component: oh-chart-title
-            config:
               show: true
-              text: COP per day
-              left: 10
-              top: 15
-              textStyle:
-                fontSize: 13
-                fontWeight: 600
+              smartFormatter: false
+              transitionDuration: 0.0
+              trigger: axis
+          xAxis:
+          - component: oh-category-axis
+            config:
+              axisTick:
+                show: false
+              categoryType: month
+              gridIndex: 0.0
+              name: Day
+              nameGap: 12.0
+          yAxis:
+          - component: oh-value-axis
+            config:
+              gridIndex: 0.0
+              name: COP
+              nameGap: 14.0
+              nameTextStyle:
+                align: right
+                padding:
+                - 0.0
+                - 8.0
+                - 0.0
+                - 0.0
+              splitLine:
+                lineStyle:
+                  opacity: 0.4
+                  type: dashed
       - component: div
         config:
           style:
@@ -1432,13 +1432,13 @@ slots:
           default:
           - component: oh-button
             config:
-              text: All details
               action: popup
               actionModal: page:heatpump
               outline: true
               small: true
               style:
-                color: '#66bb6a'
                 border-color: '#66bb6a'
-                width: auto
+                color: '#66bb6a'
                 padding: 0 12px
+                width: auto
+              text: All details

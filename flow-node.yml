@@ -3,79 +3,79 @@ tags:
 - flow
 props:
   parameters:
-  - name: kind
+  - description: The device drawn
     label: Kind
-    description: The device drawn
-    type: TEXT
+    name: kind
     required: true
+    type: TEXT
     limitToOptions: true
     options:
-    - value: pv
-      label: pv
-    - value: grid
-      label: grid
-    - value: home
-      label: home
-    - value: heat-pump
-      label: heat-pump
-    - value: heat-pump-split
-      label: heat-pump-split
-    - value: air-conditioner
-      label: air-conditioner
-    - value: e-car
-      label: e-car
-    - value: battery
-      label: battery
-    - value: appliances
-      label: appliances
-    - value: ventilation
-      label: ventilation
-    - value: coffee-machine
-      label: coffee-machine
-    - value: refrigerator
-      label: refrigerator
-    - value: media
-      label: media
-    - value: office
-      label: office
-    - value: terrace-light
-      label: terrace-light
-    - value: e-bike
-      label: e-bike
-    - value: network-rack
-      label: network-rack
-  - name: x
+    - label: pv
+      value: pv
+    - label: grid
+      value: grid
+    - label: home
+      value: home
+    - label: heat-pump
+      value: heat-pump
+    - label: heat-pump-split
+      value: heat-pump-split
+    - label: air-conditioner
+      value: air-conditioner
+    - label: e-car
+      value: e-car
+    - label: battery
+      value: battery
+    - label: appliances
+      value: appliances
+    - label: ventilation
+      value: ventilation
+    - label: coffee-machine
+      value: coffee-machine
+    - label: refrigerator
+      value: refrigerator
+    - label: media
+      value: media
+    - label: office
+      value: office
+    - label: terrace-light
+      value: terrace-light
+    - label: e-bike
+      value: e-bike
+    - label: network-rack
+      value: network-rack
+  - description: Centre's x in the flow's viewBox
     label: x
-    description: Centre's x in the flow's viewBox
-    type: DECIMAL
+    name: x
     required: true
-  - name: y
+    type: DECIMAL
+  - description: Centre's y in the flow's viewBox
     label: y
-    description: Centre's y in the flow's viewBox
-    type: DECIMAL
+    name: y
     required: true
-  - name: power
+    type: DECIMAL
+  - description: The power in W; usually an expression on an item
     label: Power
-    description: The power in W; usually an expression on an item
+    name: power
+    required: false
     type: TEXT
-    required: false
-  - name: soc
+  - description: The battery's state of charge in %; usually an expression
     label: State of charge
-    description: The battery's state of charge in %; usually an expression
-    type: DECIMAL
+    name: soc
     required: false
-  - name: frequency
+    type: DECIMAL
+  - description: The heat pump's compressor frequency in Hz, which turns its fan; usually an expression
     label: Compressor frequency
-    description: The heat pump's compressor frequency in Hz, which turns its fan; usually an expression
+    name: frequency
+    required: false
     type: DECIMAL
-    required: false
-  - name: plugged
+  - description: Whether the E-Car's charging cable is plugged in, which draws the cable; usually an expression
     label: Plugged in
-    description: Whether the E-Car's charging cable is plugged in, which draws the cable; usually an expression
-    type: BOOLEAN
+    name: plugged
     required: false
+    type: BOOLEAN
   parameterGroups: []
-timestamp: Oct 31, 2026, 3:16:45 PM
+timestamp: Oct 31, 2026, 3:17:52 PM
 component: g
 config:
   transform: ='translate(' + props.x + ' ' + props.y + ')'
@@ -92,60 +92,60 @@ slots:
           default:
           - component: circle
             config:
-              cx: 0
-              cy: 0
+              cx: 0.0
+              cy: 0.0
               r: 27.75
               style:
                 fill: 'var(--f7-card-bg-color, #fff)'
           - component: circle
             config:
-              cx: 0
-              cy: 0
-              r: 27.75
+              cx: 0.0
+              cy: 0.0
               fill: '#ffb300'
               fill-opacity: '0.12'
+              r: 27.75
       - component: rect
         config:
-          x: -17.84
-          y: -3.76
-          width: 33.8
+          fill: '#1e88e5'
+          fill-opacity: =(0.25 + 0.75 * Math.min(1, Math.abs(Number(props.power)) / 8000)).toFixed(2)
           height: 18.79
           rx: 1.5
-          fill-opacity: =(0.25 + 0.75 * Math.min(1, Math.abs(Number(props.power)) / 8000)).toFixed(2)
           stroke: currentColor
+          stroke-linecap: round
           stroke-width: 1.2
-          stroke-linecap: round
-          fill: '#1e88e5'
+          width: 33.8
+          x: -17.84
+          y: -3.76
       - component: line
         config:
+          fill: none
+          stroke: '#e3f2fd'
+          stroke-linecap: round
+          stroke-width: 0.9
           x1: -6.57
-          y1: -3.76
           x2: -6.57
-          y2: 15.03
-          stroke: '#e3f2fd'
-          stroke-width: 0.9
-          stroke-linecap: round
-          fill: none
-      - component: line
-        config:
-          x1: 4.69
           y1: -3.76
-          x2: 4.69
           y2: 15.03
-          stroke: '#e3f2fd'
-          stroke-width: 0.9
-          stroke-linecap: round
-          fill: none
       - component: line
         config:
-          x1: -17.84
-          y1: 5.635
-          x2: 15.96
-          y2: 5.635
-          stroke: '#e3f2fd'
-          stroke-width: 0.9
-          stroke-linecap: round
           fill: none
+          stroke: '#e3f2fd'
+          stroke-linecap: round
+          stroke-width: 0.9
+          x1: 4.69
+          x2: 4.69
+          y1: -3.76
+          y2: 15.03
+      - component: line
+        config:
+          fill: none
+          stroke: '#e3f2fd'
+          stroke-linecap: round
+          stroke-width: 0.9
+          x1: -17.84
+          x2: 15.96
+          y1: 5.635
+          y2: 5.635
       - component: g
         config:
           class: '=(Math.abs(Number(props.power)) > 10) ? ''a-spin'' : '''''
@@ -158,89 +158,89 @@ slots:
             config:
               cx: 10.33
               cy: -8.45
-              r: 14.5
               fill: none
+              r: 14.5
               stroke: none
           - component: line
             config:
+              stroke-linecap: round
+              stroke-width: 4.0
+              style:
+                stroke: 'color-mix(in srgb, #ffb300 12%, var(--f7-card-bg-color, #fff))'
               x1: 16.61
-              y1: -5.85
               x2: 18.92
-              y2: -4.89
-              style:
-                stroke: 'color-mix(in srgb, #ffb300 12%, var(--f7-card-bg-color, #fff))'
-              stroke-width: 4
-              stroke-linecap: round
-          - component: line
-            config:
-              x1: 12.93
-              y1: -2.17
-              x2: 13.89
-              y2: 0.14
-              style:
-                stroke: 'color-mix(in srgb, #ffb300 12%, var(--f7-card-bg-color, #fff))'
-              stroke-width: 4
-              stroke-linecap: round
-          - component: line
-            config:
-              x1: 7.73
-              y1: -2.17
-              x2: 6.77
-              y2: 0.14
-              style:
-                stroke: 'color-mix(in srgb, #ffb300 12%, var(--f7-card-bg-color, #fff))'
-              stroke-width: 4
-              stroke-linecap: round
-          - component: line
-            config:
-              x1: 4.05
               y1: -5.85
-              x2: 1.74
               y2: -4.89
-              style:
-                stroke: 'color-mix(in srgb, #ffb300 12%, var(--f7-card-bg-color, #fff))'
-              stroke-width: 4
-              stroke-linecap: round
           - component: line
             config:
-              x1: 4.05
-              y1: -11.05
-              x2: 1.74
-              y2: -12.01
+              stroke-linecap: round
+              stroke-width: 4.0
               style:
                 stroke: 'color-mix(in srgb, #ffb300 12%, var(--f7-card-bg-color, #fff))'
-              stroke-width: 4
-              stroke-linecap: round
-          - component: line
-            config:
-              x1: 7.73
-              y1: -14.73
-              x2: 6.77
-              y2: -17.04
-              style:
-                stroke: 'color-mix(in srgb, #ffb300 12%, var(--f7-card-bg-color, #fff))'
-              stroke-width: 4
-              stroke-linecap: round
-          - component: line
-            config:
               x1: 12.93
-              y1: -14.73
               x2: 13.89
-              y2: -17.04
-              style:
-                stroke: 'color-mix(in srgb, #ffb300 12%, var(--f7-card-bg-color, #fff))'
-              stroke-width: 4
-              stroke-linecap: round
+              y1: -2.17
+              y2: 0.14
           - component: line
             config:
+              stroke-linecap: round
+              stroke-width: 4.0
+              style:
+                stroke: 'color-mix(in srgb, #ffb300 12%, var(--f7-card-bg-color, #fff))'
+              x1: 7.73
+              x2: 6.77
+              y1: -2.17
+              y2: 0.14
+          - component: line
+            config:
+              stroke-linecap: round
+              stroke-width: 4.0
+              style:
+                stroke: 'color-mix(in srgb, #ffb300 12%, var(--f7-card-bg-color, #fff))'
+              x1: 4.05
+              x2: 1.74
+              y1: -5.85
+              y2: -4.89
+          - component: line
+            config:
+              stroke-linecap: round
+              stroke-width: 4.0
+              style:
+                stroke: 'color-mix(in srgb, #ffb300 12%, var(--f7-card-bg-color, #fff))'
+              x1: 4.05
+              x2: 1.74
+              y1: -11.05
+              y2: -12.01
+          - component: line
+            config:
+              stroke-linecap: round
+              stroke-width: 4.0
+              style:
+                stroke: 'color-mix(in srgb, #ffb300 12%, var(--f7-card-bg-color, #fff))'
+              x1: 7.73
+              x2: 6.77
+              y1: -14.73
+              y2: -17.04
+          - component: line
+            config:
+              stroke-linecap: round
+              stroke-width: 4.0
+              style:
+                stroke: 'color-mix(in srgb, #ffb300 12%, var(--f7-card-bg-color, #fff))'
+              x1: 12.93
+              x2: 13.89
+              y1: -14.73
+              y2: -17.04
+          - component: line
+            config:
+              stroke-linecap: round
+              stroke-width: 4.0
+              style:
+                stroke: 'color-mix(in srgb, #ffb300 12%, var(--f7-card-bg-color, #fff))'
               x1: 16.61
-              y1: -11.05
               x2: 18.92
+              y1: -11.05
               y2: -12.01
-              style:
-                stroke: 'color-mix(in srgb, #ffb300 12%, var(--f7-card-bg-color, #fff))'
-              stroke-width: 4
-              stroke-linecap: round
           - component: g
             config:
               opacity: =(0.9 + 0.1 * Math.min(1, Math.abs(Number(props.power)) / 8000)).toFixed(2)
@@ -248,84 +248,84 @@ slots:
               default:
               - component: line
                 config:
+                  fill: none
+                  stroke: '#ffb300'
+                  stroke-linecap: round
+                  stroke-width: 1.8
                   x1: 16.61
-                  y1: -5.85
                   x2: 18.92
-                  y2: -4.89
-                  stroke: '#ffb300'
-                  stroke-width: 1.8
-                  stroke-linecap: round
-                  fill: none
-              - component: line
-                config:
-                  x1: 12.93
-                  y1: -2.17
-                  x2: 13.89
-                  y2: 0.14
-                  stroke: '#ffb300'
-                  stroke-width: 1.8
-                  stroke-linecap: round
-                  fill: none
-              - component: line
-                config:
-                  x1: 7.73
-                  y1: -2.17
-                  x2: 6.77
-                  y2: 0.14
-                  stroke: '#ffb300'
-                  stroke-width: 1.8
-                  stroke-linecap: round
-                  fill: none
-              - component: line
-                config:
-                  x1: 4.05
                   y1: -5.85
-                  x2: 1.74
                   y2: -4.89
-                  stroke: '#ffb300'
-                  stroke-width: 1.8
-                  stroke-linecap: round
-                  fill: none
               - component: line
                 config:
-                  x1: 4.05
-                  y1: -11.05
-                  x2: 1.74
-                  y2: -12.01
-                  stroke: '#ffb300'
-                  stroke-width: 1.8
-                  stroke-linecap: round
                   fill: none
-              - component: line
-                config:
-                  x1: 7.73
-                  y1: -14.73
-                  x2: 6.77
-                  y2: -17.04
                   stroke: '#ffb300'
-                  stroke-width: 1.8
                   stroke-linecap: round
-                  fill: none
-              - component: line
-                config:
+                  stroke-width: 1.8
                   x1: 12.93
-                  y1: -14.73
                   x2: 13.89
-                  y2: -17.04
-                  stroke: '#ffb300'
-                  stroke-width: 1.8
-                  stroke-linecap: round
-                  fill: none
+                  y1: -2.17
+                  y2: 0.14
               - component: line
                 config:
+                  fill: none
+                  stroke: '#ffb300'
+                  stroke-linecap: round
+                  stroke-width: 1.8
+                  x1: 7.73
+                  x2: 6.77
+                  y1: -2.17
+                  y2: 0.14
+              - component: line
+                config:
+                  fill: none
+                  stroke: '#ffb300'
+                  stroke-linecap: round
+                  stroke-width: 1.8
+                  x1: 4.05
+                  x2: 1.74
+                  y1: -5.85
+                  y2: -4.89
+              - component: line
+                config:
+                  fill: none
+                  stroke: '#ffb300'
+                  stroke-linecap: round
+                  stroke-width: 1.8
+                  x1: 4.05
+                  x2: 1.74
+                  y1: -11.05
+                  y2: -12.01
+              - component: line
+                config:
+                  fill: none
+                  stroke: '#ffb300'
+                  stroke-linecap: round
+                  stroke-width: 1.8
+                  x1: 7.73
+                  x2: 6.77
+                  y1: -14.73
+                  y2: -17.04
+              - component: line
+                config:
+                  fill: none
+                  stroke: '#ffb300'
+                  stroke-linecap: round
+                  stroke-width: 1.8
+                  x1: 12.93
+                  x2: 13.89
+                  y1: -14.73
+                  y2: -17.04
+              - component: line
+                config:
+                  fill: none
+                  stroke: '#ffb300'
+                  stroke-linecap: round
+                  stroke-width: 1.8
                   x1: 16.61
-                  y1: -11.05
                   x2: 18.92
+                  y1: -11.05
                   y2: -12.01
-                  stroke: '#ffb300'
-                  stroke-width: 1.8
-                  stroke-linecap: round
-                  fill: none
       - component: circle
         config:
           cx: 10.33
@@ -337,9 +337,9 @@ slots:
         config:
           cx: 10.33
           cy: -8.45
-          r: 5
           fill: '#ffb300'
           opacity: =(0.9 + 0.1 * Math.min(1, Math.abs(Number(props.power)) / 8000)).toFixed(2)
+          r: 5.0
   - component: g
     config:
       visible: =props.kind === 'grid'
@@ -351,266 +351,266 @@ slots:
           default:
           - component: circle
             config:
-              cx: 0
-              cy: 0
+              cx: 0.0
+              cy: 0.0
               r: 27.75
               style:
                 fill: 'var(--f7-card-bg-color, #fff)'
           - component: circle
             config:
-              cx: 0
-              cy: 0
-              r: 27.75
+              cx: 0.0
+              cy: 0.0
               fill: '=Number(props.power) < 0 ? ''#43a047'' : ''#e53935'''
               fill-opacity: '0.12'
+              r: 27.75
       - component: line
         config:
+          fill: none
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-width: 1.5
           x1: -10.0
-          y1: 16
           x2: -3.0
-          y2: -16
-          stroke: currentColor
-          stroke-width: 1.5
-          stroke-linecap: round
-          fill: none
+          y1: 16.0
+          y2: -16.0
       - component: line
         config:
+          fill: none
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-width: 1.5
           x1: 10.0
-          y1: 16
           x2: 3.0
-          y2: -16
-          stroke: currentColor
-          stroke-width: 1.5
-          stroke-linecap: round
-          fill: none
+          y1: 16.0
+          y2: -16.0
       - component: line
         config:
-          x1: -15
-          y1: -10
-          x2: 15
-          y2: -10
-          stroke: currentColor
-          stroke-width: 1.5
-          stroke-linecap: round
           fill: none
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-width: 1.5
+          x1: -15.0
+          x2: 15.0
+          y1: -10.0
+          y2: -10.0
       - component: line
         config:
-          x1: -11
-          y1: -3
-          x2: 11
-          y2: -3
-          stroke: currentColor
-          stroke-width: 1.5
-          stroke-linecap: round
           fill: none
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-width: 1.5
+          x1: -11.0
+          x2: 11.0
+          y1: -3.0
+          y2: -3.0
       - component: line
         config:
+          fill: none
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-width: 1.5
           x1: -8.69
-          y1: 10
           x2: 5.84
-          y2: -3
-          stroke: currentColor
-          stroke-width: 1.5
-          stroke-linecap: round
-          fill: none
+          y1: 10.0
+          y2: -3.0
       - component: line
         config:
+          fill: none
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-width: 1.5
           x1: 8.69
-          y1: 10
           x2: -5.84
-          y2: -3
-          stroke: currentColor
-          stroke-width: 1.5
-          stroke-linecap: round
-          fill: none
+          y1: 10.0
+          y2: -3.0
       - component: line
         config:
+          fill: none
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-width: 1.5
           x1: -5.84
-          y1: -3
           x2: 4.31
-          y2: -10
-          stroke: currentColor
-          stroke-width: 1.5
-          stroke-linecap: round
-          fill: none
+          y1: -3.0
+          y2: -10.0
       - component: line
         config:
+          fill: none
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-width: 1.5
           x1: 5.84
-          y1: -3
           x2: -4.31
-          y2: -10
-          stroke: currentColor
-          stroke-width: 1.5
-          stroke-linecap: round
-          fill: none
+          y1: -3.0
+          y2: -10.0
       - component: line
         config:
-          x1: -15
-          y1: -10
-          x2: -15
-          y2: -7
-          stroke: currentColor
-          stroke-width: 1.5
-          stroke-linecap: round
           fill: none
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-width: 1.5
+          x1: -15.0
+          x2: -15.0
+          y1: -10.0
+          y2: -7.0
       - component: line
         config:
-          x1: 15
-          y1: -10
-          x2: 15
-          y2: -7
-          stroke: currentColor
-          stroke-width: 1.5
-          stroke-linecap: round
           fill: none
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-width: 1.5
+          x1: 15.0
+          x2: 15.0
+          y1: -10.0
+          y2: -7.0
       - component: line
         config:
-          x1: -11
-          y1: -3
-          x2: -11
-          y2: 0
-          stroke: currentColor
-          stroke-width: 1.5
-          stroke-linecap: round
           fill: none
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-width: 1.5
+          x1: -11.0
+          x2: -11.0
+          y1: -3.0
+          y2: 0.0
       - component: line
         config:
-          x1: 11
-          y1: -3
-          x2: 11
-          y2: 0
-          stroke: currentColor
-          stroke-width: 1.5
-          stroke-linecap: round
           fill: none
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-width: 1.5
+          x1: 11.0
+          x2: 11.0
+          y1: -3.0
+          y2: 0.0
       - component: path
         config:
           d: M-27,-5 Q-21,-3 -15,-7 Q0,-2 15,-7 Q21,-3 27,-5
-          stroke: '=Number(props.power) < 0 ? ''#43a047'' : ''#e53935'''
-          stroke-width: 1.4
-          stroke-linecap: round
           fill: none
           opacity: '=Math.abs(Number(props.power)) > 10 ? ''0.7'' : ''0.45'''
+          stroke: '=Number(props.power) < 0 ? ''#43a047'' : ''#e53935'''
+          stroke-linecap: round
+          stroke-width: 1.4
       - component: circle
         config:
-          r: 1.3
-          fill: '=Number(props.power) < 0 ? ''#43a047'' : ''#e53935'''
-          cx: 0
-          cy: 0
-          visible: =Math.abs(Number(props.power)) > 10
           class: '=(Math.abs(Number(props.power)) > 10) ? ''a-route-df7a7e2a'' : '''''
+          cx: 0.0
+          cy: 0.0
+          fill: '=Number(props.power) < 0 ? ''#43a047'' : ''#e53935'''
+          r: 1.3
           style:
-            animation-duration: '=(Math.abs(Number(props.power)) < 1000 ? 2 : (Math.abs(Number(props.power)) < 3000 ? 1.4
-              : (Math.abs(Number(props.power)) < 6000 ? 1.0 : (0.7)))) + ''s'''
             animation-delay: '=(-0 / 4 * (Math.abs(Number(props.power)) < 1000 ? 2 : (Math.abs(Number(props.power)) < 3000
               ? 1.4 : (Math.abs(Number(props.power)) < 6000 ? 1.0 : (0.7))))) + ''s'''
             animation-direction: '=(Number(props.power) > 0) ? ''reverse'' : ''normal'''
-      - component: circle
-        config:
-          r: 1.3
-          fill: '=Number(props.power) < 0 ? ''#43a047'' : ''#e53935'''
-          cx: 0
-          cy: 0
-          visible: =Math.abs(Number(props.power)) > 10
-          class: '=(Math.abs(Number(props.power)) > 10) ? ''a-route-df7a7e2a'' : '''''
-          style:
             animation-duration: '=(Math.abs(Number(props.power)) < 1000 ? 2 : (Math.abs(Number(props.power)) < 3000 ? 1.4
               : (Math.abs(Number(props.power)) < 6000 ? 1.0 : (0.7)))) + ''s'''
+          visible: =Math.abs(Number(props.power)) > 10
+      - component: circle
+        config:
+          class: '=(Math.abs(Number(props.power)) > 10) ? ''a-route-df7a7e2a'' : '''''
+          cx: 0.0
+          cy: 0.0
+          fill: '=Number(props.power) < 0 ? ''#43a047'' : ''#e53935'''
+          r: 1.3
+          style:
             animation-delay: '=(-1 / 4 * (Math.abs(Number(props.power)) < 1000 ? 2 : (Math.abs(Number(props.power)) < 3000
               ? 1.4 : (Math.abs(Number(props.power)) < 6000 ? 1.0 : (0.7))))) + ''s'''
             animation-direction: '=(Number(props.power) > 0) ? ''reverse'' : ''normal'''
-      - component: circle
-        config:
-          r: 1.3
-          fill: '=Number(props.power) < 0 ? ''#43a047'' : ''#e53935'''
-          cx: 0
-          cy: 0
-          visible: =Math.abs(Number(props.power)) > 10
-          class: '=(Math.abs(Number(props.power)) > 10) ? ''a-route-df7a7e2a'' : '''''
-          style:
             animation-duration: '=(Math.abs(Number(props.power)) < 1000 ? 2 : (Math.abs(Number(props.power)) < 3000 ? 1.4
               : (Math.abs(Number(props.power)) < 6000 ? 1.0 : (0.7)))) + ''s'''
+          visible: =Math.abs(Number(props.power)) > 10
+      - component: circle
+        config:
+          class: '=(Math.abs(Number(props.power)) > 10) ? ''a-route-df7a7e2a'' : '''''
+          cx: 0.0
+          cy: 0.0
+          fill: '=Number(props.power) < 0 ? ''#43a047'' : ''#e53935'''
+          r: 1.3
+          style:
             animation-delay: '=(-2 / 4 * (Math.abs(Number(props.power)) < 1000 ? 2 : (Math.abs(Number(props.power)) < 3000
               ? 1.4 : (Math.abs(Number(props.power)) < 6000 ? 1.0 : (0.7))))) + ''s'''
             animation-direction: '=(Number(props.power) > 0) ? ''reverse'' : ''normal'''
-      - component: circle
-        config:
-          r: 1.3
-          fill: '=Number(props.power) < 0 ? ''#43a047'' : ''#e53935'''
-          cx: 0
-          cy: 0
-          visible: =Math.abs(Number(props.power)) > 10
-          class: '=(Math.abs(Number(props.power)) > 10) ? ''a-route-df7a7e2a'' : '''''
-          style:
             animation-duration: '=(Math.abs(Number(props.power)) < 1000 ? 2 : (Math.abs(Number(props.power)) < 3000 ? 1.4
               : (Math.abs(Number(props.power)) < 6000 ? 1.0 : (0.7)))) + ''s'''
+          visible: =Math.abs(Number(props.power)) > 10
+      - component: circle
+        config:
+          class: '=(Math.abs(Number(props.power)) > 10) ? ''a-route-df7a7e2a'' : '''''
+          cx: 0.0
+          cy: 0.0
+          fill: '=Number(props.power) < 0 ? ''#43a047'' : ''#e53935'''
+          r: 1.3
+          style:
             animation-delay: '=(-3 / 4 * (Math.abs(Number(props.power)) < 1000 ? 2 : (Math.abs(Number(props.power)) < 3000
               ? 1.4 : (Math.abs(Number(props.power)) < 6000 ? 1.0 : (0.7))))) + ''s'''
             animation-direction: '=(Number(props.power) > 0) ? ''reverse'' : ''normal'''
+            animation-duration: '=(Math.abs(Number(props.power)) < 1000 ? 2 : (Math.abs(Number(props.power)) < 3000 ? 1.4
+              : (Math.abs(Number(props.power)) < 6000 ? 1.0 : (0.7)))) + ''s'''
+          visible: =Math.abs(Number(props.power)) > 10
       - component: path
         config:
           d: M-27,2 Q-21,4 -11,0 Q0,5 11,0 Q21,4 27,2
-          stroke: '=Number(props.power) < 0 ? ''#43a047'' : ''#e53935'''
-          stroke-width: 1.4
-          stroke-linecap: round
           fill: none
           opacity: '=Math.abs(Number(props.power)) > 10 ? ''0.7'' : ''0.45'''
+          stroke: '=Number(props.power) < 0 ? ''#43a047'' : ''#e53935'''
+          stroke-linecap: round
+          stroke-width: 1.4
       - component: circle
         config:
-          r: 1.3
-          fill: '=Number(props.power) < 0 ? ''#43a047'' : ''#e53935'''
-          cx: 0
-          cy: 0
-          visible: =Math.abs(Number(props.power)) > 10
           class: '=(Math.abs(Number(props.power)) > 10) ? ''a-route-4a077550'' : '''''
+          cx: 0.0
+          cy: 0.0
+          fill: '=Number(props.power) < 0 ? ''#43a047'' : ''#e53935'''
+          r: 1.3
           style:
-            animation-duration: '=(Math.abs(Number(props.power)) < 1000 ? 2 : (Math.abs(Number(props.power)) < 3000 ? 1.4
-              : (Math.abs(Number(props.power)) < 6000 ? 1.0 : (0.7)))) + ''s'''
             animation-delay: '=(-0 / 4 * (Math.abs(Number(props.power)) < 1000 ? 2 : (Math.abs(Number(props.power)) < 3000
               ? 1.4 : (Math.abs(Number(props.power)) < 6000 ? 1.0 : (0.7))))) + ''s'''
             animation-direction: '=(Number(props.power) > 0) ? ''reverse'' : ''normal'''
-      - component: circle
-        config:
-          r: 1.3
-          fill: '=Number(props.power) < 0 ? ''#43a047'' : ''#e53935'''
-          cx: 0
-          cy: 0
-          visible: =Math.abs(Number(props.power)) > 10
-          class: '=(Math.abs(Number(props.power)) > 10) ? ''a-route-4a077550'' : '''''
-          style:
             animation-duration: '=(Math.abs(Number(props.power)) < 1000 ? 2 : (Math.abs(Number(props.power)) < 3000 ? 1.4
               : (Math.abs(Number(props.power)) < 6000 ? 1.0 : (0.7)))) + ''s'''
+          visible: =Math.abs(Number(props.power)) > 10
+      - component: circle
+        config:
+          class: '=(Math.abs(Number(props.power)) > 10) ? ''a-route-4a077550'' : '''''
+          cx: 0.0
+          cy: 0.0
+          fill: '=Number(props.power) < 0 ? ''#43a047'' : ''#e53935'''
+          r: 1.3
+          style:
             animation-delay: '=(-1 / 4 * (Math.abs(Number(props.power)) < 1000 ? 2 : (Math.abs(Number(props.power)) < 3000
               ? 1.4 : (Math.abs(Number(props.power)) < 6000 ? 1.0 : (0.7))))) + ''s'''
             animation-direction: '=(Number(props.power) > 0) ? ''reverse'' : ''normal'''
-      - component: circle
-        config:
-          r: 1.3
-          fill: '=Number(props.power) < 0 ? ''#43a047'' : ''#e53935'''
-          cx: 0
-          cy: 0
-          visible: =Math.abs(Number(props.power)) > 10
-          class: '=(Math.abs(Number(props.power)) > 10) ? ''a-route-4a077550'' : '''''
-          style:
             animation-duration: '=(Math.abs(Number(props.power)) < 1000 ? 2 : (Math.abs(Number(props.power)) < 3000 ? 1.4
               : (Math.abs(Number(props.power)) < 6000 ? 1.0 : (0.7)))) + ''s'''
+          visible: =Math.abs(Number(props.power)) > 10
+      - component: circle
+        config:
+          class: '=(Math.abs(Number(props.power)) > 10) ? ''a-route-4a077550'' : '''''
+          cx: 0.0
+          cy: 0.0
+          fill: '=Number(props.power) < 0 ? ''#43a047'' : ''#e53935'''
+          r: 1.3
+          style:
             animation-delay: '=(-2 / 4 * (Math.abs(Number(props.power)) < 1000 ? 2 : (Math.abs(Number(props.power)) < 3000
               ? 1.4 : (Math.abs(Number(props.power)) < 6000 ? 1.0 : (0.7))))) + ''s'''
             animation-direction: '=(Number(props.power) > 0) ? ''reverse'' : ''normal'''
-      - component: circle
-        config:
-          r: 1.3
-          fill: '=Number(props.power) < 0 ? ''#43a047'' : ''#e53935'''
-          cx: 0
-          cy: 0
-          visible: =Math.abs(Number(props.power)) > 10
-          class: '=(Math.abs(Number(props.power)) > 10) ? ''a-route-4a077550'' : '''''
-          style:
             animation-duration: '=(Math.abs(Number(props.power)) < 1000 ? 2 : (Math.abs(Number(props.power)) < 3000 ? 1.4
               : (Math.abs(Number(props.power)) < 6000 ? 1.0 : (0.7)))) + ''s'''
+          visible: =Math.abs(Number(props.power)) > 10
+      - component: circle
+        config:
+          class: '=(Math.abs(Number(props.power)) > 10) ? ''a-route-4a077550'' : '''''
+          cx: 0.0
+          cy: 0.0
+          fill: '=Number(props.power) < 0 ? ''#43a047'' : ''#e53935'''
+          r: 1.3
+          style:
             animation-delay: '=(-3 / 4 * (Math.abs(Number(props.power)) < 1000 ? 2 : (Math.abs(Number(props.power)) < 3000
               ? 1.4 : (Math.abs(Number(props.power)) < 6000 ? 1.0 : (0.7))))) + ''s'''
             animation-direction: '=(Number(props.power) > 0) ? ''reverse'' : ''normal'''
+            animation-duration: '=(Math.abs(Number(props.power)) < 1000 ? 2 : (Math.abs(Number(props.power)) < 3000 ? 1.4
+              : (Math.abs(Number(props.power)) < 6000 ? 1.0 : (0.7)))) + ''s'''
+          visible: =Math.abs(Number(props.power)) > 10
   - component: g
     config:
       visible: =props.kind === 'home'
@@ -622,82 +622,82 @@ slots:
           default:
           - component: circle
             config:
-              cx: 0
-              cy: 0
+              cx: 0.0
+              cy: 0.0
               r: 27.75
               style:
                 fill: 'var(--f7-card-bg-color, #fff)'
           - component: circle
             config:
-              cx: 0
-              cy: 0
-              r: 27.75
+              cx: 0.0
+              cy: 0.0
               fill: '#1e88e5'
               fill-opacity: '0.12'
+              r: 27.75
       - component: path
         config:
           d: M6.5,-12.65 V-16 H10.5 V-9.35
-          stroke: currentColor
-          stroke-width: 1.8
-          stroke-linecap: round
           fill: none
+          stroke: currentColor
+          stroke-linecap: round
           stroke-linejoin: round
+          stroke-width: 1.8
       - component: polygon
         config:
+          fill: none
           points: -17,-4 0,-18 17,-4
           stroke: currentColor
-          stroke-width: 1.8
           stroke-linecap: round
-          fill: none
           stroke-linejoin: round
-      - component: rect
-        config:
-          x: -13
-          y: -4
-          width: 26
-          height: 19
-          stroke: currentColor
           stroke-width: 1.8
-          stroke-linecap: round
-          fill: none
       - component: rect
         config:
-          x: -3
-          y: 5
-          width: 6
-          height: 10
+          fill: none
+          height: 19.0
           stroke: currentColor
-          stroke-width: 1.4
           stroke-linecap: round
+          stroke-width: 1.8
+          width: 26.0
+          x: -13.0
+          y: -4.0
+      - component: rect
+        config:
           fill: none
+          height: 10.0
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-width: 1.4
+          width: 6.0
+          x: -3.0
+          y: 5.0
       - component: rect
         config:
-          x: -10
-          y: -1
-          width: 6
-          height: 6
-          rx: 1
+          class: '=(Math.abs(Number(props.power)) > 50) ? ''a-glow'' : '''''
           fill: '#ffd54f'
           fill-opacity: '=(Math.abs(Number(props.power)) > 50) ? ''1'' : (0.3 + 0.7 * Math.min(1, Math.abs(Number(props.power))
             / 3000)).toFixed(2)'
-          class: '=(Math.abs(Number(props.power)) > 50) ? ''a-glow'' : '''''
+          height: 6.0
+          rx: 1.0
           style:
             animation-duration: '=Math.abs(Number(props.power)) < 500 ? ''2.4s'' : (Math.abs(Number(props.power)) < 1500 ?
               ''1.6s'' : (''1s''))'
+          width: 6.0
+          x: -10.0
+          y: -1.0
       - component: rect
         config:
-          x: 4
-          y: -1
-          width: 6
-          height: 6
-          rx: 1
+          class: '=(Math.abs(Number(props.power)) > 50) ? ''a-glow'' : '''''
           fill: '#ffd54f'
           fill-opacity: '=(Math.abs(Number(props.power)) > 50) ? ''1'' : (0.3 + 0.7 * Math.min(1, Math.abs(Number(props.power))
             / 3000)).toFixed(2)'
-          class: '=(Math.abs(Number(props.power)) > 50) ? ''a-glow'' : '''''
+          height: 6.0
+          rx: 1.0
           style:
             animation-duration: '=Math.abs(Number(props.power)) < 500 ? ''2.4s'' : (Math.abs(Number(props.power)) < 1500 ?
               ''1.6s'' : (''1s''))'
+          width: 6.0
+          x: 4.0
+          y: -1.0
   - component: g
     config:
       visible: =props.kind === 'heat-pump'
@@ -709,38 +709,38 @@ slots:
           default:
           - component: circle
             config:
-              cx: 0
-              cy: 0
+              cx: 0.0
+              cy: 0.0
               r: 27.75
               style:
                 fill: 'var(--f7-card-bg-color, #fff)'
           - component: circle
             config:
-              cx: 0
-              cy: 0
-              r: 27.75
+              cx: 0.0
+              cy: 0.0
               fill: '#fb8c00'
               fill-opacity: '0.12'
+              r: 27.75
       - component: rect
         config:
-          x: -17
-          y: -12
-          width: 34
-          height: 24
-          rx: 3
-          stroke: currentColor
-          stroke-width: 1.6
-          stroke-linecap: round
           fill: none
+          height: 24.0
+          rx: 3.0
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-width: 1.6
+          width: 34.0
+          x: -17.0
+          y: -12.0
       - component: circle
         config:
-          cx: -5
-          cy: 0
-          r: 9
-          stroke: currentColor
-          stroke-width: 1.2
-          stroke-linecap: round
+          cx: -5.0
+          cy: 0.0
           fill: none
+          r: 9.0
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-width: 1.2
       - component: g
         config:
           class: '=(Number(props.frequency) > 0) ? ''a-spin'' : '''''
@@ -751,10 +751,10 @@ slots:
           default:
           - component: circle
             config:
-              cx: -5
-              cy: 0
-              r: 8
+              cx: -5.0
+              cy: 0.0
               fill: none
+              r: 8.0
               stroke: none
           - component: path
             config:
@@ -773,85 +773,85 @@ slots:
               transform: rotate(240 -5 0)
       - component: circle
         config:
-          cx: -5
-          cy: 0
-          r: 1.5
+          cx: -5.0
+          cy: 0.0
           fill: currentColor
+          r: 1.5
       - component: line
         config:
-          x1: 7
-          y1: -7
-          x2: 14
-          y2: -7
-          stroke: currentColor
-          stroke-width: 1
-          stroke-linecap: round
           fill: none
           opacity: '0.7'
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-width: 1.0
+          x1: 7.0
+          x2: 14.0
+          y1: -7.0
+          y2: -7.0
       - component: line
         config:
-          x1: 7
+          fill: none
+          opacity: '0.7'
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-width: 1.0
+          x1: 7.0
+          x2: 14.0
           y1: -3.5
-          x2: 14
           y2: -3.5
-          stroke: currentColor
-          stroke-width: 1
-          stroke-linecap: round
-          fill: none
-          opacity: '0.7'
       - component: line
         config:
-          x1: 7
-          y1: 0
-          x2: 14
-          y2: 0
-          stroke: currentColor
-          stroke-width: 1
-          stroke-linecap: round
           fill: none
           opacity: '0.7'
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-width: 1.0
+          x1: 7.0
+          x2: 14.0
+          y1: 0.0
+          y2: 0.0
       - component: line
         config:
-          x1: 7
+          fill: none
+          opacity: '0.7'
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-width: 1.0
+          x1: 7.0
+          x2: 14.0
           y1: 3.5
-          x2: 14
           y2: 3.5
-          stroke: currentColor
-          stroke-width: 1
-          stroke-linecap: round
+      - component: line
+        config:
           fill: none
           opacity: '0.7'
-      - component: line
-        config:
-          x1: 7
-          y1: 7
-          x2: 14
-          y2: 7
           stroke: currentColor
-          stroke-width: 1
           stroke-linecap: round
-          fill: none
-          opacity: '0.7'
+          stroke-width: 1.0
+          x1: 7.0
+          x2: 14.0
+          y1: 7.0
+          y2: 7.0
       - component: line
         config:
-          x1: -12
-          y1: 12
-          x2: -12
-          y2: 15
+          fill: none
           stroke: currentColor
+          stroke-linecap: round
           stroke-width: 1.6
-          stroke-linecap: round
-          fill: none
+          x1: -12.0
+          x2: -12.0
+          y1: 12.0
+          y2: 15.0
       - component: line
         config:
-          x1: 12
-          y1: 12
-          x2: 12
-          y2: 15
-          stroke: currentColor
-          stroke-width: 1.6
-          stroke-linecap: round
           fill: none
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-width: 1.6
+          x1: 12.0
+          x2: 12.0
+          y1: 12.0
+          y2: 15.0
   - component: g
     config:
       visible: =props.kind === 'heat-pump-split'
@@ -863,38 +863,38 @@ slots:
           default:
           - component: circle
             config:
-              cx: 0
-              cy: 0
+              cx: 0.0
+              cy: 0.0
               r: 27.75
               style:
                 fill: 'var(--f7-card-bg-color, #fff)'
           - component: circle
             config:
-              cx: 0
-              cy: 0
-              r: 27.75
+              cx: 0.0
+              cy: 0.0
               fill: '#fb8c00'
               fill-opacity: '0.12'
+              r: 27.75
       - component: rect
         config:
-          x: -21
-          y: -14
-          width: 32
-          height: 22
-          rx: 3
-          stroke: currentColor
-          stroke-width: 1.6
-          stroke-linecap: round
           fill: none
+          height: 22.0
+          rx: 3.0
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-width: 1.6
+          width: 32.0
+          x: -21.0
+          y: -14.0
       - component: circle
         config:
-          cx: -11
-          cy: -3
+          cx: -11.0
+          cy: -3.0
+          fill: none
           r: 8.5
           stroke: currentColor
-          stroke-width: 1.2
           stroke-linecap: round
-          fill: none
+          stroke-width: 1.2
       - component: g
         config:
           class: '=(Number(props.frequency) > 0) ? ''a-spin'' : '''''
@@ -905,10 +905,10 @@ slots:
           default:
           - component: circle
             config:
-              cx: -11
-              cy: -3
-              r: 8
+              cx: -11.0
+              cy: -3.0
               fill: none
+              r: 8.0
               stroke: none
           - component: path
             config:
@@ -927,128 +927,128 @@ slots:
               transform: rotate(240 -11 -3)
       - component: circle
         config:
-          cx: -11
-          cy: -3
-          r: 1.5
+          cx: -11.0
+          cy: -3.0
           fill: currentColor
+          r: 1.5
       - component: line
         config:
-          x1: 1
-          y1: -10
-          x2: 8
-          y2: -10
-          stroke: currentColor
-          stroke-width: 1
-          stroke-linecap: round
           fill: none
           opacity: '0.7'
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-width: 1.0
+          x1: 1.0
+          x2: 8.0
+          y1: -10.0
+          y2: -10.0
       - component: line
         config:
-          x1: 1
+          fill: none
+          opacity: '0.7'
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-width: 1.0
+          x1: 1.0
+          x2: 8.0
           y1: -6.5
-          x2: 8
           y2: -6.5
-          stroke: currentColor
-          stroke-width: 1
-          stroke-linecap: round
-          fill: none
-          opacity: '0.7'
       - component: line
         config:
-          x1: 1
-          y1: -3
-          x2: 8
-          y2: -3
-          stroke: currentColor
-          stroke-width: 1
-          stroke-linecap: round
           fill: none
           opacity: '0.7'
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-width: 1.0
+          x1: 1.0
+          x2: 8.0
+          y1: -3.0
+          y2: -3.0
       - component: line
         config:
-          x1: 1
+          fill: none
+          opacity: '0.7'
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-width: 1.0
+          x1: 1.0
+          x2: 8.0
           y1: 0.5
-          x2: 8
           y2: 0.5
-          stroke: currentColor
-          stroke-width: 1
-          stroke-linecap: round
-          fill: none
-          opacity: '0.7'
       - component: line
         config:
-          x1: 1
-          y1: 4
-          x2: 8
-          y2: 4
-          stroke: currentColor
-          stroke-width: 1
-          stroke-linecap: round
           fill: none
           opacity: '0.7'
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-width: 1.0
+          x1: 1.0
+          x2: 8.0
+          y1: 4.0
+          y2: 4.0
       - component: line
         config:
-          x1: -16
-          y1: 8
-          x2: -16
-          y2: 11
+          fill: none
           stroke: currentColor
+          stroke-linecap: round
           stroke-width: 1.6
-          stroke-linecap: round
-          fill: none
+          x1: -16.0
+          x2: -16.0
+          y1: 8.0
+          y2: 11.0
       - component: rect
         config:
-          x: 3
-          y: -8
-          width: 16
-          height: 24
+          height: 24.0
           rx: 2.5
           style:
             fill: 'var(--f7-card-bg-color, #fff)'
+          width: 16.0
+          x: 3.0
+          y: -8.0
       - component: rect
         config:
-          x: 3
-          y: -8
-          width: 16
-          height: 24
-          rx: 2.5
           fill: '#64b5f6'
           fill-opacity: '0.12'
+          height: 24.0
+          rx: 2.5
+          width: 16.0
+          x: 3.0
+          y: -8.0
       - component: rect
         config:
-          x: 3
-          y: -8
-          width: 16
-          height: 24
+          fill: none
+          height: 24.0
           rx: 2.5
           stroke: currentColor
-          stroke-width: 1.6
           stroke-linecap: round
-          fill: none
+          stroke-width: 1.6
+          width: 16.0
+          x: 3.0
+          y: -8.0
       - component: rect
         config:
-          x: 6
-          y: -5
-          width: 10
-          height: 4
-          rx: 1
           fill: '#37474f'
+          height: 4.0
+          rx: 1.0
+          width: 10.0
+          x: 6.0
+          y: -5.0
       - component: path
         config:
           d: M5.5,4 l1.8,-2 l1.8,4 l1.8,-4 l1.8,4 l1.8,-4 l1.8,2
-          stroke: '#9e9e9e'
-          stroke-width: 1.2
-          stroke-linecap: round
           fill: none
+          stroke: '#9e9e9e'
+          stroke-linecap: round
+          stroke-width: 1.2
       - component: circle
         config:
-          cx: 11
-          cy: 11
+          cx: 11.0
+          cy: 11.0
+          fill: none
           r: 2.3
           stroke: '#9e9e9e'
-          stroke-width: 1.2
           stroke-linecap: round
-          fill: none
+          stroke-width: 1.2
   - component: g
     config:
       visible: =props.kind === 'air-conditioner'
@@ -1060,147 +1060,147 @@ slots:
           default:
           - component: circle
             config:
-              cx: 0
-              cy: 0
+              cx: 0.0
+              cy: 0.0
               r: 27.75
               style:
                 fill: 'var(--f7-card-bg-color, #fff)'
           - component: circle
             config:
-              cx: 0
-              cy: 0
-              r: 27.75
+              cx: 0.0
+              cy: 0.0
               fill: '#29b6f6'
               fill-opacity: '0.12'
+              r: 27.75
       - component: rect
         config:
-          x: -18
-          y: -14
-          width: 36
-          height: 14
-          rx: 4
-          stroke: currentColor
-          stroke-width: 1.6
-          stroke-linecap: round
           fill: none
+          height: 14.0
+          rx: 4.0
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-width: 1.6
+          width: 36.0
+          x: -18.0
+          y: -14.0
       - component: line
         config:
-          x1: -13
-          y1: -4
-          x2: 13
-          y2: -4
-          stroke: currentColor
-          stroke-width: 1.2
-          stroke-linecap: round
           fill: none
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-width: 1.2
+          x1: -13.0
+          x2: 13.0
+          y1: -4.0
+          y2: -4.0
       - component: circle
         config:
-          cx: 13
-          cy: -10
-          r: 1.4
+          cx: 13.0
+          cy: -10.0
           fill: '=Math.abs(Number(props.power)) > 5 ? ''#29b6f6'' : ''#9e9e9e'''
+          r: 1.4
       - component: path
         config:
           d: M-9,3 q3,3.5 0,7 q-3,3.5 0,7
+          fill: none
           opacity: '=Math.abs(Number(props.power)) > 5 ? ''0.5'' : ''0.25'''
           stroke: '#29b6f6'
-          stroke-width: 1.4
           stroke-linecap: round
-          fill: none
+          stroke-width: 1.4
       - component: circle
         config:
-          r: 1.2
-          fill: '#29b6f6'
-          cx: 0
-          cy: 0
-          visible: =Math.abs(Number(props.power)) > 5
           class: '=(Math.abs(Number(props.power)) > 5) ? ''a-route-a934eb5f'' : '''''
+          cx: 0.0
+          cy: 0.0
+          fill: '#29b6f6'
+          r: 1.2
           style:
-            animation-duration: '=(Math.abs(Number(props.power)) < 300 ? 1.6 : (Math.abs(Number(props.power)) < 800 ? 1 :
-              (0.6))) + ''s'''
             animation-delay: '=(-0 / 2 * (Math.abs(Number(props.power)) < 300 ? 1.6 : (Math.abs(Number(props.power)) < 800
               ? 1 : (0.6)))) + ''s'''
-      - component: circle
-        config:
-          r: 1.2
-          fill: '#29b6f6'
-          cx: 0
-          cy: 0
-          visible: =Math.abs(Number(props.power)) > 5
-          class: '=(Math.abs(Number(props.power)) > 5) ? ''a-route-a934eb5f'' : '''''
-          style:
             animation-duration: '=(Math.abs(Number(props.power)) < 300 ? 1.6 : (Math.abs(Number(props.power)) < 800 ? 1 :
               (0.6))) + ''s'''
+          visible: =Math.abs(Number(props.power)) > 5
+      - component: circle
+        config:
+          class: '=(Math.abs(Number(props.power)) > 5) ? ''a-route-a934eb5f'' : '''''
+          cx: 0.0
+          cy: 0.0
+          fill: '#29b6f6'
+          r: 1.2
+          style:
             animation-delay: '=(-1 / 2 * (Math.abs(Number(props.power)) < 300 ? 1.6 : (Math.abs(Number(props.power)) < 800
               ? 1 : (0.6)))) + ''s'''
+            animation-duration: '=(Math.abs(Number(props.power)) < 300 ? 1.6 : (Math.abs(Number(props.power)) < 800 ? 1 :
+              (0.6))) + ''s'''
+          visible: =Math.abs(Number(props.power)) > 5
       - component: path
         config:
           d: M0,3 q3,3.5 0,7 q-3,3.5 0,7
+          fill: none
           opacity: '=Math.abs(Number(props.power)) > 5 ? ''0.5'' : ''0.25'''
           stroke: '#29b6f6'
-          stroke-width: 1.4
           stroke-linecap: round
-          fill: none
+          stroke-width: 1.4
       - component: circle
         config:
-          r: 1.2
-          fill: '#29b6f6'
-          cx: 0
-          cy: 0
-          visible: =Math.abs(Number(props.power)) > 5
           class: '=(Math.abs(Number(props.power)) > 5) ? ''a-route-f590ad61'' : '''''
+          cx: 0.0
+          cy: 0.0
+          fill: '#29b6f6'
+          r: 1.2
           style:
-            animation-duration: '=(Math.abs(Number(props.power)) < 300 ? 1.6 : (Math.abs(Number(props.power)) < 800 ? 1 :
-              (0.6))) + ''s'''
             animation-delay: '=(-0 / 2 * (Math.abs(Number(props.power)) < 300 ? 1.6 : (Math.abs(Number(props.power)) < 800
               ? 1 : (0.6)))) + ''s'''
-      - component: circle
-        config:
-          r: 1.2
-          fill: '#29b6f6'
-          cx: 0
-          cy: 0
-          visible: =Math.abs(Number(props.power)) > 5
-          class: '=(Math.abs(Number(props.power)) > 5) ? ''a-route-f590ad61'' : '''''
-          style:
             animation-duration: '=(Math.abs(Number(props.power)) < 300 ? 1.6 : (Math.abs(Number(props.power)) < 800 ? 1 :
               (0.6))) + ''s'''
+          visible: =Math.abs(Number(props.power)) > 5
+      - component: circle
+        config:
+          class: '=(Math.abs(Number(props.power)) > 5) ? ''a-route-f590ad61'' : '''''
+          cx: 0.0
+          cy: 0.0
+          fill: '#29b6f6'
+          r: 1.2
+          style:
             animation-delay: '=(-1 / 2 * (Math.abs(Number(props.power)) < 300 ? 1.6 : (Math.abs(Number(props.power)) < 800
               ? 1 : (0.6)))) + ''s'''
+            animation-duration: '=(Math.abs(Number(props.power)) < 300 ? 1.6 : (Math.abs(Number(props.power)) < 800 ? 1 :
+              (0.6))) + ''s'''
+          visible: =Math.abs(Number(props.power)) > 5
       - component: path
         config:
           d: M9,3 q3,3.5 0,7 q-3,3.5 0,7
+          fill: none
           opacity: '=Math.abs(Number(props.power)) > 5 ? ''0.5'' : ''0.25'''
           stroke: '#29b6f6'
-          stroke-width: 1.4
           stroke-linecap: round
-          fill: none
+          stroke-width: 1.4
       - component: circle
         config:
-          r: 1.2
-          fill: '#29b6f6'
-          cx: 0
-          cy: 0
-          visible: =Math.abs(Number(props.power)) > 5
           class: '=(Math.abs(Number(props.power)) > 5) ? ''a-route-4c29644b'' : '''''
+          cx: 0.0
+          cy: 0.0
+          fill: '#29b6f6'
+          r: 1.2
           style:
-            animation-duration: '=(Math.abs(Number(props.power)) < 300 ? 1.6 : (Math.abs(Number(props.power)) < 800 ? 1 :
-              (0.6))) + ''s'''
             animation-delay: '=(-0 / 2 * (Math.abs(Number(props.power)) < 300 ? 1.6 : (Math.abs(Number(props.power)) < 800
               ? 1 : (0.6)))) + ''s'''
-      - component: circle
-        config:
-          r: 1.2
-          fill: '#29b6f6'
-          cx: 0
-          cy: 0
-          visible: =Math.abs(Number(props.power)) > 5
-          class: '=(Math.abs(Number(props.power)) > 5) ? ''a-route-4c29644b'' : '''''
-          style:
             animation-duration: '=(Math.abs(Number(props.power)) < 300 ? 1.6 : (Math.abs(Number(props.power)) < 800 ? 1 :
               (0.6))) + ''s'''
+          visible: =Math.abs(Number(props.power)) > 5
+      - component: circle
+        config:
+          class: '=(Math.abs(Number(props.power)) > 5) ? ''a-route-4c29644b'' : '''''
+          cx: 0.0
+          cy: 0.0
+          fill: '#29b6f6'
+          r: 1.2
+          style:
             animation-delay: '=(-1 / 2 * (Math.abs(Number(props.power)) < 300 ? 1.6 : (Math.abs(Number(props.power)) < 800
               ? 1 : (0.6)))) + ''s'''
+            animation-duration: '=(Math.abs(Number(props.power)) < 300 ? 1.6 : (Math.abs(Number(props.power)) < 800 ? 1 :
+              (0.6))) + ''s'''
+          visible: =Math.abs(Number(props.power)) > 5
   - component: g
     config:
       visible: =props.kind === 'e-car'
@@ -1212,87 +1212,87 @@ slots:
           default:
           - component: circle
             config:
-              cx: 0
-              cy: 0
+              cx: 0.0
+              cy: 0.0
               r: 27.75
               style:
                 fill: 'var(--f7-card-bg-color, #fff)'
           - component: circle
             config:
-              cx: 0
-              cy: 0
-              r: 27.75
+              cx: 0.0
+              cy: 0.0
               fill: '#26a69a'
               fill-opacity: '0.12'
+              r: 27.75
       - component: path
         config:
           d: M22.38,4.6 L22.5,1.6 Q22.5,-1.4 21.5,-1.77 Q17.25,-2.77 11.12,-3.9 L3.75,-7.9 Q-5.62,-9.03 -16.75,-8.15 L-20.62,-7.53
             L-22.0,-3.9 L-22.62,1.85 Q-22.62,4.1 -21.0,4.6 Z
-          stroke: currentColor
-          stroke-width: 1.6
-          stroke-linecap: round
           fill: '#78909c'
           fill-opacity: '0.3'
+          stroke: currentColor
+          stroke-linecap: round
           stroke-linejoin: round
+          stroke-width: 1.6
       - component: path
         config:
           d: M9.5,-3.9 L4.12,-7.15 Q-5.62,-8.15 -15.5,-7.15 L-17.0,-5.4 Q-16.25,-4.53 -12.5,-4.4 Z
-          stroke: currentColor
-          stroke-width: 1.2
-          stroke-linecap: round
           fill: none
+          stroke: currentColor
+          stroke-linecap: round
           stroke-linejoin: round
+          stroke-width: 1.2
       - component: line
         config:
+          fill: none
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-width: 1.2
           x1: -2.62
-          y1: -8.03
           x2: -2.62
+          y1: -8.03
           y2: -4.28
-          stroke: currentColor
-          stroke-width: 1.2
-          stroke-linecap: round
-          fill: none
       - component: line
         config:
+          fill: none
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-width: 1.2
           x1: -9.88
-          y1: -7.78
           x2: -9.88
+          y1: -7.78
           y2: -4.4
-          stroke: currentColor
-          stroke-width: 1.2
-          stroke-linecap: round
-          fill: none
       - component: line
         config:
-          x1: 10.25
-          y1: 3.1
-          x2: -9.25
-          y2: 3.1
-          stroke: currentColor
-          stroke-width: 1
-          stroke-linecap: round
           fill: none
           opacity: '0.5'
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-width: 1.0
+          x1: 10.25
+          x2: -9.25
+          y1: 3.1
+          y2: 3.1
       - component: line
         config:
-          x1: 22.0
-          y1: -0.9
-          x2: 19.0
-          y2: -1.4
+          fill: none
           stroke: '#ffd54f'
-          stroke-width: 1.2
           stroke-linecap: round
-          fill: none
+          stroke-width: 1.2
+          x1: 22.0
+          x2: 19.0
+          y1: -0.9
+          y2: -1.4
       - component: line
         config:
-          x1: -22.38
-          y1: -2.4
-          x2: -20.38
-          y2: -2.02
-          stroke: '#ef5350'
-          stroke-width: 1.2
-          stroke-linecap: round
           fill: none
+          stroke: '#ef5350'
+          stroke-linecap: round
+          stroke-width: 1.2
+          x1: -22.38
+          x2: -20.38
+          y1: -2.4
+          y2: -2.02
       - component: g
         config:
           visible: =(props.plugged === true || props.plugged === 'true')
@@ -1301,20 +1301,20 @@ slots:
           - component: path
             config:
               d: M-19.8,-0.2 C-23.2,4.2 -25.2,10.8 -19.6,14.6 C-13.2,18.4 -2,19.5 0,27.75
-              stroke: currentColor
-              stroke-width: 1.4
-              stroke-linecap: round
               fill: none
+              stroke: currentColor
+              stroke-linecap: round
+              stroke-width: 1.4
           - component: line
             config:
-              x1: -18.55
-              y1: -2.12
-              x2: -19.8
-              y2: -0.2
-              stroke: currentColor
-              stroke-width: 2
-              stroke-linecap: round
               fill: none
+              stroke: currentColor
+              stroke-linecap: round
+              stroke-width: 2.0
+              x1: -18.55
+              x2: -19.8
+              y1: -2.12
+              y2: -0.2
       - component: circle
         config:
           cx: 14.88
@@ -1326,17 +1326,17 @@ slots:
         config:
           cx: 14.88
           cy: 3.73
+          fill: none
           r: 3.88
           stroke: currentColor
-          stroke-width: 1.6
           stroke-linecap: round
-          fill: none
+          stroke-width: 1.6
       - component: circle
         config:
           cx: 14.88
           cy: 3.73
-          r: 1
           fill: currentColor
+          r: 1.0
       - component: circle
         config:
           cx: -14.0
@@ -1348,39 +1348,39 @@ slots:
         config:
           cx: -14.0
           cy: 3.73
+          fill: none
           r: 3.88
           stroke: currentColor
-          stroke-width: 1.6
           stroke-linecap: round
-          fill: none
+          stroke-width: 1.6
       - component: circle
         config:
           cx: -14.0
           cy: 3.73
-          r: 1
           fill: currentColor
+          r: 1.0
       - component: g
         config:
+          class: a-fade
           opacity: '0'
           visible: =Math.abs(Number(props.power)) > 500
-          class: a-fade
         slots:
           default:
           - component: polygon
             config:
               points: 2.25,-12.0 -6.75,1.8 -0.9,1.8 -2.7,12.0 6.75,-1.8 0.9,-1.8
+              stroke-linejoin: round
+              stroke-width: 3.5
               style:
                 fill: 'var(--f7-card-bg-color, #fff)'
                 stroke: 'var(--f7-card-bg-color, #fff)'
-              stroke-width: 3.5
-              stroke-linejoin: round
           - component: polygon
             config:
-              points: 2.25,-12.0 -6.75,1.8 -0.9,1.8 -2.7,12.0 6.75,-1.8 0.9,-1.8
               fill: '#26a69a'
+              points: 2.25,-12.0 -6.75,1.8 -0.9,1.8 -2.7,12.0 6.75,-1.8 0.9,-1.8
               stroke: '#26a69a'
-              stroke-width: 0.8
               stroke-linejoin: round
+              stroke-width: 0.8
   - component: g
     config:
       visible: =props.kind === 'battery'
@@ -1392,58 +1392,58 @@ slots:
           default:
           - component: circle
             config:
-              cx: 0
-              cy: 0
+              cx: 0.0
+              cy: 0.0
               r: 27.75
               style:
                 fill: 'var(--f7-card-bg-color, #fff)'
           - component: circle
             config:
-              cx: 0
-              cy: 0
-              r: 27.75
+              cx: 0.0
+              cy: 0.0
               fill: '#7cb342'
               fill-opacity: '0.12'
+              r: 27.75
       - component: rect
         config:
-          x: -21
-          y: -10
-          width: 40
-          height: 20
-          rx: 3
           fill: none
+          height: 20.0
+          rx: 3.0
           stroke: currentColor
-          stroke-width: 2
+          stroke-width: 2.0
+          width: 40.0
+          x: -21.0
+          y: -10.0
       - component: rect
         config:
-          x: 19
-          y: -4.5
-          width: 3
-          height: 9
-          rx: 1
           fill: currentColor
+          height: 9.0
+          rx: 1.0
+          width: 3.0
+          x: 19.0
+          y: -4.5
       - component: rect
         config:
-          x: -18
-          y: -7
-          width: =(34 * Math.max(0, Math.min(100, Number(props.soc))) / 100).toFixed(1)
-          height: 14
-          rx: 1
           fill: '=Math.max(0, Math.min(100, Number(props.soc))) < 20 ? ''#e53935'' : Math.max(0, Math.min(100, Number(props.soc)))
             < 50 ? ''#fb8c00'' : ''#43a047'''
+          height: 14.0
+          rx: 1.0
+          width: =(34 * Math.max(0, Math.min(100, Number(props.soc))) / 100).toFixed(1)
+          x: -18.0
+          y: -7.0
       - component: text
         config:
-          x: -1
-          y: 4
           content: =Math.round(Math.max(0, Math.min(100, Number(props.soc)))) + ' %'
           fill: currentColor
-          font-size: 11
+          font-size: 11.0
           font-weight: '700'
-          text-anchor: middle
           paint-order: stroke
           stroke: 'var(--f7-card-bg-color, #fff)'
-          stroke-width: 3
           stroke-linejoin: round
+          stroke-width: 3.0
+          text-anchor: middle
+          x: -1.0
+          y: 4.0
   - component: g
     config:
       visible: =props.kind === 'appliances'
@@ -1455,18 +1455,18 @@ slots:
           default:
           - component: circle
             config:
-              cx: 0
-              cy: 0
+              cx: 0.0
+              cy: 0.0
               r: 27.75
               style:
                 fill: 'var(--f7-card-bg-color, #fff)'
           - component: circle
             config:
-              cx: 0
-              cy: 0
-              r: 27.75
+              cx: 0.0
+              cy: 0.0
               fill: '#5c6bc0'
               fill-opacity: '0.12'
+              r: 27.75
       - component: g
         config:
           transform: translate(-32 -32)
@@ -1474,31 +1474,31 @@ slots:
           default:
           - component: rect
             config:
-              x: 20
-              y: 15
-              width: 24
-              height: 34
-              rx: 3
-              stroke: currentColor
-              stroke-width: 1.6
-              stroke-linecap: round
               fill: none
+              height: 34.0
+              rx: 3.0
+              stroke: currentColor
+              stroke-linecap: round
+              stroke-width: 1.6
+              width: 24.0
+              x: 20.0
+              y: 15.0
           - component: line
             config:
-              x1: 20
-              y1: 21
-              x2: 44
-              y2: 21
-              stroke: currentColor
-              stroke-width: 1.2
-              stroke-linecap: round
               fill: none
+              stroke: currentColor
+              stroke-linecap: round
+              stroke-width: 1.2
+              x1: 20.0
+              x2: 44.0
+              y1: 21.0
+              y2: 21.0
           - component: circle
             config:
-              cx: 39
-              cy: 18
-              r: 1.3
+              cx: 39.0
+              cy: 18.0
               fill: currentColor
+              r: 1.3
           - component: g
             config:
               opacity: '=Math.abs(Number(props.power)) > 10 ? ''1'' : ''0.45'''
@@ -1511,26 +1511,26 @@ slots:
                   default:
                   - component: path
                     config:
+                      class: '=(Math.abs(Number(props.power)) > 10) ? ''a-breathe'' : '''''
                       d: M0,-8 Q1.28,-1.28 8,0 Q1.28,1.28 0,8 Q-1.28,1.28 -8,0 Q-1.28,-1.28 0,-8 Z
                       fill: '#5c6bc0'
-                      class: '=(Math.abs(Number(props.power)) > 10) ? ''a-breathe'' : '''''
                       style:
                         animation-duration: '=Math.abs(Number(props.power)) < 500 ? ''2.4s'' : (Math.abs(Number(props.power))
                           < 1500 ? ''1.6s'' : (''1s''))'
               - component: path
                 config:
+                  class: '=(Math.abs(Number(props.power)) > 10) ? ''a-blink-up'' : '''''
                   d: M38.6,25.1 Q39.06,27.54 41.5,28 Q39.06,28.46 38.6,30.9 Q38.14,28.46 35.7,28 Q38.14,27.54 38.6,25.1 Z
                   fill: '#5c6bc0'
-                  class: '=(Math.abs(Number(props.power)) > 10) ? ''a-blink-up'' : '''''
                   style:
                     animation-duration: '=Math.abs(Number(props.power)) < 500 ? ''1.8s'' : (Math.abs(Number(props.power))
                       < 1500 ? ''1.2s'' : (''0.75s''))'
               - component: path
                 config:
+                  class: '=(Math.abs(Number(props.power)) > 10) ? ''a-blink-down'' : '''''
                   d: M25.2,41.1 Q25.54,42.86 27.3,43.2 Q25.54,43.54 25.2,45.3 Q24.86,43.54 23.1,43.2 Q24.86,42.86 25.2,41.1
                     Z
                   fill: '#5c6bc0'
-                  class: '=(Math.abs(Number(props.power)) > 10) ? ''a-blink-down'' : '''''
                   style:
                     animation-duration: '=Math.abs(Number(props.power)) < 500 ? ''1.8s'' : (Math.abs(Number(props.power))
                       < 1500 ? ''1.2s'' : (''0.75s''))'
@@ -1545,29 +1545,29 @@ slots:
           default:
           - component: circle
             config:
-              cx: 0
-              cy: 0
+              cx: 0.0
+              cy: 0.0
               r: 27.75
               style:
                 fill: 'var(--f7-card-bg-color, #fff)'
           - component: circle
             config:
-              cx: 0
-              cy: 0
-              r: 27.75
+              cx: 0.0
+              cy: 0.0
               fill: '#26a69a'
               fill-opacity: '0.12'
+              r: 27.75
       - component: rect
         config:
-          x: -16
-          y: -6
-          width: 32
-          height: 21
-          rx: 3
-          stroke: currentColor
-          stroke-width: 1.6
-          stroke-linecap: round
           fill: none
+          height: 21.0
+          rx: 3.0
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-width: 1.6
+          width: 32.0
+          x: -16.0
+          y: -6.0
       - component: g
         config:
           class: '=(Math.abs(Number(props.power)) > 5) ? ''a-spin'' : '''''
@@ -1578,84 +1578,84 @@ slots:
           default:
           - component: circle
             config:
-              cx: 0
+              cx: 0.0
               cy: 4.5
-              r: 9
               fill: none
+              r: 9.0
               stroke: none
           - component: path
             config:
               d: M0,4.5 C2.5,3.0 4.5,-1.0 1.5,-4.0 C-0.5,-1.5 -2,1.5 0,4.5 Z
               fill: '#26a69a'
+              fill-opacity: '0.85'
               transform: rotate(0 0 4.5)
-              fill-opacity: '0.85'
           - component: path
             config:
               d: M0,4.5 C2.5,3.0 4.5,-1.0 1.5,-4.0 C-0.5,-1.5 -2,1.5 0,4.5 Z
               fill: '#26a69a'
+              fill-opacity: '0.85'
               transform: rotate(72 0 4.5)
-              fill-opacity: '0.85'
           - component: path
             config:
               d: M0,4.5 C2.5,3.0 4.5,-1.0 1.5,-4.0 C-0.5,-1.5 -2,1.5 0,4.5 Z
               fill: '#26a69a'
+              fill-opacity: '0.85'
               transform: rotate(144 0 4.5)
-              fill-opacity: '0.85'
           - component: path
             config:
               d: M0,4.5 C2.5,3.0 4.5,-1.0 1.5,-4.0 C-0.5,-1.5 -2,1.5 0,4.5 Z
               fill: '#26a69a'
+              fill-opacity: '0.85'
               transform: rotate(216 0 4.5)
-              fill-opacity: '0.85'
           - component: path
             config:
               d: M0,4.5 C2.5,3.0 4.5,-1.0 1.5,-4.0 C-0.5,-1.5 -2,1.5 0,4.5 Z
               fill: '#26a69a'
-              transform: rotate(288 0 4.5)
               fill-opacity: '0.85'
+              transform: rotate(288 0 4.5)
       - component: circle
         config:
-          cx: 0
+          cx: 0.0
           cy: 4.5
-          r: 2
-          style:
-            fill: 'var(--f7-card-bg-color, #fff)'
+          r: 2.0
           stroke: '#26a69a'
           stroke-width: 1.4
+          style:
+            fill: 'var(--f7-card-bg-color, #fff)'
       - component: path
         config:
           d: M-7,-21 V-10
+          fill: none
           opacity: '=Math.abs(Number(props.power)) > 5 ? ''0.5'' : ''0.3'''
           stroke: '#26a69a'
-          stroke-width: 1.6
           stroke-linecap: round
-          fill: none
+          stroke-width: 1.6
       - component: circle
         config:
-          r: 1.2
-          fill: '#26a69a'
-          cx: 0
-          cy: 0
-          visible: =Math.abs(Number(props.power)) > 5
           class: '=(Math.abs(Number(props.power)) > 5) ? ''a-route-aabac290'' : '''''
+          cx: 0.0
+          cy: 0.0
+          fill: '#26a69a'
+          r: 1.2
           style:
-            animation-duration: '=(Math.abs(Number(props.power)) < 30 ? 1.6 : (Math.abs(Number(props.power)) < 60 ? 1 : (0.6)))
-              + ''s'''
             animation-delay: '=(-0 / 2 * (Math.abs(Number(props.power)) < 30 ? 1.6 : (Math.abs(Number(props.power)) < 60 ?
               1 : (0.6)))) + ''s'''
-      - component: circle
-        config:
-          r: 1.2
-          fill: '#26a69a'
-          cx: 0
-          cy: 0
-          visible: =Math.abs(Number(props.power)) > 5
-          class: '=(Math.abs(Number(props.power)) > 5) ? ''a-route-aabac290'' : '''''
-          style:
             animation-duration: '=(Math.abs(Number(props.power)) < 30 ? 1.6 : (Math.abs(Number(props.power)) < 60 ? 1 : (0.6)))
               + ''s'''
+          visible: =Math.abs(Number(props.power)) > 5
+      - component: circle
+        config:
+          class: '=(Math.abs(Number(props.power)) > 5) ? ''a-route-aabac290'' : '''''
+          cx: 0.0
+          cy: 0.0
+          fill: '#26a69a'
+          r: 1.2
+          style:
             animation-delay: '=(-1 / 2 * (Math.abs(Number(props.power)) < 30 ? 1.6 : (Math.abs(Number(props.power)) < 60 ?
               1 : (0.6)))) + ''s'''
+            animation-duration: '=(Math.abs(Number(props.power)) < 30 ? 1.6 : (Math.abs(Number(props.power)) < 60 ? 1 : (0.6)))
+              + ''s'''
+          visible: =Math.abs(Number(props.power)) > 5
       - component: path
         config:
           d: M-10.5,-11.5 L-7,-8 L-3.5,-11.5 Z
@@ -1663,37 +1663,37 @@ slots:
       - component: path
         config:
           d: M7,-7 V-18
+          fill: none
           opacity: '=Math.abs(Number(props.power)) > 5 ? ''0.5'' : ''0.3'''
           stroke: '#90a4ae'
-          stroke-width: 1.6
           stroke-linecap: round
-          fill: none
+          stroke-width: 1.6
       - component: circle
         config:
-          r: 1.2
-          fill: '#90a4ae'
-          cx: 0
-          cy: 0
-          visible: =Math.abs(Number(props.power)) > 5
           class: '=(Math.abs(Number(props.power)) > 5) ? ''a-route-4221cc14'' : '''''
+          cx: 0.0
+          cy: 0.0
+          fill: '#90a4ae'
+          r: 1.2
           style:
-            animation-duration: '=(Math.abs(Number(props.power)) < 30 ? 1.6 : (Math.abs(Number(props.power)) < 60 ? 1 : (0.6)))
-              + ''s'''
             animation-delay: '=(-0 / 2 * (Math.abs(Number(props.power)) < 30 ? 1.6 : (Math.abs(Number(props.power)) < 60 ?
               1 : (0.6)))) + ''s'''
-      - component: circle
-        config:
-          r: 1.2
-          fill: '#90a4ae'
-          cx: 0
-          cy: 0
-          visible: =Math.abs(Number(props.power)) > 5
-          class: '=(Math.abs(Number(props.power)) > 5) ? ''a-route-4221cc14'' : '''''
-          style:
             animation-duration: '=(Math.abs(Number(props.power)) < 30 ? 1.6 : (Math.abs(Number(props.power)) < 60 ? 1 : (0.6)))
               + ''s'''
+          visible: =Math.abs(Number(props.power)) > 5
+      - component: circle
+        config:
+          class: '=(Math.abs(Number(props.power)) > 5) ? ''a-route-4221cc14'' : '''''
+          cx: 0.0
+          cy: 0.0
+          fill: '#90a4ae'
+          r: 1.2
+          style:
             animation-delay: '=(-1 / 2 * (Math.abs(Number(props.power)) < 30 ? 1.6 : (Math.abs(Number(props.power)) < 60 ?
               1 : (0.6)))) + ''s'''
+            animation-duration: '=(Math.abs(Number(props.power)) < 30 ? 1.6 : (Math.abs(Number(props.power)) < 60 ? 1 : (0.6)))
+              + ''s'''
+          visible: =Math.abs(Number(props.power)) > 5
       - component: path
         config:
           d: M3.5,-17.5 L7,-21 L10.5,-17.5 Z
@@ -1709,168 +1709,168 @@ slots:
           default:
           - component: circle
             config:
-              cx: 0
-              cy: 0
+              cx: 0.0
+              cy: 0.0
               r: 27.75
               style:
                 fill: 'var(--f7-card-bg-color, #fff)'
           - component: circle
             config:
-              cx: 0
-              cy: 0
-              r: 27.75
+              cx: 0.0
+              cy: 0.0
               fill: '#8d6e63'
               fill-opacity: '0.12'
+              r: 27.75
       - component: path
         config:
           d: M-18,-10 V-13.5 H2 V-10
-          stroke: currentColor
-          stroke-width: 1.2
-          stroke-linecap: round
           fill: none
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-width: 1.2
       - component: path
         config:
           d: M-19,-7 H-20.5 V4
-          stroke: currentColor
-          stroke-width: 1.4
-          stroke-linecap: round
           fill: none
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-width: 1.4
       - component: rect
         config:
-          x: -19
-          y: -10
-          width: 22
-          height: 19
-          rx: 2
-          stroke: currentColor
-          stroke-width: 1.6
-          stroke-linecap: round
           fill: '#b0bec5'
           fill-opacity: '0.35'
+          height: 19.0
+          rx: 2.0
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-width: 1.6
+          width: 22.0
+          x: -19.0
+          y: -10.0
       - component: rect
         config:
-          x: -18
-          y: 9
-          width: 20
+          fill: '#b0bec5'
+          fill-opacity: '0.35'
           height: 2.5
           rx: 0.8
           stroke: currentColor
-          stroke-width: 1.2
           stroke-linecap: round
-          fill: '#b0bec5'
-          fill-opacity: '0.35'
+          stroke-width: 1.2
+          width: 20.0
+          x: -18.0
+          y: 9.0
       - component: circle
         config:
           cx: -14.5
           cy: -5.5
+          fill: '#ffffff'
           r: 2.6
           stroke: currentColor
-          stroke-width: 1.1
           stroke-linecap: round
-          fill: '#ffffff'
+          stroke-width: 1.1
       - component: line
         config:
-          x1: -14.5
-          y1: -5.5
-          x2: -15.7
-          y2: -7.1
-          stroke: '#e53935'
-          stroke-width: 0.9
-          stroke-linecap: round
           fill: none
+          stroke: '#e53935'
+          stroke-linecap: round
+          stroke-width: 0.9
+          x1: -14.5
+          x2: -15.7
+          y1: -5.5
+          y2: -7.1
       - component: circle
         config:
           cx: -0.2
           cy: -6.8
-          r: 1.3
           fill: '=Math.abs(Number(props.power)) > 300 ? ''#fb8c00'' : ''#9e9e9e'''
+          r: 1.3
       - component: line
         config:
-          x1: -7
-          y1: -4
-          x2: -3.5
-          y2: -7.5
-          stroke: currentColor
-          stroke-width: 1.4
-          stroke-linecap: round
           fill: none
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-width: 1.4
+          x1: -7.0
+          x2: -3.5
+          y1: -4.0
+          y2: -7.5
       - component: circle
         config:
           cx: -3.5
           cy: -7.5
-          r: 1.3
           fill: currentColor
+          r: 1.3
       - component: path
         config:
           d: M-10,0.5 V-1.5 Q-10,-4.5 -7,-4.5 Q-4,-4.5 -4,-1.5 V0.5 Z
-          stroke: currentColor
-          stroke-width: 1.3
-          stroke-linecap: round
           fill: '#eceff1'
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-width: 1.3
       - component: rect
         config:
+          fill: currentColor
+          height: 2.0
+          rx: 0.8
+          width: 7.0
           x: -10.5
           y: 0.5
-          width: 7
-          height: 2
-          rx: 0.8
-          fill: currentColor
       - component: line
         config:
-          x1: -4
-          y1: 1.5
-          x2: 0.5
-          y2: 3.5
-          stroke: '#5d4037'
-          stroke-width: 2.4
-          stroke-linecap: round
           fill: none
+          stroke: '#5d4037'
+          stroke-linecap: round
+          stroke-width: 2.4
+          x1: -4.0
+          x2: 0.5
+          y1: 1.5
+          y2: 3.5
       - component: path
         config:
           d: M-9.5,4.5 H-4.5 L-5,8.2 H-9 Z
-          stroke: currentColor
-          stroke-width: 1.1
-          stroke-linecap: round
           fill: '#ffffff'
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-width: 1.1
       - component: path
         config:
           d: M9,-17 H18 L16,-10 H11 Z
-          stroke: currentColor
-          stroke-width: 1.3
-          stroke-linecap: round
           fill: '#8d6e63'
           fill-opacity: '0.5'
+          stroke: currentColor
+          stroke-linecap: round
           stroke-linejoin: round
+          stroke-width: 1.3
       - component: rect
         config:
-          x: 10
-          y: -10
-          width: 7
-          height: 21.5
-          rx: 1
-          stroke: currentColor
-          stroke-width: 1.6
-          stroke-linecap: round
           fill: '#b0bec5'
           fill-opacity: '0.35'
+          height: 21.5
+          rx: 1.0
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-width: 1.6
+          width: 7.0
+          x: 10.0
+          y: -10.0
       - component: rect
         config:
-          x: 12
-          y: -0.5
-          width: 3
+          fill: currentColor
           height: 2.4
           rx: 0.6
-          fill: currentColor
+          width: 3.0
+          x: 12.0
+          y: -0.5
       - component: line
         config:
-          x1: 9
-          y1: 11.5
-          x2: 18
-          y2: 11.5
-          stroke: currentColor
-          stroke-width: 1.6
-          stroke-linecap: round
           fill: none
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-width: 1.6
+          x1: 9.0
+          x2: 18.0
+          y1: 11.5
+          y2: 11.5
   - component: g
     config:
       visible: =props.kind === 'refrigerator'
@@ -1882,111 +1882,111 @@ slots:
           default:
           - component: circle
             config:
-              cx: 0
-              cy: 0
+              cx: 0.0
+              cy: 0.0
               r: 27.75
               style:
                 fill: 'var(--f7-card-bg-color, #fff)'
           - component: circle
             config:
-              cx: 0
-              cy: 0
-              r: 27.75
+              cx: 0.0
+              cy: 0.0
               fill: '#78909c'
               fill-opacity: '0.12'
+              r: 27.75
       - component: rect
         config:
-          x: -9
-          y: -22
-          width: 18
-          height: 43
-          rx: 2.2
-          stroke: currentColor
-          stroke-width: 1.6
-          stroke-linecap: round
           fill: '#b0bec5'
           fill-opacity: '0.35'
+          height: 43.0
+          rx: 2.2
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-width: 1.6
+          width: 18.0
+          x: -9.0
+          y: -22.0
       - component: line
         config:
-          x1: -9
-          y1: 3
-          x2: 9
-          y2: 3
+          fill: none
           stroke: currentColor
+          stroke-linecap: round
           stroke-width: 1.4
-          stroke-linecap: round
-          fill: none
+          x1: -9.0
+          x2: 9.0
+          y1: 3.0
+          y2: 3.0
       - component: line
         config:
-          x1: -9
+          fill: none
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-width: 1.2
+          x1: -9.0
+          x2: 9.0
           y1: 9.0
-          x2: 9
           y2: 9.0
-          stroke: currentColor
-          stroke-width: 1.2
-          stroke-linecap: round
-          fill: none
       - component: line
         config:
-          x1: -9
+          fill: none
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-width: 1.2
+          x1: -9.0
+          x2: 9.0
           y1: 15.0
-          x2: 9
           y2: 15.0
-          stroke: currentColor
-          stroke-width: 1.2
-          stroke-linecap: round
-          fill: none
       - component: line
         config:
-          x1: 6
-          y1: -18
-          x2: 6
-          y2: -3
+          fill: none
           stroke: currentColor
+          stroke-linecap: round
           stroke-width: 1.8
-          stroke-linecap: round
-          fill: none
+          x1: 6.0
+          x2: 6.0
+          y1: -18.0
+          y2: -3.0
       - component: line
         config:
-          x1: -4
+          fill: none
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-width: 1.6
+          x1: -4.0
+          x2: 4.0
           y1: 5.3
-          x2: 4
           y2: 5.3
-          stroke: currentColor
-          stroke-width: 1.6
-          stroke-linecap: round
-          fill: none
       - component: line
         config:
-          x1: -4
+          fill: none
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-width: 1.6
+          x1: -4.0
+          x2: 4.0
           y1: 11.3
-          x2: 4
           y2: 11.3
-          stroke: currentColor
-          stroke-width: 1.6
-          stroke-linecap: round
-          fill: none
       - component: line
         config:
-          x1: -4
+          fill: none
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-width: 1.6
+          x1: -4.0
+          x2: 4.0
           y1: 17.3
-          x2: 4
           y2: 17.3
-          stroke: currentColor
-          stroke-width: 1.6
-          stroke-linecap: round
-          fill: none
       - component: line
         config:
-          x1: -6.5
-          y1: -19
-          x2: -6.5
-          y2: 18
-          stroke: '#ffffff'
-          stroke-width: 1.3
-          stroke-linecap: round
           fill: none
           opacity: '0.6'
+          stroke: '#ffffff'
+          stroke-linecap: round
+          stroke-width: 1.3
+          x1: -6.5
+          x2: -6.5
+          y1: -19.0
+          y2: 18.0
       - component: g
         config:
           opacity: '=Math.abs(Number(props.power)) > 10 ? ''1'' : ''0.35'''
@@ -1994,34 +1994,34 @@ slots:
           default:
           - component: line
             config:
+              fill: none
+              stroke: '#29b6f6'
+              stroke-linecap: round
+              stroke-width: 1.2
               x1: -1.5
-              y1: -5.8
               x2: -1.5
+              y1: -5.8
               y2: -14.2
-              stroke: '#29b6f6'
-              stroke-width: 1.2
-              stroke-linecap: round
-              fill: none
           - component: line
             config:
+              fill: none
+              stroke: '#29b6f6'
+              stroke-linecap: round
+              stroke-width: 1.2
               x1: -5.14
+              x2: 2.14
               y1: -7.9
-              x2: 2.14
               y2: -12.1
-              stroke: '#29b6f6'
-              stroke-width: 1.2
-              stroke-linecap: round
-              fill: none
           - component: line
             config:
-              x1: -5.14
-              y1: -12.1
-              x2: 2.14
-              y2: -7.9
-              stroke: '#29b6f6'
-              stroke-width: 1.2
-              stroke-linecap: round
               fill: none
+              stroke: '#29b6f6'
+              stroke-linecap: round
+              stroke-width: 1.2
+              x1: -5.14
+              x2: 2.14
+              y1: -12.1
+              y2: -7.9
   - component: g
     config:
       visible: =props.kind === 'media'
@@ -2033,39 +2033,39 @@ slots:
           default:
           - component: circle
             config:
-              cx: 0
-              cy: 0
+              cx: 0.0
+              cy: 0.0
               r: 27.75
               style:
                 fill: 'var(--f7-card-bg-color, #fff)'
           - component: circle
             config:
-              cx: 0
-              cy: 0
-              r: 27.75
+              cx: 0.0
+              cy: 0.0
               fill: '#ec407a'
               fill-opacity: '0.12'
+              r: 27.75
       - component: rect
         config:
-          x: -17
-          y: -17
-          width: 34
-          height: 19
-          rx: 1.5
-          stroke: currentColor
-          stroke-width: 1.6
-          stroke-linecap: round
           fill: '#37474f'
           fill-opacity: '0.85'
+          height: 19.0
+          rx: 1.5
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-width: 1.6
+          width: 34.0
+          x: -17.0
+          y: -17.0
       - component: rect
         config:
+          fill: '#4fc3f7'
+          height: 15.8
+          opacity: '=Math.abs(Number(props.power)) > 50 ? ''0.75'' : ''0'''
+          rx: 0.6
+          width: 30.8
           x: -15.4
           y: -15.4
-          width: 30.8
-          height: 15.8
-          rx: 0.6
-          fill: '#4fc3f7'
-          opacity: '=Math.abs(Number(props.power)) > 50 ? ''0.75'' : ''0'''
       - component: path
         config:
           d: M-15.4,0.3999999999999999 L-6,-8 L-1,-3 L5,-10 L15.4,0.3999999999999999 Z
@@ -2073,53 +2073,53 @@ slots:
           opacity: '=Math.abs(Number(props.power)) > 50 ? ''0.55'' : ''0'''
       - component: circle
         config:
-          cx: 9
-          cy: -11
-          r: 2
+          cx: 9.0
+          cy: -11.0
           fill: '#fff59d'
           opacity: '=Math.abs(Number(props.power)) > 50 ? ''0.9'' : ''0'''
+          r: 2.0
       - component: rect
         config:
-          x: -2
-          y: 2
-          width: 4
-          height: 4
-          stroke: currentColor
-          stroke-width: 1.2
-          stroke-linecap: round
           fill: '#b0bec5'
           fill-opacity: '0.35'
+          height: 4.0
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-width: 1.2
+          width: 4.0
+          x: -2.0
+          y: 2.0
       - component: rect
         config:
-          x: -9
-          y: 6
-          width: 18
-          height: 2
+          fill: '#b0bec5'
+          fill-opacity: '0.35'
+          height: 2.0
           rx: 0.8
           stroke: currentColor
-          stroke-width: 1.2
           stroke-linecap: round
-          fill: '#b0bec5'
-          fill-opacity: '0.35'
+          stroke-width: 1.2
+          width: 18.0
+          x: -9.0
+          y: 6.0
       - component: rect
         config:
-          x: -11
-          y: 10
-          width: 22
-          height: 6
+          fill: '#263238'
+          height: 6.0
           rx: 1.2
           stroke: currentColor
-          stroke-width: 1.4
           stroke-linecap: round
-          fill: '#263238'
+          stroke-width: 1.4
+          width: 22.0
+          x: -11.0
+          y: 10.0
       - component: rect
         config:
-          x: 2
-          y: 11.8
-          width: 6
+          fill: '=Math.abs(Number(props.power)) > 50 ? ''#4fc3f7'' : ''#546e7a'''
           height: 2.4
           rx: 0.5
-          fill: '=Math.abs(Number(props.power)) > 50 ? ''#4fc3f7'' : ''#546e7a'''
+          width: 6.0
+          x: 2.0
+          y: 11.8
   - component: g
     config:
       visible: =props.kind === 'office'
@@ -2131,45 +2131,45 @@ slots:
           default:
           - component: circle
             config:
-              cx: 0
-              cy: 0
+              cx: 0.0
+              cy: 0.0
               r: 27.75
               style:
                 fill: 'var(--f7-card-bg-color, #fff)'
           - component: circle
             config:
-              cx: 0
-              cy: 0
-              r: 27.75
+              cx: 0.0
+              cy: 0.0
               fill: '#ab47bc'
               fill-opacity: '0.12'
+              r: 27.75
       - component: rect
         config:
-          x: -1.5
-          y: -0.19999999999999996
-          width: 3
-          height: 4.2
-          stroke: currentColor
-          stroke-width: 1.2
-          stroke-linecap: round
           fill: '#b0bec5'
           fill-opacity: '0.35'
+          height: 4.2
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-width: 1.2
+          width: 3.0
+          x: -1.5
+          y: -0.19999999999999996
       - component: path
         config:
           d: M-5,5.6 Q0,3 5,5.6
-          stroke: currentColor
-          stroke-width: 1.8
-          stroke-linecap: round
           fill: none
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-width: 1.8
       - component: path
         config:
           d: M-19.0,-15.2 Q0.0,-18.8 19.0,-15.2 L19.0,0.30000000000000004 Q0.0,-3.3 -19.0,0.30000000000000004 Z
-          stroke: currentColor
-          stroke-width: 1.6
-          stroke-linecap: round
           fill: '#37474f'
           fill-opacity: '0.85'
+          stroke: currentColor
+          stroke-linecap: round
           stroke-linejoin: round
+          stroke-width: 1.6
       - component: g
         config:
           visible: =Math.abs(Number(props.power)) > 10
@@ -2182,43 +2182,43 @@ slots:
               fill-opacity: '0.6'
           - component: rect
             config:
-              x: -14.62
-              y: -12.4
-              width: 13.22
-              height: 6.77
-              rx: 0.5
               fill: '#ffffff'
               fill-opacity: '0.85'
-          - component: rect
-            config:
-              x: 0.7
-              y: -12.4
-              width: 13.92
               height: 6.77
               rx: 0.5
+              width: 13.22
+              x: -14.62
+              y: -12.4
+          - component: rect
+            config:
               fill: '#ffffff'
               fill-opacity: '0.6'
+              height: 6.77
+              rx: 0.5
+              width: 13.92
+              x: 0.7
+              y: -12.4
       - component: rect
         config:
-          x: -8
-          y: 4.5
-          width: 16
           height: 9.5
-          rx: 1
+          rx: 1.0
           style:
             fill: 'var(--f7-card-bg-color, #fff)'
+          width: 16.0
+          x: -8.0
+          y: 4.5
       - component: rect
         config:
-          x: -8
-          y: 4.5
-          width: 16
-          height: 9.5
-          rx: 1
-          stroke: currentColor
-          stroke-width: 1.5
-          stroke-linecap: round
           fill: '#37474f'
           fill-opacity: '0.85'
+          height: 9.5
+          rx: 1.0
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-width: 1.5
+          width: 16.0
+          x: -8.0
+          y: 4.5
       - component: g
         config:
           visible: =Math.abs(Number(props.power)) > 10
@@ -2226,31 +2226,31 @@ slots:
           default:
           - component: rect
             config:
-              x: -6.6
-              y: 5.9
-              width: 13.2
-              height: 6.699999999999999
-              rx: 0.4
               fill: '#90caf9'
               fill-opacity: '0.6'
+              height: 6.699999999999999
+              rx: 0.4
+              width: 13.2
+              x: -6.6
+              y: 5.9
           - component: rect
             config:
-              x: -5.54
-              y: 7.24
-              width: 5.02
-              height: 3.69
-              rx: 0.5
               fill: '#ffffff'
               fill-opacity: '0.85'
-          - component: rect
-            config:
-              x: 0.26
-              y: 7.24
-              width: 5.28
               height: 3.69
               rx: 0.5
+              width: 5.02
+              x: -5.54
+              y: 7.24
+          - component: rect
+            config:
               fill: '#ffffff'
               fill-opacity: '0.6'
+              height: 3.69
+              rx: 0.5
+              width: 5.28
+              x: 0.26
+              y: 7.24
       - component: path
         config:
           d: M-10,17 L-8,14 H8 L10,17 Z
@@ -2259,23 +2259,23 @@ slots:
       - component: path
         config:
           d: M-10,17 L-8,14 H8 L10,17 Z
-          stroke: currentColor
-          stroke-width: 1.4
-          stroke-linecap: round
           fill: '#b0bec5'
           fill-opacity: '0.35'
+          stroke: currentColor
+          stroke-linecap: round
           stroke-linejoin: round
+          stroke-width: 1.4
       - component: line
         config:
-          x1: -6.8
-          y1: 15.5
-          x2: 6.8
-          y2: 15.5
-          stroke: currentColor
-          stroke-width: 0.7
-          stroke-linecap: round
           fill: none
           opacity: '0.5'
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-width: 0.7
+          x1: -6.8
+          x2: 6.8
+          y1: 15.5
+          y2: 15.5
   - component: g
     config:
       visible: =props.kind === 'terrace-light'
@@ -2287,202 +2287,202 @@ slots:
           default:
           - component: circle
             config:
-              cx: 0
-              cy: 0
+              cx: 0.0
+              cy: 0.0
               r: 27.75
               style:
                 fill: 'var(--f7-card-bg-color, #fff)'
           - component: circle
             config:
-              cx: 0
-              cy: 0
-              r: 27.75
+              cx: 0.0
+              cy: 0.0
               fill: '#fbc02d'
               fill-opacity: '0.12'
+              r: 27.75
       - component: rect
         config:
+          fill: '#a1887f'
+          fill-opacity: '0.6'
+          height: 17.0
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-linejoin: round
+          stroke-width: 1.3
+          width: 2.8
           x: -21.4
-          y: -8
-          width: 2.8
-          height: 17
-          stroke: currentColor
-          stroke-width: 1.3
-          stroke-linecap: round
-          fill: '#a1887f'
-          fill-opacity: '0.6'
-          stroke-linejoin: round
+          y: -8.0
       - component: rect
         config:
+          fill: '#a1887f'
+          fill-opacity: '0.6'
+          height: 16.0
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-linejoin: round
+          stroke-width: 1.3
+          width: 2.8
           x: -1.4
-          y: 1
-          width: 2.8
-          height: 16
-          stroke: currentColor
-          stroke-width: 1.3
-          stroke-linecap: round
-          fill: '#a1887f'
-          fill-opacity: '0.6'
-          stroke-linejoin: round
+          y: 1.0
       - component: rect
         config:
-          x: 18.6
-          y: -8
-          width: 2.8
-          height: 17
-          stroke: currentColor
-          stroke-width: 1.3
-          stroke-linecap: round
           fill: '#a1887f'
           fill-opacity: '0.6'
+          height: 17.0
+          stroke: currentColor
+          stroke-linecap: round
           stroke-linejoin: round
+          stroke-width: 1.3
+          width: 2.8
+          x: 18.6
+          y: -8.0
       - component: path
         config:
           d: M-20,-8 L0,-17 L20,-8 L0,1 Z
-          stroke: currentColor
-          stroke-width: 1.2
-          stroke-linecap: round
           fill: '#ffffff'
+          stroke: currentColor
+          stroke-linecap: round
           stroke-linejoin: round
+          stroke-width: 1.2
       - component: line
         config:
+          fill: none
+          opacity: '0.35'
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-width: 0.8
           x1: -15.0
-          y1: -5.75
           x2: 5.0
+          y1: -5.75
           y2: -14.75
-          stroke: currentColor
-          stroke-width: 0.8
-          stroke-linecap: round
-          fill: none
-          opacity: '0.35'
       - component: line
         config:
+          fill: none
+          opacity: '0.35'
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-width: 0.8
           x1: -10.0
-          y1: -3.5
           x2: 10.0
+          y1: -3.5
           y2: -12.5
-          stroke: currentColor
-          stroke-width: 0.8
-          stroke-linecap: round
-          fill: none
-          opacity: '0.35'
       - component: line
         config:
-          x1: -5.0
-          y1: -1.25
-          x2: 15.0
-          y2: -10.25
-          stroke: currentColor
-          stroke-width: 0.8
-          stroke-linecap: round
           fill: none
           opacity: '0.35'
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-width: 0.8
+          x1: -5.0
+          x2: 15.0
+          y1: -1.25
+          y2: -10.25
       - component: path
         config:
           d: M-20,-8 L0,-17 L20,-8 L0,1 Z
-          stroke: '#a1887f'
-          stroke-width: 2.2
-          stroke-linecap: round
           fill: none
+          stroke: '#a1887f'
+          stroke-linecap: round
           stroke-linejoin: round
+          stroke-width: 2.2
       - component: path
         config:
           d: M-20,-6.5 Q-10.0,1.2 0,2.5 Q10.0,1.2 20,-6.5
-          stroke: currentColor
-          stroke-width: 0.8
-          stroke-linecap: round
           fill: none
           opacity: '0.7'
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-width: 0.8
       - component: circle
         config:
           cx: -15.0
           cy: -3.05
-          r: 2.5
           fill: '#fbc02d'
           opacity: '=Math.abs(Number(props.power)) > 2 ? ''0.3'' : ''0'''
+          r: 2.5
       - component: circle
         config:
           cx: -10.0
           cy: -0.4
-          r: 2.5
           fill: '#fbc02d'
           opacity: '=Math.abs(Number(props.power)) > 2 ? ''0.3'' : ''0'''
+          r: 2.5
       - component: circle
         config:
           cx: -5.0
           cy: 1.45
-          r: 2.5
           fill: '#fbc02d'
           opacity: '=Math.abs(Number(props.power)) > 2 ? ''0.3'' : ''0'''
+          r: 2.5
       - component: circle
         config:
-          cx: 0
+          cx: 0.0
           cy: 2.5
-          r: 2.5
           fill: '#fbc02d'
           opacity: '=Math.abs(Number(props.power)) > 2 ? ''0.3'' : ''0'''
+          r: 2.5
       - component: circle
         config:
           cx: 5.0
           cy: 1.45
-          r: 2.5
           fill: '#fbc02d'
           opacity: '=Math.abs(Number(props.power)) > 2 ? ''0.3'' : ''0'''
+          r: 2.5
       - component: circle
         config:
           cx: 10.0
           cy: -0.4
-          r: 2.5
           fill: '#fbc02d'
           opacity: '=Math.abs(Number(props.power)) > 2 ? ''0.3'' : ''0'''
+          r: 2.5
       - component: circle
         config:
           cx: 15.0
           cy: -3.05
-          r: 2.5
           fill: '#fbc02d'
           opacity: '=Math.abs(Number(props.power)) > 2 ? ''0.3'' : ''0'''
+          r: 2.5
       - component: circle
         config:
           cx: -15.0
           cy: -3.05
-          r: 1.25
           fill: '=Math.abs(Number(props.power)) > 2 ? ''#fbc02d'' : ''#9e9e9e'''
+          r: 1.25
       - component: circle
         config:
           cx: -10.0
           cy: -0.4
-          r: 1.25
           fill: '=Math.abs(Number(props.power)) > 2 ? ''#fbc02d'' : ''#9e9e9e'''
+          r: 1.25
       - component: circle
         config:
           cx: -5.0
           cy: 1.45
-          r: 1.25
           fill: '=Math.abs(Number(props.power)) > 2 ? ''#fbc02d'' : ''#9e9e9e'''
+          r: 1.25
       - component: circle
         config:
-          cx: 0
+          cx: 0.0
           cy: 2.5
-          r: 1.25
           fill: '=Math.abs(Number(props.power)) > 2 ? ''#fbc02d'' : ''#9e9e9e'''
+          r: 1.25
       - component: circle
         config:
           cx: 5.0
           cy: 1.45
-          r: 1.25
           fill: '=Math.abs(Number(props.power)) > 2 ? ''#fbc02d'' : ''#9e9e9e'''
+          r: 1.25
       - component: circle
         config:
           cx: 10.0
           cy: -0.4
-          r: 1.25
           fill: '=Math.abs(Number(props.power)) > 2 ? ''#fbc02d'' : ''#9e9e9e'''
+          r: 1.25
       - component: circle
         config:
           cx: 15.0
           cy: -3.05
-          r: 1.25
           fill: '=Math.abs(Number(props.power)) > 2 ? ''#fbc02d'' : ''#9e9e9e'''
+          r: 1.25
   - component: g
     config:
       visible: =props.kind === 'e-bike'
@@ -2494,123 +2494,123 @@ slots:
           default:
           - component: circle
             config:
-              cx: 0
-              cy: 0
+              cx: 0.0
+              cy: 0.0
               r: 27.75
               style:
                 fill: 'var(--f7-card-bg-color, #fff)'
           - component: circle
             config:
-              cx: 0
-              cy: 0
-              r: 27.75
+              cx: 0.0
+              cy: 0.0
               fill: '#7cb342'
               fill-opacity: '0.12'
+              r: 27.75
       - component: circle
         config:
           cx: -12.5
           cy: 4.46
+          fill: none
           r: 8.5
           stroke: currentColor
-          stroke-width: 1.6
           stroke-linecap: round
-          fill: none
+          stroke-width: 1.6
       - component: circle
         config:
           cx: -12.5
           cy: 4.46
-          r: 1
           fill: currentColor
+          r: 1.0
       - component: circle
         config:
           cx: 12.5
           cy: 4.46
+          fill: none
           r: 8.5
           stroke: currentColor
-          stroke-width: 1.6
           stroke-linecap: round
-          fill: none
+          stroke-width: 1.6
       - component: circle
         config:
           cx: 12.5
           cy: 4.46
-          r: 1
           fill: currentColor
+          r: 1.0
       - component: path
         config:
           d: M-22.6,4.46 A10.1,10.1 0 0 1 -7.45,-4.29
-          stroke: currentColor
-          stroke-width: 1.2
-          stroke-linecap: round
           fill: none
           opacity: '0.75'
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-width: 1.2
       - component: path
         config:
           d: M7.45,-4.29 A10.1,10.1 0 0 1 22.6,4.46
-          stroke: currentColor
-          stroke-width: 1.2
-          stroke-linecap: round
           fill: none
           opacity: '0.75'
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-width: 1.2
       - component: path
         config:
           d: M-17.5,-6.04 H-6.5 M-15.5,-6.04 L-12.5,4.46
-          stroke: currentColor
-          stroke-width: 1.3
-          stroke-linecap: round
           fill: none
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-width: 1.3
       - component: path
         config:
           d: M-12.5,4.46 L-5.5,-8.54 L7.5,-9.04 L9,-4.54 L-1.5,5.46 Z M-5.5,-8.54 L-1.5,5.46 M9,-4.54 L12.5,4.46
-          stroke: currentColor
-          stroke-width: 1.6
-          stroke-linecap: round
           fill: none
+          stroke: currentColor
+          stroke-linecap: round
           stroke-linejoin: round
+          stroke-width: 1.6
       - component: line
         config:
-          x1: -5.5
-          y1: -8.54
-          x2: -6.3
-          y2: -11.54
-          stroke: currentColor
-          stroke-width: 1.4
-          stroke-linecap: round
           fill: none
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-width: 1.4
+          x1: -5.5
+          x2: -6.3
+          y1: -8.54
+          y2: -11.54
       - component: path
         config:
           d: M-10.0,-11.94 H-3.0
-          stroke: currentColor
-          stroke-width: 2.2
-          stroke-linecap: round
           fill: none
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-width: 2.2
       - component: path
         config:
           d: M7.5,-9.04 L7.1,-12.24 Q6.5,-13.44 3.0,-12.64
-          stroke: currentColor
-          stroke-width: 1.4
-          stroke-linecap: round
           fill: none
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-width: 1.4
       - component: circle
         config:
           cx: -1.5
           cy: 5.46
-          r: 2.6
-          stroke: currentColor
-          stroke-width: 1.3
-          stroke-linecap: round
           fill: '#78909c'
           fill-opacity: '0.5'
+          r: 2.6
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-width: 1.3
       - component: line
         config:
-          x1: -1.5
-          y1: 5.46
-          x2: 0.5
-          y2: 8.96
-          stroke: currentColor
-          stroke-width: 1.3
-          stroke-linecap: round
           fill: none
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-width: 1.3
+          x1: -1.5
+          x2: 0.5
+          y1: 5.46
+          y2: 8.96
       - component: g
         config:
           transform: translate(1.89 -1.91) rotate(-43.6)
@@ -2618,34 +2618,34 @@ slots:
           default:
           - component: rect
             config:
-              x: -7.0
-              y: -2.5
-              width: 14
-              height: 5
+              height: 5.0
               rx: 1.6
               style:
                 fill: 'var(--f7-card-bg-color, #fff)'
-          - component: rect
-            config:
-              x: -6.0
-              y: -1.5
-              width: 12
-              height: 3
-              rx: 0.8
-              fill: '=Math.abs(Number(props.power)) > 10 ? ''#7cb342'' : ''#546e7a'''
-              fill-opacity: '0.9'
-              class: '=(Math.abs(Number(props.power)) > 10) ? ''a-fill'' : '''''
-          - component: rect
-            config:
+              width: 14.0
               x: -7.0
               y: -2.5
-              width: 14
-              height: 5
+          - component: rect
+            config:
+              class: '=(Math.abs(Number(props.power)) > 10) ? ''a-fill'' : '''''
+              fill: '=Math.abs(Number(props.power)) > 10 ? ''#7cb342'' : ''#546e7a'''
+              fill-opacity: '0.9'
+              height: 3.0
+              rx: 0.8
+              width: 12.0
+              x: -6.0
+              y: -1.5
+          - component: rect
+            config:
+              fill: none
+              height: 5.0
               rx: 1.6
               stroke: currentColor
-              stroke-width: 1.2
               stroke-linecap: round
-              fill: none
+              stroke-width: 1.2
+              width: 14.0
+              x: -7.0
+              y: -2.5
   - component: g
     config:
       visible: =props.kind === 'network-rack'
@@ -2657,165 +2657,165 @@ slots:
           default:
           - component: circle
             config:
-              cx: 0
-              cy: 0
+              cx: 0.0
+              cy: 0.0
               r: 27.75
               style:
                 fill: 'var(--f7-card-bg-color, #fff)'
           - component: circle
             config:
-              cx: 0
-              cy: 0
-              r: 27.75
+              cx: 0.0
+              cy: 0.0
               fill: '#5c6bc0'
               fill-opacity: '0.12'
+              r: 27.75
       - component: rect
         config:
-          x: -17
-          y: -13
-          width: 34
-          height: 26
-          rx: 2
-          stroke: currentColor
-          stroke-width: 1.6
-          stroke-linecap: round
           fill: '#37474f'
           fill-opacity: '0.85'
+          height: 26.0
+          rx: 2.0
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-width: 1.6
+          width: 34.0
+          x: -17.0
+          y: -13.0
       - component: rect
         config:
-          x: -13.5
-          y: -9.5
-          width: 27
+          fill: '#cfd8dc'
+          fill-opacity: '0.9'
           height: 5.4
           rx: 0.8
           stroke: currentColor
-          stroke-width: 1
           stroke-linecap: round
-          fill: '#cfd8dc'
-          fill-opacity: '0.9'
+          stroke-width: 1.0
+          width: 27.0
+          x: -13.5
+          y: -9.5
       - component: rect
         config:
+          fill: '#263238'
+          height: 2.0
+          rx: 0.3
+          width: 2.4
           x: -10.5
           y: -7.8
-          width: 2.4
-          height: 2
-          rx: 0.3
-          fill: '#263238'
       - component: rect
         config:
+          fill: '#263238'
+          height: 2.0
+          rx: 0.3
+          width: 2.4
           x: -6.9
           y: -7.8
-          width: 2.4
-          height: 2
-          rx: 0.3
-          fill: '#263238'
       - component: rect
         config:
+          fill: '#263238'
+          height: 2.0
+          rx: 0.3
+          width: 2.4
           x: -3.3
           y: -7.8
-          width: 2.4
-          height: 2
-          rx: 0.3
-          fill: '#263238'
       - component: rect
         config:
+          fill: '#263238'
+          height: 2.0
+          rx: 0.3
+          width: 2.4
           x: 0.3
           y: -7.8
-          width: 2.4
-          height: 2
-          rx: 0.3
-          fill: '#263238'
       - component: g
         config:
-          opacity: '=Math.abs(Number(props.power)) > 10 ? ''1'' : ''0.3'''
           class: '=(Math.abs(Number(props.power)) > 10) ? ''a-flicker-a'' : '''''
+          opacity: '=Math.abs(Number(props.power)) > 10 ? ''1'' : ''0.3'''
         slots:
           default:
           - component: circle
             config:
-              cx: 7
+              cx: 7.0
               cy: -6.8
-              r: 1.1
               fill: '#69f0ae'
+              r: 1.1
       - component: g
         config:
-          opacity: '=Math.abs(Number(props.power)) > 10 ? ''1'' : ''0.3'''
           class: '=(Math.abs(Number(props.power)) > 10) ? ''a-flicker-b'' : '''''
+          opacity: '=Math.abs(Number(props.power)) > 10 ? ''1'' : ''0.3'''
         slots:
           default:
           - component: circle
             config:
               cx: 10.5
               cy: -6.8
-              r: 1.1
               fill: '#69f0ae'
+              r: 1.1
       - component: rect
         config:
-          x: -13.5
-          y: -2.7
-          width: 27
+          fill: '#cfd8dc'
+          fill-opacity: '0.9'
           height: 5.4
           rx: 0.8
           stroke: currentColor
-          stroke-width: 1
           stroke-linecap: round
-          fill: '#cfd8dc'
-          fill-opacity: '0.9'
+          stroke-width: 1.0
+          width: 27.0
+          x: -13.5
+          y: -2.7
       - component: rect
         config:
+          fill: '#263238'
+          height: 2.0
+          rx: 0.3
+          width: 2.4
           x: -10.5
           y: -1.0
-          width: 2.4
-          height: 2
-          rx: 0.3
-          fill: '#263238'
       - component: rect
         config:
+          fill: '#263238'
+          height: 2.0
+          rx: 0.3
+          width: 2.4
           x: -6.9
           y: -1.0
-          width: 2.4
-          height: 2
-          rx: 0.3
-          fill: '#263238'
       - component: g
         config:
-          opacity: '=Math.abs(Number(props.power)) > 10 ? ''1'' : ''0.3'''
           class: '=(Math.abs(Number(props.power)) > 10) ? ''a-flicker-c'' : '''''
+          opacity: '=Math.abs(Number(props.power)) > 10 ? ''1'' : ''0.3'''
         slots:
           default:
           - component: circle
             config:
               cx: 10.5
               cy: 0.0
-              r: 1.1
               fill: '#69f0ae'
+              r: 1.1
       - component: rect
         config:
-          x: -13.5
-          y: 4.1
-          width: 27
+          fill: '#cfd8dc'
+          fill-opacity: '0.9'
           height: 5.4
           rx: 0.8
           stroke: currentColor
-          stroke-width: 1
           stroke-linecap: round
-          fill: '#cfd8dc'
-          fill-opacity: '0.9'
+          stroke-width: 1.0
+          width: 27.0
+          x: -13.5
+          y: 4.1
       - component: circle
         config:
-          cx: -6
+          cx: -6.0
           cy: 6.8
-          r: 1.2
           fill: '#263238'
+          r: 1.2
       - component: circle
         config:
-          cx: 0
+          cx: 0.0
           cy: 6.8
-          r: 1.2
           fill: '#263238'
+          r: 1.2
       - component: circle
         config:
-          cx: 6
+          cx: 6.0
           cy: 6.8
-          r: 1.2
           fill: '#263238'
+          r: 1.2

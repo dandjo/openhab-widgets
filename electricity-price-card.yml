@@ -3,85 +3,84 @@ tags:
 - overview
 props:
   parameters:
-  - name: priceTotalGross
+  - context: item
+    description: Number:EnergyPrice item
     label: EPEX Spot aWATTar Total Gross
-    description: Number:EnergyPrice item
-    type: TEXT
+    name: priceTotalGross
     required: true
-    context: item
-  - name: priceCheapestHour
+    type: TEXT
+  - context: item
+    description: DateTime item
     label: Cheapest hour
-    description: DateTime item
-    type: TEXT
+    name: priceCheapestHour
     required: true
-    context: item
-  - name: pricePriciestHour
+    type: TEXT
+  - context: item
+    description: DateTime item
     label: EPEX Spot aWATTar Priciest Hour
-    description: DateTime item
-    type: TEXT
+    name: pricePriciestHour
     required: true
-    context: item
-  - name: communityLevel
-    label: Community level
+    type: TEXT
+  - context: item
     description: String item
-    type: TEXT
+    label: Community level
+    name: communityLevel
     required: true
-    context: item
-  - name: communityBalance
-    label: Community balance
+    type: TEXT
+  - context: item
     description: Number:Power item
-    type: TEXT
+    label: Community balance
+    name: communityBalance
     required: true
-    context: item
-  - name: communityWindowEnd
+    type: TEXT
+  - context: item
+    description: DateTime item
     label: Community window end
-    description: DateTime item
-    type: TEXT
+    name: communityWindowEnd
     required: true
-    context: item
-  - name: communityWindowStart
+    type: TEXT
+  - context: item
+    description: DateTime item
     label: Community window start
-    description: DateTime item
-    type: TEXT
+    name: communityWindowStart
     required: true
-    context: item
-  - name: communityWindowEnergy
-    label: Community window energy
+    type: TEXT
+  - context: item
     description: Number:Energy item
-    type: TEXT
+    label: Community window energy
+    name: communityWindowEnergy
     required: true
-    context: item
-  - name: priceTotalNet
+    type: TEXT
+  - context: item
+    description: Number:EnergyPrice item
     label: EPEX Spot aWATTar Total Net
-    description: Number:EnergyPrice item
-    type: TEXT
+    name: priceTotalNet
     required: true
-    context: item
-  - name: priceMarketGross
+    type: TEXT
+  - context: item
+    description: Number:EnergyPrice item
     label: EPEX Spot aWATTar Market Gross
-    description: Number:EnergyPrice item
-    type: TEXT
+    name: priceMarketGross
     required: true
-    context: item
-  - name: priceMarketNet
+    type: TEXT
+  - context: item
+    description: Number:EnergyPrice item
     label: EPEX Spot aWATTar
-    description: Number:EnergyPrice item
-    type: TEXT
+    name: priceMarketNet
     required: true
-    context: item
+    type: TEXT
   parameterGroups: []
-timestamp: Oct 25, 2026, 2:07:58 PM
+timestamp: Oct 25, 2026, 1:50:26 PM
 component: oh-card
 config:
-  title: Electricity Price
-  style:
-    height: calc(100% - 2 * var(--f7-card-margin-vertical))
-    display: flex
-    flex-direction: column
   contentStyle:
+    display: flex
     flex: 1 1 auto
+    flex-direction: column
+  style:
     display: flex
     flex-direction: column
+    height: calc(100% - 2 * var(--f7-card-margin-vertical))
   stylesheet: '@keyframes a-soft { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.06; } }
 
     @keyframes a-full { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
@@ -186,43 +185,49 @@ config:
     .menu-item-dropdown:not(.menu-item-dropdown-opened) .menu-dropdown { display: none; }
 
     .oh-chart-container > .menu.padding { padding-top: 6px !important; }'
+  title: Electricity Price
 slots:
   content:
   - component: div
     config:
       style:
-        display: flex
-        flex-wrap: wrap
         align-items: baseline
         column-gap: 8px
+        display: flex
+        flex-wrap: wrap
         padding: 0 16px
     slots:
       default:
       - component: Label
         config:
-          text: '=([''NULL'', ''UNDEF''].includes(items[props.priceTotalGross].state) ? ''–'' : (items[props.priceTotalGross].displayState
-            || items[props.priceTotalGross].state))'
           style:
-            font-size: '=screen.width < 600 ? ''26px'' : ''28px'''
-            font-weight: '700'
-            line-height: '=screen.width < 600 ? ''32px'' : ''34px'''
-            letter-spacing: -0.01em
             color: '=(Number(items[props.priceTotalGross].numericState) || 0) < 0.2 ? ''#43a047'' : (Number(items[props.priceTotalGross].numericState)
               || 0) < 0.3 ? ''#fb8c00'' : ''#e53935'''
+            font-size: '=screen.width < 600 ? ''26px'' : ''28px'''
+            font-weight: '700'
+            letter-spacing: -0.01em
+            line-height: '=screen.width < 600 ? ''32px'' : ''34px'''
+          text: '=([''NULL'', ''UNDEF''].includes(items[props.priceTotalGross].state) ? ''–'' : (items[props.priceTotalGross].displayState
+            || items[props.priceTotalGross].state))'
       - component: Label
         config:
-          text: per kWh all-in
           style:
             opacity: '0.7'
+          text: per kWh all-in
   - component: Label
     config:
-      text: ='Cheapest ' + items[props.priceCheapestHour].displayState + ' · priciest ' + items[props.pricePriciestHour].displayState
       style:
-        padding: 0 16px
-        opacity: '0.7'
         font-size: 13px
+        opacity: '0.7'
+        padding: 0 16px
+      text: ='Cheapest ' + items[props.priceCheapestHour].displayState + ' · priciest ' + items[props.pricePriciestHour].displayState
   - component: Label
     config:
+      style:
+        font-size: 13px
+        margin-bottom: 12px
+        opacity: '0.7'
+        padding: 0 16px
       text: '=''Community '' + (![''NULL'', ''UNDEF''].includes(items[props.communityLevel].state) ? ([''NULL'', ''UNDEF''].includes(items[props.communityBalance].state)
         ? ''–'' : ((Number(items[props.communityBalance].numericState) || 0) > 0 ? ''+'' : '''') + ((Number(items[props.communityBalance].numericState)
         || 0) / 1000).toFixed(1) + '' kW'') + '' · '' : '''') + (![''NULL'', ''UNDEF''].includes(items[props.communityWindowEnd].state)
@@ -233,252 +238,152 @@ slots:
         : (![''NULL'', ''UNDEF''].includes(items[props.communityLevel].state) ? ''none expected'' : ''–'')) + (![''NULL'',
         ''UNDEF''].includes(items[props.communityWindowEnd].state) ? '' · '' + ((Number(items[props.communityWindowEnergy].numericState)
         || 0)).toFixed(0) + '' kWh'' : '''')'
-      style:
-        padding: 0 16px
-        opacity: '0.7'
-        font-size: 13px
-        margin-bottom: 12px
   - component: div
     config:
       style:
-        position: relative
         flex: 1 1 auto
         min-height: '=screen.width < 600 ? ''260px'' : ''280px'''
+        position: relative
     slots:
       default:
       - component: div
         config:
           style:
-            position: absolute
             inset: '0'
+            position: absolute
         slots:
           default:
           - component: oh-chart
             config:
               chartType: ''
-              periodVisible: false
-              period: 2D
               future: '0.75'
               height: 100%
               options:
-                backgroundColor: transparent
                 axisPointer:
                   link:
                   - xAxisIndex: all
+                backgroundColor: transparent
+              period: 2D
+              periodVisible: false
             slots:
               grid:
               - component: oh-chart-grid
                 config:
-                  top: '45'
                   bottom: '30'
                   left: '45'
                   right: '40'
-              xAxis:
-              - component: oh-time-axis
-                config:
-                  gridIndex: 0
-                  axisPointer:
-                    snap: false
-                    label:
-                      show: false
-              - component: oh-time-axis
-                config:
-                  gridIndex: 0
-                  show: false
-                  axisPointer:
-                    snap: false
-                    label:
-                      show: false
-              - component: oh-time-axis
-                config:
-                  gridIndex: 0
-                  show: false
-                  axisPointer:
-                    snap: false
-                    label:
-                      show: false
-              - component: oh-time-axis
-                config:
-                  gridIndex: 0
-                  show: false
-                  axisPointer:
-                    snap: false
-                    label:
-                      show: false
-              - component: oh-time-axis
-                config:
-                  gridIndex: 0
-                  show: false
-                  axisPointer:
-                    snap: false
-                    label:
-                      show: false
-              - component: oh-time-axis
-                config:
-                  gridIndex: 0
-                  axisPointer:
-                    snap: false
-                    label:
-                      show: false
-                  show: false
-              yAxis:
-              - component: oh-value-axis
-                config:
-                  gridIndex: 0
-                  name: EUR/kWh
-                  nameGap: 14
-                  nameTextStyle:
-                    align: right
-                    padding:
-                    - 0
-                    - 8
-                    - 0
-                    - 0
-              - component: oh-value-axis
-                config:
-                  gridIndex: 0
-                  name: kW
-                  nameGap: 14
-                  nameTextStyle:
-                    align: left
-                    padding:
-                    - 0
-                    - 0
-                    - 0
-                    - 8
-                  position: right
-                  splitLine:
-                    show: false
-                  axisLabel:
-                    formatter: =(v) => Math.round(v / 1000)
+                  top: '45'
               series:
               - component: oh-time-series
                 config:
-                  name: All-in price
-                  gridIndex: 0
-                  xAxisIndex: 0
-                  yAxisIndex: 0
-                  type: line
-                  item: =props.priceTotalGross
-                  step: end
                   areaStyle:
                     opacity: 0.25
+                  gridIndex: 0.0
+                  item: =props.priceTotalGross
                   lineStyle:
-                    opacity: 0
+                    opacity: 0.0
+                  name: All-in price
                   silent: true
+                  step: end
                   tooltip:
                     show: false
-                  z: 1
+                  type: line
+                  xAxisIndex: 0.0
+                  yAxisIndex: 0.0
+                  z: 1.0
               - component: oh-time-series
                 config:
-                  name: All-in price
-                  gridIndex: 0
-                  xAxisIndex: 0
-                  yAxisIndex: 0
-                  type: line
+                  gridIndex: 0.0
                   item: =props.priceTotalGross
-                  step: end
-                  z: 3
                   markLine:
-                    symbol:
-                    - none
-                    - none
-                    silent: true
+                    data:
+                    - xAxis: =dayjs().valueOf()
                     label:
                       show: false
                     lineStyle:
                       color: '#888'
                       type: dashed
-                    data:
-                    - xAxis: =dayjs().valueOf()
+                    silent: true
+                    symbol:
+                    - none
+                    - none
+                  name: All-in price
+                  step: end
+                  type: line
+                  xAxisIndex: 0.0
+                  yAxisIndex: 0.0
+                  z: 3.0
               - component: oh-time-series
                 config:
-                  name: Community balance
-                  gridIndex: 0
-                  xAxisIndex: 1
-                  yAxisIndex: 1
-                  type: bar
+                  gridIndex: 0.0
                   item: =props.communityBalance
-                  z: 2
                   itemStyle:
                     color: '=(p) => p.value[1] >= 0 ? ''rgba(38, 166, 154, 0.6)'' : ''rgba(158, 158, 158, 0.45)'''
+                  name: Community balance
+                  type: bar
+                  xAxisIndex: 1.0
+                  yAxisIndex: 1.0
+                  z: 2.0
               - component: oh-time-series
                 config:
-                  name: Total net
-                  gridIndex: 0
-                  xAxisIndex: 2
-                  yAxisIndex: 0
-                  type: line
+                  gridIndex: 0.0
                   item: =props.priceTotalNet
-                  lineStyle:
-                    opacity: 0
                   itemStyle:
                     color: '#fb8c00'
+                  lineStyle:
+                    opacity: 0.0
+                  name: Total net
                   symbol: none
+                  type: line
+                  xAxisIndex: 2.0
+                  yAxisIndex: 0.0
               - component: oh-time-series
                 config:
-                  name: Market gross
-                  gridIndex: 0
-                  xAxisIndex: 3
-                  yAxisIndex: 0
-                  type: line
+                  gridIndex: 0.0
                   item: =props.priceMarketGross
-                  lineStyle:
-                    opacity: 0
                   itemStyle:
                     color: '#ffb74d'
+                  lineStyle:
+                    opacity: 0.0
+                  name: Market gross
                   symbol: none
+                  type: line
+                  xAxisIndex: 3.0
+                  yAxisIndex: 0.0
               - component: oh-time-series
                 config:
-                  name: Market net
-                  gridIndex: 0
-                  xAxisIndex: 4
-                  yAxisIndex: 0
-                  type: line
+                  gridIndex: 0.0
                   item: =props.priceMarketNet
-                  lineStyle:
-                    opacity: 0
                   itemStyle:
                     color: '#ffe0b2'
+                  lineStyle:
+                    opacity: 0.0
+                  name: Market net
                   symbol: none
+                  type: line
+                  xAxisIndex: 4.0
+                  yAxisIndex: 0.0
               - component: oh-data-series
                 config:
-                  id: oh-data-series#clock
-                  name: ''
-                  type: line
-                  xAxisIndex: 5
-                  yAxisIndex: 0
+                  animation: false
                   data: =((t0) => [0,1,2,3,4,5,6,7,8,9,10,11].map((a) => [0,1,2,3,4,5,6,7,8,9,10,11].map((b) => [0,1,2,3,4,5].map((c)
                     => [t0 + ((a * 12 + b) * 6 + c) * 300000, null]))).flat(2))(dayjs().startOf('hour').valueOf())
-                  symbol: none
-                  silent: true
-                  animation: false
+                  id: oh-data-series#clock
                   lineStyle:
-                    opacity: 0
-              visualMap:
-              - component: oh-chart-visualmap
-                config:
-                  show: false
-                  type: piecewise
-                  dimension: 1
-                  seriesIndex:
-                  - 0
-                  - 1
-                  pieces:
-                  - lt: 0.2
-                    color: '#43a047'
-                  - gte: 0.2
-                    lt: 0.3
-                    color: '#fb8c00'
-                  - gte: 0.3
-                    color: '#e53935'
+                    opacity: 0.0
+                  name: ''
+                  silent: true
+                  symbol: none
+                  type: line
+                  xAxisIndex: 5.0
+                  yAxisIndex: 0.0
               tooltip:
               - component: oh-chart-tooltip
                 config:
-                  show: true
+                  backgroundColor: transparent
+                  borderWidth: 0.0
                   confine: true
-                  trigger: axis
-                  smartFormatter: false
+                  extraCssText: 'box-shadow: none;'
                   formatter: '=(ps) => ((H) => ''<div style="display: flex; flex-direction: column; align-items: flex-start;
                     height: 0">'' + [0].map((g) => ((r) => ''<div style="'' + (r ? ''border: 1px solid; border-radius: 4px;
                     padding: 10px; box-shadow: rgba(0, 0, 0, 0.2) 1px 2px 10px; '' + (themeOptions.dark === ''dark'' ? ''background-color:
@@ -495,6 +400,7 @@ slots:
                     + ''</b></span><br/>'').join(''''))).join('''') + ''</div>'')(((c, now) => c && c.axisValue > now && ps[0].axisValue
                     <= now && c.axisValue - ps[0].axisValue > 600000 ? c.axisValue : ps[0].axisValue)(ps.filter((p) => p.seriesId
                     === ''oh-data-series#clock'')[0], dayjs().valueOf()))'
+                  padding: 0.0
                   position: '=(pt, ps, dom, rect, size) => ((T, B) => ((c, left, h) => [c.style.setProperty(''align-items'',
                     left ? ''flex-end'' : ''flex-start''), dom.hasAttribute(''data-wb'') || [dom.parentNode.addEventListener(''mouseleave'',
                     () => [0].map((i) => dom.removeAttribute(''data-wb'' + i))), dom.setAttribute(''data-wb'', '''')], [0].map((i)
@@ -506,8 +412,102 @@ slots:
                     Math.min(pt[1] + 20, B[i] - b.offsetHeight)) : T[i])))(c.children[i]) : 0), [left ? pt[0] - 20 - c.offsetWidth
                     : pt[0] + 20, 0]][4])(dom.firstChild, pt[0] > size.viewSize[0] / 2, T.filter((t) => t <= pt[1]).length
                     - 1))([45], [size.viewSize[1] - 30])'
-                  backgroundColor: transparent
-                  borderWidth: 0
-                  padding: 0
-                  transitionDuration: 0
-                  extraCssText: 'box-shadow: none;'
+                  show: true
+                  smartFormatter: false
+                  transitionDuration: 0.0
+                  trigger: axis
+              visualMap:
+              - component: oh-chart-visualmap
+                config:
+                  dimension: 1.0
+                  pieces:
+                  - color: '#43a047'
+                    lt: 0.2
+                  - color: '#fb8c00'
+                    gte: 0.2
+                    lt: 0.3
+                  - color: '#e53935'
+                    gte: 0.3
+                  seriesIndex:
+                  - 0.0
+                  - 1.0
+                  show: false
+                  type: piecewise
+              xAxis:
+              - component: oh-time-axis
+                config:
+                  axisPointer:
+                    label:
+                      show: false
+                    snap: false
+                  gridIndex: 0.0
+              - component: oh-time-axis
+                config:
+                  axisPointer:
+                    label:
+                      show: false
+                    snap: false
+                  gridIndex: 0.0
+                  show: false
+              - component: oh-time-axis
+                config:
+                  axisPointer:
+                    label:
+                      show: false
+                    snap: false
+                  gridIndex: 0.0
+                  show: false
+              - component: oh-time-axis
+                config:
+                  axisPointer:
+                    label:
+                      show: false
+                    snap: false
+                  gridIndex: 0.0
+                  show: false
+              - component: oh-time-axis
+                config:
+                  axisPointer:
+                    label:
+                      show: false
+                    snap: false
+                  gridIndex: 0.0
+                  show: false
+              - component: oh-time-axis
+                config:
+                  axisPointer:
+                    label:
+                      show: false
+                    snap: false
+                  gridIndex: 0.0
+                  show: false
+              yAxis:
+              - component: oh-value-axis
+                config:
+                  gridIndex: 0.0
+                  name: EUR/kWh
+                  nameGap: 14.0
+                  nameTextStyle:
+                    align: right
+                    padding:
+                    - 0.0
+                    - 8.0
+                    - 0.0
+                    - 0.0
+              - component: oh-value-axis
+                config:
+                  axisLabel:
+                    formatter: =(v) => Math.round(v / 1000)
+                  gridIndex: 0.0
+                  name: kW
+                  nameGap: 14.0
+                  nameTextStyle:
+                    align: left
+                    padding:
+                    - 0.0
+                    - 0.0
+                    - 0.0
+                    - 8.0
+                  position: right
+                  splitLine:
+                    show: false

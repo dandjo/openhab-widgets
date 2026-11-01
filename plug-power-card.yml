@@ -3,31 +3,30 @@ tags:
 - plug
 props:
   parameters:
-  - name: prefix
-    label: Item prefix
-    description: 'Name prefix of the plug''s items: <prefix>_power, _switch, _energy_today, _energy_total, _voltage, _current,
+  - description: 'Name prefix of the plug''s items: <prefix>_power, _switch, _energy_today, _energy_total, _voltage, _current,
       _power_factor, _apparent_power, _reactive_power'
-    type: TEXT
+    label: Item prefix
+    name: prefix
     required: true
-  - name: color
-    label: Colour
-    description: 'Device colour as #rrggbb'
     type: TEXT
+  - default: '#8d6e63'
+    description: 'Device colour as #rrggbb'
+    label: Colour
+    name: color
     required: false
-    default: '#8d6e63'
+    type: TEXT
   parameterGroups: []
-timestamp: Oct 25, 2026, 2:07:58 PM
+timestamp: Oct 25, 2026, 1:50:27 PM
 component: oh-card
 config:
-  title: Power today
-  style:
-    height: calc(100% - 2 * var(--f7-card-margin-vertical))
-    display: flex
-    flex-direction: column
   contentStyle:
+    display: flex
     flex: 1 1 auto
+    flex-direction: column
+  style:
     display: flex
     flex-direction: column
+    height: calc(100% - 2 * var(--f7-card-margin-vertical))
   stylesheet: '@keyframes a-soft { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.06; } }
 
     @keyframes a-full { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
@@ -132,110 +131,90 @@ config:
     .menu-item-dropdown:not(.menu-item-dropdown-opened) .menu-dropdown { display: none; }
 
     .oh-chart-container > .menu.padding { padding-top: 6px !important; }'
+  title: Power today
 slots:
   content:
   - component: div
     config:
       style:
-        position: relative
         flex: 1 1 auto
         min-height: 260px
+        position: relative
     slots:
       default:
       - component: div
         config:
           style:
-            position: absolute
             inset: '0'
+            position: absolute
         slots:
           default:
           - component: oh-chart
             config:
               chartType: ''
-              periodVisible: true
-              period: D
               height: 100%
               options:
                 backgroundColor: transparent
+              period: D
+              periodVisible: true
             slots:
               grid:
               - component: oh-chart-grid
                 config:
-                  top: '62'
                   bottom: '35'
                   left: '50'
                   right: '20'
-              xAxis:
-              - component: oh-time-axis
-                config:
-                  gridIndex: 0
-              yAxis:
-              - component: oh-value-axis
-                config:
-                  gridIndex: 0
-                  name: W
-                  nameGap: 14
-                  nameTextStyle:
-                    align: right
-                    padding:
-                    - 0
-                    - 8
-                    - 0
-                    - 0
-                  splitLine:
-                    lineStyle:
-                      type: dashed
-                      opacity: 0.4
+                  top: '62'
               series:
               - component: oh-time-series
                 config:
-                  name: Power
-                  gridIndex: 0
-                  xAxisIndex: 0
-                  yAxisIndex: 0
-                  type: line
-                  item: =props.prefix + '_power'
-                  symbol: none
-                  sampling: lttb
-                  lineStyle:
-                    width: 1.5
-                    color: =props.color
-                  itemStyle:
-                    color: =props.color
                   areaStyle:
                     color:
-                      type: linear
-                      x: 0
-                      y: 0
-                      x2: 0
-                      y2: 1
                       colorStops:
-                      - offset: 0
-                        color: ='rgba(' + Number.parseInt(props.color.slice(1, 3), 16) + ', ' + Number.parseInt(props.color.slice(3,
+                      - color: ='rgba(' + Number.parseInt(props.color.slice(1, 3), 16) + ', ' + Number.parseInt(props.color.slice(3,
                           5), 16) + ', ' + Number.parseInt(props.color.slice(5, 7), 16) + ', 0.45)'
-                      - offset: 1
-                        color: ='rgba(' + Number.parseInt(props.color.slice(1, 3), 16) + ', ' + Number.parseInt(props.color.slice(3,
+                        offset: 0.0
+                      - color: ='rgba(' + Number.parseInt(props.color.slice(1, 3), 16) + ', ' + Number.parseInt(props.color.slice(3,
                           5), 16) + ', ' + Number.parseInt(props.color.slice(5, 7), 16) + ', 0.02)'
+                        offset: 1.0
+                      type: linear
+                      x: 0.0
+                      x2: 0.0
+                      y: 0.0
+                      y2: 1.0
+                  gridIndex: 0.0
+                  item: =props.prefix + '_power'
+                  itemStyle:
+                    color: =props.color
+                  lineStyle:
+                    color: =props.color
+                    width: 1.5
+                  name: Power
+                  sampling: lttb
+                  symbol: none
+                  type: line
+                  xAxisIndex: 0.0
+                  yAxisIndex: 0.0
               - component: oh-data-series
                 config:
-                  name: ''
-                  type: line
-                  xAxisIndex: 0
-                  yAxisIndex: 0
                   data:
                   - - =dayjs().valueOf()
-                    - 100
-                  symbol: none
+                    - 100.0
+                  name: ''
                   silent: true
+                  symbol: none
                   tooltip:
                     show: false
+                  type: line
+                  xAxisIndex: 0.0
+                  yAxisIndex: 0.0
               tooltip:
               - component: oh-chart-tooltip
                 config:
-                  show: true
+                  backgroundColor: transparent
+                  borderWidth: 0.0
                   confine: true
-                  trigger: axis
-                  smartFormatter: false
+                  extraCssText: 'box-shadow: none;'
                   formatter: '=(ps) => ((H) => ''<div style="display: flex; flex-direction: column; align-items: flex-start;
                     height: 0">'' + [0].map((g) => ((r) => ''<div style="'' + (r ? ''border: 1px solid; border-radius: 4px;
                     padding: 10px; box-shadow: rgba(0, 0, 0, 0.2) 1px 2px 10px; '' + (themeOptions.dark === ''dark'' ? ''background-color:
@@ -250,6 +229,7 @@ slots:
                     style="float: right; margin-left: 20px"><b style="text-align: right;">'' + ((v) => v.toLocaleString(''en-GB'')
                     + '' '' + p.seriesId.split(''#'')[2])(Number(p.value[1])) + ''</b></span><br/>'').join(''''))).join('''')
                     + ''</div>'')(ps[0].axisValue)'
+                  padding: 0.0
                   position: '=(pt, ps, dom, rect, size) => ((T, B) => ((c, left, h) => [c.style.setProperty(''align-items'',
                     left ? ''flex-end'' : ''flex-start''), dom.hasAttribute(''data-wb'') || [dom.parentNode.addEventListener(''mouseleave'',
                     () => [0].map((i) => dom.removeAttribute(''data-wb'' + i))), dom.setAttribute(''data-wb'', '''')], [0].map((i)
@@ -261,8 +241,28 @@ slots:
                     Math.min(pt[1] + 20, B[i] - b.offsetHeight)) : T[i])))(c.children[i]) : 0), [left ? pt[0] - 20 - c.offsetWidth
                     : pt[0] + 20, 0]][4])(dom.firstChild, pt[0] > size.viewSize[0] / 2, T.filter((t) => t <= pt[1]).length
                     - 1))([62], [size.viewSize[1] - 35])'
-                  backgroundColor: transparent
-                  borderWidth: 0
-                  padding: 0
-                  transitionDuration: 0
-                  extraCssText: 'box-shadow: none;'
+                  show: true
+                  smartFormatter: false
+                  transitionDuration: 0.0
+                  trigger: axis
+              xAxis:
+              - component: oh-time-axis
+                config:
+                  gridIndex: 0.0
+              yAxis:
+              - component: oh-value-axis
+                config:
+                  gridIndex: 0.0
+                  name: W
+                  nameGap: 14.0
+                  nameTextStyle:
+                    align: right
+                    padding:
+                    - 0.0
+                    - 8.0
+                    - 0.0
+                    - 0.0
+                  splitLine:
+                    lineStyle:
+                      opacity: 0.4
+                      type: dashed

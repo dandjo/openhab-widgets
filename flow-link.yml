@@ -3,74 +3,73 @@ tags:
 - flow
 props:
   parameters:
-  - name: x1
+  - description: Start point's x in the flow's viewBox
     label: x1
-    description: Start point's x in the flow's viewBox
-    type: DECIMAL
+    name: x1
     required: true
-  - name: y1
+    type: DECIMAL
+  - description: Start point's y in the flow's viewBox
     label: y1
-    description: Start point's y in the flow's viewBox
-    type: DECIMAL
+    name: y1
     required: true
-  - name: x2
+    type: DECIMAL
+  - description: End point's x in the flow's viewBox
     label: x2
-    description: End point's x in the flow's viewBox
-    type: DECIMAL
+    name: x2
     required: true
-  - name: y2
+    type: DECIMAL
+  - description: End point's y in the flow's viewBox
     label: y2
-    description: End point's y in the flow's viewBox
-    type: DECIMAL
+    name: y2
     required: true
-  - name: color
-    label: Colour
+    type: DECIMAL
+  - default: '#78909c'
     description: 'The link''s colour as #rrggbb; may be an expression'
-    type: TEXT
+    label: Colour
+    name: color
     required: false
-    default: '#78909c'
-  - name: power
+    type: TEXT
+  - description: The power in W; usually an expression on an item
     label: Power
-    description: The power in W; usually an expression on an item
-    type: TEXT
+    name: power
     required: true
-  - name: forward
+    type: TEXT
+  - description: The dots run from (x1, y1) to (x2, y2) while it holds, else back; usually an expression
     label: Forward
-    description: The dots run from (x1, y1) to (x2, y2) while it holds, else back; usually an expression
+    name: forward
+    required: false
     type: BOOLEAN
-    required: false
-  - name: threshold
-    label: Threshold
+  - default: '10'
     description: The power in W above which the dots run
-    type: DECIMAL
+    label: Threshold
+    name: threshold
     required: false
-    default: '10'
+    type: DECIMAL
   parameterGroups: []
-timestamp: Oct 25, 2026, 2:07:58 PM
+timestamp: Oct 25, 2026, 1:50:26 PM
 component: g
 config: {}
 slots:
   default:
   - component: line
     config:
-      x1: =props.x1
-      y1: =props.y1
-      x2: =props.x2
-      y2: =props.y2
-      stroke: =props.color
-      stroke-width: 3
-      stroke-linecap: round
       opacity: '=Math.abs(Number(props.power)) > Number(props.threshold !== undefined ? props.threshold : 10) ? ''0.45'' :
         ''0.15'''
+      stroke: =props.color
+      stroke-linecap: round
+      stroke-width: 3.0
+      x1: =props.x1
+      x2: =props.x2
+      y1: =props.y1
+      y2: =props.y2
   - component: circle
     config:
-      r: 4.5
-      fill: =props.color
-      cx: 0
-      cy: 0
-      visible: '=Math.abs(Number(props.power)) > Number(props.threshold !== undefined ? props.threshold : 10)'
       class: '=(Math.abs(Number(props.power)) > Number(props.threshold !== undefined ? props.threshold : 10)) ? ''a-run''
         : '''''
+      cx: 0.0
+      cy: 0.0
+      fill: =props.color
+      r: 4.5
       style:
         --ax: =(Number(props.x1) - (Number(props.x2) - Number(props.x1)) / Math.hypot(Number(props.x2) - Number(props.x1),
           Number(props.y2) - Number(props.y1)) * 5).toFixed(1) + 'px'
@@ -80,20 +79,20 @@ slots:
           Number(props.y2) - Number(props.y1)) * 5).toFixed(1) + 'px'
         --by: =(Number(props.y2) + (Number(props.y2) - Number(props.y1)) / Math.hypot(Number(props.x2) - Number(props.x1),
           Number(props.y2) - Number(props.y1)) * 5).toFixed(1) + 'px'
-        animation-direction: '=props.forward ? ''normal'' : ''reverse'''
-        animation-duration: '=((Math.abs(Number(props.power)) < 300 ? 3.5 : Math.abs(Number(props.power)) < 1000 ? 2.5 : Math.abs(Number(props.power))
-          < 2500 ? 1.8 : 1.2)) + ''s'''
         animation-delay: '=(-0 / 3 * (Math.abs(Number(props.power)) < 300 ? 3.5 : Math.abs(Number(props.power)) < 1000 ? 2.5
           : Math.abs(Number(props.power)) < 2500 ? 1.8 : 1.2)) + ''s'''
+        animation-direction: '=props.forward ? ''normal'' : ''reverse'''
+        animation-duration: '=((Math.abs(Number(props.power)) < 300 ? 3.5 : Math.abs(Number(props.power)) < 1000 ? 2.5 : Math.abs(Number(props.power))
+          < 2500 ? 1.8 : 1.2)) + ''s'''
+      visible: '=Math.abs(Number(props.power)) > Number(props.threshold !== undefined ? props.threshold : 10)'
   - component: circle
     config:
-      r: 4.5
-      fill: =props.color
-      cx: 0
-      cy: 0
-      visible: '=Math.abs(Number(props.power)) > Number(props.threshold !== undefined ? props.threshold : 10)'
       class: '=(Math.abs(Number(props.power)) > Number(props.threshold !== undefined ? props.threshold : 10)) ? ''a-run''
         : '''''
+      cx: 0.0
+      cy: 0.0
+      fill: =props.color
+      r: 4.5
       style:
         --ax: =(Number(props.x1) - (Number(props.x2) - Number(props.x1)) / Math.hypot(Number(props.x2) - Number(props.x1),
           Number(props.y2) - Number(props.y1)) * 5).toFixed(1) + 'px'
@@ -103,20 +102,20 @@ slots:
           Number(props.y2) - Number(props.y1)) * 5).toFixed(1) + 'px'
         --by: =(Number(props.y2) + (Number(props.y2) - Number(props.y1)) / Math.hypot(Number(props.x2) - Number(props.x1),
           Number(props.y2) - Number(props.y1)) * 5).toFixed(1) + 'px'
-        animation-direction: '=props.forward ? ''normal'' : ''reverse'''
-        animation-duration: '=((Math.abs(Number(props.power)) < 300 ? 3.5 : Math.abs(Number(props.power)) < 1000 ? 2.5 : Math.abs(Number(props.power))
-          < 2500 ? 1.8 : 1.2)) + ''s'''
         animation-delay: '=(-1 / 3 * (Math.abs(Number(props.power)) < 300 ? 3.5 : Math.abs(Number(props.power)) < 1000 ? 2.5
           : Math.abs(Number(props.power)) < 2500 ? 1.8 : 1.2)) + ''s'''
+        animation-direction: '=props.forward ? ''normal'' : ''reverse'''
+        animation-duration: '=((Math.abs(Number(props.power)) < 300 ? 3.5 : Math.abs(Number(props.power)) < 1000 ? 2.5 : Math.abs(Number(props.power))
+          < 2500 ? 1.8 : 1.2)) + ''s'''
+      visible: '=Math.abs(Number(props.power)) > Number(props.threshold !== undefined ? props.threshold : 10)'
   - component: circle
     config:
-      r: 4.5
-      fill: =props.color
-      cx: 0
-      cy: 0
-      visible: '=Math.abs(Number(props.power)) > Number(props.threshold !== undefined ? props.threshold : 10)'
       class: '=(Math.abs(Number(props.power)) > Number(props.threshold !== undefined ? props.threshold : 10)) ? ''a-run''
         : '''''
+      cx: 0.0
+      cy: 0.0
+      fill: =props.color
+      r: 4.5
       style:
         --ax: =(Number(props.x1) - (Number(props.x2) - Number(props.x1)) / Math.hypot(Number(props.x2) - Number(props.x1),
           Number(props.y2) - Number(props.y1)) * 5).toFixed(1) + 'px'
@@ -126,8 +125,9 @@ slots:
           Number(props.y2) - Number(props.y1)) * 5).toFixed(1) + 'px'
         --by: =(Number(props.y2) + (Number(props.y2) - Number(props.y1)) / Math.hypot(Number(props.x2) - Number(props.x1),
           Number(props.y2) - Number(props.y1)) * 5).toFixed(1) + 'px'
+        animation-delay: '=(-2 / 3 * (Math.abs(Number(props.power)) < 300 ? 3.5 : Math.abs(Number(props.power)) < 1000 ? 2.5
+          : Math.abs(Number(props.power)) < 2500 ? 1.8 : 1.2)) + ''s'''
         animation-direction: '=props.forward ? ''normal'' : ''reverse'''
         animation-duration: '=((Math.abs(Number(props.power)) < 300 ? 3.5 : Math.abs(Number(props.power)) < 1000 ? 2.5 : Math.abs(Number(props.power))
           < 2500 ? 1.8 : 1.2)) + ''s'''
-        animation-delay: '=(-2 / 3 * (Math.abs(Number(props.power)) < 300 ? 3.5 : Math.abs(Number(props.power)) < 1000 ? 2.5
-          : Math.abs(Number(props.power)) < 2500 ? 1.8 : 1.2)) + ''s'''
+      visible: '=Math.abs(Number(props.power)) > Number(props.threshold !== undefined ? props.threshold : 10)'

@@ -81,8 +81,9 @@ const inWindow = start <= end ? hour >= start && hour < end : hour >= start || h
 const phase = !enabled ? 'off' : !season ? 'normal' : inWindow ? 'day' : 'night';
 
 const write = (value, why) => {
-  // in °C like the item: a quantity in K would be taken as an absolute temperature (−272.15 °C)
-  offsetItem.sendCommand(Quantity(value + ' °C'));
+  // a bare number: the item is a plain Number in K (user, 2026-11-01), which the MQTT channel takes in its °C, as a
+  // difference; a quantity in K sent to a °C item would have been an absolute temperature (−272.15 °C)
+  offsetItem.sendCommand(value);
   cache.private.put('write', now);
   console.info(`day heating: offset ${offset} -> ${value}, ${why}`);
 };

@@ -3,137 +3,137 @@ tags:
 - appliance
 props:
   parameters:
-  - name: kind
+  - description: The appliance drawn
     label: Kind
-    description: The appliance drawn
-    type: TEXT
+    name: kind
     required: true
+    type: TEXT
     limitToOptions: true
     options:
-    - value: washer
-      label: washer
-    - value: dryer
-      label: dryer
-    - value: dish-washer
-      label: dish-washer
-  - name: running
+    - label: washer
+      value: washer
+    - label: dryer
+      value: dryer
+    - label: dish-washer
+      value: dish-washer
+  - description: Whether it runs; usually an expression
     label: Running
-    description: Whether it runs; usually an expression
+    name: running
+    required: false
     type: BOOLEAN
-    required: false
-  - name: progress
+  - description: 'Program progress in %, filling the ring while it runs; empty: the ring pulses'
     label: Progress
-    description: 'Program progress in %, filling the ring while it runs; empty: the ring pulses'
+    name: progress
+    required: false
     type: DECIMAL
-    required: false
-  - name: color
-    label: Colour
+  - default: '#1e88e5'
     description: 'Colour of the ring as #rrggbb'
+    label: Colour
+    name: color
+    required: false
     type: TEXT
-    required: false
-    default: '#1e88e5'
-  - name: size
-    label: Size
+  - default: '72'
     description: Width and height in px
-    type: INTEGER
+    label: Size
+    name: size
     required: false
-    default: '72'
+    type: INTEGER
   parameterGroups: []
-timestamp: Oct 25, 2026, 2:07:58 PM
+timestamp: Oct 25, 2026, 1:50:25 PM
 component: svg
 config:
+  height: =props.size || 72
   viewBox: 0 0 64 64
   width: =props.size || 72
-  height: =props.size || 72
 slots:
   default:
   - component: circle
     config:
-      cx: 32
-      cy: 32
+      cx: 32.0
+      cy: 32.0
+      fill: none
       r: 27.29
       stroke: '#9e9e9e'
-      stroke-width: 2.58
       stroke-linecap: round
-      fill: none
       stroke-opacity: '0.25'
+      stroke-width: 2.58
   - component: circle
     config:
-      cx: 32
-      cy: 32
-      r: 27.29
-      stroke: =props.color || '#1e88e5'
-      stroke-width: 2.58
-      stroke-linecap: round
-      fill: none
-      visible: =!!props.running
       class: '=(props.progress !== undefined && props.progress !== null && props.progress !== '''') ? ''a-soft'' : ''a-full'''
-  - component: circle
-    config:
-      cx: 32
-      cy: 32
+      cx: 32.0
+      cy: 32.0
+      fill: none
       r: 27.29
       stroke: =props.color || '#1e88e5'
       stroke-linecap: round
-      fill: none
-      stroke-width: 4
-      visible: =!!props.running && !(props.progress !== undefined && props.progress !== null && props.progress !== '')
-      class: a-halo
-  - component: circle
-    config:
-      cx: 32
-      cy: 32
-      r: 27.29
-      transform: rotate(-90 32 32)
-      pathLength: 100
-      stroke: =props.color || '#1e88e5'
       stroke-width: 2.58
-      stroke-linecap: round
-      fill: none
-      stroke-dasharray: =Number(props.progress).toFixed(1) + ' 100'
-      visible: =!!props.running && (props.progress !== undefined && props.progress !== null && props.progress !== '')
-      class: a-arc
+      visible: =!!props.running
   - component: circle
     config:
-      cx: 32
-      cy: 32
+      class: a-halo
+      cx: 32.0
+      cy: 32.0
+      fill: none
       r: 27.29
-      transform: rotate(-90 32 32)
-      pathLength: 100
       stroke: =props.color || '#1e88e5'
       stroke-linecap: round
-      stroke-dasharray: =Number(props.progress).toFixed(1) + ' 100'
+      stroke-width: 4.0
+      visible: =!!props.running && !(props.progress !== undefined && props.progress !== null && props.progress !== '')
+  - component: circle
+    config:
+      class: a-arc
+      cx: 32.0
+      cy: 32.0
       fill: none
-      stroke-width: 4
+      pathLength: 100.0
+      r: 27.29
+      stroke: =props.color || '#1e88e5'
+      stroke-dasharray: =Number(props.progress).toFixed(1) + ' 100'
+      stroke-linecap: round
+      stroke-width: 2.58
+      transform: rotate(-90 32 32)
       visible: =!!props.running && (props.progress !== undefined && props.progress !== null && props.progress !== '')
+  - component: circle
+    config:
       class: a-halo-arc
+      cx: 32.0
+      cy: 32.0
+      fill: none
+      pathLength: 100.0
+      r: 27.29
+      stroke: =props.color || '#1e88e5'
+      stroke-dasharray: =Number(props.progress).toFixed(1) + ' 100'
+      stroke-linecap: round
+      stroke-width: 4.0
+      transform: rotate(-90 32 32)
+      visible: =!!props.running && (props.progress !== undefined && props.progress !== null && props.progress !== '')
   - component: rect
     config:
-      x: 20
-      y: 15
-      width: 24
-      height: 34
-      rx: 3
-      stroke: currentColor
-      stroke-width: 1.6
-      stroke-linecap: round
       fill: none
+      height: 34.0
+      rx: 3.0
+      stroke: currentColor
+      stroke-linecap: round
+      stroke-width: 1.6
+      width: 24.0
+      x: 20.0
+      y: 15.0
   - component: line
     config:
-      x1: 20
-      y1: 21
-      x2: 44
-      y2: 21
-      stroke: currentColor
-      stroke-width: 1.2
-      stroke-linecap: round
       fill: none
+      stroke: currentColor
+      stroke-linecap: round
+      stroke-width: 1.2
+      x1: 20.0
+      x2: 44.0
+      y1: 21.0
+      y2: 21.0
   - component: circle
     config:
-      cx: 39
-      cy: 18
-      r: 1.3
+      cx: 39.0
+      cy: 18.0
       fill: currentColor
+      r: 1.3
   - component: g
     config:
       visible: =props.kind === 'washer'
@@ -141,22 +141,22 @@ slots:
       default:
       - component: circle
         config:
-          cx: 32
-          cy: 35
-          r: 9
-          stroke: currentColor
-          stroke-width: 1.6
-          stroke-linecap: round
+          cx: 32.0
+          cy: 35.0
           fill: none
+          r: 9.0
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-width: 1.6
       - component: circle
         config:
-          cx: 32
-          cy: 35
+          cx: 32.0
+          cy: 35.0
+          fill: none
           r: 6.5
           stroke: '#90a4ae'
-          stroke-width: 0.8
           stroke-linecap: round
-          fill: none
+          stroke-width: 0.8
       - component: g
         config:
           class: '=(!!props.running) ? ''a-spin'' : '''''
@@ -166,10 +166,10 @@ slots:
           default:
           - component: circle
             config:
-              cx: 32
-              cy: 35
-              r: 6.5
+              cx: 32.0
+              cy: 35.0
               fill: none
+              r: 6.5
               stroke: none
           - component: path
             config:
@@ -178,16 +178,16 @@ slots:
               fill-opacity: '0.55'
           - component: circle
             config:
-              cx: 29
+              cx: 29.0
               cy: 37.5
-              r: 1.6
               fill: '#42a5f5'
+              r: 1.6
           - component: circle
             config:
-              cx: 35
+              cx: 35.0
               cy: 38.5
-              r: 1.2
               fill: '#42a5f5'
+              r: 1.2
   - component: g
     config:
       visible: =props.kind === 'dryer'
@@ -195,23 +195,23 @@ slots:
       default:
       - component: circle
         config:
-          cx: 32
-          cy: 35
-          r: 9
-          stroke: currentColor
-          stroke-width: 1.6
-          stroke-linecap: round
+          cx: 32.0
+          cy: 35.0
           fill: none
+          r: 9.0
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-width: 1.6
       - component: circle
         config:
-          cx: 32
-          cy: 35
-          r: 6.5
-          fill-opacity: '0.15'
-          stroke: '#90a4ae'
-          stroke-width: 0.8
-          stroke-linecap: round
+          cx: 32.0
+          cy: 35.0
           fill: '#ffb74d'
+          fill-opacity: '0.15'
+          r: 6.5
+          stroke: '#90a4ae'
+          stroke-linecap: round
+          stroke-width: 0.8
       - component: g
         config:
           class: '=(!!props.running) ? ''a-spin'' : '''''
@@ -221,55 +221,55 @@ slots:
           default:
           - component: circle
             config:
-              cx: 32
-              cy: 35
-              r: 6.5
+              cx: 32.0
+              cy: 35.0
               fill: none
+              r: 6.5
               stroke: none
           - component: line
             config:
-              x1: 32
-              y1: 29.5
-              x2: 32
-              y2: 33
+              fill: none
+              stroke: '#ffb74d'
+              stroke-linecap: round
+              stroke-width: 1.6
               transform: rotate(0 32 35)
-              stroke: '#ffb74d'
-              stroke-width: 1.6
-              stroke-linecap: round
-              fill: none
+              x1: 32.0
+              x2: 32.0
+              y1: 29.5
+              y2: 33.0
           - component: line
             config:
-              x1: 32
-              y1: 29.5
-              x2: 32
-              y2: 33
+              fill: none
+              stroke: '#ffb74d'
+              stroke-linecap: round
+              stroke-width: 1.6
               transform: rotate(120 32 35)
-              stroke: '#ffb74d'
-              stroke-width: 1.6
-              stroke-linecap: round
-              fill: none
+              x1: 32.0
+              x2: 32.0
+              y1: 29.5
+              y2: 33.0
           - component: line
             config:
-              x1: 32
-              y1: 29.5
-              x2: 32
-              y2: 33
-              transform: rotate(240 32 35)
-              stroke: '#ffb74d'
-              stroke-width: 1.6
-              stroke-linecap: round
               fill: none
+              stroke: '#ffb74d'
+              stroke-linecap: round
+              stroke-width: 1.6
+              transform: rotate(240 32 35)
+              x1: 32.0
+              x2: 32.0
+              y1: 29.5
+              y2: 33.0
       - component: line
         config:
-          x1: 27
-          y1: 46
-          x2: 37
-          y2: 46
-          stroke: currentColor
-          stroke-width: 1.2
-          stroke-linecap: round
           fill: none
           opacity: '0.7'
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-width: 1.2
+          x1: 27.0
+          x2: 37.0
+          y1: 46.0
+          y2: 46.0
   - component: g
     config:
       visible: =props.kind === 'dish-washer'
@@ -277,26 +277,26 @@ slots:
       default:
       - component: line
         config:
-          x1: 27
-          y1: 24.5
-          x2: 37
-          y2: 24.5
-          stroke: currentColor
-          stroke-width: 1.6
-          stroke-linecap: round
           fill: none
+          stroke: currentColor
+          stroke-linecap: round
+          stroke-width: 1.6
+          x1: 27.0
+          x2: 37.0
+          y1: 24.5
+          y2: 24.5
       - component: rect
         config:
-          x: 22.5
-          y: 27
-          width: 19
-          height: 19
-          rx: 2
-          fill-opacity: '0.12'
-          stroke: '#90a4ae'
-          stroke-width: 1
-          stroke-linecap: round
           fill: '#4fc3f7'
+          fill-opacity: '0.12'
+          height: 19.0
+          rx: 2.0
+          stroke: '#90a4ae'
+          stroke-linecap: round
+          stroke-width: 1.0
+          width: 19.0
+          x: 22.5
+          y: 27.0
       - component: g
         config:
           class: '=(!!props.running) ? ''a-spin'' : '''''
@@ -306,54 +306,54 @@ slots:
           default:
           - component: circle
             config:
-              cx: 32
-              cy: 38
-              r: 7.5
+              cx: 32.0
+              cy: 38.0
               fill: none
+              r: 7.5
               stroke: none
           - component: line
             config:
-              x1: 24.5
-              y1: 38
-              x2: 39.5
-              y2: 38
-              stroke: '#4fc3f7'
-              stroke-width: 2
-              stroke-linecap: round
               fill: none
+              stroke: '#4fc3f7'
+              stroke-linecap: round
+              stroke-width: 2.0
+              x1: 24.5
+              x2: 39.5
+              y1: 38.0
+              y2: 38.0
           - component: circle
             config:
-              cx: 32
-              cy: 38
-              r: 1.4
+              cx: 32.0
+              cy: 38.0
               fill: '#4fc3f7'
+              r: 1.4
       - component: circle
         config:
-          cx: 27
-          cy: 37
-          r: 0.9
-          fill: '#4fc3f7'
-          visible: =!!props.running
           class: '=(!!props.running) ? ''a-rise'' : '''''
+          cx: 27.0
+          cy: 37.0
+          fill: '#4fc3f7'
+          r: 0.9
           style:
             animation-duration: 1.0s
+          visible: =!!props.running
       - component: circle
         config:
-          cx: 32
-          cy: 37
-          r: 0.9
-          fill: '#4fc3f7'
-          visible: =!!props.running
           class: '=(!!props.running) ? ''a-rise'' : '''''
+          cx: 32.0
+          cy: 37.0
+          fill: '#4fc3f7'
+          r: 0.9
           style:
             animation-duration: 1.3s
+          visible: =!!props.running
       - component: circle
         config:
-          cx: 37
-          cy: 37
-          r: 0.9
-          fill: '#4fc3f7'
-          visible: =!!props.running
           class: '=(!!props.running) ? ''a-rise'' : '''''
+          cx: 37.0
+          cy: 37.0
+          fill: '#4fc3f7'
+          r: 0.9
           style:
             animation-duration: 1.6s
+          visible: =!!props.running
