@@ -3450,7 +3450,8 @@ def section(icon, title, color, children, row=False, divider=True, dim=None):
 def boost_pill_widget():
     """The widget every boost pill is an instance of: a boost as an action, icon, title and state, and Starten or
     Stoppen; while it runs the pill fills with the device colour and rings pulse from the icon. A tap anywhere
-    switches."""
+    switches. The state line wraps where it does not fit, rather than being cut (user, 2026-11-01: the car's charging
+    line lost its clock on a laptop)."""
     on = "items[props.item].state === 'ON'"
     # two rings growing from 11 to 19 as they fade, half a period apart
     pulse = svg("svg", [animated(svg("circle", cx=20, cy=20, r=11, fill="none", stroke="#ffffff", **{"stroke-width": 2}),
@@ -3465,8 +3466,7 @@ def boost_pill_widget():
                                   "'color-mix(in srgb, var(--boost-color) 15%, transparent)'"})
     texts = div([label("=props.title || 'Boost'", **{"font-size": "14px", "font-weight": "600", "line-height": "18px"}),
                  label(f"={on} ? (props.running || 'läuft') : 'Aus'",
-                       **{"font-size": "11px", "opacity": "0.8", "line-height": "15px", "white-space": "nowrap",
-                          "overflow": "hidden", "text-overflow": "ellipsis"})],
+                       **{"font-size": "11px", "opacity": "0.8", "line-height": "15px"})],
                 **{"flex": "1", "min-width": "0", "display": "flex", "flex-direction": "column"})
     action = label(f"={on} ? 'Stoppen' : 'Starten'",
                    **{"flex": "0 0 auto", "padding": "3px 12px", "border-radius": PILL_R, "font-size": "12px",
@@ -9059,8 +9059,8 @@ def climate_degrees(item):
 
 
 def e_car_controls():
-    """The commands the API takes for the car (user, 2026-10-25), each action over its setting, the two side by side
-    where they fit:
+    """The commands the API takes for the car (user, 2026-10-25), each action over its setting, the two one under the
+    other at every width (user, 2026-11-01: side by side their detail lines were cut on a desktop):
     Laden as a boost pill, Starten and Stoppen, while a cable is plugged in or it charges, a hint without, and
     Klimatisierung, on with the target temperature below or off. Under them the settings as pill sliders: the charge
     target set in the car (Ladeziel), the value it charges to, 50 to 100 % in steps of 10, whose context gives the
@@ -9077,9 +9077,12 @@ def e_car_controls():
     # with the charge power in front and the clock written out as "fertig" (user, 2026-10-26)
     power = skoda("charge_power")
     kw = f"({ok(power)} && {num(power)} > 0 ? '~ ' + {fixed(num(power), 1)} + ' kW' : '')"  # the car's, in 0.5 kW steps
+    # where the line wraps (a narrow card) it breaks only after a "·", each part's spaces non-breaking
+    parts = (f"[{kw}, {ok(reached_at)} ? 'noch ' + {hm(left)} : '', {ok(reached_at)} ? 'fertig ' + "
+             f"{clock_of(reached_at)} : '']")
     pill = boost_pill(charging, "material:ev_station", ECAR_COLOR, "Laden",
-                      f"([{kw}, {ok(reached_at)} ? 'noch ' + {hm(left)} + ' · fertig ' + {clock_of(reached_at)} : '']"
-                      f".filter((s) => s !== '').join(' · ') || 'lädt')")
+                      f"({parts}.filter((s) => s !== '').map((s) => s.split(' ').join('\u00a0'))"
+                      f".join('\u00a0· ') || 'lädt')")
     pill["config"]["visible"] = f"={plugged}"
     hint = label("Zum Laden das Ladekabel einstecken", f"=!{plugged}",
                  **{"font-size": "13px", "opacity": "0.7", "padding": "10px 2px"})
@@ -9104,12 +9107,11 @@ def e_car_controls():
     last = skoda("command_result")
     outcome = label(f"=items.{last}.state", f"={ok(last)}",
                     **{"font-size": "12px", "opacity": "0.65", "padding": "6px 2px 0"})
-    # the two settings side by side where they fit (desktop), one above the other on a phone
-    # each action directly over its setting (user, 2026-10-25: on a phone Laden over Ladeziel, Klima over
-    # Zieltemperatur); the two groups side by side only where each has room for the time left and the clock
+    # each action directly over its setting (user, 2026-10-25: Laden over Ladeziel, Klima over Zieltemperatur), the
+    # two groups one under the other on a desktop as on a phone (user, 2026-11-01)
     group = {"display": "flex", "flex-direction": "column", "gap": "6px", "min-width": "0"}
     groups = div([div([pill, hint, slider], **group), div([climate_pill, climate_slider], **group)],
-                 **{"display": "grid", "gap": "6px 16px", "grid-template-columns": "repeat(auto-fit, minmax(270px, 1fr))"})
+                 **{"display": "grid", "gap": "6px", "grid-template-columns": "minmax(0, 1fr)"})
     return controls_box(groups, outcome)
 
 

@@ -34,7 +34,7 @@ props:
     required: false
     default: running
   parameterGroups: []
-timestamp: Oct 25, 2026, 2:07:58 PM
+timestamp: Nov 1, 2026, 2:26:50 AM
 component: div
 config:
   style:
@@ -231,9 +231,6 @@ slots:
             font-size: 11px
             opacity: '0.8'
             line-height: 15px
-            white-space: nowrap
-            overflow: hidden
-            text-overflow: ellipsis
   - component: Label
     config:
       text: '=items[props.item].state === ''ON'' ? ''Stop'' : ''Start'''
