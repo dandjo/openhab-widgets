@@ -69,9 +69,9 @@ props:
     type: TEXT
     required: true
     context: item
-  - name: heatpumpLeavingWaterTempOffsetHeating
-    label: Pyaltherma Leaving Water Temp Offset Heating
-    description: Number:Temperature item
+  - name: heatpumpLeavingWaterTempOffsetHeatingK
+    label: Pyaltherma Vorlauf-Offset Heizen (K)
+    description: Number item
     type: TEXT
     required: true
     context: item
@@ -100,7 +100,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Nov 1, 2026, 3:52:45 PM
+timestamp: Nov 1, 2026, 7:11:30 PM
 component: div
 config:
   style:
@@ -454,20 +454,20 @@ slots:
             : (items[props.heatpumpDhwTankTemp].displayState || items[props.heatpumpDhwTankTemp].state))'
       - component: widget:pill-slider
         config:
-          item: =props.heatpumpLeavingWaterTempOffsetHeating
+          item: =props.heatpumpLeavingWaterTempOffsetHeatingK
           color: '#fb8c00'
           min: -10
           max: 10
           step: 1
-          unit: °C
+          unit: ''
           title: Flow offset
-          value: '=(Math.round((Number(items[props.heatpumpLeavingWaterTempOffsetHeating].numericState) || 0)) > 0 ? ''+''
-            : '''') + Math.round((Number(items[props.heatpumpLeavingWaterTempOffsetHeating].numericState) || 0)) + '' °C'''
+          value: '=(Math.round((Number(items[props.heatpumpLeavingWaterTempOffsetHeatingK].numericState) || 0)) > 0 ? ''+''
+            : '''') + Math.round((Number(items[props.heatpumpLeavingWaterTempOffsetHeatingK].numericState) || 0)) + '' K'''
           context: '=''Flow target '' + ([''NULL'', ''UNDEF''].includes(items[props.heatpumpLeavingWaterSetpoint].state) ?
             ''–'' : (items[props.heatpumpLeavingWaterSetpoint].displayState || items[props.heatpumpLeavingWaterSetpoint].state))
             + (items[props.heatpumpClimateControlPower].state === ''ON'' ? ([''day'', ''night''].includes(items[props.heatpumpDayHeatingState].state)
             ? '' · Day heating controls'' : '''') : '' · Heating off'')'
-          marks: -10=−10 °C;-5=−5;0=0;5=+5;10=+10 °C
+          marks: -10=−10 K;-5=−5;0=0;5=+5;10=+10 K
           icon: material:tune
           row: true
       - component: widget:pill-slider

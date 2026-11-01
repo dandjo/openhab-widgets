@@ -357,9 +357,9 @@ props:
     type: TEXT
     required: true
     context: item
-  - name: heatpumpLeavingWaterTempOffsetHeating
-    label: Pyaltherma Leaving Water Temp Offset Heating
-    description: Number:Temperature item
+  - name: heatpumpLeavingWaterTempOffsetHeatingK
+    label: Pyaltherma Vorlauf-Offset Heizen (K)
+    description: Number item
     type: TEXT
     required: true
     context: item
@@ -400,7 +400,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Nov 1, 2026, 3:52:45 PM
+timestamp: Nov 1, 2026, 7:11:30 PM
 component: oh-card
 config:
   title: Heat Pump
@@ -3560,7 +3560,7 @@ slots:
                 heatpumpDhwTempHeating: =props.heatpumpDhwTempHeating
                 heatpumpDhwTankTemp: =props.heatpumpDhwTankTemp
                 heatpumpDhwBoost: =props.heatpumpDhwBoost
-                heatpumpLeavingWaterTempOffsetHeating: =props.heatpumpLeavingWaterTempOffsetHeating
+                heatpumpLeavingWaterTempOffsetHeatingK: =props.heatpumpLeavingWaterTempOffsetHeatingK
                 heatpumpLeavingWaterSetpoint: =props.heatpumpLeavingWaterSetpoint
                 heatpumpDayHeatingState: =props.heatpumpDayHeatingState
                 heatpumpDayHeatingOffset: =props.heatpumpDayHeatingOffset
@@ -3616,7 +3616,7 @@ slots:
               actionModalConfig:
                 heatpumpLeavingWaterTempAfterBuh: =props.heatpumpLeavingWaterTempAfterBuh
                 heatpumpInletWaterTemp: =props.heatpumpInletWaterTemp
-                heatpumpLeavingWaterTempOffsetHeating: =props.heatpumpLeavingWaterTempOffsetHeating
+                heatpumpLeavingWaterTempOffsetHeatingK: =props.heatpumpLeavingWaterTempOffsetHeatingK
                 heatpumpLeavingWaterSetpoint: =props.heatpumpLeavingWaterSetpoint
                 heatpumpClimateControlPower: =props.heatpumpClimateControlPower
                 heatpumpDayHeatingState: =props.heatpumpDayHeatingState

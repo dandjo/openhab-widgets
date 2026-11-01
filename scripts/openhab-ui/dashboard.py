@@ -3698,19 +3698,24 @@ def dhw_setpoint(dim=None, row=False):
                        row=row)
 
 
+# the leaving water offset in kelvins (user, 2026-11-01, as the day heating's): the plain Number of
+# applied/lw_offset_kelvin.py on the same MQTT channel as the Number:Temperature in °C, whose slider would send "3 K",
+# an absolute temperature (−270.15 °C); the plain one sends a bare number, which the channel takes in °C
+LW_OFFSET_K = "pyaltherma_leaving_water_temp_offset_heating_k"
+
+
 def lw_offset(dim=None, row=False):
-    n = f"Math.round({num('pyaltherma_leaving_water_temp_offset_heating')})"
+    n = f"Math.round({num(LW_OFFSET_K)})"
     heating = is_on("pyaltherma_climate_control_power")
     # whether the day heating holds the offset by the day's decision (day or night phase), not whether its switch is
     # on, as the hot water's "Automatik regelt" (user, 2026-10-31)
     day_heating = "['day', 'night'].includes(items.heatpump_day_heating_state.state)"
-    # the item is a Number:Temperature in °C; oh-slider sends its value with the unit, and "−2 K" would be taken as
-    # an absolute temperature (−275.15 °C), so the offset is set and shown in °C like the item
-    return pill_slider("pyaltherma_leaving_water_temp_offset_heating", HP_ORANGE, -10, 10, 1, "Vorlauf-Offset",
-                       f"({n} > 0 ? '+' : '') + {n} + ' °C'",
+    # no unit given: the slider's label takes "K" from the item's display state and sends a bare number
+    return pill_slider(LW_OFFSET_K, HP_ORANGE, -10, 10, 1, "Vorlauf-Offset",
+                       f"({n} > 0 ? '+' : '') + {n} + ' K'",
                        f"'Vorlauf-Soll ' + {disp('espaltherma_leaving_water_setpoint')} + "
                        f"({heating} ? ({day_heating} ? ' · Tagheizung regelt' : '') : ' · Heizung aus')",
-                       [(-10, "−10 °C"), (-5, "−5"), (0, "0"), (5, "+5"), (10, "+10 °C")], "°C", icon="material:tune",
+                       [(-10, "−10 K"), (-5, "−5"), (0, "0"), (5, "+5"), (10, "+10 K")], "", icon="material:tune",
                        dim=dim, row=row)
 
 
