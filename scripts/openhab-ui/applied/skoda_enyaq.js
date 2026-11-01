@@ -17,6 +17,9 @@ const IDLE_MINUTES = 15;
 const QUOTA_RESERVE = 4;
 // watts on the car's circuit (rule air_conditioning_circuit_power) from which it counts as charging at home
 const HOME_CHARGING_WATTS = 100;
+// the circuit's meter per percent of charge at home, the charger's losses included: 65.6 kWh for 76 % over 19 spans
+// between two reports (2026-11-02; 77 kWh usable would be 0.77)
+const KWH_PER_PERCENT_HOME = 0.86;
 const HOME_RADIUS_METERS = 200;
 const KEY_WARNING_DAYS = 7;
 const REFRESH_AFTER_COMMAND_MS = 90000;
@@ -166,6 +169,10 @@ function applyCharging(charging) {
   const battery = status.battery || {};
   const settings = charging.settings || {};
   postQuantity('soc', battery.stateOfChargeInPercent, '%');
+  // the charge and when the car captured it, the start of the estimate between its reports (estimateSoc)
+  if (typeof battery.stateOfChargeInPercent === 'number' && charging.carCapturedTimestamp) {
+    store.put('socBase', {soc: battery.stateOfChargeInPercent, at: Date.parse(charging.carCapturedTimestamp)});
+  }
   const meters = battery.remainingCruisingRangeInMeters;
   postQuantity('range', typeof meters === 'number' ? Math.round(meters / 1000) : null, 'km');
   // left out when the reported combination has no name (plugged in and unlocked without charging, after a drive)
@@ -870,6 +877,26 @@ function setClimateTarget(command) {
   }
 }
 
+// the charge while the car charges at home, between its reports (user, 2026-11-02): at about 2 kW it reports only every
+// one to four hours, away at 11 kW every few minutes. From the charge it last reported, the energy the circuit's meter
+// counted since the car captured it, at KWH_PER_PERCENT_HOME, up to the charge target; UNDEF elsewhere and while it
+// does not charge, so the UI shows the car's own value then. It never asks the car anything.
+function estimateSoc() {
+  const base = store.get('socBase');
+  let estimate = null;
+  if (base && state('charging_state') === 'CHARGING' && state('at_home') === 'ON') {
+    const meter = items.getItem('e_car_energy_total');
+    const then = meter.persistence.persistedState(time.toZDT(new Date(base.at).toISOString()), 'influxdb');
+    const now = meter.numericState;
+    if (then !== null && then.numericState !== null && now !== null) {
+      const target = items.getItem(P + 'charge_target').numericState;
+      const top = Math.min(100, target === null ? 100 : Math.max(target, base.soc));
+      estimate = Math.min(top, base.soc + Math.max(0, now - then.numericState) / KWH_PER_PERCENT_HOME);
+    }
+  }
+  postQuantity('soc_estimate', estimate === null ? null : Math.round(estimate * 10) / 10, '%');
+}
+
 function run() {
   const received = receivedCommand();
   if (received === null) {
@@ -882,6 +909,11 @@ function run() {
     setClimate(received.command);
   } else {
     setClimateTarget(received.command);
+  }
+  try {
+    estimateSoc();
+  } catch (e) {
+    console.warn(`Škoda: Ladestand-Schätzung: ${e}`);
   }
   try {
     publishTrips();

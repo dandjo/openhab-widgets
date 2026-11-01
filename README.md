@@ -488,7 +488,7 @@ Needs `boost-pill`, `flow-node`, `ground-floor-quick`, `heatpump-circuit-quick`,
 | `heatpumpDayHeating` | Wärmepumpe Tagheizung-Automatik | Switch |
 | `heatpumpDayHeatingStart` | Wärmepumpe Tagheizung Beginn | Number |
 | `heatpumpDhwTempHeating` | Pyaltherma DHW Temp Heating | Number:Temperature |
-| `heatpumpLeavingWaterTempOffsetHeating` | Pyaltherma Leaving Water Temp Offset Heating | Number:Temperature |
+| `heatpumpLeavingWaterTempOffsetHeating` | Pyaltherma Leaving Water Temp Offset Heating | Number |
 | `heatpumpDayHeatingState` | Wärmepumpe Tagheizung Zustand | String |
 | `heatpumpDayHeatingOffset` | Wärmepumpe Tagheizung Offset | Number |
 | `heatpumpDayHeatingEnd` | Wärmepumpe Tagheizung Ende | Number |
@@ -680,7 +680,7 @@ loops and the three figures at its top open them:
 | `heatpumpDhwTempHeating` | Pyaltherma DHW Temp Heating | Number:Temperature |
 | `heatpumpDhwTankTemp` | ESPAltherma DHW Tank Temperature | Number:Temperature |
 | `heatpumpDhwBoost` | Pyaltherma DHW Powerful | Switch |
-| `heatpumpLeavingWaterTempOffsetHeating` | Pyaltherma Leaving Water Temp Offset Heating | Number:Temperature |
+| `heatpumpLeavingWaterTempOffsetHeating` | Pyaltherma Leaving Water Temp Offset Heating | Number |
 | `heatpumpLeavingWaterSetpoint` | ESPAltherma Leaving Water Setpoint | Number:Temperature |
 | `heatpumpDayHeatingState` | Wärmepumpe Tagheizung Zustand | String |
 | `heatpumpDayHeatingOffset` | Wärmepumpe Tagheizung Offset | Number |
@@ -741,7 +741,7 @@ loops and the three figures at its top open them:
 |---|---|---|
 | `heatpumpLeavingWaterTempAfterBuh` | ESPAltherma Leaving Water Temperature After BUH | Number:Temperature |
 | `heatpumpInletWaterTemp` | ESPAltherma Inlet Water Temperature | Number:Temperature |
-| `heatpumpLeavingWaterTempOffsetHeating` | Pyaltherma Leaving Water Temp Offset Heating | Number:Temperature |
+| `heatpumpLeavingWaterTempOffsetHeating` | Pyaltherma Leaving Water Temp Offset Heating | Number |
 | `heatpumpLeavingWaterSetpoint` | ESPAltherma Leaving Water Setpoint | Number:Temperature |
 | `heatpumpClimateControlPower` | Pyaltherma Climate Control Power | Switch |
 | `heatpumpDayHeatingState` | Wärmepumpe Tagheizung Zustand | String |

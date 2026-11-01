@@ -8957,6 +8957,12 @@ def skoda(suffix):
 
 
 SKODA_CHARGING = f"items.{skoda('charging_state')}.state === 'CHARGING'"
+# the charge while the car charges at home between its reports (user, 2026-11-02: at 2 kW it reports only every few
+# hours): the rule's estimate from the circuit's meter, shown with "~" where it lies a percent above what the car last
+# reported; SOC_NOW is the charge to draw
+SOC_EST = skoda("soc_estimate")
+SOC_ESTIMATED = f"({ok(SOC_EST)} && Math.round({num(SOC_EST)}) > Math.round({num(skoda('soc'))}))"
+SOC_NOW = f"({SOC_ESTIMATED} ? {num(SOC_EST)} : {num(skoda('soc'))})"
 
 
 def clock_of(item):
@@ -9000,7 +9006,7 @@ def e_car_now():
     soc, state, plug = skoda("soc"), skoda("charging_state"), skoda("plug")
     # charging at home shows on the circuit at once, elsewhere only in what the car reports
     power = f"Math.max({num(ECAR)}, {SKODA_CHARGING} ? {num(skoda('charge_power'))} * 1000 : 0)"
-    icon = node_icon("e-car", ECAR_COLOR, flowing(power, ECAR_CHARGING), share=f"{num(soc)} / 100", power=power,
+    icon = node_icon("e-car", ECAR_COLOR, flowing(power, ECAR_CHARGING), share=f"{SOC_NOW} / 100", power=power,
                      plugged=ecar_plugged(power))
     charge_type = skoda("charge_type")
     # while it charges with its type and power; plugged in and unlocked without charging the API names no state. The
@@ -9017,19 +9023,24 @@ def e_car_now():
     where = (f"(items.{skoda('parking_state')}.state === 'IN_MOTION' ? 'Fährt' : "
              f"items.{skoda('at_home')}.state === 'ON' ? 'Zu Hause' : "
              f"items.{skoda('at_home')}.state === 'OFF' ? 'Unterwegs' : '–')")
-    # the charge and the range it gives as the main value (user, 2026-10-25: charge / range)
+    # the charge and the range it gives as the main value (user, 2026-10-25: charge / range); while the estimate holds
+    # both with "~", the range scaled from the car's to the estimated charge, to 5 km
+    rng = skoda("range")
+    est_range = f"Math.round({num(rng)} / {num(soc)} * {num(SOC_EST)} / 5) * 5"
     head = hero("material:electric_car", ECAR_COLOR, "Ladestand",
-                f"={disp(soc)} + ' / ' + {disp(skoda('range'))}",
+                f"=({SOC_ESTIMATED} ? '~ ' + Math.round({num(SOC_EST)}) + ' %' + ({ok(rng)} && {num(soc)} > 0 ? "
+                f"' / ~ ' + {est_range} + ' km' : '') : {disp(soc)} + ' / ' + {disp(rng)})",
                 [chips(chip(f"={state_text}", f"={plugged} ? '{ECAR_COLOR}' : '#9e9e9e'"),
                        chip(f"={where}", "#78909c")),
-                 label(f"='Stand ' + {when_short(skoda('updated'))}", **{"font-size": "14px"})],
+                 label(f"='Stand ' + {when_short(skoda('updated'))} + ({SOC_ESTIMATED} ? ' · ~ aus dem Zähler' : '')",
+                       **{"font-size": "14px"})],
                 picture=icon)
     # the mark at the charge target, the value set in the car that it charges to (user, 2026-10-25); under the bar on
     # the left, while it charges, when it reaches the target ("fertig ca.", user: shorter than "Ladeziel erreicht"), on
     # the right the target and, while battery care is on, "Akkuschonung aktiv" (user, 2026-10-26: the target stays as set
     # with battery care on, a 50 % target stayed 50 %)
     target, reached_at = skoda("charge_target"), skoda("target_reached_at")
-    charge = target_bar(vt_clamp(num(soc)), target, ECAR_COLOR,
+    charge = target_bar(vt_clamp(SOC_NOW), target, ECAR_COLOR,
                         f"={SKODA_CHARGING} && {ok(reached_at)} ? 'fertig ca. ' + {clock_of(reached_at)} : ''",
                         f"='Ladeziel ' + {disp(target)} + (items.{skoda('battery_care')}.state === 'ON' ? "
                         f"' · Akkuschonung aktiv' : '')")

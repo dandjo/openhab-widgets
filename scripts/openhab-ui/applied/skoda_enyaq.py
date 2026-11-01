@@ -68,6 +68,10 @@ POINTS = {
     "soc": ("Number:Dimensionless", "Ladestand", "battery_charging_full", ["Measurement", "Energy"], COURSE,
             quantity("%", "%.0f %unit%")),
     "range": ("Number:Length", "Reichweite", "route", ["Measurement"], COURSE, quantity("km", "%.0f %unit%")),
+    # the charge while the car charges at home between its reports, from the circuit's meter (user, 2026-11-02); the
+    # rule works it out every run, so it needs no history
+    "soc_estimate": ("Number:Dimensionless", "Ladestand geschätzt", "battery_charging_full", ["Point"], [],
+                     quantity("%", "%.0f %unit%")),
     "charging_state": ("String", "Ladestatus", "ev_station", ["Status"], CHANGE, state("%s", options=CHARGING_STATES)),
     "charge_power": ("Number:Power", "Ladeleistung", "bolt", ["Measurement", "Power"], COURSE,
                      quantity("kW", "%.1f %unit%")),
