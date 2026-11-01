@@ -87,8 +87,20 @@ props:
     type: TEXT
     required: true
     context: item
+  - name: heatpumpDayHeatingOffset
+    label: Wärmepumpe Tagheizung Offset
+    description: Number item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpDayHeatingEnd
+    label: Wärmepumpe Tagheizung Ende
+    description: Number item
+    type: TEXT
+    required: true
+    context: item
   parameterGroups: []
-timestamp: Nov 1, 2026, 3:29:37 PM
+timestamp: Nov 1, 2026, 3:52:45 PM
 component: div
 config:
   style:
@@ -457,6 +469,22 @@ slots:
             ? '' · Day heating controls'' : '''') : '' · Heating off'')'
           marks: -10=−10 °C;-5=−5;0=0;5=+5;10=+10 °C
           icon: material:tune
+          row: true
+      - component: widget:pill-slider
+        config:
+          item: =props.heatpumpDayHeatingOffset
+          color: '#fb8c00'
+          min: 0
+          max: 5
+          step: 1
+          unit: ''
+          title: Day heating offset
+          value: '=(Math.round((Number(items[props.heatpumpDayHeatingOffset].numericState) || 0)) > 0 ? ''+'' : '''') + Math.round((Number(items[props.heatpumpDayHeatingOffset].numericState)
+            || 0)) + '' K'''
+          context: ='Day window ' + Math.round((Number(items[props.heatpumpDayHeatingStart].numericState) || 0)) + ':00–'
+            + Math.round((Number(items[props.heatpumpDayHeatingEnd].numericState) || 0)) + ':00'
+          marks: 0=0;1=+1;2=+2;3=+3;4=+4;5=+5 K
+          icon: material:wb_sunny
           row: true
       - component: div
         config:

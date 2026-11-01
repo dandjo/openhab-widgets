@@ -425,7 +425,7 @@ Needs `boost-pill`, `flow-node`, `ground-floor-quick`, `heatpump-circuit-quick`,
 ![Heat pump in dark mode](screenshots/heatpump-card-dark.gif)
 
 <details>
-<summary>64 props</summary>
+<summary>66 props</summary>
 
 | Prop | Item | Item type |
 |---|---|---|
@@ -490,6 +490,8 @@ Needs `boost-pill`, `flow-node`, `ground-floor-quick`, `heatpump-circuit-quick`,
 | `heatpumpDhwTempHeating` | Pyaltherma DHW Temp Heating | Number:Temperature |
 | `heatpumpLeavingWaterTempOffsetHeating` | Pyaltherma Leaving Water Temp Offset Heating | Number:Temperature |
 | `heatpumpDayHeatingState` | Wärmepumpe Tagheizung Zustand | String |
+| `heatpumpDayHeatingOffset` | Wärmepumpe Tagheizung Offset | Number |
+| `heatpumpDayHeatingEnd` | Wärmepumpe Tagheizung Ende | Number |
 | `heatpumpTargetDischargeTemp` | ESPAltherma Target Discharge Temperature | Number:Temperature |
 | `heatpumpHeatingPowerAfterBuh` | ESPAltherma Heating Power After BUH | Number:Power |
 | `heatpumpWaterPumpSignal` | ESPAltherma Water Pump Signal | Number:Dimensionless |
@@ -663,7 +665,7 @@ loops and the three figures at its top open them:
 `heatpump-control-quick` needs `boost-pill`, `pill-slider`, `pill-switch`, `state-bar`, `switch-row`.
 
 <details>
-<summary><code>heatpump-control-quick</code>: 14 props</summary>
+<summary><code>heatpump-control-quick</code>: 16 props</summary>
 
 | Prop | Item | Item type |
 |---|---|---|
@@ -681,6 +683,8 @@ loops and the three figures at its top open them:
 | `heatpumpLeavingWaterTempOffsetHeating` | Pyaltherma Leaving Water Temp Offset Heating | Number:Temperature |
 | `heatpumpLeavingWaterSetpoint` | ESPAltherma Leaving Water Setpoint | Number:Temperature |
 | `heatpumpDayHeatingState` | Wärmepumpe Tagheizung Zustand | String |
+| `heatpumpDayHeatingOffset` | Wärmepumpe Tagheizung Offset | Number |
+| `heatpumpDayHeatingEnd` | Wärmepumpe Tagheizung Ende | Number |
 
 </details>
 

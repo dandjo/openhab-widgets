@@ -3714,6 +3714,21 @@ def lw_offset(dim=None, row=False):
                        dim=dim, row=row)
 
 
+def day_heating_offset(row=False):
+    """The day heating's offset in its window (heatpump_day_heating_offset), which its rule writes as the leaving water
+    offset there (user, 2026-11-01: a slider under the Vorlauf-Offset, as moving that one in day mode is undone by the
+    rule within a minute); whole K as the controller takes them, 0 to +5, its window as the context. The item is a
+    plain Number, so the slider sends no unit."""
+    item = "heatpump_day_heating_offset"
+    n = f"Math.round({num(item)})"
+    hour = lambda i: f"Math.round({num(i)})"
+    return pill_slider(item, HP_ORANGE, 0, 5, 1, "Tagheizung-Offset", f"({n} > 0 ? '+' : '') + {n} + ' K'",
+                       f"'Tagfenster ' + {hour('heatpump_day_heating_start')} + ':00–' + "
+                       f"{hour('heatpump_day_heating_end')} + ':00'",
+                       [(0, "0"), (1, "+1"), (2, "+2"), (3, "+3"), (4, "+4"), (5, "+5 K")], "",
+                       icon="material:wb_sunny", row=row)
+
+
 def battery_power_slider(item, title, context):
     return pill_slider(item, BATTERY_GREEN, 100, 3500, 100, title, f"Math.round({num(item)}) + ' W'", f"'{context}'",
                        [(100, "100 W"), (1000, "1 kW"), (2000, "2 kW"), (3500, "3,5 kW")], "W", icon="material:bolt",
@@ -3816,12 +3831,12 @@ def quick_stack(*panels, weights=None):
 
 def hp_control_quick():
     """The heat pump's control: all its controls, as on its page: Smart Grid, heating, hot water and the automation,
-    the DHW setpoint, the hot-water boost and the leaving water offset."""
+    the DHW setpoint, the hot-water boost, the leaving water offset and under it the day heating's."""
     on = lambda item: f"(items.{item}.state === 'ON' ? 'an' : 'aus')"
     state = f"'Heizung ' + {on('pyaltherma_climate_control_power')} + ' · Warmwasser ' + {on('pyaltherma_dhw_power')}"
     return quick("material:tune", "Regelung", HP_ORANGE, state,
                  [smart_grid_section(row=True), operation_section(row=True), dhw_setpoint(row=True), dhw_boost(),
-                  lw_offset(row=True)], "heatpump")
+                  lw_offset(row=True), day_heating_offset(row=True)], "heatpump")
 
 
 # the heat pump's charts over the day, as panels of stacked_chart(), shared by the card's popups and its page
@@ -8681,7 +8696,8 @@ def heatpump_blocks():
         operation_section(row=True),
         dhw_setpoint(row=True),
         dhw_boost(),
-        lw_offset(row=True))
+        lw_offset(row=True),
+        day_heating_offset(row=True))
     now = hp_head() + [value_grid([
         vtile("Heizleistung", P["heat"], color="#e53935"),  # Strom → Wärme jetzt, only while it runs
         hp_circuit_tile(),
