@@ -4258,8 +4258,9 @@ PEAK_GROUPS = [(name, [PEAK_POWER.get(i, i.replace("_energy_today", "_power")) f
                for name, its, color in parts]
 PEAK_GROUPS.insert(1, ("E-Auto", ["e_car_power"], "#26a69a"))
 PEAK_COLORS = {**{name: color for name, _, color in PEAK_GROUPS}, "Nicht gemessen": "#e0e0e0", "Akku laden": "#4db6ac"}
-GRID_PEAKS = "grid_peaks"
-GRID_PEAK_MONTHLY = "grid_peak_monthly"  # every finished month since October 2024, in the form of grid_peaks
+# rule grid_peaks: every month since October 2024 with its 7 strongest days and their breakdowns, the running first
+GRID_PEAK_BREAKDOWN = "grid_peak_breakdown"
+GRID_PEAK_MONTHLY = "grid_peak_monthly"  # the running month's strongest quarter-hour mean of the import, kW
 GRID_PEAK_DAILY = "grid_peak_daily"  # every day's strongest quarter-hour mean of the import, kW (rule grid_peaks)
 # the house's consumption from PV (the battery's discharge included) and from the grid (less the battery's grid charge,
 # which is no consumption), rule home_energy since 2026-10-19
@@ -9640,35 +9641,29 @@ def peak_month_name(m):
 
 def grid_peaks_card():
     """The grid's strongest quarter-hours by month (user, 2026-11-02: the grid operator charges for a month's strongest
-    quarter-hour mean of the import; which consumers cause it): the last 6 months, the running one first (grid_peaks,
-    worked out every quarter-hour) and the newest finished months after it (grid_peak_monthly, every finished month
-    since October 2024), each with its strongest quarter-hour, its mean import, a bar of what the house drew then by
-    consumer group and the main groups with their kW and what PV covered; a tap opens the month's 7 strongest days
-    (widget grid-peaks-month). Ältere anzeigen opens the older finished months in the same form. The bars measure
-    against the strongest draw of the months shown, closed or open."""
-    data = f"(((s) => (s || '').charAt(0) === '{{' ? JSON.parse(s) : {{}})(items.{GRID_PEAKS}.state))"
-    archive = f"(((s) => (s || '').charAt(0) === '{{' ? JSON.parse(s) : {{}})(items.{GRID_PEAK_MONTHLY}.state))"
+    quarter-hour mean of the import; which consumers cause it): the last 6 months of grid_peak_breakdown, the running
+    one first (worked out every quarter-hour), each with its strongest quarter-hour, its mean import, a bar of what
+    the house drew then by consumer group and the main groups with their kW and what PV covered; a tap opens the
+    month's 7 strongest days (widget grid-peaks-month). Ältere anzeigen opens the older months in the same form. The
+    bars measure against the strongest draw of the months shown, closed or open."""
+    data = f"(((s) => (s || '').charAt(0) === '{{' ? JSON.parse(s) : {{}})(items.{GRID_PEAK_BREAKDOWN}.state))"
     shown = "(vars.olderPeaks === 'on')"
-    # 6 months in all: the archive's newest beside the running month (none on a month's first minutes)
-    count = f"(6 - ({data}.months || []).length)"
-    recent = f"(({archive}.months || []).slice(0, {count}))"
-    older = f"(({archive}.months || []).slice({count}))"
-    closed = f"{recent}.reduce((a, m) => Math.max(a, m.d[0].p.reduce((b, x) => b + x[1], 0)), {data}.max || 0)"
-    scale = f"({shown} ? Math.max({data}.max || 0, {archive}.max || 0) : {closed})"
+    recent = f"(({data}.months || []).slice(0, 6))"
+    older = f"(({data}.months || []).slice(6))"
+    closed = f"{recent}.reduce((a, m) => Math.max(a, m.d[0].p.reduce((b, x) => b + x[1], 0)), 0)"
+    scale = f"({shown} ? ({data}.max || 0) : {closed})"
 
-    def month_box(m, item, running):
+    def month_box(m):
         tap = comp("oh-link", {"action": "popup", "actionModal": "widget:grid-peaks-month",
-                               "actionModalConfig": {"peaks": item, "month": f"={m}.m"},
+                               "actionModalConfig": {"peaks": GRID_PEAK_BREAKDOWN, "month": f"={m}.m"},
                                "style": {"position": "absolute", "inset": "0", "display": "block",
                                          "border-radius": "12px"}})
-        title = f"{peak_month_name(m + '.m')}" + (" + ' · bisher'" if running else "")
+        title = f"{peak_month_name(m + '.m')} + ({m}.cur ? ' · bisher' : '')"
         return peak_box(title, peak_quarter(f"{m}.d[0].t"), f"{m}.d[0]", scale, tap)
-    rows = [comp("oh-repeater", {"for": "month", "sourceType": "array", "in": f"={data}.months || []",
-                                 "fragment": True}, default=[month_box("loop.month", GRID_PEAKS, True)]),
-            comp("oh-repeater", {"for": "done", "sourceType": "array", "in": f"={recent}", "fragment": True},
-                 default=[month_box("loop.done", GRID_PEAK_MONTHLY, False)])]
+    rows = [comp("oh-repeater", {"for": "month", "sourceType": "array", "in": f"={recent}", "fragment": True},
+                 default=[month_box("loop.month")])]
     olders = div([comp("oh-repeater", {"for": "old", "sourceType": "array", "in": f"={older}", "fragment": True},
-                       default=[month_box("loop.old", GRID_PEAK_MONTHLY, False)])], f"={shown}")
+                       default=[month_box("loop.old")])], f"={shown}")
     toggle = comp("oh-link", {"text": f"={shown} ? 'Weniger anzeigen' : 'Ältere anzeigen (' + {older}.length + ')'",
                               "iconF7": f"={shown} ? 'chevron_up' : 'chevron_down'", "iconSize": 16,
                               "action": "variable", "actionVariable": "olderPeaks",
