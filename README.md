@@ -47,6 +47,7 @@ number formats come from the items.
 | `energy-flow-card` | `flow-link`, `flow-node` |
 | `flow-link` | – |
 | `flow-node` | – |
+| `grid-peaks-month` | – |
 | `ground-floor-quick` | – |
 | `heating-card` | `flow-node`, `item-popup`, `trip-popup` |
 | `heatpump-card` | `boost-pill`, `flow-node`, `ground-floor-quick`, `heatpump-circuit-quick`, `heatpump-control-quick`, `heatpump-cop-quick`, `heatpump-electric-quick`, `heatpump-heat-quick`, `heatpump-indoor-quick`, `heatpump-outdoor-quick`, `heatpump-refrigerant-quick`, `heatpump-tank-quick`, `heatpump-valve-quick`, `item-popup`, `pill-slider`, `pill-switch`, `state-bar`, `switch-row`, `trip-popup`, `upper-floor-quick`, `value-tile` |

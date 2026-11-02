@@ -214,6 +214,8 @@ EN.update({"Kartendaten © OpenStreetMap": "Map data © OpenStreetMap", "Zwische
            "Taktschutz-Automatik": "Cycle guard automation", "Tagheizung-Automatik": "Day heating automation",
            "Tagheizung regelt": "Day heating controls", "Tagheizung-Offset": "Day heating offset",
            "Tagfenster": "Day window",
+           "Die 7 stärksten Tage, je mit ihrer stärksten Viertelstunde":
+               "The 7 strongest days, each with its strongest quarter-hour", "PV deckte": "PV covered",
            "Fahrten mit weniger als 2 Stunden Abstand sind eine Sitzung, „~“: aus den Abfragen geschätzt":
            "Trips less than 2 hours apart are one session, „~“: estimated from the reads",
            "Parkposition": "Parking position", "Heizkurve": "Heating curve", "Heizkurve (fortgesetzt": "Heating curve (extrapolated",

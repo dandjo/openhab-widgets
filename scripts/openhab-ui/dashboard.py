@@ -9531,52 +9531,92 @@ def photovoltaics_blocks():
             one(card("PV-Eigenverbrauch pro Tag", [self_use_days()]))]
 
 
-def grid_peaks_card():
-    """The grid's strongest quarter-hours (user, 2026-11-02: the grid operator charges for the month's strongest
-    quarter-hour mean; which consumers cause it): the month's so far, then the 5 strongest of the last 7 days, at least
-    45 minutes apart, each with its mean import, a bar of what the house drew then by consumer (its length against the
-    strongest draw of the list) and the main consumers with their kW, and what PV covered. The rule grid_peaks writes
-    them as JSON every quarter-hour."""
-    data = f"(((s) => (s || '').charAt(0) === '{{' ? JSON.parse(s) : {{}})(items.{GRID_PEAKS}.state))"
-    p = "loop.peak"
-    # what no meter counts in a darker grey on the light theme's box, where the consumption card's light grey vanishes
+def peak_color():
+    """The colour of a consumer group (loop.part[0]) as the consumption card gives it; what no meter counts in a darker
+    grey on the light theme's box, where the card's light grey vanishes."""
     tone = lambda n, c: f"{VT_DARK} ? '{c}' : '#9e9e9e'" if n == "Nicht gemessen" else f"'{c}'"
     pairs = "[" + ", ".join(f"[{js_str(n)}, {tone(n, c)}]" for n, c in PEAK_COLORS.items()) + "]"
-    color = f"((c) => c ? c[1] : '#bdbdbd')({pairs}.find((c) => c[0] === loop.part[0]))"
-    total = f"{p}.p.reduce((a, x) => a + x[1], 0)"
-    when = (f"((d) => d.format('dd DD.MM.') + ' · ' + d.format('HH:mm') + '–' + d.add(15, 'minute').format('HH:mm'))"
-            f"(dayjs({p}.t))")
-    badge = label("Monatsspitze", f"=!!{p}.m",
-                  **{"font-size": "11px", "font-weight": "700", "color": "#ffffff", "background": "#e53935",
-                     "border-radius": PILL_R, "padding": "1px 8px", "margin-left": "8px", "white-space": "nowrap"})
-    head = div([div([label(f"={when}", **{"font-weight": "600"}), badge],
-                    **{"display": "flex", "align-items": "center", "min-width": "0", "flex-wrap": "wrap"}),
-                label(f"={p}.kw.toFixed(2).replace('.', ',') + ' kW'",
+    return f"((c) => c ? c[1] : '#bdbdbd')({pairs}.find((c) => c[0] === loop.part[0]))"
+
+
+def peak_quarter(t):
+    """A quarter-hour by its start in ms: So 01.11. · 21:15–21:30."""
+    return (f"((d) => d.format('dd DD.MM.') + ' · ' + d.format('HH:mm') + '–' + d.add(15, 'minute').format('HH:mm'))"
+            f"(dayjs({t}))")
+
+
+def peak_box(title, sub, q, scale, tap=None):
+    """A strong quarter-hour (q: its JSON object, {t, kw, pv, p: [[group, kW], ...]}) as a box: a title and a line
+    under it, its mean import on the right, a bar of what the house drew then by consumer group (its length against
+    scale, the strongest draw of the list) and the main groups with their kW and what PV covered; tap: a link over
+    it."""
+    total = f"{q}.p.reduce((a, x) => a + x[1], 0)"
+    head = div([div([label(f"={title}", **{"font-weight": "700"}),
+                     *([label(f"={sub}", **{**VT_SUB, "font-size": "12px"})] if sub else [])],
+                    **{"min-width": "0"}),
+                label(f"={q}.kw.toFixed(2).replace('.', ',') + ' kW'",
                       **{"font-weight": "700", "font-size": "17px", "color": "#e53935", "white-space": "nowrap"})],
                **{"display": "flex", "justify-content": "space-between", "align-items": "baseline", "gap": "8px"})
     segment_ = div([], **{"width": f"=(100 * loop.part[1] / Math.max(0.001, {total})).toFixed(2) + '%'",
-                          "height": "100%", "background": f"={color}",
-                          "border-radius": "3px"})
-    bar = div([comp("oh-repeater", {"for": "part", "sourceType": "array", "in": f"={p}.p", "fragment": True},
+                          "height": "100%", "background": f"={peak_color()}", "border-radius": "3px"})
+    bar = div([comp("oh-repeater", {"for": "part", "sourceType": "array", "in": f"={q}.p", "fragment": True},
                     default=[segment_])],
               **{"display": "flex", "gap": "2px", "height": "12px", "margin": "8px 0 6px",
-                 "width": f"=(100 * {total} / Math.max(0.001, {data}.max || 0)).toFixed(1) + '%'"})
+                 "width": f"=(100 * {total} / Math.max(0.001, {scale} || 0)).toFixed(1) + '%'"})
     dot = div([], **{"width": "8px", "height": "8px", "border-radius": "50%", "flex": "0 0 auto",
-                     "background": f"={color}"})
+                     "background": f"={peak_color()}"})
     chip_ = div([dot, label("=loop.part[0] + ' ' + loop.part[1].toFixed(1).replace('.', ',') + ' kW'")],
                 **{"display": "flex", "align-items": "center", "gap": "5px", "white-space": "nowrap"})
     legend = div([comp("oh-repeater", {"for": "part", "sourceType": "array", "fragment": True,
-                                       "in": f"={p}.p.filter((x) => x[1] >= 0.1).slice(0, 4)"}, default=[chip_]),
-                  label(f"='PV deckte ' + {p}.pv.toFixed(1).replace('.', ',') + ' kW'", f"={p}.pv >= 0.1",
+                                       "in": f"={q}.p.filter((x) => x[1] >= 0.1).slice(0, 4)"}, default=[chip_]),
+                  label(f"='PV deckte ' + {q}.pv.toFixed(1).replace('.', ',') + ' kW'", f"={q}.pv >= 0.1",
                         **{"white-space": "nowrap"})],
                  **{**VT_SUB, "display": "flex", "flex-wrap": "wrap", "align-items": "center", "gap": "4px 12px"})
-    box = div([head, bar, legend], **{"background": "rgba(127, 127, 127, 0.12)", "border-radius": "12px",
-                                      "padding": "10px 12px", "margin-bottom": "8px"})
-    rows = comp("oh-repeater", {"for": "peak", "sourceType": "array", "in": f"={data}.rows || []", "fragment": True},
-                default=[box])
-    note = label("Mittlerer Netzbezug je Viertelstunde: die stärksten der letzten 7 Tage.",
-                 **{**VT_SUB, "padding": "0 2px 8px"})
+    return div([head, bar, legend, *([tap] if tap else [])],
+               **{"background": "rgba(127, 127, 127, 0.12)", "border-radius": "12px", "padding": "10px 12px",
+                  "margin-bottom": "8px", "position": "relative"})
+
+
+def peak_month_name(m):
+    """A month by its key (2026-11) as November 2026."""
+    return f"({WX_MONTHS})[Number({m}.slice(5, 7)) - 1] + ' ' + {m}.slice(0, 4)"
+
+
+def grid_peaks_card():
+    """The grid's strongest quarter-hours by month (user, 2026-11-02: the grid operator charges for a month's strongest
+    quarter-hour mean of the import; which consumers cause it): the last 6 months, the running one first, each with
+    its strongest quarter-hour, its mean import, a bar of what the house drew then by consumer group (its length
+    against the strongest draw of the months) and the main groups with their kW and what PV covered; a tap opens the
+    month's 7 strongest days (widget grid-peaks-month). The rule grid_peaks writes them as JSON every quarter-hour."""
+    data = f"(((s) => (s || '').charAt(0) === '{{' ? JSON.parse(s) : {{}})(items.{GRID_PEAKS}.state))"
+    m = "loop.month"
+    tap = comp("oh-link", {"action": "popup", "actionModal": "widget:grid-peaks-month",
+                           "actionModalConfig": {"peaks": GRID_PEAKS, "month": f"={m}.m"},
+                           "style": {"position": "absolute", "inset": "0", "display": "block",
+                                     "border-radius": "12px"}})
+    box = peak_box(f"{peak_month_name(m + '.m')} + ({m}.cur ? ' · bisher' : '')", peak_quarter(f"{m}.d[0].t"),
+                   f"{m}.d[0]", f"{data}.max", tap)
+    rows = comp("oh-repeater", {"for": "month", "sourceType": "array", "in": f"={data}.months || []",
+                                "fragment": True}, default=[box])
+    note = label("Stärkste Viertelstunde je Monat (mittlerer Netzbezug), die letzten 6 Monate. Tippen zeigt die 7 "
+                 "stärksten Tage des Monats.", **{**VT_SUB, "padding": "0 2px 8px"})
     return card("Spitzen-Viertelstunden", [div([note, rows], **{"padding": "0 12px 8px"})])
+
+
+def grid_peaks_month_popup():
+    """A month of the Stromzähler's strongest quarter-hours (prop peaks: the item, month: its key, 2026-11): its 7
+    strongest days by their strongest quarter-hour, strongest first, each as the card's months, the bars against the
+    month's strongest draw (user, 2026-11-02)."""
+    # the month's JSON object, undefined while the item holds none for it
+    month = ("(((s) => ((s || '').charAt(0) === '{' ? JSON.parse(s).months || [] : [])"
+             ".find((x) => x.m === props.month))(props.peaks ? items[props.peaks].state : ''))")
+    head = div([label(f"={peak_month_name("(props.month || '')")}", **{"font-size": "20px", "font-weight": "700"}),
+                label("Die 7 stärksten Tage, je mit ihrer stärksten Viertelstunde",
+                      **{**VT_SUB, "font-size": "14px"})], **{"padding": "6px 10px 10px"})
+    box = peak_box(peak_quarter("loop.day.t"), None, "loop.day", f"((x) => x ? x.max : 0)({month})")
+    days = comp("oh-repeater", {"for": "day", "sourceType": "array", "in": f"=((x) => x ? x.d : [])({month})",
+                                "fragment": True}, default=[box])
+    return div([head, div([days], **{"padding": "0 4px"})], **{"padding": "8px 6px"})
 
 
 def meter_blocks(title_item, color_expr, today, phases, heads, extra, chart_item, peaks=False):
@@ -10604,6 +10644,11 @@ TRIP_POPUP_PARAMS = [
     param("id", "Trip", "The trip's id, its start in ms", required=True),
     param("color", "Colour", "Colour of the map's places and line as #rrggbb", default=ECAR_COLOR)]
 
+GRID_PEAKS_POPUP_PARAMS = [
+    dict(param("peaks", "Peaks", "The String item holding the grid's strongest quarter-hours by month as JSON (rule "
+               "grid_peaks)", required=True), context="item"),
+    param("month", "Month", "The month's key, as 2026-11", required=True)]
+
 VALUE_TILE_PARAMS = [
     param("title", "Title", "Title above the value", required=True),
     param("value", "Value", "The text to show, usually an expression on an item", required=True),
@@ -10749,6 +10794,7 @@ def widgets():
         out[uid] = (templated(plots_below_controls(card_)), params, ["plug"])
     out["item-popup"] = (templated(plots_below_controls(item_popup())), ITEM_POPUP_PARAMS, ["popup"])
     out["trip-popup"] = (trip_popup(), TRIP_POPUP_PARAMS, ["popup"])
+    out["grid-peaks-month"] = (grid_peaks_month_popup(), GRID_PEAKS_POPUP_PARAMS, ["popup"])
     out["value-tile"] = (value_tile_widget(), VALUE_TILE_PARAMS, ["tile"])
     out["pill-slider"] = (pill_slider_widget(), PILL_SLIDER_PARAMS, ["slider"])
     out["switch-row"] = (switch_row_widget(), SWITCH_ROW_PARAMS, ["switch"])

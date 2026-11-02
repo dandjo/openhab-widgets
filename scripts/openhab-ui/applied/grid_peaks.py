@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""The grid's strongest quarter-hours for the Stromzähler page (user, 2026-11-02: the grid operator charges for the
+"""The grid's strongest quarter-hours for the Stromzähler page (user, 2026-11-02: the grid operator charges for a
 month's strongest quarter-hour mean of the import; which consumers cause it): the rule grid_peaks (grid_peaks.js
-beside this script) writes every quarter-hour, a minute after it, and right after openHAB starts the month's strongest
-and the 5 strongest of the last 7 days with what each consumer drew then as JSON into the String item grid_peaks,
-which is not persisted. The consumers' groups come from the UI generator (PEAK_GROUPS in dashboard.py), as the
-consumption card's.
+beside this script) writes every quarter-hour, a minute after it, and right after openHAB starts, for each of the last
+6 months its 7 strongest days by their strongest quarter-hour with what each consumer drew then, as JSON into the
+String item grid_peaks, which MapDB restores, so finished months need not be worked out again. The consumers' groups
+come from the UI generator (PEAK_GROUPS in dashboard.py), as the consumption card's.
 Usage: grid_peaks.py check|apply   (on homepi, as pi; the API token from ~/.openhab_token, never printed)"""
 import json
 import os
@@ -42,11 +42,11 @@ def main():
     rule = {
         "uid": RULE_UID,
         "name": "Netz-Spitzenviertelstunden",
-        "description": "Rechnet jede Viertelstunde den mittleren Netzbezug je Viertelstunde aus dem Bezugszähler "
-                       "(an den Grenzen interpoliert, so verteilen sich Lücken der Aufzeichnung) und schreibt die "
-                       "stärkste des Monats und die 5 stärksten der letzten 7 Tage samt der Leistung jeder "
-                       "Verbrauchergruppe als JSON in grid_peaks, für die Seite Stromzähler "
-                       "(applied/grid_peaks.py, Gruppen aus dem UI-Generator).",
+        "description": "Sucht jede Viertelstunde für die letzten 6 Monate die 7 stärksten Tage nach ihrer "
+                       "stärksten Viertelstunde (Viertelstunden-Mittel der Netzleistung) und schreibt sie samt der "
+                       "Leistung jeder Verbrauchergruppe als JSON in grid_peaks, für die Seite Stromzähler; "
+                       "abgeschlossene Monate übernimmt sie aus dem letzten Ergebnis (applied/grid_peaks.py, Gruppen "
+                       "aus dem UI-Generator).",
         "tags": [],
         "triggers": [{"id": "1", "type": "timer.GenericCronTrigger",
                       "configuration": {"cronExpression": "0 1/15 * * * ? *"}},
@@ -58,8 +58,9 @@ def main():
                                        "script": SCRIPT.replace("__GROUPS__",
                                                                 json.dumps(groups, ensure_ascii=False))}}],
     }
+    # restored after a restart: the rule takes the finished months from it
     item = {"type": "String", "name": ITEM, "label": "Netz-Spitzenviertelstunden", "category": "material:bolt",
-            "tags": [], "groupNames": []}
+            "tags": [], "groupNames": ["mapdb_change_restore"]}
     print(f"item {ITEM}:", "exists" if call("GET", f"/items/{ITEM}") == 200 else "missing")
     exists = call("GET", f"/rules/{RULE_UID}") == 200
     print(f"rule {RULE_UID}:", "exists" if exists else "missing", f"({len(groups)} consumer groups)")
