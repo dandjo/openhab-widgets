@@ -4419,7 +4419,8 @@ PV_SCALE = ["#eeeeee", "#ffe082", "#ffb300", "#e65100"]
 # Every series reads only the stored days (DAY_ONLY): for a period around now MainUI asks the persistence for the
 # boundary, which moves the last value before the period, 31 December's, to its start, into January, and for the
 # item's state as a point at now, which repeats today's stored value; January's bar took in 31 December and the
-# running month's sum and average today twice (found 2026-11-02: PV November 18.1 instead of 14.6 kWh)
+# running month's sum and average today twice (found 2026-11-02: PV November 18.1 instead of 14.6 kWh). The month
+# sums of the flow popups (month_sums) read the same way; the charts of a value per day ('last') are not affected
 DAY_ONLY = {"noBoundary": True, "noItemState": True}
 
 
@@ -5841,7 +5842,8 @@ def day_sums(series, stack):
 
 def month_sums(series):
     """Sums per month of the daily total items over a year, the arrows paging through years; series: (name, item,
-    colour, extra), bars unless extra says otherwise."""
+    colour, extra), bars unless extra says otherwise. Only the stored days count (DAY_ONLY): else January took in
+    31 December and the running month today twice."""
     return chart({"chartType": "year", "periodVisible": True, "height": "260px"},
                  grid=[comp("oh-chart-grid", {"top": "40", "bottom": "60", "left": "45", "right": "12"})],
                  xAxis=[comp("oh-category-axis", {"gridIndex": 0, "categoryType": "values", "data": PV_MONTHS,
@@ -5853,7 +5855,8 @@ def month_sums(series):
                                                "splitLine": {"lineStyle": {"type": "dashed", "opacity": 0.4}}})],
                  series=[comp("oh-aggregate-series", {"name": name, "gridIndex": 0, "xAxisIndex": 0, "yAxisIndex": 0,
                                                       "type": "bar", "item": item, "aggregationFunction": "sum",
-                                                      "dimension1": "month", "itemStyle": {"color": color}, **extra})
+                                                      "dimension1": "month", "itemStyle": {"color": color},
+                                                      **DAY_ONLY, **extra})
                          for name, item, color, extra in series],
                  # MainUI's smart formatter, on unless switched off, would override valueFormatter
                  tooltip=tooltip(trigger="axis", smartFormatter=False, valueFormatter=PV_MONTH_VALUE), legend=legend())
