@@ -10,7 +10,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 25, 2026, 2:07:58 PM
+timestamp: Nov 2, 2026, 3:41:47 PM
 component: oh-card
 config:
   title: PV Yield per Day
@@ -247,6 +247,8 @@ slots:
               calendarIndex: 0
               item: =props.dailyPvGeneration
               aggregationFunction: last
+              noBoundary: true
+              noItemState: true
           visualMap:
           - component: oh-chart-visualmap
             config:
@@ -445,6 +447,8 @@ slots:
               calendarIndex: 0
               item: =props.dailyPvGeneration
               aggregationFunction: last
+              noBoundary: true
+              noItemState: true
           - component: oh-calendar-series
             config:
               name: PV yield
@@ -452,6 +456,8 @@ slots:
               calendarIndex: 1
               item: =props.dailyPvGeneration
               aggregationFunction: last
+              noBoundary: true
+              noItemState: true
           visualMap:
           - component: oh-chart-visualmap
             config:
@@ -552,6 +558,8 @@ slots:
                 - 62) / 28, (H - 164) / 18)))(api.getWidth(), api.getHeight(), params.coordSys.rangeInfo.start.y)'
               item: =props.dailyPvGeneration
               aggregationFunction: last
+              noBoundary: true
+              noItemState: true
           visualMap:
           - component: oh-chart-visualmap
             config:
@@ -669,6 +677,8 @@ slots:
               item: =props.dailyPvGeneration
               aggregationFunction: sum
               dimension1: month
+              noBoundary: true
+              noItemState: true
               itemStyle:
                 color: '#ffb300'
                 borderRadius:
@@ -686,6 +696,8 @@ slots:
               item: =props.dailyPvGeneration
               aggregationFunction: average
               dimension1: month
+              noBoundary: true
+              noItemState: true
               symbol: none
               lineStyle:
                 opacity: 0

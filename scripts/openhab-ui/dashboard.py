@@ -4260,6 +4260,7 @@ PEAK_GROUPS.insert(1, ("E-Auto", ["e_car_power"], "#26a69a"))
 PEAK_COLORS = {**{name: color for name, _, color in PEAK_GROUPS}, "Nicht gemessen": "#e0e0e0", "Akku laden": "#4db6ac"}
 GRID_PEAKS = "grid_peaks"
 GRID_PEAKS_ARCHIVE = "grid_peaks_archive"  # every finished month since October 2024, in the form of grid_peaks
+GRID_PEAK_DAILY = "grid_peak_daily"  # every day's strongest quarter-hour mean of the import, kW (rule grid_peaks)
 # the house's consumption from PV (the battery's discharge included) and from the grid (less the battery's grid charge,
 # which is no consumption), rule home_energy since 2026-10-19
 FROM_PV = f"({num('home_from_pv_day')} + {num('home_from_battery_day')})"
@@ -4394,28 +4395,47 @@ energy_days = chart({"chartType": "month", "periodVisible": True, "height": "100
 # the card's views of the year, by the value of its variable pvView, and the texts of the bar that switches them:
 # on a wider screen the year's calendar, by default, the month calendars and the bars; on a phone the year's 53 weeks
 # would leave a day about 5 px wide, so there the bar offers the half-years, by default, instead of the year. pvView
-# starts empty, so each width opens on its own default (PV_VIEW)
+# starts empty, so each width opens on its own default (day_view)
 PV_VIEWS = [("year", "Jahr"), ("halves", "Halbjahre"), ("months", "Monate"), ("bars", "Balken")]
-PV_VIEW = f"(vars.pvView || ({NARROW} ? 'halves' : 'year'))"
 
 
-def pv_shows(view, width=None):
+def day_view(cfg):
+    """The card's view: its variable, else the width's default."""
+    return f"(vars.{cfg['var']} || ({NARROW} ? 'halves' : 'year'))"
+
+
+def day_shows(cfg, view, width=None):
     """The visible expression of a view's chart; width 'narrow' or 'wide' for a chart made for one of them."""
     where = {"narrow": f"({NARROW}) && ", "wide": f"!({NARROW}) && ", None: ""}[width]
-    return f"={where}{PV_VIEW} === '{view}'"
+    return f"={where}{day_view(cfg)} === '{view}'"
 
 
 PV_SCALE = ["#eeeeee", "#ffe082", "#ffb300", "#e65100"]
-calendar = chart({"chartType": "year", "periodVisible": True, "height": "250px", "visible": pv_shows("year", "wide")},
+# The calendar cards of daily values (the PV yield, the grid's daily peak; user, 2026-11-02: the peak as the PV's)
+# are built from one set of views, by cfg: the card's variable, the daily item, the series' name, the colour scale and
+# its top, the unit, the bars' aggregation, name and colour, the line's name and colour, the buttons' accent and the
+# bars' tooltip value.
+# Every series reads only the stored days (DAY_ONLY): for a period around now MainUI asks the persistence for the
+# boundary, which moves the last value before the period, 31 December's, to its start, into January, and for the
+# item's state as a point at now, which repeats today's stored value; January's bar took in 31 December and the
+# running month's sum and average today twice (found 2026-11-02: PV November 18.1 instead of 14.6 kWh)
+DAY_ONLY = {"noBoundary": True, "noItemState": True}
+
+
+def day_year(cfg):
+    """Jahr: the year's calendar on a wider screen."""
+    return chart({"chartType": "year", "periodVisible": True, "height": "250px",
+                  "visible": day_shows(cfg, "year", "wide")},
                  calendar=[comp("oh-calendar-axis", {"orient": "horizontal", "cellSize": ["auto", "auto"],
                                                      "top": "75", "bottom": "10", "left": "40", "right": "20",
                                                      "dayLabel": {"firstDay": 1}, "yearLabel": {"show": False},
                                                      "monthLabel": {"fontSize": "=screen.width < 600 ? 8 : 12"}})],
-                 series=[comp("oh-calendar-series", {"name": "PV Production", "type": "heatmap", "calendarIndex": 0,
-                                                     "item": "energy_daily_pv_generation", "aggregationFunction": "last"})],
-                 visualMap=[comp("oh-chart-visualmap", {"show": "=!(screen.width < 600)", "min": 0, "max": 60, "type": "continuous", "calculable": True,
+                 series=[comp("oh-calendar-series", {"name": cfg["name"], "type": "heatmap", "calendarIndex": 0,
+                                                     "item": cfg["item"], "aggregationFunction": "last", **DAY_ONLY})],
+                 visualMap=[comp("oh-chart-visualmap", {"show": "=!(screen.width < 600)", "min": 0, "max": cfg["max"],
+                                                        "type": "continuous", "calculable": True,
                                                         "orient": "horizontal", "left": "center", "top": "8", "itemWidth": 12, "itemHeight": 200,
-                                                        "inRange": {"color": PV_SCALE}})],
+                                                        "inRange": {"color": cfg["scale"]}})],
                  tooltip=tooltip())
 
 
@@ -4452,17 +4472,20 @@ pv_halves_graphic = [pv_mask(f"={PV_X0} + 26 * {PV_CW}", PV_T1 - 20, "=screen.wi
                                   "textVerticalAlign": "middle", "fontSize": 12,
                                   "fill": "=themeOptions.dark === 'dark' ? '#aaa' : '#000'"}}
                        for i, d in enumerate(PV_DAYS)]]
-pv_halves = chart({"chartType": "year", "periodVisible": True, "height": "318px", "visible": pv_shows("halves", "narrow"),
-                   "options": {"graphic": pv_halves_graphic}},
-                  calendar=[pv_half(PV_T1, PV_X0), pv_half(PV_T2, f"={PV_X0} - 26 * {PV_CW}")],
-                  series=[comp("oh-calendar-series", {"name": "PV Production", "type": "heatmap", "calendarIndex": i,
-                                                      "item": "energy_daily_pv_generation", "aggregationFunction": "last"})
-                          for i in (0, 1)],
-                  visualMap=[comp("oh-chart-visualmap", {"show": True, "min": 0, "max": 60, "type": "continuous",
-                                                         "calculable": True, "orient": "horizontal", "left": PV_X0,
-                                                         "top": "8", "itemWidth": 10, "itemHeight": 110,
-                                                         "inRange": {"color": PV_SCALE}})],
-                  tooltip=tooltip())
+def day_halves(cfg):
+    """Halbjahre: the year in two halves on a phone."""
+    return chart({"chartType": "year", "periodVisible": True, "height": "318px",
+                  "visible": day_shows(cfg, "halves", "narrow"),
+                  "options": {"graphic": copy.deepcopy(pv_halves_graphic)}},
+                 calendar=[pv_half(PV_T1, PV_X0), pv_half(PV_T2, f"={PV_X0} - 26 * {PV_CW}")],
+                 series=[comp("oh-calendar-series", {"name": cfg["name"], "type": "heatmap", "calendarIndex": i,
+                                                     "item": cfg["item"], "aggregationFunction": "last", **DAY_ONLY})
+                         for i in (0, 1)],
+                 visualMap=[comp("oh-chart-visualmap", {"show": True, "min": 0, "max": cfg["max"], "type": "continuous",
+                                                        "calculable": True, "orient": "horizontal", "left": PV_X0,
+                                                        "top": "8", "itemWidth": 10, "itemHeight": 110,
+                                                        "inRange": {"color": cfg["scale"]}})],
+                 tooltip=tooltip())
 
 
 def pv_hidden_calendar():
@@ -4474,18 +4497,20 @@ def pv_hidden_calendar():
                                      "splitLine": {"show": False}, "itemStyle": {"opacity": 0}})
 
 
-def pv_custom_days(render):
-    """The days' yields as a custom series on the hidden calendar, drawn by render."""
-    return comp("oh-calendar-series", {"name": "PV Production", "calendarIndex": 0, "type": "custom",
-                                       "renderItem": render, "item": "energy_daily_pv_generation", "aggregationFunction": "last"})
+def day_custom_days(cfg, render):
+    """The days' values as a custom series on the hidden calendar, drawn by render."""
+    return comp("oh-calendar-series", {"name": cfg["name"], "calendarIndex": 0, "type": "custom",
+                                       "renderItem": render, "item": cfg["item"], "aggregationFunction": "last",
+                                       **DAY_ONLY})
 
 
-def pv_short_scale():
+def day_short_scale(cfg):
     """A short scale at the top left, without handles, clear of the year's buttons down to 360 px; its ends name the
     scale's values."""
-    return comp("oh-chart-visualmap", {"show": True, "min": 0, "max": 60, "type": "continuous", "calculable": False,
-                                       "orient": "horizontal", "left": 4, "top": "22", "itemWidth": 10,
-                                       "itemHeight": 60, "text": ["60 kWh", "0"], "inRange": {"color": PV_SCALE}})
+    return comp("oh-chart-visualmap", {"show": True, "min": 0, "max": cfg["max"], "type": "continuous",
+                                       "calculable": False, "orient": "horizontal", "left": 4, "top": "22",
+                                       "itemWidth": 10, "itemHeight": 60, "text": [f"{cfg['max']} {cfg['unit']}", "0"],
+                                       "inRange": {"color": cfg["scale"]}})
 
 
 # Monate: twelve wall calendars in square cells, three a row on a phone; where the chart is 600 px wide or more six or
@@ -4538,9 +4563,12 @@ def pv_wall_calendar():
 # on a phone the chart is the screen less 28 px wide, so its cells and height follow from the screen's width; on a
 # wider screen the months fit 420 px, two rows of six or three of four
 PV_WALL_HEIGHT = f"={NARROW} ? (84 + 4 * (28 + 6 * Math.floor((screen.width - 60) / 21))) + 'px' : '420px'"
-pv_wall = chart({"chartType": "year", "periodVisible": True, "height": PV_WALL_HEIGHT, "visible": pv_shows("months")},
-                calendar=[pv_hidden_calendar()], series=[pv_custom_days(pv_wall_calendar())],
-                visualMap=[pv_short_scale()], tooltip=tooltip())
+def day_wall(cfg):
+    """Monate: twelve wall calendars."""
+    return chart({"chartType": "year", "periodVisible": True, "height": PV_WALL_HEIGHT,
+                  "visible": day_shows(cfg, "months")},
+                 calendar=[pv_hidden_calendar()], series=[day_custom_days(cfg, pv_wall_calendar())],
+                 visualMap=[day_short_scale(cfg)], tooltip=tooltip())
 
 # Balken: the months as bars, the sum of their days' yields; the average per day, of the days with a value so far,
 # only in the tooltip, as a second line would just redraw the bars' shape
@@ -4550,41 +4578,47 @@ PV_MONTHS = ["Jänner", "Februar", "März", "April", "Mai", "Juni", "Juli", "Aug
 # the month's sum whole, the average per day to a tenth
 PV_MONTH_VALUE = ("=(v) => v == null ? '–' : Number(v).toLocaleString('de-AT', {minimumFractionDigits: Number(v) >= 100 ? 0 "
                   ": 1, maximumFractionDigits: Number(v) >= 100 ? 0 : 1}) + ' kWh'")
-pv_months = chart({"chartType": "year", "periodVisible": True, "height": "250px", "visible": pv_shows("bars")},
+def day_bars(cfg):
+    """Balken: the months as bars and, only in the tooltip, the average per day."""
+    return chart({"chartType": "year", "periodVisible": True, "height": "250px", "visible": day_shows(cfg, "bars")},
                   grid=[comp("oh-chart-grid", {"top": "62", "bottom": "28", "left": "45", "right": "12"})],
                   # the months as the axis' own values: the tooltip names the month in full, the axis shortly
                   xAxis=[comp("oh-category-axis", {"gridIndex": 0, "categoryType": "values", "data": PV_MONTHS,
                                                    "name": " ", "axisTick": {"show": False},
                                                    "axisLabel": {"interval": 0, "fontSize": f"={NARROW} ? 10 : 12",
                                                                  "formatter": f"=(v, i) => {PV_MONTHS_SHORT}[i]"}})],
-                  yAxis=[comp("oh-value-axis", {"gridIndex": 0, "name": "kWh", "nameGap": 14, "nameTextStyle": AXIS_NAME,
+                  yAxis=[comp("oh-value-axis", {"gridIndex": 0, "name": cfg["unit"], "nameGap": 14,
+                                                "nameTextStyle": AXIS_NAME,
                                                 "axisLabel": {"formatter": "=(v) => v.toLocaleString('de-AT')"},
                                                 "splitLine": {"lineStyle": {"type": "dashed", "opacity": 0.4}}}),
                          comp("oh-value-axis", {"gridIndex": 0, "show": False})],
-                  series=[comp("oh-aggregate-series", {"name": "PV Production", "gridIndex": 0, "xAxisIndex": 0,
-                                                       "yAxisIndex": 0, "type": "bar", "item": "energy_daily_pv_generation",
-                                                       "aggregationFunction": "sum", "dimension1": "month",
-                                                       "itemStyle": {"color": "#ffb300", "borderRadius": [4, 4, 0, 0]}}),
-                          comp("oh-aggregate-series", {"name": "Average per Day", "gridIndex": 0, "xAxisIndex": 0,
-                                                       "yAxisIndex": 1, "type": "line", "item": "energy_daily_pv_generation",
+                  series=[comp("oh-aggregate-series", {"name": cfg["bar_name"], "gridIndex": 0, "xAxisIndex": 0,
+                                                       "yAxisIndex": 0, "type": "bar", "item": cfg["item"],
+                                                       "aggregationFunction": cfg["bars"], "dimension1": "month",
+                                                       **DAY_ONLY,
+                                                       "itemStyle": {"color": cfg["bar_color"],
+                                                                     "borderRadius": [4, 4, 0, 0]}}),
+                          comp("oh-aggregate-series", {"name": cfg["avg"], "gridIndex": 0, "xAxisIndex": 0,
+                                                       "yAxisIndex": 1, "type": "line", "item": cfg["item"],
                                                        "aggregationFunction": "average", "dimension1": "month",
+                                                       **DAY_ONLY,
                                                        "symbol": "none", "lineStyle": {"opacity": 0},
-                                                       "itemStyle": {"color": "#e65100"}})],
+                                                       "itemStyle": {"color": cfg["avg_color"]}})],
                   # MainUI's smart formatter, on unless switched off, would override valueFormatter
-                  tooltip=tooltip(trigger="axis", smartFormatter=False, valueFormatter=PV_MONTH_VALUE))
+                  tooltip=tooltip(trigger="axis", smartFormatter=False, valueFormatter=cfg["value"]))
 
 
-def pv_view_bar():
+def day_view_bar(cfg):
     """The bar that switches the views, in the look of the Smart Grid states (widget state-bar, sized by its texts) in
-    the PV colour; state-bar sends an item command, this one sets the card's variable pvView. Jahr only on a wider
+    the card's accent; state-bar sends an item command, this one sets the card's variable. Jahr only on a wider
     screen, where the bar stays at most 440 px wide, Halbjahre only on a phone."""
-    active = f"{PV_VIEW} === '{{}}'"
-    buttons = [comp("oh-button", {"text": text, "action": "variable", "actionVariable": "pvView",
+    active = f"{day_view(cfg)} === '{{}}'"
+    buttons = [comp("oh-button", {"text": text, "action": "variable", "actionVariable": cfg["var"],
                                   "actionVariableValue": view, "small": True, "active": f"={active.format(view)}",
                                   **({"visible": f"=!({NARROW})"} if view == "year" else
                                      {"visible": f"={NARROW}"} if view == "halves" else {}),
                                   "style": {"font-size": "12px", "flex": "1 1 auto", "width": "auto", "padding": "0 6px",
-                                            "background-color": f"=({active.format(view)}) ? '{PV_AMBER}' : ''",
+                                            "background-color": f"=({active.format(view)}) ? '{cfg['accent']}' : ''",
                                             "color": f"=({active.format(view)}) ? '#ffffff' : ''"}})
                for view, text in PV_VIEWS]
     bar = comp("f7-segmented", {"strong": True, "stylesheet": BY_TEXT_BAR,
@@ -4593,11 +4627,32 @@ def pv_view_bar():
     return div([bar], **{"padding": "4px 12px 0"})
 
 
-def pv_days():
+def day_calendar(cfg):
     """The card's content: the bar and the chosen view; the variable lives in an oh-context, so it passes into the
-    widget's parts, and starts empty, so each width shows its own default (PV_VIEW)."""
-    return comp("oh-context", {"variables": {"pvView": ""}},
-                default=[pv_view_bar(), calendar, pv_halves, pv_wall, pv_months])
+    widget's parts, and starts empty, so each width shows its own default (day_view)."""
+    return comp("oh-context", {"variables": {cfg["var"]: ""}},
+                default=[day_view_bar(cfg), day_year(cfg), day_halves(cfg), day_wall(cfg), day_bars(cfg)])
+
+
+PV_DAYS_CFG = {"var": "pvView", "item": "energy_daily_pv_generation", "name": "PV Production", "scale": PV_SCALE,
+               "max": 60, "unit": "kWh", "bars": "sum", "bar_name": "PV Production", "bar_color": "#ffb300",
+               "avg": "Average per Day", "avg_color": "#e65100", "accent": PV_AMBER, "value": PV_MONTH_VALUE}
+# the grid's daily peak, the strongest quarter-hour mean of the import (user, 2026-11-02, as the PV yield's calendar):
+# white to red up to 8 kW, the month's bar its peak (the strongest day), the line the average daily peak
+PEAK_SCALE = ["#eeeeee", "#ffcdd2", "#e57373", "#b71c1c"]
+PEAK_DAYS_CFG = {"var": "peakView", "item": GRID_PEAK_DAILY, "name": "Daily Peak", "scale": PEAK_SCALE, "max": 8,
+                 "unit": "kW", "bars": "max", "bar_name": "Monthly Peak", "bar_color": "#e53935",
+                 "avg": "Average Daily Peak", "avg_color": "#b71c1c", "accent": "#e53935",
+                 "value": "=(v) => v == null ? '–' : Number(v).toLocaleString('de-AT', {minimumFractionDigits: 2, "
+                          "maximumFractionDigits: 2}) + ' kW'"}
+
+
+def pv_days():
+    return day_calendar(PV_DAYS_CFG)
+
+
+def peak_days():
+    return day_calendar(PEAK_DAYS_CFG)
 
 # ---------------------------------------------------------------- 8. temperatures, storage, appliances
 
@@ -9870,7 +9925,10 @@ GEN_DE = {
     "Total Net": "Gesamt netto", "Market Gross": "Markt brutto", "Market Net": "Markt netto",
     # consumption, daily energy, calendar, temperatures
     "Consumers": "Verbraucher", "From PV": "Aus PV", "From Battery": "Aus dem Akku", "From Grid": "Aus dem Netz", "PV Production": "PV-Ertrag",
-    "Average per Day": "Ø pro Tag", "kWh": "kWh", "Tag": "Tag", "Indoor": "Innen", "Outdoor": "Außen",
+    "Average per Day": "Ø pro Tag", "kWh": "kWh",
+    "Peak Quarter-Hour per Day": "Spitzen-Viertelstunde pro Tag", "Daily Peak": "Tagesspitze",
+    "Monthly Peak": "Monatsspitze", "Average Daily Peak": "Ø Tagesspitze",
+    "Tag": "Tag", "Indoor": "Innen", "Outdoor": "Außen",
     "Heatpump sensor": "Fühler der Wärmepumpe", "°C": "°C", "W": "W",
     # energy flow popups and the controls
     "Total": "Gesamt", "Consumption": "Verbrauch", "Climate Control": "Heizung",
@@ -10000,6 +10058,7 @@ def overview_cards():
         "consumption-card": card("='Verbrauch heute · ' + " + disp("home_ec_day"), consumption_content()),
         "energy-days-card": card("Energy per Day", [fill_chart(energy_days, "340px")], fill=True),
         "pv-days-card": card("PV Production per Day", [pv_days()]),
+        "peak-days-card": card("Peak Quarter-Hour per Day", [peak_days()]),
         "temperatures-card": card("Temperatures", temps_content()),
     }
 
@@ -10029,13 +10088,15 @@ def page(now):
         # a phone the weather stays on top), the flow taking the height the row leaves; the heat pump beside today's
         # consumption over the energy per day, which fills the column down to the heat pump's height; the price beside
         # the temperatures, on one line (user, 2026-10-05: back from two stacked columns); the PV calendar across the
-        # bottom. The consumers stay in two columns from 1390 px on and the page is one column below, so the heat pump
+        # bottom, the grid's daily peak in the same views under it (user, 2026-11-02). The consumers stay in two
+        # columns from 1390 px on and the page is one column below, so the heat pump
         # and today's consumption with the energy per day come out about the same height
         block(row(col([widget_stack(w("weather-card"), w("energy-flow-card"), w("switches-card"), grow=2)]),
                   col([widget_stack(w("appliances-card"), w("heating-card"))])),
               row(col([w("heatpump-card")]), col([widget_stack(w("consumption-card"), w("energy-days-card"))])),
               row(col([w("electricity-price-card")]), col([w("temperatures-card")])),
-              row(full(w("pv-days-card")))),
+              row(full(w("pv-days-card"))),
+              row(full(w("peak-days-card")))),
     ], now)
 
 

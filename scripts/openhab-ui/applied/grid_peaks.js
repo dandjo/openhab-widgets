@@ -10,6 +10,10 @@
 // ARCHIVE_PER_RUN a run. No item may carry the measurement's name: the nightly downsampler leaves only measurements
 // without one alone. The whole archive also goes into the String item grid_peaks_archive, in the form of grid_peaks,
 // for the Stromzähler page, which shows the running month, the archive's 5 newest and on demand the older ones.
+// Every day's strongest quarter goes into InfluxDB too, as the item grid_peak_daily's values, one point a day at
+// 23:59:59 as the daily energies have them, for the overview's calendar (user, 2026-11-02): the running month's days
+// on every run (the running day's value, as it grows, its state too), a month's days when the archive takes it;
+// applied/grid_peak_daily_backfill.py wrote the days before.
 const GROUPS = __GROUPS__;  // [[name, [power items]], ...] from the UI generator (PEAK_GROUPS in dashboard.py)
 const GRID = 'huawei_inverter_power_meter_active_power';  // positive while it imports
 const HOME = 'home_active_power';
@@ -24,6 +28,7 @@ const ARCHIVE = 'grid_peak_months';
 const ARCHIVE_FROM = new Date(2024, 9, 1);  // the first whole month of the meter's record (October 2024)
 const ARCHIVE_PER_RUN = 3;
 const ARCHIVE_ITEM = 'grid_peaks_archive';
+const DAILY = 'grid_peak_daily';
 const store = cache.private;
 const round = (x) => Math.round(x * 100) / 100;
 const pad = (n) => (n < 10 ? '0' : '') + n;
@@ -41,7 +46,8 @@ function query(q) {
 }
 
 // the n strongest days of [from, to) by their strongest finished quarter (of two alike the earlier), strongest first
-function strongestDays(from, to, now, n) {
+// every day of [from, to) with its strongest finished quarter (of two alike the earlier): [start, kW], by time
+function dailyBest(from, to, now) {
   const series = query(`SELECT mean(value) FROM "${GRID}" WHERE time >= ${from}ms AND time < ${to}ms ` +
     'GROUP BY time(15m) fill(none)')[0];
   const best = {};
@@ -55,7 +61,24 @@ function strongestDays(from, to, now, n) {
       best[day] = [v[0], v[1] / 1000];
     }
   });
-  return Object.keys(best).map((k) => best[k]).sort((a, b) => b[1] - a[1] || a[0] - b[0]).slice(0, n);
+  return Object.keys(best).map((k) => best[k]).sort((a, b) => a[0] - b[0]);
+}
+
+// the days' values of grid_peak_daily, at each day's 23:59:59
+function writeDaily(days) {
+  if (!days.length) {
+    return;
+  }
+  const lines = days.map((q) => {
+    const d = new Date(q[0]);
+    const end = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 23, 59, 59).getTime();
+    return `${DAILY},item=${DAILY} value=${round(q[1])} ${end}`;
+  });
+  const answer = actions.HTTP.sendHttpPostRequest(`${INFLUX}/write?db=openhab&precision=ms`, 'text/plain',
+    lines.join('\n'), 10000);
+  if (answer === null || answer === undefined || String(answer).indexOf('"error"') >= 0) {
+    throw new Error('InfluxDB did not take the days\' peaks');
+  }
 }
 
 // what the house drew in a quarter by consumer (kW), PV's power and the battery's discharge then
@@ -87,9 +110,17 @@ const draw = (d) => d.p.reduce((a, c) => a + c[1], 0);
 const monthKey = (ms) => { const d = new Date(ms); return `${d.getFullYear()}-${pad(d.getMonth() + 1)}`; };
 
 // a month's 7 strongest days with their breakdowns, strongest first
+// a month's 7 strongest days with their breakdowns, strongest first; all its days' values into grid_peak_daily, and
+// the running day's (the last, when the month is the running one) as the item's state
 function monthDays(parts, from, to, now) {
-  return strongestDays(from, to, now, DAYS).map((q) => Object.assign({t: q[0], kw: round(q[1])},
-    breakdown(parts, q[0])));
+  const days = dailyBest(from, to, now);
+  writeDaily(days);
+  const last = days[days.length - 1];
+  if (last && new Date(last[0]).toDateString() === new Date(now).toDateString()) {
+    items.getItem(DAILY).postUpdate(`${round(last[1])} kW`);
+  }
+  return days.slice().sort((a, b) => b[1] - a[1] || a[0] - b[0]).slice(0, DAYS)
+    .map((q) => Object.assign({t: q[0], kw: round(q[1])}, breakdown(parts, q[0])));
 }
 
 // the finished months the archive lacks, newest first, worked out at most ARCHIVE_PER_RUN a run; a month without a

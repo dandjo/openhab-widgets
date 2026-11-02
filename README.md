@@ -62,6 +62,7 @@ number formats come from the items.
 | `heatpump-tank-quick` | – |
 | `heatpump-valve-quick` | – |
 | `item-popup` | `trip-popup` |
+| `peak-days-card` | – |
 | `pill-slider` | – |
 | `pill-switch` | – |
 | `plug-card` | `appliance-icon`, `flow-node`, `item-popup`, `power-pill`, `trip-popup` |
@@ -572,6 +573,23 @@ and the bars, a phone the half-years instead of the year.
 | Prop | Item | Item type |
 |---|---|---|
 | `dailyPvGeneration` | Energy Daily PV Generation | Number:Energy |
+
+</details>
+
+### Peak quarter-hour per day: `peak-days-card`
+
+Every day's strongest quarter-hour mean of the grid import (a daily item the rule grid_peaks writes) in the same four
+views as the PV calendar, white to dark red up to 8 kW; the bars show each month's peak, the strongest day, which the
+grid operator charges for, the average daily peak in the tooltip.
+
+![Peak quarter-hour per day](screenshots/peak-days-card.png)
+
+<details>
+<summary>1 props</summary>
+
+| Prop | Item | Item type |
+|---|---|---|
+| `gridPeakDaily` | Grid Peak of the Day | Number:Power |
 
 </details>
 

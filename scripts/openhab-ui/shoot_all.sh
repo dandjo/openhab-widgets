@@ -22,6 +22,7 @@ cp $(shot ov appliances) $R/appliances-card.png; cp $(shot ov electricity-price)
 cp $(shot ov switches) $R/switches-card.png
 cp $(shot ov consumption-today*) $R/consumption-card.png; cp $(shot ov energy-per-day) $R/energy-days-card.png
 cp $(shot ov pv-yield*) $R/pv-days-card.png; cp $(shot ov temperatures) $R/temperatures-card.png
+cp $(shot ov peak-quarter-hour*) $R/peak-days-card.png
 cp $O/ov-0-card.png $R/weather-card.png; cp $O/ovd-0-card.png $R/weather-card-dark.png
 # 1600 px, where the consumers list shows each consumer's share beside its energy
 python3 cdp_cards.py $B/overview $O/ovcons 1600 >/dev/null

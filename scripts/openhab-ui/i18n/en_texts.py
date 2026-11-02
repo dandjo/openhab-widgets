@@ -131,6 +131,8 @@ EN = {
     # consumption, daily energy, calendar, temperatures
     "Ø pro Tag": "Ø per day", "Tag": "Day", "Jahr": "Year", "Monate": "Months", "Halbjahre": "Half-years",
     "Balken": "Bars", "Jetzt": "Now", "Heute": "Today",
+    "Spitzen-Viertelstunde pro Tag": "Peak Quarter-Hour per Day", "Tagesspitze": "Daily peak",
+    "Monatsspitze": "Monthly peak", "Ø Tagesspitze": "Ø daily peak", "Netz-Spitzenlast des Tages": "Grid Peak of the Day",
     "Jänner": "January", "Februar": "February", "März": "March", "April": "April", "Mai": "May", "Juni": "June",
     "Juli": "July", "August": "August", "September": "September", "Oktober": "October", "November": "November",
     "Dezember": "December", "Jän": "Jan", "Mär": "Mar", "Okt": "Oct", "Dez": "Dec",

@@ -122,6 +122,10 @@ OVERVIEW = [
      "a bar switches: a "
      "calendar heatmap of the year, two half-years, twelve month calendars and the months' sums as bars; a wider "
      "screen gets the year, the month calendars and the bars, a phone the half-years instead of the year."),
+    ("peak-days-card", "Peak quarter-hour per day", "Every day's strongest quarter-hour mean of the grid import "
+     "(a daily item the rule grid_peaks writes) in the same four views as the PV calendar, white to dark red up to "
+     "8 kW; the bars show each month's peak, the strongest day, which the grid operator charges for, the average "
+     "daily peak in the tooltip."),
     ("temperatures-card", "Temperatures", "Indoor and outdoor temperature now, each with its change over the last "
      "hour in a pill beside it and under that indoors the room's climate in a word (from the humidity), outdoors "
      "whether airing dries or dampens the rooms (from both airs' absolute humidity); the day's minimum and maximum, "

@@ -1,0 +1,742 @@
+uid: peak-days-card
+tags:
+- overview
+props:
+  parameters:
+  - name: gridPeakDaily
+    label: Grid Peak of the Day
+    description: Number:Power item
+    type: TEXT
+    required: true
+    context: item
+  parameterGroups: []
+timestamp: Nov 2, 2026, 3:41:47 PM
+component: oh-card
+config:
+  title: Peak Quarter-Hour per Day
+  style:
+    height: calc(100% - 2 * var(--f7-card-margin-vertical))
+  stylesheet: '@keyframes a-soft { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.06; } }
+
+    @keyframes a-full { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+
+    @keyframes a-arc { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
+
+    @keyframes a-halo { 0%, 100% { opacity: 0; } 50% { opacity: 1; } }
+
+    @keyframes a-halo-arc { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+    @keyframes a-fade { 0%, 100% { opacity: 0; } 50% { opacity: 1; } }
+
+    @keyframes a-glow { 0%, 100% { opacity: 0.35; } 50% { opacity: 1; } }
+
+    @keyframes a-blink-up { 0%, 100% { opacity: 0.2; } 50% { opacity: 1; } }
+
+    @keyframes a-blink-down { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
+
+    @keyframes a-flicker-a { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
+
+    @keyframes a-flicker-b { 0%, 100% { opacity: 0.25; } 50% { opacity: 1; } }
+
+    @keyframes a-flicker-c { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+    @keyframes a-bolt { 0%, 66.7%, 100% { opacity: 1; } 33.3% { opacity: 0.35; } }
+
+    @keyframes a-breathe { 0%, 100% { transform: scale(0.82); } 50% { transform: scale(1.05); } }
+
+    @keyframes a-spin { to { transform: rotate(360deg); } }
+
+    @keyframes a-wobble { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(3px); } }
+
+    @keyframes a-rise { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+
+    @keyframes a-fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+    @keyframes a-ripple { from { transform: scale(1); opacity: 0.7; } to { transform: scale(var(--grow)); opacity: 0; } }
+
+    @keyframes a-run { from { transform: translate(var(--ax), var(--ay)); } to { transform: translate(var(--bx), var(--by));
+    } }
+
+    @keyframes a-drop { 0% { transform: translate(0, 0); opacity: 0; } 25% { opacity: 1; } 75% { opacity: 1; } 100% { transform:
+    translate(-2px, 6px); opacity: 0; } }
+
+    @keyframes a-bubble-l { 0% { transform: translate(0.00px, 0.00px) scale(1.00); opacity: 0; } 15% { opacity: 0.9; } 25%
+    { transform: translate(0.42px, -5.84px) scale(1.33); } 50% { transform: translate(0.00px, -11.50px) scale(1.67); } 70%
+    { opacity: 0.9; } 75% { transform: translate(-0.42px, -17.16px) scale(2.00); } 100% { transform: translate(0.00px, -23.00px)
+    scale(2.33); opacity: 0; } }
+
+    @keyframes a-bubble-r { 0% { transform: translate(0.00px, 0.00px) scale(1.00); opacity: 0; } 15% { opacity: 0.9; } 25%
+    { transform: translate(-0.42px, -5.84px) scale(1.33); } 50% { transform: translate(0.00px, -11.50px) scale(1.67); } 70%
+    { opacity: 0.9; } 75% { transform: translate(0.42px, -17.16px) scale(2.00); } 100% { transform: translate(0.00px, -23.00px)
+    scale(2.33); opacity: 0; } }
+
+    .a-soft { animation: a-soft 2s linear infinite; }
+
+    .a-full { animation: a-full 2s linear infinite; }
+
+    .a-arc { animation: a-arc 2s linear infinite; }
+
+    .a-halo { animation: a-halo 2s linear infinite; }
+
+    .a-halo-arc { animation: a-halo-arc 2s linear infinite; }
+
+    .a-fade { animation: a-fade 2.4s linear infinite; }
+
+    .a-glow { animation: a-glow 2.4s linear infinite; }
+
+    .a-blink-up { animation: a-blink-up 1.8s ease-in-out infinite; }
+
+    .a-blink-down { animation: a-blink-down 1.8s ease-in-out infinite; }
+
+    .a-flicker-a { animation: a-flicker-a 0.9s linear infinite; }
+
+    .a-flicker-b { animation: a-flicker-b 1.3s linear infinite; }
+
+    .a-flicker-c { animation: a-flicker-c 2s linear infinite; }
+
+    .a-bolt { animation: a-bolt 1.8s linear infinite; }
+
+    .a-breathe { transform-box: fill-box; transform-origin: center; animation: a-breathe 2.4s ease-in-out infinite; }
+
+    .a-spin { transform-box: fill-box; transform-origin: center; animation: a-spin 1s linear infinite; }
+
+    .a-wobble { animation: a-wobble 2s linear infinite; }
+
+    .a-rise { animation: a-rise 1s linear infinite; }
+
+    .a-fill { transform-box: fill-box; transform-origin: left center; animation: a-fill 2.4s linear infinite; }
+
+    .a-ripple { transform-box: fill-box; transform-origin: center; animation: a-ripple 1.6s linear infinite; }
+
+    .a-run { animation: a-run 2.5s linear infinite; }
+
+    .a-drop { animation: a-drop 0.9s linear infinite; }
+
+    .a-bubble-l { transform-box: fill-box; transform-origin: center; animation: a-bubble-l 2.6s linear infinite; }
+
+    .a-bubble-r { transform-box: fill-box; transform-origin: center; animation: a-bubble-r 2.6s linear infinite; }
+
+
+    .menu-item-dropdown:not(.menu-item-dropdown-opened) .menu-dropdown { display: none; }
+
+    .oh-chart-container > .menu.padding { padding-top: 6px !important; }'
+slots:
+  content:
+  - component: oh-context
+    config:
+      variables:
+        peakView: ''
+    slots:
+      default:
+      - component: div
+        config:
+          style:
+            padding: 4px 12px 0
+        slots:
+          default:
+          - component: f7-segmented
+            config:
+              strong: true
+              stylesheet: '.segmented-highlight { display: none; }'
+              style:
+                width: 100%
+                max-width: '=screen.width < 600 ? ''none'' : ''440px'''
+            slots:
+              default:
+              - component: oh-button
+                config:
+                  text: Year
+                  action: variable
+                  actionVariable: peakView
+                  actionVariableValue: year
+                  small: true
+                  active: '=(vars.peakView || (screen.width < 600 ? ''halves'' : ''year'')) === ''year'''
+                  visible: =!(screen.width < 600)
+                  style:
+                    font-size: 12px
+                    flex: 1 1 auto
+                    width: auto
+                    padding: 0 6px
+                    background-color: '=((vars.peakView || (screen.width < 600 ? ''halves'' : ''year'')) === ''year'') ? ''#e53935''
+                      : '''''
+                    color: '=((vars.peakView || (screen.width < 600 ? ''halves'' : ''year'')) === ''year'') ? ''#ffffff''
+                      : '''''
+              - component: oh-button
+                config:
+                  text: Half-years
+                  action: variable
+                  actionVariable: peakView
+                  actionVariableValue: halves
+                  small: true
+                  active: '=(vars.peakView || (screen.width < 600 ? ''halves'' : ''year'')) === ''halves'''
+                  visible: =screen.width < 600
+                  style:
+                    font-size: 12px
+                    flex: 1 1 auto
+                    width: auto
+                    padding: 0 6px
+                    background-color: '=((vars.peakView || (screen.width < 600 ? ''halves'' : ''year'')) === ''halves'') ?
+                      ''#e53935'' : '''''
+                    color: '=((vars.peakView || (screen.width < 600 ? ''halves'' : ''year'')) === ''halves'') ? ''#ffffff''
+                      : '''''
+              - component: oh-button
+                config:
+                  text: Months
+                  action: variable
+                  actionVariable: peakView
+                  actionVariableValue: months
+                  small: true
+                  active: '=(vars.peakView || (screen.width < 600 ? ''halves'' : ''year'')) === ''months'''
+                  style:
+                    font-size: 12px
+                    flex: 1 1 auto
+                    width: auto
+                    padding: 0 6px
+                    background-color: '=((vars.peakView || (screen.width < 600 ? ''halves'' : ''year'')) === ''months'') ?
+                      ''#e53935'' : '''''
+                    color: '=((vars.peakView || (screen.width < 600 ? ''halves'' : ''year'')) === ''months'') ? ''#ffffff''
+                      : '''''
+              - component: oh-button
+                config:
+                  text: Bars
+                  action: variable
+                  actionVariable: peakView
+                  actionVariableValue: bars
+                  small: true
+                  active: '=(vars.peakView || (screen.width < 600 ? ''halves'' : ''year'')) === ''bars'''
+                  style:
+                    font-size: 12px
+                    flex: 1 1 auto
+                    width: auto
+                    padding: 0 6px
+                    background-color: '=((vars.peakView || (screen.width < 600 ? ''halves'' : ''year'')) === ''bars'') ? ''#e53935''
+                      : '''''
+                    color: '=((vars.peakView || (screen.width < 600 ? ''halves'' : ''year'')) === ''bars'') ? ''#ffffff''
+                      : '''''
+      - component: oh-chart
+        config:
+          chartType: year
+          periodVisible: true
+          height: 250px
+          visible: '=!(screen.width < 600) && (vars.peakView || (screen.width < 600 ? ''halves'' : ''year'')) === ''year'''
+          options:
+            backgroundColor: transparent
+        slots:
+          calendar:
+          - component: oh-calendar-axis
+            config:
+              orient: horizontal
+              cellSize:
+              - auto
+              - auto
+              top: '75'
+              bottom: '10'
+              left: '40'
+              right: '20'
+              dayLabel:
+                firstDay: 1
+              yearLabel:
+                show: false
+              monthLabel:
+                fontSize: '=screen.width < 600 ? 8 : 12'
+          series:
+          - component: oh-calendar-series
+            config:
+              name: Daily peak
+              type: heatmap
+              calendarIndex: 0
+              item: =props.gridPeakDaily
+              aggregationFunction: last
+              noBoundary: true
+              noItemState: true
+          visualMap:
+          - component: oh-chart-visualmap
+            config:
+              show: =!(screen.width < 600)
+              min: 0
+              max: 8
+              type: continuous
+              calculable: true
+              orient: horizontal
+              left: center
+              top: '8'
+              itemWidth: 12
+              itemHeight: 200
+              inRange:
+                color:
+                - '#eeeeee'
+                - '#ffcdd2'
+                - '#e57373'
+                - '#b71c1c'
+          tooltip:
+          - component: oh-chart-tooltip
+            config:
+              show: true
+              confine: true
+              smartFormatter: false
+              formatter: '=(p) => p.seriesId && p.value ? ''<div'' + '' style="font-size: 12px; line-height: 18px; margin:
+                0 -10px 6px; padding: 0 10px 6px; border-bottom: 1px solid; border-bottom-color: inherit">'' + dayjs(p.value[0]).format(''ddd,
+                ll'') + ''</div>'' + p.marker + '' '' + p.seriesName + ''<span style="float: right; margin-left: 20px"><b
+                style="text-align: right;">'' + Number(p.value[1]).toLocaleString(''en-GB'') + '' '' + p.seriesId.split(''#'')[2]
+                + ''</b></span><br/>'' : '''''
+              transitionDuration: 0
+              borderColor: '=themeOptions.dark === ''dark'' ? ''rgb(91, 94, 100)'' : ''rgb(183, 185, 190)'''
+              position: '=(pt, ps, dom, rect, size) => [dom.hasAttribute(''data-wt'') || [dom.parentNode.addEventListener(''mouseleave'',
+                () => [0].map((i) => dom.removeAttribute(''data-wt'' + i))), dom.setAttribute(''data-wt'', '''')], [0].map((i)
+                => ((b) => b.style.display === ''none'' ? 0 : ((w) => [b.style.setProperty(''box-sizing'', ''border-box''),
+                b.style.setProperty(''min-width'', w + ''px''), dom.setAttribute(''data-wt'' + i, w)])(Math.max(b.offsetWidth,
+                Number(dom.getAttribute(''data-wt'' + i)))))(dom)), ((w, h) => [pt[0] + w + 20 + 2 > size.viewSize[0] ? pt[0]
+                - w - 20 : pt[0] + 20, pt[1] + h + 20 > size.viewSize[1] ? pt[1] - h - 20 : pt[1] + 20])(dom.offsetWidth,
+                dom.offsetHeight)][2]'
+      - component: oh-chart
+        config:
+          chartType: year
+          periodVisible: true
+          height: 318px
+          visible: '=(screen.width < 600) && (vars.peakView || (screen.width < 600 ? ''halves'' : ''year'')) === ''halves'''
+          options:
+            backgroundColor: transparent
+            graphic:
+            - type: rect
+              z: 100
+              shape:
+                x: =28 + 26 * (screen.width - 64) / 27
+                y: 58
+                width: =screen.width
+                height: 120
+              style:
+                fill: '=themeOptions.dark === ''dark'' ? ''#121212'' : ''#ffffff'''
+            - type: rect
+              z: 100
+              shape:
+                x: =28 + 27 * (screen.width - 64) / 27
+                y: 190
+                width: =screen.width
+                height: 120
+              style:
+                fill: '=themeOptions.dark === ''dark'' ? ''#121212'' : ''#ffffff'''
+            - type: rect
+              z: 100
+              shape:
+                x: 0
+                y: 190
+                width: 27
+                height: 120
+              style:
+                fill: '=themeOptions.dark === ''dark'' ? ''#121212'' : ''#ffffff'''
+            - type: text
+              z: 101
+              silent: true
+              style:
+                text: M
+                x: 23
+                y: 217.0
+                textAlign: right
+                textVerticalAlign: middle
+                fontSize: 12
+                fill: '=themeOptions.dark === ''dark'' ? ''#aaa'' : ''#000'''
+            - type: text
+              z: 101
+              silent: true
+              style:
+                text: T
+                x: 23
+                y: 231.0
+                textAlign: right
+                textVerticalAlign: middle
+                fontSize: 12
+                fill: '=themeOptions.dark === ''dark'' ? ''#aaa'' : ''#000'''
+            - type: text
+              z: 101
+              silent: true
+              style:
+                text: W
+                x: 23
+                y: 245.0
+                textAlign: right
+                textVerticalAlign: middle
+                fontSize: 12
+                fill: '=themeOptions.dark === ''dark'' ? ''#aaa'' : ''#000'''
+            - type: text
+              z: 101
+              silent: true
+              style:
+                text: T
+                x: 23
+                y: 259.0
+                textAlign: right
+                textVerticalAlign: middle
+                fontSize: 12
+                fill: '=themeOptions.dark === ''dark'' ? ''#aaa'' : ''#000'''
+            - type: text
+              z: 101
+              silent: true
+              style:
+                text: F
+                x: 23
+                y: 273.0
+                textAlign: right
+                textVerticalAlign: middle
+                fontSize: 12
+                fill: '=themeOptions.dark === ''dark'' ? ''#aaa'' : ''#000'''
+            - type: text
+              z: 101
+              silent: true
+              style:
+                text: S
+                x: 23
+                y: 287.0
+                textAlign: right
+                textVerticalAlign: middle
+                fontSize: 12
+                fill: '=themeOptions.dark === ''dark'' ? ''#aaa'' : ''#000'''
+            - type: text
+              z: 101
+              silent: true
+              style:
+                text: S
+                x: 23
+                y: 301.0
+                textAlign: right
+                textVerticalAlign: middle
+                fontSize: 12
+                fill: '=themeOptions.dark === ''dark'' ? ''#aaa'' : ''#000'''
+        slots:
+          calendar:
+          - component: oh-calendar-axis
+            config:
+              orient: horizontal
+              cellSize:
+              - auto
+              - auto
+              width: =53 * (screen.width - 64) / 27
+              height: 98
+              top: '78'
+              bottom: '10'
+              left: 28
+              right: '20'
+              dayLabel:
+                firstDay: 1
+              yearLabel:
+                show: false
+              monthLabel:
+                fontSize: 10
+          - component: oh-calendar-axis
+            config:
+              orient: horizontal
+              cellSize:
+              - auto
+              - auto
+              width: =53 * (screen.width - 64) / 27
+              height: 98
+              top: '210'
+              bottom: '10'
+              left: =28 - 26 * (screen.width - 64) / 27
+              right: '20'
+              dayLabel:
+                firstDay: 1
+              yearLabel:
+                show: false
+              monthLabel:
+                fontSize: 10
+          series:
+          - component: oh-calendar-series
+            config:
+              name: Daily peak
+              type: heatmap
+              calendarIndex: 0
+              item: =props.gridPeakDaily
+              aggregationFunction: last
+              noBoundary: true
+              noItemState: true
+          - component: oh-calendar-series
+            config:
+              name: Daily peak
+              type: heatmap
+              calendarIndex: 1
+              item: =props.gridPeakDaily
+              aggregationFunction: last
+              noBoundary: true
+              noItemState: true
+          visualMap:
+          - component: oh-chart-visualmap
+            config:
+              show: true
+              min: 0
+              max: 8
+              type: continuous
+              calculable: true
+              orient: horizontal
+              left: 28
+              top: '8'
+              itemWidth: 10
+              itemHeight: 110
+              inRange:
+                color:
+                - '#eeeeee'
+                - '#ffcdd2'
+                - '#e57373'
+                - '#b71c1c'
+          tooltip:
+          - component: oh-chart-tooltip
+            config:
+              show: true
+              confine: true
+              smartFormatter: false
+              formatter: '=(p) => p.seriesId && p.value ? ''<div'' + '' style="font-size: 12px; line-height: 18px; margin:
+                0 -10px 6px; padding: 0 10px 6px; border-bottom: 1px solid; border-bottom-color: inherit">'' + dayjs(p.value[0]).format(''ddd,
+                ll'') + ''</div>'' + p.marker + '' '' + p.seriesName + ''<span style="float: right; margin-left: 20px"><b
+                style="text-align: right;">'' + Number(p.value[1]).toLocaleString(''en-GB'') + '' '' + p.seriesId.split(''#'')[2]
+                + ''</b></span><br/>'' : '''''
+              transitionDuration: 0
+              borderColor: '=themeOptions.dark === ''dark'' ? ''rgb(91, 94, 100)'' : ''rgb(183, 185, 190)'''
+              position: '=(pt, ps, dom, rect, size) => [dom.hasAttribute(''data-wt'') || [dom.parentNode.addEventListener(''mouseleave'',
+                () => [0].map((i) => dom.removeAttribute(''data-wt'' + i))), dom.setAttribute(''data-wt'', '''')], [0].map((i)
+                => ((b) => b.style.display === ''none'' ? 0 : ((w) => [b.style.setProperty(''box-sizing'', ''border-box''),
+                b.style.setProperty(''min-width'', w + ''px''), dom.setAttribute(''data-wt'' + i, w)])(Math.max(b.offsetWidth,
+                Number(dom.getAttribute(''data-wt'' + i)))))(dom)), ((w, h) => [pt[0] + w + 20 + 2 > size.viewSize[0] ? pt[0]
+                - w - 20 : pt[0] + 20, pt[1] + h + 20 > size.viewSize[1] ? pt[1] - h - 20 : pt[1] + 20])(dom.offsetWidth,
+                dom.offsetHeight)][2]'
+      - component: oh-chart
+        config:
+          chartType: year
+          periodVisible: true
+          height: '=screen.width < 600 ? (84 + 4 * (28 + 6 * Math.floor((screen.width - 60) / 21))) + ''px'' : ''420px'''
+          visible: '=(vars.peakView || (screen.width < 600 ? ''halves'' : ''year'')) === ''months'''
+          options:
+            backgroundColor: transparent
+        slots:
+          calendar:
+          - component: oh-calendar-axis
+            config:
+              orient: horizontal
+              cellSize:
+              - auto
+              - auto
+              top: '75'
+              bottom: '10'
+              left: '40'
+              right: '20'
+              dayLabel:
+                firstDay: 1
+                show: false
+              yearLabel:
+                show: false
+              monthLabel:
+                show: false
+              splitLine:
+                show: false
+              itemStyle:
+                opacity: 0
+          series:
+          - component: oh-calendar-series
+            config:
+              name: Daily peak
+              calendarIndex: 0
+              type: custom
+              renderItem: '=(params, api) => ((W, H, y) => ((c6, c4) => ((n) => ((c) => ((x0) => ((bx, by, off) => params.dataIndex
+                === 0 ? ({type: ''group'', children: [({type: ''group'', silent: true, children: [0,1,2,3,4,5,6,7,8,9,10,11].map((m)
+                => ({type: ''group'', silent: true, children: [{type: ''text'', silent: true, style: {x: bx(m), y: by(m),
+                text: [''January'', ''February'', ''March'', ''April'', ''May'', ''June'', ''July'', ''August'', ''September'',
+                ''October'', ''November'', ''December''][m], fontSize: 11, fontWeight: 600, fill: (themeOptions.dark === ''dark''
+                ? ''#bdbdbd'' : ''#616161'')}}].concat([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30].slice(0,
+                dayjs().date(1).year(y).month(m).daysInMonth()).map((i) => ({type: ''rect'', silent: true, shape: {x: bx(m)
+                + (off(m) + i) % 7 * c + 1, y: by(m) + 16 + Math.floor((off(m) + i) / 7) * c + 1, width: c - 2, height: c
+                - 2, r: 2}, style: {fill: (themeOptions.dark === ''dark'' ? ''#2b2b2b'' : ''#eeeeee'')}})))})).concat([0,1,2,3,4,5].slice(0,
+                n).map((m) => [''M'', ''T'', ''W'', ''T'', ''F'', ''S'', ''S''].map((w, k) => ({type: ''text'', silent: true,
+                style: {x: bx(m) + k * c + c / 2, y: 64, text: w, fontSize: 9, fill: (themeOptions.dark === ''dark'' ? ''#bdbdbd''
+                : ''#616161''), align: ''center''}}))).reduce((a, b) => a.concat(b), []))}), ({type: ''rect'', silent: false,
+                shape: {x: bx(dayjs(api.value(0)).month()) + (off(dayjs(api.value(0)).month()) + dayjs(api.value(0)).date()
+                - 1) % 7 * c + 1, y: by(dayjs(api.value(0)).month()) + 16 + Math.floor((off(dayjs(api.value(0)).month()) +
+                dayjs(api.value(0)).date() - 1) / 7) * c + 1, width: c - 2, height: c - 2, r: 2}, style: {fill: api.visual(''color'')}})]})
+                : ({type: ''rect'', silent: false, shape: {x: bx(dayjs(api.value(0)).month()) + (off(dayjs(api.value(0)).month())
+                + dayjs(api.value(0)).date() - 1) % 7 * c + 1, y: by(dayjs(api.value(0)).month()) + 16 + Math.floor((off(dayjs(api.value(0)).month())
+                + dayjs(api.value(0)).date() - 1) / 7) * c + 1, width: c - 2, height: c - 2, r: 2}, style: {fill: api.visual(''color'')}}))((m)
+                => x0 + (m % n) * (7 * c + 10), (m) => 80 + Math.floor(m / n) * (16 + 6 * c + 12), (m) => (dayjs().date(1).year(y).month(m).day()
+                + 6) % 7))((W - n * 7 * c - (n - 1) * 10) / 2))(Math.floor(n === 3 ? Math.min((W - 32) / 21, (H - 196) / 24)
+                : n === 6 ? c6 : c4)))(W < 600 ? 3 : c6 >= c4 ? 6 : 4))(Math.min((W - 82) / 42, (H - 136) / 12), Math.min((W
+                - 62) / 28, (H - 164) / 18)))(api.getWidth(), api.getHeight(), params.coordSys.rangeInfo.start.y)'
+              item: =props.gridPeakDaily
+              aggregationFunction: last
+              noBoundary: true
+              noItemState: true
+          visualMap:
+          - component: oh-chart-visualmap
+            config:
+              show: true
+              min: 0
+              max: 8
+              type: continuous
+              calculable: false
+              orient: horizontal
+              left: 4
+              top: '22'
+              itemWidth: 10
+              itemHeight: 60
+              text:
+              - 8 kW
+              - '0'
+              inRange:
+                color:
+                - '#eeeeee'
+                - '#ffcdd2'
+                - '#e57373'
+                - '#b71c1c'
+          tooltip:
+          - component: oh-chart-tooltip
+            config:
+              show: true
+              confine: true
+              smartFormatter: false
+              formatter: '=(p) => p.seriesId && p.value ? ''<div'' + '' style="font-size: 12px; line-height: 18px; margin:
+                0 -10px 6px; padding: 0 10px 6px; border-bottom: 1px solid; border-bottom-color: inherit">'' + dayjs(p.value[0]).format(''ddd,
+                ll'') + ''</div>'' + p.marker + '' '' + p.seriesName + ''<span style="float: right; margin-left: 20px"><b
+                style="text-align: right;">'' + Number(p.value[1]).toLocaleString(''en-GB'') + '' '' + p.seriesId.split(''#'')[2]
+                + ''</b></span><br/>'' : '''''
+              transitionDuration: 0
+              borderColor: '=themeOptions.dark === ''dark'' ? ''rgb(91, 94, 100)'' : ''rgb(183, 185, 190)'''
+              position: '=(pt, ps, dom, rect, size) => [dom.hasAttribute(''data-wt'') || [dom.parentNode.addEventListener(''mouseleave'',
+                () => [0].map((i) => dom.removeAttribute(''data-wt'' + i))), dom.setAttribute(''data-wt'', '''')], [0].map((i)
+                => ((b) => b.style.display === ''none'' ? 0 : ((w) => [b.style.setProperty(''box-sizing'', ''border-box''),
+                b.style.setProperty(''min-width'', w + ''px''), dom.setAttribute(''data-wt'' + i, w)])(Math.max(b.offsetWidth,
+                Number(dom.getAttribute(''data-wt'' + i)))))(dom)), ((w, h) => [pt[0] + w + 20 + 2 > size.viewSize[0] ? pt[0]
+                - w - 20 : pt[0] + 20, pt[1] + h + 20 > size.viewSize[1] ? pt[1] - h - 20 : pt[1] + 20])(dom.offsetWidth,
+                dom.offsetHeight)][2]'
+      - component: oh-chart
+        config:
+          chartType: year
+          periodVisible: true
+          height: 250px
+          visible: '=(vars.peakView || (screen.width < 600 ? ''halves'' : ''year'')) === ''bars'''
+          options:
+            backgroundColor: transparent
+        slots:
+          grid:
+          - component: oh-chart-grid
+            config:
+              top: '62'
+              bottom: '28'
+              left: '45'
+              right: '12'
+          xAxis:
+          - component: oh-category-axis
+            config:
+              gridIndex: 0
+              categoryType: values
+              data:
+              - January
+              - February
+              - March
+              - April
+              - May
+              - June
+              - July
+              - August
+              - September
+              - October
+              - November
+              - December
+              name: ' '
+              axisTick:
+                show: false
+              axisLabel:
+                interval: 0
+                fontSize: '=screen.width < 600 ? 10 : 12'
+                formatter: =(v, i) => ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][i]
+          yAxis:
+          - component: oh-value-axis
+            config:
+              gridIndex: 0
+              name: kW
+              nameGap: 14
+              nameTextStyle:
+                align: right
+                padding:
+                - 0
+                - 8
+                - 0
+                - 0
+              axisLabel:
+                formatter: =(v) => v.toLocaleString('en-GB')
+              splitLine:
+                lineStyle:
+                  type: dashed
+                  opacity: 0.4
+          - component: oh-value-axis
+            config:
+              gridIndex: 0
+              show: false
+          series:
+          - component: oh-aggregate-series
+            config:
+              name: Monthly peak
+              gridIndex: 0
+              xAxisIndex: 0
+              yAxisIndex: 0
+              type: bar
+              item: =props.gridPeakDaily
+              aggregationFunction: max
+              dimension1: month
+              noBoundary: true
+              noItemState: true
+              itemStyle:
+                color: '#e53935'
+                borderRadius:
+                - 4
+                - 4
+                - 0
+                - 0
+          - component: oh-aggregate-series
+            config:
+              name: Ø daily peak
+              gridIndex: 0
+              xAxisIndex: 0
+              yAxisIndex: 1
+              type: line
+              item: =props.gridPeakDaily
+              aggregationFunction: average
+              dimension1: month
+              noBoundary: true
+              noItemState: true
+              symbol: none
+              lineStyle:
+                opacity: 0
+              itemStyle:
+                color: '#b71c1c'
+          tooltip:
+          - component: oh-chart-tooltip
+            config:
+              show: true
+              confine: true
+              trigger: axis
+              smartFormatter: false
+              formatter: '=(ps) => ((H) => ''<div style="display: flex; flex-direction: column; align-items: flex-start; height:
+                0">'' + [0].map((g) => ((r) => ''<div style="'' + (r ? ''border: 1px solid; border-radius: 4px; padding: 10px;
+                box-shadow: rgba(0, 0, 0, 0.2) 1px 2px 10px; '' + (themeOptions.dark === ''dark'' ? ''background-color: rgb(58,
+                62, 68); border-color: rgb(91, 94, 100)'' : ''background-color: rgb(255, 255, 255); border-color: rgb(183,
+                185, 190)'') : ''display: none'') + ''">'' + (r ? ''<div'' + '' data-head="'' + (ps[0].axisType === ''xAxis.time''
+                ? dayjs(H).format(''llll'') : ps[0].axisValueLabel) + ''"'' + '' style="font-size: 12px; line-height: 18px;
+                margin: 0 -10px 6px; padding: 0 10px 6px; border-bottom: 1px solid; border-bottom-color: inherit">'' + (ps[0].axisType
+                === ''xAxis.time'' ? dayjs(H).format(''llll'') : ps[0].axisValueLabel) + ''</div>'' + r : '''') + ''</div>'')(ps.filter((p)
+                => [0][p.axisIndex] === g && p.seriesId && p.seriesId !== ''oh-data-series#clock'' && (p.seriesId.indexOf(''oh-time-series'')
+                === 0 ? !p.seriesId.split(''#'')[4] : p.seriesId.indexOf(''oh-state-series'') !== 0)).map((p) => p.marker
+                + '' '' + p.seriesName + ''<span style="float: right; margin-left: 20px"><b style="text-align: right;">''
+                + ((v) => ((v) => v == null ? ''–'' : Number(v).toLocaleString(''en-GB'', {minimumFractionDigits: 2, maximumFractionDigits:
+                2}) + '' kW'')(p.value[1]))(Number(p.value[1])) + ''</b></span><br/>'').join(''''))).join('''') + ''</div>'')(ps[0].axisValue)'
+              position: '=(pt, ps, dom, rect, size) => ((T, B) => ((c, left, h) => [((hd, per) => hd && per ? hd.replaceChildren(hd.getAttribute(''data-head'')
+                + '' '' + per.textContent.trim()) : 0)(c.querySelector(''[data-head]''), (dom.closest(''.oh-chart-container'')
+                || dom).querySelector(''.menu-item-content:not(:has(i))'')), c.style.setProperty(''align-items'', left ? ''flex-end''
+                : ''flex-start''), dom.hasAttribute(''data-wb'') || [dom.parentNode.addEventListener(''mouseleave'', () =>
+                [0].map((i) => dom.removeAttribute(''data-wb'' + i))), dom.setAttribute(''data-wb'', '''')], [0].map((i) =>
+                ((b) => b.style.display === ''none'' ? 0 : ((w) => [b.style.setProperty(''box-sizing'', ''border-box''), b.style.setProperty(''min-width'',
+                w + ''px''), dom.setAttribute(''data-wb'' + i, w)])(Math.max(b.offsetWidth, Number(dom.getAttribute(''data-wb''
+                + i)))))(c.children[i])), ((f) => f(f, 0, 0))((f, i, y) => i < 1 ? ((b) => b.style.display === ''none'' ?
+                f(f, i + 1, y) : ((top) => [b.style.setProperty(''margin-top'', (top - y) + ''px''), f(f, i + 1, top + b.offsetHeight)][1])(Math.max(y
+                ? y + 4 : 0, i === h ? Math.max(T[i], Math.min(pt[1] + 20, B[i] - b.offsetHeight)) : T[i])))(c.children[i])
+                : 0), [left ? pt[0] - 20 - c.offsetWidth : pt[0] + 20, 0]][5])(dom.firstChild, pt[0] > size.viewSize[0] /
+                2, T.filter((t) => t <= pt[1]).length - 1))([62], [size.viewSize[1] - 28])'
+              backgroundColor: transparent
+              borderWidth: 0
+              padding: 0
+              transitionDuration: 0
+              extraCssText: 'box-shadow: none;'
