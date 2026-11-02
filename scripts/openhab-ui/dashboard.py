@@ -4249,6 +4249,16 @@ value_items = [its for _, its, _ in parts]
 value_items[1] = ["air_conditioning_unit_energy_today"]
 value_items.insert(1, ["e_car_energy_today"])
 value_items.append(None)
+# the same groups by their power, for the grid's strongest quarter-hours (rule grid_peaks, user 2026-11-02): the heat
+# pump by its circuit's meter, which counts its heaters too, not by its own estimate; with the grid's charge of the
+# battery and what no meter counts
+PEAK_POWER = {"espaltherma_energy_today": "heatpump_power",
+              "air_conditioning_energy_today": "air_conditioning_unit_power"}
+PEAK_GROUPS = [(name, [PEAK_POWER.get(i, i.replace("_energy_today", "_power")) for i in its], color)
+               for name, its, color in parts]
+PEAK_GROUPS.insert(1, ("E-Auto", ["e_car_power"], "#26a69a"))
+PEAK_COLORS = {**{name: color for name, _, color in PEAK_GROUPS}, "Nicht gemessen": "#e0e0e0", "Akku laden": "#4db6ac"}
+GRID_PEAKS = "grid_peaks"
 # the house's consumption from PV (the battery's discharge included) and from the grid (less the battery's grid charge,
 # which is no consumption), rule home_energy since 2026-10-19
 FROM_PV = f"({num('home_from_pv_day')} + {num('home_from_battery_day')})"
@@ -9521,8 +9531,57 @@ def photovoltaics_blocks():
             one(card("PV-Eigenverbrauch pro Tag", [self_use_days()]))]
 
 
-def meter_blocks(title_item, color_expr, today, phases, heads, extra, chart_item):
-    """SmartPi and the Huawei power meter: signed power, today's energies, the phases side by side."""
+def grid_peaks_card():
+    """The grid's strongest quarter-hours (user, 2026-11-02: the grid operator charges for the month's strongest
+    quarter-hour mean; which consumers cause it): the month's so far, then the 5 strongest of the last 7 days, at least
+    45 minutes apart, each with its mean import, a bar of what the house drew then by consumer (its length against the
+    strongest draw of the list) and the main consumers with their kW, and what PV covered. The rule grid_peaks writes
+    them as JSON every quarter-hour."""
+    data = f"(((s) => (s || '').charAt(0) === '{{' ? JSON.parse(s) : {{}})(items.{GRID_PEAKS}.state))"
+    p = "loop.peak"
+    # what no meter counts in a darker grey on the light theme's box, where the consumption card's light grey vanishes
+    tone = lambda n, c: f"{VT_DARK} ? '{c}' : '#9e9e9e'" if n == "Nicht gemessen" else f"'{c}'"
+    pairs = "[" + ", ".join(f"[{js_str(n)}, {tone(n, c)}]" for n, c in PEAK_COLORS.items()) + "]"
+    color = f"((c) => c ? c[1] : '#bdbdbd')({pairs}.find((c) => c[0] === loop.part[0]))"
+    total = f"{p}.p.reduce((a, x) => a + x[1], 0)"
+    when = (f"((d) => d.format('dd DD.MM.') + ' · ' + d.format('HH:mm') + '–' + d.add(15, 'minute').format('HH:mm'))"
+            f"(dayjs({p}.t))")
+    badge = label("Monatsspitze", f"=!!{p}.m",
+                  **{"font-size": "11px", "font-weight": "700", "color": "#ffffff", "background": "#e53935",
+                     "border-radius": PILL_R, "padding": "1px 8px", "margin-left": "8px", "white-space": "nowrap"})
+    head = div([div([label(f"={when}", **{"font-weight": "600"}), badge],
+                    **{"display": "flex", "align-items": "center", "min-width": "0", "flex-wrap": "wrap"}),
+                label(f"={p}.kw.toFixed(2).replace('.', ',') + ' kW'",
+                      **{"font-weight": "700", "font-size": "17px", "color": "#e53935", "white-space": "nowrap"})],
+               **{"display": "flex", "justify-content": "space-between", "align-items": "baseline", "gap": "8px"})
+    segment_ = div([], **{"width": f"=(100 * loop.part[1] / Math.max(0.001, {total})).toFixed(2) + '%'",
+                          "height": "100%", "background": f"={color}",
+                          "border-radius": "3px"})
+    bar = div([comp("oh-repeater", {"for": "part", "sourceType": "array", "in": f"={p}.p", "fragment": True},
+                    default=[segment_])],
+              **{"display": "flex", "gap": "2px", "height": "12px", "margin": "8px 0 6px",
+                 "width": f"=(100 * {total} / Math.max(0.001, {data}.max || 0)).toFixed(1) + '%'"})
+    dot = div([], **{"width": "8px", "height": "8px", "border-radius": "50%", "flex": "0 0 auto",
+                     "background": f"={color}"})
+    chip_ = div([dot, label("=loop.part[0] + ' ' + loop.part[1].toFixed(1).replace('.', ',') + ' kW'")],
+                **{"display": "flex", "align-items": "center", "gap": "5px", "white-space": "nowrap"})
+    legend = div([comp("oh-repeater", {"for": "part", "sourceType": "array", "fragment": True,
+                                       "in": f"={p}.p.filter((x) => x[1] >= 0.1).slice(0, 4)"}, default=[chip_]),
+                  label(f"='PV deckte ' + {p}.pv.toFixed(1).replace('.', ',') + ' kW'", f"={p}.pv >= 0.1",
+                        **{"white-space": "nowrap"})],
+                 **{**VT_SUB, "display": "flex", "flex-wrap": "wrap", "align-items": "center", "gap": "4px 12px"})
+    box = div([head, bar, legend], **{"background": "rgba(127, 127, 127, 0.12)", "border-radius": "12px",
+                                      "padding": "10px 12px", "margin-bottom": "8px"})
+    rows = comp("oh-repeater", {"for": "peak", "sourceType": "array", "in": f"={data}.rows || []", "fragment": True},
+                default=[box])
+    note = label("Mittlerer Netzbezug je Viertelstunde: die stärksten der letzten 7 Tage. Der Netzbetreiber "
+                 "verrechnet die stärkste Viertelstunde des Monats.", **{**VT_SUB, "padding": "0 2px 8px"})
+    return card("Spitzen-Viertelstunden", [div([note, rows], **{"padding": "0 12px 8px"})])
+
+
+def meter_blocks(title_item, color_expr, today, phases, heads, extra, chart_item, peaks=False):
+    """SmartPi and the Huawei power meter: signed power, today's energies, the phases side by side; with peaks the
+    grid's strongest quarter-hours under them (the Huawei meter, user 2026-11-02)."""
     def blocks():
         # the energy flow's pylon large, red on import, green on export, pulsing while power flows (user, 2026-10-05)
         icon = node_icon("grid", color_expr, flowing(num(title_item), 10), power=num(title_item))
@@ -9533,6 +9592,7 @@ def meter_blocks(title_item, color_expr, today, phases, heads, extra, chart_item
         chart_ = day_chart([time_series("Leistung", chart_item, symbol="none", sampling="lttb", lineStyle={"width": 1.5},
                                         areaStyle={"opacity": 0.25})], height="100%", visualMap=sign_colors())
         return [two(card("Jetzt", now), card("Leistung heute", [fill_chart(chart_, "260px")], fill=True)),
+                *([one(grid_peaks_card())] if peaks else []),
                 one(card("Phasen", [phase_table(heads, phases)]))]
     return blocks
 
@@ -9677,7 +9737,7 @@ DEVICE_PAGES = {
                                 ["L1", "L2", "L3"],
                                 [("Blindleistung", "huawei_inverter_power_meter_reactive_power"),
                                  ("Leistungsfaktor", "huawei_inverter_power_meter_power_factor"),
-                                 ("Frequenz", "huawei_inverter_power_meter_frequency")], GRID),
+                                 ("Frequenz", "huawei_inverter_power_meter_frequency")], GRID, peaks=True),
     "photovoltaics": photovoltaics_blocks,
     "energy_storage": energy_storage_blocks,
     "e_car": e_car_blocks,
