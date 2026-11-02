@@ -8963,6 +8963,9 @@ SKODA_CHARGING = f"items.{skoda('charging_state')}.state === 'CHARGING'"
 SOC_EST = skoda("soc_estimate")
 SOC_ESTIMATED = f"({ok(SOC_EST)} && Math.round({num(SOC_EST)}) > Math.round({num(skoda('soc'))}))"
 SOC_NOW = f"({SOC_ESTIMATED} ? {num(SOC_EST)} : {num(skoda('soc'))})"
+# minutes since the car last reported, beside "hochgerechnet" (user, 2026-11-02); MainUI works an expression out again
+# only when an item it reads changes, here the estimate, every 5 minutes while it rises
+SINCE_REPORT = f"Math.max(0, dayjs().diff(dayjs(items.{skoda('updated')}.state), 'minute'))"
 
 
 def clock_of(item):
@@ -9033,7 +9036,9 @@ def e_car_now():
                 f"' / ' + {est_range} + ' km' : '') : {disp(soc)} + ' / ' + {disp(rng)})",
                 [chips(chip(f"={state_text}", f"={plugged} ? '{ECAR_COLOR}' : '#9e9e9e'"),
                        chip(f"={where}", "#78909c")),
-                 label(f"='Stand ' + {when_short(skoda('updated'))} + ({SOC_ESTIMATED} ? ' · hochgerechnet' : '')",
+                 # where it wraps (a phone), after the report's time: the rest holds non-breaking spaces
+                 label(f"='Stand ' + {when_short(skoda('updated'))} + ({SOC_ESTIMATED} ? ' · ' + ('vor ' + "
+                       f"{hm(SINCE_REPORT)} + ' · hochgerechnet').split(' ').join('\u00a0') : '')",
                        **{"font-size": "14px"})],
                 picture=icon)
     # the mark at the charge target, the value set in the car that it charges to (user, 2026-10-25); under the bar on
