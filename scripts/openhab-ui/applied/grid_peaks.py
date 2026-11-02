@@ -3,9 +3,9 @@
 month's strongest quarter-hour mean of the import; which consumers cause it): the rule grid_peaks (grid_peaks.js
 beside this script) writes every quarter-hour, a minute after it, and right after openHAB starts, a month's 7
 strongest days by their strongest quarter-hour with what each consumer drew then: the running month as JSON into the
-String item grid_peaks, every finished month since October 2024 once into the InfluxDB measurement grid_peak_months,
-the only store of finished months, and the whole archive into the String item grid_peaks_archive; the page shows the
-running month, the archive's 5 newest and on demand the older ones. Every day's strongest quarter goes into InfluxDB as
+String item grid_peaks, every finished month since October 2024 once into the InfluxDB measurement grid_peak_monthly,
+the only store of finished months, and all of them into the String item of the same name; the page shows the running
+month, the 5 newest finished months and on demand the older ones. Every day's strongest quarter goes into InfluxDB as
 the values of the item grid_peak_daily (kW), for the overview's calendar (grid_peak_daily_backfill.py wrote the days
 before). The consumers' groups come from the UI generator
 (PEAK_GROUPS in dashboard.py), as the consumption card's.
@@ -26,7 +26,8 @@ exec(compile(open(GEN).read().replace("\nmain()\n", "\n"), GEN, "exec"), ns)
 BASE = "http://127.0.0.1:8080/rest"
 TOKEN = open(os.path.expanduser("~/.openhab_token")).read().strip()
 ITEM = RULE_UID = ns["GRID_PEAKS"]
-ARCHIVE_ITEM = ns["GRID_PEAKS_ARCHIVE"]
+ARCHIVE_ITEM = ns["GRID_PEAK_MONTHLY"]
+OLD_ITEMS = ["grid_peaks_archive"]  # the finished months' item before they took grid_peak_monthly's name (2026-11-02)
 DAILY_ITEM = ns["GRID_PEAK_DAILY"]
 SCRIPT = open(os.path.join(HERE, "grid_peaks.js"), encoding="utf-8").read()
 
@@ -51,8 +52,9 @@ def main():
         "description": "Sucht jede Viertelstunde die 7 stärksten Tage des laufenden Monats nach ihrer stärksten "
                        "Viertelstunde (Viertelstunden-Mittel der Netzleistung) samt der Leistung jeder "
                        "Verbrauchergruppe und schreibt sie als JSON in grid_peaks; jeden abgeschlossenen Monat ab "
-                       "Oktober 2024 schreibt sie einmal ins InfluxDB-Archiv grid_peak_months und das ganze Archiv "
-                       "in grid_peaks_archive, für die Seite Stromzähler; die stärkste Viertelstunde jedes Tages "
+                       "Oktober 2024 schreibt sie einmal in die InfluxDB-Messreihe grid_peak_monthly und alle "
+                       "abgeschlossenen Monate ins gleichnamige Item, für die Seite Stromzähler; die stärkste "
+                       "Viertelstunde jedes Tages "
                        "als Wert von grid_peak_daily für den Kalender der Übersicht (applied/grid_peaks.py, Gruppen "
                        "aus dem UI-Generator).",
         "tags": [],
@@ -69,8 +71,9 @@ def main():
     # the running month, worked out anew on every run (no MapDB: finished months are the archive's)
     item = {"type": "String", "name": ITEM, "label": "Netz-Spitzenviertelstunden", "category": "material:bolt",
             "tags": [], "groupNames": []}
-    # the archive as the page reads it; the rule writes it anew from InfluxDB on every run where it changed
-    archive = {"type": "String", "name": ARCHIVE_ITEM, "label": "Netz-Spitzenviertelstunden Archiv",
+    # the finished months as the page reads them, beside the measurement of the same name; the rule writes it anew
+    # from the measurement on every run where they changed. A String item: the downsampler leaves its measurement alone
+    archive = {"type": "String", "name": ARCHIVE_ITEM, "label": "Netz-Spitzenlast je Monat",
                "category": "material:bolt", "tags": [], "groupNames": []}
     # every day's strongest quarter for the overview's calendar: the rule writes its values into InfluxDB itself, one
     # a day at 23:59:59 as the daily energies, so it is in no persistence group; its state is the running day's
@@ -84,7 +87,10 @@ def main():
     print(f"rule {RULE_UID}:", "exists" if exists else "missing", f"({len(groups)} consumer groups)")
     if MODE[0] == "apply":
         print("item PUT", call("PUT", f"/items/{ITEM}", item))
-        print("archive item PUT", call("PUT", f"/items/{ARCHIVE_ITEM}", archive))
+        print("monthly item PUT", call("PUT", f"/items/{ARCHIVE_ITEM}", archive))
+        for old in OLD_ITEMS:
+            if call("GET", f"/items/{old}") == 200:
+                print(f"old item {old} DELETE", call("DELETE", f"/items/{old}"))
         print("daily item PUT", call("PUT", f"/items/{DAILY_ITEM}", daily))
         for namespace, meta in daily_meta.items():
             print(f"  metadata {namespace} PUT", call("PUT", f"/items/{DAILY_ITEM}/metadata/{namespace}", meta))

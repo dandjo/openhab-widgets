@@ -4,12 +4,12 @@
 // quarters are InfluxDB's 15-minute means of the meter's power: its import counter was stored only every 15 minutes
 // in some months, which would smear a peak over two quarters. The running month goes into grid_peaks on every run (a
 // quarter's breakdown it had before taken over); every finished month since the record began (October 2024) once
-// into the InfluxDB measurement grid_peak_months, the only store of the finished months (user, 2026-11-02: one
-// source, no copy of the last months in grid_peaks): one point per month at its start with its key as the tag m, its
-// peak (kw, t) and its 7 days as JSON. A month the archive lacks, the one that just ended too, is worked out at most
-// ARCHIVE_PER_RUN a run. No item may carry the measurement's name: the nightly downsampler leaves only measurements
-// without one alone. The whole archive also goes into the String item grid_peaks_archive, in the form of grid_peaks,
-// for the Stromzähler page, which shows the running month, the archive's 5 newest and on demand the older ones.
+// into grid_peak_monthly, the only store of the finished months (user, 2026-11-02: one source, no copy of the last
+// months in grid_peaks; one name as grid_peak_daily has), as the InfluxDB measurement of that name: one point per
+// month at its start with its key as the tag m, its peak (kw, t) and its 7 days as JSON. A month it lacks, the one
+// that just ended too, is worked out at most ARCHIVE_PER_RUN a run. The String item of the same name holds them all,
+// in the form of grid_peaks, for the Stromzähler page, which shows the running month, the 5 newest finished months
+// and on demand the older ones; being a String item, it keeps the nightly downsampler off the measurement.
 // Every day's strongest quarter goes into InfluxDB too, as the item grid_peak_daily's values, one point a day at
 // 23:59:59 as the daily energies have them, for the overview's calendar (user, 2026-11-02): the running month's days
 // on every run (the running day's value, as it grows, its state too), a month's days when the archive takes it;
@@ -24,10 +24,9 @@ const INFLUX = 'http://127.0.0.1:8086';
 const Q = 15 * 60000;
 const DAYS = 7;
 const BEFORE = 20 * 60000;  // read before a quarter too: an item stored only on change has its value from then
-const ARCHIVE = 'grid_peak_months';
+const ARCHIVE = 'grid_peak_monthly';  // the finished months: the InfluxDB measurement and the String item
 const ARCHIVE_FROM = new Date(2024, 9, 1);  // the first whole month of the meter's record (October 2024)
 const ARCHIVE_PER_RUN = 3;
-const ARCHIVE_ITEM = 'grid_peaks_archive';
 const DAILY = 'grid_peak_daily';
 const store = cache.private;
 const round = (x) => Math.round(x * 100) / 100;
@@ -158,8 +157,8 @@ function archive(parts, today, now) {
   return written;
 }
 
-// the whole archive (and what this run wrote into it) into ARCHIVE_ITEM, newest first, months without a record left
-// out; written only when it changed, about once a month
+// the finished months (and what this run wrote) from the measurement into the item, newest first, months without a
+// record left out; written only when they changed, about once a month
 function publishArchive(written) {
   const series = query(`SELECT days FROM "${ARCHIVE}"`)[0];
   const byMonth = {};
@@ -174,8 +173,8 @@ function publishArchive(written) {
   const months = Object.keys(byMonth).sort().reverse().filter((key) => byMonth[key].length)
     .map((key) => ({m: key, max: round(Math.max(...byMonth[key].map(draw))), d: byMonth[key]}));
   const text = JSON.stringify({max: round(Math.max(0, ...months.map((m) => draw(m.d[0])))), months});
-  if (items.getItem(ARCHIVE_ITEM).state !== text) {
-    items.getItem(ARCHIVE_ITEM).postUpdate(text);
+  if (items.getItem(ARCHIVE).state !== text) {
+    items.getItem(ARCHIVE).postUpdate(text);
   }
 }
 
