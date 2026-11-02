@@ -9585,28 +9585,33 @@ def peak_month_name(m):
 
 def grid_peaks_card():
     """The grid's strongest quarter-hours by month (user, 2026-11-02: the grid operator charges for a month's strongest
-    quarter-hour mean of the import; which consumers cause it): the last 6 months, the running one first, each with
-    its strongest quarter-hour, its mean import, a bar of what the house drew then by consumer group (its length
-    against the strongest draw of the months) and the main groups with their kW and what PV covered; a tap opens the
-    month's 7 strongest days (widget grid-peaks-month). Under them Ältere anzeigen opens the months before them from
-    the archive (user, 2026-11-02), in the same form, all bars then against the strongest draw of both. The rule
-    grid_peaks writes both items as JSON."""
+    quarter-hour mean of the import; which consumers cause it): the last 6 months, the running one first (grid_peaks,
+    worked out every quarter-hour) and the archive's newest after it (grid_peaks_archive, every finished month since
+    October 2024), each with its strongest quarter-hour, its mean import, a bar of what the house drew then by consumer
+    group and the main groups with their kW and what PV covered; a tap opens the month's 7 strongest days (widget
+    grid-peaks-month). Ältere anzeigen opens the archive's older months in the same form. The bars measure against the
+    strongest draw of the months shown, closed or open."""
     data = f"(((s) => (s || '').charAt(0) === '{{' ? JSON.parse(s) : {{}})(items.{GRID_PEAKS}.state))"
     archive = f"(((s) => (s || '').charAt(0) === '{{' ? JSON.parse(s) : {{}})(items.{GRID_PEAKS_ARCHIVE}.state))"
     shown = "(vars.olderPeaks === 'on')"
-    oldest = f"((ms) => ms.length ? ms[ms.length - 1].m : '')({data}.months || [])"
-    older = f"(({archive}.months || []).filter((x) => x.m < {oldest}))"
-    scale = f"({shown} ? Math.max({data}.max || 0, {archive}.max || 0) : {data}.max)"
+    # 6 months in all: the archive's newest beside the running month (none on a month's first minutes)
+    count = f"(6 - ({data}.months || []).length)"
+    recent = f"(({archive}.months || []).slice(0, {count}))"
+    older = f"(({archive}.months || []).slice({count}))"
+    closed = f"{recent}.reduce((a, m) => Math.max(a, m.d[0].p.reduce((b, x) => b + x[1], 0)), {data}.max || 0)"
+    scale = f"({shown} ? Math.max({data}.max || 0, {archive}.max || 0) : {closed})"
 
     def month_box(m, item, running):
         tap = comp("oh-link", {"action": "popup", "actionModal": "widget:grid-peaks-month",
                                "actionModalConfig": {"peaks": item, "month": f"={m}.m"},
                                "style": {"position": "absolute", "inset": "0", "display": "block",
                                          "border-radius": "12px"}})
-        title = f"{peak_month_name(m + '.m')}" + (f" + ({m}.cur ? ' · bisher' : '')" if running else "")
+        title = f"{peak_month_name(m + '.m')}" + (" + ' · bisher'" if running else "")
         return peak_box(title, peak_quarter(f"{m}.d[0].t"), f"{m}.d[0]", scale, tap)
-    rows = comp("oh-repeater", {"for": "month", "sourceType": "array", "in": f"={data}.months || []",
-                                "fragment": True}, default=[month_box("loop.month", GRID_PEAKS, True)])
+    rows = [comp("oh-repeater", {"for": "month", "sourceType": "array", "in": f"={data}.months || []",
+                                 "fragment": True}, default=[month_box("loop.month", GRID_PEAKS, True)]),
+            comp("oh-repeater", {"for": "done", "sourceType": "array", "in": f"={recent}", "fragment": True},
+                 default=[month_box("loop.done", GRID_PEAKS_ARCHIVE, False)])]
     olders = div([comp("oh-repeater", {"for": "old", "sourceType": "array", "in": f"={older}", "fragment": True},
                        default=[month_box("loop.old", GRID_PEAKS_ARCHIVE, False)])], f"={shown}")
     toggle = comp("oh-link", {"text": f"={shown} ? 'Weniger anzeigen' : 'Ältere anzeigen (' + {older}.length + ')'",
@@ -9618,7 +9623,7 @@ def grid_peaks_card():
     note = label("Stärkste Viertelstunde je Monat (mittlerer Netzbezug), die letzten 6 Monate. Tippen zeigt die 7 "
                  "stärksten Tage des Monats.", **{**VT_SUB, "padding": "0 2px 8px"})
     content = comp("oh-context", {"variables": {"olderPeaks": ""}},
-                   default=[div([note, rows, olders, toggle], **{"padding": "0 12px 8px"})])
+                   default=[div([note, *rows, olders, toggle], **{"padding": "0 12px 8px"})])
     return card("Spitzen-Viertelstunden", [content])
 
 

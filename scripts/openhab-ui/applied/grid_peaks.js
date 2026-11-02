@@ -1,16 +1,15 @@
 // the grid's strongest quarter-hours by month (user, 2026-11-02): the grid operator charges for a month's strongest
-// quarter-hour mean of the import, and the user wants to see which consumers cause it. For each of the last 6 months,
-// the running one first, its 7 strongest days by their strongest quarter-hour, each with what the consumers drew then,
-// as JSON in grid_peaks for the Stromzähler page; a month's strongest day holds its peak. The quarters are InfluxDB's
-// 15-minute means of the meter's power: its import counter was stored only every 15 minutes in some months, which
-// would smear a peak over two quarters. A finished month never changes, it comes from the item's last JSON (restored
-// after a restart); the running month is worked out on every run, a quarter's breakdown it had before taken over.
-// Every finished month since the record began (October 2024) goes once into the InfluxDB measurement
-// grid_peak_months (user, 2026-11-02: to trace them back beyond the page's 6 months), one point per month at its
-// start with its key as the tag m, its peak (kw, t) and its 7 days as JSON; months the run did not work out anyway are
-// added at most ARCHIVE_PER_RUN a run, so the first runs fill the past in steps. No item may carry the measurement's
-// name: the nightly downsampler leaves only measurements without one alone. The whole archive goes into the String
-// item grid_peaks_archive too, in the form of grid_peaks, for the page's older months (user, 2026-11-02).
+// quarter-hour mean of the import, and the user wants to see which consumers cause it. For a month its 7 strongest
+// days by their strongest quarter-hour, each with what the consumers drew then; its strongest day holds its peak. The
+// quarters are InfluxDB's 15-minute means of the meter's power: its import counter was stored only every 15 minutes
+// in some months, which would smear a peak over two quarters. The running month goes into grid_peaks on every run (a
+// quarter's breakdown it had before taken over); every finished month since the record began (October 2024) once
+// into the InfluxDB measurement grid_peak_months, the only store of the finished months (user, 2026-11-02: one
+// source, no copy of the last months in grid_peaks): one point per month at its start with its key as the tag m, its
+// peak (kw, t) and its 7 days as JSON. A month the archive lacks, the one that just ended too, is worked out at most
+// ARCHIVE_PER_RUN a run. No item may carry the measurement's name: the nightly downsampler leaves only measurements
+// without one alone. The whole archive also goes into the String item grid_peaks_archive, in the form of grid_peaks,
+// for the Stromzähler page, which shows the running month, the archive's 5 newest and on demand the older ones.
 const GROUPS = __GROUPS__;  // [[name, [power items]], ...] from the UI generator (PEAK_GROUPS in dashboard.py)
 const GRID = 'huawei_inverter_power_meter_active_power';  // positive while it imports
 const HOME = 'home_active_power';
@@ -19,7 +18,6 @@ const BATTERY = 'huawei_inverter_energy_storage_power';  // positive while it gi
 const ITEM = 'grid_peaks';
 const INFLUX = 'http://127.0.0.1:8086';
 const Q = 15 * 60000;
-const MONTHS = 6;
 const DAYS = 7;
 const BEFORE = 20 * 60000;  // read before a quarter too: an item stored only on change has its value from then
 const ARCHIVE = 'grid_peak_months';
@@ -94,16 +92,13 @@ function monthDays(parts, from, to, now) {
     breakdown(parts, q[0])));
 }
 
-// the finished months the archive lacks, newest first: those of this run's months as they are, older ones worked out,
-// at most ARCHIVE_PER_RUN a run; a month without a record is written empty, so it is not looked for again. Returns
-// what it wrote, by month.
-function archive(months, parts, today, now) {
+// the finished months the archive lacks, newest first, worked out at most ARCHIVE_PER_RUN a run; a month without a
+// record is written empty, so it is not looked for again. Returns what it wrote, by month.
+function archive(parts, today, now) {
   const written = {};
   const tags = query(`SHOW TAG VALUES FROM "${ARCHIVE}" WITH KEY = "m"`)[0];
   const have = {};
   (tags ? tags.values : []).forEach((v) => { have[v[1]] = true; });
-  const known = {};
-  months.forEach((m) => { known[m.m] = m; });
   let worked = 0;
   for (let k = 1; ; k++) {
     const from = new Date(today.getFullYear(), today.getMonth() - k, 1).getTime();
@@ -114,14 +109,11 @@ function archive(months, parts, today, now) {
     if (have[key]) {
       continue;
     }
-    let days = known[key] ? known[key].d : null;
-    if (!days) {
-      if (worked >= ARCHIVE_PER_RUN) {
-        continue;
-      }
-      worked++;
-      days = monthDays(parts, from, new Date(today.getFullYear(), today.getMonth() - k + 1, 1).getTime(), now);
+    if (worked >= ARCHIVE_PER_RUN) {
+      break;
     }
+    worked++;
+    const days = monthDays(parts, from, new Date(today.getFullYear(), today.getMonth() - k + 1, 1).getTime(), now);
     const json = JSON.stringify(days).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
     const peak = days[0];
     const line = `${ARCHIVE},m=${key} kw=${peak ? peak.kw : 0},t=${peak ? peak.t : 0}i,days="${json}" ${from}`;
@@ -159,32 +151,20 @@ function publishArchive(written) {
 try {
   const now = Date.now();
   const today = new Date(now);
-  // the months of the last run, and their quarters' breakdowns
-  const previous = {};
+  // the breakdowns of the last run's quarters (its item, after a new rule; the cache, otherwise)
   const parts = store.get('parts', () => ({}));
   const last = items.getItem(ITEM).state;
   if (last && last.charAt(0) === '{') {
-    (JSON.parse(last).months || []).forEach((m) => {
-      previous[m.m] = m;
-      m.d.forEach((d) => { if (!parts[d.t]) { parts[d.t] = {pv: d.pv, out: d.out, p: d.p}; } });
-    });
+    (JSON.parse(last).months || []).forEach((m) => m.d.forEach((d) => {
+      if (!parts[d.t]) {
+        parts[d.t] = {pv: d.pv, out: d.out, p: d.p};
+      }
+    }));
   }
-  const months = [];
-  for (let k = 0; k < MONTHS; k++) {
-    const from = new Date(today.getFullYear(), today.getMonth() - k, 1).getTime();
-    const to = new Date(today.getFullYear(), today.getMonth() - k + 1, 1).getTime();
-    const start = new Date(from);
-    const key = `${start.getFullYear()}-${pad(start.getMonth() + 1)}`;
-    if (k > 0 && previous[key] && !previous[key].cur) {
-      months.push(previous[key]);
-      continue;
-    }
-    const days = monthDays(parts, from, to, now);
-    if (days.length) {
-      months.push({m: key, cur: k === 0, max: round(Math.max(...days.map(draw))), d: days});
-    }
-  }
-  publishArchive(archive(months, parts, today, now));
+  const from = new Date(today.getFullYear(), today.getMonth(), 1).getTime();
+  const days = monthDays(parts, from, new Date(today.getFullYear(), today.getMonth() + 1, 1).getTime(), now);
+  const months = days.length ? [{m: monthKey(from), cur: true, max: round(Math.max(...days.map(draw))), d: days}] : [];
+  publishArchive(archive(parts, today, now));
   const kept = {};
   months.forEach((m) => m.d.forEach((d) => { kept[d.t] = true; }));
   Object.keys(parts).forEach((t) => { if (!kept[t]) { delete parts[t]; } });
