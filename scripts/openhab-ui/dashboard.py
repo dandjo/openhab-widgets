@@ -561,8 +561,8 @@ def runners(points, color, dur, active, count, r=4.5, reverse=None, fade=False):
 
 
 def pylon_node(cx, cy, color, power):
-    """High-voltage pylon; dots run along its wires towards the house on import, away on export (dashes until
-    2026-10-25, which no cheap animation moves)."""
+    """High-voltage pylon; dots run along its wires from left to right on import, the other way on export (user,
+    2026-11-02; dashes until 2026-10-25, which no cheap animation moves)."""
     def leg_x(y, side):  # the legs run from (cx±10, cy+16) up to (cx±3, cy-16)
         return round(cx + side * (10 + (y - cy - 16) * 0.21875), 2)
     lines = [(leg_x(cy + 16, -1), cy + 16, leg_x(cy - 16, -1), cy - 16),
@@ -584,8 +584,9 @@ def pylon_node(cx, cy, color, power):
              f"Q{cx},{y_ins + sag + 1} {cx + 15 if y_ins == cy - 7 else cx + 11},{y_ins} "
              f"Q{cx + 21},{y_ins + sag} {cx + 27},{y_ins + 2}")
         wires.append(svg("path", d=d, **stroke(1.4, color, opacity=f"={active} ? '0.7' : '0.45'")))
-        # the dots run from the house's side (the right, the wire drawn from the left) on import
-        wires += runners(sample_path(d), color, dur, active, 4, r=1.3, reverse=f"{power} > 0", fade=True)
+        # the wire is drawn from the left: on import the dots run along it, left to right, towards the house that stands
+        # right of the pylon in the energy flow; on export back
+        wires += runners(sample_path(d), color, dur, active, 4, r=1.3, reverse=f"{power} < 0", fade=True)
     return [ring(cx, cy, color), *[svg("line", x1=a, y1=b, x2=c, y2=e, **stroke(1.5)) for a, b, c, e in lines],
             *wires]
 
