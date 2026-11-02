@@ -5,6 +5,11 @@
 // 15-minute means of the meter's power: its import counter was stored only every 15 minutes in some months, which
 // would smear a peak over two quarters. A finished month never changes, it comes from the item's last JSON (restored
 // after a restart); the running month is worked out on every run, a quarter's breakdown it had before taken over.
+// Every finished month since the record began (October 2024) goes once into the InfluxDB measurement
+// grid_peak_months (user, 2026-11-02: to trace them back beyond the page's 6 months), one point per month at its
+// start with its key as the tag m, its peak (kw, t) and its 7 days as JSON; months the run did not work out anyway are
+// added at most ARCHIVE_PER_RUN a run, so the first runs fill the past in steps. No item may carry the measurement's
+// name: the nightly downsampler leaves only measurements without one alone.
 const GROUPS = __GROUPS__;  // [[name, [power items]], ...] from the UI generator (PEAK_GROUPS in dashboard.py)
 const GRID = 'huawei_inverter_power_meter_active_power';  // positive while it imports
 const HOME = 'home_active_power';
@@ -16,6 +21,9 @@ const Q = 15 * 60000;
 const MONTHS = 6;
 const DAYS = 7;
 const BEFORE = 20 * 60000;  // read before a quarter too: an item stored only on change has its value from then
+const ARCHIVE = 'grid_peak_months';
+const ARCHIVE_FROM = new Date(2024, 9, 1);  // the first whole month of the meter's record (October 2024)
+const ARCHIVE_PER_RUN = 3;
 const store = cache.private;
 const round = (x) => Math.round(x * 100) / 100;
 const pad = (n) => (n < 10 ? '0' : '') + n;
@@ -76,6 +84,50 @@ function breakdown(parts, t) {
 }
 
 const draw = (d) => d.p.reduce((a, c) => a + c[1], 0);
+const monthKey = (ms) => { const d = new Date(ms); return `${d.getFullYear()}-${pad(d.getMonth() + 1)}`; };
+
+// a month's 7 strongest days with their breakdowns, strongest first
+function monthDays(parts, from, to, now) {
+  return strongestDays(from, to, now, DAYS).map((q) => Object.assign({t: q[0], kw: round(q[1])},
+    breakdown(parts, q[0])));
+}
+
+// the finished months the archive lacks, newest first: those of this run's months as they are, older ones worked out,
+// at most ARCHIVE_PER_RUN a run; a month without a record is written empty, so it is not looked for again
+function archive(months, parts, today, now) {
+  const tags = query(`SHOW TAG VALUES FROM "${ARCHIVE}" WITH KEY = "m"`)[0];
+  const have = {};
+  (tags ? tags.values : []).forEach((v) => { have[v[1]] = true; });
+  const known = {};
+  months.forEach((m) => { known[m.m] = m; });
+  let worked = 0;
+  for (let k = 1; ; k++) {
+    const from = new Date(today.getFullYear(), today.getMonth() - k, 1).getTime();
+    if (from < ARCHIVE_FROM.getTime()) {
+      break;
+    }
+    const key = monthKey(from);
+    if (have[key]) {
+      continue;
+    }
+    let days = known[key] ? known[key].d : null;
+    if (!days) {
+      if (worked >= ARCHIVE_PER_RUN) {
+        continue;
+      }
+      worked++;
+      days = monthDays(parts, from, new Date(today.getFullYear(), today.getMonth() - k + 1, 1).getTime(), now);
+    }
+    const json = JSON.stringify(days).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+    const peak = days[0];
+    const line = `${ARCHIVE},m=${key} kw=${peak ? peak.kw : 0},t=${peak ? peak.t : 0}i,days="${json}" ${from}`;
+    const answer = actions.HTTP.sendHttpPostRequest(`${INFLUX}/write?db=openhab&precision=ms`, 'text/plain', line,
+      10000);
+    if (answer === null || answer === undefined || String(answer).indexOf('"error"') >= 0) {
+      throw new Error(`the archive did not take ${key}`);
+    }
+  }
+}
 
 try {
   const now = Date.now();
@@ -100,12 +152,12 @@ try {
       months.push(previous[key]);
       continue;
     }
-    const days = strongestDays(from, to, now, DAYS).map((q) => Object.assign({t: q[0], kw: round(q[1])},
-      breakdown(parts, q[0])));
+    const days = monthDays(parts, from, to, now);
     if (days.length) {
       months.push({m: key, cur: k === 0, max: round(Math.max(...days.map(draw))), d: days});
     }
   }
+  archive(months, parts, today, now);
   const kept = {};
   months.forEach((m) => m.d.forEach((d) => { kept[d.t] = true; }));
   Object.keys(parts).forEach((t) => { if (!kept[t]) { delete parts[t]; } });

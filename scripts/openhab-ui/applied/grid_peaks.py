@@ -3,8 +3,9 @@
 month's strongest quarter-hour mean of the import; which consumers cause it): the rule grid_peaks (grid_peaks.js
 beside this script) writes every quarter-hour, a minute after it, and right after openHAB starts, for each of the last
 6 months its 7 strongest days by their strongest quarter-hour with what each consumer drew then, as JSON into the
-String item grid_peaks, which MapDB restores, so finished months need not be worked out again. The consumers' groups
-come from the UI generator (PEAK_GROUPS in dashboard.py), as the consumption card's.
+String item grid_peaks, which MapDB restores, so finished months need not be worked out again; and every finished
+month since October 2024 once into the InfluxDB measurement grid_peak_months, to trace them back beyond 6 months. The
+consumers' groups come from the UI generator (PEAK_GROUPS in dashboard.py), as the consumption card's.
 Usage: grid_peaks.py check|apply   (on homepi, as pi; the API token from ~/.openhab_token, never printed)"""
 import json
 import os
@@ -45,8 +46,9 @@ def main():
         "description": "Sucht jede Viertelstunde für die letzten 6 Monate die 7 stärksten Tage nach ihrer "
                        "stärksten Viertelstunde (Viertelstunden-Mittel der Netzleistung) und schreibt sie samt der "
                        "Leistung jeder Verbrauchergruppe als JSON in grid_peaks, für die Seite Stromzähler; "
-                       "abgeschlossene Monate übernimmt sie aus dem letzten Ergebnis (applied/grid_peaks.py, Gruppen "
-                       "aus dem UI-Generator).",
+                       "abgeschlossene Monate übernimmt sie aus dem letzten Ergebnis und schreibt jeden einmal ins "
+                       "InfluxDB-Archiv grid_peak_months, ab Oktober 2024 (applied/grid_peaks.py, Gruppen aus dem "
+                       "UI-Generator).",
         "tags": [],
         "triggers": [{"id": "1", "type": "timer.GenericCronTrigger",
                       "configuration": {"cronExpression": "0 1/15 * * * ? *"}},
