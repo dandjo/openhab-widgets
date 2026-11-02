@@ -9574,8 +9574,8 @@ def grid_peaks_card():
                                       "padding": "10px 12px", "margin-bottom": "8px"})
     rows = comp("oh-repeater", {"for": "peak", "sourceType": "array", "in": f"={data}.rows || []", "fragment": True},
                 default=[box])
-    note = label("Mittlerer Netzbezug je Viertelstunde: die stärksten der letzten 7 Tage. Der Netzbetreiber "
-                 "verrechnet die stärkste Viertelstunde des Monats.", **{**VT_SUB, "padding": "0 2px 8px"})
+    note = label("Mittlerer Netzbezug je Viertelstunde: die stärksten der letzten 7 Tage.",
+                 **{**VT_SUB, "padding": "0 2px 8px"})
     return card("Spitzen-Viertelstunden", [div([note, rows], **{"padding": "0 12px 8px"})])
 
 
