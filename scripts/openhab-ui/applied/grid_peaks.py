@@ -29,8 +29,6 @@ RULE_UID = "grid_peaks"
 BREAKDOWN_ITEM = ns["GRID_PEAK_BREAKDOWN"]
 MONTHLY_ITEM = ns["GRID_PEAK_MONTHLY"]
 DAILY_ITEM = ns["GRID_PEAK_DAILY"]
-# the items before the values became numbers (2026-11-02): the running month's JSON, the finished months' JSON
-OLD_ITEMS = ["grid_peaks", "grid_peaks_archive"]
 SCRIPT = open(os.path.join(HERE, "grid_peaks.js"), encoding="utf-8").read()
 
 
@@ -104,9 +102,6 @@ def main():
             print(f"item {item['name']} PUT", call("PUT", f"/items/{item['name']}", item))
             for namespace, meta in meta_.items():
                 print(f"  metadata {namespace} PUT", call("PUT", f"/items/{item['name']}/metadata/{namespace}", meta))
-        for old in OLD_ITEMS:
-            if call("GET", f"/items/{old}") == 200:
-                print(f"old item {old} DELETE", call("DELETE", f"/items/{old}"))
         print("rule", ("PUT " + str(call("PUT", f"/rules/{RULE_UID}", rule))) if exists else
               ("POST " + str(call("POST", "/rules", rule))))
         print("run now:", call("POST", f"/rules/{RULE_UID}/runnow", {}))
