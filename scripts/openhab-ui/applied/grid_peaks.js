@@ -9,7 +9,8 @@
 // grid_peak_months (user, 2026-11-02: to trace them back beyond the page's 6 months), one point per month at its
 // start with its key as the tag m, its peak (kw, t) and its 7 days as JSON; months the run did not work out anyway are
 // added at most ARCHIVE_PER_RUN a run, so the first runs fill the past in steps. No item may carry the measurement's
-// name: the nightly downsampler leaves only measurements without one alone.
+// name: the nightly downsampler leaves only measurements without one alone. The whole archive goes into the String
+// item grid_peaks_archive too, in the form of grid_peaks, for the page's older months (user, 2026-11-02).
 const GROUPS = __GROUPS__;  // [[name, [power items]], ...] from the UI generator (PEAK_GROUPS in dashboard.py)
 const GRID = 'huawei_inverter_power_meter_active_power';  // positive while it imports
 const HOME = 'home_active_power';
@@ -24,6 +25,7 @@ const BEFORE = 20 * 60000;  // read before a quarter too: an item stored only on
 const ARCHIVE = 'grid_peak_months';
 const ARCHIVE_FROM = new Date(2024, 9, 1);  // the first whole month of the meter's record (October 2024)
 const ARCHIVE_PER_RUN = 3;
+const ARCHIVE_ITEM = 'grid_peaks_archive';
 const store = cache.private;
 const round = (x) => Math.round(x * 100) / 100;
 const pad = (n) => (n < 10 ? '0' : '') + n;
@@ -93,8 +95,10 @@ function monthDays(parts, from, to, now) {
 }
 
 // the finished months the archive lacks, newest first: those of this run's months as they are, older ones worked out,
-// at most ARCHIVE_PER_RUN a run; a month without a record is written empty, so it is not looked for again
+// at most ARCHIVE_PER_RUN a run; a month without a record is written empty, so it is not looked for again. Returns
+// what it wrote, by month.
 function archive(months, parts, today, now) {
+  const written = {};
   const tags = query(`SHOW TAG VALUES FROM "${ARCHIVE}" WITH KEY = "m"`)[0];
   const have = {};
   (tags ? tags.values : []).forEach((v) => { have[v[1]] = true; });
@@ -126,6 +130,29 @@ function archive(months, parts, today, now) {
     if (answer === null || answer === undefined || String(answer).indexOf('"error"') >= 0) {
       throw new Error(`the archive did not take ${key}`);
     }
+    written[key] = days;
+  }
+  return written;
+}
+
+// the whole archive (and what this run wrote into it) into ARCHIVE_ITEM, newest first, months without a record left
+// out; written only when it changed, about once a month
+function publishArchive(written) {
+  const series = query(`SELECT days FROM "${ARCHIVE}"`)[0];
+  const byMonth = {};
+  (series ? series.values : []).forEach((v) => {
+    try {
+      byMonth[monthKey(v[0])] = JSON.parse(v[1]);
+    } catch (e) {
+      // a broken point is left out
+    }
+  });
+  Object.keys(written).forEach((key) => { byMonth[key] = written[key]; });
+  const months = Object.keys(byMonth).sort().reverse().filter((key) => byMonth[key].length)
+    .map((key) => ({m: key, max: round(Math.max(...byMonth[key].map(draw))), d: byMonth[key]}));
+  const text = JSON.stringify({max: round(Math.max(0, ...months.map((m) => draw(m.d[0])))), months});
+  if (items.getItem(ARCHIVE_ITEM).state !== text) {
+    items.getItem(ARCHIVE_ITEM).postUpdate(text);
   }
 }
 
@@ -157,7 +184,7 @@ try {
       months.push({m: key, cur: k === 0, max: round(Math.max(...days.map(draw))), d: days});
     }
   }
-  archive(months, parts, today, now);
+  publishArchive(archive(months, parts, today, now));
   const kept = {};
   months.forEach((m) => m.d.forEach((d) => { kept[d.t] = true; }));
   Object.keys(parts).forEach((t) => { if (!kept[t]) { delete parts[t]; } });
