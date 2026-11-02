@@ -8957,9 +8957,9 @@ def skoda(suffix):
 
 
 SKODA_CHARGING = f"items.{skoda('charging_state')}.state === 'CHARGING'"
-# the charge while the car charges at home between its reports (user, 2026-11-02: at 2 kW it reports only every few
-# hours): the rule's estimate from the circuit's meter, shown with "~" where it lies a percent above what the car last
-# reported; SOC_NOW is the charge to draw
+# the charge while the car charges, between its reports (user, 2026-11-02: at 2 kW at home it reports only every few
+# hours): the rule's estimate from its last reported charge power, shown with "~" where it lies a percent above what
+# the car last reported; SOC_NOW is the charge to draw
 SOC_EST = skoda("soc_estimate")
 SOC_ESTIMATED = f"({ok(SOC_EST)} && Math.round({num(SOC_EST)}) > Math.round({num(skoda('soc'))}))"
 SOC_NOW = f"({SOC_ESTIMATED} ? {num(SOC_EST)} : {num(skoda('soc'))})"
@@ -9032,7 +9032,7 @@ def e_car_now():
                 f"' / ~ ' + {est_range} + ' km' : '') : {disp(soc)} + ' / ' + {disp(rng)})",
                 [chips(chip(f"={state_text}", f"={plugged} ? '{ECAR_COLOR}' : '#9e9e9e'"),
                        chip(f"={where}", "#78909c")),
-                 label(f"='Stand ' + {when_short(skoda('updated'))} + ({SOC_ESTIMATED} ? ' · ~ aus dem Zähler' : '')",
+                 label(f"='Stand ' + {when_short(skoda('updated'))} + ({SOC_ESTIMATED} ? ' · ~ hochgerechnet' : '')",
                        **{"font-size": "14px"})],
                 picture=icon)
     # the mark at the charge target, the value set in the car that it charges to (user, 2026-10-25); under the bar on

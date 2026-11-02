@@ -17,9 +17,9 @@ const IDLE_MINUTES = 15;
 const QUOTA_RESERVE = 4;
 // watts on the car's circuit (rule air_conditioning_circuit_power) from which it counts as charging at home
 const HOME_CHARGING_WATTS = 100;
-// the circuit's meter per percent of charge at home, the charger's losses included: 65.6 kWh for 76 % over 19 spans
-// between two reports (2026-11-02; 77 kWh usable would be 0.77)
-const KWH_PER_PERCENT_HOME = 0.86;
+// the car's reported charge power over time per percent of charge it gave: 44.8 kWh for 53 % over 14 spans between two
+// reports at home (2026-11-02; the circuit's meter counted 0.864, 77 kWh usable would be 0.77)
+const KWH_PER_PERCENT = 0.85;
 const HOME_RADIUS_METERS = 200;
 const KEY_WARNING_DAYS = 7;
 const REFRESH_AFTER_COMMAND_MS = 90000;
@@ -169,10 +169,7 @@ function applyCharging(charging) {
   const battery = status.battery || {};
   const settings = charging.settings || {};
   postQuantity('soc', battery.stateOfChargeInPercent, '%');
-  // the charge and when the car captured it, the start of the estimate between its reports (estimateSoc)
-  if (typeof battery.stateOfChargeInPercent === 'number' && charging.carCapturedTimestamp) {
-    store.put('socBase', {soc: battery.stateOfChargeInPercent, at: Date.parse(charging.carCapturedTimestamp)});
-  }
+  rebaseEstimate(charging);
   const meters = battery.remainingCruisingRangeInMeters;
   postQuantity('range', typeof meters === 'number' ? Math.round(meters / 1000) : null, 'km');
   // left out when the reported combination has no name (plugged in and unlocked without charging, after a drive)
@@ -877,24 +874,40 @@ function setClimateTarget(command) {
   }
 }
 
-// the charge while the car charges at home, between its reports (user, 2026-11-02): at about 2 kW it reports only every
-// one to four hours, away at 11 kW every few minutes. From the charge it last reported, the energy the circuit's meter
-// counted since the car captured it, at KWH_PER_PERCENT_HOME, up to the charge target; UNDEF elsewhere and while it
-// does not charge, so the UI shows the car's own value then. It never asks the car anything.
+// the charge while the car charges, between its reports (user, 2026-11-02): at home, at about 2 kW, it reports only
+// every one to four hours. From the charge it last reported, its last reported charge power over the time since it
+// captured that charge, at KWH_PER_PERCENT, up to the charge target; UNDEF while it does not charge or reports no
+// power, so the UI shows the car's own value then. It never asks the car anything.
 function estimateSoc() {
   const base = store.get('socBase');
+  const kw = items.getItem(P + 'charge_power').numericState;
   let estimate = null;
-  if (base && state('charging_state') === 'CHARGING' && state('at_home') === 'ON') {
-    const meter = items.getItem('e_car_energy_total');
-    const then = meter.persistence.persistedState(time.toZDT(new Date(base.at).toISOString()), 'influxdb');
-    const now = meter.numericState;
-    if (then !== null && then.numericState !== null && now !== null) {
-      const target = items.getItem(P + 'charge_target').numericState;
-      const top = Math.min(100, target === null ? 100 : Math.max(target, base.soc));
-      estimate = Math.min(top, base.soc + Math.max(0, now - then.numericState) / KWH_PER_PERCENT_HOME);
-    }
+  if (base && state('charging_state') === 'CHARGING' && kw !== null && kw > 0) {
+    const target = items.getItem(P + 'charge_target').numericState;
+    const top = Math.min(100, target === null ? 100 : Math.max(target, base.soc));
+    const hours = Math.max(0, Date.now() - base.at) / 3600000;
+    estimate = Math.min(top, base.soc + kw * hours / KWH_PER_PERCENT);
   }
   postQuantity('soc_estimate', estimate === null ? null : Math.round(estimate * 10) / 10, '%');
+}
+
+// where the estimate between reports starts (estimateSoc): the charge and when the car captured it. A report with the
+// same charge and the same predicted end as the last, only a newer capture time, is the car's old data sent again
+// (user, 2026-11-02: woken by a command at 00:33 it sent 40 % and the end at 06:41:31 as at 22:01, while the meter
+// counted 5 kWh), so the estimate goes on from the last one
+function rebaseEstimate(charging) {
+  const status = charging.status || {};
+  const soc = (status.battery || {}).stateOfChargeInPercent;
+  if (typeof soc !== 'number' || !charging.carCapturedTimestamp) {
+    return;
+  }
+  const remaining = status.remainingTimeToFullyChargedInMinutes;
+  const end = status.fullyChargedAt || (typeof remaining === 'number' ? `${remaining} min` : null);
+  const base = store.get('socBase');
+  if (base && base.soc === soc && end !== null && base.end === end) {
+    return;
+  }
+  store.put('socBase', {soc, end, at: Date.parse(charging.carCapturedTimestamp)});
 }
 
 function run() {
