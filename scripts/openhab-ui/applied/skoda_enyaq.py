@@ -111,6 +111,9 @@ POINTS = {
     "trips": ("String", "Fahrten", "route", ["Status"], RESTORE, state("%s")),
     # what the finding of trips needs between reads: since when the car stands, an open session (no history)
     "trip_state": ("String", "Fahrterkennung", "pending_actions", ["Status"], RESTORE, state("%s")),
+    # where the charge estimate starts: the charge, its capture time and the predicted end of the last real report,
+    # restored after a restart (user, 2026-11-02)
+    "soc_base": ("String", "Ladestand-Schätzung Ausgangspunkt", "pending_actions", ["Status"], RESTORE, state("%s")),
     "at_home": ("Switch", "zu Hause", "home", ["Status", "Presence"], CHANGE,
                 state("%s", options="ON=Zu Hause,OFF=Unterwegs")),
     "climate_state": ("String", "Klimatisierung", "thermostat", ["Status"], CHANGE, state("%s", options=CLIMATE_STATES)),

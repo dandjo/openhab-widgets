@@ -879,7 +879,7 @@ function setClimateTarget(command) {
 // captured that charge, at KWH_PER_PERCENT, up to the charge target; UNDEF while it does not charge or reports no
 // power, so the UI shows the car's own value then. It never asks the car anything.
 function estimateSoc() {
-  const base = store.get('socBase');
+  const base = estimateBase();
   const kw = items.getItem(P + 'charge_power').numericState;
   let estimate = null;
   if (base && state('charging_state') === 'CHARGING' && kw !== null && kw > 0) {
@@ -903,11 +903,26 @@ function rebaseEstimate(charging) {
   }
   const remaining = status.remainingTimeToFullyChargedInMinutes;
   const end = status.fullyChargedAt || (typeof remaining === 'number' ? `${remaining} min` : null);
-  const base = store.get('socBase');
+  const base = estimateBase();
   if (base && base.soc === soc && end !== null && base.end === end) {
     return;
   }
-  store.put('socBase', {soc, end, at: Date.parse(charging.carCapturedTimestamp)});
+  post('soc_base', JSON.stringify({soc, end, at: Date.parse(charging.carCapturedTimestamp)}));
+}
+
+// the estimate's start as the item skoda_enyaq_soc_base holds it, restored after a restart or a new rule (user,
+// 2026-11-02: in the rule's private cache it was lost with every one), null without one
+function estimateBase() {
+  const text = state('soc_base');
+  if (!text || text.charAt(0) !== '{') {
+    return null;
+  }
+  try {
+    const base = JSON.parse(text);
+    return typeof base.soc === 'number' && typeof base.at === 'number' ? base : null;
+  } catch (e) {
+    return null;
+  }
 }
 
 function run() {
