@@ -9227,12 +9227,13 @@ SKODA_REQUESTS_PER_HOUR = 20  # the MyŠkoda Public API's quota per vehicle, as 
 
 def e_car_charge_chart():
     """The charge with the charge target set in the car (dashed, Ladeziel) on the left axis, the charge power the car reports on the
-    right, over the week (a car's charges and drives span days), as the battery's power and charge in one grid."""
+    right, over the week (a car's charges and drives span days), as the battery's power and charge in one grid. The
+    target holds until it is changed, so it is drawn in steps that jump at the change (user, 2026-11-03)."""
     # short names over the plot, where the period buttons leave a phone little room; the tooltip's are the series'
     return stacked_chart([((("Ladestand", ECAR_COLOR), ("Ziel", ECAR_COLOR), ("Leistung", ELECTRIC_C)),
                            [area("Ladeleistung", skoda("charge_power"), ELECTRIC_C, y=1),
                             line("Ladestand", skoda("soc"), ECAR_COLOR),
-                            line("Ladeziel", skoda("charge_target"), ECAR_COLOR, dashed=True)],
+                            line("Ladeziel", skoda("charge_target"), ECAR_COLOR, dashed=True, step="end")],
                            [value_axis("%", min=0, max=100), value_axis("kW", min=0)])], E_CAR_CHART_H, period="W")
 
 
