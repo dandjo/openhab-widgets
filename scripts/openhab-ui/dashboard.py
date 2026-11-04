@@ -9113,14 +9113,17 @@ def e_car_now():
                        **{"font-size": "14px"})],
                 picture=icon)
     # the mark at the charge target, the value set in the car that it charges to (user, 2026-10-25); under the bar on
-    # the left, while it charges, when it reaches the target ("fertig ca.", user: shorter than "Ladeziel erreicht"), on
-    # the right the target and, while battery care is on, "Akkuschonung aktiv" (user, 2026-10-26: the target stays as set
-    # with battery care on, a 50 % target stayed 50 %)
+    # the left, while it charges, the time left and when it reaches the target as in the Steuerung card ("noch 1:35 h ·
+    # fertig 21:59", user, 2026-11-04; it said "fertig ca." before), each part breaking only after its "·", on
+    # the right the target and, while battery care is on, "Akkuschonung" (user, 2026-10-26: the target stays as set
+    # with battery care on, a 50 % target stayed 50 %; without "aktiv" since 2026-11-04, user)
     target, reached_at = skoda("charge_target"), skoda("target_reached_at")
+    left = f"Math.max(0, Math.round(dayjs(items.{reached_at}.state).diff(dayjs(), 'minute', true)))"
     charge = target_bar(vt_clamp(SOC_NOW), target, ECAR_COLOR,
-                        f"={SKODA_CHARGING} && {ok(reached_at)} ? 'fertig ca. ' + {clock_of(reached_at)} : ''",
+                        f"={SKODA_CHARGING} && {ok(reached_at)} ? ['noch ' + {hm(left)}, 'fertig ' + "
+                        f"{clock_of(reached_at)}].map((s) => s.split(' ').join('\u00a0')).join('\u00a0· ') : ''",
                         f"='Ladeziel ' + {disp(target)} + (items.{skoda('battery_care')}.state === 'ON' ? "
-                        f"' · Akkuschonung aktiv' : '')")
+                        f"' · Akkuschonung' : '')")
     # the locks, and below them what stands open; the lights only while on
     locked = skoda("locked")
     lock_text = (f"(items.{locked}.state === 'ON' ? 'Verriegelt' : items.{locked}.state === 'OFF' ? 'Entriegelt' : "
