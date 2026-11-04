@@ -9245,16 +9245,18 @@ def e_car_blocks():
     the week across the page; below the charging at home as the Shelly EM of the air conditioner's circuit measures it (plug_refs()):
     the plug card over its electrical values on the left, the day's power over the energy per day on the right at
     their own heights (the day's power had stretched to the plug card's), and the Diagnose card under them (the API's
-    state, the requests left in its hourly quota, the key's expiry, battery care)."""
+    state, the requests used of its hourly quota, the key's expiry, battery care)."""
     left, reset = skoda("api_requests_left"), skoda("api_quota_reset_at")
     diagnose = two_on_phone(value_grid([vtile("API", skoda("api_status")),
-                           # the requests left of the hour's quota (Škoda: 20 an hour, "not final"; user, 2026-10-25:
-                           # "API-Kontingent", as the tile's old title said little)
+                           # the requests used of the hour's quota (Škoda: 20 an hour, "not final"; user, 2026-10-25:
+                           # "API-Kontingent", as the tile's old title said little; used instead of left, "belegt",
+                           # user, 2026-11-04)
                            vt_tile([vt_head("API-Kontingent"),
-                                    # once the hour has run out the quota is full again, though the item keeps the
+                                    # once the hour has run out nothing is used any more, though the item keeps the
                                     # last answer's count until the next request opens a new hour (user, 2026-10-25)
-                                    vt_value(f"=((over) => {ok(left)} ? (over ? {SKODA_REQUESTS_PER_HOUR} : "
-                                             f"Math.round({num(left)})) + ' von {SKODA_REQUESTS_PER_HOUR} frei' : '–')"
+                                    vt_value(f"=((over) => {ok(left)} ? (over ? 0 : Math.max(0, "
+                                             f"{SKODA_REQUESTS_PER_HOUR} - Math.round({num(left)}))) + "
+                                             f"' von {SKODA_REQUESTS_PER_HOUR} belegt' : '–')"
                                              f"({ok(reset)} && !dayjs(items.{reset}.state).isAfter(dayjs()))"),
                                     # and when it is full again, while that lies ahead (user, 2026-10-25)
                                     label(f"='pro Stunde' + ((m) => m > 0 ? ' · Reset in ' + m + ' min' : '')"
