@@ -7584,8 +7584,12 @@ def sun_tile(title, start, stop, peak, power_item):
     noon = f"({sun_js()}).noon"
     now = mins("dayjs()")
     # while it runs past that estimate (after a late start, or with the west plane's evening sun) the end 5 minutes
-    # ahead, not in the past
-    t1 = f"({ok(stop)} ? {mins(f'dayjs(items.{stop}.state)')} : Math.max(2 * {noon} - {t0}, {now} + 5))"
+    # ahead, not in the past; but no later than 15 minutes after sunset: with the battery the inverter stays on the
+    # grid at night and reports no end, so the end ran on into the night and the sun sat on its label (user,
+    # 2026-11-07: 22:06)
+    sunset = f"({sun_js()}).set"
+    t1 = (f"({ok(stop)} ? {mins(f'dayjs(items.{stop}.state)')} : "
+          f"Math.min(Math.max(2 * {noon} - {t0}, {now} + 5), {sunset} + 15))")
     X = lambda m: f"(14 + 432 * (({m}) - {SUN_LO}) / {SUN_HI - SUN_LO})"
     cx, rx = f"(({X(t0)} + {X(t1)}) / 2)", f"(({X(t1)} - {X(t0)}) / 2)"
     xn = f"Math.max({X(t0)}, Math.min({X(t1)}, {X(now)}))"
@@ -7597,9 +7601,11 @@ def sun_tile(title, start, stop, peak, power_item):
     hm_ = lambda m: f"((r) => Math.floor(r / 60) + ':' + ('0' + r % 60).slice(-2))(Math.round({m}))"
     up = f"({ok(start)} && {now} < {t1})"
     hours = list(range(-(-SUN_LO // 180) * 3, SUN_HI // 60 + 1, 3))  # every 3 h within the scale
-    # start and end 20 off the arc's feet, kept inside the drawing (0..470)
-    sx, ex = f"Math.max(32, {X(t0)} - 20)", f"Math.min(428, {X(t1)} + 20)"
-    right_side = f"({xn} > 300)"
+    # start and end 20 off the arc's feet, kept inside the drawing (0..470; the end's label ~37 wide)
+    sx, ex = f"Math.max(32, {X(t0)} - 20)", f"Math.min(432, {X(t1)} + 20)"
+    # the power toward the arc's middle, so near a foot it stays off the start's or the end's label, and at a foot
+    # above the base line (user, 2026-11-07: "überlagert die Texte")
+    right_side = f"({xn} > {cx})"
     kids = [svg("path", d=f"={done} + ' L' + {f1(xn)} + ' 96 Z'", fill="#ffb300", **{"fill-opacity": "0.12"},
                 visible=f"={ok(start)}"),
             svg("path", d=f"={done}", fill="none", stroke="#ffb300", **{"stroke-width": "2.5", "stroke-linecap": "round"},
@@ -7622,7 +7628,7 @@ def sun_tile(title, start, stop, peak, power_item):
             svg("circle", cx=f"={f1(xn)}", cy=f"={f1(yn)}", r=13, fill="#ffb300", **{"fill-opacity": "0.22"},
                 visible=f"={up}"),
             svg("circle", cx=f"={f1(xn)}", cy=f"={f1(yn)}", r=8, fill="#ffb300", visible=f"={up}"),
-            svg_text(f"={f1(f'{xn} + ({right_side} ? -18 : 18)')}", f"={f1(f'{yn} + 4')}",
+            svg_text(f"={f1(f'{xn} + ({right_side} ? -18 : 18)')}", f"={f1(f'Math.min({yn} + 4, 88)')}",
                        f"={dash(disp(power_item))}", 13, weight="700", anchor=f"={right_side} ? 'end' : 'start'")]
     kids[-1]["config"]["visible"] = f"={up}"
     word = vt_chip(f"='Spitze ' + {dash(disp(peak))}", "'neutral'")
@@ -7645,7 +7651,11 @@ def sun_popup_blocks():
     today = lambda i: f"(!['NULL', 'UNDEF'].includes(items.{i}.state) && dayjs(items.{i}.state).isSame(dayjs(), 'day'))"
     mins = lambda i: f"(dayjs(items.{i}.state).hour() * 60 + dayjs(items.{i}.state).minute())"
     up, ended = today(start), f"({today(stop)} && {mins(stop)} > {mins(start)})"
-    run = f"(({ended} ? {mins(stop)} : dayjs().hour() * 60 + dayjs().minute()) - {mins(start)})"
+    # without a reported end as the sun arc: the run lasts at most until 15 minutes after sunset (the inverter stays on
+    # the grid at night with the battery), after that the end an estimate (user, 2026-11-07)
+    now_m, late = "(dayjs().hour() * 60 + dayjs().minute())", f"(({sun_js()}).set + 15)"
+    over = f"(!{ended} && {now_m} >= {late})"
+    run = f"(({ended} ? {mins(stop)} : Math.min({now_m}, {late})) - {mins(start)})"
     with_sun = lambda body, day="dayjs()": f"=((s) => {body})({sun_js(day)})"
     yesterday = sun_js("dayjs().subtract(1, 'day')")
     change = (f"((x) => (Math.abs(x)).toLocaleString('de-AT', {{minimumFractionDigits: 1, maximumFractionDigits: 1}}) "
@@ -7658,11 +7668,11 @@ def sun_popup_blocks():
 
     def tile(title, value, *lines):
         return vt_tile([vt_title(title), vt_value(value), *[label(line, **VT_SUB) for line in lines]])
-    tiles = [tile("Laufzeit heute", f"={up} ? {hm_js(run)} + ' h' : '–'",
-                  f"={up} ? {hm_js(mins(start))} + ' – ' + ({ended} ? {hm_js(mins(stop))} : 'jetzt') : "
-                  f"'noch nicht gestartet'",
-                  with_sun(f"{up} ? ({ended} ? '' : 'bisher ') + Math.round(100 * {run} / (s.set - s.rise)) + "
-                           f"' % des Tageslichts' : ''")),
+    tiles = [tile("Laufzeit heute", f"={up} ? ({over} ? '≈ ' : '') + {hm_js(run)} + ' h' : '–'",
+                  f"={up} ? {hm_js(mins(start))} + ' – ' + ({ended} ? {hm_js(mins(stop))} : {over} ? "
+                  f"'≈ ' + {hm_js(late)} : 'jetzt') : 'noch nicht gestartet'",
+                  with_sun(f"{up} ? ({ended} || {over} ? '' : 'bisher ') + "
+                           f"Math.round(100 * {run} / (s.set - s.rise)) + ' % des Tageslichts' : ''")),
              tile("Tageslicht", with_sun(f"{hm_js('s.set - s.rise')} + ' h'"),
                   with_sun(f"'Aufgang ' + {hm_js('s.rise')} + ' · Untergang ' + {hm_js('s.set')}"),
                   with_sun(f"((y) => {change}((s.set - s.rise) - (y.set - y.rise)))({yesterday})")),
@@ -9496,12 +9506,17 @@ def plot_below_buttons(height):
 def planes_chart():
     """The three directions' power over the day in one grid, so that they compare: east string 1, which has no
     optimizers, west and north string 2's planes by their optimizers (user, 2026-10-20: a chart of their own, not
-    in Leistung heute)."""
+    in Leistung heute). Over each its forecast dashed in its colour, as over the strings in Leistung heute: east
+    string 1's, west and north string 2's split by pv_forecast_ml's planes' models (user, 2026-11-07); the title
+    without them, and the present a dashed line."""
+    forecasts = [line("Prognose Ost", "pv_forecast_pv1_power", EAST_C, dashed=True, markLine=now_mark()),
+                 *(line(f"Prognose {name}", f"pv_forecast_{key}_power", color, dashed=True)
+                   for key, (name, color, _) in OPT_PLANES.items())]
     # noBoundary: the reading MainUI adds before the day may be weeks old while a gap is filled
     return stacked_chart([((("Ost", EAST_C), *((name, color) for name, color, _ in OPT_PLANES.values())),
                            [line("Ost", "huawei_inverter_pv1_power", EAST_C),
                             *(line(name, OPT + key + "_power", color, noBoundary=True)
-                              for key, (name, color, _) in OPT_PLANES.items())],
+                              for key, (name, color, _) in OPT_PLANES.items()), *forecasts],
                            value_axis("W"))], PLANES_H, chartType="day")
 
 

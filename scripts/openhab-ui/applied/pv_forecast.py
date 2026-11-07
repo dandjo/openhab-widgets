@@ -11,6 +11,9 @@ budget (dhw_sun_budget.py) and the Photovoltaik page.
   the points straight into InfluxDB, only changed ones), each hour's mean at the hour's middle, set for the running hour;
 - pv_forecast_pv1_power, pv_forecast_pv2_power (W): the strings' forecasts as pv_forecast_power, whose sum it is (a
   model per string, user, 2026-10-20), for the Photovoltaik page's strings;
+- pv_forecast_west_power, pv_forecast_north_power (W): string 2's forecast split among its planes by a model per
+  plane that learns from the optimizers (user, 2026-11-07), times the optimizers' ratio to the string, for the
+  Photovoltaik page's Himmelsrichtungen heute; east is string 1's;
 - pv_forecast_energy (kWh): each day's total from today on at the day's 23:59:59 (forecast series, as the daily
   totals energy_daily_* stand), set to today's, for the Photovoltaik page's yield per day;
 - pv_forecast_energy_tomorrow (kWh): tomorrow's total, persisted on change (the day-ahead forecasts' history).
@@ -36,6 +39,11 @@ ITEMS = {
     **{f"pv_forecast_pv{n}_power": {"type": "Number:Power", "label": f"PV Prognose PV{n} Leistung",
                                     "category": "material:solar_power", "tags": ["Power", "Measurement"],
                                     "groupNames": [GROUP, "influxdb_forecast"]} for n in (1, 2)},
+    # string 2's planes (user, 2026-11-07)
+    **{f"pv_forecast_{key}_power": {"type": "Number:Power", "label": f"PV Prognose {name} Leistung",
+                                     "category": "material:solar_power", "tags": ["Power", "Measurement"],
+                                     "groupNames": [GROUP, "influxdb_forecast"]}
+       for key, name in (("west", "West"), ("north", "Nord"))},
     "pv_forecast_hourly": {"type": "String", "label": "PV Prognose Stunden", "category": "material:schedule",
                            "tags": ["Status"], "groupNames": [GROUP, "mapdb_change_restore"]},
     "pv_forecast_energy": {"type": "Number:Energy", "label": "PV Prognose Tagesenergie", "category": "material:solar_power",
@@ -54,6 +62,10 @@ METADATA = {
     **{f"pv_forecast_pv{n}_power": {"unit": {"value": "W"},
                                     "stateDescription": {"value": " ", "config": {"pattern": "%.0f %unit%",
                                                                                   "readOnly": True}}} for n in (1, 2)},
+    **{f"pv_forecast_{key}_power": {"unit": {"value": "W"},
+                                     "stateDescription": {"value": " ", "config": {"pattern": "%.0f %unit%",
+                                                                                   "readOnly": True}}}
+       for key in ("west", "north")},
     "pv_forecast_hourly": {"stateDescription": {"value": " ", "config": {"readOnly": True}}},
     "pv_forecast_energy": {"unit": {"value": "kWh"},
                            "stateDescription": {"value": " ", "config": {"pattern": "%.1f %unit%", "readOnly": True}}},
