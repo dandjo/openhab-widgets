@@ -538,12 +538,16 @@ function trackTrips(vehicle, prev, now) {
       console.warn('Škoda: Fahrt nicht in InfluxDB geschrieben, nächster Versuch beim nächsten Lesen');
     }
   };
-  if (prev.pos === null || prev.odo === null) {
+  // parked after a read that saw it gone is an arrival, wherever: back at the same place, the odometer may have grown
+  // already with the read that saw it moving (user, 2026-11-08: a 6 km trip of 7 November stayed "unterwegs", its
+  // arrival read alike to the items in place and odometer, so the session waited for an arrival ever after)
+  const back = r.parked && Boolean(s.session && s.session.departing);
+  if (!back && (prev.pos === null || prev.odo === null)) {
     // nothing known of the place before: it starts here
     if (r.parked) {
       s.seen = now;
     }
-  } else if (!(r.odo > prev.odo || r.moving || (r.parked && metersBetween(prev.pos, r.pos) > MOVED_METERS))) {
+  } else if (!back && !(r.odo > prev.odo || r.moving || (r.parked && metersBetween(prev.pos, r.pos) > MOVED_METERS))) {
     // still where it stood: a charge away from home after an arrival of the open session is a charging stop there
     const sess = s.session;
     if (sess && sess.end !== undefined && !sess.departing && r.soc !== null) {
@@ -585,7 +589,12 @@ function trackTrips(vehicle, prev, now) {
     if (!sess.departing) {
       sess.departing = { after: s.seen || now, by: now };
     }
-    if (r.parked) {
+    if (r.parked && sess.points.length === 1 && r.odo === sess.odoStart &&
+        metersBetween(sess.points[0], r.pos) <= MOVED_METERS) {
+      // seen moving, then parked where it left without a kilometre: no trip
+      delete s.session;
+      s.seen = now;
+    } else if (r.parked) {
       const arrived = Number.isNaN(r.odoAt) ? now : Math.min(now, Math.max(r.odoAt, sess.departing.after));
       const left = Math.round(sess.departing.after + (Math.min(sess.departing.by, arrived) - sess.departing.after) / 2);
       if (sess.start === null) {
