@@ -58,7 +58,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 25, 2026, 2:07:58 PM
+timestamp: Nov 8, 2026, 8:26:39 PM
 component: div
 config:
   style:
@@ -814,7 +814,7 @@ slots:
               item: =props.heatpumpBshMode
               yValue: 0
               yHeight: 1
-              mapState: '=(s) => s === ''ON'' || s === ''​'' ? ''​'' : ''UNDEF'''
+              mapState: '=(s) => s === ''ON'' ? ''​'' : ''UNDEF'''
               stateColor:
                 ​: '#fb8c00'
               tooltip:

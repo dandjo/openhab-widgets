@@ -3964,11 +3964,10 @@ def band_panel(title, item, active, rest, extra=(), in_tooltip=False, display=No
     smart formatter would read a bar's start as its value and a part of its id as its unit ("NaN" and a long number)."""
     # MainUI draws every bar's state as text in it and leaves out UNDEF and NULL only: the rest becomes UNDEF, so
     # nothing is drawn there, an active state a run of zero-width spaces, a key of its own for its colour that writes
-    # nothing; a bar's tooltip names it in words where the band stands alone (state_band()). MainUI (5.3) writes the
-    # mapped states over the fetched ones and maps them again whenever it rebuilds the chart (a resize, a period
-    # change), so a key maps to itself: else the second pass made every bar UNDEF and the band empty (2026-10-07)
+    # nothing; a bar's tooltip names it in words where the band stands alone (state_band()). MainUI maps into a copy of
+    # the fetched states since 5.3.0.M4 (openhab-webui#4587), so each pass maps the item's own states
     keys = {v: "\u200b" * (k + 1) for k, (v, _, _) in enumerate(active)}
-    names = " : ".join(f"s === '{v}' || s === '{keys[v]}' ? '{keys[v]}'" for v, _, _ in active)
+    names = " : ".join(f"s === '{v}' ? '{keys[v]}'" for v, _, _ in active)
     words = " : ".join(f"p.value[3] === '{keys[v]}' ? '{t}'" for v, t, _ in active)
     tip = state_tooltip(f"({words} : '{rest}')")
     return (display or [(title, active[0][2])],
