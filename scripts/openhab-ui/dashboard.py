@@ -5428,8 +5428,9 @@ def grid_boxes(chart_, texts=None, bands=False, value_formatter=None):
     (tip_value()). The head is the time on a time axis; on a category axis of days (chartType month) or months (year)
     the position function names the date, from the category and the period MainUI's period button shows ('5' and
     'Okt. 2026' become 'Mo., 5. Okt. 2026'). The time H is the first series' reading's; where that series ends
-    before now (a measurement, not a forecast) and the pointer is past it into the future by more than 10 minutes, the
-    clock's (add_clock()), and a reading more than 30 minutes older than a time to come is left out (a measurement's
+    before now (a measurement, not a forecast) but today, and the pointer is past it into the future by
+    more than 10 minutes, the clock's (add_clock()), and a reading more than 30 minutes older than a time to come is
+    left out (a measurement's
     last one, now, under the forecast); a first series with readings to come (prices, the weather) keeps its own. A grid's top and height or
     bottom are taken as pixels; it runs last (tooltips_designed()), once every grid stands where it stays. In
     place."""
@@ -5454,8 +5455,14 @@ def grid_boxes(chart_, texts=None, bands=False, value_formatter=None):
             "!p.seriesId.split('#')[4] : " + ("true" if bands else "p.seriesId.indexOf('oh-state-series') !== 0")
             + f"){tip_fresh(texts)}{stale}")
     # the time: the first series' reading's, or the clock's past it into the future
-    at = (f"((c, now) => c && c.axisValue > now && ps[0].axisValue <= now && c.axisValue - ps[0].axisValue > 600000 ? "
-          f"c.axisValue : ps[0].axisValue)(ps.filter((p) => p.seriesId === '{CLOCK}')[0], dayjs().valueOf())"
+    # (the clock's hidden axis stays on today's period while the arrows page the others: on an earlier period it gave
+    # the pointer's time of day today, past now in the afternoon, and every reading of that grid fell out as stale
+    # (user, 2026-11-08: no tooltip on 6 November's upper grid); a paged period ends before today, so the clock counts
+    # only while the first series' reading is today's)
+    at = (f"((c, now) => c && c.axisValue > now && ps[0].axisValue <= now && "
+          f"ps[0].axisValue >= dayjs().startOf('day').valueOf() && "
+          f"c.axisValue - ps[0].axisValue > 600000 ? c.axisValue : ps[0].axisValue)"
+          f"(ps.filter((p) => p.seriesId === '{CLOCK}')[0], dayjs().valueOf())"
           if clock else "ps[0].axisValue")
     row = TIP_ROW.format(value=tip_value(texts, bands, value_formatter))
     label = "(ps[0].axisType === 'xAxis.time' ? dayjs(H).format('llll') : ps[0].axisValueLabel)"

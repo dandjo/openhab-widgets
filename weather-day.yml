@@ -16,7 +16,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 25, 2026, 2:07:58 PM
+timestamp: Nov 8, 2026, 3:32:55 AM
 component: div
 config:
   style:
@@ -466,9 +466,9 @@ slots:
                         && H - p.value[0] > 1800000)).map((p) => p.marker + '' '' + p.seriesName + ''<span style="float: right;
                         margin-left: 20px"><b style="text-align: right;">'' + ((v) => v.toLocaleString(''en-GB'') + '' ''
                         + p.seriesId.split(''#'')[2])(Number(p.value[1])) + ''</b></span><br/>'').join(''''))).join('''')
-                        + ''</div>'')(((c, now) => c && c.axisValue > now && ps[0].axisValue <= now && c.axisValue - ps[0].axisValue
-                        > 600000 ? c.axisValue : ps[0].axisValue)(ps.filter((p) => p.seriesId === ''oh-data-series#clock'')[0],
-                        dayjs().valueOf()))'
+                        + ''</div>'')(((c, now) => c && c.axisValue > now && ps[0].axisValue <= now && ps[0].axisValue >=
+                        dayjs().startOf(''day'').valueOf() && c.axisValue - ps[0].axisValue > 600000 ? c.axisValue : ps[0].axisValue)(ps.filter((p)
+                        => p.seriesId === ''oh-data-series#clock'')[0], dayjs().valueOf()))'
                       position: '=(pt, ps, dom, rect, size) => ((T, B) => ((c, left, h) => [c.style.setProperty(''align-items'',
                         left ? ''flex-end'' : ''flex-start''), dom.hasAttribute(''data-wb'') || [dom.parentNode.addEventListener(''mouseleave'',
                         () => [0,1,2].map((i) => dom.removeAttribute(''data-wb'' + i))), dom.setAttribute(''data-wb'', '''')],
