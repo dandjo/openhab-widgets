@@ -152,14 +152,11 @@ grey otherwise. A running timer covers its device's ring with an arc, full at wh
 ring is filled with its state of charge, and the heat pump's, while it charges the tank, towards the charge's expected
 end; beside such an arc the rest of the ring pulses softly and, while the node works, the arc pulses in step with it,
 brightest and widest with it. A tap on a node opens its device's page of my installation, on the house and the
-appliances a popup of their own. Under the star three tiles: the house as its node inside the pie of what the consumers
-draw, as large as the rings beside it, with its power and today's energy against yesterday's at this time in a pill (the
-difference in kWh), and today's self-consumption (the PV generation less the export, of the generation) and
-self-sufficiency (the consumption not taken from the grid) as rings, each with yesterday's whole day in a pill, green
-while today's share is higher, orange while lower. PV's energy is the strings' generation: a hybrid inverter's own day
-yield counts the battery's discharge and leaves out what charges the battery. The card places its lines and nodes as
-`flow-link` and `flow-node`. The recording and the dark screenshot show it with demo powers; today's energies and the
-comparisons are those of the moment shown.
+appliances a popup of their own. Under the strip a tile: the house as its node inside the pie of what the consumers
+draw, with its power and today's energy against yesterday's at this time in a pill (the difference in kWh). PV's energy
+is the strings' generation: a hybrid inverter's own day yield counts the battery's discharge and leaves out what charges
+the battery. The card places its lines and nodes as `flow-link` and `flow-node`. The recording and the dark screenshot
+show it with demo powers; today's energies and the comparisons are those of the moment shown.
 
 Needs `flow-link`, `flow-node`.
 
@@ -168,7 +165,7 @@ Needs `flow-link`, `flow-node`.
 ![Energy flow in dark mode](screenshots/energy-flow-card-dark.gif)
 
 <details>
-<summary>55 props</summary>
+<summary>54 props</summary>
 
 | Prop | Item | Item type |
 |---|---|---|
@@ -226,7 +223,6 @@ Needs `flow-link`, `flow-node`.
 | `bicycleBatteriesPower` | Bicycle Batteries Power | Number:Power |
 | `homeEnergyToday` | Home Energy Day | Number:Energy |
 | `tileHistory` | Tile history | String |
-| `pvSelfUseToday` | Photovoltaics Own Ec-Day | Number:Energy |
 
 </details>
 
@@ -513,41 +509,47 @@ Needs `boost-pill`, `flow-node`, `ground-floor-quick`, `heatpump-circuit-quick`,
 
 ### Consumption today: `consumption-card`
 
-Today's consumption as one bar split by source (PV with the battery, the grid less what charged the battery from it),
-the total against yesterday at this time in a pill between the two shares (the difference in kWh), and as one bar split
-by consumer, with a legend in two columns that gives each consumer's energy and how many kWh more (orange) or fewer
-(green) it drew than yesterday until this time; hovering a part lifts it everywhere. The screenshot shows it with demo
-values.
+On top today's self-consumption (the PV generation less the export, of the generation) and self-sufficiency (the
+consumption not taken from the grid) as rings, each with yesterday's whole day in a pill, green while today's share is
+higher, orange while lower (the prop selfRow hides them where the page shows them already). Below, today's consumption
+as one bar split by source (PV with the battery, the grid less what charged the battery from it), the total against
+yesterday at this time in a pill between the two shares (the difference in kWh), and as one bar split by consumer, with
+a legend in two columns that gives each consumer's energy and how many kWh more (orange) or fewer (green) it drew than
+yesterday until this time; hovering a part lifts it everywhere. The screenshot shows it with demo values.
 
 ![Consumption today](screenshots/consumption-card.png)
 
 <details>
-<summary>22 props</summary>
+<summary>26 props</summary>
 
-| Prop | Item | Item type |
-|---|---|---|
-| `homeEnergyToday` | Home Energy Day | Number:Energy |
-| `homeFromPvToday` | Home from PV Today | Number:Energy |
-| `homeFromBatteryToday` | Home from Battery Today | Number:Energy |
-| `tileHistory` | Tile history | String |
-| `homeFromGridToday` | Home from Grid Today | Number:Energy |
-| `heatpumpEnergyToday` | ESPAltherma Energy Today | Number:Energy |
-| `ecarEnergyToday` | E-Car Energy Today | Number:Energy |
-| `acUnitEnergyToday` | Air Conditioning Unit Energy Today | Number:Energy |
-| `office1EnergyToday` | Office 1 Energy Today | Number:Energy |
-| `office2EnergyToday` | Office 2 Energy Today | Number:Energy |
-| `networkEnergyToday` | Network Energy Today | Number:Energy |
-| `ventilationEnergyToday` | Ventilation Energy Today | Number:Energy |
-| `refrigeratorEnergyToday` | Refrigerator Energy Today | Number:Energy |
-| `coffeeMachineEnergyToday` | Coffee Machine Energy Today | Number:Energy |
-| `livingRoomEntertainmentEnergyToday` | Living Room Entertainment Energy Today | Number:Energy |
-| `dishwasherEnergyToday` | Dishwasher Energy Today | Number:Energy |
-| `washingMachine1EnergyToday` | Washing Machine 1 Energy Today | Number:Energy |
-| `washingMachine2EnergyToday` | Washing Machine 2 Energy Today | Number:Energy |
-| `tumbleDryerEnergyToday` | Tumble Dryer Energy Today | Number:Energy |
-| `terraceLightEnergyToday` | Terrace Light Energy Today | Number:Energy |
-| `bicycleBatteriesEnergyToday` | Bicycle Batteries Energy Today | Number:Energy |
-| `acMeterEnergyToday` | Air Conditioning Energy Today | Number:Energy |
+| Prop | Description | Type | Default |
+|---|---|---|---|
+| `homeEnergyToday` | Number:Energy item | Item |  |
+| `pvGenerationToday` | Number:Energy item | Item |  |
+| `pvSelfUseToday` | Number:Energy item | Item |  |
+| `tileHistory` | String item | Item |  |
+| `gridImportToday` | Number:Energy item | Item |  |
+| `homeFromPvToday` | Number:Energy item | Item |  |
+| `homeFromBatteryToday` | Number:Energy item | Item |  |
+| `homeFromGridToday` | Number:Energy item | Item |  |
+| `heatpumpEnergyToday` | Number:Energy item | Item |  |
+| `ecarEnergyToday` | Number:Energy item | Item |  |
+| `acUnitEnergyToday` | Number:Energy item | Item |  |
+| `office1EnergyToday` | Number:Energy item | Item |  |
+| `office2EnergyToday` | Number:Energy item | Item |  |
+| `networkEnergyToday` | Number:Energy item | Item |  |
+| `ventilationEnergyToday` | Number:Energy item | Item |  |
+| `refrigeratorEnergyToday` | Number:Energy item | Item |  |
+| `coffeeMachineEnergyToday` | Number:Energy item | Item |  |
+| `livingRoomEntertainmentEnergyToday` | Number:Energy item | Item |  |
+| `dishwasherEnergyToday` | Number:Energy item | Item |  |
+| `washingMachine1EnergyToday` | Number:Energy item | Item |  |
+| `washingMachine2EnergyToday` | Number:Energy item | Item |  |
+| `tumbleDryerEnergyToday` | Number:Energy item | Item |  |
+| `terraceLightEnergyToday` | Number:Energy item | Item |  |
+| `bicycleBatteriesEnergyToday` | Number:Energy item | Item |  |
+| `acMeterEnergyToday` | Number:Energy item | Item |  |
+| `selfRow` | Show today's self-consumption and self-sufficiency as the top row; off where the page shows them already | BOOLEAN | `true` |
 
 </details>
 

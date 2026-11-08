@@ -1830,50 +1830,58 @@ def others_strip():
 
 
 
+def flow_tile(child, popup, **extra):
+    """A small card that opens its popup with a tap anywhere on it: the house's under the energy flow, today's
+    self-consumption and self-sufficiency on top of the consumption card."""
+    link = comp("oh-link", {"action": "popup", "actionModal": f"page:{popup}",
+                            "style": {"position": "absolute", "inset": "0", "display": "block",
+                                      "border-radius": "12px"}})
+    return div([div([child], **{"position": "relative", "min-width": "0", "flex": "1 1 auto"}), link],
+               **{"position": "relative", "overflow": "hidden", "padding": "8px 10px", "border-radius": "12px",
+                  "background": TILE_BG, "min-width": "0", "display": "flex", "align-items": "center", **extra})
+
+
+def tile_ring_svg(parts):
+    return svg("svg", parts, viewBox="0 0 150 50", width="100%",
+               style={"display": "block", "overflow": "visible", "max-width": "170px"})
+
+
 def house_tiles():
-    """The house's power and energy today, today's self-consumption and self-sufficiency, as three small cards under
-    the star, each opening its popup with a tap anywhere on it: three abreast, on a phone the house above the two
-    rings."""
+    """The house's power and energy today as a small card under the strip of the other consumers, the width of the
+    card, opening its popup with a tap anywhere on it; today's self-consumption and self-sufficiency stand on top of
+    the consumption card (self_share_tiles(); user, 2026-11-08)."""
     # a pill under the texts with today against yesterday at this time, flush with them (user, 2026-10-06); the texts
     # rise by 10, so texts and pill stand as one block in the ring's vertical middle, and the ring in the tile's
-    ring_svg = lambda parts: svg("svg", parts, viewBox="0 0 150 50", width="100%",
-                                 style={"display": "block", "overflow": "visible", "max-width": "170px"})
-    share = lambda ring, pill: ring_svg([*share_ring(24, 25, *ring, lift=10), pill])
     # the house as its node in the star, the ring the pie of what the consumers draw, at its widest pulse as large and
-    # as wide as the self-consumption ring beside it (user, 2026-10-05), SWELL times thinner at rest, swelling around
-    # its middle as the star's rings; its power and today's energy beside it
+    # as wide as the self-consumption ring of the consumption card (user, 2026-10-05), SWELL times thinner at rest,
+    # swelling around its middle as the star's rings; its power and today's energy beside it
     max_r, max_w = 22, 5  # share_ring()'s
     w = round(max_w / SWELL, 2)
     r = max_r - (max_w - w) / 2
-    home = ring_svg([svg("circle", cx=24, cy=25, r=r, fill="none", stroke="rgba(127, 127, 127, 0.28)",
-                         **{"stroke-width": w}),
-                     *house_pie((24, 25), r, w, max_w, underlay=False),
-                     # the node's disc just inside the ring
-                     svg("g", [flow_node("home", (0, 0), num(HOME))],
-                         transform=f"translate(24 25) scale({(r - w / 2) / (ORBIT - RING_MAX / 2):.3f})"),
-                     svg_text(56, 13, f"={kw(HOME)}", 13, "700", anchor="start"),
-                     svg_text(56, 29, kwh(num("home_ec_day")), 11, anchor="start", opacity="0.5"),
-                     # without its unit, the line above names kWh: "+0,03 kWh zu gestern" did not fit the tile
-                     svg_pill(56, 34, *day_change("home_ec_day", "less", unit=""))])
-    # on a phone its tile spans the row: the drawing as wide as in a tile of half the row, so the rings match there too
-    home["config"]["style"]["width"] = f"={NARROW} ? 'calc(50% - 14px)' : '100%'"
+    home = tile_ring_svg([svg("circle", cx=24, cy=25, r=r, fill="none", stroke="rgba(127, 127, 127, 0.28)",
+                              **{"stroke-width": w}),
+                          *house_pie((24, 25), r, w, max_w, underlay=False),
+                          # the node's disc just inside the ring
+                          svg("g", [flow_node("home", (0, 0), num(HOME))],
+                              transform=f"translate(24 25) scale({(r - w / 2) / (ORBIT - RING_MAX / 2):.3f})"),
+                          svg_text(56, 13, f"={kw(HOME)}", 13, "700", anchor="start"),
+                          svg_text(56, 29, kwh(num("home_ec_day")), 11, anchor="start", opacity="0.5"),
+                          # without its unit, the line above names kWh: "+0,03 kWh zu gestern" did not fit the tile
+                          svg_pill(56, 34, *day_change("home_ec_day", "less", unit=""))])
+    return flow_tile(home, "flow_home")
 
-    def tile(child, popup, **extra):
-        link = comp("oh-link", {"action": "popup", "actionModal": f"page:{popup}",
-                                "style": {"position": "absolute", "inset": "0", "display": "block",
-                                          "border-radius": "12px"}})
-        return div([div([child], **{"position": "relative", "min-width": "0", "flex": "1 1 auto"}), link],
-                   **{"position": "relative", "overflow": "hidden", "padding": "8px 10px", "border-radius": "12px",
-                      "background": TILE_BG, "min-width": "0", "display": "flex", "align-items": "center", **extra})
-    return div([tile(home, "flow_home", **{"grid-column": f"={NARROW} ? '1 / -1' : 'auto'"}),
-                tile(share(SELF_CONSUMPTION, svg_pill(56, 34, *points_change("photovoltaics_own_ec_day",
-                                                                             "photovoltaics_generation_day"))),
-                     "flow_self_consumption"),
-                tile(share(SELF_SUFFICIENCY, svg_pill(56, 34, *points_change(
+
+def self_share_tiles():
+    """Today's self-consumption and self-sufficiency as two small cards side by side, each with its ring, its share
+    and today's against yesterday's whole day, opening its popup with a tap anywhere on it."""
+    share = lambda ring, pill: tile_ring_svg([*share_ring(24, 25, *ring, lift=10), pill])
+    return div([flow_tile(share(SELF_CONSUMPTION, svg_pill(56, 34, *points_change("photovoltaics_own_ec_day",
+                                                                                   "photovoltaics_generation_day"))),
+                          "flow_self_consumption"),
+                flow_tile(share(SELF_SUFFICIENCY, svg_pill(56, 34, *points_change(
                     "home_ec_day", "home_ec_day", minus="huawei_inverter_power_meter_ec_day"))),
-                     "flow_self_sufficiency")],
-               **{"display": "grid", "gap": "8px",
-                  "grid-template-columns": f"={NARROW} ? 'repeat(2, minmax(0, 1fr))' : 'repeat(3, minmax(0, 1fr))'"})
+                          "flow_self_sufficiency")],
+               **{"display": "grid", "gap": "8px", "grid-template-columns": "repeat(2, minmax(0, 1fr))"})
 
 
 # ---------------------------------------------------------------- 2a. weather, a slim bar at the top
@@ -4399,7 +4407,12 @@ def consumption_content():
     # in kWh, as the consumers' column beside it (user, 2026-10-07)
     total = vt_chip(*day_change("home_ec_day", "less"))
     total["config"]["style"]["justify-self"] = "center"
+    # today's self-consumption and self-sufficiency as its top row (user, 2026-11-08: from under the energy flow),
+    # unless the place shows them already (props.selfRow false: the house's popup, whose Heute has their rings)
+    shares = div([self_share_tiles()], "=props.selfRow !== false && props.selfRow !== 'false'",
+                 **{"margin-bottom": "14px"})
     return [div([
+    shares,
     hover_group([div([source_head("pv", FROM_PV, "aus PV", "#43a047", "left"), total,
                       source_head("grid", FROM_GRID, "aus dem Netz", "#e53935", "right")],
                      **{"display": "grid", "grid-template-columns": "1fr auto 1fr", "align-items": "center",
@@ -5995,7 +6008,8 @@ def home_blocks():
     # Heute under Jetzt, where Jetzt left space beside the day's power (user, 2026-10-05), and the consumers of the
     # day under them, so the four grids of power beside keep their height; per day beside per month below
     return [two(widget_stack(card("Jetzt", now), card("Heute", [today]),
-                             widget_ref("consumption-card", **props["consumption-card"])),
+                             # without the self-consumption row: Heute above has their rings
+                             widget_ref("consumption-card", **props["consumption-card"], selfRow=False)),
                 card("Leistung heute", [power])),
             block(row(col([widget_ref("energy-days-card", **props["energy-days-card"])]),
                       col([card("Energie pro Monat", [months])])))]
@@ -10745,6 +10759,12 @@ def item_kind(item):
     return "none", options
 
 
+# the overview's card widgets' props beyond their items
+CARD_PARAMS = {"consumption-card": [param("selfRow", "Self-consumption row", "Show today's self-consumption and "
+                                          "self-sufficiency as the top row; off where the page shows them already",
+                                          "BOOLEAN", default="true")]}
+
+
 def overview_widget_props():
     """uid: {prop: item} the overview passes to each of its card widgets."""
     return {uid: {item_prop(i): i for i in items_in(card_)} for uid, card_ in overview_cards().items()}
@@ -10957,7 +10977,7 @@ def widgets():
         assert len(set(props.values())) == len(props), f"{uid}: two items share a prop name"
         params = [dict(param(p, names.get(i, (p, ""))[0], f"{names.get(i, ('', 'Item'))[1]} item", required=True),
                        context="item") for i, p in props.items()]
-        out[uid] = (itemized(card_, props), params, ["overview"])
+        out[uid] = (itemized(card_, props), params + CARD_PARAMS.get(uid, []), ["overview"])
     for uid, (card_, params) in plug.items():
         # the plug cards stand on the device pages, whose charts start below their period buttons
         out[uid] = (templated(plots_below_controls(card_)), params, ["plug"])
