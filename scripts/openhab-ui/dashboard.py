@@ -1690,7 +1690,7 @@ def house_pie(xy=HOME_XY, r=RING_R, w=RING_W, max_w=RING_MAX, underlay=True):
 
 def energy_flow():
     """The energy flow's card content: the star of eight nodes with their rings, timers, badges and links, under it
-    the strip of the other consumers (others_strip()) and the house's figures; the switches have a card of their own
+    the house's figures and the strip of the other consumers (others_strip()); the switches have a card of their own
     below it (switches-card)."""
     ac_texts = below(AC_XY, f"={fixed(f'{AC_NET} / 1000', 3)} + ' kW'", kwh(num("air_conditioning_unit_energy_today")))
     ac_texts[1]["config"].update(timer_line(M_AC, AC_BLUE, ac_texts[1]["config"]["content"]))
@@ -1772,16 +1772,19 @@ def energy_flow():
                **{"padding": f"={NARROW} ? '4px' : '12px'", "flex": "1 1 auto", "display": "flex",
                   "flex-direction": "column", "justify-content": "center"})
     # its tiles as far in from the card's edge as the other cards' tiles (16 px, user 2026-10-05)
-    strip = div([house_tiles()], **{"padding": "8px 16px 14px"})
-    return [star, others_strip(), strip]
+    # the house over the strip of the other consumers (user, 2026-11-08)
+    strip = div([house_tiles()], **{"padding": "8px 16px 0"})
+    return [star, strip, others_strip()]
 
 
 # the consumers outside the star that no card under it shows (user, 2026-11-08, proposal C; the switches' devices stand
 # in the switches card below it): a strip under the star with what the house's ring leaves grey, these consumers as
 # pills sorted by their power, tinted in the consumption card's colour while they draw more than their standby, and
-# what no meter counts last; consumption card group, the pill's name, its icon, the standby in W
-STRIP_CONSUMERS = [("Netzwerk", "Netzwerk", "router", 5), ("Kühlschrank", "Kühlschrank", "kitchen", 20),
-                   ("Wohnzimmer Medien", "Medien", "tv", 25)]
+# what no meter counts last; a tap on a pill opens its device's page as a popup, as a node's does (user, 2026-11-08);
+# consumption card group, the pill's name, its icon, the standby in W, the device's page
+STRIP_CONSUMERS = [("Netzwerk", "Netzwerk", "router", 5, "network"),
+                   ("Kühlschrank", "Kühlschrank", "kitchen", 20, "refrigerator"),
+                   ("Wohnzimmer Medien", "Medien", "tv", 25, "living_room_entertainment")]
 # the consumption card's groups that are nodes of the star
 STAR_GROUPS = {"Wärmepumpe", "E-Auto", "Klimaanlage", "Lüftung", "Wäsche & Geschirr"}
 OTHERS_REST_C = "#bdbdbd"
@@ -1792,16 +1795,20 @@ def power_text(expr):
     return f"((v) => v >= 1000 ? {fixed('v / 1000', 2)} + ' kW' : Math.round(v) + ' W')(Math.max(0, {expr}))"
 
 
-def others_pill(name, icon, power, color, standby):
+def others_pill(name, icon, power, color, standby, page=None):
     """A pill of the strip: icon, name and power, tinted in color while it draws more than standby, grey at rest;
-    standby None: what no meter counts, grey, always last. Pills of more power stand first (CSS order)."""
+    standby None: what no meter counts, grey, always last. Pills of more power stand first (CSS order). With page, a
+    tap anywhere on it opens that page as a popup."""
     on = f"(Math.max(0, {power}) > {standby})" if standby is not None else "false"
+    link = [page_link({"position": "absolute", "inset": "0", "display": "block", "border-radius": PILL_R}, page)] \
+        if page else []
     return div([comp("oh-icon", {"icon": f"material:{icon}", "width": 14, "height": 14,
                                  "style": {"width": "14px", "height": "14px", "flex": "0 0 auto",
                                            "color": f"={on} ? '{color}' : '{BADGE_OFF}'"}}),
                 label(name, **{"white-space": "nowrap"}),
-                label(f"={power_text(power)}", **{"font-weight": "700", "white-space": "nowrap"})],
-               **{"display": "inline-flex", "align-items": "center", "gap": "5px", "padding": "4px 9px",
+                label(f"={power_text(power)}", **{"font-weight": "700", "white-space": "nowrap"}), *link],
+               **{"position": "relative", "display": "inline-flex", "align-items": "center", "gap": "5px",
+                  "padding": "4px 9px",
                   "border-radius": PILL_R, "font-size": "12px",
                   "order": f"=-Math.round(Math.max(0, {power}))" if standby is not None else "1",
                   "background": f"={on} ? 'color-mix(in srgb, {color} 22%, transparent)' : '{TILE_BG}'",
@@ -1823,10 +1830,10 @@ def others_strip():
                                                                           **{"font-weight": "700"})],
                **{"display": "flex", "gap": "6px", "font-size": "12px", "margin-bottom": "6px"})
     pills = [others_pill(name, icon, "(" + " + ".join(num(i) for i in groups[group][0]) + ")", groups[group][1],
-                         standby) for group, name, icon, standby in STRIP_CONSUMERS]
+                         standby, page) for group, name, icon, standby, page in STRIP_CONSUMERS]
     pills.append(others_pill("Nicht gemessen", "help_outline", rest, OTHERS_REST_C, None))
     return div([head, div(pills, **{"display": "flex", "flex-wrap": "wrap", "gap": "6px"})],
-               **{"padding": "4px 16px 0"})
+               **{"padding": "12px 16px 14px"})
 
 
 
@@ -1847,9 +1854,9 @@ def tile_ring_svg(parts):
 
 
 def house_tiles():
-    """The house's power and energy today as a small card under the strip of the other consumers, the width of the
-    card, opening its popup with a tap anywhere on it; today's self-consumption and self-sufficiency stand on top of
-    the consumption card (self_share_tiles(); user, 2026-11-08)."""
+    """The house's power and energy today as a small card under the star, over the strip of the other consumers, the
+    width of the card, opening its popup with a tap anywhere on it; today's self-consumption and self-sufficiency stand
+    on top of the consumption card (self_share_tiles(); user, 2026-11-08)."""
     # a pill under the texts with today against yesterday at this time, flush with them (user, 2026-10-06); the texts
     # rise by 10, so texts and pill stand as one block in the ring's vertical middle, and the ring in the tile's
     # the house as its node in the star, the ring the pie of what the consumers draw, at its widest pulse as large and
