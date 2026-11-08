@@ -14,6 +14,10 @@ budget (dhw_sun_budget.py) and the Photovoltaik page.
 - pv_forecast_west_power, pv_forecast_north_power (W): string 2's forecast split among its planes by a model per
   plane that learns from the optimizers (user, 2026-11-07), times the optimizers' ratio to the string, for the
   Photovoltaik page's Himmelsrichtungen heute; east is string 1's;
+- pv_forecast_power_low, pv_forecast_power_high, pv_forecast_power_band (W): the band around pv_forecast_power (the
+  strings' 10 % and 90 % quantile models, calibrated so that the rest of a day from 12:00 falls below it and above it
+  on about one day in ten each; user, 2026-11-08), and its width, which Leistung heute stacks on the low bound to fill
+  the band; heatpump_dhw_management takes the low bound from pv_forecast_hourly;
 - pv_forecast_energy (kWh): each day's total from today on at the day's 23:59:59 (forecast series, as the daily
   totals energy_daily_* stand), set to today's, for the Photovoltaik page's yield per day;
 - pv_forecast_energy_tomorrow (kWh): tomorrow's total, persisted on change (the day-ahead forecasts' history).
@@ -44,6 +48,11 @@ ITEMS = {
                                      "category": "material:solar_power", "tags": ["Power", "Measurement"],
                                      "groupNames": [GROUP, "influxdb_forecast"]}
        for key, name in (("west", "West"), ("north", "Nord"))},
+    # the band around the house's forecast (user, 2026-11-08)
+    **{f"pv_forecast_power_{key}": {"type": "Number:Power", "label": label, "category": "material:solar_power",
+                                     "tags": ["Power", "Measurement"], "groupNames": [GROUP, "influxdb_forecast"]}
+       for key, label in (("low", "PV Prognose Leistung min"), ("high", "PV Prognose Leistung max"),
+                          ("band", "PV Prognose Bandbreite"))},
     "pv_forecast_hourly": {"type": "String", "label": "PV Prognose Stunden", "category": "material:schedule",
                            "tags": ["Status"], "groupNames": [GROUP, "mapdb_change_restore"]},
     "pv_forecast_energy": {"type": "Number:Energy", "label": "PV Prognose Tagesenergie", "category": "material:solar_power",
@@ -66,6 +75,10 @@ METADATA = {
                                      "stateDescription": {"value": " ", "config": {"pattern": "%.0f %unit%",
                                                                                    "readOnly": True}}}
        for key in ("west", "north")},
+    **{f"pv_forecast_power_{key}": {"unit": {"value": "W"},
+                                     "stateDescription": {"value": " ", "config": {"pattern": "%.0f %unit%",
+                                                                                   "readOnly": True}}}
+       for key in ("low", "high", "band")},
     "pv_forecast_hourly": {"stateDescription": {"value": " ", "config": {"readOnly": True}}},
     "pv_forecast_energy": {"unit": {"value": "kWh"},
                            "stateDescription": {"value": " ", "config": {"pattern": "%.1f %unit%", "readOnly": True}}},
