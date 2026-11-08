@@ -9564,22 +9564,12 @@ def photovoltaics_blocks():
     # own, Himmelsrichtungen heute (user, 2026-10-20); the present a dashed line in both grids, as on the prices (user,
     # 2026-10-24), one per grid
     forecast = line("Prognose", "pv_forecast_power", f"={NEUTRAL_LINE}", dashed=True, markLine=now_mark())
-    # round it its band in the same grey, faint (pv_forecast_ml's quantile models, calibrated so that the rest of a day
-    # from 12:00 falls below and above it on about one day in ten each; user, 2026-11-08): the low bound an invisible
-    # base, the band's width stacked on it as the area, so it fills from low to high; the tooltip names the bounds
-    # (the high bound an invisible series of its own), not the width; all without the points MainUI adds before the
-    # day and at the present, which the stack would pair with the wrong hours
-    hidden = {"symbol": "none", "lineStyle": {"opacity": 0}, "itemStyle": {"color": f"={NEUTRAL_LINE}"}, **DAY_ONLY}
-    band = [time_series("Prognose min", "pv_forecast_power_low", stack="pv-band", **hidden),
-            time_series("Bandbreite", "pv_forecast_power_band", stack="pv-band", silent=True, tooltip={"show": False},
-                        areaStyle={"color": f"={NEUTRAL_LINE}", "opacity": 0.18}, **hidden),
-            time_series("Prognose max", "pv_forecast_power_high", **hidden)]
     string_forecasts = [line(f"Prognose PV{n}", f"pv_forecast_pv{n}_power", color, dashed=True,
                              **({"markLine": now_mark()} if n == 1 else {}))
                         for n, color in ((1, "#ffca28"), (2, "#ff8f00"))]
     chart_ = stacked_chart([((("Eingang", "#ffb300"), ("Wirkleistung", "#5c6bc0"), ("Prognose", f"={NEUTRAL_LINE}")),
                              [area("Eingang", PV, "#ffb300"), area("Wirkleistung", "huawei_inverter_active_power", "#5c6bc0"),
-                              forecast, *band], value_axis("W")),
+                              forecast], value_axis("W")),
                             ((("PV1", "#ffca28"), ("PV2", "#ff8f00")),
                              [area("PV1", "huawei_inverter_pv1_power", "#ffca28"),
                               area("PV2", "huawei_inverter_pv2_power", "#ff8f00"), *string_forecasts],
