@@ -1689,8 +1689,9 @@ def house_pie(xy=HOME_XY, r=RING_R, w=RING_W, max_w=RING_MAX, underlay=True):
 
 
 def energy_flow():
-    """The energy flow's card content: the star of eight nodes with their rings, timers, badges and links, and under
-    it the house's figures; the switches have a card of their own below it (switches-card)."""
+    """The energy flow's card content: the star of eight nodes with their rings, timers, badges and links, under it
+    the strip of the other consumers (others_strip()) and the house's figures; the switches have a card of their own
+    below it (switches-card)."""
     ac_texts = below(AC_XY, f"={fixed(f'{AC_NET} / 1000', 3)} + ' kW'", kwh(num("air_conditioning_unit_energy_today")))
     ac_texts[1]["config"].update(timer_line(M_AC, AC_BLUE, ac_texts[1]["config"]["content"]))
     # its energy today as the other nodes' second line; the level stands in its badge (user, 2026-10-06)
@@ -1772,7 +1773,60 @@ def energy_flow():
                   "flex-direction": "column", "justify-content": "center"})
     # its tiles as far in from the card's edge as the other cards' tiles (16 px, user 2026-10-05)
     strip = div([house_tiles()], **{"padding": "8px 16px 14px"})
-    return [star, strip]
+    return [star, others_strip(), strip]
+
+
+# the consumers outside the star that no card under it shows (user, 2026-11-08, proposal C; the switches' devices stand
+# in the switches card below it): a strip under the star with what the house's ring leaves grey, these consumers as
+# pills sorted by their power, tinted in the consumption card's colour while they draw more than their standby, and
+# what no meter counts last; consumption card group, the pill's name, its icon, the standby in W
+STRIP_CONSUMERS = [("Netzwerk", "Netzwerk", "router", 5), ("Kühlschrank", "Kühlschrank", "kitchen", 20),
+                   ("Wohnzimmer Medien", "Medien", "tv", 25)]
+# the consumption card's groups that are nodes of the star
+STAR_GROUPS = {"Wärmepumpe", "E-Auto", "Klimaanlage", "Lüftung", "Wäsche & Geschirr"}
+OTHERS_REST_C = "#bdbdbd"
+
+
+def power_text(expr):
+    """A power as text: W below 1 kW, kW with two decimals above."""
+    return f"((v) => v >= 1000 ? {fixed('v / 1000', 2)} + ' kW' : Math.round(v) + ' W')(Math.max(0, {expr}))"
+
+
+def others_pill(name, icon, power, color, standby):
+    """A pill of the strip: icon, name and power, tinted in color while it draws more than standby, grey at rest;
+    standby None: what no meter counts, grey, always last. Pills of more power stand first (CSS order)."""
+    on = f"(Math.max(0, {power}) > {standby})" if standby is not None else "false"
+    return div([comp("oh-icon", {"icon": f"material:{icon}", "width": 14, "height": 14,
+                                 "style": {"width": "14px", "height": "14px", "flex": "0 0 auto",
+                                           "color": f"={on} ? '{color}' : '{BADGE_OFF}'"}}),
+                label(name, **{"white-space": "nowrap"}),
+                label(f"={power_text(power)}", **{"font-weight": "700", "white-space": "nowrap"})],
+               **{"display": "inline-flex", "align-items": "center", "gap": "5px", "padding": "4px 9px",
+                  "border-radius": PILL_R, "font-size": "12px",
+                  "order": f"=-Math.round(Math.max(0, {power}))" if standby is not None else "1",
+                  "background": f"={on} ? 'color-mix(in srgb, {color} 22%, transparent)' : '{TILE_BG}'",
+                  "box-shadow": f"={on} ? 'inset 0 0 0 1.5px color-mix(in srgb, {color} 60%, transparent)' : 'none'",
+                  "opacity": "1" if standby is None else f"={on} ? 1 : 0.75"})
+
+
+def others_strip():
+    """The strip under the star: the house's power less the star's consumers (the air conditioner by its node's value,
+    its standby too, which the star's pie counts only while it is on), STRIP_CONSUMERS and what no meter counts (the
+    house less the star and every metered group outside it)."""
+    groups = {name: (items_, color) for name, items_, color in PEAK_GROUPS}
+    star = " + ".join(f"Math.max(0, {AC_NET if xy == AC_XY else power})" for xy, power, _, _ in consumers())
+    metered = " + ".join(f"Math.max(0, {num(i)})" for name, (items_, _) in groups.items() if name not in STAR_GROUPS
+                         for i in items_)
+    beyond = f"Math.max(0, {num(HOME)} - ({star}))"
+    rest = f"Math.max(0, {num(HOME)} - ({star}) - ({metered}))"
+    head = div([label("Weitere Verbraucher", **{"opacity": "0.7"}), label(f"={power_text(beyond)}",
+                                                                          **{"font-weight": "700"})],
+               **{"display": "flex", "gap": "6px", "font-size": "12px", "margin-bottom": "6px"})
+    pills = [others_pill(name, icon, "(" + " + ".join(num(i) for i in groups[group][0]) + ")", groups[group][1],
+                         standby) for group, name, icon, standby in STRIP_CONSUMERS]
+    pills.append(others_pill("Nicht gemessen", "help_outline", rest, OTHERS_REST_C, None))
+    return div([head, div(pills, **{"display": "flex", "flex-wrap": "wrap", "gap": "6px"})],
+               **{"padding": "4px 16px 0"})
 
 
 
@@ -4233,7 +4287,9 @@ parts = [
     ("Wohnzimmer Medien", ["living_room_entertainment_energy_today"], "#f48fb1"),
     ("Wäsche & Geschirr", ["dishwasher_energy_today", "washing_machine_1_energy_today",
                           "washing_machine_2_energy_today", "tumble_dryer_energy_today"], "#aed581"),
-    ("Terrasse & Fahrräder", ["terrace_light_energy_today", "bicycle_batteries_energy_today"], "#fff176"),
+    # each a group of its own since 2026-11-08 (user; one group "Terrasse & Fahrräder" before)
+    ("Terrasse", ["terrace_light_energy_today"], "#fff176"),
+    ("Fahrräder", ["bicycle_batteries_energy_today"], "#ff8a65"),
 ]
 HOME_DAY = num("home_ec_day")
 metered = " + ".join(num(i) for _, its, _ in parts for i in its)
@@ -4257,7 +4313,9 @@ PEAK_POWER = {"espaltherma_energy_today": "heatpump_power",
 PEAK_GROUPS = [(name, [PEAK_POWER.get(i, i.replace("_energy_today", "_power")) for i in its], color)
                for name, its, color in parts]
 PEAK_GROUPS.insert(1, ("E-Auto", ["e_car_power"], "#26a69a"))
-PEAK_COLORS = {**{name: color for name, _, color in PEAK_GROUPS}, "Nicht gemessen": "#e0e0e0", "Akku laden": "#4db6ac"}
+PEAK_COLORS = {**{name: color for name, _, color in PEAK_GROUPS}, "Nicht gemessen": "#e0e0e0", "Akku laden": "#4db6ac",
+               # the finished months' breakdowns before 2026-11-08, when Terrasse and Fahrräder were one group
+               "Terrasse & Fahrräder": "#fff176"}
 # rule grid_peaks: every month since October 2024 with its 7 strongest days and their breakdowns, the running first
 GRID_PEAK_BREAKDOWN = "grid_peak_breakdown"
 GRID_PEAK_MONTHLY = "grid_peak_monthly"  # the running month's strongest quarter-hour mean of the import, kW

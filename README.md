@@ -135,28 +135,31 @@ Needs `weather-icon`.
 
 A regular star around the house: PV, heat pump, air conditioner, E-Car, the household appliances together, ventilation,
 battery and grid, each with its power and today's energy; each consumer's share of the house's power in a pill on its
-line, and the house's ring as a pie of that power, the rest no known consumer draws in grey. Every node is one grey ring
-around its drawing, the ring carrying what the node shows beyond it; a working ring and its arc swell inwards and
-outwards at their brightest, about half again as wide as at rest. Dots run along the lines in the direction of the flow
-at four speeds and slide under the node rims; while power flows through a node, its ring pulses in its colour. The icons
-move with the power (sun rays, dots down the air streams and along the pylon's wires, a pulsing bolt over the middle of
-the charging car, sparkles twinkling while the appliances run, the battery filled to its state of charge, the
-ventilation unit's fan turning and its air arrows flowing, fresh air in and used air out), the heat pump, outdoor and
-indoor unit, its fan with its compressor: while only its electric heaters run it stands and the energy only flows.
-Badges just outside the rings tell what the heat pump does (space heating, hot water, defrost, a red bolt while only its
-electric heaters run), the air conditioner's mode (heating, cooling, drying, fan, automatic) and the ventilation's
-level; a badge is filled in its colour while its device works and grey otherwise. A running timer covers its device's
-ring with an arc, full at what it was last set to, the battery's ring is filled with its state of charge, and the heat
-pump's, while it charges the tank, towards the charge's expected end; beside such an arc the rest of the ring pulses
-softly and, while the node works, the arc pulses in step with it, brightest and widest with it. A tap on a node opens
-its device's page of my installation, on the house and the appliances a popup of their own. Under the star three tiles:
-the house as its node inside the pie of what the consumers draw, as large as the rings beside it, with its power and
-today's energy against yesterday's at this time in a pill (the difference in kWh), and today's self-consumption (the PV
-generation less the export, of the generation) and self-sufficiency (the consumption not taken from the grid) as rings,
-each with yesterday's whole day in a pill, green while today's share is higher, orange while lower. PV's energy is the
-strings' generation: a hybrid inverter's own day yield counts the battery's discharge and leaves out what charges the
-battery. The card places its lines and nodes as `flow-link` and `flow-node`. The recording and the dark screenshot show
-it with demo powers; today's energies and the comparisons are those of the moment shown.
+line, and the house's ring as a pie of that power, the rest no known consumer draws in grey. A strip under the star
+names that rest: the house's power less the star's consumers as Other consumers, the consumers outside the star that no
+switch tile shows (network, media, refrigerator) as pills sorted by their power, tinted while they draw more than their
+standby, and what no meter counts. Every node is one grey ring around its drawing, the ring carrying what the node shows
+beyond it; a working ring and its arc swell inwards and outwards at their brightest, about half again as wide as at
+rest. Dots run along the lines in the direction of the flow at four speeds and slide under the node rims; while power
+flows through a node, its ring pulses in its colour. The icons move with the power (sun rays, dots down the air streams
+and along the pylon's wires, a pulsing bolt over the middle of the charging car, sparkles twinkling while the appliances
+run, the battery filled to its state of charge, the ventilation unit's fan turning and its air arrows flowing, fresh air
+in and used air out), the heat pump, outdoor and indoor unit, its fan with its compressor: while only its electric
+heaters run it stands and the energy only flows. Badges just outside the rings tell what the heat pump does (space
+heating, hot water, defrost, a red bolt while only its electric heaters run), the air conditioner's mode (heating,
+cooling, drying, fan, automatic) and the ventilation's level; a badge is filled in its colour while its device works and
+grey otherwise. A running timer covers its device's ring with an arc, full at what it was last set to, the battery's
+ring is filled with its state of charge, and the heat pump's, while it charges the tank, towards the charge's expected
+end; beside such an arc the rest of the ring pulses softly and, while the node works, the arc pulses in step with it,
+brightest and widest with it. A tap on a node opens its device's page of my installation, on the house and the
+appliances a popup of their own. Under the star three tiles: the house as its node inside the pie of what the consumers
+draw, as large as the rings beside it, with its power and today's energy against yesterday's at this time in a pill (the
+difference in kWh), and today's self-consumption (the PV generation less the export, of the generation) and
+self-sufficiency (the consumption not taken from the grid) as rings, each with yesterday's whole day in a pill, green
+while today's share is higher, orange while lower. PV's energy is the strings' generation: a hybrid inverter's own day
+yield counts the battery's discharge and leaves out what charges the battery. The card places its lines and nodes as
+`flow-link` and `flow-node`. The recording and the dark screenshot show it with demo powers; today's energies and the
+comparisons are those of the moment shown.
 
 Needs `flow-link`, `flow-node`.
 
@@ -165,7 +168,7 @@ Needs `flow-link`, `flow-node`.
 ![Energy flow in dark mode](screenshots/energy-flow-card-dark.gif)
 
 <details>
-<summary>47 props</summary>
+<summary>55 props</summary>
 
 | Prop | Item | Item type |
 |---|---|---|
@@ -213,6 +216,14 @@ Needs `flow-link`, `flow-node`.
 | `dishwasherEnergyToday` | Dishwasher Energy Today | Number:Energy |
 | `batteryDischargeToday` | Huawei Inverter Energy Storage Day Discharge | Number:Energy |
 | `batteryChargeToday` | Huawei Inverter Energy Storage Day Charge | Number:Energy |
+| `networkPower` | Network Power | Number:Power |
+| `refrigeratorPower` | Refrigerator Power | Number:Power |
+| `livingRoomEntertainmentPower` | Living Room Entertainment Power | Number:Power |
+| `office1Power` | Office 1 Power | Number:Power |
+| `office2Power` | Office 2 Power | Number:Power |
+| `coffeeMachinePower` | Coffee Machine Power | Number:Power |
+| `terraceLightPower` | Terrace Light Power | Number:Power |
+| `bicycleBatteriesPower` | Bicycle Batteries Power | Number:Power |
 | `homeEnergyToday` | Home Energy Day | Number:Energy |
 | `tileHistory` | Tile history | String |
 | `pvSelfUseToday` | Photovoltaics Own Ec-Day | Number:Energy |

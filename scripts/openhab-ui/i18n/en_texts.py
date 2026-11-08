@@ -11,6 +11,7 @@ EN = {
     "PV-Ertrag": "PV yield", "Temperaturen": "Temperatures", "Temperaturen heute": "Temperatures today",
     "Verbrauch heute": "Consumption Today", "Widget-Galerie": "Widget Gallery", "Regelung": "Control",
     "Wäsche & Geschirr": "Laundry & Dishes", "Terrasse & Fahrräder": "Terrace & Bicycles", "Terrasse": "Terrace",
+    "Fahrräder": "Bicycles", "Medien": "Media", "Weitere Verbraucher": "Other consumers",
     "Büros": "Offices", "Kaffee": "Coffee", "Verbraucher": "Consumers", "Sollwerte": "Setpoints", "Modi": "Modes",
     "Verlauf": "History", "Vorhersage": "Forecast", "Warnungen": "Warnings", "Weitere Quellen": "More sources",
     # the weather page's day popup

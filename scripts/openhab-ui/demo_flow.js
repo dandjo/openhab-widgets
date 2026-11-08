@@ -22,6 +22,11 @@
     // running timers, each set to more than is left, so their arcs cover part of the ring
     air_conditioning_timer: q(135, "min", 0), air_conditioning_timer_set: q(240, "min", 0),
     ventilation_timer: q(20, "min", 0), ventilation_timer_set: q(30, "min", 0), ventilation_power: q(38, "W", 1),
+    // the plugs outside the star, so the strip under it adds up (337 W beyond the star): the refrigerator's compressor
+    // running, the media at standby, about 110 W left that no meter counts
+    network_power: q(108, "W", 1), refrigerator_power: q(86, "W", 1), living_room_entertainment_power: q(18, "W", 1),
+    office_1_power: q(14, "W", 1), office_2_power: q(0, "W", 1), coffee_machine_power: q(1, "W", 1),
+    terrace_light_power: q(0, "W", 1), bicycle_batteries_power: q(0, "W", 1),
   };
   await new Promise(r => setTimeout(r, 500));
   for (const [name, state] of Object.entries(demo)) st.setItemState(name, state);

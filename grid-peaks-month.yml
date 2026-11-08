@@ -15,7 +15,7 @@ props:
     type: TEXT
     required: true
   parameterGroups: []
-timestamp: Nov 2, 2026, 1:25:21 PM
+timestamp: Nov 8, 2026, 11:26:49 AM
 component: div
 config:
   style:
@@ -224,9 +224,10 @@ slots:
                             background: '=((c) => c ? c[1] : ''#bdbdbd'')([[''Wärmepumpe'', ''#ffb74d''], [''E-Auto'', ''#26a69a''],
                               [''Klimaanlage'', ''#4fc3f7''], [''Büros'', ''#ce93d8''], [''Netzwerk'', ''#9fa8da''], [''Lüftung'',
                               ''#80cbc4''], [''Kühlschrank'', ''#b0bec5''], [''Kaffeemaschine'', ''#bcaaa4''], [''Wohnzimmer
-                              Medien'', ''#f48fb1''], [''Wäsche & Geschirr'', ''#aed581''], [''Terrasse & Fahrräder'', ''#fff176''],
-                              [''Nicht gemessen'', (themeOptions.dark === ''dark'') ? ''#e0e0e0'' : ''#9e9e9e''], [''Akku
-                              laden'', ''#4db6ac'']].find((c) => c[0] === loop.part[0]))'
+                              Medien'', ''#f48fb1''], [''Wäsche & Geschirr'', ''#aed581''], [''Terrasse'', ''#fff176''], [''Fahrräder'',
+                              ''#ff8a65''], [''Nicht gemessen'', (themeOptions.dark === ''dark'') ? ''#e0e0e0'' : ''#9e9e9e''],
+                              [''Akku laden'', ''#4db6ac''], [''Terrasse & Fahrräder'', ''#fff176'']].find((c) => c[0] ===
+                              loop.part[0]))'
                             border-radius: 3px
                         slots:
                           default: []
@@ -268,9 +269,10 @@ slots:
                                 background: '=((c) => c ? c[1] : ''#bdbdbd'')([[''Wärmepumpe'', ''#ffb74d''], [''E-Auto'',
                                   ''#26a69a''], [''Klimaanlage'', ''#4fc3f7''], [''Büros'', ''#ce93d8''], [''Netzwerk'', ''#9fa8da''],
                                   [''Lüftung'', ''#80cbc4''], [''Kühlschrank'', ''#b0bec5''], [''Kaffeemaschine'', ''#bcaaa4''],
-                                  [''Wohnzimmer Medien'', ''#f48fb1''], [''Wäsche & Geschirr'', ''#aed581''], [''Terrasse
-                                  & Fahrräder'', ''#fff176''], [''Nicht gemessen'', (themeOptions.dark === ''dark'') ? ''#e0e0e0''
-                                  : ''#9e9e9e''], [''Akku laden'', ''#4db6ac'']].find((c) => c[0] === loop.part[0]))'
+                                  [''Wohnzimmer Medien'', ''#f48fb1''], [''Wäsche & Geschirr'', ''#aed581''], [''Terrasse'',
+                                  ''#fff176''], [''Fahrräder'', ''#ff8a65''], [''Nicht gemessen'', (themeOptions.dark ===
+                                  ''dark'') ? ''#e0e0e0'' : ''#9e9e9e''], [''Akku laden'', ''#4db6ac''], [''Terrasse & Fahrräder'',
+                                  ''#fff176'']].find((c) => c[0] === loop.part[0]))'
                             slots:
                               default: []
                           - component: Label

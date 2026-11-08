@@ -136,7 +136,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 25, 2026, 2:07:58 PM
+timestamp: Nov 8, 2026, 11:26:49 AM
 component: oh-card
 config:
   title: '=''Consumption Today · '' + ([''NULL'', ''UNDEF''].includes(items[props.homeEnergyToday].state) ? ''–'' : (items[props.homeEnergyToday].displayState
@@ -513,9 +513,15 @@ slots:
 
             :host:has(.k-c11:hover) .k-c11 { opacity: 1; }
 
-            :host:has(.k-c11:hover) .item.k-c11 { background-color: rgba(224, 224, 224, 0.4); font-weight: 700; }
+            :host:has(.k-c11:hover) .item.k-c11 { background-color: rgba(255, 138, 101, 0.4); font-weight: 700; }
 
-            :host:has(.k-c11:hover) .seg.k-c11 { transform: scaleY(1.5); }'
+            :host:has(.k-c11:hover) .seg.k-c11 { transform: scaleY(1.5); }
+
+            :host:has(.k-c12:hover) .k-c12 { opacity: 1; }
+
+            :host:has(.k-c12:hover) .item.k-c12 { background-color: rgba(224, 224, 224, 0.4); font-weight: 700; }
+
+            :host:has(.k-c12:hover) .seg.k-c12 { transform: scaleY(1.5); }'
           style: {}
         slots:
           default:
@@ -691,16 +697,13 @@ slots:
               - component: div
                 config:
                   class: seg k k-c10
-                  title: '=''Terrace & Bicycles · '' + (((Number(items[props.terraceLightEnergyToday].numericState) || 0)
-                    + (Number(items[props.bicycleBatteriesEnergyToday].numericState) || 0))).toFixed(2) + '' kWh · '' + ((Number(items[props.homeEnergyToday].numericState)
-                    || 0) > 0 ? Math.round(100 * ((Number(items[props.terraceLightEnergyToday].numericState) || 0) + (Number(items[props.bicycleBatteriesEnergyToday].numericState)
+                  title: '=''Terrace · '' + (((Number(items[props.terraceLightEnergyToday].numericState) || 0))).toFixed(2)
+                    + '' kWh · '' + ((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? Math.round(100 * ((Number(items[props.terraceLightEnergyToday].numericState)
                     || 0)) / (Number(items[props.homeEnergyToday].numericState) || 0)) : 0) + '' %'''
-                  visible: =((Number(items[props.terraceLightEnergyToday].numericState) || 0) + (Number(items[props.bicycleBatteriesEnergyToday].numericState)
-                    || 0)) > 0.005
+                  visible: =((Number(items[props.terraceLightEnergyToday].numericState) || 0)) > 0.005
                   style:
                     width: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? 100 * ((Number(items[props.terraceLightEnergyToday].numericState)
-                      || 0) + (Number(items[props.bicycleBatteriesEnergyToday].numericState) || 0)) / (Number(items[props.homeEnergyToday].numericState)
-                      || 0) : 0).toFixed(2) + ''%'''
+                      || 0)) / (Number(items[props.homeEnergyToday].numericState) || 0) : 0).toFixed(2) + ''%'''
                     height: 100%
                     background: '#fff176'
                     border-radius: 4px
@@ -709,6 +712,21 @@ slots:
               - component: div
                 config:
                   class: seg k k-c11
+                  title: '=''Bicycles · '' + (((Number(items[props.bicycleBatteriesEnergyToday].numericState) || 0))).toFixed(2)
+                    + '' kWh · '' + ((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? Math.round(100 * ((Number(items[props.bicycleBatteriesEnergyToday].numericState)
+                    || 0)) / (Number(items[props.homeEnergyToday].numericState) || 0)) : 0) + '' %'''
+                  visible: =((Number(items[props.bicycleBatteriesEnergyToday].numericState) || 0)) > 0.005
+                  style:
+                    width: '=((Number(items[props.homeEnergyToday].numericState) || 0) > 0 ? 100 * ((Number(items[props.bicycleBatteriesEnergyToday].numericState)
+                      || 0)) / (Number(items[props.homeEnergyToday].numericState) || 0) : 0).toFixed(2) + ''%'''
+                    height: 100%
+                    background: '#ff8a65'
+                    border-radius: 4px
+                slots:
+                  default: []
+              - component: div
+                config:
+                  class: seg k k-c12
                   title: '=''Not measured · '' + (Math.max(0, (Number(items[props.homeEnergyToday].numericState) || 0) - ((Number(items[props.heatpumpEnergyToday].numericState)
                     || 0) + (Number(items[props.acMeterEnergyToday].numericState) || 0) + (Number(items[props.office1EnergyToday].numericState)
                     || 0) + (Number(items[props.office2EnergyToday].numericState) || 0) + (Number(items[props.networkEnergyToday].numericState)
@@ -1668,7 +1686,7 @@ slots:
                       default: []
                   - component: Label
                     config:
-                      text: Terrace & Bicycles
+                      text: Terrace
                       style:
                         flex: '1'
                         min-width: '0'
@@ -1677,8 +1695,7 @@ slots:
                         text-overflow: ellipsis
                   - component: Label
                     config:
-                      text: =(((Number(items[props.terraceLightEnergyToday].numericState) || 0) + (Number(items[props.bicycleBatteriesEnergyToday].numericState)
-                        || 0))).toFixed(2) + ' kWh'
+                      text: =(((Number(items[props.terraceLightEnergyToday].numericState) || 0))).toFixed(2) + ' kWh'
                       style:
                         font-weight: '600'
                         white-space: nowrap
@@ -1690,34 +1707,94 @@ slots:
                         || {})) !== undefined && ((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
                         ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
                         || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.terraceLightEnergyToday]
-                        || {})) !== null) || (((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
+                        || {})) !== null)) ? (Math.abs((((Number(items[props.terraceLightEnergyToday].numericState) || 0))
+                        - ((Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y
+                        : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
+                        || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.terraceLightEnergyToday]
+                        || {}))) || 0)))) < 0.005 ? ''±0'' : ((((Number(items[props.terraceLightEnergyToday].numericState)
+                        || 0)) - ((Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
                         ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
+                        || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.terraceLightEnergyToday]
+                        || {}))) || 0))) > 0 ? ''+'' : ''−'') + (Math.abs((((Number(items[props.terraceLightEnergyToday].numericState)
+                        || 0)) - ((Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
+                        ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
+                        || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.terraceLightEnergyToday]
+                        || {}))) || 0))))).toFixed(2)) : ''–'''
+                      style:
+                        min-width: 46px
+                        text-align: right
+                        font-size: 12px
+                        font-weight: '600'
+                        white-space: nowrap
+                        color: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
+                          ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
+                          ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[(Math.abs((((Number(items[props.terraceLightEnergyToday].numericState)
+                          || 0)) - ((Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
+                          ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.terraceLightEnergyToday]
+                          || {}))) || 0)))) < 0.05 ? ''neutral'' : (((Number(items[props.terraceLightEnergyToday].numericState)
+                          || 0)) - ((Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
+                          ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.terraceLightEnergyToday]
+                          || {}))) || 0))) > 0 ? ''warn'' : ''good'')] || (({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'',
+                          ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'',
+                          ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark
+                          === ''dark'') ? 1 : 0]'
+              - component: div
+                config:
+                  class: item k k-c11
+                  style:
+                    display: flex
+                    align-items: center
+                    gap: 8px
+                    font-size: 13px
+                    break-inside: avoid
+                    margin-bottom: 2px
+                slots:
+                  default:
+                  - component: div
+                    config:
+                      style:
+                        width: 10px
+                        height: 10px
+                        border-radius: 50%
+                        background: '#ff8a65'
+                        flex: 0 0 auto
+                    slots:
+                      default: []
+                  - component: Label
+                    config:
+                      text: Bicycles
+                      style:
+                        flex: '1'
+                        min-width: '0'
+                        white-space: nowrap
+                        overflow: hidden
+                        text-overflow: ellipsis
+                  - component: Label
+                    config:
+                      text: =(((Number(items[props.bicycleBatteriesEnergyToday].numericState) || 0))).toFixed(2) + ' kWh'
+                      style:
+                        font-weight: '600'
+                        white-space: nowrap
+                  - component: Label
+                    config:
+                      text: '=((((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y
+                        + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
                         || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.bicycleBatteriesEnergyToday]
                         || {})) !== undefined && ((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
                         ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
                         || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.bicycleBatteriesEnergyToday]
-                        || {})) !== null)) ? (Math.abs((((Number(items[props.terraceLightEnergyToday].numericState) || 0)
-                        + (Number(items[props.bicycleBatteriesEnergyToday].numericState) || 0)) - ((Number(((h) => h.y2 ===
-                        undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1,
-                        Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state) ||
-                        '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.terraceLightEnergyToday]
-                        || {}))) || 0) + (Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
+                        || {})) !== null)) ? (Math.abs((((Number(items[props.bicycleBatteriesEnergyToday].numericState) ||
+                        0)) - ((Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined ?
+                        h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
+                        || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.bicycleBatteriesEnergyToday]
+                        || {}))) || 0)))) < 0.005 ? ''±0'' : ((((Number(items[props.bicycleBatteriesEnergyToday].numericState)
+                        || 0)) - ((Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
                         ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
                         || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.bicycleBatteriesEnergyToday]
-                        || {}))) || 0)))) < 0.005 ? ''±0'' : ((((Number(items[props.terraceLightEnergyToday].numericState)
-                        || 0) + (Number(items[props.bicycleBatteriesEnergyToday].numericState) || 0)) - ((Number(((h) => h.y2
-                        === undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1,
-                        Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state) ||
-                        '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.terraceLightEnergyToday]
-                        || {}))) || 0) + (Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
-                        ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
-                        || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.bicycleBatteriesEnergyToday]
-                        || {}))) || 0))) > 0 ? ''+'' : ''−'') + (Math.abs((((Number(items[props.terraceLightEnergyToday].numericState)
-                        || 0) + (Number(items[props.bicycleBatteriesEnergyToday].numericState) || 0)) - ((Number(((h) => h.y2
-                        === undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1,
-                        Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state) ||
-                        '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.terraceLightEnergyToday]
-                        || {}))) || 0) + (Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
+                        || {}))) || 0))) > 0 ? ''+'' : ''−'') + (Math.abs((((Number(items[props.bicycleBatteriesEnergyToday].numericState)
+                        || 0)) - ((Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
                         ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
                         || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.bicycleBatteriesEnergyToday]
                         || {}))) || 0))))).toFixed(2)) : ''–'''
@@ -1729,29 +1806,21 @@ slots:
                         white-space: nowrap
                         color: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
                           ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
-                          ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[(Math.abs((((Number(items[props.terraceLightEnergyToday].numericState)
-                          || 0) + (Number(items[props.bicycleBatteriesEnergyToday].numericState) || 0)) - ((Number(((h) =>
-                          h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y + (h.y2 - h.y)
-                          * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
-                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.terraceLightEnergyToday]
-                          || {}))) || 0) + (Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y ===
-                          undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1,
-                          h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
-                          : {}))[props.bicycleBatteriesEnergyToday] || {}))) || 0)))) < 0.05 ? ''neutral'' : (((Number(items[props.terraceLightEnergyToday].numericState)
-                          || 0) + (Number(items[props.bicycleBatteriesEnergyToday].numericState) || 0)) - ((Number(((h) =>
-                          h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y : h.y + (h.y2 - h.y)
-                          * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
-                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.terraceLightEnergyToday]
-                          || {}))) || 0) + (Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y ===
-                          undefined ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1,
-                          h.dt))))((((((items[props.tileHistory].state) || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state)
-                          : {}))[props.bicycleBatteriesEnergyToday] || {}))) || 0))) > 0 ? ''warn'' : ''good'')] || (({good:
-                          [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''],
-                          warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''],
-                          neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark === ''dark'') ? 1 : 0]'
+                          ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[(Math.abs((((Number(items[props.bicycleBatteriesEnergyToday].numericState)
+                          || 0)) - ((Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
+                          ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.bicycleBatteriesEnergyToday]
+                          || {}))) || 0)))) < 0.05 ? ''neutral'' : (((Number(items[props.bicycleBatteriesEnergyToday].numericState)
+                          || 0)) - ((Number(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined
+                          ? h.y : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
+                          || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.bicycleBatteriesEnergyToday]
+                          || {}))) || 0))) > 0 ? ''warn'' : ''good'')] || (({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'',
+                          ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'',
+                          ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark
+                          === ''dark'') ? 1 : 0]'
               - component: div
                 config:
-                  class: item k k-c11
+                  class: item k k-c12
                   style:
                     display: flex
                     align-items: center
