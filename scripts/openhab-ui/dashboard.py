@@ -1773,8 +1773,9 @@ def energy_flow():
                **{"padding": f"={NARROW} ? '4px' : '12px'", "flex": "1 1 auto", "display": "flex",
                   "flex-direction": "column", "justify-content": "center"})
     # its tiles as far in from the card's edge as the other cards' tiles (16 px, user 2026-10-05)
-    # the house over the strip of the other consumers (user, 2026-11-08)
-    strip = div([house_tiles()], **{"padding": "8px 16px 0"})
+    # the house over the strip of the other consumers (user, 2026-11-08), as wide as its content as they are (user,
+    # 2026-11-09)
+    strip = div([house_tiles()], **{"display": "flex", "padding": "8px 16px 0"})
     return [star, strip, others_strip()]
 
 
@@ -1782,11 +1783,12 @@ def energy_flow():
 # in the switches card below it): a strip under the star with what the house's ring leaves grey, these consumers as
 # tiles like the house's sorted by their power (user, 2026-11-09: circles as large as the house's, the tiles as wide
 # as their content, flowing), lit in the consumption card's colour while they draw more than their standby, and what
-# no meter counts last; a tap on a tile opens its device's page as a popup, as a node's does (user, 2026-11-08);
-# consumption card group, the tile's name, its icon, the standby in W, the device's page
-STRIP_CONSUMERS = [("Netzwerk", "Netzwerk", "router", 5, "network"),
-                   ("Kühlschrank", "Kühlschrank", "kitchen", 20, "refrigerator"),
-                   ("Wohnzimmer Medien", "Medien", "tv", 25, "living_room_entertainment")]
+# no meter counts last; a tap on a tile opens its device's page as a popup, as a node's does (user, 2026-11-08); its
+# circle the device's node as the star draws its nodes (user, 2026-11-09);
+# consumption card group, the tile's name, its node's kind (flow_node()), the standby in W, the device's page
+STRIP_CONSUMERS = [("Netzwerk", "Netzwerk", "network-rack", 5, "network"),
+                   ("Kühlschrank", "Kühlschrank", "refrigerator", 20, "refrigerator"),
+                   ("Wohnzimmer Medien", "Medien", "media", 25, "living_room_entertainment")]
 # the consumption card's groups that are nodes of the star
 STAR_GROUPS = {"Wärmepumpe", "E-Auto", "Klimaanlage", "Lüftung", "Wäsche & Geschirr"}
 OTHERS_REST_C = "#bdbdbd"
@@ -1797,39 +1799,45 @@ def power_text(expr):
     return f"((v) => v >= 1000 ? {fixed('v / 1000', 2)} + ' kW' : Math.round(v) + ' W')(Math.max(0, {expr}))"
 
 
-def others_tile(name, icon, power, energy, color, standby, page=None):
-    """A tile of the strip as the house's beside it: a circle as large as the house's, its ring the consumer's share of
-    the house's power now in color, its icon in the middle, lit while it draws more than standby; beside it the power,
-    the name and today's energy. As wide as its content, so the strip's tiles flow; tiles of more power stand first
-    (CSS order). standby None: what no meter counts, always last. With page, a tap anywhere on it opens that page as a
-    popup."""
-    on = f"(Math.max(0, {power}) > {standby})" if standby is not None else "false"
-    pct = f"Math.max(0, Math.min(100, Math.max(0, {power}) / Math.max(1, {num(HOME)}) * 100))"
-    tint = f"={on} ? '{color}' : '{BADGE_OFF}'"
-    ring_ = svg("svg", [svg("circle", cx=25, cy=25, r=22, fill="none", stroke="rgba(127, 127, 127, 0.28)",
-                            **{"stroke-width": 4}),
-                        svg("circle", visible=f"={pct} > 0.5", cx=25, cy=25, r=22, fill="none", stroke=color,
-                            pathLength=100, transform="rotate(-90 25 25)",
-                            **{"stroke-width": 4, "stroke-linecap": "round",
-                               "stroke-dasharray": f"={pct}.toFixed(1) + ' 100'"}),
-                        svg("circle", cx=25, cy=25, r=17, fill=f"={on} ? '{color}' : '{BADGE_OFF}'",
-                            **{"fill-opacity": "0.16"})],
-                viewBox="0 0 50 50", width=50, height=50, style={"display": "block"})
-    icon_ = comp("oh-icon", {"icon": f"material:{icon}", "width": 22, "height": 22,
-                             "style": {"position": "absolute", "left": "14px", "top": "14px", "width": "22px",
-                                       "height": "22px", "color": tint}})
-    circle = div([ring_, icon_], **{"position": "relative", "width": "50px", "height": "50px", "flex": "0 0 auto"})
-    texts = div([label(f"={power_text(power)}", **{"font-size": "13px", "font-weight": "700", "white-space": "nowrap"}),
-                 label(name, **{"font-size": "11px", "opacity": "0.7", "white-space": "nowrap"}),
-                 label(kwh(energy), **{"font-size": "11px", "opacity": "0.5", "white-space": "nowrap"})],
-                **{"display": "flex", "flex-direction": "column", "gap": "1px"})
-    link = [page_link({"position": "absolute", "inset": "0", "display": "block", "border-radius": "12px"}, page)] \
-        if page else []
-    return div([circle, texts, *link],
+TILE_NODE = 54  # px, a node of the star in a tile under it (the star draws one about 68 px wide)
+
+
+def tile_node(parts):
+    """A node drawn as the star draws it, around (0, 0) with its ring at ORBIT, small in a tile."""
+    box = ORBIT + RING_MAX / 2 + 1.75  # the ring's widest edge and a little room, as device_icon()'s
+    return svg("svg", parts, viewBox=f"{-box:g} {-box:g} {2 * box:g} {2 * box:g}", width=TILE_NODE, height=TILE_NODE,
+               style={"display": "block", "flex": "0 0 auto", "overflow": "visible"})
+
+
+def strip_tile(node, lines, link=None, order=None):
+    """A small card of the house or another consumer under the star: its node, beside it its lines of text; as wide
+    as its content, so the tiles flow and wrap (user, 2026-11-09). link: an oh-link over the whole card."""
+    texts = div(lines, **{"display": "flex", "flex-direction": "column", "gap": "1px", "min-width": "0"})
+    return div([node, texts, *([link] if link else [])],
                **{"position": "relative", "display": "flex", "align-items": "center", "gap": "10px",
                   "padding": "8px 14px 8px 10px", "border-radius": "12px", "background": TILE_BG,
-                  "flex": "0 1 auto", "min-width": "0",
-                  "order": f"=-Math.round(Math.max(0, {power}))" if standby is not None else "1"})
+                  "flex": "0 1 auto", "min-width": "0", **({"order": order} if order else {})})
+
+
+def strip_lines(power, name, energy):
+    return [label(f"={power_text(power)}", **{"font-size": "13px", "font-weight": "700", "white-space": "nowrap"}),
+            label(name, **{"font-size": "11px", "opacity": "0.7", "white-space": "nowrap"}),
+            label(kwh(energy), **{"font-size": "11px", "opacity": "0.5", "white-space": "nowrap"})]
+
+
+def others_tile(name, kind, power, energy, color, standby, page=None):
+    """A tile of the strip as the house's beside it: the device's node as the star draws a consumer's (its grey ring
+    pulsing in color while it draws more than standby, the device's drawing inside); beside it the power, the name
+    and today's energy. Tiles of more power stand first (CSS order). kind None: what no meter counts, a question mark
+    in the node, never pulsing, always last. With page, a tap anywhere on it opens that page as a popup."""
+    if kind:
+        node = [track(0, 0), flow_orbit((0, 0), color, power, standby), flow_node(kind, (0, 0), power)]
+    else:
+        node = [track(0, 0), *glyph_parts("help_outline", BADGE_OFF)]
+    link = page_link({"position": "absolute", "inset": "0", "display": "block", "border-radius": "12px"}, page) \
+        if page else None
+    return strip_tile(tile_node(node), strip_lines(power, name, energy), link,
+                      f"=-Math.round(Math.max(0, {power}))" if kind else "1")
 
 
 def others_strip():
@@ -1846,17 +1854,17 @@ def others_strip():
                                                                           **{"font-weight": "700"})],
                **{"display": "flex", "gap": "6px", "font-size": "12px", "margin-bottom": "6px"})
     energy = {name: value for name, value, _ in values}  # today's energy of the consumption card's groups
-    tiles = [others_tile(name, icon, "(" + " + ".join(num(i) for i in groups[group][0]) + ")", energy[group],
-                         groups[group][1], standby, page) for group, name, icon, standby, page in STRIP_CONSUMERS]
-    tiles.append(others_tile("Nicht gemessen", "help_outline", rest, energy["Nicht gemessen"], OTHERS_REST_C, None))
+    tiles = [others_tile(name, kind, "(" + " + ".join(num(i) for i in groups[group][0]) + ")", energy[group],
+                         groups[group][1], standby, page) for group, name, kind, standby, page in STRIP_CONSUMERS]
+    tiles.append(others_tile("Nicht gemessen", None, rest, energy["Nicht gemessen"], OTHERS_REST_C, None))
     return div([head, div(tiles, **{"display": "flex", "flex-wrap": "wrap", "gap": "8px"})],
                **{"padding": "12px 16px 14px"})
 
 
 
 def flow_tile(child, popup, **extra):
-    """A small card that opens its popup with a tap anywhere on it: the house's under the energy flow, today's
-    self-consumption and self-sufficiency on top of the consumption card."""
+    """A small card that opens its popup with a tap anywhere on it: today's self-consumption and self-sufficiency on
+    top of the consumption card."""
     link = comp("oh-link", {"action": "popup", "actionModal": f"page:{popup}",
                             "style": {"position": "absolute", "inset": "0", "display": "block",
                                       "border-radius": "12px"}})
@@ -1871,28 +1879,18 @@ def tile_ring_svg(parts):
 
 
 def house_tiles():
-    """The house's power and energy today as a small card under the star, over the strip of the other consumers, the
-    width of the card, opening its popup with a tap anywhere on it; today's self-consumption and self-sufficiency stand
-    on top of the consumption card (self_share_tiles(); user, 2026-11-08)."""
-    # a pill under the texts with today against yesterday at this time, flush with them (user, 2026-10-06); the texts
-    # rise by 10, so texts and pill stand as one block in the ring's vertical middle, and the ring in the tile's
-    # the house as its node in the star, the ring the pie of what the consumers draw, at its widest pulse as large and
-    # as wide as the self-consumption ring of the consumption card (user, 2026-10-05), SWELL times thinner at rest,
-    # swelling around its middle as the star's rings; its power and today's energy beside it
-    max_r, max_w = 22, 5  # share_ring()'s
-    w = round(max_w / SWELL, 2)
-    r = max_r - (max_w - w) / 2
-    home = tile_ring_svg([svg("circle", cx=24, cy=25, r=r, fill="none", stroke="rgba(127, 127, 127, 0.28)",
-                              **{"stroke-width": w}),
-                          *house_pie((24, 25), r, w, max_w, underlay=False),
-                          # the node's disc just inside the ring
-                          svg("g", [flow_node("home", (0, 0), num(HOME))],
-                              transform=f"translate(24 25) scale({(r - w / 2) / (ORBIT - RING_MAX / 2):.3f})"),
-                          svg_text(56, 13, f"={kw(HOME)}", 13, "700", anchor="start"),
-                          svg_text(56, 29, kwh(num("home_ec_day")), 11, anchor="start", opacity="0.5"),
-                          # without its unit, the line above names kWh: "+0,03 kWh zu gestern" did not fit the tile
-                          svg_pill(56, 34, *day_change("home_ec_day", "less", unit=""))])
-    return flow_tile(home, "flow_home")
+    """The house's power and energy today as a small card under the star, over the strip of the other consumers and
+    as wide as its content as theirs are (user, 2026-11-09), opening its popup with a tap anywhere on it; today's
+    self-consumption and self-sufficiency stand on top of the consumption card (self_share_tiles(); user,
+    2026-11-08)."""
+    # the house's node as the star draws it (user, 2026-11-09): its ring the pie of what the consumers draw; beside it
+    # its power, name and today's energy, and a pill with today against yesterday at this time (user, 2026-10-06)
+    node = tile_node([track(0, 0), *house_pie((0, 0), underlay=False), flow_node("home", (0, 0), num(HOME))])
+    link = comp("oh-link", {"action": "popup", "actionModal": "page:flow_home",
+                            "style": {"position": "absolute", "inset": "0", "display": "block",
+                                      "border-radius": "12px"}})
+    return strip_tile(node, [*strip_lines(num(HOME), "Haus", num("home_ec_day")),
+                             vt_chip(*day_change("home_ec_day", "less"))], link)
 
 
 def self_share_tiles():
