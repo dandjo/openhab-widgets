@@ -202,7 +202,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Nov 9, 2026, 10:25:29 PM
+timestamp: Nov 9, 2026, 10:48:10 PM
 component: oh-card
 config:
   title: Heating & Hot Water
@@ -1659,6 +1659,7 @@ slots:
                                   style:
                                     font-size: 12px
                                     opacity: '0.85'
+                                    white-space: nowrap
                           - component: div
                             config:
                               class: item k k-warmwasser
@@ -1693,6 +1694,7 @@ slots:
                                   style:
                                     font-size: 12px
                                     opacity: '0.85'
+                                    white-space: nowrap
                           - component: div
                             config:
                               class: item k k-standby
@@ -1737,6 +1739,7 @@ slots:
                                   style:
                                     font-size: 12px
                                     opacity: '0.85'
+                                    white-space: nowrap
                       - component: Label
                         config:
                           text: '=(Math.abs(((Number(items[props.heatpumpEnergyToday].numericState) || 0) - Number(((h) =>
@@ -1981,6 +1984,7 @@ slots:
                                   style:
                                     font-size: 12px
                                     opacity: '0.85'
+                                    white-space: nowrap
                           - component: div
                             config:
                               class: item k k-warmwasser
@@ -2017,6 +2021,7 @@ slots:
                                   style:
                                     font-size: 12px
                                     opacity: '0.85'
+                                    white-space: nowrap
                       - component: Label
                         config:
                           text: '=(Math.abs(((Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0) - Number(((h)

@@ -137,27 +137,28 @@ A regular star around the house: PV, heat pump, air conditioner, E-Car, the hous
 battery and grid, each with its power and today's energy; each consumer's share of the house's power in a pill on its
 line, and the house's ring as a pie of that power, the rest no known consumer draws in grey. A strip under the house's
 tile names that rest: the house's power less the star's consumers as Other consumers, the consumers outside the star
-that no switch tile shows (network, media, refrigerator) as pills sorted by their power, tinted while they draw more
-than their standby, each opening its device's page with a tap, and what no meter counts. Every node is one grey ring
-around its drawing, the ring carrying what the node shows beyond it; a working ring and its arc swell inwards and
-outwards at their brightest, about half again as wide as at rest. Dots run along the lines in the direction of the flow
-at four speeds and slide under the node rims; while power flows through a node, its ring pulses in its colour. The icons
-move with the power (sun rays, dots down the air streams and along the pylon's wires, a pulsing bolt over the middle of
-the charging car, sparkles twinkling while the appliances run, the battery filled to its state of charge, the
-ventilation unit's fan turning and its air arrows flowing, fresh air in and used air out), the heat pump, outdoor and
-indoor unit, its fan with its compressor: while only its electric heaters run it stands and the energy only flows.
-Badges just outside the rings tell what the heat pump does (space heating, hot water, defrost, a red bolt while only its
-electric heaters run), the air conditioner's mode (heating, cooling, drying, fan, automatic) and the ventilation's
-level; a badge is filled in its colour while its device works and grey otherwise. A running timer covers its device's
-ring with an arc, full at what it was last set to, the battery's ring is filled with its state of charge, and the heat
-pump's, while it charges the tank, towards the charge's expected end; beside such an arc the rest of the ring pulses
-softly and, while the node works, the arc pulses in step with it, brightest and widest with it. A tap on a node opens
-its device's page of my installation, on the house and the appliances a popup of their own. Under the star a tile: the
-house as its node inside the pie of what the consumers draw, with its power and today's energy against yesterday's at
-this time in a pill (the difference in kWh). PV's energy is the strings' generation: a hybrid inverter's own day yield
-counts the battery's discharge and leaves out what charges the battery. The card places its lines and nodes as
-`flow-link` and `flow-node`. The recording and the dark screenshot show it with demo powers; today's energies and the
-comparisons are those of the moment shown.
+that no switch tile shows (network, media, refrigerator) as small tiles like the house's, as wide as their content and
+wrapping, sorted by their power: a circle whose ring is the consumer's share of the house's power, its icon lit while it
+draws more than its standby, beside it the power, the name and today's energy, each opening its device's page with a
+tap, and what no meter counts. Every node is one grey ring around its drawing, the ring carrying what the node shows
+beyond it; a working ring and its arc swell inwards and outwards at their brightest, about half again as wide as at
+rest. Dots run along the lines in the direction of the flow at four speeds and slide under the node rims; while power
+flows through a node, its ring pulses in its colour. The icons move with the power (sun rays, dots down the air streams
+and along the pylon's wires, a pulsing bolt over the middle of the charging car, sparkles twinkling while the appliances
+run, the battery filled to its state of charge, the ventilation unit's fan turning and its air arrows flowing, fresh air
+in and used air out), the heat pump, outdoor and indoor unit, its fan with its compressor: while only its electric
+heaters run it stands and the energy only flows. Badges just outside the rings tell what the heat pump does (space
+heating, hot water, defrost, a red bolt while only its electric heaters run), the air conditioner's mode (heating,
+cooling, drying, fan, automatic) and the ventilation's level; a badge is filled in its colour while its device works and
+grey otherwise. A running timer covers its device's ring with an arc, full at what it was last set to, the battery's
+ring is filled with its state of charge, and the heat pump's, while it charges the tank, towards the charge's expected
+end; beside such an arc the rest of the ring pulses softly and, while the node works, the arc pulses in step with it,
+brightest and widest with it. A tap on a node opens its device's page of my installation, on the house and the
+appliances a popup of their own. Under the star a tile: the house as its node inside the pie of what the consumers draw,
+with its power and today's energy against yesterday's at this time in a pill (the difference in kWh). PV's energy is the
+strings' generation: a hybrid inverter's own day yield counts the battery's discharge and leaves out what charges the
+battery. The card places its lines and nodes as `flow-link` and `flow-node`. The recording and the dark screenshot show
+it with demo powers; today's energies and the comparisons are those of the moment shown.
 
 Needs `flow-link`, `flow-node`.
 
@@ -166,7 +167,7 @@ Needs `flow-link`, `flow-node`.
 ![Energy flow in dark mode](screenshots/energy-flow-card-dark.gif)
 
 <details>
-<summary>54 props</summary>
+<summary>63 props</summary>
 
 | Prop | Item | Item type |
 |---|---|---|
@@ -217,13 +218,22 @@ Needs `flow-link`, `flow-node`.
 | `homeEnergyToday` | Home Energy Day | Number:Energy |
 | `tileHistory` | Tile history | String |
 | `networkPower` | Network Power | Number:Power |
+| `networkEnergyToday` | Network Energy Today | Number:Energy |
 | `refrigeratorPower` | Refrigerator Power | Number:Power |
+| `refrigeratorEnergyToday` | Refrigerator Energy Today | Number:Energy |
 | `livingRoomEntertainmentPower` | Living Room Entertainment Power | Number:Power |
+| `livingRoomEntertainmentEnergyToday` | Living Room Entertainment Energy Today | Number:Energy |
 | `office1Power` | Office 1 Power | Number:Power |
 | `office2Power` | Office 2 Power | Number:Power |
 | `coffeeMachinePower` | Coffee Machine Power | Number:Power |
 | `terraceLightPower` | Terrace Light Power | Number:Power |
 | `bicycleBatteriesPower` | Bicycle Batteries Power | Number:Power |
+| `acMeterEnergyToday` | Air Conditioning Energy Today | Number:Energy |
+| `office1EnergyToday` | Office 1 Energy Today | Number:Energy |
+| `office2EnergyToday` | Office 2 Energy Today | Number:Energy |
+| `coffeeMachineEnergyToday` | Coffee Machine Energy Today | Number:Energy |
+| `terraceLightEnergyToday` | Terrace Light Energy Today | Number:Energy |
+| `bicycleBatteriesEnergyToday` | Bicycle Batteries Energy Today | Number:Energy |
 
 </details>
 
@@ -514,10 +524,11 @@ Needs `boost-pill`, `flow-node`, `ground-floor-quick`, `heatpump-circuit-quick`,
 On top today's self-consumption (the PV generation less the export, of the generation) and self-sufficiency (the
 consumption not taken from the grid) as rings, each with yesterday's whole day in a pill, green while today's share is
 higher, orange while lower (the prop selfRow hides them where the page shows them already). Below, today's consumption
-as one bar split by source (PV with the battery, the grid less what charged the battery from it), the total against
-yesterday at this time in a pill between the two shares (the difference in kWh), and as one bar split by consumer, with
-a legend in two columns that gives each consumer's energy and how many kWh more (orange) or fewer (green) it drew than
-yesterday until this time; hovering a part lifts it everywhere. The screenshot shows it with demo values.
+as a ring split by source (PV with the battery, the grid less what charged the battery from it) with the total inside,
+beside it each source's share and kWh and the total against yesterday at this time in a pill (the difference in kWh),
+and as one bar split by consumer, with a legend in two columns that gives each consumer's energy and how many kWh more
+(orange) or fewer (green) it drew than yesterday until this time; hovering a part lifts it everywhere. The screenshot
+shows it with demo values.
 
 ![Consumption today](screenshots/consumption-card.png)
 

@@ -30,6 +30,7 @@ EN = {
     "Timer bis": "timer until", "vergangen": "elapsed", "übrig": "left", "fertig um": "done at",
     "Fertig um": "Done at", "Aus PV": "From PV",
     "Aus dem Netz": "From the grid", "aus PV": "from PV", "aus dem Netz": "from the grid", "Haus": "Home",
+    "Herkunft": "Source",
     "Strompreis gesamt": "Electricity price", "Läuft": "Running", "nichts": "nothing", "lädt": "charging",
     "CO₂": "CO₂", "Luftfeuchtigkeit": "Humidity", "Stufe": "Level", "Timer": "Timer", "Geschirrspüler": "Dishwasher",
     "Waschmaschine 1": "Washing Machine 1", "Waschmaschine 2": "Washing Machine 2",

@@ -1780,9 +1780,10 @@ def energy_flow():
 
 # the consumers outside the star that no card under it shows (user, 2026-11-08, proposal C; the switches' devices stand
 # in the switches card below it): a strip under the star with what the house's ring leaves grey, these consumers as
-# pills sorted by their power, tinted in the consumption card's colour while they draw more than their standby, and
-# what no meter counts last; a tap on a pill opens its device's page as a popup, as a node's does (user, 2026-11-08);
-# consumption card group, the pill's name, its icon, the standby in W, the device's page
+# tiles like the house's sorted by their power (user, 2026-11-09: circles as large as the house's, the tiles as wide
+# as their content, flowing), lit in the consumption card's colour while they draw more than their standby, and what
+# no meter counts last; a tap on a tile opens its device's page as a popup, as a node's does (user, 2026-11-08);
+# consumption card group, the tile's name, its icon, the standby in W, the device's page
 STRIP_CONSUMERS = [("Netzwerk", "Netzwerk", "router", 5, "network"),
                    ("Kühlschrank", "Kühlschrank", "kitchen", 20, "refrigerator"),
                    ("Wohnzimmer Medien", "Medien", "tv", 25, "living_room_entertainment")]
@@ -1796,25 +1797,39 @@ def power_text(expr):
     return f"((v) => v >= 1000 ? {fixed('v / 1000', 2)} + ' kW' : Math.round(v) + ' W')(Math.max(0, {expr}))"
 
 
-def others_pill(name, icon, power, color, standby, page=None):
-    """A pill of the strip: icon, name and power, tinted in color while it draws more than standby, grey at rest;
-    standby None: what no meter counts, grey, always last. Pills of more power stand first (CSS order). With page, a
-    tap anywhere on it opens that page as a popup."""
+def others_tile(name, icon, power, energy, color, standby, page=None):
+    """A tile of the strip as the house's beside it: a circle as large as the house's, its ring the consumer's share of
+    the house's power now in color, its icon in the middle, lit while it draws more than standby; beside it the power,
+    the name and today's energy. As wide as its content, so the strip's tiles flow; tiles of more power stand first
+    (CSS order). standby None: what no meter counts, always last. With page, a tap anywhere on it opens that page as a
+    popup."""
     on = f"(Math.max(0, {power}) > {standby})" if standby is not None else "false"
-    link = [page_link({"position": "absolute", "inset": "0", "display": "block", "border-radius": PILL_R}, page)] \
+    pct = f"Math.max(0, Math.min(100, Math.max(0, {power}) / Math.max(1, {num(HOME)}) * 100))"
+    tint = f"={on} ? '{color}' : '{BADGE_OFF}'"
+    ring_ = svg("svg", [svg("circle", cx=25, cy=25, r=22, fill="none", stroke="rgba(127, 127, 127, 0.28)",
+                            **{"stroke-width": 4}),
+                        svg("circle", visible=f"={pct} > 0.5", cx=25, cy=25, r=22, fill="none", stroke=color,
+                            pathLength=100, transform="rotate(-90 25 25)",
+                            **{"stroke-width": 4, "stroke-linecap": "round",
+                               "stroke-dasharray": f"={pct}.toFixed(1) + ' 100'"}),
+                        svg("circle", cx=25, cy=25, r=17, fill=f"={on} ? '{color}' : '{BADGE_OFF}'",
+                            **{"fill-opacity": "0.16"})],
+                viewBox="0 0 50 50", width=50, height=50, style={"display": "block"})
+    icon_ = comp("oh-icon", {"icon": f"material:{icon}", "width": 22, "height": 22,
+                             "style": {"position": "absolute", "left": "14px", "top": "14px", "width": "22px",
+                                       "height": "22px", "color": tint}})
+    circle = div([ring_, icon_], **{"position": "relative", "width": "50px", "height": "50px", "flex": "0 0 auto"})
+    texts = div([label(f"={power_text(power)}", **{"font-size": "13px", "font-weight": "700", "white-space": "nowrap"}),
+                 label(name, **{"font-size": "11px", "opacity": "0.7", "white-space": "nowrap"}),
+                 label(kwh(energy), **{"font-size": "11px", "opacity": "0.5", "white-space": "nowrap"})],
+                **{"display": "flex", "flex-direction": "column", "gap": "1px"})
+    link = [page_link({"position": "absolute", "inset": "0", "display": "block", "border-radius": "12px"}, page)] \
         if page else []
-    return div([comp("oh-icon", {"icon": f"material:{icon}", "width": 14, "height": 14,
-                                 "style": {"width": "14px", "height": "14px", "flex": "0 0 auto",
-                                           "color": f"={on} ? '{color}' : '{BADGE_OFF}'"}}),
-                label(name, **{"white-space": "nowrap"}),
-                label(f"={power_text(power)}", **{"font-weight": "700", "white-space": "nowrap"}), *link],
-               **{"position": "relative", "display": "inline-flex", "align-items": "center", "gap": "5px",
-                  "padding": "4px 9px",
-                  "border-radius": PILL_R, "font-size": "12px",
-                  "order": f"=-Math.round(Math.max(0, {power}))" if standby is not None else "1",
-                  "background": f"={on} ? 'color-mix(in srgb, {color} 22%, transparent)' : '{TILE_BG}'",
-                  "box-shadow": f"={on} ? 'inset 0 0 0 1.5px color-mix(in srgb, {color} 60%, transparent)' : 'none'",
-                  "opacity": "1" if standby is None else f"={on} ? 1 : 0.75"})
+    return div([circle, texts, *link],
+               **{"position": "relative", "display": "flex", "align-items": "center", "gap": "10px",
+                  "padding": "8px 14px 8px 10px", "border-radius": "12px", "background": TILE_BG,
+                  "flex": "0 1 auto", "min-width": "0",
+                  "order": f"=-Math.round(Math.max(0, {power}))" if standby is not None else "1"})
 
 
 def others_strip():
@@ -1830,10 +1845,11 @@ def others_strip():
     head = div([label("Weitere Verbraucher", **{"opacity": "0.7"}), label(f"={power_text(beyond)}",
                                                                           **{"font-weight": "700"})],
                **{"display": "flex", "gap": "6px", "font-size": "12px", "margin-bottom": "6px"})
-    pills = [others_pill(name, icon, "(" + " + ".join(num(i) for i in groups[group][0]) + ")", groups[group][1],
-                         standby, page) for group, name, icon, standby, page in STRIP_CONSUMERS]
-    pills.append(others_pill("Nicht gemessen", "help_outline", rest, OTHERS_REST_C, None))
-    return div([head, div(pills, **{"display": "flex", "flex-wrap": "wrap", "gap": "6px"})],
+    energy = {name: value for name, value, _ in values}  # today's energy of the consumption card's groups
+    tiles = [others_tile(name, icon, "(" + " + ".join(num(i) for i in groups[group][0]) + ")", energy[group],
+                         groups[group][1], standby, page) for group, name, icon, standby, page in STRIP_CONSUMERS]
+    tiles.append(others_tile("Nicht gemessen", "help_outline", rest, energy["Nicht gemessen"], OTHERS_REST_C, None))
+    return div([head, div(tiles, **{"display": "flex", "flex-wrap": "wrap", "gap": "8px"})],
                **{"padding": "12px 16px 14px"})
 
 
@@ -3088,32 +3104,32 @@ PART_GAP = 1.6  # per cent of a ring left free between two of its parts
 
 
 def part_shares(total, parts):
-    """(name, item, colour, share, before) per part: its per cent of total and the per cent of the parts before it,
-    clamped so they never add up beyond 100; 0 while the total is."""
+    """(key, name, value, colour, share, before) per part (key, name, value, colour): its per cent of total and the
+    per cent of the parts before it, clamped so they never add up beyond 100; 0 while the total is."""
     out, before = [], "0"
-    for name, item, color in parts:
-        share = f"({total} > 0 ? Math.max(0, Math.min(100 * {num(item)} / {total}, 100 - {before})) : 0)"
-        out.append((name, item, color, share, before))
+    for key, name, value, color in parts:
+        share = f"({total} > 0 ? Math.max(0, Math.min(100 * {value} / {total}, 100 - {before})) : 0)"
+        out.append((key, name, value, color, share, before))
         before = f"({before} + {share})"
     return out
 
 
-def split_ring(title, total_item, parts, better):
-    """Today's energy as a ring of its parts in a small card, as the COPs' rings under it stand (user, 2026-11-09:
-    rings, after pies with their shares written in looked bad): each part an arc in its colour, clockwise from the
-    top, PART_GAP apart, the total inside; beside it the title, each part's share in per cent behind a dot in its
-    colour (from 1 %) and the pill against yesterday. An arc's tooltip names the part with its kWh; hovering an arc
-    or a share lifts that part in both rings and the legend (hover_group(), keyed by the part's lower-case name).
-    Grey while nothing counts yet."""
+def split_ring(title, total_item, parts, better, named=False):
+    """Today's energy as a ring of its parts (key, name, value expression, colour) in a small card, as the COPs' rings
+    under it stand (user, 2026-11-09: rings, after pies with their shares written in looked bad): each part an arc in
+    its colour, clockwise from the top, PART_GAP apart, the total inside; beside it the title, each part's share in
+    per cent behind a dot in its colour (from 1 %), with its name and kWh where named (no legend names them), and the
+    pill against yesterday. An arc's tooltip names the part with its kWh; hovering an arc or a share lifts that part
+    wherever its key stands in the hover group (hover_group()). Grey while nothing counts yet."""
     total = num(total_item)
     split = part_shares(total, parts)
     arcs = []
-    for name, item, color, share, before in split:
+    for key, name, value, color, share, before in split:
         # its own transform lifts it, so the turn to the top sits on the group around the arcs
-        arcs.append(svg("circle", [svg("title", content=f"='{name} · ' + {fixed(num(item), 2)} + ' kWh'")],
+        arcs.append(svg("circle", [svg("title", content=f"='{name} · ' + {fixed(value, 2)} + ' kWh'")],
                         visible=f"={share} > 0.05", cx=25, cy=25, r=20, fill="none", stroke=color, pathLength=100,
                         style={"transform-box": "fill-box", "transform-origin": "center"},
-                        **{"class": f"wedge k k-{name.lower()}", "stroke-width": 7,
+                        **{"class": f"wedge k k-{key}", "stroke-width": 7,
                            "stroke-dasharray": f"=Math.max(0, {share} - ({share} < 99.9 ? {PART_GAP} : 0))"
                                                f".toFixed(2) + ' 100'",
                            "stroke-dashoffset": f"=(-({before} + {PART_GAP / 2})).toFixed(2)"}))
@@ -3124,13 +3140,17 @@ def split_ring(title, total_item, parts, better):
                         svg_text(25, 34, "kWh", 6, opacity="0.6")],
                 viewBox="0 0 50 50", width=66, height=66,
                 style={"display": "block", "flex": "0 0 auto", "overflow": "visible"})
-    shares = div([keyed(f"item k k-{name.lower()}",
+    # a name as a literal of its own, which the repository's English texts translate whole
+    text = (lambda name, value, share: f"=Math.round({share}) + ' % ' + '{name}' + ' · ' + {fixed(value, 1)} + ' kWh'"
+            ) if named else (lambda name, value, share: f"=Math.round({share}) + ' %'")
+    shares = div([keyed(f"item k k-{key}",
                         [div([], **{"width": "8px", "height": "8px", "border-radius": "50%", "background": color}),
-                         label(f"=Math.round({share}) + ' %'", **{"font-size": "12px", "opacity": "0.85"})],
+                         label(text(name, value, share), **{"font-size": "12px", "opacity": "0.85",
+                                                            "white-space": "nowrap"})],
                         visible=f"=Math.round({share}) >= 1",
                         style={"display": "flex", "align-items": "center", "gap": "4px"})
-                  for name, item, color, share, _ in split],
-                 **{"display": "flex", "flex-wrap": "wrap", "gap": "2px 8px"})
+                  for key, name, value, color, share, _ in split],
+                 **{"display": "flex", "flex-wrap": "wrap", "gap": "2px 12px" if named else "2px 8px"})
     # the pill never reaches past the card; where a card leaves too little room it is cut short
     chip = vt_chip(*day_change(total_item, better))
     chip["config"]["style"].update({"max-width": "100%", "overflow": "hidden", "text-overflow": "ellipsis"})
@@ -3197,13 +3217,14 @@ def hp_day_split():
     other where the card is too narrow for two (a phone) so their texts keep their room, with their legend; hovering a
     part lifts it, the same part in the other ring and its legend entry, as in Consumption Today."""
     # the chips against yesterday in kWh, as Verbrauch heute (user, 2026-10-07)
+    parts = lambda *spec: [(name.lower(), name, num(item), color) for name, item, color in spec]
     rings = div([split_ring("Electricity Today", "espaltherma_energy_today",
-                            [("Heizung", "espaltherma_energy_space_today", SPACE_C),
-                             ("Warmwasser", "espaltherma_energy_dhw_today", DHW_C),
-                             ("Standby", "espaltherma_energy_standby_today", STANDBY_C)], "less"),
+                            parts(("Heizung", "espaltherma_energy_space_today", SPACE_C),
+                                  ("Warmwasser", "espaltherma_energy_dhw_today", DHW_C),
+                                  ("Standby", "espaltherma_energy_standby_today", STANDBY_C)), "less"),
                  split_ring("Heat Today", "espaltherma_heating_energy_today",
-                            [("Heizung", "espaltherma_heating_energy_space_today", SPACE_C),
-                             ("Warmwasser", "espaltherma_heating_energy_dhw_today", DHW_C)], "more")],
+                            parts(("Heizung", "espaltherma_heating_energy_space_today", SPACE_C),
+                                  ("Warmwasser", "espaltherma_heating_energy_dhw_today", DHW_C)), "more")],
                 **{"display": "grid", "gap": "8px", "margin-bottom": "10px",
                    "grid-template-columns": "repeat(auto-fit, minmax(225px, 1fr))"})
     return [hover_group([
@@ -4439,32 +4460,20 @@ def legend_row(key, name, value, color, items_=None):
                "break-inside": "avoid", "margin-bottom": "2px"})
 
 
-def source_head(key, value, title, color, align):
-    return keyed(f"item k k-{key}", [
-        label(f"={share(value)} + ' %'", **{**HERO, "color": color}),
-        label(f"='{title} · ' + {fixed(value, 1)} + ' kWh'", **{"font-size": "12px", "opacity": "0.7"})],
-        style={"text-align": align})
-
-
 def consumption_content():
-    """Today's consumption card: from PV and from the grid with the total's change against yesterday in their middle,
+    """Today's consumption card: from PV and from the grid as a ring with the total inside and the total's change
+    against yesterday beside it (split_ring(); user, 2026-11-09: a ring as the heating card's, instead of the bar),
     the consumers' bar and list, each with its change (user, 2026-10-06)."""
-    # in kWh, as the consumers' column beside it (user, 2026-10-07)
-    total = vt_chip(*day_change("home_ec_day", "less"))
-    total["config"]["style"]["justify-self"] = "center"
     # today's self-consumption and self-sufficiency as its top row (user, 2026-11-08: from under the energy flow),
     # unless the place shows them already (props.selfRow false: the house's popup, whose Heute has their rings)
     shares = div([self_share_tiles()], "=props.selfRow !== false && props.selfRow !== 'false'",
                  **{"margin-bottom": "14px"})
     return [div([
     shares,
-    hover_group([div([source_head("pv", FROM_PV, "aus PV", "#43a047", "left"), total,
-                      source_head("grid", FROM_GRID, "aus dem Netz", "#e53935", "right")],
-                     **{"display": "grid", "grid-template-columns": "1fr auto 1fr", "align-items": "center",
-                        "gap": "8px", "margin-bottom": "6px"}),
-                 segment_bar([segment("pv", FROM_PV, PV_GREEN, "=" + share(FROM_PV) + " + ' % aus PV'"),
-                              segment("grid", FROM_GRID, GRID_RED, "=" + share(FROM_GRID) + " + ' % aus dem Netz'")],
-                             "10px")],
+    # the pill in kWh, as the consumers' column below (user, 2026-10-07)
+    hover_group([split_ring("Herkunft", "home_ec_day", [("pv", "aus PV", FROM_PV, PV_GREEN),
+                                                        ("grid", "aus dem Netz", FROM_GRID, GRID_RED)],
+                            "less", named=True)],
                 [("pv", PV_GREEN), ("grid", GRID_RED)]),
     label("Consumers", **{"font-size": "13px", "opacity": "0.7", "margin": "16px 0 6px"}),
     hover_group([segment_bar([segment(f"c{i}", v, c, f"='{n} · ' + {fixed(v, 2)} + ' kWh · ' + {share(v)} + ' %'")
