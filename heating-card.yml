@@ -202,7 +202,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Nov 9, 2026, 9:19:48 PM
+timestamp: Nov 9, 2026, 10:25:29 PM
 component: oh-card
 config:
   title: Heating & Hot Water
@@ -1422,7 +1422,7 @@ slots:
                 display: grid
                 gap: 8px
                 margin-bottom: 10px
-                grid-template-columns: '=screen.width < 600 ? ''minmax(0, 1fr)'' : ''repeat(2, minmax(0, 1fr))'''
+                grid-template-columns: repeat(auto-fit, minmax(225px, 1fr))
             slots:
               default:
               - component: div
@@ -1430,7 +1430,7 @@ slots:
                   style:
                     display: flex
                     align-items: center
-                    gap: 12px
+                    gap: 14px
                     padding: 10px 12px
                     border-radius: 12px
                     background: color-mix(in srgb, var(--f7-text-color) 6%, transparent)
@@ -1440,8 +1440,8 @@ slots:
                   - component: svg
                     config:
                       viewBox: 0 0 50 50
-                      width: 64
-                      height: 64
+                      width: 66
+                      height: 66
                       style:
                         display: block
                         flex: 0 0 auto
@@ -1452,8 +1452,11 @@ slots:
                         config:
                           cx: 25
                           cy: 25
-                          r: 24
-                          fill: rgba(127, 127, 127, 0.25)
+                          r: 20
+                          fill: none
+                          stroke: rgba(127, 127, 127, 0.25)
+                          stroke-width: 7
+                          visible: =(Number(items[props.heatpumpEnergyToday].numericState) || 0) <= 0
                       - component: g
                         config:
                           transform: rotate(-90 25 25)
@@ -1463,7 +1466,7 @@ slots:
                             config:
                               cx: 25
                               cy: 25
-                              r: 12.0
+                              r: 20
                               fill: none
                               stroke: '#ffb74d'
                               pathLength: 100
@@ -1471,11 +1474,14 @@ slots:
                                 transform-box: fill-box
                                 transform-origin: center
                               class: wedge k k-heizung
-                              stroke-width: 24
-                              stroke-dasharray: '=((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ? Math.max(0,
-                                Math.min(100 * (Number(items[props.heatpumpEnergySpaceToday].numericState) || 0) / (Number(items[props.heatpumpEnergyToday].numericState)
-                                || 0), 100 - 0)) : 0).toFixed(2) + '' 100'''
-                              stroke-dashoffset: =(-0).toFixed(2)
+                              stroke-width: 7
+                              stroke-dasharray: '=Math.max(0, ((Number(items[props.heatpumpEnergyToday].numericState) || 0)
+                                > 0 ? Math.max(0, Math.min(100 * (Number(items[props.heatpumpEnergySpaceToday].numericState)
+                                || 0) / (Number(items[props.heatpumpEnergyToday].numericState) || 0), 100 - 0)) : 0) - (((Number(items[props.heatpumpEnergyToday].numericState)
+                                || 0) > 0 ? Math.max(0, Math.min(100 * (Number(items[props.heatpumpEnergySpaceToday].numericState)
+                                || 0) / (Number(items[props.heatpumpEnergyToday].numericState) || 0), 100 - 0)) : 0) < 99.9
+                                ? 1.6 : 0)).toFixed(2) + '' 100'''
+                              stroke-dashoffset: =(-(0 + 0.8)).toFixed(2)
                               visible: '=((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ? Math.max(0, Math.min(100
                                 * (Number(items[props.heatpumpEnergySpaceToday].numericState) || 0) / (Number(items[props.heatpumpEnergyToday].numericState)
                                 || 0), 100 - 0)) : 0) > 0.05'
@@ -1489,7 +1495,7 @@ slots:
                             config:
                               cx: 25
                               cy: 25
-                              r: 12.0
+                              r: 20
                               fill: none
                               stroke: '#e57373'
                               pathLength: 100
@@ -1497,15 +1503,20 @@ slots:
                                 transform-box: fill-box
                                 transform-origin: center
                               class: wedge k k-warmwasser
-                              stroke-width: 24
-                              stroke-dasharray: '=((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ? Math.max(0,
-                                Math.min(100 * (Number(items[props.heatpumpEnergyDhwToday].numericState) || 0) / (Number(items[props.heatpumpEnergyToday].numericState)
+                              stroke-width: 7
+                              stroke-dasharray: '=Math.max(0, ((Number(items[props.heatpumpEnergyToday].numericState) || 0)
+                                > 0 ? Math.max(0, Math.min(100 * (Number(items[props.heatpumpEnergyDhwToday].numericState)
+                                || 0) / (Number(items[props.heatpumpEnergyToday].numericState) || 0), 100 - (0 + ((Number(items[props.heatpumpEnergyToday].numericState)
+                                || 0) > 0 ? Math.max(0, Math.min(100 * (Number(items[props.heatpumpEnergySpaceToday].numericState)
+                                || 0) / (Number(items[props.heatpumpEnergyToday].numericState) || 0), 100 - 0)) : 0)))) :
+                                0) - (((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ? Math.max(0, Math.min(100
+                                * (Number(items[props.heatpumpEnergyDhwToday].numericState) || 0) / (Number(items[props.heatpumpEnergyToday].numericState)
                                 || 0), 100 - (0 + ((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ? Math.max(0,
                                 Math.min(100 * (Number(items[props.heatpumpEnergySpaceToday].numericState) || 0) / (Number(items[props.heatpumpEnergyToday].numericState)
-                                || 0), 100 - 0)) : 0)))) : 0).toFixed(2) + '' 100'''
-                              stroke-dashoffset: '=(-(0 + ((Number(items[props.heatpumpEnergyToday].numericState) || 0) >
+                                || 0), 100 - 0)) : 0)))) : 0) < 99.9 ? 1.6 : 0)).toFixed(2) + '' 100'''
+                              stroke-dashoffset: '=(-((0 + ((Number(items[props.heatpumpEnergyToday].numericState) || 0) >
                                 0 ? Math.max(0, Math.min(100 * (Number(items[props.heatpumpEnergySpaceToday].numericState)
-                                || 0) / (Number(items[props.heatpumpEnergyToday].numericState) || 0), 100 - 0)) : 0))).toFixed(2)'
+                                || 0) / (Number(items[props.heatpumpEnergyToday].numericState) || 0), 100 - 0)) : 0)) + 0.8)).toFixed(2)'
                               visible: '=((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ? Math.max(0, Math.min(100
                                 * (Number(items[props.heatpumpEnergyDhwToday].numericState) || 0) / (Number(items[props.heatpumpEnergyToday].numericState)
                                 || 0), 100 - (0 + ((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ? Math.max(0,
@@ -1521,7 +1532,7 @@ slots:
                             config:
                               cx: 25
                               cy: 25
-                              r: 12.0
+                              r: 20
                               fill: none
                               stroke: '#b0bec5'
                               pathLength: 100
@@ -1529,8 +1540,17 @@ slots:
                                 transform-box: fill-box
                                 transform-origin: center
                               class: wedge k k-standby
-                              stroke-width: 24
-                              stroke-dasharray: '=((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ? Math.max(0,
+                              stroke-width: 7
+                              stroke-dasharray: '=Math.max(0, ((Number(items[props.heatpumpEnergyToday].numericState) || 0)
+                                > 0 ? Math.max(0, Math.min(100 * (Number(items[props.heatpumpEnergyStandbyToday].numericState)
+                                || 0) / (Number(items[props.heatpumpEnergyToday].numericState) || 0), 100 - ((0 + ((Number(items[props.heatpumpEnergyToday].numericState)
+                                || 0) > 0 ? Math.max(0, Math.min(100 * (Number(items[props.heatpumpEnergySpaceToday].numericState)
+                                || 0) / (Number(items[props.heatpumpEnergyToday].numericState) || 0), 100 - 0)) : 0)) + ((Number(items[props.heatpumpEnergyToday].numericState)
+                                || 0) > 0 ? Math.max(0, Math.min(100 * (Number(items[props.heatpumpEnergyDhwToday].numericState)
+                                || 0) / (Number(items[props.heatpumpEnergyToday].numericState) || 0), 100 - (0 + ((Number(items[props.heatpumpEnergyToday].numericState)
+                                || 0) > 0 ? Math.max(0, Math.min(100 * (Number(items[props.heatpumpEnergySpaceToday].numericState)
+                                || 0) / (Number(items[props.heatpumpEnergyToday].numericState) || 0), 100 - 0)) : 0)))) :
+                                0)))) : 0) - (((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ? Math.max(0,
                                 Math.min(100 * (Number(items[props.heatpumpEnergyStandbyToday].numericState) || 0) / (Number(items[props.heatpumpEnergyToday].numericState)
                                 || 0), 100 - ((0 + ((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ? Math.max(0,
                                 Math.min(100 * (Number(items[props.heatpumpEnergySpaceToday].numericState) || 0) / (Number(items[props.heatpumpEnergyToday].numericState)
@@ -1539,15 +1559,15 @@ slots:
                                 0) / (Number(items[props.heatpumpEnergyToday].numericState) || 0), 100 - (0 + ((Number(items[props.heatpumpEnergyToday].numericState)
                                 || 0) > 0 ? Math.max(0, Math.min(100 * (Number(items[props.heatpumpEnergySpaceToday].numericState)
                                 || 0) / (Number(items[props.heatpumpEnergyToday].numericState) || 0), 100 - 0)) : 0)))) :
-                                0)))) : 0).toFixed(2) + '' 100'''
-                              stroke-dashoffset: '=(-((0 + ((Number(items[props.heatpumpEnergyToday].numericState) || 0) >
-                                0 ? Math.max(0, Math.min(100 * (Number(items[props.heatpumpEnergySpaceToday].numericState)
+                                0)))) : 0) < 99.9 ? 1.6 : 0)).toFixed(2) + '' 100'''
+                              stroke-dashoffset: '=(-(((0 + ((Number(items[props.heatpumpEnergyToday].numericState) || 0)
+                                > 0 ? Math.max(0, Math.min(100 * (Number(items[props.heatpumpEnergySpaceToday].numericState)
                                 || 0) / (Number(items[props.heatpumpEnergyToday].numericState) || 0), 100 - 0)) : 0)) + ((Number(items[props.heatpumpEnergyToday].numericState)
                                 || 0) > 0 ? Math.max(0, Math.min(100 * (Number(items[props.heatpumpEnergyDhwToday].numericState)
                                 || 0) / (Number(items[props.heatpumpEnergyToday].numericState) || 0), 100 - (0 + ((Number(items[props.heatpumpEnergyToday].numericState)
                                 || 0) > 0 ? Math.max(0, Math.min(100 * (Number(items[props.heatpumpEnergySpaceToday].numericState)
                                 || 0) / (Number(items[props.heatpumpEnergyToday].numericState) || 0), 100 - 0)) : 0)))) :
-                                0))).toFixed(2)'
+                                0)) + 0.8)).toFixed(2)'
                               visible: '=((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ? Math.max(0, Math.min(100
                                 * (Number(items[props.heatpumpEnergyStandbyToday].numericState) || 0) / (Number(items[props.heatpumpEnergyToday].numericState)
                                 || 0), 100 - ((0 + ((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ? Math.max(0,
@@ -1566,152 +1586,30 @@ slots:
                                     || 0)).toFixed(2) + ' kWh'
                       - component: text
                         config:
-                          content: '=Math.round(((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ? Math.max(0,
-                            Math.min(100 * (Number(items[props.heatpumpEnergySpaceToday].numericState) || 0) / (Number(items[props.heatpumpEnergyToday].numericState)
-                            || 0), 100 - 0)) : 0)) + '' %'''
-                          x: '=(25 + (((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ? Math.max(0, Math.min(100
-                            * (Number(items[props.heatpumpEnergySpaceToday].numericState) || 0) / (Number(items[props.heatpumpEnergyToday].numericState)
-                            || 0), 100 - 0)) : 0) >= 99.5 ? 0 : 14.399999999999999) * Math.sin(((0 + ((Number(items[props.heatpumpEnergyToday].numericState)
-                            || 0) > 0 ? Math.max(0, Math.min(100 * (Number(items[props.heatpumpEnergySpaceToday].numericState)
-                            || 0) / (Number(items[props.heatpumpEnergyToday].numericState) || 0), 100 - 0)) : 0) / 2) * Math.PI
-                            / 50))).toFixed(1)'
-                          y: '=(25 + 2.8 - (((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ? Math.max(0,
-                            Math.min(100 * (Number(items[props.heatpumpEnergySpaceToday].numericState) || 0) / (Number(items[props.heatpumpEnergyToday].numericState)
-                            || 0), 100 - 0)) : 0) >= 99.5 ? 0 : 14.399999999999999) * Math.cos(((0 + ((Number(items[props.heatpumpEnergyToday].numericState)
-                            || 0) > 0 ? Math.max(0, Math.min(100 * (Number(items[props.heatpumpEnergySpaceToday].numericState)
-                            || 0) / (Number(items[props.heatpumpEnergyToday].numericState) || 0), 100 - 0)) : 0) / 2) * Math.PI
-                            / 50))).toFixed(1)'
-                          fill: rgba(0, 0, 0, 0.78)
-                          style:
-                            pointer-events: none
-                          font-size: 8
-                          font-weight: 700
+                          x: 25
+                          y: 26.5
+                          content: =((Number(items[props.heatpumpEnergyToday].numericState) || 0)).toFixed(1)
+                          fill: currentColor
+                          font-size: 11
+                          font-weight: '700'
                           text-anchor: middle
-                          visible: '=((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ? Math.max(0, Math.min(100
-                            * (Number(items[props.heatpumpEnergySpaceToday].numericState) || 0) / (Number(items[props.heatpumpEnergyToday].numericState)
-                            || 0), 100 - 0)) : 0) >= 20'
+                          opacity: '1'
                       - component: text
                         config:
-                          content: '=Math.round(((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ? Math.max(0,
-                            Math.min(100 * (Number(items[props.heatpumpEnergyDhwToday].numericState) || 0) / (Number(items[props.heatpumpEnergyToday].numericState)
-                            || 0), 100 - (0 + ((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ? Math.max(0,
-                            Math.min(100 * (Number(items[props.heatpumpEnergySpaceToday].numericState) || 0) / (Number(items[props.heatpumpEnergyToday].numericState)
-                            || 0), 100 - 0)) : 0)))) : 0)) + '' %'''
-                          x: '=(25 + (((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ? Math.max(0, Math.min(100
-                            * (Number(items[props.heatpumpEnergyDhwToday].numericState) || 0) / (Number(items[props.heatpumpEnergyToday].numericState)
-                            || 0), 100 - (0 + ((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ? Math.max(0,
-                            Math.min(100 * (Number(items[props.heatpumpEnergySpaceToday].numericState) || 0) / (Number(items[props.heatpumpEnergyToday].numericState)
-                            || 0), 100 - 0)) : 0)))) : 0) >= 99.5 ? 0 : 14.399999999999999) * Math.sin((((0 + ((Number(items[props.heatpumpEnergyToday].numericState)
-                            || 0) > 0 ? Math.max(0, Math.min(100 * (Number(items[props.heatpumpEnergySpaceToday].numericState)
-                            || 0) / (Number(items[props.heatpumpEnergyToday].numericState) || 0), 100 - 0)) : 0)) + ((Number(items[props.heatpumpEnergyToday].numericState)
-                            || 0) > 0 ? Math.max(0, Math.min(100 * (Number(items[props.heatpumpEnergyDhwToday].numericState)
-                            || 0) / (Number(items[props.heatpumpEnergyToday].numericState) || 0), 100 - (0 + ((Number(items[props.heatpumpEnergyToday].numericState)
-                            || 0) > 0 ? Math.max(0, Math.min(100 * (Number(items[props.heatpumpEnergySpaceToday].numericState)
-                            || 0) / (Number(items[props.heatpumpEnergyToday].numericState) || 0), 100 - 0)) : 0)))) : 0) /
-                            2) * Math.PI / 50))).toFixed(1)'
-                          y: '=(25 + 2.8 - (((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ? Math.max(0,
-                            Math.min(100 * (Number(items[props.heatpumpEnergyDhwToday].numericState) || 0) / (Number(items[props.heatpumpEnergyToday].numericState)
-                            || 0), 100 - (0 + ((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ? Math.max(0,
-                            Math.min(100 * (Number(items[props.heatpumpEnergySpaceToday].numericState) || 0) / (Number(items[props.heatpumpEnergyToday].numericState)
-                            || 0), 100 - 0)) : 0)))) : 0) >= 99.5 ? 0 : 14.399999999999999) * Math.cos((((0 + ((Number(items[props.heatpumpEnergyToday].numericState)
-                            || 0) > 0 ? Math.max(0, Math.min(100 * (Number(items[props.heatpumpEnergySpaceToday].numericState)
-                            || 0) / (Number(items[props.heatpumpEnergyToday].numericState) || 0), 100 - 0)) : 0)) + ((Number(items[props.heatpumpEnergyToday].numericState)
-                            || 0) > 0 ? Math.max(0, Math.min(100 * (Number(items[props.heatpumpEnergyDhwToday].numericState)
-                            || 0) / (Number(items[props.heatpumpEnergyToday].numericState) || 0), 100 - (0 + ((Number(items[props.heatpumpEnergyToday].numericState)
-                            || 0) > 0 ? Math.max(0, Math.min(100 * (Number(items[props.heatpumpEnergySpaceToday].numericState)
-                            || 0) / (Number(items[props.heatpumpEnergyToday].numericState) || 0), 100 - 0)) : 0)))) : 0) /
-                            2) * Math.PI / 50))).toFixed(1)'
-                          fill: rgba(0, 0, 0, 0.78)
-                          style:
-                            pointer-events: none
-                          font-size: 8
-                          font-weight: 700
+                          x: 25
+                          y: 34
+                          content: kWh
+                          fill: currentColor
+                          font-size: 6
+                          font-weight: normal
                           text-anchor: middle
-                          visible: '=((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ? Math.max(0, Math.min(100
-                            * (Number(items[props.heatpumpEnergyDhwToday].numericState) || 0) / (Number(items[props.heatpumpEnergyToday].numericState)
-                            || 0), 100 - (0 + ((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ? Math.max(0,
-                            Math.min(100 * (Number(items[props.heatpumpEnergySpaceToday].numericState) || 0) / (Number(items[props.heatpumpEnergyToday].numericState)
-                            || 0), 100 - 0)) : 0)))) : 0) >= 20'
-                      - component: text
-                        config:
-                          content: '=Math.round(((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ? Math.max(0,
-                            Math.min(100 * (Number(items[props.heatpumpEnergyStandbyToday].numericState) || 0) / (Number(items[props.heatpumpEnergyToday].numericState)
-                            || 0), 100 - ((0 + ((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ? Math.max(0,
-                            Math.min(100 * (Number(items[props.heatpumpEnergySpaceToday].numericState) || 0) / (Number(items[props.heatpumpEnergyToday].numericState)
-                            || 0), 100 - 0)) : 0)) + ((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ? Math.max(0,
-                            Math.min(100 * (Number(items[props.heatpumpEnergyDhwToday].numericState) || 0) / (Number(items[props.heatpumpEnergyToday].numericState)
-                            || 0), 100 - (0 + ((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ? Math.max(0,
-                            Math.min(100 * (Number(items[props.heatpumpEnergySpaceToday].numericState) || 0) / (Number(items[props.heatpumpEnergyToday].numericState)
-                            || 0), 100 - 0)) : 0)))) : 0)))) : 0)) + '' %'''
-                          x: '=(25 + (((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ? Math.max(0, Math.min(100
-                            * (Number(items[props.heatpumpEnergyStandbyToday].numericState) || 0) / (Number(items[props.heatpumpEnergyToday].numericState)
-                            || 0), 100 - ((0 + ((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ? Math.max(0,
-                            Math.min(100 * (Number(items[props.heatpumpEnergySpaceToday].numericState) || 0) / (Number(items[props.heatpumpEnergyToday].numericState)
-                            || 0), 100 - 0)) : 0)) + ((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ? Math.max(0,
-                            Math.min(100 * (Number(items[props.heatpumpEnergyDhwToday].numericState) || 0) / (Number(items[props.heatpumpEnergyToday].numericState)
-                            || 0), 100 - (0 + ((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ? Math.max(0,
-                            Math.min(100 * (Number(items[props.heatpumpEnergySpaceToday].numericState) || 0) / (Number(items[props.heatpumpEnergyToday].numericState)
-                            || 0), 100 - 0)) : 0)))) : 0)))) : 0) >= 99.5 ? 0 : 14.399999999999999) * Math.sin(((((0 + ((Number(items[props.heatpumpEnergyToday].numericState)
-                            || 0) > 0 ? Math.max(0, Math.min(100 * (Number(items[props.heatpumpEnergySpaceToday].numericState)
-                            || 0) / (Number(items[props.heatpumpEnergyToday].numericState) || 0), 100 - 0)) : 0)) + ((Number(items[props.heatpumpEnergyToday].numericState)
-                            || 0) > 0 ? Math.max(0, Math.min(100 * (Number(items[props.heatpumpEnergyDhwToday].numericState)
-                            || 0) / (Number(items[props.heatpumpEnergyToday].numericState) || 0), 100 - (0 + ((Number(items[props.heatpumpEnergyToday].numericState)
-                            || 0) > 0 ? Math.max(0, Math.min(100 * (Number(items[props.heatpumpEnergySpaceToday].numericState)
-                            || 0) / (Number(items[props.heatpumpEnergyToday].numericState) || 0), 100 - 0)) : 0)))) : 0))
-                            + ((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ? Math.max(0, Math.min(100
-                            * (Number(items[props.heatpumpEnergyStandbyToday].numericState) || 0) / (Number(items[props.heatpumpEnergyToday].numericState)
-                            || 0), 100 - ((0 + ((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ? Math.max(0,
-                            Math.min(100 * (Number(items[props.heatpumpEnergySpaceToday].numericState) || 0) / (Number(items[props.heatpumpEnergyToday].numericState)
-                            || 0), 100 - 0)) : 0)) + ((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ? Math.max(0,
-                            Math.min(100 * (Number(items[props.heatpumpEnergyDhwToday].numericState) || 0) / (Number(items[props.heatpumpEnergyToday].numericState)
-                            || 0), 100 - (0 + ((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ? Math.max(0,
-                            Math.min(100 * (Number(items[props.heatpumpEnergySpaceToday].numericState) || 0) / (Number(items[props.heatpumpEnergyToday].numericState)
-                            || 0), 100 - 0)) : 0)))) : 0)))) : 0) / 2) * Math.PI / 50))).toFixed(1)'
-                          y: '=(25 + 2.8 - (((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ? Math.max(0,
-                            Math.min(100 * (Number(items[props.heatpumpEnergyStandbyToday].numericState) || 0) / (Number(items[props.heatpumpEnergyToday].numericState)
-                            || 0), 100 - ((0 + ((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ? Math.max(0,
-                            Math.min(100 * (Number(items[props.heatpumpEnergySpaceToday].numericState) || 0) / (Number(items[props.heatpumpEnergyToday].numericState)
-                            || 0), 100 - 0)) : 0)) + ((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ? Math.max(0,
-                            Math.min(100 * (Number(items[props.heatpumpEnergyDhwToday].numericState) || 0) / (Number(items[props.heatpumpEnergyToday].numericState)
-                            || 0), 100 - (0 + ((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ? Math.max(0,
-                            Math.min(100 * (Number(items[props.heatpumpEnergySpaceToday].numericState) || 0) / (Number(items[props.heatpumpEnergyToday].numericState)
-                            || 0), 100 - 0)) : 0)))) : 0)))) : 0) >= 99.5 ? 0 : 14.399999999999999) * Math.cos(((((0 + ((Number(items[props.heatpumpEnergyToday].numericState)
-                            || 0) > 0 ? Math.max(0, Math.min(100 * (Number(items[props.heatpumpEnergySpaceToday].numericState)
-                            || 0) / (Number(items[props.heatpumpEnergyToday].numericState) || 0), 100 - 0)) : 0)) + ((Number(items[props.heatpumpEnergyToday].numericState)
-                            || 0) > 0 ? Math.max(0, Math.min(100 * (Number(items[props.heatpumpEnergyDhwToday].numericState)
-                            || 0) / (Number(items[props.heatpumpEnergyToday].numericState) || 0), 100 - (0 + ((Number(items[props.heatpumpEnergyToday].numericState)
-                            || 0) > 0 ? Math.max(0, Math.min(100 * (Number(items[props.heatpumpEnergySpaceToday].numericState)
-                            || 0) / (Number(items[props.heatpumpEnergyToday].numericState) || 0), 100 - 0)) : 0)))) : 0))
-                            + ((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ? Math.max(0, Math.min(100
-                            * (Number(items[props.heatpumpEnergyStandbyToday].numericState) || 0) / (Number(items[props.heatpumpEnergyToday].numericState)
-                            || 0), 100 - ((0 + ((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ? Math.max(0,
-                            Math.min(100 * (Number(items[props.heatpumpEnergySpaceToday].numericState) || 0) / (Number(items[props.heatpumpEnergyToday].numericState)
-                            || 0), 100 - 0)) : 0)) + ((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ? Math.max(0,
-                            Math.min(100 * (Number(items[props.heatpumpEnergyDhwToday].numericState) || 0) / (Number(items[props.heatpumpEnergyToday].numericState)
-                            || 0), 100 - (0 + ((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ? Math.max(0,
-                            Math.min(100 * (Number(items[props.heatpumpEnergySpaceToday].numericState) || 0) / (Number(items[props.heatpumpEnergyToday].numericState)
-                            || 0), 100 - 0)) : 0)))) : 0)))) : 0) / 2) * Math.PI / 50))).toFixed(1)'
-                          fill: rgba(0, 0, 0, 0.78)
-                          style:
-                            pointer-events: none
-                          font-size: 8
-                          font-weight: 700
-                          text-anchor: middle
-                          visible: '=((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ? Math.max(0, Math.min(100
-                            * (Number(items[props.heatpumpEnergyStandbyToday].numericState) || 0) / (Number(items[props.heatpumpEnergyToday].numericState)
-                            || 0), 100 - ((0 + ((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ? Math.max(0,
-                            Math.min(100 * (Number(items[props.heatpumpEnergySpaceToday].numericState) || 0) / (Number(items[props.heatpumpEnergyToday].numericState)
-                            || 0), 100 - 0)) : 0)) + ((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ? Math.max(0,
-                            Math.min(100 * (Number(items[props.heatpumpEnergyDhwToday].numericState) || 0) / (Number(items[props.heatpumpEnergyToday].numericState)
-                            || 0), 100 - (0 + ((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ? Math.max(0,
-                            Math.min(100 * (Number(items[props.heatpumpEnergySpaceToday].numericState) || 0) / (Number(items[props.heatpumpEnergyToday].numericState)
-                            || 0), 100 - 0)) : 0)))) : 0)))) : 0) >= 20'
+                          opacity: '0.6'
                   - component: div
                     config:
                       style:
                         display: flex
                         flex-direction: column
-                        gap: 3px
+                        gap: 4px
                         min-width: '0'
                     slots:
                       default:
@@ -1724,14 +1622,121 @@ slots:
                             white-space: nowrap
                             overflow: hidden
                             text-overflow: ellipsis
-                      - component: Label
+                      - component: div
                         config:
-                          text: =((Number(items[props.heatpumpEnergyToday].numericState) || 0)).toFixed(1) + ' kWh'
                           style:
-                            font-size: 18px
-                            font-weight: '700'
-                            line-height: '1.3'
-                            white-space: nowrap
+                            display: flex
+                            flex-wrap: wrap
+                            gap: 2px 8px
+                        slots:
+                          default:
+                          - component: div
+                            config:
+                              class: item k k-heizung
+                              visible: '=Math.round(((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ? Math.max(0,
+                                Math.min(100 * (Number(items[props.heatpumpEnergySpaceToday].numericState) || 0) / (Number(items[props.heatpumpEnergyToday].numericState)
+                                || 0), 100 - 0)) : 0)) >= 1'
+                              style:
+                                display: flex
+                                align-items: center
+                                gap: 4px
+                            slots:
+                              default:
+                              - component: div
+                                config:
+                                  style:
+                                    width: 8px
+                                    height: 8px
+                                    border-radius: 50%
+                                    background: '#ffb74d'
+                                slots:
+                                  default: []
+                              - component: Label
+                                config:
+                                  text: '=Math.round(((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ? Math.max(0,
+                                    Math.min(100 * (Number(items[props.heatpumpEnergySpaceToday].numericState) || 0) / (Number(items[props.heatpumpEnergyToday].numericState)
+                                    || 0), 100 - 0)) : 0)) + '' %'''
+                                  style:
+                                    font-size: 12px
+                                    opacity: '0.85'
+                          - component: div
+                            config:
+                              class: item k k-warmwasser
+                              visible: '=Math.round(((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ? Math.max(0,
+                                Math.min(100 * (Number(items[props.heatpumpEnergyDhwToday].numericState) || 0) / (Number(items[props.heatpumpEnergyToday].numericState)
+                                || 0), 100 - (0 + ((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ? Math.max(0,
+                                Math.min(100 * (Number(items[props.heatpumpEnergySpaceToday].numericState) || 0) / (Number(items[props.heatpumpEnergyToday].numericState)
+                                || 0), 100 - 0)) : 0)))) : 0)) >= 1'
+                              style:
+                                display: flex
+                                align-items: center
+                                gap: 4px
+                            slots:
+                              default:
+                              - component: div
+                                config:
+                                  style:
+                                    width: 8px
+                                    height: 8px
+                                    border-radius: 50%
+                                    background: '#e57373'
+                                slots:
+                                  default: []
+                              - component: Label
+                                config:
+                                  text: '=Math.round(((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ? Math.max(0,
+                                    Math.min(100 * (Number(items[props.heatpumpEnergyDhwToday].numericState) || 0) / (Number(items[props.heatpumpEnergyToday].numericState)
+                                    || 0), 100 - (0 + ((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ?
+                                    Math.max(0, Math.min(100 * (Number(items[props.heatpumpEnergySpaceToday].numericState)
+                                    || 0) / (Number(items[props.heatpumpEnergyToday].numericState) || 0), 100 - 0)) : 0))))
+                                    : 0)) + '' %'''
+                                  style:
+                                    font-size: 12px
+                                    opacity: '0.85'
+                          - component: div
+                            config:
+                              class: item k k-standby
+                              visible: '=Math.round(((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ? Math.max(0,
+                                Math.min(100 * (Number(items[props.heatpumpEnergyStandbyToday].numericState) || 0) / (Number(items[props.heatpumpEnergyToday].numericState)
+                                || 0), 100 - ((0 + ((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ? Math.max(0,
+                                Math.min(100 * (Number(items[props.heatpumpEnergySpaceToday].numericState) || 0) / (Number(items[props.heatpumpEnergyToday].numericState)
+                                || 0), 100 - 0)) : 0)) + ((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0
+                                ? Math.max(0, Math.min(100 * (Number(items[props.heatpumpEnergyDhwToday].numericState) ||
+                                0) / (Number(items[props.heatpumpEnergyToday].numericState) || 0), 100 - (0 + ((Number(items[props.heatpumpEnergyToday].numericState)
+                                || 0) > 0 ? Math.max(0, Math.min(100 * (Number(items[props.heatpumpEnergySpaceToday].numericState)
+                                || 0) / (Number(items[props.heatpumpEnergyToday].numericState) || 0), 100 - 0)) : 0)))) :
+                                0)))) : 0)) >= 1'
+                              style:
+                                display: flex
+                                align-items: center
+                                gap: 4px
+                            slots:
+                              default:
+                              - component: div
+                                config:
+                                  style:
+                                    width: 8px
+                                    height: 8px
+                                    border-radius: 50%
+                                    background: '#b0bec5'
+                                slots:
+                                  default: []
+                              - component: Label
+                                config:
+                                  text: '=Math.round(((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ? Math.max(0,
+                                    Math.min(100 * (Number(items[props.heatpumpEnergyStandbyToday].numericState) || 0) / (Number(items[props.heatpumpEnergyToday].numericState)
+                                    || 0), 100 - ((0 + ((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ?
+                                    Math.max(0, Math.min(100 * (Number(items[props.heatpumpEnergySpaceToday].numericState)
+                                    || 0) / (Number(items[props.heatpumpEnergyToday].numericState) || 0), 100 - 0)) : 0))
+                                    + ((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ? Math.max(0, Math.min(100
+                                    * (Number(items[props.heatpumpEnergyDhwToday].numericState) || 0) / (Number(items[props.heatpumpEnergyToday].numericState)
+                                    || 0), 100 - (0 + ((Number(items[props.heatpumpEnergyToday].numericState) || 0) > 0 ?
+                                    Math.max(0, Math.min(100 * (Number(items[props.heatpumpEnergySpaceToday].numericState)
+                                    || 0) / (Number(items[props.heatpumpEnergyToday].numericState) || 0), 100 - 0)) : 0))))
+                                    : 0)))) : 0)) + '' %'''
+                                  style:
+                                    font-size: 12px
+                                    opacity: '0.85'
                       - component: Label
                         config:
                           text: '=(Math.abs(((Number(items[props.heatpumpEnergyToday].numericState) || 0) - Number(((h) =>
@@ -1782,6 +1787,9 @@ slots:
                               [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''],
                               bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark
                               === ''dark'') ? 1 : 0] + '' 16%, transparent)'''
+                            max-width: 100%
+                            overflow: hidden
+                            text-overflow: ellipsis
                           visible: '=(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y
                             : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
                             || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpEnergyToday]
@@ -1794,7 +1802,7 @@ slots:
                   style:
                     display: flex
                     align-items: center
-                    gap: 12px
+                    gap: 14px
                     padding: 10px 12px
                     border-radius: 12px
                     background: color-mix(in srgb, var(--f7-text-color) 6%, transparent)
@@ -1804,8 +1812,8 @@ slots:
                   - component: svg
                     config:
                       viewBox: 0 0 50 50
-                      width: 64
-                      height: 64
+                      width: 66
+                      height: 66
                       style:
                         display: block
                         flex: 0 0 auto
@@ -1816,8 +1824,11 @@ slots:
                         config:
                           cx: 25
                           cy: 25
-                          r: 24
-                          fill: rgba(127, 127, 127, 0.25)
+                          r: 20
+                          fill: none
+                          stroke: rgba(127, 127, 127, 0.25)
+                          stroke-width: 7
+                          visible: =(Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0) <= 0
                       - component: g
                         config:
                           transform: rotate(-90 25 25)
@@ -1827,7 +1838,7 @@ slots:
                             config:
                               cx: 25
                               cy: 25
-                              r: 12.0
+                              r: 20
                               fill: none
                               stroke: '#ffb74d'
                               pathLength: 100
@@ -1835,12 +1846,15 @@ slots:
                                 transform-box: fill-box
                                 transform-origin: center
                               class: wedge k k-heizung
-                              stroke-width: 24
-                              stroke-dasharray: '=((Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0) > 0
-                                ? Math.max(0, Math.min(100 * (Number(items[props.heatpumpHeatingEnergySpaceToday].numericState)
-                                || 0) / (Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0), 100 - 0)) : 0).toFixed(2)
-                                + '' 100'''
-                              stroke-dashoffset: =(-0).toFixed(2)
+                              stroke-width: 7
+                              stroke-dasharray: '=Math.max(0, ((Number(items[props.heatpumpHeatingEnergyToday].numericState)
+                                || 0) > 0 ? Math.max(0, Math.min(100 * (Number(items[props.heatpumpHeatingEnergySpaceToday].numericState)
+                                || 0) / (Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0), 100 - 0)) : 0)
+                                - (((Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0) > 0 ? Math.max(0,
+                                Math.min(100 * (Number(items[props.heatpumpHeatingEnergySpaceToday].numericState) || 0) /
+                                (Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0), 100 - 0)) : 0) < 99.9
+                                ? 1.6 : 0)).toFixed(2) + '' 100'''
+                              stroke-dashoffset: =(-(0 + 0.8)).toFixed(2)
                               visible: '=((Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0) > 0 ? Math.max(0,
                                 Math.min(100 * (Number(items[props.heatpumpHeatingEnergySpaceToday].numericState) || 0) /
                                 (Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0), 100 - 0)) : 0) > 0.05'
@@ -1854,7 +1868,7 @@ slots:
                             config:
                               cx: 25
                               cy: 25
-                              r: 12.0
+                              r: 20
                               fill: none
                               stroke: '#e57373'
                               pathLength: 100
@@ -1862,16 +1876,22 @@ slots:
                                 transform-box: fill-box
                                 transform-origin: center
                               class: wedge k k-warmwasser
-                              stroke-width: 24
-                              stroke-dasharray: '=((Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0) > 0
-                                ? Math.max(0, Math.min(100 * (Number(items[props.heatpumpHeatingEnergyDhwToday].numericState)
+                              stroke-width: 7
+                              stroke-dasharray: '=Math.max(0, ((Number(items[props.heatpumpHeatingEnergyToday].numericState)
+                                || 0) > 0 ? Math.max(0, Math.min(100 * (Number(items[props.heatpumpHeatingEnergyDhwToday].numericState)
                                 || 0) / (Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0), 100 - (0 + ((Number(items[props.heatpumpHeatingEnergyToday].numericState)
                                 || 0) > 0 ? Math.max(0, Math.min(100 * (Number(items[props.heatpumpHeatingEnergySpaceToday].numericState)
                                 || 0) / (Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0), 100 - 0)) : 0))))
-                                : 0).toFixed(2) + '' 100'''
-                              stroke-dashoffset: '=(-(0 + ((Number(items[props.heatpumpHeatingEnergyToday].numericState) ||
-                                0) > 0 ? Math.max(0, Math.min(100 * (Number(items[props.heatpumpHeatingEnergySpaceToday].numericState)
-                                || 0) / (Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0), 100 - 0)) : 0))).toFixed(2)'
+                                : 0) - (((Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0) > 0 ? Math.max(0,
+                                Math.min(100 * (Number(items[props.heatpumpHeatingEnergyDhwToday].numericState) || 0) / (Number(items[props.heatpumpHeatingEnergyToday].numericState)
+                                || 0), 100 - (0 + ((Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0) > 0
+                                ? Math.max(0, Math.min(100 * (Number(items[props.heatpumpHeatingEnergySpaceToday].numericState)
+                                || 0) / (Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0), 100 - 0)) : 0))))
+                                : 0) < 99.9 ? 1.6 : 0)).toFixed(2) + '' 100'''
+                              stroke-dashoffset: '=(-((0 + ((Number(items[props.heatpumpHeatingEnergyToday].numericState)
+                                || 0) > 0 ? Math.max(0, Math.min(100 * (Number(items[props.heatpumpHeatingEnergySpaceToday].numericState)
+                                || 0) / (Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0), 100 - 0)) : 0))
+                                + 0.8)).toFixed(2)'
                               visible: '=((Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0) > 0 ? Math.max(0,
                                 Math.min(100 * (Number(items[props.heatpumpHeatingEnergyDhwToday].numericState) || 0) / (Number(items[props.heatpumpHeatingEnergyToday].numericState)
                                 || 0), 100 - (0 + ((Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0) > 0
@@ -1886,80 +1906,30 @@ slots:
                                     || 0)).toFixed(2) + ' kWh'
                       - component: text
                         config:
-                          content: '=Math.round(((Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0) > 0 ?
-                            Math.max(0, Math.min(100 * (Number(items[props.heatpumpHeatingEnergySpaceToday].numericState)
-                            || 0) / (Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0), 100 - 0)) : 0)) +
-                            '' %'''
-                          x: '=(25 + (((Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0) > 0 ? Math.max(0,
-                            Math.min(100 * (Number(items[props.heatpumpHeatingEnergySpaceToday].numericState) || 0) / (Number(items[props.heatpumpHeatingEnergyToday].numericState)
-                            || 0), 100 - 0)) : 0) >= 99.5 ? 0 : 14.399999999999999) * Math.sin(((0 + ((Number(items[props.heatpumpHeatingEnergyToday].numericState)
-                            || 0) > 0 ? Math.max(0, Math.min(100 * (Number(items[props.heatpumpHeatingEnergySpaceToday].numericState)
-                            || 0) / (Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0), 100 - 0)) : 0) /
-                            2) * Math.PI / 50))).toFixed(1)'
-                          y: '=(25 + 2.8 - (((Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0) > 0 ? Math.max(0,
-                            Math.min(100 * (Number(items[props.heatpumpHeatingEnergySpaceToday].numericState) || 0) / (Number(items[props.heatpumpHeatingEnergyToday].numericState)
-                            || 0), 100 - 0)) : 0) >= 99.5 ? 0 : 14.399999999999999) * Math.cos(((0 + ((Number(items[props.heatpumpHeatingEnergyToday].numericState)
-                            || 0) > 0 ? Math.max(0, Math.min(100 * (Number(items[props.heatpumpHeatingEnergySpaceToday].numericState)
-                            || 0) / (Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0), 100 - 0)) : 0) /
-                            2) * Math.PI / 50))).toFixed(1)'
-                          fill: rgba(0, 0, 0, 0.78)
-                          style:
-                            pointer-events: none
-                          font-size: 8
-                          font-weight: 700
+                          x: 25
+                          y: 26.5
+                          content: =((Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0)).toFixed(1)
+                          fill: currentColor
+                          font-size: 11
+                          font-weight: '700'
                           text-anchor: middle
-                          visible: '=((Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0) > 0 ? Math.max(0,
-                            Math.min(100 * (Number(items[props.heatpumpHeatingEnergySpaceToday].numericState) || 0) / (Number(items[props.heatpumpHeatingEnergyToday].numericState)
-                            || 0), 100 - 0)) : 0) >= 20'
+                          opacity: '1'
                       - component: text
                         config:
-                          content: '=Math.round(((Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0) > 0 ?
-                            Math.max(0, Math.min(100 * (Number(items[props.heatpumpHeatingEnergyDhwToday].numericState) ||
-                            0) / (Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0), 100 - (0 + ((Number(items[props.heatpumpHeatingEnergyToday].numericState)
-                            || 0) > 0 ? Math.max(0, Math.min(100 * (Number(items[props.heatpumpHeatingEnergySpaceToday].numericState)
-                            || 0) / (Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0), 100 - 0)) : 0))))
-                            : 0)) + '' %'''
-                          x: '=(25 + (((Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0) > 0 ? Math.max(0,
-                            Math.min(100 * (Number(items[props.heatpumpHeatingEnergyDhwToday].numericState) || 0) / (Number(items[props.heatpumpHeatingEnergyToday].numericState)
-                            || 0), 100 - (0 + ((Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0) > 0 ? Math.max(0,
-                            Math.min(100 * (Number(items[props.heatpumpHeatingEnergySpaceToday].numericState) || 0) / (Number(items[props.heatpumpHeatingEnergyToday].numericState)
-                            || 0), 100 - 0)) : 0)))) : 0) >= 99.5 ? 0 : 14.399999999999999) * Math.sin((((0 + ((Number(items[props.heatpumpHeatingEnergyToday].numericState)
-                            || 0) > 0 ? Math.max(0, Math.min(100 * (Number(items[props.heatpumpHeatingEnergySpaceToday].numericState)
-                            || 0) / (Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0), 100 - 0)) : 0)) +
-                            ((Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0) > 0 ? Math.max(0, Math.min(100
-                            * (Number(items[props.heatpumpHeatingEnergyDhwToday].numericState) || 0) / (Number(items[props.heatpumpHeatingEnergyToday].numericState)
-                            || 0), 100 - (0 + ((Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0) > 0 ? Math.max(0,
-                            Math.min(100 * (Number(items[props.heatpumpHeatingEnergySpaceToday].numericState) || 0) / (Number(items[props.heatpumpHeatingEnergyToday].numericState)
-                            || 0), 100 - 0)) : 0)))) : 0) / 2) * Math.PI / 50))).toFixed(1)'
-                          y: '=(25 + 2.8 - (((Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0) > 0 ? Math.max(0,
-                            Math.min(100 * (Number(items[props.heatpumpHeatingEnergyDhwToday].numericState) || 0) / (Number(items[props.heatpumpHeatingEnergyToday].numericState)
-                            || 0), 100 - (0 + ((Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0) > 0 ? Math.max(0,
-                            Math.min(100 * (Number(items[props.heatpumpHeatingEnergySpaceToday].numericState) || 0) / (Number(items[props.heatpumpHeatingEnergyToday].numericState)
-                            || 0), 100 - 0)) : 0)))) : 0) >= 99.5 ? 0 : 14.399999999999999) * Math.cos((((0 + ((Number(items[props.heatpumpHeatingEnergyToday].numericState)
-                            || 0) > 0 ? Math.max(0, Math.min(100 * (Number(items[props.heatpumpHeatingEnergySpaceToday].numericState)
-                            || 0) / (Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0), 100 - 0)) : 0)) +
-                            ((Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0) > 0 ? Math.max(0, Math.min(100
-                            * (Number(items[props.heatpumpHeatingEnergyDhwToday].numericState) || 0) / (Number(items[props.heatpumpHeatingEnergyToday].numericState)
-                            || 0), 100 - (0 + ((Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0) > 0 ? Math.max(0,
-                            Math.min(100 * (Number(items[props.heatpumpHeatingEnergySpaceToday].numericState) || 0) / (Number(items[props.heatpumpHeatingEnergyToday].numericState)
-                            || 0), 100 - 0)) : 0)))) : 0) / 2) * Math.PI / 50))).toFixed(1)'
-                          fill: rgba(0, 0, 0, 0.78)
-                          style:
-                            pointer-events: none
-                          font-size: 8
-                          font-weight: 700
+                          x: 25
+                          y: 34
+                          content: kWh
+                          fill: currentColor
+                          font-size: 6
+                          font-weight: normal
                           text-anchor: middle
-                          visible: '=((Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0) > 0 ? Math.max(0,
-                            Math.min(100 * (Number(items[props.heatpumpHeatingEnergyDhwToday].numericState) || 0) / (Number(items[props.heatpumpHeatingEnergyToday].numericState)
-                            || 0), 100 - (0 + ((Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0) > 0 ? Math.max(0,
-                            Math.min(100 * (Number(items[props.heatpumpHeatingEnergySpaceToday].numericState) || 0) / (Number(items[props.heatpumpHeatingEnergyToday].numericState)
-                            || 0), 100 - 0)) : 0)))) : 0) >= 20'
+                          opacity: '0.6'
                   - component: div
                     config:
                       style:
                         display: flex
                         flex-direction: column
-                        gap: 3px
+                        gap: 4px
                         min-width: '0'
                     slots:
                       default:
@@ -1972,14 +1942,81 @@ slots:
                             white-space: nowrap
                             overflow: hidden
                             text-overflow: ellipsis
-                      - component: Label
+                      - component: div
                         config:
-                          text: =((Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0)).toFixed(1) + ' kWh'
                           style:
-                            font-size: 18px
-                            font-weight: '700'
-                            line-height: '1.3'
-                            white-space: nowrap
+                            display: flex
+                            flex-wrap: wrap
+                            gap: 2px 8px
+                        slots:
+                          default:
+                          - component: div
+                            config:
+                              class: item k k-heizung
+                              visible: '=Math.round(((Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0) >
+                                0 ? Math.max(0, Math.min(100 * (Number(items[props.heatpumpHeatingEnergySpaceToday].numericState)
+                                || 0) / (Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0), 100 - 0)) : 0))
+                                >= 1'
+                              style:
+                                display: flex
+                                align-items: center
+                                gap: 4px
+                            slots:
+                              default:
+                              - component: div
+                                config:
+                                  style:
+                                    width: 8px
+                                    height: 8px
+                                    border-radius: 50%
+                                    background: '#ffb74d'
+                                slots:
+                                  default: []
+                              - component: Label
+                                config:
+                                  text: '=Math.round(((Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0)
+                                    > 0 ? Math.max(0, Math.min(100 * (Number(items[props.heatpumpHeatingEnergySpaceToday].numericState)
+                                    || 0) / (Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0), 100 - 0))
+                                    : 0)) + '' %'''
+                                  style:
+                                    font-size: 12px
+                                    opacity: '0.85'
+                          - component: div
+                            config:
+                              class: item k k-warmwasser
+                              visible: '=Math.round(((Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0) >
+                                0 ? Math.max(0, Math.min(100 * (Number(items[props.heatpumpHeatingEnergyDhwToday].numericState)
+                                || 0) / (Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0), 100 - (0 + ((Number(items[props.heatpumpHeatingEnergyToday].numericState)
+                                || 0) > 0 ? Math.max(0, Math.min(100 * (Number(items[props.heatpumpHeatingEnergySpaceToday].numericState)
+                                || 0) / (Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0), 100 - 0)) : 0))))
+                                : 0)) >= 1'
+                              style:
+                                display: flex
+                                align-items: center
+                                gap: 4px
+                            slots:
+                              default:
+                              - component: div
+                                config:
+                                  style:
+                                    width: 8px
+                                    height: 8px
+                                    border-radius: 50%
+                                    background: '#e57373'
+                                slots:
+                                  default: []
+                              - component: Label
+                                config:
+                                  text: '=Math.round(((Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0)
+                                    > 0 ? Math.max(0, Math.min(100 * (Number(items[props.heatpumpHeatingEnergyDhwToday].numericState)
+                                    || 0) / (Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0), 100 - (0
+                                    + ((Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0) > 0 ? Math.max(0,
+                                    Math.min(100 * (Number(items[props.heatpumpHeatingEnergySpaceToday].numericState) || 0)
+                                    / (Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0), 100 - 0)) : 0))))
+                                    : 0)) + '' %'''
+                                  style:
+                                    font-size: 12px
+                                    opacity: '0.85'
                       - component: Label
                         config:
                           text: '=(Math.abs(((Number(items[props.heatpumpHeatingEnergyToday].numericState) || 0) - Number(((h)
@@ -2030,6 +2067,9 @@ slots:
                               [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''],
                               bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark
                               === ''dark'') ? 1 : 0] + '' 16%, transparent)'''
+                            max-width: 100%
+                            overflow: hidden
+                            text-overflow: ellipsis
                           visible: '=(((h) => h.y2 === undefined || h.y2 === null || h.y === null || h.y === undefined ? h.y
                             : h.y + (h.y2 - h.y) * Math.min(1, Math.max(0, (dayjs().unix() - h.t) / Math.max(1, h.dt))))((((((items[props.tileHistory].state)
                             || '''').charAt(0) === ''{'' ? JSON.parse(items[props.tileHistory].state) : {}))[props.heatpumpHeatingEnergyToday]

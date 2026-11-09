@@ -32,9 +32,10 @@ step flow; PRE_JS=demo_flow.js FPS=20 python3 cdp_gif.py $B/overview 1 1400 $R/e
 PRE_JS=demo_flow.js FPS=20 python3 cdp_gif.py $B/overview 1 1400 $R/energy-flow-card-dark.gif 6 dark 1.5
 step heatpump; PRE_JS=demo_heatpump.js FPS=20 python3 cdp_gif.py $B/overview 5 1400 $R/heatpump-card.gif 4 light 1
 PRE_JS=demo_heatpump.js FPS=20 python3 cdp_gif.py $B/overview 5 1400 $R/heatpump-card-dark.gif 4 dark 1
-python3 cdp_cards_js.py $B/overview $O/ovhp-dark 1400 dark "$(cat demo_heatpump.js)" >/dev/null
-# the heating card on the heat pump card's demo values: a space heating run, the tank not charging
-python3 cdp_cards_js.py $B/overview $O/ovhp 1400 light "$(cat demo_heatpump.js)" >/dev/null
+# the heating card on the heat pump card's demo values: a space heating run, the tank not charging; at 1600 px, where
+# its two rings stand side by side with room for the English pill (vs. yesterday is longer than zu gestern)
+python3 cdp_cards_js.py $B/overview $O/ovhp-dark 1600 dark "$(cat demo_heatpump.js)" >/dev/null
+python3 cdp_cards_js.py $B/overview $O/ovhp 1600 light "$(cat demo_heatpump.js)" >/dev/null
 cp $(shot ovhp heating-hot-water) $R/heating-card.png; cp $(shot ovhp-dark heating-hot-water) $R/heating-card-dark.png
 # the quick popups as the heat pump card's tiles and figures open them, each as tall as its content
 step popups

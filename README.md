@@ -311,10 +311,10 @@ shows on the tank), its ring as in the energy flow, whole while it draws and fil
 hot-water charge, while the setpoint pill gives way to the time left, as a Miele machine's, and a line names the end.
 Each tile's pill holds the temperature, the tank's and the leaving water's, filled in the tile's colour while hot water
 or heating is switched on, outlined while off, beside a tinted pill with the setpoint and a small target icon; a tap
-opens the heat pump's page of my installation. Below them today's electricity and heat of the heat pump as two pies of
-space heating, DHW and standby in small cards, each share written into its wedge (hovering a part lifts it everywhere),
-beside each its total and today against yesterday at this time in a pill (the difference in kWh), and today's COPs of
-space heating, DHW and in total in one row as rings like the energy flow's self-consumption, each with today against
+opens the heat pump's page of my installation. Below them today's electricity and heat of the heat pump as two rings of
+space heating, DHW and standby in small cards, the total inside, beside each the parts' shares in per cent (hovering a
+part lifts it everywhere) and today against yesterday at this time in a pill (the difference in kWh), and today's COPs
+of space heating, DHW and in total in one row as rings like the energy flow's self-consumption, each with today against
 yesterday at this time in a pill under its title; a tap on one opens the item popup with that COP large inside its ring,
 beside it today's heat and electricity it is the ratio of and yesterday's whole day, and its course over the day. While
 the tank charges or the heating runs, a line under its tile says since when. A round badge right of each tile's pills

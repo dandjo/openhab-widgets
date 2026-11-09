@@ -3084,45 +3084,60 @@ def stat_tile(title, value, color, icon, popup):
     return div([tile, link], **{"position": "relative", "min-width": "0"})
 
 
-PIE_LABEL_MIN = 20  # a part's share in per cent from which its wedge has room for it
+PART_GAP = 1.6  # per cent of a ring left free between two of its parts
 
 
-def pie_tile(title, total, parts, chip):
-    """Today's energy as a pie of its parts in a small card, its title, total and the pill against yesterday beside it,
-    as the COPs' rings under it stand beside their texts (user, 2026-11-09: pies instead of the bars): each part a
-    wedge in its colour, clockwise from the top, clamped so they never add up beyond the pie, its share written into
-    it from PIE_LABEL_MIN per cent; a wedge's tooltip names the part with its kWh, and hovering it lifts it, the same
-    part in the other pie and its legend entry (hover_group(), keyed by the part's lower-case name). Grey while
-    nothing counts yet."""
-    c, r = 25, 24
-    before, wedges, shares = "0", [], []
+def part_shares(total, parts):
+    """(name, item, colour, share, before) per part: its per cent of total and the per cent of the parts before it,
+    clamped so they never add up beyond 100; 0 while the total is."""
+    out, before = [], "0"
     for name, item, color in parts:
         share = f"({total} > 0 ? Math.max(0, Math.min(100 * {num(item)} / {total}, 100 - {before})) : 0)"
-        # a stroke as wide as the pie's radius around half of it fills the wedge; its own transform lifts it, so the
-        # turn to the top sits on the group around the wedges
-        wedges.append(svg("circle", [svg("title", content=f"='{name} · ' + {fixed(num(item), 2)} + ' kWh'")],
-                          visible=f"={share} > 0.05", cx=c, cy=c, r=r / 2, fill="none", stroke=color,
-                          pathLength=100, style={"transform-box": "fill-box", "transform-origin": "center"},
-                          **{"class": f"wedge k k-{name.lower()}", "stroke-width": r,
-                             "stroke-dasharray": f"={share}.toFixed(2) + ' 100'",
-                             "stroke-dashoffset": f"=(-{before}).toFixed(2)"}))
-        # its share in the wedge's middle, in the pie's middle where it is the whole pie
-        mid, dist = f"(({before} + {share} / 2) * Math.PI / 50)", f"({share} >= 99.5 ? 0 : {0.6 * r})"
-        shares.append(svg("text", visible=f"={share} >= {PIE_LABEL_MIN}", content=f"=Math.round({share}) + ' %'",
-                          x=f"=({c} + {dist} * Math.sin({mid})).toFixed(1)",
-                          y=f"=({c} + 2.8 - {dist} * Math.cos({mid})).toFixed(1)",
-                          fill="rgba(0, 0, 0, 0.78)", style={"pointer-events": "none"},
-                          **{"font-size": 8, "font-weight": 700, "text-anchor": "middle"}))
+        out.append((name, item, color, share, before))
         before = f"({before} + {share})"
-    pie = svg("svg", [svg("circle", cx=c, cy=c, r=r, fill="rgba(127, 127, 127, 0.25)"),
-                      svg("g", wedges, transform=f"rotate(-90 {c} {c})"), *shares],
-              viewBox=f"0 0 {2 * c} {2 * c}", width=64, height=64,
-              style={"display": "block", "flex": "0 0 auto", "overflow": "visible"})
-    texts = div([label(title, **VT_TITLE),
-                 label(f"={fixed(total, 1)} + ' kWh'", **{**VT_VALUE, "font-size": "18px"}), chip],
-                **{"display": "flex", "flex-direction": "column", "gap": "3px", "min-width": "0"})
-    return div([pie, texts], **{"display": "flex", "align-items": "center", "gap": "12px", "padding": "10px 12px",
-                                "border-radius": "12px", "background": TILE_BG, "min-width": "0"})
+    return out
+
+
+def split_ring(title, total_item, parts, better):
+    """Today's energy as a ring of its parts in a small card, as the COPs' rings under it stand (user, 2026-11-09:
+    rings, after pies with their shares written in looked bad): each part an arc in its colour, clockwise from the
+    top, PART_GAP apart, the total inside; beside it the title, each part's share in per cent behind a dot in its
+    colour (from 1 %) and the pill against yesterday. An arc's tooltip names the part with its kWh; hovering an arc
+    or a share lifts that part in both rings and the legend (hover_group(), keyed by the part's lower-case name).
+    Grey while nothing counts yet."""
+    total = num(total_item)
+    split = part_shares(total, parts)
+    arcs = []
+    for name, item, color, share, before in split:
+        # its own transform lifts it, so the turn to the top sits on the group around the arcs
+        arcs.append(svg("circle", [svg("title", content=f"='{name} · ' + {fixed(num(item), 2)} + ' kWh'")],
+                        visible=f"={share} > 0.05", cx=25, cy=25, r=20, fill="none", stroke=color, pathLength=100,
+                        style={"transform-box": "fill-box", "transform-origin": "center"},
+                        **{"class": f"wedge k k-{name.lower()}", "stroke-width": 7,
+                           "stroke-dasharray": f"=Math.max(0, {share} - ({share} < 99.9 ? {PART_GAP} : 0))"
+                                               f".toFixed(2) + ' 100'",
+                           "stroke-dashoffset": f"=(-({before} + {PART_GAP / 2})).toFixed(2)"}))
+    ring_ = svg("svg", [svg("circle", cx=25, cy=25, r=20, fill="none", stroke="rgba(127, 127, 127, 0.25)",
+                            visible=f"={total} <= 0", **{"stroke-width": 7}),
+                        svg("g", arcs, transform="rotate(-90 25 25)"),
+                        svg_text(25, 26.5, f"={fixed(total, 1)}", 11, "700"),
+                        svg_text(25, 34, "kWh", 6, opacity="0.6")],
+                viewBox="0 0 50 50", width=66, height=66,
+                style={"display": "block", "flex": "0 0 auto", "overflow": "visible"})
+    shares = div([keyed(f"item k k-{name.lower()}",
+                        [div([], **{"width": "8px", "height": "8px", "border-radius": "50%", "background": color}),
+                         label(f"=Math.round({share}) + ' %'", **{"font-size": "12px", "opacity": "0.85"})],
+                        visible=f"=Math.round({share}) >= 1",
+                        style={"display": "flex", "align-items": "center", "gap": "4px"})
+                  for name, item, color, share, _ in split],
+                 **{"display": "flex", "flex-wrap": "wrap", "gap": "2px 8px"})
+    # the pill never reaches past the card; where a card leaves too little room it is cut short
+    chip = vt_chip(*day_change(total_item, better))
+    chip["config"]["style"].update({"max-width": "100%", "overflow": "hidden", "text-overflow": "ellipsis"})
+    texts = div([label(title, **VT_TITLE), shares, chip],
+                **{"display": "flex", "flex-direction": "column", "gap": "4px", "min-width": "0"})
+    return div([ring_, texts], **{"display": "flex", "align-items": "center", "gap": "14px", "padding": "10px 12px",
+                                  "border-radius": "12px", "background": TILE_BG, "min-width": "0"})
 
 
 # the electricity each day's COP is a ratio of: its pill waits for that to be base enough
@@ -3177,24 +3192,22 @@ def hp_stats():
 
 
 def hp_day_split():
-    """Today's electricity and heat of the heat pump, each a pie of space heating, hot water and standby in a small
-    card titled with "heute" (pie_tile(); user, 2026-11-09: pies instead of the bars), side by side, on a phone one
-    over the other so their texts keep their room, with their legend; hovering a part lifts it, the same part in the
-    other pie and its legend entry, as in Consumption Today."""
+    """Today's electricity and heat of the heat pump, each a ring of space heating, hot water and standby in a small
+    card titled with "heute" (split_ring(); user, 2026-11-09: rings instead of the bars), side by side, one over the
+    other where the card is too narrow for two (a phone) so their texts keep their room, with their legend; hovering a
+    part lifts it, the same part in the other ring and its legend entry, as in Consumption Today."""
     # the chips against yesterday in kWh, as Verbrauch heute (user, 2026-10-07)
-    pies = div([pie_tile("Electricity Today", num("espaltherma_energy_today"),
-                         [("Heizung", "espaltherma_energy_space_today", SPACE_C),
-                          ("Warmwasser", "espaltherma_energy_dhw_today", DHW_C),
-                          ("Standby", "espaltherma_energy_standby_today", STANDBY_C)],
-                         vt_chip(*day_change("espaltherma_energy_today", "less"))),
-                pie_tile("Heat Today", num("espaltherma_heating_energy_today"),
-                         [("Heizung", "espaltherma_heating_energy_space_today", SPACE_C),
-                          ("Warmwasser", "espaltherma_heating_energy_dhw_today", DHW_C)],
-                         vt_chip(*day_change("espaltherma_heating_energy_today", "more")))],
-               **{"display": "grid", "gap": "8px", "margin-bottom": "10px",
-                  "grid-template-columns": f"={NARROW} ? 'minmax(0, 1fr)' : 'repeat(2, minmax(0, 1fr))'"})
+    rings = div([split_ring("Electricity Today", "espaltherma_energy_today",
+                            [("Heizung", "espaltherma_energy_space_today", SPACE_C),
+                             ("Warmwasser", "espaltherma_energy_dhw_today", DHW_C),
+                             ("Standby", "espaltherma_energy_standby_today", STANDBY_C)], "less"),
+                 split_ring("Heat Today", "espaltherma_heating_energy_today",
+                            [("Heizung", "espaltherma_heating_energy_space_today", SPACE_C),
+                             ("Warmwasser", "espaltherma_heating_energy_dhw_today", DHW_C)], "more")],
+                **{"display": "grid", "gap": "8px", "margin-bottom": "10px",
+                   "grid-template-columns": "repeat(auto-fit, minmax(225px, 1fr))"})
     return [hover_group([
-        pies,
+        rings,
         div([legend_dot("Heizung", SPACE_C), legend_dot("Warmwasser", DHW_C), legend_dot("Standby", STANDBY_C)],
             **{"display": "flex", "gap": "14px", "margin": "0 0 14px"})],
         [("heizung", SPACE_C), ("warmwasser", DHW_C), ("standby", STANDBY_C)])]
