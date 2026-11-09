@@ -213,7 +213,8 @@ def hover_group(children, keys, **style):
     for key, color in keys:
         css += [f":host:has(.k-{key}:hover) .k-{key} {{ opacity: 1; }}",
                 f":host:has(.k-{key}:hover) .item.k-{key} {{ background-color: {rgba(color, 0.4)}; font-weight: 700; }}",
-                f":host:has(.k-{key}:hover) .seg.k-{key} {{ transform: scaleY(1.5); }}"]
+                f":host:has(.k-{key}:hover) .seg.k-{key} {{ transform: scaleY(1.5); }}",
+                f":host:has(.k-{key}:hover) .wedge.k-{key} {{ transform: scale(1.06); }}"]
     return comp("div", {"stylesheet": "\n".join(css), "style": style}, default=children)
 
 
@@ -3083,24 +3084,45 @@ def stat_tile(title, value, color, icon, popup):
     return div([tile, link], **{"position": "relative", "min-width": "0"})
 
 
-def stacked_bar(title, total, parts, middle=None):
-    """Today's energy as one bar split into its parts, total on the right; the parts take part in the hover
-    highlight of their group, keyed by their lower-case name. middle: a component centred between title and total."""
-    segs = [keyed(f"seg k k-{name.lower()}", [], title=f"='{name} · ' + {fixed(num(i), 2)} + ' kWh'",
-                  visible=f"={num(i)} > 0.005", style={
-                      "width": f"=({total} > 0 ? 100 * {num(i)} / {total} : 0).toFixed(1) + '%'", "background": c,
-                      "height": "100%", "border-radius": "4px"}) for name, i, c in parts]
-    head_ = [label(title, **{"opacity": "0.7"}), label(f"={fixed(total, 1)} + ' kWh'", **{"font-weight": "700"})]
-    if middle is not None:  # title, the pill in the row's middle, the total (user, 2026-10-06)
-        head_[1]["config"]["style"]["justify-self"] = "end"
-        head_.insert(1, middle)
-        row_style = {"display": "grid", "grid-template-columns": "1fr auto 1fr", "align-items": "center",
-                     "gap": "8px", "margin-bottom": "4px"}
-    else:
-        row_style = {"display": "flex", "justify-content": "space-between", "margin-bottom": "4px"}
-    return div([div(head_, **row_style),
-                div(segs, **{"display": "flex", "gap": "2px", "height": "14px"})],
-               **{"margin-bottom": "12px"})
+PIE_LABEL_MIN = 20  # a part's share in per cent from which its wedge has room for it
+
+
+def pie_tile(title, total, parts, chip):
+    """Today's energy as a pie of its parts in a small card, its title, total and the pill against yesterday beside it,
+    as the COPs' rings under it stand beside their texts (user, 2026-11-09: pies instead of the bars): each part a
+    wedge in its colour, clockwise from the top, clamped so they never add up beyond the pie, its share written into
+    it from PIE_LABEL_MIN per cent; a wedge's tooltip names the part with its kWh, and hovering it lifts it, the same
+    part in the other pie and its legend entry (hover_group(), keyed by the part's lower-case name). Grey while
+    nothing counts yet."""
+    c, r = 25, 24
+    before, wedges, shares = "0", [], []
+    for name, item, color in parts:
+        share = f"({total} > 0 ? Math.max(0, Math.min(100 * {num(item)} / {total}, 100 - {before})) : 0)"
+        # a stroke as wide as the pie's radius around half of it fills the wedge; its own transform lifts it, so the
+        # turn to the top sits on the group around the wedges
+        wedges.append(svg("circle", [svg("title", content=f"='{name} · ' + {fixed(num(item), 2)} + ' kWh'")],
+                          visible=f"={share} > 0.05", cx=c, cy=c, r=r / 2, fill="none", stroke=color,
+                          pathLength=100, style={"transform-box": "fill-box", "transform-origin": "center"},
+                          **{"class": f"wedge k k-{name.lower()}", "stroke-width": r,
+                             "stroke-dasharray": f"={share}.toFixed(2) + ' 100'",
+                             "stroke-dashoffset": f"=(-{before}).toFixed(2)"}))
+        # its share in the wedge's middle, in the pie's middle where it is the whole pie
+        mid, dist = f"(({before} + {share} / 2) * Math.PI / 50)", f"({share} >= 99.5 ? 0 : {0.6 * r})"
+        shares.append(svg("text", visible=f"={share} >= {PIE_LABEL_MIN}", content=f"=Math.round({share}) + ' %'",
+                          x=f"=({c} + {dist} * Math.sin({mid})).toFixed(1)",
+                          y=f"=({c} + 2.8 - {dist} * Math.cos({mid})).toFixed(1)",
+                          fill="rgba(0, 0, 0, 0.78)", style={"pointer-events": "none"},
+                          **{"font-size": 8, "font-weight": 700, "text-anchor": "middle"}))
+        before = f"({before} + {share})"
+    pie = svg("svg", [svg("circle", cx=c, cy=c, r=r, fill="rgba(127, 127, 127, 0.25)"),
+                      svg("g", wedges, transform=f"rotate(-90 {c} {c})"), *shares],
+              viewBox=f"0 0 {2 * c} {2 * c}", width=64, height=64,
+              style={"display": "block", "flex": "0 0 auto", "overflow": "visible"})
+    texts = div([label(title, **VT_TITLE),
+                 label(f"={fixed(total, 1)} + ' kWh'", **{**VT_VALUE, "font-size": "18px"}), chip],
+                **{"display": "flex", "flex-direction": "column", "gap": "3px", "min-width": "0"})
+    return div([pie, texts], **{"display": "flex", "align-items": "center", "gap": "12px", "padding": "10px 12px",
+                                "border-radius": "12px", "background": TILE_BG, "min-width": "0"})
 
 
 # the electricity each day's COP is a ratio of: its pill waits for that to be base enough
@@ -3155,22 +3177,26 @@ def hp_stats():
 
 
 def hp_day_split():
-    """Today's electricity and heat of the heat pump, each a bar split into space heating, hot water and standby, titled
-    with "heute" (no heading over them, it saves height), with their legend; hovering a part lifts it, the same part
-    in the other bar and its legend entry, as in Consumption Today."""
+    """Today's electricity and heat of the heat pump, each a pie of space heating, hot water and standby in a small
+    card titled with "heute" (pie_tile(); user, 2026-11-09: pies instead of the bars), side by side, on a phone one
+    over the other so their texts keep their room, with their legend; hovering a part lifts it, the same part in the
+    other pie and its legend entry, as in Consumption Today."""
     # the chips against yesterday in kWh, as Verbrauch heute (user, 2026-10-07)
+    pies = div([pie_tile("Electricity Today", num("espaltherma_energy_today"),
+                         [("Heizung", "espaltherma_energy_space_today", SPACE_C),
+                          ("Warmwasser", "espaltherma_energy_dhw_today", DHW_C),
+                          ("Standby", "espaltherma_energy_standby_today", STANDBY_C)],
+                         vt_chip(*day_change("espaltherma_energy_today", "less"))),
+                pie_tile("Heat Today", num("espaltherma_heating_energy_today"),
+                         [("Heizung", "espaltherma_heating_energy_space_today", SPACE_C),
+                          ("Warmwasser", "espaltherma_heating_energy_dhw_today", DHW_C)],
+                         vt_chip(*day_change("espaltherma_heating_energy_today", "more")))],
+               **{"display": "grid", "gap": "8px", "margin-bottom": "10px",
+                  "grid-template-columns": f"={NARROW} ? 'minmax(0, 1fr)' : 'repeat(2, minmax(0, 1fr))'"})
     return [hover_group([
-        stacked_bar("Electricity Today", num("espaltherma_energy_today"),
-                    [("Heizung", "espaltherma_energy_space_today", SPACE_C),
-                     ("Warmwasser", "espaltherma_energy_dhw_today", DHW_C),
-                     ("Standby", "espaltherma_energy_standby_today", STANDBY_C)],
-                    vt_chip(*day_change("espaltherma_energy_today", "less"))),
-        stacked_bar("Heat Today", num("espaltherma_heating_energy_today"),
-                    [("Heizung", "espaltherma_heating_energy_space_today", SPACE_C),
-                     ("Warmwasser", "espaltherma_heating_energy_dhw_today", DHW_C)],
-                    vt_chip(*day_change("espaltherma_heating_energy_today", "more"))),
+        pies,
         div([legend_dot("Heizung", SPACE_C), legend_dot("Warmwasser", DHW_C), legend_dot("Standby", STANDBY_C)],
-            **{"display": "flex", "gap": "14px", "margin": "-4px 0 14px"})],
+            **{"display": "flex", "gap": "14px", "margin": "0 0 14px"})],
         [("heizung", SPACE_C), ("warmwasser", DHW_C), ("standby", STANDBY_C)])]
 
 

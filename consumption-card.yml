@@ -160,7 +160,7 @@ props:
     required: false
     default: 'true'
   parameterGroups: []
-timestamp: Nov 8, 2026, 12:20:24 PM
+timestamp: Nov 9, 2026, 9:19:48 PM
 component: oh-card
 config:
   title: '=''Consumption Today · '' + ([''NULL'', ''UNDEF''].includes(items[props.homeEnergyToday].state) ? ''–'' : (items[props.homeEnergyToday].displayState
@@ -669,11 +669,15 @@ slots:
 
             :host:has(.k-pv:hover) .seg.k-pv { transform: scaleY(1.5); }
 
+            :host:has(.k-pv:hover) .wedge.k-pv { transform: scale(1.06); }
+
             :host:has(.k-grid:hover) .k-grid { opacity: 1; }
 
             :host:has(.k-grid:hover) .item.k-grid { background-color: rgba(239, 154, 154, 0.4); font-weight: 700; }
 
-            :host:has(.k-grid:hover) .seg.k-grid { transform: scaleY(1.5); }'
+            :host:has(.k-grid:hover) .seg.k-grid { transform: scaleY(1.5); }
+
+            :host:has(.k-grid:hover) .wedge.k-grid { transform: scale(1.06); }'
           style: {}
         slots:
           default:
@@ -854,11 +858,15 @@ slots:
 
             :host:has(.k-c0:hover) .seg.k-c0 { transform: scaleY(1.5); }
 
+            :host:has(.k-c0:hover) .wedge.k-c0 { transform: scale(1.06); }
+
             :host:has(.k-c1:hover) .k-c1 { opacity: 1; }
 
             :host:has(.k-c1:hover) .item.k-c1 { background-color: rgba(38, 166, 154, 0.4); font-weight: 700; }
 
             :host:has(.k-c1:hover) .seg.k-c1 { transform: scaleY(1.5); }
+
+            :host:has(.k-c1:hover) .wedge.k-c1 { transform: scale(1.06); }
 
             :host:has(.k-c2:hover) .k-c2 { opacity: 1; }
 
@@ -866,11 +874,15 @@ slots:
 
             :host:has(.k-c2:hover) .seg.k-c2 { transform: scaleY(1.5); }
 
+            :host:has(.k-c2:hover) .wedge.k-c2 { transform: scale(1.06); }
+
             :host:has(.k-c3:hover) .k-c3 { opacity: 1; }
 
             :host:has(.k-c3:hover) .item.k-c3 { background-color: rgba(206, 147, 216, 0.4); font-weight: 700; }
 
             :host:has(.k-c3:hover) .seg.k-c3 { transform: scaleY(1.5); }
+
+            :host:has(.k-c3:hover) .wedge.k-c3 { transform: scale(1.06); }
 
             :host:has(.k-c4:hover) .k-c4 { opacity: 1; }
 
@@ -878,11 +890,15 @@ slots:
 
             :host:has(.k-c4:hover) .seg.k-c4 { transform: scaleY(1.5); }
 
+            :host:has(.k-c4:hover) .wedge.k-c4 { transform: scale(1.06); }
+
             :host:has(.k-c5:hover) .k-c5 { opacity: 1; }
 
             :host:has(.k-c5:hover) .item.k-c5 { background-color: rgba(128, 203, 196, 0.4); font-weight: 700; }
 
             :host:has(.k-c5:hover) .seg.k-c5 { transform: scaleY(1.5); }
+
+            :host:has(.k-c5:hover) .wedge.k-c5 { transform: scale(1.06); }
 
             :host:has(.k-c6:hover) .k-c6 { opacity: 1; }
 
@@ -890,11 +906,15 @@ slots:
 
             :host:has(.k-c6:hover) .seg.k-c6 { transform: scaleY(1.5); }
 
+            :host:has(.k-c6:hover) .wedge.k-c6 { transform: scale(1.06); }
+
             :host:has(.k-c7:hover) .k-c7 { opacity: 1; }
 
             :host:has(.k-c7:hover) .item.k-c7 { background-color: rgba(188, 170, 164, 0.4); font-weight: 700; }
 
             :host:has(.k-c7:hover) .seg.k-c7 { transform: scaleY(1.5); }
+
+            :host:has(.k-c7:hover) .wedge.k-c7 { transform: scale(1.06); }
 
             :host:has(.k-c8:hover) .k-c8 { opacity: 1; }
 
@@ -902,11 +922,15 @@ slots:
 
             :host:has(.k-c8:hover) .seg.k-c8 { transform: scaleY(1.5); }
 
+            :host:has(.k-c8:hover) .wedge.k-c8 { transform: scale(1.06); }
+
             :host:has(.k-c9:hover) .k-c9 { opacity: 1; }
 
             :host:has(.k-c9:hover) .item.k-c9 { background-color: rgba(174, 213, 129, 0.4); font-weight: 700; }
 
             :host:has(.k-c9:hover) .seg.k-c9 { transform: scaleY(1.5); }
+
+            :host:has(.k-c9:hover) .wedge.k-c9 { transform: scale(1.06); }
 
             :host:has(.k-c10:hover) .k-c10 { opacity: 1; }
 
@@ -914,17 +938,23 @@ slots:
 
             :host:has(.k-c10:hover) .seg.k-c10 { transform: scaleY(1.5); }
 
+            :host:has(.k-c10:hover) .wedge.k-c10 { transform: scale(1.06); }
+
             :host:has(.k-c11:hover) .k-c11 { opacity: 1; }
 
             :host:has(.k-c11:hover) .item.k-c11 { background-color: rgba(255, 138, 101, 0.4); font-weight: 700; }
 
             :host:has(.k-c11:hover) .seg.k-c11 { transform: scaleY(1.5); }
 
+            :host:has(.k-c11:hover) .wedge.k-c11 { transform: scale(1.06); }
+
             :host:has(.k-c12:hover) .k-c12 { opacity: 1; }
 
             :host:has(.k-c12:hover) .item.k-c12 { background-color: rgba(224, 224, 224, 0.4); font-weight: 700; }
 
-            :host:has(.k-c12:hover) .seg.k-c12 { transform: scaleY(1.5); }'
+            :host:has(.k-c12:hover) .seg.k-c12 { transform: scaleY(1.5); }
+
+            :host:has(.k-c12:hover) .wedge.k-c12 { transform: scale(1.06); }'
           style: {}
         slots:
           default:

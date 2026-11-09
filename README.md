@@ -311,18 +311,19 @@ shows on the tank), its ring as in the energy flow, whole while it draws and fil
 hot-water charge, while the setpoint pill gives way to the time left, as a Miele machine's, and a line names the end.
 Each tile's pill holds the temperature, the tank's and the leaving water's, filled in the tile's colour while hot water
 or heating is switched on, outlined while off, beside a tinted pill with the setpoint and a small target icon; a tap
-opens the heat pump's page of my installation. Below them today's electricity and heat of the heat pump split into space
-heating, DHW and standby as bars (hovering a part lifts it everywhere), each with today against yesterday at this time
-in a pill in the middle of its title (the difference in kWh), and today's COPs of space heating, DHW and in total in one
-row as rings like the energy flow's self-consumption, each with today against yesterday at this time in a pill under its
-title; a tap on one opens the item popup with that COP large inside its ring, beside it today's heat and electricity it
-is the ratio of and yesterday's whole day, and its course over the day. While the tank charges or the heating runs, a
-line under its tile says since when. A round badge right of each tile's pills counts today's compressor runs in the
-tile's mode: every stretch of 2 minutes or more in which the compressor runs with the three-way valve on that side, so a
-charge that takes over a running heating run counts for hot water (the restarts of a defrost do not count), outlined in
-the tile's colour, grey at none; while the cycle guard of my installation holds back the next start after a stop (it
-lowers the leaving water setpoint until the return water has cooled well below the heating curve, so that the run after
-it lasts), a line under the heating tile says so. The screenshots show it with the heat pump card's demo values.
+opens the heat pump's page of my installation. Below them today's electricity and heat of the heat pump as two pies of
+space heating, DHW and standby in small cards, each share written into its wedge (hovering a part lifts it everywhere),
+beside each its total and today against yesterday at this time in a pill (the difference in kWh), and today's COPs of
+space heating, DHW and in total in one row as rings like the energy flow's self-consumption, each with today against
+yesterday at this time in a pill under its title; a tap on one opens the item popup with that COP large inside its ring,
+beside it today's heat and electricity it is the ratio of and yesterday's whole day, and its course over the day. While
+the tank charges or the heating runs, a line under its tile says since when. A round badge right of each tile's pills
+counts today's compressor runs in the tile's mode: every stretch of 2 minutes or more in which the compressor runs with
+the three-way valve on that side, so a charge that takes over a running heating run counts for hot water (the restarts
+of a defrost do not count), outlined in the tile's colour, grey at none; while the cycle guard of my installation holds
+back the next start after a stop (it lowers the leaving water setpoint until the return water has cooled well below the
+heating curve, so that the run after it lasts), a line under the heating tile says so. The screenshots show it with the
+heat pump card's demo values.
 
 Needs `flow-node`, `item-popup`, `trip-popup`.
 
@@ -358,10 +359,10 @@ Needs `flow-node`, `item-popup`, `trip-popup`.
 | `heatpumpHeatingSince` | Heatpump Heating Running Since | DateTime |
 | `heatpumpCycleLock` | Heatpump Cycle Guard Lock | Number |
 | `heatpumpEnergyToday` | ESPAltherma Energy Today | Number:Energy |
-| `tileHistory` | Tile history | String |
 | `heatpumpEnergySpaceToday` | ESPAltherma Energy Space Today | Number:Energy |
 | `heatpumpEnergyDhwToday` | ESPAltherma Energy DHW Today | Number:Energy |
 | `heatpumpEnergyStandbyToday` | ESPAltherma Energy Standby Today | Number:Energy |
+| `tileHistory` | Tile history | String |
 | `heatpumpHeatingEnergyToday` | ESPAltherma Heating Energy Today | Number:Energy |
 | `heatpumpHeatingEnergySpaceToday` | ESPAltherma Heating Energy Space Today | Number:Energy |
 | `heatpumpHeatingEnergyDhwToday` | ESPAltherma Heating Energy DHW Today | Number:Energy |
