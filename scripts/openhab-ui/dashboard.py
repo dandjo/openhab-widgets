@@ -5946,6 +5946,27 @@ def month_sums(series, unit="kWh", value_formatter=PV_MONTH_VALUE):
                  tooltip=tooltip(trigger="axis", smartFormatter=False, valueFormatter=value_formatter), legend=legend())
 
 
+def year_sums(series, unit, value_formatter):
+    """Sums per year of the daily total items over five calendar years, the arrows paging by five; series: (name,
+    item, colour). MainUI's chartType fiveYears runs from the first of January four years back to the end of this one,
+    its category axis years names them, and the aggregate series puts each year's sum at its place. Only the stored
+    days count (DAY_ONLY), as in month_sums()."""
+    return chart({"chartType": "fiveYears", "periodVisible": True, "height": "260px"},
+                 grid=[comp("oh-chart-grid", {"top": "40", "bottom": "40", "left": "55", "right": "12"})],
+                 xAxis=[comp("oh-category-axis", {"gridIndex": 0, "categoryType": "years", "name": " ",
+                                                  "axisTick": {"show": False}})],
+                 yAxis=[comp("oh-value-axis", {"gridIndex": 0, "name": unit, "nameGap": 14, "nameTextStyle": AXIS_NAME,
+                                               "axisLabel": {"formatter": "=(v) => v.toLocaleString('de-AT')"},
+                                               "splitLine": {"lineStyle": {"type": "dashed", "opacity": 0.4}}})],
+                 series=[comp("oh-aggregate-series", {"name": name, "gridIndex": 0, "xAxisIndex": 0, "yAxisIndex": 0,
+                                                      "type": "bar", "item": item, "aggregationFunction": "sum",
+                                                      "dimension1": "year", "barMaxWidth": 60,
+                                                      "itemStyle": {"color": color, "borderRadius": [4, 4, 0, 0]},
+                                                      **DAY_ONLY})
+                         for name, item, color in series],
+                 tooltip=tooltip(trigger="axis", smartFormatter=False, valueFormatter=value_formatter))
+
+
 def home_sources_today():
     """Where today's consumption came from, as a donut: PV straight, the battery and the grid, which counts less the
     battery's charge from the grid (rule home_energy since 2026-10-19)."""
@@ -9269,7 +9290,7 @@ def km_tile():
 
 def km_popup_blocks():
     """The car's odometer and the km it drove (user, 2026-11-09: the odometer's own course, a nearly flat line, said
-    nothing): the reading large with today's km, the km per day of a month and per month of a year
+    nothing): the reading large with today's km, the km per day of a month, per month of a year and per year of five
     (skoda_enyaq_km_today, one point per day as the daily totals have it), the arrows paging back."""
     odometer, today = skoda("odometer"), skoda("km_today")
     now = [hero("material:speed", ECAR_COLOR, "Kilometerstand",
@@ -9277,9 +9298,12 @@ def km_popup_blocks():
                 [chip(f"='heute ' + ({ok(today)} ? Math.round({num(today)}) : 0) + ' km'", ECAR_COLOR)])]
     days = day_sums([("Gefahren", today, ECAR_COLOR)], "km", unit="km")
     months = month_sums([("Gefahren", today, ECAR_COLOR, {})], unit="km", value_formatter=KM_MONTH_VALUE)
+    # and per year, five a page (user, 2026-11-09)
+    years = year_sums([("Gefahren", today, ECAR_COLOR)], "km", KM_MONTH_VALUE)
     for one_chart in (days, months):
         one_chart["slots"].pop("legend", None)  # one series needs no legend
-    return [one(card("Jetzt", now)), one(card("Pro Tag", [days])), one(card("Pro Monat", [months]))]
+    return [one(card("Jetzt", now)), one(card("Pro Tag", [days])), one(card("Pro Monat", [months])),
+            one(card("Pro Jahr", [years]))]
 
 
 def climate_degrees(item):
