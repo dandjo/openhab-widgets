@@ -5909,14 +5909,14 @@ def pv_destinations():
         ("ins Netz", PV_GRID, "#78909c", "upload")])
 
 
-def day_sums(series, stack):
+def day_sums(series, stack, unit="kWh"):
     """The daily totals of the current month as stacked bars, the arrows paging through months; series: (name,
     item, colour)."""
     return chart({"chartType": "month", "periodVisible": True, "height": "260px"},
                  grid=[comp("oh-chart-grid", {"top": "40", "bottom": "60", "left": "45", "right": "20"})],
                  xAxis=[comp("oh-category-axis", {"gridIndex": 0, "categoryType": "month", "name": "Tag", "nameGap": 12,
                                                   "axisTick": {"show": False}})],
-                 yAxis=[value_axis("kWh")],
+                 yAxis=[value_axis(unit)],
                  series=[daily(name, item, color, stack=stack,
                                **({"itemStyle": {"color": color, "borderRadius": [4, 4, 0, 0]}} if i == len(series) - 1
                                   else {}))
@@ -5924,7 +5924,7 @@ def day_sums(series, stack):
                  tooltip=tooltip(trigger="axis", smartFormatter=True), legend=legend())
 
 
-def month_sums(series):
+def month_sums(series, unit="kWh", value_formatter=PV_MONTH_VALUE):
     """Sums per month of the daily total items over a year, the arrows paging through years; series: (name, item,
     colour, extra), bars unless extra says otherwise. Only the stored days count (DAY_ONLY): else January took in
     31 December and the running month today twice."""
@@ -5934,7 +5934,7 @@ def month_sums(series):
                                                   "name": " ", "axisTick": {"show": False},
                                                   "axisLabel": {"interval": 0, "fontSize": f"={NARROW} ? 10 : 12",
                                                                 "formatter": f"=(v, i) => {PV_MONTHS_SHORT}[i]"}})],
-                 yAxis=[comp("oh-value-axis", {"gridIndex": 0, "name": "kWh", "nameGap": 14, "nameTextStyle": AXIS_NAME,
+                 yAxis=[comp("oh-value-axis", {"gridIndex": 0, "name": unit, "nameGap": 14, "nameTextStyle": AXIS_NAME,
                                                "axisLabel": {"formatter": "=(v) => v.toLocaleString('de-AT')"},
                                                "splitLine": {"lineStyle": {"type": "dashed", "opacity": 0.4}}})],
                  series=[comp("oh-aggregate-series", {"name": name, "gridIndex": 0, "xAxisIndex": 0, "yAxisIndex": 0,
@@ -5943,7 +5943,7 @@ def month_sums(series):
                                                       **DAY_ONLY, **extra})
                          for name, item, color, extra in series],
                  # MainUI's smart formatter, on unless switched off, would override valueFormatter
-                 tooltip=tooltip(trigger="axis", smartFormatter=False, valueFormatter=PV_MONTH_VALUE), legend=legend())
+                 tooltip=tooltip(trigger="axis", smartFormatter=False, valueFormatter=value_formatter), legend=legend())
 
 
 def home_sources_today():
@@ -9241,19 +9241,45 @@ def e_car_now():
                          skoda("at_home"), "Standort", ECAR_COLOR,
                          # its popup with a map of where the car stands and its trips (user, 2026-10-26)
                          popup={"map": skoda("parking_position"), "trips": skoda("trips")})
-    odometer = skoda("odometer")
     climate, target = skoda("climate_state"), skoda("climate_target")
     climate_tile = vt_tile([vt_head("Klimatisierung"), vt_value(f"={disp(climate)}"),
                             label(f"='Ziel ' + {climate_degrees(target)}", **VT_SUB)], climate, "Klimatisierung",
                            ECAR_COLOR)
     tiles = two_on_phone(value_grid([lock_tile, place_tile,
-                        vtile("Kilometerstand", odometer,
-                              f"={ok(odometer)} ? Math.round({num(odometer)}).toLocaleString('de-DE') + ' km' : '–'",
-                              color=ECAR_COLOR),
+                        km_tile(),
                         climate_tile,
                         vtile("Ladekabel", skoda("plug"), color=ECAR_COLOR),
                         vtile("Ladestecker", skoda("plug_locked"), color=ECAR_COLOR)]), 200)
     return [head, charge, tiles]
+
+
+KM_POPUP = "e_car_km"
+KM_MONTH_VALUE = "=(v) => v == null ? '–' : Math.round(Number(v)).toLocaleString('de-AT') + ' km'"
+
+
+def km_tile():
+    """The odometer with today's km under it, a tap opening the km popup (KM_POPUP)."""
+    odometer, today = skoda("odometer"), skoda("km_today")
+    return vt_tile([vt_head("Kilometerstand"),
+                    vt_value(f"={ok(odometer)} ? Math.round({num(odometer)}).toLocaleString('de-DE') + ' km' : '–'"),
+                    label(f"={ok(today)} ? 'heute ' + Math.round({num(today)}) + ' km' : ''", **VT_SUB),
+                    page_link({"position": "absolute", "inset": "0", "display": "block", "border-radius": "12px"},
+                              KM_POPUP)])
+
+
+def km_popup_blocks():
+    """The car's odometer and the km it drove (user, 2026-11-09: the odometer's own course, a nearly flat line, said
+    nothing): the reading large with today's km, the km per day of a month and per month of a year
+    (skoda_enyaq_km_today, one point per day as the daily totals have it), the arrows paging back."""
+    odometer, today = skoda("odometer"), skoda("km_today")
+    now = [hero("material:speed", ECAR_COLOR, "Kilometerstand",
+                f"={ok(odometer)} ? Math.round({num(odometer)}).toLocaleString('de-DE') + ' km' : '–'",
+                [chip(f"='heute ' + ({ok(today)} ? Math.round({num(today)}) : 0) + ' km'", ECAR_COLOR)])]
+    days = day_sums([("Gefahren", today, ECAR_COLOR)], "km", unit="km")
+    months = month_sums([("Gefahren", today, ECAR_COLOR, {})], unit="km", value_formatter=KM_MONTH_VALUE)
+    for one_chart in (days, months):
+        one_chart["slots"].pop("legend", None)  # one series needs no legend
+    return [one(card("Jetzt", now)), one(card("Pro Tag", [days])), one(card("Pro Monat", [months]))]
 
 
 def climate_degrees(item):
@@ -11087,6 +11113,8 @@ def migrate_pages(d):
     # the sun arc's popup, at MainUI's usual popup width
     d = m.insert(d, SUN_POPUP, layout_page(SUN_POPUP, {"label": "Sonnenbogen", "sidebar": False}, sun_popup_blocks(),
                                            now))
+    # the e-car's km per day and month, opened by the odometer's tile (user, 2026-11-09)
+    d = m.insert(d, KM_POPUP, layout_page(KM_POPUP, {"label": "Kilometer", "sidebar": False}, km_popup_blocks(), now))
     for uid, blocks in DEVICE_PAGES.items():  # the device pages, label, icon and sidebar order kept
         old = d[uid]["value"]["config"] if uid in d else NEW_PAGES[uid]
         config = {"label": old["label"], "icon": old.get("icon"), "order": old.get("order"), "sidebar": True,

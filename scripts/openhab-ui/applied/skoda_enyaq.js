@@ -934,6 +934,37 @@ function estimateBase() {
   }
 }
 
+// the km driven per day (user, 2026-11-09: the odometer's own course was a flat line): a day's are the odometer at its
+// end (today: now) less its last reading before the day, today's in the item skoda_enyaq_km_today; one point per day
+// at 23:59:59 in InfluxDB, as the daily totals of the rule energy_daily_totals have it, so a month's bars and a year's
+// sums read one value a day. In the first half hour after midnight yesterday's again, as the odometer reaches the item
+// (and InfluxDB) only after the run that posted it
+function kmPerDay() {
+  const odometer = items.getItem(P + 'odometer');
+  const reading = (zdt) => {
+    const p = odometer.persistence.persistedState(zdt, 'influxdb');
+    return p && typeof p.numericState === 'number' ? p.numericState : null;
+  };
+  const target = items.getItem(P + 'km_today');
+  const midnight = time.toZDT('00:00');
+  const atMidnight = reading(midnight);
+  const now = odometer.numericState;
+  if (now !== null && atMidnight !== null) {
+    const km = Math.max(0, Math.round(now - atMidnight));
+    if (target.numericState !== km) {
+      target.postUpdate(Quantity(`${km} km`));
+      target.persistence.persist(time.toZDT('23:59:59'), Quantity(`${km} km`), 'influxdb');
+    }
+  }
+  if (time.Duration.between(midnight, time.toZDT()).toMinutes() < 30) {
+    const before = reading(midnight.minusDays(1));
+    if (atMidnight !== null && before !== null) {
+      const km = Math.max(0, Math.round(atMidnight - before));
+      target.persistence.persist(time.toZDT('23:59:59').minusDays(1), Quantity(`${km} km`), 'influxdb');
+    }
+  }
+}
+
 function run() {
   const received = receivedCommand();
   if (received === null) {
@@ -951,6 +982,11 @@ function run() {
     estimateSoc();
   } catch (e) {
     console.warn(`Škoda: Ladestand-Schätzung: ${e}`);
+  }
+  try {
+    kmPerDay();
+  } catch (e) {
+    console.warn(`Škoda: Kilometer pro Tag: ${e}`);
   }
   try {
     publishTrips();

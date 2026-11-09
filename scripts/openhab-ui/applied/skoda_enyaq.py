@@ -94,6 +94,10 @@ POINTS = {
     "plug_locked": ("Switch", "Ladestecker verriegelt", "lock", ["Status"], CHANGE,
                     state("%s", options="ON=Verriegelt,OFF=Entriegelt")),
     "odometer": ("Number:Length", "Kilometerstand", "speed", ["Measurement"], CHANGE, quantity("km", "%.0f %unit%")),
+    # the km driven today, from the odometer (rule: kmPerDay; user, 2026-11-09); its InfluxDB points, one per day at
+    # 23:59:59, the rule writes itself, as the daily totals are written: a persistence group would add a point at every
+    # change, and a month's sum would count them all
+    "km_today": ("Number:Length", "Kilometer heute", "route", ["Measurement"], RESTORE, quantity("km", "%.0f %unit%")),
     "locked": ("Switch", "Verriegelt", "lock", ["Status"], CHANGE, state("%s", options="ON=Verriegelt,OFF=Entriegelt")),
     "doors": ("Contact", "Türen", "sensor_door", ["Status", "Opening"], CHANGE, state("%s", options=OPEN_CLOSED)),
     "windows": ("Contact", "Fenster", "window", ["Status", "Opening"], CHANGE, state("%s", options=OPEN_CLOSED)),
