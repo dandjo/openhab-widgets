@@ -1772,11 +1772,8 @@ def energy_flow():
                # it centres itself in the height the row leaves, the cards below stay at the card's bottom
                **{"padding": f"={NARROW} ? '4px' : '12px'", "flex": "1 1 auto", "display": "flex",
                   "flex-direction": "column", "justify-content": "center"})
-    # its tiles as far in from the card's edge as the other cards' tiles (16 px, user 2026-10-05)
-    # the house over the strip of the other consumers (user, 2026-11-08), as wide as its content as they are (user,
-    # 2026-11-09)
-    strip = div([house_tiles()], **{"display": "flex", "padding": "8px 16px 0"})
-    return [star, strip, others_strip()]
+    # the house first among the other consumers' tiles (others_strip())
+    return [star, others_strip()]
 
 
 # the consumers outside the star that no card under it shows (user, 2026-11-08, proposal C; the switches' devices stand
@@ -1842,8 +1839,9 @@ def others_tile(name, kind, power, energy, color, standby, page=None):
 
 def others_strip():
     """The strip under the star: the house's power less the star's consumers (the air conditioner by its node's value,
-    its standby too, which the star's pie counts only while it is on), STRIP_CONSUMERS and what no meter counts (the
-    house less the star and every metered group outside it)."""
+    its standby too, which the star's pie counts only while it is on) over one flowing row of tiles (user,
+    2026-11-10): the house first, then STRIP_CONSUMERS and what no meter counts (the house less the star and every
+    metered group outside it)."""
     groups = {name: (items_, color) for name, items_, color in PEAK_GROUPS}
     star = " + ".join(f"Math.max(0, {AC_NET if xy == AC_XY else power})" for xy, power, _, _ in consumers())
     metered = " + ".join(f"Math.max(0, {num(i)})" for name, (items_, _) in groups.items() if name not in STAR_GROUPS
@@ -1854,8 +1852,9 @@ def others_strip():
                                                                           **{"font-weight": "700"})],
                **{"display": "flex", "gap": "6px", "font-size": "12px", "margin-bottom": "6px"})
     energy = {name: value for name, value, _ in values}  # today's energy of the consumption card's groups
-    tiles = [others_tile(name, kind, "(" + " + ".join(num(i) for i in groups[group][0]) + ")", energy[group],
-                         groups[group][1], standby, page) for group, name, kind, standby, page in STRIP_CONSUMERS]
+    tiles = [house_tiles()]
+    tiles += [others_tile(name, kind, "(" + " + ".join(num(i) for i in groups[group][0]) + ")", energy[group],
+                          groups[group][1], standby, page) for group, name, kind, standby, page in STRIP_CONSUMERS]
     tiles.append(others_tile("Nicht gemessen", None, rest, energy["Nicht gemessen"], OTHERS_REST_C, None))
     return div([head, div(tiles, **{"display": "flex", "flex-wrap": "wrap", "gap": "8px"})],
                **{"padding": "12px 16px 14px"})
@@ -1879,18 +1878,18 @@ def tile_ring_svg(parts):
 
 
 def house_tiles():
-    """The house's power and energy today as a small card under the star, over the strip of the other consumers and
-    as wide as its content as theirs are (user, 2026-11-09), opening its popup with a tap anywhere on it; today's
+    """The house's power and energy today as a small card under the star, the first of the strip's tiles and as wide
+    as its content as theirs are (user, 2026-11-09), opening its popup with a tap anywhere on it; today's
     self-consumption and self-sufficiency stand on top of the consumption card (self_share_tiles(); user,
     2026-11-08)."""
     # the house's node as the star draws it (user, 2026-11-09): its ring the pie of what the consumers draw; beside it
-    # its power, name and today's energy, and a pill with today against yesterday at this time (user, 2026-10-06)
+    # its power, name and today's energy, without today against yesterday (user, 2026-11-10: so it flows with the
+    # other consumers' tiles; Verbrauch heute has it)
     node = tile_node([track(0, 0), *house_pie((0, 0), underlay=False), flow_node("home", (0, 0), num(HOME))])
     link = comp("oh-link", {"action": "popup", "actionModal": "page:flow_home",
                             "style": {"position": "absolute", "inset": "0", "display": "block",
                                       "border-radius": "12px"}})
-    return strip_tile(node, [*strip_lines(num(HOME), "Haus", num("home_ec_day")),
-                             vt_chip(*day_change("home_ec_day", "less"))], link)
+    return strip_tile(node, strip_lines(num(HOME), "Haus", num("home_ec_day")), link, "-1000000")
 
 
 def self_share_tiles():
