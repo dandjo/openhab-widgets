@@ -58,7 +58,8 @@ with the live files uid by uid and `ui_put.py` write what changed, with the API 
     rm -rf /tmp/ui-run && mkdir -p /tmp/ui-run/jsondb
     cd /var/lib/openhab/jsondb
     cp uicomponents_ui_page.json uicomponents_ui_widget.json \
-       org.openhab.core.items.Item.json org.openhab.core.items.Metadata.json /tmp/ui-run/jsondb/
+       org.openhab.core.items.Item.json org.openhab.core.items.Metadata.json \
+       org.openhab.core.persistence.PersistenceServiceConfiguration.json /tmp/ui-run/jsondb/
     cd ~/scripts/openhab-ui
     OPENHAB_JSONDB=/tmp/ui-run/jsondb python3 dashboard.py update-apply
     python3 ui_diff.py /var/lib/openhab/jsondb /tmp/ui-run/jsondb /tmp/ui-run/body.json
@@ -70,6 +71,10 @@ MainUI shows the change on the next page load. `~/docs/openhab-changes.md` descr
 
 `awattar_migrate.py` holds the JSONDB helpers the script uses: byte-exact re-encoding of openHAB's files and
 insertion in their sorted order. `OPENHAB_JSONDB` points them at another directory than `/var/lib/openhab/jsondb`.
+
+A tile opens its item's popup only where InfluxDB has a course of it: the persistence configuration of the JSONDB
+stores the item, or a rule wrote a point within 60 days (`INFLUXDB_URL`, default `http://127.0.0.1:8086`, and
+`INFLUXDB_DB`, default `openhab`). Without the configuration or an answer from InfluxDB every tile keeps its popup.
 
 ## The rest of this directory
 

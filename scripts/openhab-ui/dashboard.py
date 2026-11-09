@@ -5227,8 +5227,9 @@ def heating(tile=heat_tile):
 
 def value_tile_widget():
     """The widget every value tile is an instance of: title and value in the text colour, a tap opening the item's
-    popup where an item is given. Its lengths are em of its font size, 14 px unless fontSize sets another, so a tile
-    in a card that grows grows with it; wrap lets a long text wrap across the whole row of the grid."""
+    popup where an item is given and the popup has a course to show (kind not none; user, 2026-11-09). Its lengths are
+    em of its font size, 14 px unless fontSize sets another, so a tile in a card that grows grows with it; wrap lets a
+    long text wrap across the whole row of the grid."""
     return div([
         # the texts in their own positioned box, the link above them
         div([label("=props.title", **{"font-size": "0.8571em", "opacity": "0.65"}),
@@ -5239,7 +5240,8 @@ def value_tile_widget():
                                       "overflow": "hidden", "text-overflow": "=props.wrap ? 'clip' : 'ellipsis'",
                                       "overflow-wrap": "anywhere"})],
             **{"position": "relative"}),
-        comp("oh-link", {"visible": "=!!props.item", "action": "=props.action || 'popup'", "actionItem": "=props.item",
+        comp("oh-link", {"visible": "=!!props.item && (props.kind !== 'none' || (props.action || 'popup') !== 'popup')",
+                         "action": "=props.action || 'popup'", "actionItem": "=props.item",
                          "actionModal": "widget:item-popup",
                          "actionModalConfig": {"item": "=props.item", "title": "=props.title",
                                                "color": f"=props.color || '{POPUP_COLOR}'",
@@ -6232,6 +6234,7 @@ def item_tap(item, action="popup"):
     if action != "popup":
         return {"item": item, "action": action}
     kind, states = item_kind(item)
+    # kind none: no popup (value_tile_widget()), the item stays for value_grid()'s renderers
     return {"item": item, "kind": kind, **({"states": states} if states else {})}
 
 
@@ -6254,7 +6257,8 @@ def status_tile(title, item, color="#fb8c00"):
     on = f"items.{item}.state === 'ON'"
     return div([label(title, **{"font-size": "13px", "flex": "1", "min-width": "0", "white-space": "nowrap",
                                 "overflow": "hidden", "text-overflow": "ellipsis"}),
-                chip(f"={on} ? 'An' : 'Aus'", f"={on} ? '{color}' : '#9e9e9e'"), link_over(item, title=title, color=color)],
+                chip(f"={on} ? 'An' : 'Aus'", f"={on} ? '{color}' : '#9e9e9e'"),
+                *([link_over(item, title=title, color=color)] if item_kind(item)[0] != "none" else [])],
                **{"position": "relative", "display": "flex", "align-items": "center", "gap": "8px",
                   "padding": "8px 12px", "border-radius": "12px", "background": TILE_BG})
 
@@ -9103,8 +9107,10 @@ def energy_storage_blocks():
         comp("oh-label-item", {"action": "options", "actionItem": "huawei_inverter_energy_storage_forcible_charge_discharge",
                                "icon": "material:battery_charging_full", "item": "huawei_inverter_energy_storage_forcible_charge_discharge",
                                "title": "Zwangsladen/-entladen"}),
-        comp("oh-label-item", {**item_modal("huawei_inverter_energy_storage_remaining_charge_discharge_time",
-                                            "Restzeit Laden/Entladen"),
+        comp("oh-label-item", {**(item_modal("huawei_inverter_energy_storage_remaining_charge_discharge_time",
+                                             "Restzeit Laden/Entladen")
+                                  if item_kind("huawei_inverter_energy_storage_remaining_charge_discharge_time")[0]
+                                  != "none" else {}),
                                "icon": "material:hourglass_bottom", "item": "huawei_inverter_energy_storage_remaining_charge_discharge_time",
                                "title": "Restzeit Laden/Entladen"})]
     controls = [comp("f7-list", {"style": {"margin": "0 0 8px"}}, default=control_items),
@@ -10803,16 +10809,103 @@ def known_items():
     return _ITEMS
 
 
+INFLUXDB_URL = os.environ.get("INFLUXDB_URL", "http://127.0.0.1:8086")
+INFLUXDB_DB = os.environ.get("INFLUXDB_DB", "openhab")
+RULE_WRITTEN_DAYS = 60  # how recent a point a rule wrote must be for its item to count as charted
+_CHARTED = {}
+
+
+def influx_persisted():
+    """The items openHAB's InfluxDB persistence stores by its configuration, or None where the JSONDB the generator
+    reads lacks it: per configuration its plain names and group* for the members of a group, of its member groups
+    too, * for all items, less the !-prefixed exclusions of either."""
+    path, items_path = (m.DB + f for f in ("org.openhab.core.persistence.PersistenceServiceConfiguration.json",
+                                           "org.openhab.core.items.Item.json"))
+    if not (os.access(path, os.R_OK) and os.access(items_path, os.R_OK)):
+        return None
+    configs = m.json.load(open(path)).get("influxdb", {}).get("value", {}).get("configs", [])
+    raw = {k: v["value"] for k, v in m.json.load(open(items_path)).items()}
+    members = {}
+    for name, value in raw.items():
+        for group in value.get("groupNames", []):
+            members.setdefault(group, []).append(name)
+
+    def expand(entry):
+        if entry == "*":
+            return {k for k, v in raw.items() if v.get("itemType") != "Group"}
+        if not entry.endswith("*"):
+            return {entry}
+        out, todo, seen = set(), [entry[:-1]], set()
+        while todo:
+            group = todo.pop()
+            for name in members.get(group, []):
+                if raw[name].get("itemType") == "Group":
+                    if name not in seen:
+                        seen.add(name)
+                        todo.append(name)
+                else:
+                    out.add(name)
+        return out
+
+    stored = set()
+    for config in configs:
+        entries = config.get("items", [])
+        stored |= (set().union(*(expand(e) for e in entries if not e.startswith("!")))
+                   - set().union(*(expand(e[1:]) for e in entries if e.startswith("!"))))
+    return stored
+
+
+def influx_recent(item):
+    """Whether InfluxDB holds a point of the item from the last RULE_WRITTEN_DAYS days, for the items rules write
+    there themselves (persistence.persist), which no persistence configuration names; None where it does not answer.
+    Old points of an item no longer stored do not count."""
+    import urllib.parse
+    import urllib.request
+    query = f'SELECT last(value) FROM "{item}" WHERE time > now() - {RULE_WRITTEN_DAYS}d'
+    url = f"{INFLUXDB_URL}/query?" + urllib.parse.urlencode({"db": INFLUXDB_DB, "q": query})
+    try:
+        result = m.json.load(urllib.request.urlopen(url, timeout=10))["results"][0]
+    except (OSError, ValueError, KeyError, IndexError):
+        return None
+    if "error" in result:
+        return None
+    return bool(result.get("series"))
+
+
+def charted(item):
+    """Whether InfluxDB has a course of the item for its popup to draw: its persistence configuration stores the item,
+    or a rule wrote a point lately (user, 2026-11-09: the API quota's popup, of an item only MapDB restores, showed an
+    empty chart). True where neither can be told, as the generator then knows no better than before."""
+    if "stored" not in _CHARTED:
+        _CHARTED["stored"], _CHARTED["recent"] = influx_persisted(), {}
+        if _CHARTED["stored"] is None:
+            print("note: no persistence configuration in the JSONDB, every item counts as charted", file=sys.stderr)
+    stored, recent = _CHARTED["stored"], _CHARTED["recent"]
+    if stored is None or item in stored:
+        return True
+    if item not in recent:
+        answer = influx_recent(item)
+        if answer is None and not _CHARTED.get("warned"):
+            _CHARTED["warned"] = True
+            print(f"note: InfluxDB at {INFLUXDB_URL} does not answer, items it may hold count as charted",
+                  file=sys.stderr)
+        recent[item] = answer is not False
+    return recent[item]
+
+
 def item_kind(item):
-    """How an item's popup shows its course: a line (number), a band of its states (state), or not at all (none)."""
+    """How an item's popup shows its course: a line (number), a band of its states (state), or not at all (none),
+    as for a point in time or where InfluxDB has no course of it (charted())."""
     if item.startswith("zzpfx"):  # the plug cards' items are all measurements
         return "number", ""
     _, type_, options = known_items().get(item, (item, "", ""))
     if type_.startswith("Number") or type_ == "Dimmer":
-        return ("state" if options else "number"), options
-    if type_ in ("Switch", "Contact", "String"):
-        return "state", options
-    return "none", options
+        kind = "state" if options else "number"
+    elif type_ in ("Switch", "Contact", "String"):
+        kind = "state"
+    else:
+        return "none", options
+    return (kind if charted(item) else "none"), options
 
 
 # the overview's card widgets' props beyond their items
@@ -10901,7 +10994,7 @@ VALUE_TILE_PARAMS = [
     dict(param("item", "Item", "The item whose popup a tap opens; empty: no tap"), context="item"),
     param("action", "Action", "popup: the item popup (widget item-popup); options: the item's command options",
           default="popup"),
-    param("kind", "Kind", "What the item popup shows: number, state or none", default="number"),
+    param("kind", "Kind", "What the item popup shows: number, state, or none for no popup", default="number"),
     param("states", "State labels", "value=label pairs, comma-separated, for the item popup's band of states"),
     param("wrap", "Wrap", "A long text wraps across the whole row of the grid instead of being cut", "BOOLEAN"),
     param("fontSize", "Font size", "The tile's base size, e.g. 1.1em to grow with its card; default 14px")]

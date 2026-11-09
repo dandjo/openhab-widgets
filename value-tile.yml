@@ -32,7 +32,7 @@ props:
     default: popup
   - name: kind
     label: Kind
-    description: 'What the item popup shows: number, state or none'
+    description: 'What the item popup shows: number, state, or none for no popup'
     type: TEXT
     required: false
     default: number
@@ -52,7 +52,7 @@ props:
     type: TEXT
     required: false
   parameterGroups: []
-timestamp: Oct 25, 2026, 2:07:58 PM
+timestamp: Nov 9, 2026, 9:10:32 PM
 component: div
 config:
   style:
@@ -194,7 +194,7 @@ slots:
             overflow-wrap: anywhere
   - component: oh-link
     config:
-      visible: =!!props.item
+      visible: =!!props.item && (props.kind !== 'none' || (props.action || 'popup') !== 'popup')
       action: =props.action || 'popup'
       actionItem: =props.item
       actionModal: widget:item-popup

@@ -1496,7 +1496,7 @@ config:
 | `color` | Colour of the item popup's course as #rrggbb | TEXT |  |
 | `item` | The item whose popup a tap opens; empty: no tap | Item |  |
 | `action` | popup: the item popup (widget item-popup); options: the item's command options | TEXT | `popup` |
-| `kind` | What the item popup shows: number, state or none | TEXT | `number` |
+| `kind` | What the item popup shows: number, state, or none for no popup | TEXT | `number` |
 | `states` | value=label pairs, comma-separated, for the item popup's band of states | TEXT |  |
 | `wrap` | A long text wraps across the whole row of the grid instead of being cut | BOOLEAN |  |
 | `fontSize` | The tile's base size, e.g. 1.1em to grow with its card; default 14px | TEXT |  |
