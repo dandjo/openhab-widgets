@@ -1792,8 +1792,9 @@ OTHERS_REST_C = "#bdbdbd"
 
 
 def power_text(expr):
-    """A power as text: W below 1 kW, kW with two decimals above."""
-    return f"((v) => v >= 1000 ? {fixed('v / 1000', 2)} + ' kW' : Math.round(v) + ' W')(Math.max(0, {expr}))"
+    """A power as text in kW to three decimals, as the star writes its nodes' (user, 2026-11-10; W below 1 kW and two
+    decimals above before)."""
+    return f"{fixed(f'Math.max(0, {expr}) / 1000', 3)} + ' kW'"
 
 
 TILE_NODE = 54  # px, a node of the star in a tile under it (the star draws one about 68 px wide)
