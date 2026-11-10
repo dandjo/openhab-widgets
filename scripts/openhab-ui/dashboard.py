@@ -894,6 +894,31 @@ def netatmo_parts(color, own, co2):
     return [ring(0, 0, color), *((indoor + [faint(outdoor)]) if own == "indoor" else ([faint(indoor)] + outdoor))]
 
 
+def air1_led(co2):
+    """The AIR-1's LED as it shows the CO₂ (Apollo's firmware, LED source CO2): green up to 800 ppm, yellow to 1000,
+    orange to 1500, red to 2000, purple to 2500, dark red above."""
+    return (f"={co2} > 2500 ? '#880e4f' : {co2} > 2000 ? '#8e24aa' : {co2} > 1500 ? '#e53935' : {co2} > 1000 ? "
+            f"'#fb8c00' : {co2} > 800 ? '#fdd835' : '#43a047'")
+
+
+def air1_parts(color, co2):
+    """The Apollo AIR-1 as it lies on a shelf (user, 2026-11-10): a flat white box with rounded corners, 61 × 61 ×
+    30 mm, from the front a little from above; its lid's top, the white posts and lid band round the black perforated
+    window of its side, through which its LED shines in the CO₂'s colour (air1_led()), and the light spilt under it."""
+    led = air1_led(co2)
+    white = {"fill": "#eceff1", "stroke-linejoin": "round"}
+    rows = [svg("line", x1=-15.6, y1=y, x2=15.6, y2=y,
+                **stroke(1, "#cfd8dc", opacity="0.5", **{"stroke-dasharray": "0.01 2.2"})) for y in (-1.6, 1, 3.6, 6.2)]
+    return [ring(0, 0, color),
+            svg("ellipse", cx=0, cy=14.2, rx=17, ry=2.4, fill=led, **{"fill-opacity": "0.4"}),
+            svg("rect", x=-20, y=-14.6, width=40, height=9, rx=4, **stroke(1.6, **white)),
+            svg("rect", x=-22, y=-9.6, width=44, height=21.6, rx=4.5, **stroke(1.6, **white)),
+            svg("rect", x=-17.7, y=-3.8, width=35.4, height=13.6, rx=1, fill="#263238"),
+            svg("rect", x=-17.7, y=-3.8, width=35.4, height=13.6, rx=1, fill=led, **{"fill-opacity": "0.3"}),
+            svg("rect", x=-17.7, y=3.4, width=35.4, height=6.4, rx=1, fill=led, **{"fill-opacity": "0.3"}),
+            *rows]
+
+
 def water_meter_parts(color, rate, value, digits=True):
     """A classic dial water meter from above: brass connections left and right, the blue cover ring round the dial,
     the roller counter (cubic metres black, tenths and hundredths red; the meter's own reading), and the red pointer
@@ -6974,6 +6999,28 @@ VT_SCALES = {
                              (50, "heiß", "bad", VT_BAD)]),
     "price": (0.1, 0.5, [(0.2, "günstig", "good", "#43a047"), (0.3, "mittel", "warn", "#fb8c00"),
                          (0.5, "teuer", "bad", "#e53935")]),
+    # particulate matter in µg/m³ as the Umweltbundesamt's air quality index grades an hour's mean (LQI since 2024,
+    # UMID 2/2025, table 3): PM2.5 up to 5 very good, 15 good, 30 moderate, 50 poor, above very poor; PM10 up to 9,
+    # 27, 54, 90; the classes are whole µg/m³, so a tile passes the value less 0.5 (5.4 is still very good)
+    "pm2_5": (0, 70, [(5, "sehr gut", "good", "#26a69a"), (15, "gut", "good", VT_GOOD),
+                      (30, "mäßig", "caution", "#fdd835"), (50, "schlecht", "warn", VT_WARN),
+                      (70, "sehr schlecht", "bad", VT_BAD)]),
+    "pm10": (0, 120, [(9, "sehr gut", "good", "#26a69a"), (27, "gut", "good", VT_GOOD),
+                      (54, "mäßig", "caution", "#fdd835"), (90, "schlecht", "warn", VT_WARN),
+                      (120, "sehr schlecht", "bad", VT_BAD)]),
+    # the US EPA's air quality index, which the AIR-1 computes from PM2.5 and PM10 (NowCast); whole numbers, the
+    # class bounds 50, 100, 150, 200, 300 belong to the lower class, so a tile passes the value less 0.5
+    "aqi_us": (0, 350, [(50, "gut", "good", VT_GOOD), (100, "mäßig", "caution", "#fdd835"),
+                        (150, "ungesund für Empfindliche", "warn", VT_WARN), (200, "ungesund", "bad", VT_BAD),
+                        (300, "sehr ungesund", "bad", "#8e24aa"), (350, "gefährlich", "bad", "#880e4f")]),
+    # Sensirion's VOC index: 100 is the room's mean of the last 24 h (Info Note VOC Index, as the AIR-1 words it)
+    "voc": (0, 500, [(80, "besser als üblich", "good", "#26a69a"), (150, "üblich", "good", VT_GOOD),
+                     (250, "auffällig", "caution", "#fdd835"), (400, "stark auffällig", "warn", VT_WARN),
+                     (500, "extrem auffällig", "bad", VT_BAD)]),
+    # Sensirion's NOx index: 1 is the room's mean, above it an event such as a gas stove; 20 is Sensirion's example
+    # threshold for starting an air purifier (Info Note NOx Index)
+    "nox": (0, 50, [(2, "unauffällig", "good", VT_GOOD), (20, "leicht erhöht", "caution", "#fdd835"),
+                    (50, "erhöht", "warn", VT_WARN)]),
 }
 
 
@@ -7560,10 +7607,12 @@ def tank_tile(title, item, set_item):
                                   "color2": DHW_C, "dashed2": True, "scale": True})
 
 
-def levels_tile(title, item, names, color, sub=None, value_expr=None):
-    """A level as rising bars, as many lit as the level: names = [(state, word)] from the lowest."""
+def levels_tile(title, item, names, color, sub=None, value_expr=None, idx=None):
+    """A level as rising bars, as many lit as the level: names = [(state, word)] from the lowest; idx: the level as
+    an expression (1 to len(names), 0 for none) instead of the item's state."""
     n = len(names)
-    idx = " : ".join(f"items.{item}.state === '{s_}' ? {i + 1}" for i, (s_, _) in enumerate(names)) + " : 0"
+    if idx is None:
+        idx = " : ".join(f"items.{item}.state === '{s_}' ? {i + 1}" for i, (s_, _) in enumerate(names)) + " : 0"
     idx = f"({idx})"
     word = "[" + ", ".join(["'–'"] + [js_str(w) for _, w in names]) + f"][{idx}]"
     w, gap = 12, 5
@@ -8472,6 +8521,41 @@ def plug_total(title, item):
     return counter_tile(title, item, 5, 1, "kWh")
 
 
+A1 = "apollo_air_1_"
+UG_M3 = "µg/m³"
+
+
+def particle_sizes_tile(title, item):
+    """The particulate matter by size (AIR-1): PM1 and PM4, and how the mass up to 10 µm splits into the bands below
+    1 µm, 1–2.5, 2.5–4 and 4–10 µm, the AIR-1's PM values being cumulative."""
+    pm = {k: num(A1 + k) for k in ("pm1", "pm2_5", "pm4", "pm10")}
+    parts = [("unter 1 µm", pm["pm1"], "#5d4037"), ("1–2,5 µm", f"Math.max(0, {pm['pm2_5']} - {pm['pm1']})", "#8d6e63"),
+             ("2,5–4 µm", f"Math.max(0, {pm['pm4']} - {pm['pm2_5']})", "#bcaaa4"),
+             ("4–10 µm", f"Math.max(0, {pm['pm10']} - {pm['pm4']})", "#d7ccc8")]
+    value = f"='PM1 ' + {fixed(pm['pm1'], 1)} + ' · PM4 ' + {fixed(pm['pm4'], 1)} + ' {UG_M3}'"
+    legend = div([div([vt_dot(c), label(f"='{n} ' + {fixed(e, 1)}")],
+                      **{"display": "inline-flex", "align-items": "center", "gap": "5px"}) for n, e, c in parts],
+                 **{"display": "flex", "flex-wrap": "wrap", "gap": "4px 14px", "font-size": "11px", "opacity": "0.8",
+                    "margin-top": "6px"})
+    return vt_tile([vt_title(title), vt_value(value, **{"font-size": "17px"}), split_bar(parts, pm["pm10"]), legend],
+                   item, title, "#8d6e63")
+
+
+def wifi_level(item):
+    """A Wi-Fi signal in dBm as a level of 1 to 4, as the Netatmo's: from −55 very good, −67 good, −75 fair."""
+    v = num(item)
+    return (f"(['NULL', 'UNDEF'].includes(items.{item}.state) ? 0 : {v} >= -55 ? 4 : {v} >= -67 ? 3 : "
+            f"{v} >= -75 ? 2 : 1)")
+
+
+def uptime_text(item):
+    """Seconds since a start as '3 d 4 h', '5 h 12 min' or '7 min'."""
+    s_ = num(item)
+    return (f"=['NULL', 'UNDEF'].includes(items.{item}.state) ? '–' : {s_} >= 86400 ? Math.floor({s_} / 86400) + ' d ' "
+            f"+ Math.floor({s_} % 86400 / 3600) + ' h' : {s_} >= 3600 ? Math.floor({s_} / 3600) + ' h ' + "
+            f"Math.floor({s_} % 3600 / 60) + ' min' : Math.floor({s_} / 60) + ' min'")
+
+
 def socket_volt(title, item):
     return band_bar(title, item, 200, 260, 207, 253, "#7986cb", nominal=230, ok_text="230 V ± 10 %")
 
@@ -8502,6 +8586,25 @@ VALUE_RENDER = {
                       W + "max_temp"),
     O + "min_temp": vt_r(lambda t, i: day_range("Temperatur heute", i, O + "max_temp", O + "temperature", "#29b6f6"),
                       O + "max_temp"),
+    # Apollo AIR-1: the courses in the page's charts, so its tiles rate without a sparkline; its pressure, which no
+    # chart draws, with its course
+    A1 + "co2": vt_r(lambda t, i: rating_tile(t, i, "co2")),
+    A1 + "humidity": vt_r(lambda t, i: rating_tile(t, i, "humidity")),
+    A1 + "pressure": vt_r(lambda t, i: spark_tile(t, i, "#7986cb", "hPa", 1, span=6, trend_h=3, wide=True)),
+    A1 + "pm2_5": vt_r(lambda t, i: rating_tile(t, i, "pm2_5", expr=f"({num(i)} - 0.5)")),
+    A1 + "pm10": vt_r(lambda t, i: rating_tile(t, i, "pm10", expr=f"({num(i)} - 0.5)")),
+    A1 + "pm1": vt_r(particle_sizes_tile),
+    A1 + "aqi": vt_r(lambda t, i: rating_tile(t, i, "aqi_us", expr=f"({num(i)} - 0.5)")),
+    A1 + "voc_index": vt_r(lambda t, i: rating_tile(t, i, "voc")),
+    A1 + "nox_index": vt_r(lambda t, i: rating_tile(t, i, "nox")),
+    A1 + "last_seen": vt_r(lambda t, i: age_tile(t, i, 1)),
+    A1 + "rssi": vt_r(lambda t, i: levels_tile(t, i, [("1", "schwach"), ("2", "mittel"), ("3", "gut"),
+                                                      ("4", "sehr gut")],
+                                               "#7986cb", sub=f"={dash(disp(i))}", idx=wifi_level(i))),
+    A1 + "uptime": vt_r(lambda t, i: vt_tile([vt_title(t), vt_value(uptime_text(i))], i, t)),
+    A1 + "firmware_version": vt_r(lambda t, i: vt_tile([vt_title(t), vt_value(f"={dash(disp(i))}"),
+                                                        label(f"='ESPHome ' + (items.{A1}esphome_version.state || '')"
+                                                              f".split(' ')[0]", **VT_SUB)], i, t)),
     # SmartPi and the Huawei power meter
     "smartpi_ecday": grid_day("smartpi_ecday", "smartpi_epday"),
     "smartpi_i4": VT_DROP,  # in the current triangle
@@ -9955,6 +10058,39 @@ def netatmo_blocks():
                 card("Außenmodul Details", [details(o, [])]))]
 
 
+def air1_blocks():
+    """The Apollo AIR-1's page, under Netatmo's in the sidebar and built as Netatmo's (user, 2026-11-10): the room's
+    air with the device drawn at its head, its LED in the CO₂'s colour, beside the pollutants; their courses today
+    below; the device's state at the foot."""
+    a = A1
+    offline = div([chip("offline", "#9e9e9e")], f"=items.{a}online.state === 'OFF'")
+    air = [hero("material:thermostat", "#fb8c00", "Temperatur", f"={disp(a + 'temperature')}", [offline],
+                picture=device_icon(air1_parts("#fb8c00", num(a + "co2")), "#fb8c00")),
+           value_grid([vtile("CO₂", a + "co2"), vtile("Luftfeuchtigkeit", a + "humidity"),
+                       vtile("Luftdruck (absolut)", a + "pressure")])]
+    pollutants = [value_grid([vtile("Feinstaub PM2,5", a + "pm2_5"), vtile("Feinstaub PM10", a + "pm10"),
+                              vtile("Partikelgrößen", a + "pm1"), vtile("US-AQI", a + "aqi"),
+                              vtile("VOC-Index", a + "voc_index"), vtile("NOx-Index", a + "nox_index")])]
+    panel = lambda name, item, color, unit: (name, [line(name, item, color)],
+                                             span_axis(unit) if unit in LEAST_SPAN else value_axis(unit, scale=True))
+    room = stacked_chart([panel("CO₂", a + "co2", "#90a4ae", "ppm"),
+                          panel("Temperatur", a + "temperature", "#fb8c00", "°C"),
+                          panel("Luftfeuchtigkeit", a + "humidity", "#29b6f6", "%")], 420)
+    dust = stacked_chart([((("PM2,5", "#8d6e63"), ("PM10", "#bcaaa4")),
+                           [line("PM2,5", a + "pm2_5", "#8d6e63"), line("PM10", a + "pm10", "#bcaaa4")],
+                           value_axis(UG_M3, min=0)),
+                          ("VOC-Index", [line("VOC-Index", a + "voc_index", "#9575cd")],
+                           value_axis("Index", scale=True)),
+                          ("NOx-Index", [line("NOx-Index", a + "nox_index", "#ba68c8")], value_axis("Index", min=0))],
+                         420)
+    device = value_grid([vtile("Zuletzt gemeldet", a + "last_seen"), vtile("WLAN-Signal", a + "rssi"),
+                         vtile("Laufzeit", a + "uptime"), vtile("Chiptemperatur", a + "esp_temperature"),
+                         vtile("Firmware", a + "firmware_version"), vtile("IP-Adresse", a + "ip_address")])
+    return [two(card("Raumluft", air), card("Schadstoffe", pollutants)),
+            two(card("Raumluft heute", [room]), card("Schadstoffe heute", [dust])),
+            one(card("Gerät", [device]))]
+
+
 def water_meter_blocks():
     now = [hero("material:water", "#1e88e5", "Verbrauch heute", f"={disp('water_meter_value_day')}",
                 # a classic dial water meter with the reading on its counter, its pointer turning while water flows
@@ -10040,11 +10176,14 @@ def below_controls(builder):
 
 
 # the label, icon and sidebar order of a page the generator adds, until the UI changes them
-NEW_PAGES = {"weather": {"label": "Wetter", "icon": "material:wb_sunny", "order": "1"}}
+NEW_PAGES = {"weather": {"label": "Wetter", "icon": "material:wb_sunny", "order": "1"},
+             # under Netatmo (3), the pages below it moved down by one when it came (user, 2026-11-10)
+             "apollo_air_1": {"label": "Apollo AIR-1", "icon": "material:co2", "order": "4"}}
 DEVICE_PAGES = {
     # uid: builder of the blocks; label, icon and sidebar order stay those of the existing page
     "weather": weather_blocks,
     "netatmo": netatmo_blocks,
+    "apollo_air_1": air1_blocks,
     "smartpi": meter_blocks("smartpi_ptot", SMARTPI_SIGN,
                             [("Bezug heute", "smartpi_ecday", "#e53935"), ("Einspeisung heute", "smartpi_epday", "#43a047")],
                             [("Leistung", ["smartpi_p1", "smartpi_p2", "smartpi_p3"]),
