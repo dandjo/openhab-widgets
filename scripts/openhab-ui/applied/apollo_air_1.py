@@ -3,7 +3,7 @@
 mosquitto, one channel per value the device publishes under its topic prefix (its ESPHome firmware with MQTT,
 see ~/docs/air-1.md), and the items of the equipment apollo_air_1, linked one to one; apollo_air_1_last_seen is the
 time of the device's last message, the uptime channel's timestamp-update. The measurements go into InfluxDB at most
-once a minute (the device sends every 10 to 60 s) and every quarter hour; the diagnostics are not persisted. The
+once a minute (the device sends every 10 s to 5 min) and every quarter hour; the diagnostics are not persisted. The
 device's own settings (LED, offsets, sleep) stay on its web interface; its MiCS-4514 gas values are not taken over,
 as all six read NA.
 apply creates the thing, or replaces it, then PUTs the items, their metadata and the links.
