@@ -3,9 +3,11 @@
 mosquitto, one channel per value the device publishes under its topic prefix (its ESPHome firmware with MQTT,
 see ~/docs/air-1.md), and the items of the equipment apollo_air_1, linked one to one; apollo_air_1_last_seen is the
 time of the device's last message, the uptime channel's timestamp-update. The measurements go into InfluxDB at most
-once a minute (the device sends every 10 s to 5 min) and every quarter hour; the diagnostics are not persisted. The
-device's own settings (LED, offsets, sleep) stay on its web interface; its MiCS-4514 gas values are not taken over,
-as all six read NA.
+once a minute (the device sends every 10 s to 5 min) and every quarter hour; the diagnostics are not persisted. Three
+of the device's settings take commands (user, same day): the SEN55's fan in intervals or running all the time, which
+value the LED shows and its brightness; the device sets their state once it took the command (autoupdate off). Its
+other settings (offsets, sleep) stay on its web interface; its MiCS-4514 gas values are not taken over, as all six
+read NA.
 apply creates the thing, or replaces it, then PUTs the items, their metadata and the links.
 Usage: AIR1_TOPIC=<the device's topic prefix> apollo_air_1.py check|apply   (on homepi, as pi; the API token from
 ~/.openhab_token; the prefix, the device's name with its MAC suffix, stands in ~/docs/air-1.md, not here)"""
@@ -25,6 +27,9 @@ P = GROUP + "_"
 TOPIC = os.environ["AIR1_TOPIC"].rstrip("/") + "/"  # the device's topic prefix, its name with the MAC suffix
 STATUS_TOPIC = "apollo-air-1/status"  # its birth and last will, without the suffix (ESPHome adds it to the rest only)
 UG = "\u00b5g/m\u00b3"  # µg/m³ with the micro sign, as openHAB knows the unit
+# what the LED can show (the device's select), with its German labels
+LED_SOURCES = {"Off": "Aus", "CO2": "CO₂", "NowCast AQI": "US-AQI", "VOC Index": "VOC-Index"}
+LED_OPTIONS = ",".join(f"{k}={v}" for k, v in LED_SOURCES.items())
 
 # the course at most once a minute and a floor of one point every quarter hour
 COURSE = ["influxdb_change_at_most_minute", "influxdb_periodic"]
@@ -36,6 +41,18 @@ def state(pattern, **cfg):
 
 def quantity(unit, pattern):
     return {"unit": {"value": unit}, **state(pattern)}
+
+
+def command(pattern, **cfg):
+    """A state description for an item that takes commands; its state comes from the device's answer (autoupdate
+    off), not from the command."""
+    return {"stateDescription": {"value": " ", "config": {"pattern": pattern, "readOnly": False, **cfg}},
+            "autoupdate": {"value": "false"}}
+
+
+def control(domain, name, **cfg):
+    """A channel's configuration for one of the device's settings: its state and command topics."""
+    return {"stateTopic": TOPIC + f"{domain}/{name}/state", "commandTopic": TOPIC + f"{domain}/{name}/command", **cfg}
 
 
 def sensor(name):
@@ -88,6 +105,16 @@ POINTS = {
                          {"stateTopic": sensor("apollo_firmware_version")}),
     "esphome_version": ("String", "ESPHome-Version", "system_update", ["Status"], [], state("%s"), "string",
                         {"stateTopic": sensor("esphome_version")}),
+    # the settings; their values as the device's MQTT discovery names them
+    "fan_interval": ("Switch", "Lüfter-Intervall", "air", ["Switch"], [],
+                     command("%s", options="ON=Intervall,OFF=Dauerbetrieb"), "switch",
+                     control("switch", "sen55_fan_interval", on="ON", off="OFF")),
+    "led_source": ("String", "LED-Anzeige", "lightbulb", ["Control"], [],
+                   command("%s", options=LED_OPTIONS), "string",
+                   control("select", "air_quality_led_source", allowedStates=",".join(LED_SOURCES))),
+    "led_brightness": ("Number:Dimensionless", "LED-Helligkeit", "brightness_6", ["Setpoint"], [],
+                       {"unit": {"value": "%"}, **command("%.0f %unit%", min=5, max=100, step=1)}, "number",
+                       control("number", "air_quality_led_brightness", unit="%", min=5, max=100, step=1)),
 }
 # items linked to another item's channel with a profile: item suffix -> (channel suffix, profile)
 PROFILE_LINKS = {"last_seen": ("uptime", "system:timestamp-update")}

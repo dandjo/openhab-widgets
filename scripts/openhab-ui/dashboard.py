@@ -10086,9 +10086,21 @@ def air1_blocks():
     device = value_grid([vtile("Zuletzt gemeldet", a + "last_seen"), vtile("WLAN-Signal", a + "rssi"),
                          vtile("Laufzeit", a + "uptime"), vtile("Chiptemperatur", a + "esp_temperature"),
                          vtile("Firmware", a + "firmware_version"), vtile("IP-Adresse", a + "ip_address")])
+    # three of the device's settings (user, 2026-11-10): the SEN55's fan in intervals or all the time, what the LED
+    # shows and how bright; each control sends its command over MQTT and shows the state the device answers with
+    led = a + "led_source"
+    settings = controls_box(
+        switch_row("Lüfter-Intervall", "material:air", a + "fan_interval", "#fb8c00", off_text="Dauerbetrieb"),
+        section("material:lightbulb", "LED-Anzeige", "#fb8c00",
+                [state_bar(led, [("Off", "Aus"), ("CO2", "CO₂"), ("NowCast AQI", "US-AQI"), ("VOC Index", "VOC")],
+                           "#fb8c00", by_text=True)], row=True),
+        pill_slider(a + "led_brightness", "#fb8c00", 5, 100, 5, "LED-Helligkeit",
+                    f"Math.round({num(a + 'led_brightness')}) + ' %'",
+                    f"items.{led}.state === 'Off' ? 'LED aus' : 'zeigt ' + {disp(led)}",
+                    [(5, "5 %"), (50, "50 %"), (100, "100 %")], "%", icon="material:brightness_6", row=True))
     return [two(card("Raumluft", air), card("Schadstoffe", pollutants)),
             two(card("Raumluft heute", [room]), card("Schadstoffe heute", [dust])),
-            one(card("Gerät", [device]))]
+            two(card("Gerät", [device]), card("Einstellungen", [settings]))]
 
 
 def water_meter_blocks():
