@@ -3183,7 +3183,7 @@ def split_ring(title, total_item, parts, better, named=False):
                                   "border-radius": "12px", "background": TILE_BG, "min-width": "0"})
 
 
-# the electricity each day's COP is a ratio of: its pill waits for that to be base enough
+# the electricity each day's COP is a ratio of: its pill shows where yesterday's had a base, coloured once today's has
 COP_BASE = {"espaltherma_dcop": "espaltherma_energy_today", "espaltherma_dcop_space": "espaltherma_energy_space_today",
             "espaltherma_dcop_dhw": "espaltherma_energy_dhw_today"}
 # the value a day's COP fills its ring at, in its tile and its popup
@@ -3206,11 +3206,11 @@ def cop_tile(title, item, color, width="100%", name=None):
                            **stroke(5, color, **{"stroke-dasharray":
                                                   f"=({length} * Math.min(1, {value} / {COP_FULL})).toFixed(1) + ' {length}'"})),
                        svg_text(24, 30, f"={value} > 0 ? {fixed(value, 1)} : '–'", 13, "700"),
-                       # title, heute and today's COP against yesterday's at this time in a pill, as one block in the
-                       # ring's vertical middle, as the energy flow's tiles (user, 2026-10-06)
+                       # title, heute and yesterday's whole day's COP in a pill, as one block in the ring's vertical
+                       # middle, as the energy flow's tiles (user, 2026-10-06; yesterday's whole day since 2026-11-11)
                        svg_text(56, 13, title, 12, anchor="start", opacity="0.7"),
                        svg_text(56, 29, "heute", 11, anchor="start", opacity="0.5"),
-                       svg_pill(56, 34, *value_change(item, 1, base=COP_BASE.get(item)))],
+                       svg_pill(56, 34, *day_value_change(item, 1, base=COP_BASE.get(item)))],
                viewBox="0 0 150 50", width="100%", style={"display": "block", "overflow": "visible", "max-width": "170px",
                                                           "width": width})
     link = comp("oh-link", {**item_modal(item, name or title, color),
@@ -6643,19 +6643,8 @@ def vt_icon_chip(icon, text, cls_expr="'neutral'", visible=None):
                **{**style, "display": "inline-flex", "align-items": "center", "gap": "3px", "padding": "1px 8px 1px 6px"})
 
 
-# a day's COP against yesterday needs a base: yesterday's electricity at this time at least this share of its whole
-# day and this much (kWh); right after midnight a few watt hours made wild COPs; DAY_BASE_MIN also keeps a pill
-# against yesterday neutral below it
-DAY_BASE_SHARE, DAY_BASE_MIN = 0.05, 0.05
-
-
-def day_base_ok(item):
-    """Whether yesterday's value of a day counter at this time is base enough for a day's COP against yesterday
-    (DAY_BASE_SHARE of yesterday's whole day, d in the history, and DAY_BASE_MIN)."""
-    track_history(item, c=True)
-    y, d = vt_hv(item, "y"), vt_hv(item, "d")
-    return (f"({vt_has(y)} && Number({y}) >= Math.max({DAY_BASE_MIN}, "
-            f"{DAY_BASE_SHARE} * (Number({d}) || 0)))")
+# a day counter below this (kWh) is no base: a pill against yesterday stays neutral, a day's COP of it uncoloured
+DAY_BASE_MIN = 0.05
 
 
 def change_text(now, then, unit, digits):
@@ -6685,19 +6674,23 @@ def day_change(item, better="less", unit="kWh", digits=2):
             f"={vt_has(vt_hv(item, 'y'))}")
 
 
-def value_change(item, digits=1, unit="", base=None):
-    """A value today against its value yesterday at this time as (text, class, visible) for a pill: the difference
-    itself, as for a day's COP; green where it rose. base: the day counter the value is a ratio of (a COP's
-    electricity), the pill shows only once it is base enough (day_base_ok) today and yesterday."""
+def day_value_change(item, digits=1, base=None):
+    """A day's value (a COP) against yesterday's whole day as (text, class, visible) for a pill, "gestern 3,8", as the
+    energy flow's shares stand (user, 2026-11-11: against yesterday at this time, the COPs' pills stayed hidden half
+    the night and morning, as yesterday's electricity up to this time made no base); green where today's value so far
+    is higher, orange where lower, neutral while today's base is below DAY_BASE_MIN. base: the day counter the value is
+    a ratio of (a COP's electricity); the pill shows only where yesterday's whole day had a base."""
     track_history(item, c=True)
-    y = f"Number({vt_hv(item, 'y')})"
-    d = f"({num(item)} - {y})"
-    small = 0.5 * 10 ** -digits
-    cls = f"(Math.abs({d}) < {2 * small} ? 'neutral' : {d} > 0 ? 'good' : 'warn')"
-    text = (f"=(Math.abs({d}) < {small} ? '±0' : ({d} > 0 ? '+' : '−') + {fixed(f'Math.abs({d})', digits)}) + "
-            f"'{unit} zu gestern'")
-    guard = f" && {day_base_ok(base)} && {num(base)} >= {DAY_BASE_MIN}" if base else ""
-    return text, cls, f"={vt_has(vt_hv(item, 'y'))} && {y} > 0{guard}"
+    d = f"Number({vt_hv(item, 'd')})"
+    diff = f"({num(item)} - {d})"
+    today_ok = f"{num(base)} >= {DAY_BASE_MIN}" if base else "true"
+    cls = (f"(!({today_ok}) || {num(item)} <= 0 || Math.abs({diff}) < {10 ** -digits} ? 'neutral' : "
+           f"{diff} > 0 ? 'good' : 'warn')")
+    known = f"{vt_has(vt_hv(item, 'd'))} && {d} > 0"
+    if base:
+        track_history(base, c=True)
+        known += f" && Number({vt_hv(base, 'd')}) >= {DAY_BASE_MIN}"
+    return f"='gestern ' + {fixed(d, digits)}", cls, f"={known}"
 
 
 def points_change(own, base, minus=None):

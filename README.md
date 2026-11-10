@@ -324,16 +324,16 @@ or heating is switched on, outlined while off, beside a tinted pill with the set
 opens the heat pump's page of my installation. Below them today's electricity and heat of the heat pump as two rings of
 space heating, DHW and standby in small cards, the total inside, beside each the parts' shares in per cent (hovering a
 part lifts it everywhere) and today against yesterday at this time in a pill (the difference in kWh), and today's COPs
-of space heating, DHW and in total in one row as rings like the energy flow's self-consumption, each with today against
-yesterday at this time in a pill under its title; a tap on one opens the item popup with that COP large inside its ring,
-beside it today's heat and electricity it is the ratio of and yesterday's whole day, and its course over the day. While
-the tank charges or the heating runs, a line under its tile says since when. A round badge right of each tile's pills
-counts today's compressor runs in the tile's mode: every stretch of 2 minutes or more in which the compressor runs with
-the three-way valve on that side, so a charge that takes over a running heating run counts for hot water (the restarts
-of a defrost do not count), outlined in the tile's colour, grey at none; while the cycle guard of my installation holds
-back the next start after a stop (it lowers the leaving water setpoint until the return water has cooled well below the
-heating curve, so that the run after it lasts), a line under the heating tile says so. The screenshots show it with the
-heat pump card's demo values.
+of space heating, DHW and in total in one row as rings like the energy flow's self-consumption, each with yesterday's
+whole day's COP in a pill under its title, green or orange once today has a base; a tap on one opens the item popup with
+that COP large inside its ring, beside it today's heat and electricity it is the ratio of and yesterday's whole day, and
+its course over the day. While the tank charges or the heating runs, a line under its tile says since when. A round
+badge right of each tile's pills counts today's compressor runs in the tile's mode: every stretch of 2 minutes or more
+in which the compressor runs with the three-way valve on that side, so a charge that takes over a running heating run
+counts for hot water (the restarts of a defrost do not count), outlined in the tile's colour, grey at none; while the
+cycle guard of my installation holds back the next start after a stop (it lowers the leaving water setpoint until the
+return water has cooled well below the heating curve, so that the run after it lasts), a line under the heating tile
+says so. The screenshots show it with the heat pump card's demo values.
 
 Needs `flow-node`, `item-popup`, `trip-popup`.
 
