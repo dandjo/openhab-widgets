@@ -76,9 +76,16 @@ CALIBRATION_JS_FUNCTION = r"""(function(data) {
     when = ' am ' + t[3] + '.' + t[2] + '.' + t[1] + ' ' + t[4];
     text = text.replace(t[0], '');
   }
+  // when the measurement did not start again after a calibration, the device restarts
+  var restart = '';
+  var stuck = '; the measurement did not restart, restarting the device';
+  if (text.slice(-stuck.length) === stuck) {
+    restart = '; die Messung lief nicht wieder an, das Gerät startet neu';
+    text = text.slice(0, -stuck.length);
+  }
   var m = text.match(/^Calibrated to (\d+) ppm \(was (\d+) ppm\)$/);
   if (m) {
-    return 'Kalibriert auf ' + m[1] + ' ppm' + when + ' (vorher ' + m[2] + ' ppm)';
+    return 'Kalibriert auf ' + m[1] + ' ppm' + when + ' (vorher ' + m[2] + ' ppm)' + restart;
   }
   m = text.match(/^Not calibrated: (.*)$/);
   if (!m) {
@@ -92,12 +99,16 @@ CALIBRATION_JS_FUNCTION = r"""(function(data) {
     why = 'noch keine 3 Minuten Messwerte';
   } else if (why === 'the sensor refused it') {
     why = 'der Sensor hat es abgelehnt';
+  } else if (why === 'the sensor is busy') {
+    why = 'der Sensor ist gerade beschäftigt';
+  } else if (why === 'the sensor did not stop measuring') {
+    why = 'der Sensor hat die Messung nicht angehalten';
   } else if ((w = why.match(/^readings not steady \((\d+)-(\d+) ppm\)$/))) {
     why = 'Werte schwanken (' + w[1] + ' bis ' + w[2] + ' ppm)';
   } else if ((w = why.match(/^(\d+) ppm is too far from (\d+) ppm$/))) {
     why = w[1] + ' ppm sind keine Außenluft nahe ' + w[2] + ' ppm';
   }
-  return 'Nicht kalibriert' + when + ': ' + why;
+  return 'Nicht kalibriert' + when + ': ' + why + restart;
 })(input)
 """
 TRANSFORMATION = {"uid": CALIBRATION_JS, "label": "Apollo AIR-1 CO2-Kalibrierung auf Deutsch", "type": "js",
