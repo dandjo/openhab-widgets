@@ -1,7 +1,7 @@
 # openHAB UI generator
 
 `dashboard.py` generates homepi's MainUI: the `overview` page with the energy flow's two popups (`flow_home`,
-`flow_appliances`), the 24 device pages in the sidebar, which the overview opens as popups everywhere else, and the
+`flow_appliances`), the 26 device pages in the sidebar, which the overview opens as popups everywhere else, and the
 widgets these pages are built from. It writes them into
 `uicomponents_ui_page.json` and `uicomponents_ui_widget.json` in `/var/lib/openhab/jsondb`. Every page it
 generates is replaced on each run, and so is every widget tagged `generated`; widgets made in the UI stay.

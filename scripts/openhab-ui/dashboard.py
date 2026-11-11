@@ -919,6 +919,30 @@ def air1_parts(color, co2):
             *rows]
 
 
+def tado_parts(color, temperature):
+    """The tado° Smart AC Control V3+ as it hangs on the wall beside the air conditioner (user, 2026-11-11: its page):
+    a matte white square of 100 × 100 × 15 mm with rounded corners, its edge showing a little to the right and below;
+    the LED matrix behind the white front (10 × 19 dots) lit with the room's temperature in whole degrees, in the
+    colour, as dots (white lines between its rows and columns), and the gloss black line below it."""
+    white = {"fill": "#eceff1", "stroke-linejoin": "round"}
+    shown = (f"=['NULL', 'UNDEF'].includes(items.tado_temperature.state) ? '' : "
+             f"Math.round({temperature}) + '°'")
+    # the matrix 19 dots wide and 10 high, 1.15 apart, round the digits; the lines between the dots in the front's
+    # white cut the digits into dots
+    x0, y0, pitch = -11.5, -6.6, 1.15
+    grid = [svg("line", x1=x0, y1=round(y0 + k * pitch, 2), x2=round(x0 + 19 * pitch, 2), y2=round(y0 + k * pitch, 2),
+                stroke="#eceff1", **{"stroke-width": 0.3}) for k in range(11)]
+    grid += [svg("line", x1=round(x0 + k * pitch, 2), y1=y0, x2=round(x0 + k * pitch, 2), y2=round(y0 + 10 * pitch, 2),
+                 stroke="#eceff1", **{"stroke-width": 0.3}) for k in range(20)]
+    return [ring(0, 0, color),
+            svg("rect", x=-15.5, y=-16, width=34, height=34, rx=4.5, **stroke(1.6, "#90a4ae", fill="#cfd8dc")),
+            svg("rect", x=-17.5, y=-18, width=34, height=34, rx=4.5, **stroke(1.6, **white)),
+            svg("text", x=-0.5, y=4.6, content=shown, fill=color, **{
+                "font-size": 15, "font-weight": "800", "text-anchor": "middle"}),
+            *grid,
+            svg("line", x1=-6, y1=10.5, x2=5, y2=10.5, **stroke(1.6, "#263238"))]
+
+
 def water_meter_parts(color, rate, value, digits=True):
     """A classic dial water meter from above: brass connections left and right, the blue cover ring round the dial,
     the roller counter (cubic metres black, tenths and hundredths red; the meter's own reading), and the red pointer
@@ -8601,6 +8625,9 @@ VALUE_RENDER = {
     A1 + "firmware_version": vt_r(lambda t, i: vt_tile([vt_title(t), vt_value(f"={dash(disp(i))}"),
                                                         label(f"='ESPHome ' + (items.{A1}esphome_version.state || '')"
                                                               f".split(' ')[0]", **VT_SUB)], i, t)),
+    # Tado: the course in the page's chart, so its humidity rates without a sparkline, in whole per cent (the zone
+    # reports two decimals)
+    "tado_humidity": vt_r(lambda t, i: rating_tile(t, i, "humidity", value_expr=f"={percent(i)}")),
     # SmartPi and the Huawei power meter
     "smartpi_ecday": grid_day("smartpi_ecday", "smartpi_epday"),
     "smartpi_i4": VT_DROP,  # in the current triangle
@@ -10121,6 +10148,19 @@ def air1_blocks():
             two(card("Gerät", [device]), card("Einstellungen", [settings]))]
 
 
+def tado_blocks():
+    """Tado's page, under the Apollo AIR-1's in the sidebar (user, 2026-11-11): its zone's room climate in the upper
+    floor, the temperature at the head with the device drawn, its LED matrix showing it, the humidity beside; their
+    course today beside it, temperature over humidity."""
+    t, h = "tado_temperature", "tado_humidity"
+    now = [hero("material:thermostat", "#fb8c00", "Temperatur", f"={disp(t)}",
+                picture=device_icon(tado_parts("#fb8c00", num(t)), "#fb8c00")),
+           value_grid([vtile("Luftfeuchtigkeit", h)])]
+    room = stacked_chart([("Temperatur", [line("Temperatur", t, "#fb8c00")], span_axis("°C")),
+                          ("Luftfeuchtigkeit", [line("Luftfeuchtigkeit", h, "#29b6f6")], span_axis("%"))], 420)
+    return [two(card("Raumklima", now), card("Raumklima heute", [room]))]
+
+
 def water_meter_blocks():
     now = [hero("material:water", "#1e88e5", "Verbrauch heute", f"={disp('water_meter_value_day')}",
                 # a classic dial water meter with the reading on its counter, its pointer turning while water flows
@@ -10208,12 +10248,15 @@ def below_controls(builder):
 # the label, icon and sidebar order of a page the generator adds, until the UI changes them
 NEW_PAGES = {"weather": {"label": "Wetter", "icon": "material:wb_sunny", "order": "1"},
              # under Netatmo (3), the pages below it moved down by one when it came (user, 2026-11-10)
-             "apollo_air_1": {"label": "Apollo AIR-1", "icon": "material:co2", "order": "4"}}
+             "apollo_air_1": {"label": "Apollo AIR-1", "icon": "material:co2", "order": "4"},
+             # under Apollo AIR-1 (4), the pages below it moved down by one when it came (user, 2026-11-11)
+             "tado": {"label": "Tado", "icon": "material:thermostat", "order": "5"}}
 DEVICE_PAGES = {
     # uid: builder of the blocks; label, icon and sidebar order stay those of the existing page
     "weather": weather_blocks,
     "netatmo": netatmo_blocks,
     "apollo_air_1": air1_blocks,
+    "tado": tado_blocks,
     "smartpi": meter_blocks("smartpi_ptot", SMARTPI_SIGN,
                             [("Bezug heute", "smartpi_ecday", "#e53935"), ("Einspeisung heute", "smartpi_epday", "#43a047")],
                             [("Leistung", ["smartpi_p1", "smartpi_p2", "smartpi_p3"]),
