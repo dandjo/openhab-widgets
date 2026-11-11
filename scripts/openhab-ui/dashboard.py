@@ -10093,7 +10093,29 @@ def air1_blocks():
         pill_slider(a + "led_brightness", "#fb8c00", 5, 100, 5, "LED-Helligkeit",
                     f"Math.round({num(a + 'led_brightness')}) + ' %'",
                     f"items.{led}.state === 'Off' ? 'LED aus' : 'zeigt ' + {disp(led)}",
-                    [(5, "5 %"), (50, "50 %"), (100, "100 %")], "%", icon="material:brightness_6", row=True))
+                    [(5, "5 %"), (50, "50 %"), (100, "100 %")], "%", icon="material:brightness_6", row=True),
+        # the CO2 sensor's calibration to the local outdoor air (user, 2026-11-11): its target, then the button with
+        # the device's last outcome; the device itself refuses unless its last three minutes are steady and near the
+        # target, and the button asks first, as the A/C's restart does
+        pill_slider(a + "co2_calibration_target", "#fb8c00", 400, 500, 5, "CO₂-Kalibrierziel",
+                    f"Math.round({num(a + 'co2_calibration_target')}) + ' ppm'", "'Außenluft am Standort'",
+                    [(400, "400"), (440, "440"), (500, "500")], "ppm", icon="material:tune", row=True),
+        div([div([comp("oh-icon", {"icon": "material:co2", "width": 15, "height": 15})],
+                 **{"width": "26px", "height": "26px", "flex": "0 0 auto", "border-radius": "50%",
+                    "background": "color-mix(in srgb, #fb8c00 20%, transparent)", "display": "flex",
+                    "align-items": "center", "justify-content": "center"}),
+             div([label("CO₂ kalibrieren", **{"font-size": "13px", "line-height": "16px"}),
+                  label(f"=['NULL', 'UNDEF'].includes(items.{a}co2_calibration.state) ? "
+                        f"'Am offenen Fenster, nach 3 Minuten stabiler Werte' : "
+                        f"'Zuletzt: ' + items.{a}co2_calibration.state",
+                        **{"font-size": "11px", "opacity": "0.7", "line-height": "14px", "white-space": "normal"})],
+                 **{"flex": "1", "min-width": "0", "display": "flex", "flex-direction": "column"}),
+             comp("oh-button", {"text": "Kalibrieren", "action": "command", "actionItem": a + "co2_calibrate",
+                                "actionCommand": "PRESS",
+                                "actionConfirmation": "Steht der AIR-1 seit mindestens 3 Minuten am offenen Fenster? "
+                                                      "Sein CO₂-Sensor wird dann auf den Zielwert kalibriert.",
+                                "actionFeedback": "Kalibrierung gesendet", "outline": True, "small": True})],
+            **{"display": "flex", "align-items": "center", "gap": "8px", "padding": "8px 2px 4px"}))
     return [two(card("Raumluft", air), card("Schadstoffe", pollutants)),
             two(card("Raumluft heute", [room]), card("Schadstoffe heute", [dust])),
             two(card("Gerät", [device]), card("Einstellungen", [settings]))]

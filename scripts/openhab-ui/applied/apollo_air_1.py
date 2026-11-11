@@ -5,7 +5,9 @@ see ~/docs/air-1.md), and the items of the equipment apollo_air_1, linked one to
 time of the device's last message, the uptime channel's timestamp-update. The measurements go into InfluxDB at most
 once a minute (the device sends every 10 s to 5 min) and every quarter hour; the diagnostics are not persisted. Three
 of the device's settings take commands (user, same day): the SEN55's fan in intervals or running all the time, which
-value the LED shows and its brightness; the device sets their state once it took the command (autoupdate off). Its
+value the LED shows and its brightness; the device sets their state once it took the command (autoupdate off). The
+CO2 sensor's calibration to the local outdoor air (user, 2026-11-11): its target, the button and the outcome the
+device names with its time; the device refuses unless its last readings are steady and near the target. Its
 other settings (offsets, sleep) stay on its web interface; its MiCS-4514 gas values are not taken over, as all six
 read NA.
 apply creates the thing, or replaces it, then PUTs the items, their metadata and the links.
@@ -115,6 +117,15 @@ POINTS = {
     "led_brightness": ("Number:Dimensionless", "LED-Helligkeit", "brightness_6", ["Setpoint"], [],
                        {"unit": {"value": "%"}, **command("%.0f %unit%", min=5, max=100, step=1)}, "number",
                        control("number", "air_quality_led_brightness", unit="%", min=5, max=100, step=1)),
+    # the CO2 calibration (user, 2026-11-11): the target, the button (ESPHome takes PRESS) and the outcome, a text
+    # sensor, which ESPHome publishes under sensor/
+    "co2_calibration_target": ("Number:Dimensionless", "CO2-Kalibrierziel", "tune", ["Setpoint"], [],
+                               {"unit": {"value": "ppm"}, **command("%.0f ppm", min=400, max=500, step=1)}, "number",
+                               control("number", "co2_calibration_target", unit="ppm", min=400, max=500, step=1)),
+    "co2_calibrate": ("String", "CO2 kalibrieren", "co2", ["Control"], [], command("%s", options="PRESS=Kalibrieren"),
+                      "string", {"commandTopic": TOPIC + "button/calibrate_scd40/command"}),
+    "co2_calibration": ("String", "CO2-Kalibrierung", "co2", ["Status"], [], state("%s"), "string",
+                        {"stateTopic": sensor("co2_calibration")}),
 }
 # items linked to another item's channel with a profile: item suffix -> (channel suffix, profile)
 PROFILE_LINKS = {"last_seen": ("uptime", "system:timestamp-update")}
