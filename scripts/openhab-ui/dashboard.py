@@ -8608,8 +8608,9 @@ VALUE_RENDER = {
                       O + "max_temp"),
     # Apollo AIR-1: the courses in the page's charts, so its tiles rate without a sparkline; its pressure, which no
     # chart draws, with its course
-    A1 + "co2": vt_r(lambda t, i: rating_tile(t, i, "co2")),
-    A1 + "humidity": vt_r(lambda t, i: rating_tile(t, i, "humidity")),
+    # the change of the last hour and the day's course as Netatmo's (user, 2026-11-11), on its page and on Lüftung's
+    A1 + "co2": vt_r(lambda t, i: rating_tile(t, i, "co2", spark_of=("#90a4ae", 200, "ppm", 0, 1000))),
+    A1 + "humidity": vt_r(lambda t, i: rating_tile(t, i, "humidity", spark_of=("#29b6f6", 10, "%", 0, None))),
     A1 + "pressure": vt_r(lambda t, i: spark_tile(t, i, "#7986cb", "hPa", 1, span=6, trend_h=3, wide=True)),
     A1 + "pm2_5": vt_r(lambda t, i: rating_tile(t, i, "pm2_5", expr=f"({num(i)} - 0.5)")),
     A1 + "pm10": vt_r(lambda t, i: rating_tile(t, i, "pm10", expr=f"({num(i)} - 0.5)")),
