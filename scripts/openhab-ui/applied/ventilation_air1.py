@@ -8,6 +8,9 @@ ventilation's. The AIR-1's state topics are retained, so after a restart its rea
 Since the evening of 2026-11-11 (user) an AIR-1 reading also counts as lacking when its last update is more than 3
 minutes old (CO2 comes every 60 s, humidity every 10 s, each as an update even when unchanged): a reading that stopped
 with the device online, as a sensor that stopped measuring, would otherwise steer the level and the alert.
+Instead of holding the level for as long as readings lack, the rule sets level 2 (Mittel) once they have lacked for
+30 minutes and no timer holds a level, with a push naming them, and pushes again once they are back (user, same
+evening); it keeps the episode in its cache.private, which a PUT of the rule empties.
 apply creates the new item with the old one's state, PUTs the rule and the sitemap, then removes the old item; its
 history stays in InfluxDB.
 Usage: ventilation_air1.py check|apply   (on homepi, as pi; the API token from ~/.openhab_token)"""
@@ -87,6 +90,41 @@ if (co2_item.numericState !== null && air1_online && !co2_alert_item""",
 
 if (co2_item.numericState !== null && air1_fresh('apollo_air_1_co2') && !co2_alert_item"""),
 ]
+# the fallback after 30 minutes of lacking readings, on top of FRESH
+FALLBACK = [
+    ("""const missing = lacks('ventilation_co2_management', 'apollo_air_1_co2', true)
+  || lacks('ventilation_humidity_management', 'apollo_air_1_humidity', true)
+  || lacks('ventilation_temperature_management', 'espaltherma_ext_ambient_temp', false);""",
+     """const lacking = [['ventilation_co2_management', 'apollo_air_1_co2', true, 'Apollo AIR-1 CO2'],
+  ['ventilation_humidity_management', 'apollo_air_1_humidity', true, 'Apollo AIR-1 Feuchte'],
+  ['ventilation_temperature_management', 'espaltherma_ext_ambient_temp', false, 'Außentemperatur']]
+  .filter((r) => lacks(r[0], r[1], r[2])).map((r) => r[3]);
+const missing = lacking.length > 0;
+
+// readings lacking for 30 minutes: rather than hold the level for as long as they lack, level 2 (Mittel) once no
+// timer holds a level, with a push naming them; another push once they are back (user, 2026-11-11)
+const auto_on = items.getItem('ventilation_management').state === 'ON';
+if (!auto_on || !missing) {
+  if (auto_on && cache.private.get('lacking_fallback')) {
+    actions.NotificationAction.sendBroadcastNotification('Lüftung: Werte wieder da, die Automatik regelt wieder');
+  }
+  cache.private.remove('lacking_since');
+  cache.private.remove('lacking_fallback');
+} else if (!cache.private.get('lacking_since')) {
+  cache.private.put('lacking_since', Date.now());
+} else if (!cache.private.get('lacking_fallback') && Date.now() - cache.private.get('lacking_since') >= 30 * 60000
+  && items.getItem('ventilation_timer').numericState <= 0) {
+  cache.private.put('lacking_fallback', true);
+  items.getItem('esplyfterl_level').sendCommandIfDifferent('2');
+  actions.NotificationAction.sendBroadcastNotification('Lüftung: seit '
+    + Math.round((Date.now() - cache.private.get('lacking_since')) / 60000) + ' Minuten fehlen Werte ('
+    + lacking.join(', ') + '), Stufe Mittel');
+}"""),
+]
+FALLBACK_DESCRIPTION = [("seit über 3 Minuten nicht aktualisiert, bleibt die Stufe.",
+                         "seit über 3 Minuten nicht aktualisiert, bleibt die Stufe; fehlen Werte 30 Minuten lang, "
+                         "setzt die Regel Stufe 2, sobald kein Timer läuft, und meldet das per Push, ebenso wenn die "
+                         "Werte wieder da sind.")]
 FRESH_DESCRIPTION = [("Fehlt eine Messung oder ist der AIR-1 offline, bleibt die Stufe.",
                       "Fehlt eine Messung, ist der AIR-1 offline oder ein Wert von ihm seit über 3 Minuten nicht "
                       "aktualisiert, bleibt die Stufe.")]
@@ -168,8 +206,13 @@ if not done:
 fresh = "air1_fresh" in script
 print(f"rule {RULE}:", "checks the readings' age" if fresh else f"{len(FRESH)} replacements for the readings' age")
 if not fresh:
-    action["configuration"]["script"] = replaced(script, FRESH, "script")
+    script = action["configuration"]["script"] = replaced(script, FRESH, "script")
     rule["description"] = replaced(rule["description"], FRESH_DESCRIPTION, "description")
+fallback = "lacking_since" in script
+print(f"rule {RULE}:", "falls back after 30 minutes" if fallback else f"{len(FALLBACK)} replacement for the fallback")
+if not fallback:
+    action["configuration"]["script"] = replaced(script, FALLBACK, "script")
+    rule["description"] = replaced(rule["description"], FALLBACK_DESCRIPTION, "description")
 old_status, old_item = call("GET", f"/items/{OLD}")
 new_exists = call("GET", f"/items/{NEW}")[0] == 200
 print(f"item {NEW}:", "exists" if new_exists else "missing", f"| item {OLD}:",
@@ -188,7 +231,7 @@ if not new_exists:
     print("PUT stateDescription", call("PUT", f"/items/{NEW}/metadata/stateDescription", STATE_DESCRIPTION)[0])
     state = old_item["state"] if old_status == 200 and old_item["state"] in ("ON", "OFF") else "OFF"
     print("state", state, put_text(f"/items/{NEW}/state", state))
-if not done or not fresh:
+if not done or not fresh or not fallback:
     body = {k: v for k, v in rule.items() if k not in ("status", "editable", "templateState")}
     print("PUT rule", call("PUT", f"/rules/{RULE}", body)[0])
 if not moved:
