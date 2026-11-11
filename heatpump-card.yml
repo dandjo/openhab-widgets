@@ -291,14 +291,14 @@ props:
     type: TEXT
     required: true
     context: item
-  - name: netatmoWeatherstationAtmosphericHumidity
-    label: Netatmo Weatherstation Atmospheric Humidity
+  - name: apolloAir1Humidity
+    label: Apollo AIR-1 Humidity
     description: Number:Dimensionless item
     type: TEXT
     required: true
     context: item
-  - name: netatmoWeatherstationCo2
-    label: Netatmo Weatherstation CO2
+  - name: apolloAir1Co2
+    label: Apollo AIR-1 CO2
     description: Number:Dimensionless item
     type: TEXT
     required: true
@@ -400,7 +400,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Nov 1, 2026, 7:25:19 PM
+timestamp: Nov 11, 2026, 11:34:07 AM
 component: oh-card
 config:
   title: Heat Pump
@@ -3310,9 +3310,8 @@ slots:
                 config:
                   x: 258.0
                   y: 344
-                  content: '=([''NULL'', ''UNDEF''].includes(items[props.netatmoWeatherstationAtmosphericHumidity].state)
-                    ? ''–'' : ((Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState) || 0)).toFixed(0)
-                    + '' %'')'
+                  content: '=([''NULL'', ''UNDEF''].includes(items[props.apolloAir1Humidity].state) ? ''–'' : ((Number(items[props.apolloAir1Humidity].numericState)
+                    || 0)).toFixed(0) + '' %'')'
                   fill: currentColor
                   font-size: 15
                   font-weight: '700'
@@ -3332,8 +3331,8 @@ slots:
                 config:
                   x: 258.0
                   y: 361
-                  content: '=([''NULL'', ''UNDEF''].includes(items[props.netatmoWeatherstationCo2].state) ? ''–'' : (items[props.netatmoWeatherstationCo2].displayState
-                    || items[props.netatmoWeatherstationCo2].state))'
+                  content: '=([''NULL'', ''UNDEF''].includes(items[props.apolloAir1Co2].state) ? ''–'' : (items[props.apolloAir1Co2].displayState
+                    || items[props.apolloAir1Co2].state))'
                   fill: currentColor
                   font-size: 15
                   font-weight: '700'
@@ -3658,8 +3657,8 @@ slots:
                 heatpumpValve: =props.heatpumpValve
                 heatpumpLeavingWaterTempAfterBuh: =props.heatpumpLeavingWaterTempAfterBuh
                 heatpumpIndoorAmbientTemp: =props.heatpumpIndoorAmbientTemp
-                netatmoWeatherstationAtmosphericHumidity: =props.netatmoWeatherstationAtmosphericHumidity
-                netatmoWeatherstationCo2: =props.netatmoWeatherstationCo2
+                apolloAir1Humidity: =props.apolloAir1Humidity
+                apolloAir1Co2: =props.apolloAir1Co2
               style:
                 position: absolute
                 display: block
@@ -3817,8 +3816,8 @@ slots:
                 heatpumpValve: =props.heatpumpValve
                 heatpumpLeavingWaterTempAfterBuh: =props.heatpumpLeavingWaterTempAfterBuh
                 heatpumpIndoorAmbientTemp: =props.heatpumpIndoorAmbientTemp
-                netatmoWeatherstationAtmosphericHumidity: =props.netatmoWeatherstationAtmosphericHumidity
-                netatmoWeatherstationCo2: =props.netatmoWeatherstationCo2
+                apolloAir1Humidity: =props.apolloAir1Humidity
+                apolloAir1Co2: =props.apolloAir1Co2
               style:
                 position: absolute
                 display: block

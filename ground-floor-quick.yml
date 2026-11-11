@@ -33,20 +33,20 @@ props:
     type: TEXT
     required: true
     context: item
-  - name: netatmoWeatherstationAtmosphericHumidity
-    label: Netatmo Weatherstation Atmospheric Humidity
+  - name: apolloAir1Humidity
+    label: Apollo AIR-1 Humidity
     description: Number:Dimensionless item
     type: TEXT
     required: true
     context: item
-  - name: netatmoWeatherstationCo2
-    label: Netatmo Weatherstation CO2
+  - name: apolloAir1Co2
+    label: Apollo AIR-1 CO2
     description: Number:Dimensionless item
     type: TEXT
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 25, 2026, 2:07:58 PM
+timestamp: Nov 11, 2026, 11:34:07 AM
 component: div
 config:
   style:
@@ -314,10 +314,10 @@ slots:
               - component: Label
                 config:
                   text: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpIndoorAmbientTemp].state) ? ''–'' : (items[props.heatpumpIndoorAmbientTemp].displayState
-                    || items[props.heatpumpIndoorAmbientTemp].state)) + '' · '' + ([''NULL'', ''UNDEF''].includes(items[props.netatmoWeatherstationAtmosphericHumidity].state)
-                    ? ''–'' : ((Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState) || 0)).toFixed(0)
-                    + '' %'') + '' · '' + ([''NULL'', ''UNDEF''].includes(items[props.netatmoWeatherstationCo2].state) ? ''–''
-                    : (items[props.netatmoWeatherstationCo2].displayState || items[props.netatmoWeatherstationCo2].state))'
+                    || items[props.heatpumpIndoorAmbientTemp].state)) + '' · '' + ([''NULL'', ''UNDEF''].includes(items[props.apolloAir1Humidity].state)
+                    ? ''–'' : ((Number(items[props.apolloAir1Humidity].numericState) || 0)).toFixed(0) + '' %'') + '' · ''
+                    + ([''NULL'', ''UNDEF''].includes(items[props.apolloAir1Co2].state) ? ''–'' : (items[props.apolloAir1Co2].displayState
+                    || items[props.apolloAir1Co2].state))'
                   style:
                     font-size: 12px
                     opacity: '0.7'
@@ -361,11 +361,9 @@ slots:
                         flex: 1 1 auto
                   - component: Label
                     config:
-                      text: '=[''too dry'', ''dry'', ''comfortable'', ''humid'', ''too humid''][(((Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState)
-                        || 0)) < 30 ? 0 : ((Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState) ||
-                        0)) < 40 ? 1 : ((Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState) || 0))
-                        < 60 ? 2 : ((Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState) || 0)) < 70
-                        ? 3 : 4)]'
+                      text: '=[''too dry'', ''dry'', ''comfortable'', ''humid'', ''too humid''][(((Number(items[props.apolloAir1Humidity].numericState)
+                        || 0)) < 30 ? 0 : ((Number(items[props.apolloAir1Humidity].numericState) || 0)) < 40 ? 1 : ((Number(items[props.apolloAir1Humidity].numericState)
+                        || 0)) < 60 ? 2 : ((Number(items[props.apolloAir1Humidity].numericState) || 0)) < 70 ? 3 : 4)]'
                       style:
                         font-size: 11px
                         font-weight: '600'
@@ -376,30 +374,26 @@ slots:
                         color: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
                           ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
                           ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[[''warn'', ''caution'', ''good'', ''info'',
-                          ''bad''][(((Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState) || 0)) <
-                          30 ? 0 : ((Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState) || 0)) < 40
-                          ? 1 : ((Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState) || 0)) < 60 ?
-                          2 : ((Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState) || 0)) < 70 ? 3
-                          : 4)]] || (({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
-                          ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
-                          ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark === ''dark'') ?
-                          1 : 0]'
+                          ''bad''][(((Number(items[props.apolloAir1Humidity].numericState) || 0)) < 30 ? 0 : ((Number(items[props.apolloAir1Humidity].numericState)
+                          || 0)) < 40 ? 1 : ((Number(items[props.apolloAir1Humidity].numericState) || 0)) < 60 ? 2 : ((Number(items[props.apolloAir1Humidity].numericState)
+                          || 0)) < 70 ? 3 : 4)]] || (({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution:
+                          [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info:
+                          [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark ===
+                          ''dark'') ? 1 : 0]'
                         background: '=''color-mix(in srgb, '' + ((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''],
                           caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''],
                           info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[[''warn'', ''caution'',
-                          ''good'', ''info'', ''bad''][(((Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState)
-                          || 0)) < 30 ? 0 : ((Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState) ||
-                          0)) < 40 ? 1 : ((Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState) || 0))
-                          < 60 ? 2 : ((Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState) || 0)) <
-                          70 ? 3 : 4)]] || (({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
-                          ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
-                          ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark === ''dark'') ?
-                          1 : 0] + '' 16%, transparent)'''
+                          ''good'', ''info'', ''bad''][(((Number(items[props.apolloAir1Humidity].numericState) || 0)) < 30
+                          ? 0 : ((Number(items[props.apolloAir1Humidity].numericState) || 0)) < 40 ? 1 : ((Number(items[props.apolloAir1Humidity].numericState)
+                          || 0)) < 60 ? 2 : ((Number(items[props.apolloAir1Humidity].numericState) || 0)) < 70 ? 3 : 4)]]
+                          || (({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''],
+                          warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''],
+                          neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark === ''dark'') ? 1 : 0] + '' 16%,
+                          transparent)'''
               - component: Label
                 config:
-                  text: '=([''NULL'', ''UNDEF''].includes(items[props.netatmoWeatherstationAtmosphericHumidity].state) ? ''–''
-                    : ((Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState) || 0)).toFixed(0) + ''
-                    %'')'
+                  text: '=([''NULL'', ''UNDEF''].includes(items[props.apolloAir1Humidity].state) ? ''–'' : ((Number(items[props.apolloAir1Humidity].numericState)
+                    || 0)).toFixed(0) + '' %'')'
                   style:
                     font-size: 20px
                     font-weight: '700'
@@ -426,7 +420,7 @@ slots:
                             top: '0'
                             width: 10px
                             height: 6px
-                            left: ='calc(' + Math.max(0, Math.min(100, (((Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState)
+                            left: ='calc(' + Math.max(0, Math.min(100, (((Number(items[props.apolloAir1Humidity].numericState)
                               || 0)) - (20)) / ((80) - (20)) * 100)) + '% - 5px)'
                         slots:
                           default:
@@ -452,11 +446,10 @@ slots:
                                 height: 8px
                                 border-radius: 4px
                                 background: '#ffa726'
-                                opacity: '=(((Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState) ||
-                                  0)) < 30 ? 0 : ((Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState)
-                                  || 0)) < 40 ? 1 : ((Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState)
-                                  || 0)) < 60 ? 2 : ((Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState)
-                                  || 0)) < 70 ? 3 : 4) === 0 ? 1 : 0.28'
+                                opacity: '=(((Number(items[props.apolloAir1Humidity].numericState) || 0)) < 30 ? 0 : ((Number(items[props.apolloAir1Humidity].numericState)
+                                  || 0)) < 40 ? 1 : ((Number(items[props.apolloAir1Humidity].numericState) || 0)) < 60 ? 2
+                                  : ((Number(items[props.apolloAir1Humidity].numericState) || 0)) < 70 ? 3 : 4) === 0 ? 1
+                                  : 0.28'
                             slots:
                               default: []
                           - component: div
@@ -466,11 +459,10 @@ slots:
                                 height: 8px
                                 border-radius: 4px
                                 background: '#fdd835'
-                                opacity: '=(((Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState) ||
-                                  0)) < 30 ? 0 : ((Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState)
-                                  || 0)) < 40 ? 1 : ((Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState)
-                                  || 0)) < 60 ? 2 : ((Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState)
-                                  || 0)) < 70 ? 3 : 4) === 1 ? 1 : 0.28'
+                                opacity: '=(((Number(items[props.apolloAir1Humidity].numericState) || 0)) < 30 ? 0 : ((Number(items[props.apolloAir1Humidity].numericState)
+                                  || 0)) < 40 ? 1 : ((Number(items[props.apolloAir1Humidity].numericState) || 0)) < 60 ? 2
+                                  : ((Number(items[props.apolloAir1Humidity].numericState) || 0)) < 70 ? 3 : 4) === 1 ? 1
+                                  : 0.28'
                             slots:
                               default: []
                           - component: div
@@ -480,11 +472,10 @@ slots:
                                 height: 8px
                                 border-radius: 4px
                                 background: '#66bb6a'
-                                opacity: '=(((Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState) ||
-                                  0)) < 30 ? 0 : ((Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState)
-                                  || 0)) < 40 ? 1 : ((Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState)
-                                  || 0)) < 60 ? 2 : ((Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState)
-                                  || 0)) < 70 ? 3 : 4) === 2 ? 1 : 0.28'
+                                opacity: '=(((Number(items[props.apolloAir1Humidity].numericState) || 0)) < 30 ? 0 : ((Number(items[props.apolloAir1Humidity].numericState)
+                                  || 0)) < 40 ? 1 : ((Number(items[props.apolloAir1Humidity].numericState) || 0)) < 60 ? 2
+                                  : ((Number(items[props.apolloAir1Humidity].numericState) || 0)) < 70 ? 3 : 4) === 2 ? 1
+                                  : 0.28'
                             slots:
                               default: []
                           - component: div
@@ -494,11 +485,10 @@ slots:
                                 height: 8px
                                 border-radius: 4px
                                 background: '#4fc3f7'
-                                opacity: '=(((Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState) ||
-                                  0)) < 30 ? 0 : ((Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState)
-                                  || 0)) < 40 ? 1 : ((Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState)
-                                  || 0)) < 60 ? 2 : ((Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState)
-                                  || 0)) < 70 ? 3 : 4) === 3 ? 1 : 0.28'
+                                opacity: '=(((Number(items[props.apolloAir1Humidity].numericState) || 0)) < 30 ? 0 : ((Number(items[props.apolloAir1Humidity].numericState)
+                                  || 0)) < 40 ? 1 : ((Number(items[props.apolloAir1Humidity].numericState) || 0)) < 60 ? 2
+                                  : ((Number(items[props.apolloAir1Humidity].numericState) || 0)) < 70 ? 3 : 4) === 3 ? 1
+                                  : 0.28'
                             slots:
                               default: []
                           - component: div
@@ -508,11 +498,10 @@ slots:
                                 height: 8px
                                 border-radius: 4px
                                 background: '#42a5f5'
-                                opacity: '=(((Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState) ||
-                                  0)) < 30 ? 0 : ((Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState)
-                                  || 0)) < 40 ? 1 : ((Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState)
-                                  || 0)) < 60 ? 2 : ((Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState)
-                                  || 0)) < 70 ? 3 : 4) === 4 ? 1 : 0.28'
+                                opacity: '=(((Number(items[props.apolloAir1Humidity].numericState) || 0)) < 30 ? 0 : ((Number(items[props.apolloAir1Humidity].numericState)
+                                  || 0)) < 40 ? 1 : ((Number(items[props.apolloAir1Humidity].numericState) || 0)) < 60 ? 2
+                                  : ((Number(items[props.apolloAir1Humidity].numericState) || 0)) < 70 ? 3 : 4) === 4 ? 1
+                                  : 0.28'
                             slots:
                               default: []
                   - component: div
@@ -589,9 +578,8 @@ slots:
                         flex: 1 1 auto
                   - component: Label
                     config:
-                      text: '=[''harmless'', ''elevated'', ''too high''][(((Number(items[props.netatmoWeatherstationCo2].numericState)
-                        || 0)) < 1000 ? 0 : ((Number(items[props.netatmoWeatherstationCo2].numericState) || 0)) < 2000 ? 1
-                        : 2)]'
+                      text: '=[''harmless'', ''elevated'', ''too high''][(((Number(items[props.apolloAir1Co2].numericState)
+                        || 0)) < 1000 ? 0 : ((Number(items[props.apolloAir1Co2].numericState) || 0)) < 2000 ? 1 : 2)]'
                       style:
                         font-size: 11px
                         font-weight: '600'
@@ -601,24 +589,23 @@ slots:
                         width: fit-content
                         color: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
                           ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
-                          ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[[''good'', ''warn'', ''bad''][(((Number(items[props.netatmoWeatherstationCo2].numericState)
-                          || 0)) < 1000 ? 0 : ((Number(items[props.netatmoWeatherstationCo2].numericState) || 0)) < 2000 ?
-                          1 : 2)]] || (({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
-                          ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
-                          ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark === ''dark'') ?
-                          1 : 0]'
+                          ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[[''good'', ''warn'', ''bad''][(((Number(items[props.apolloAir1Co2].numericState)
+                          || 0)) < 1000 ? 0 : ((Number(items[props.apolloAir1Co2].numericState) || 0)) < 2000 ? 1 : 2)]] ||
+                          (({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''],
+                          warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''],
+                          neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark === ''dark'') ? 1 : 0]'
                         background: '=''color-mix(in srgb, '' + ((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''],
                           caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''],
-                          info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[[''good'', ''warn'', ''bad''][(((Number(items[props.netatmoWeatherstationCo2].numericState)
-                          || 0)) < 1000 ? 0 : ((Number(items[props.netatmoWeatherstationCo2].numericState) || 0)) < 2000 ?
-                          1 : 2)]] || (({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
-                          ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
-                          ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark === ''dark'') ?
-                          1 : 0] + '' 16%, transparent)'''
+                          info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[[''good'', ''warn'', ''bad''][(((Number(items[props.apolloAir1Co2].numericState)
+                          || 0)) < 1000 ? 0 : ((Number(items[props.apolloAir1Co2].numericState) || 0)) < 2000 ? 1 : 2)]] ||
+                          (({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''],
+                          warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''],
+                          neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark === ''dark'') ? 1 : 0] + '' 16%,
+                          transparent)'''
               - component: Label
                 config:
-                  text: '=(([''NULL'', ''UNDEF''].includes(items[props.netatmoWeatherstationCo2].state) ? ''–'' : (items[props.netatmoWeatherstationCo2].displayState
-                    || items[props.netatmoWeatherstationCo2].state)) || ''–'')'
+                  text: '=(([''NULL'', ''UNDEF''].includes(items[props.apolloAir1Co2].state) ? ''–'' : (items[props.apolloAir1Co2].displayState
+                    || items[props.apolloAir1Co2].state)) || ''–'')'
                   style:
                     font-size: 20px
                     font-weight: '700'
@@ -645,7 +632,7 @@ slots:
                             top: '0'
                             width: 10px
                             height: 6px
-                            left: ='calc(' + Math.max(0, Math.min(100, (((Number(items[props.netatmoWeatherstationCo2].numericState)
+                            left: ='calc(' + Math.max(0, Math.min(100, (((Number(items[props.apolloAir1Co2].numericState)
                               || 0)) - (400)) / ((2400) - (400)) * 100)) + '% - 5px)'
                         slots:
                           default:
@@ -671,9 +658,8 @@ slots:
                                 height: 8px
                                 border-radius: 4px
                                 background: '#66bb6a'
-                                opacity: '=(((Number(items[props.netatmoWeatherstationCo2].numericState) || 0)) < 1000 ? 0
-                                  : ((Number(items[props.netatmoWeatherstationCo2].numericState) || 0)) < 2000 ? 1 : 2) ===
-                                  0 ? 1 : 0.28'
+                                opacity: '=(((Number(items[props.apolloAir1Co2].numericState) || 0)) < 1000 ? 0 : ((Number(items[props.apolloAir1Co2].numericState)
+                                  || 0)) < 2000 ? 1 : 2) === 0 ? 1 : 0.28'
                             slots:
                               default: []
                           - component: div
@@ -683,9 +669,8 @@ slots:
                                 height: 8px
                                 border-radius: 4px
                                 background: '#ffa726'
-                                opacity: '=(((Number(items[props.netatmoWeatherstationCo2].numericState) || 0)) < 1000 ? 0
-                                  : ((Number(items[props.netatmoWeatherstationCo2].numericState) || 0)) < 2000 ? 1 : 2) ===
-                                  1 ? 1 : 0.28'
+                                opacity: '=(((Number(items[props.apolloAir1Co2].numericState) || 0)) < 1000 ? 0 : ((Number(items[props.apolloAir1Co2].numericState)
+                                  || 0)) < 2000 ? 1 : 2) === 1 ? 1 : 0.28'
                             slots:
                               default: []
                           - component: div
@@ -695,9 +680,8 @@ slots:
                                 height: 8px
                                 border-radius: 4px
                                 background: '#ef5350'
-                                opacity: '=(((Number(items[props.netatmoWeatherstationCo2].numericState) || 0)) < 1000 ? 0
-                                  : ((Number(items[props.netatmoWeatherstationCo2].numericState) || 0)) < 2000 ? 1 : 2) ===
-                                  2 ? 1 : 0.28'
+                                opacity: '=(((Number(items[props.apolloAir1Co2].numericState) || 0)) < 1000 ? 0 : ((Number(items[props.apolloAir1Co2].numericState)
+                                  || 0)) < 2000 ? 1 : 2) === 2 ? 1 : 0.28'
                             slots:
                               default: []
                   - component: div
@@ -861,7 +845,7 @@ slots:
               xAxisIndex: 1
               yAxisIndex: 1
               type: line
-              item: =props.netatmoWeatherstationAtmosphericHumidity
+              item: =props.apolloAir1Humidity
               symbol: none
               lineStyle:
                 width: 2
@@ -875,7 +859,7 @@ slots:
               xAxisIndex: 2
               yAxisIndex: 2
               type: line
-              item: =props.netatmoWeatherstationCo2
+              item: =props.apolloAir1Co2
               symbol: none
               sampling: lttb
               lineStyle:
@@ -971,7 +955,7 @@ slots:
             config:
               text: All details
               action: popup
-              actionModal: page:netatmo
+              actionModal: page:apollo_air_1
               outline: true
               small: true
               style:

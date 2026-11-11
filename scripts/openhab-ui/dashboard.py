@@ -2928,7 +2928,7 @@ FLOOR_TILE_W = round(UPPER_FH[0] - ORBIT - RING_MAX / 2 - 14 - FLOOR_TILE_X)
 
 
 def percent(item):
-    """A humidity in whole per cent, as the Netatmo reports it; Tado's has two decimals."""
+    """A humidity in whole per cent, as the Netatmo reports it; Tado's has two decimals, the AIR-1's one."""
     return f"(['NULL', 'UNDEF'].includes(items.{item}.state) ? '–' : {fixed(num(item), 0)} + ' %')"
 
 
@@ -3089,7 +3089,8 @@ hp_svg = svg("svg", [
         ("Vorlauf", f"={disp(HPX['supply'])}", SUPPLY), ("Rücklauf", f"={disp(HPX['return'])}", RETURN)]),
     # the floors' climate left of their floor loops, tinted while those carry water:
     # the upper floor's from the air conditioner (temperature) and its Tado zone (humidity), the ground floor's from
-    # the heat pump's room sensor (temperature) and the Netatmo station beside it (humidity, CO₂)
+    # the heat pump's room sensor (temperature) and the Apollo AIR-1 beside it (humidity, CO₂; user, 2026-11-11:
+    # instead of the Netatmo station)
     *hp_tile(*UPPER_TILE, "Obergeschoss", "bed",
              "#f48fb1", HEATING_FLOW, [
         ("Temperatur", f"={disp('faikout_perfera_temperature')}", "currentColor"),
@@ -3097,8 +3098,8 @@ hp_svg = svg("svg", [
     *hp_tile(*GROUND_TILE, "Erdgeschoss", "weekend",
              "#f48fb1", HEATING_FLOW, [
         ("Temperatur", f"={disp(HPX['indoor'])}", "currentColor"),
-        ("Luftfeuchtigkeit", f"={percent('netatmo_weatherstation_atmospheric_humidity')}", "currentColor"),
-        ("CO₂", f"={disp('netatmo_weatherstation_co2')}", "currentColor")]),
+        ("Luftfeuchtigkeit", f"={percent('apollo_air_1_humidity')}", "currentColor"),
+        ("CO₂", f"={disp('apollo_air_1_co2')}", "currentColor")]),
     # below the house, flush with its walls, the tank's and the indoor unit's tiles: the tank's temperature,
     # its setpoint and its booster heater, at work while it charges or heats; the indoor unit's flow, the circuit's
     # pressure (red outside its range) and the backup heater, at work while the pump runs; no electrical power
@@ -4301,9 +4302,8 @@ QUICK_PANELS = {"heatpump-control-quick": hp_control_quick, "heatpump-indoor-qui
                 "heatpump-cop-quick": hp_cop_quick,
                 "upper-floor-quick": lambda: floor_quick("Obergeschoss", "faikout_perfera_temperature",
                                                          "tado_humidity", None, "air_conditioning"),
-                "ground-floor-quick": lambda: floor_quick("Erdgeschoss", HPX["indoor"],
-                                                          "netatmo_weatherstation_atmospheric_humidity",
-                                                          "netatmo_weatherstation_co2", "netatmo")}
+                "ground-floor-quick": lambda: floor_quick("Erdgeschoss", HPX["indoor"], "apollo_air_1_humidity",
+                                                          "apollo_air_1_co2", "apollo_air_1")}
 _QUICK = {}
 
 

@@ -498,8 +498,8 @@ Needs `boost-pill`, `flow-node`, `ground-floor-quick`, `heatpump-circuit-quick`,
 | `acTemperature` | Faikout Perfera Temperature | Number:Temperature |
 | `tadoHumidity` | Tado Humidity | Number:Dimensionless |
 | `heatpumpIndoorAmbientTemp` | ESPAltherma Indoor Ambient Temperature | Number:Temperature |
-| `netatmoWeatherstationAtmosphericHumidity` | Netatmo Weatherstation Atmospheric Humidity | Number:Dimensionless |
-| `netatmoWeatherstationCo2` | Netatmo Weatherstation CO2 | Number:Dimensionless |
+| `apolloAir1Humidity` | Apollo AIR-1 Humidity | Number:Dimensionless |
+| `apolloAir1Co2` | Apollo AIR-1 CO2 | Number:Dimensionless |
 | `heatpumpDhwSetpoint` | ESPAltherma DHW Setpoint | Number:Temperature |
 | `heatpumpBshPower` | ESPAltherma Electrical Power Booster Heater | Number:Power |
 | `heatpumpWaterPressure` | ESPAltherma Water Pressure | Number:Pressure |
@@ -846,8 +846,8 @@ loops and the three figures at its top open them:
 | `heatpumpValve` | ESPAltherma 3-Way Valve Mode | String |
 | `heatpumpLeavingWaterTempAfterBuh` | ESPAltherma Leaving Water Temperature After BUH | Number:Temperature |
 | `heatpumpIndoorAmbientTemp` | ESPAltherma Indoor Ambient Temperature | Number:Temperature |
-| `netatmoWeatherstationAtmosphericHumidity` | Netatmo Weatherstation Atmospheric Humidity | Number:Dimensionless |
-| `netatmoWeatherstationCo2` | Netatmo Weatherstation CO2 | Number:Dimensionless |
+| `apolloAir1Humidity` | Apollo AIR-1 Humidity | Number:Dimensionless |
+| `apolloAir1Co2` | Apollo AIR-1 CO2 | Number:Dimensionless |
 
 </details>
 
