@@ -9163,15 +9163,15 @@ def ventilation_blocks():
         switch_row("Temperatur-Automatik", "material:thermostat", "ventilation_temperature_management", VENT_TEAL))
     # the level (a text item of 1 to 3, which MainUI's series reads as numbers) over the air the automations act on,
     # CO2 and humidity overlapping in one grid, so their reactions read on one time pointer (user, 2026-10-05: without
-    # the plug's power)
+    # the plug's power); the Apollo AIR-1's since the rule takes them from it (user, 2026-11-11)
     names = [(int(v), t) for v, t in VENT_LEVELS]
     air = stacked_chart([
         ("Stufe", [text_values(line("Stufe", "esplyfterl_level", VENT_TEAL, step="end"), names)],
          value_axis("", min=0, max=3, interval=1, splitLine={"show": False},
                     axisLabel={"formatter": "=(v) => ['', " + ", ".join(f"'{t}'" for _, t in names) + "][v]"})),
         ((("CO₂", "#78909c"), ("Luftfeuchtigkeit", "#29b6f6")),
-         [line("CO₂", "netatmo_weatherstation_co2", "#78909c"),
-          line("Luftfeuchtigkeit", "netatmo_weatherstation_atmospheric_humidity", "#29b6f6", y=1)],
+         [line("CO₂", "apollo_air_1_co2", "#78909c"),
+          line("Luftfeuchtigkeit", "apollo_air_1_humidity", "#29b6f6", y=1)],
          [value_axis("ppm", scale=True), span_axis("%")], 2)], 480)  # across the page's whole width
     # Jetzt (user, 2026-10-05: as Waschmaschine 1): its node from the energy flow large, its level badge on the ring,
     # the timer's time left as the arc; while the timer holds the level the time left, when the automations take over
@@ -9187,8 +9187,8 @@ def ventilation_blocks():
                  label(f"=({auto} ? 'Automatik ab ' : 'Timer bis ') + {clock_in(M_VENT)}", f"={M_VENT} > 0",
                        **{"font-size": "22px", "font-weight": "700"})], picture=icon),
            timer_bar(M_VENT, full, VENT_TEAL),
-           value_grid([vtile("CO₂", "netatmo_weatherstation_co2"),
-                      vtile("Luftfeuchtigkeit", "netatmo_weatherstation_atmospheric_humidity"),
+           value_grid([vtile("CO₂", "apollo_air_1_co2"),
+                      vtile("Luftfeuchtigkeit", "apollo_air_1_humidity"),
                       vtile("Leistung", "ventilation_power"), vtile("Energie heute", "ventilation_energy_today")])]
     # the controls on the left beside Jetzt, on a phone on top (user, 2026-10-05), as on the heat pump's page; the day
     # below across the whole width
