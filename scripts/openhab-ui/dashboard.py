@@ -7153,11 +7153,10 @@ def ring_tile(title, item, color, pct_expr=None, value_expr=None, sub=None):
 # ---------------------------------------------------------------- 05 · donut, 06 · 100 % bar and balance
 
 
-def donut_tile(title, item, parts, total_expr, center_expr, unit, color=None, footer=None, digits=2, wide=True,
-               size=112):
-    """Parts of a whole as a donut with the whole in its middle, each part with value and share beside it:
-    parts = [(name, expr, colour)]."""
-    rings, rows, before = [], [], "0"
+def donut_svg(parts, total_expr, size, center_expr=None, unit=""):
+    """The donut of parts of a whole (parts = [(name, expr, colour)]), each its share of the ring, with the whole in
+    its middle when center_expr is given."""
+    rings, before = [], "0"
     total = f"(Math.max({total_expr}, 0.0001))"
     for name, expr, colour in parts:
         share = vt_clamp(f"({expr}) / {total} * 100")
@@ -7166,6 +7165,42 @@ def donut_tile(title, item, parts, total_expr, center_expr, unit, color=None, fo
                          **{"stroke-width": 23, "stroke-dasharray": f"=Math.max(0, {share} - 0.6).toFixed(2) + ' 100'",
                             "stroke-dashoffset": f"=(-({before})).toFixed(2)"}))
         before = f"{before} + {share}"
+    middle = [svg("text", x=50, y=52, content=f"={center_expr}", fill="currentColor",
+                  **{"font-size": "14", "font-weight": "700", "text-anchor": "middle"}),
+              svg("text", x=50, y=63, content=unit, fill="currentColor",
+                  **{"font-size": "8", "text-anchor": "middle", "opacity": "0.65"})] if center_expr else []
+    return svg("svg", [svg("circle", cx=50, cy=50, r=35.5, fill="none", stroke="rgba(127, 127, 127, 0.15)",
+                           **{"stroke-width": 23}), *rings, *middle],
+               viewBox="0 0 100 100", style={"width": f"{size}px", "height": f"{size}px", "flex": "0 0 auto"})
+
+
+def donut_split(parts, total_expr, digits=2, size=76):
+    """Parts of a whole inside a tile, under its value: the donut, its middle empty as the tile names the whole, and
+    beside it each part on two lines, its name, then its value and share, so that it fits a tile half a card wide
+    (user, 2026-11-11: the heat pump's Heute as pies, as the AIR-1's particle sizes)."""
+    total = f"(Math.max({total_expr}, 0.0001))"
+    rows = []
+    for name, expr, colour in parts:
+        share = vt_clamp(f"({expr}) / {total} * 100")
+        rows.append(div([vt_dot(colour),
+                         div([label(name, **{"font-size": "12px", "line-height": "15px"}),
+                              label(f"={fixed(expr, digits)} + ' · ' + Math.round({share}) + ' %'",
+                                    **{"font-size": "11px", "line-height": "14px", "opacity": "0.7",
+                                       "white-space": "nowrap"})], **{"min-width": "0"})],
+                        **{"display": "flex", "align-items": "flex-start", "gap": "7px"}))
+    return div([donut_svg(parts, total_expr, size),
+                div(rows, **{"display": "flex", "flex-direction": "column", "gap": "6px", "min-width": "0"})],
+               **{"display": "flex", "align-items": "center", "gap": "12px", "margin-top": "10px"})
+
+
+def donut_tile(title, item, parts, total_expr, center_expr, unit, color=None, footer=None, digits=2, wide=True,
+               size=112):
+    """Parts of a whole as a donut with the whole in its middle, each part with value and share beside it:
+    parts = [(name, expr, colour)]."""
+    rows = []
+    total = f"(Math.max({total_expr}, 0.0001))"
+    for name, expr, colour in parts:
+        share = vt_clamp(f"({expr}) / {total} * 100")
         # in a narrow tile a name on one line, cut short rather than wrapped
         one_line = {} if wide else {"white-space": "nowrap", "min-width": "0", "overflow": "hidden",
                                     "text-overflow": "ellipsis"}
@@ -7176,13 +7211,7 @@ def donut_tile(title, item, parts, total_expr, center_expr, unit, color=None, fo
                         **{"display": "flex", "align-items": "center", "gap": "7px", "font-size": "12px"}))
     if footer:
         rows.append(footer)
-    pie = svg("svg", [svg("circle", cx=50, cy=50, r=35.5, fill="none", stroke="rgba(127, 127, 127, 0.15)",
-                          **{"stroke-width": 23}), *rings,
-                      svg("text", x=50, y=52, content=f"={center_expr}", fill="currentColor",
-                          **{"font-size": "14", "font-weight": "700", "text-anchor": "middle"}),
-                      svg("text", x=50, y=63, content=unit, fill="currentColor",
-                          **{"font-size": "8", "text-anchor": "middle", "opacity": "0.65"})],
-              viewBox="0 0 100 100", style={"width": f"{size}px", "height": f"{size}px", "flex": "0 0 auto"})
+    pie = donut_svg(parts, total_expr, size, center_expr, unit)
     return vt_tile([vt_title(title),
                  div([pie, div(rows, **{"display": "flex", "flex-direction": "column", "gap": "8px", "flex": "1 1 auto",
                                         "min-width": "0", "max-width": "320px"})],
@@ -8454,14 +8483,13 @@ def hp_energy(title, item):
     parts = [("Heizung", num("espaltherma_energy_space_today"), SPACE_C),
              ("Warmwasser", num("espaltherma_energy_dhw_today"), DHW_C),
              ("Standby", num("espaltherma_energy_standby_today"), STANDBY_C)]
-    return compare_tile("Strom heute", item, "#ffa726", better="less",
-                   extra=[split_bar(parts, num(item)), split_legend(parts)])
+    return compare_tile("Strom heute", item, "#ffa726", better="less", extra=[donut_split(parts, num(item))])
 
 
 def hp_heat(title, item):
     parts = [("Heizung", num("espaltherma_heating_energy_space_today"), SPACE_C),
              ("Warmwasser", num("espaltherma_heating_energy_dhw_today"), DHW_C)]
-    return compare_tile("Wärme heute", item, "#e53935", extra=[split_bar(parts, num(item)), split_legend(parts)])
+    return compare_tile("Wärme heute", item, "#e53935", extra=[donut_split(parts, num(item))])
 
 
 def hp_split_power(title, item):
