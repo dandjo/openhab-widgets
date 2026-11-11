@@ -7153,7 +7153,8 @@ def ring_tile(title, item, color, pct_expr=None, value_expr=None, sub=None):
 # ---------------------------------------------------------------- 05 · donut, 06 · 100 % bar and balance
 
 
-def donut_tile(title, item, parts, total_expr, center_expr, unit, color=None, footer=None):
+def donut_tile(title, item, parts, total_expr, center_expr, unit, color=None, footer=None, digits=2, wide=True,
+               size=112):
     """Parts of a whole as a donut with the whole in its middle, each part with value and share beside it:
     parts = [(name, expr, colour)]."""
     rings, rows, before = [], [], "0"
@@ -7165,8 +7166,11 @@ def donut_tile(title, item, parts, total_expr, center_expr, unit, color=None, fo
                          **{"stroke-width": 23, "stroke-dasharray": f"=Math.max(0, {share} - 0.6).toFixed(2) + ' 100'",
                             "stroke-dashoffset": f"=(-({before})).toFixed(2)"}))
         before = f"{before} + {share}"
-        rows.append(div([vt_dot(colour), label(name, **{"flex": "1 1 auto"}),
-                         label(f"={fixed(expr, 2)}", **{"font-weight": "700"}),
+        # in a narrow tile a name on one line, cut short rather than wrapped
+        one_line = {} if wide else {"white-space": "nowrap", "min-width": "0", "overflow": "hidden",
+                                    "text-overflow": "ellipsis"}
+        rows.append(div([vt_dot(colour), label(name, **{"flex": "1 1 auto", **one_line}),
+                         label(f"={fixed(expr, digits)}", **{"font-weight": "700"}),
                          label(f"=Math.round({share}) + ' %'", **{"width": "36px", "text-align": "right",
                                                                    "opacity": "0.65"})],
                         **{"display": "flex", "align-items": "center", "gap": "7px", "font-size": "12px"}))
@@ -7178,12 +7182,12 @@ def donut_tile(title, item, parts, total_expr, center_expr, unit, color=None, fo
                           **{"font-size": "14", "font-weight": "700", "text-anchor": "middle"}),
                       svg("text", x=50, y=63, content=unit, fill="currentColor",
                           **{"font-size": "8", "text-anchor": "middle", "opacity": "0.65"})],
-              viewBox="0 0 100 100", style={"width": "112px", "height": "112px", "flex": "0 0 auto"})
+              viewBox="0 0 100 100", style={"width": f"{size}px", "height": f"{size}px", "flex": "0 0 auto"})
     return vt_tile([vt_title(title),
                  div([pie, div(rows, **{"display": "flex", "flex-direction": "column", "gap": "8px", "flex": "1 1 auto",
                                         "min-width": "0", "max-width": "320px"})],
                      **{"display": "flex", "align-items": "center", "gap": "14px", "margin-top": "6px"})],
-                item, title, color, wide=True)
+                item, title, color, wide=wide)
 
 
 def split_bar(parts, total_expr, height=16):
@@ -8554,19 +8558,17 @@ UG_M3 = "µg/m³"
 
 
 def particle_sizes_tile(title, item):
-    """The particulate matter by size (AIR-1): PM1 and PM4, and how the mass up to 10 µm splits into the bands below
-    1 µm, 1–2.5, 2.5–4 and 4–10 µm, the AIR-1's PM values being cumulative."""
+    """The particulate matter by size (AIR-1): how the mass up to 10 µm splits into the bands below 1 µm, 1–2.5,
+    2.5–4 and 4–10 µm, the AIR-1's PM values being cumulative, as a donut with PM10 inside (user, 2026-11-11: a
+    pie instead of the bar), PM1 and PM4 below."""
     pm = {k: num(A1 + k) for k in ("pm1", "pm2_5", "pm4", "pm10")}
-    parts = [("unter 1 µm", pm["pm1"], "#5d4037"), ("1–2,5 µm", f"Math.max(0, {pm['pm2_5']} - {pm['pm1']})", "#8d6e63"),
+    # light enough to stand out on the dark card, darkest for the smallest
+    parts = [("unter 1 µm", pm["pm1"], "#8d6e63"), ("1–2,5 µm", f"Math.max(0, {pm['pm2_5']} - {pm['pm1']})", "#a1887f"),
              ("2,5–4 µm", f"Math.max(0, {pm['pm4']} - {pm['pm2_5']})", "#bcaaa4"),
              ("4–10 µm", f"Math.max(0, {pm['pm10']} - {pm['pm4']})", "#d7ccc8")]
-    value = f"='PM1 ' + {fixed(pm['pm1'], 1)} + ' · PM4 ' + {fixed(pm['pm4'], 1)} + ' {UG_M3}'"
-    legend = div([div([vt_dot(c), label(f"='{n} ' + {fixed(e, 1)}")],
-                      **{"display": "inline-flex", "align-items": "center", "gap": "5px"}) for n, e, c in parts],
-                 **{"display": "flex", "flex-wrap": "wrap", "gap": "4px 14px", "font-size": "11px", "opacity": "0.8",
-                    "margin-top": "6px"})
-    return vt_tile([vt_title(title), vt_value(value, **{"font-size": "17px"}), split_bar(parts, pm["pm10"]), legend],
-                   item, title, "#8d6e63")
+    pm14 = label(f"='PM1 ' + {fixed(pm['pm1'], 1)} + ' · PM4 ' + {fixed(pm['pm4'], 1)} + ' {UG_M3}'", **VT_SUB)
+    return donut_tile(title, item, parts, pm["pm10"], fixed(pm["pm10"], 1), UG_M3, "#8d6e63", pm14, digits=1,
+                      wide=False, size=84)
 
 
 def wifi_level(item):
