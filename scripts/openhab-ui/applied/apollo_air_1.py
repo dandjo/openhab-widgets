@@ -103,6 +103,10 @@ CALIBRATION_JS_FUNCTION = r"""(function(data) {
     why = 'der Sensor ist gerade beschäftigt';
   } else if (why === 'the sensor did not stop measuring') {
     why = 'der Sensor hat die Messung nicht angehalten';
+  } else if (why === 'the target did not reach the sensor') {
+    why = 'der Zielwert kam beim Sensor nicht an';
+  } else if (why === 'the sensor did not answer') {
+    why = 'der Sensor hat nicht geantwortet';
   } else if ((w = why.match(/^readings not steady \((\d+)-(\d+) ppm\)$/))) {
     why = 'Werte schwanken (' + w[1] + ' bis ' + w[2] + ' ppm)';
   } else if ((w = why.match(/^(\d+) ppm is too far from (\d+) ppm$/))) {
