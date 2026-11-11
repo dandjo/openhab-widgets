@@ -5,6 +5,9 @@ so an enabled CO2 or humidity automatic then counts as lacking its reading and t
 waits. The alert's flag moves to the new item apollo_air_1_co2_alert (the old netatmo_weatherstation_co2_alert hung
 in the Netatmo's group), its pushes name the AIR-1, and in the sitemap it moves from the Netatmo's frame Innen to the
 ventilation's. The AIR-1's state topics are retained, so after a restart its readings are back at once.
+Since the evening of 2026-11-11 (user) an AIR-1 reading also counts as lacking when its last update is more than 3
+minutes old (CO2 comes every 60 s, humidity every 10 s, each as an update even when unchanged): a reading that stopped
+with the device online, as a sensor that stopped measuring, would otherwise steer the level and the alert.
 apply creates the new item with the old one's state, PUTs the rule and the sitemap, then removes the old item; its
 history stays in InfluxDB.
 Usage: ventilation_air1.py check|apply   (on homepi, as pi; the API token from ~/.openhab_token)"""
@@ -60,6 +63,33 @@ if (co2_item.numericState !== null && air1_online && !co2_alert_item"""),
     ("'Netatmo Wetterstation: CO2 hoch, '", "'Apollo AIR-1: CO2 hoch, '"),
     ("'Netatmo Wetterstation: CO2 wieder normal, '", "'Apollo AIR-1: CO2 wieder normal, '"),
 ]
+# the readings' age, on top of REPLACE
+FRESH = [
+    ("""// offline, whose items keep their last value) the level stays, as a missing value would compare as 0""",
+     """// offline, whose items keep their last value, or its reading not updated for more than 3 minutes, as a sensor
+// that stopped measuring with the device online; CO2 comes every 60 s, humidity every 10 s) the level stays, as a
+// missing value would compare as 0"""),
+    ("""const air1_online = items.getItem('apollo_air_1_online').state === 'ON';
+const lacks = (management, item, air1) => items.getItem(management).state === 'ON'
+  && (items.getItem(item).numericState === null || (air1 && !air1_online));""",
+     """const air1_online = items.getItem('apollo_air_1_online').state === 'ON';
+const air1_since = time.ZonedDateTime.now().minusMinutes(3);
+const air1_fresh = (name) => {
+  const at = items.getItem(name).lastStateUpdateTimestamp;
+  return air1_online && at !== null && at !== undefined && !at.isBefore(air1_since);
+};
+const lacks = (management, item, air1) => items.getItem(management).state === 'ON'
+  && (items.getItem(item).numericState === null || (air1 && !air1_fresh(item)));"""),
+    ("""// alert CO2 level and debounce, only with a reading of the AIR-1 online
+
+if (co2_item.numericState !== null && air1_online && !co2_alert_item""",
+     """// alert CO2 level and debounce, only with a current reading of the AIR-1 online
+
+if (co2_item.numericState !== null && air1_fresh('apollo_air_1_co2') && !co2_alert_item"""),
+]
+FRESH_DESCRIPTION = [("Fehlt eine Messung oder ist der AIR-1 offline, bleibt die Stufe.",
+                      "Fehlt eine Messung, ist der AIR-1 offline oder ein Wert von ihm seit über 3 Minuten nicht "
+                      "aktualisiert, bleibt die Stufe.")]
 DESCRIPTION = [("nach CO2, Feuchte und Außentemperatur",
                 "nach CO2 und Feuchte des Apollo AIR-1 und der Außentemperatur"),
                ("Fehlt eine Messung, bleibt die Stufe.",
@@ -133,8 +163,13 @@ script = action["configuration"]["script"]
 done = "apollo_air_1_co2_alert" in script
 print(f"rule {RULE}:", "already on the AIR-1" if done else f"{len(REPLACE)} replacements")
 if not done:
-    action["configuration"]["script"] = replaced(script, REPLACE, "script")
+    script = action["configuration"]["script"] = replaced(script, REPLACE, "script")
     rule["description"] = replaced(rule["description"], DESCRIPTION, "description")
+fresh = "air1_fresh" in script
+print(f"rule {RULE}:", "checks the readings' age" if fresh else f"{len(FRESH)} replacements for the readings' age")
+if not fresh:
+    action["configuration"]["script"] = replaced(script, FRESH, "script")
+    rule["description"] = replaced(rule["description"], FRESH_DESCRIPTION, "description")
 old_status, old_item = call("GET", f"/items/{OLD}")
 new_exists = call("GET", f"/items/{NEW}")[0] == 200
 print(f"item {NEW}:", "exists" if new_exists else "missing", f"| item {OLD}:",
@@ -153,7 +188,7 @@ if not new_exists:
     print("PUT stateDescription", call("PUT", f"/items/{NEW}/metadata/stateDescription", STATE_DESCRIPTION)[0])
     state = old_item["state"] if old_status == 200 and old_item["state"] in ("ON", "OFF") else "OFF"
     print("state", state, put_text(f"/items/{NEW}/state", state))
-if not done:
+if not done or not fresh:
     body = {k: v for k, v in rule.items() if k not in ("status", "editable", "templateState")}
     print("PUT rule", call("PUT", f"/rules/{RULE}", body)[0])
 if not moved:
