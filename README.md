@@ -634,11 +634,11 @@ absolute humidity); the day's minimum and maximum, and the last day as a chart f
 |---|---|---|
 | `heatpumpIndoorAmbientTemp` | ESPAltherma Indoor Ambient Temperature | Number:Temperature |
 | `tileHistory` | Tile history | String |
-| `netatmoWeatherstationAtmosphericHumidity` | Netatmo Weatherstation Atmospheric Humidity | Number:Dimensionless |
+| `apolloAir1Humidity` | Apollo AIR-1 Humidity | Number:Dimensionless |
 | `heatpumpExtAmbientTemp` | ESPAltherma External Ambient Temperature | Number:Temperature |
 | `netatmoOutdoorTemperature` | Netatmo Outdoor Temperature | Number:Temperature |
 | `netatmoOutdoorAtmosphericHumidity` | Netatmo Outdoor Atmospheric Humidity | Number:Dimensionless |
-| `netatmoWeatherstationTemperature` | Netatmo Weatherstation Temperature | Number:Temperature |
+| `apolloAir1Temperature` | Apollo AIR-1 Temperature | Number:Temperature |
 | `temperatureIndoor15min` | Temperature Indoor 15 min | Number:Temperature |
 | `temperatureOutdoor15min` | Temperature Outdoor 15 min | Number:Temperature |
 | `heatpumpExtAmbientTempAvg` | ESPAltherma External Ambient Temperature Average | Number:Temperature |

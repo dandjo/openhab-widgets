@@ -15,8 +15,8 @@ props:
     type: TEXT
     required: true
     context: item
-  - name: netatmoWeatherstationAtmosphericHumidity
-    label: Netatmo Weatherstation Atmospheric Humidity
+  - name: apolloAir1Humidity
+    label: Apollo AIR-1 Humidity
     description: Number:Dimensionless item
     type: TEXT
     required: true
@@ -39,8 +39,8 @@ props:
     type: TEXT
     required: true
     context: item
-  - name: netatmoWeatherstationTemperature
-    label: Netatmo Weatherstation Temperature
+  - name: apolloAir1Temperature
+    label: Apollo AIR-1 Temperature
     description: Number:Temperature item
     type: TEXT
     required: true
@@ -64,7 +64,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 31, 2026, 3:40:25 PM
+timestamp: Nov 11, 2026, 11:43:29 AM
 component: oh-card
 config:
   title: Temperatures
@@ -281,11 +281,9 @@ slots:
                             top: 1px
                   - component: Label
                     config:
-                      text: '=[''too dry'', ''dry'', ''comfortable'', ''humid'', ''too humid''][(((Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState)
-                        || 0)) < 30 ? 0 : ((Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState) ||
-                        0)) < 40 ? 1 : ((Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState) || 0))
-                        < 60 ? 2 : ((Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState) || 0)) < 70
-                        ? 3 : 4)]'
+                      text: '=[''too dry'', ''dry'', ''comfortable'', ''humid'', ''too humid''][(((Number(items[props.apolloAir1Humidity].numericState)
+                        || 0)) < 30 ? 0 : ((Number(items[props.apolloAir1Humidity].numericState) || 0)) < 40 ? 1 : ((Number(items[props.apolloAir1Humidity].numericState)
+                        || 0)) < 60 ? 2 : ((Number(items[props.apolloAir1Humidity].numericState) || 0)) < 70 ? 3 : 4)]'
                       style:
                         font-size: 11px
                         font-weight: '600'
@@ -296,25 +294,22 @@ slots:
                         color: '=((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
                           ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
                           ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[[''warn'', ''caution'', ''good'', ''info'',
-                          ''bad''][(((Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState) || 0)) <
-                          30 ? 0 : ((Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState) || 0)) < 40
-                          ? 1 : ((Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState) || 0)) < 60 ?
-                          2 : ((Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState) || 0)) < 70 ? 3
-                          : 4)]] || (({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
-                          ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
-                          ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark === ''dark'') ?
-                          1 : 0]'
+                          ''bad''][(((Number(items[props.apolloAir1Humidity].numericState) || 0)) < 30 ? 0 : ((Number(items[props.apolloAir1Humidity].numericState)
+                          || 0)) < 40 ? 1 : ((Number(items[props.apolloAir1Humidity].numericState) || 0)) < 60 ? 2 : ((Number(items[props.apolloAir1Humidity].numericState)
+                          || 0)) < 70 ? 3 : 4)]] || (({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution:
+                          [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info:
+                          [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark ===
+                          ''dark'') ? 1 : 0]'
                         background: '=''color-mix(in srgb, '' + ((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''],
                           caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''],
                           info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[[''warn'', ''caution'',
-                          ''good'', ''info'', ''bad''][(((Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState)
-                          || 0)) < 30 ? 0 : ((Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState) ||
-                          0)) < 40 ? 1 : ((Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState) || 0))
-                          < 60 ? 2 : ((Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState) || 0)) <
-                          70 ? 3 : 4)]] || (({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'',
-                          ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'',
-                          ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark === ''dark'') ?
-                          1 : 0] + '' 16%, transparent)'''
+                          ''good'', ''info'', ''bad''][(((Number(items[props.apolloAir1Humidity].numericState) || 0)) < 30
+                          ? 0 : ((Number(items[props.apolloAir1Humidity].numericState) || 0)) < 40 ? 1 : ((Number(items[props.apolloAir1Humidity].numericState)
+                          || 0)) < 60 ? 2 : ((Number(items[props.apolloAir1Humidity].numericState) || 0)) < 70 ? 3 : 4)]]
+                          || (({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''],
+                          warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''],
+                          neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark === ''dark'') ? 1 : 0] + '' 16%,
+                          transparent)'''
           - component: Label
             config:
               text: Heat pump sensor
@@ -323,8 +318,8 @@ slots:
                 opacity: '0.6'
           - component: Label
             config:
-              text: '=''Room climate · humidity '' + ([''NULL'', ''UNDEF''].includes(items[props.netatmoWeatherstationAtmosphericHumidity].state)
-                ? ''–'' : (items[props.netatmoWeatherstationAtmosphericHumidity].displayState || items[props.netatmoWeatherstationAtmosphericHumidity].state))'
+              text: '=''Room climate · humidity '' + ([''NULL'', ''UNDEF''].includes(items[props.apolloAir1Humidity].state)
+                ? ''–'' : ((Number(items[props.apolloAir1Humidity].numericState) || 0)).toFixed(0) + '' %'')'
               style:
                 font-size: 12px
                 opacity: '0.6'
@@ -427,16 +422,16 @@ slots:
                       text: '=((6.112 * Math.exp(17.67 * (Number(items[props.netatmoOutdoorTemperature].numericState) || 0)
                         / ((Number(items[props.netatmoOutdoorTemperature].numericState) || 0) + 243.5)) * (Number(items[props.netatmoOutdoorAtmosphericHumidity].numericState)
                         || 0) * 2.1674 / (273.15 + (Number(items[props.netatmoOutdoorTemperature].numericState) || 0))) -
-                        (6.112 * Math.exp(17.67 * (Number(items[props.netatmoWeatherstationTemperature].numericState) || 0)
-                        / ((Number(items[props.netatmoWeatherstationTemperature].numericState) || 0) + 243.5)) * (Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState)
-                        || 0) * 2.1674 / (273.15 + (Number(items[props.netatmoWeatherstationTemperature].numericState) ||
-                        0)))) < -1 ? ''Airing dries'' : ((6.112 * Math.exp(17.67 * (Number(items[props.netatmoOutdoorTemperature].numericState)
-                        || 0) / ((Number(items[props.netatmoOutdoorTemperature].numericState) || 0) + 243.5)) * (Number(items[props.netatmoOutdoorAtmosphericHumidity].numericState)
-                        || 0) * 2.1674 / (273.15 + (Number(items[props.netatmoOutdoorTemperature].numericState) || 0))) -
-                        (6.112 * Math.exp(17.67 * (Number(items[props.netatmoWeatherstationTemperature].numericState) || 0)
-                        / ((Number(items[props.netatmoWeatherstationTemperature].numericState) || 0) + 243.5)) * (Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState)
-                        || 0) * 2.1674 / (273.15 + (Number(items[props.netatmoWeatherstationTemperature].numericState) ||
-                        0)))) > 1 ? ''Airing dampens'' : ''Airing neutral'''
+                        (6.112 * Math.exp(17.67 * (Number(items[props.apolloAir1Temperature].numericState) || 0) / ((Number(items[props.apolloAir1Temperature].numericState)
+                        || 0) + 243.5)) * (Number(items[props.apolloAir1Humidity].numericState) || 0) * 2.1674 / (273.15 +
+                        (Number(items[props.apolloAir1Temperature].numericState) || 0)))) < -1 ? ''Airing dries'' : ((6.112
+                        * Math.exp(17.67 * (Number(items[props.netatmoOutdoorTemperature].numericState) || 0) / ((Number(items[props.netatmoOutdoorTemperature].numericState)
+                        || 0) + 243.5)) * (Number(items[props.netatmoOutdoorAtmosphericHumidity].numericState) || 0) * 2.1674
+                        / (273.15 + (Number(items[props.netatmoOutdoorTemperature].numericState) || 0))) - (6.112 * Math.exp(17.67
+                        * (Number(items[props.apolloAir1Temperature].numericState) || 0) / ((Number(items[props.apolloAir1Temperature].numericState)
+                        || 0) + 243.5)) * (Number(items[props.apolloAir1Humidity].numericState) || 0) * 2.1674 / (273.15 +
+                        (Number(items[props.apolloAir1Temperature].numericState) || 0)))) > 1 ? ''Airing dampens'' : ''Airing
+                        neutral'''
                       style:
                         font-size: 11px
                         font-weight: '600'
@@ -449,38 +444,37 @@ slots:
                           ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[(((6.112 * Math.exp(17.67 * (Number(items[props.netatmoOutdoorTemperature].numericState)
                           || 0) / ((Number(items[props.netatmoOutdoorTemperature].numericState) || 0) + 243.5)) * (Number(items[props.netatmoOutdoorAtmosphericHumidity].numericState)
                           || 0) * 2.1674 / (273.15 + (Number(items[props.netatmoOutdoorTemperature].numericState) || 0)))
-                          - (6.112 * Math.exp(17.67 * (Number(items[props.netatmoWeatherstationTemperature].numericState)
-                          || 0) / ((Number(items[props.netatmoWeatherstationTemperature].numericState) || 0) + 243.5)) * (Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState)
-                          || 0) * 2.1674 / (273.15 + (Number(items[props.netatmoWeatherstationTemperature].numericState) ||
-                          0)))) < -1 ? ''good'' : ((6.112 * Math.exp(17.67 * (Number(items[props.netatmoOutdoorTemperature].numericState)
-                          || 0) / ((Number(items[props.netatmoOutdoorTemperature].numericState) || 0) + 243.5)) * (Number(items[props.netatmoOutdoorAtmosphericHumidity].numericState)
-                          || 0) * 2.1674 / (273.15 + (Number(items[props.netatmoOutdoorTemperature].numericState) || 0)))
-                          - (6.112 * Math.exp(17.67 * (Number(items[props.netatmoWeatherstationTemperature].numericState)
-                          || 0) / ((Number(items[props.netatmoWeatherstationTemperature].numericState) || 0) + 243.5)) * (Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState)
-                          || 0) * 2.1674 / (273.15 + (Number(items[props.netatmoWeatherstationTemperature].numericState) ||
-                          0)))) > 1 ? ''warn'' : ''neutral'')] || (({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''],
-                          caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''],
-                          info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark
-                          === ''dark'') ? 1 : 0]'
+                          - (6.112 * Math.exp(17.67 * (Number(items[props.apolloAir1Temperature].numericState) || 0) / ((Number(items[props.apolloAir1Temperature].numericState)
+                          || 0) + 243.5)) * (Number(items[props.apolloAir1Humidity].numericState) || 0) * 2.1674 / (273.15
+                          + (Number(items[props.apolloAir1Temperature].numericState) || 0)))) < -1 ? ''good'' : ((6.112 *
+                          Math.exp(17.67 * (Number(items[props.netatmoOutdoorTemperature].numericState) || 0) / ((Number(items[props.netatmoOutdoorTemperature].numericState)
+                          || 0) + 243.5)) * (Number(items[props.netatmoOutdoorAtmosphericHumidity].numericState) || 0) * 2.1674
+                          / (273.15 + (Number(items[props.netatmoOutdoorTemperature].numericState) || 0))) - (6.112 * Math.exp(17.67
+                          * (Number(items[props.apolloAir1Temperature].numericState) || 0) / ((Number(items[props.apolloAir1Temperature].numericState)
+                          || 0) + 243.5)) * (Number(items[props.apolloAir1Humidity].numericState) || 0) * 2.1674 / (273.15
+                          + (Number(items[props.apolloAir1Temperature].numericState) || 0)))) > 1 ? ''warn'' : ''neutral'')]
+                          || (({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''],
+                          warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''],
+                          neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark === ''dark'') ? 1 : 0]'
                         background: '=''color-mix(in srgb, '' + ((({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''],
                           caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''],
                           info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']}))[(((6.112 * Math.exp(17.67
                           * (Number(items[props.netatmoOutdoorTemperature].numericState) || 0) / ((Number(items[props.netatmoOutdoorTemperature].numericState)
                           || 0) + 243.5)) * (Number(items[props.netatmoOutdoorAtmosphericHumidity].numericState) || 0) * 2.1674
                           / (273.15 + (Number(items[props.netatmoOutdoorTemperature].numericState) || 0))) - (6.112 * Math.exp(17.67
-                          * (Number(items[props.netatmoWeatherstationTemperature].numericState) || 0) / ((Number(items[props.netatmoWeatherstationTemperature].numericState)
-                          || 0) + 243.5)) * (Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState) ||
-                          0) * 2.1674 / (273.15 + (Number(items[props.netatmoWeatherstationTemperature].numericState) || 0))))
-                          < -1 ? ''good'' : ((6.112 * Math.exp(17.67 * (Number(items[props.netatmoOutdoorTemperature].numericState)
-                          || 0) / ((Number(items[props.netatmoOutdoorTemperature].numericState) || 0) + 243.5)) * (Number(items[props.netatmoOutdoorAtmosphericHumidity].numericState)
-                          || 0) * 2.1674 / (273.15 + (Number(items[props.netatmoOutdoorTemperature].numericState) || 0)))
-                          - (6.112 * Math.exp(17.67 * (Number(items[props.netatmoWeatherstationTemperature].numericState)
-                          || 0) / ((Number(items[props.netatmoWeatherstationTemperature].numericState) || 0) + 243.5)) * (Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState)
-                          || 0) * 2.1674 / (273.15 + (Number(items[props.netatmoWeatherstationTemperature].numericState) ||
-                          0)))) > 1 ? ''warn'' : ''neutral'')] || (({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''],
-                          caution: [''#8d6e00'', ''#fff176''], warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''],
-                          info: [''#0277bd'', ''#81d4fa''], neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark
-                          === ''dark'') ? 1 : 0] + '' 16%, transparent)'''
+                          * (Number(items[props.apolloAir1Temperature].numericState) || 0) / ((Number(items[props.apolloAir1Temperature].numericState)
+                          || 0) + 243.5)) * (Number(items[props.apolloAir1Humidity].numericState) || 0) * 2.1674 / (273.15
+                          + (Number(items[props.apolloAir1Temperature].numericState) || 0)))) < -1 ? ''good'' : ((6.112 *
+                          Math.exp(17.67 * (Number(items[props.netatmoOutdoorTemperature].numericState) || 0) / ((Number(items[props.netatmoOutdoorTemperature].numericState)
+                          || 0) + 243.5)) * (Number(items[props.netatmoOutdoorAtmosphericHumidity].numericState) || 0) * 2.1674
+                          / (273.15 + (Number(items[props.netatmoOutdoorTemperature].numericState) || 0))) - (6.112 * Math.exp(17.67
+                          * (Number(items[props.apolloAir1Temperature].numericState) || 0) / ((Number(items[props.apolloAir1Temperature].numericState)
+                          || 0) + 243.5)) * (Number(items[props.apolloAir1Humidity].numericState) || 0) * 2.1674 / (273.15
+                          + (Number(items[props.apolloAir1Temperature].numericState) || 0)))) > 1 ? ''warn'' : ''neutral'')]
+                          || (({good: [''#2e7d32'', ''#81c784''], ok: [''#558b2f'', ''#c5e1a5''], caution: [''#8d6e00'', ''#fff176''],
+                          warn: [''#e65100'', ''#ffb74d''], bad: [''#c62828'', ''#ef9a9a''], info: [''#0277bd'', ''#81d4fa''],
+                          neutral: [''#5f6368'', ''#c7c7cc'']})).neutral)[(themeOptions.dark === ''dark'') ? 1 : 0] + '' 16%,
+                          transparent)'''
           - component: Label
             config:
               text: Heat pump sensor
@@ -492,10 +486,10 @@ slots:
               text: ='absolute ' + ((6.112 * Math.exp(17.67 * (Number(items[props.netatmoOutdoorTemperature].numericState)
                 || 0) / ((Number(items[props.netatmoOutdoorTemperature].numericState) || 0) + 243.5)) * (Number(items[props.netatmoOutdoorAtmosphericHumidity].numericState)
                 || 0) * 2.1674 / (273.15 + (Number(items[props.netatmoOutdoorTemperature].numericState) || 0)))).toFixed(1)
-                + ' g/m³ · indoors ' + ((6.112 * Math.exp(17.67 * (Number(items[props.netatmoWeatherstationTemperature].numericState)
-                || 0) / ((Number(items[props.netatmoWeatherstationTemperature].numericState) || 0) + 243.5)) * (Number(items[props.netatmoWeatherstationAtmosphericHumidity].numericState)
-                || 0) * 2.1674 / (273.15 + (Number(items[props.netatmoWeatherstationTemperature].numericState) || 0)))).toFixed(1)
-                + ' g/m³'
+                + ' g/m³ · indoors ' + ((6.112 * Math.exp(17.67 * (Number(items[props.apolloAir1Temperature].numericState)
+                || 0) / ((Number(items[props.apolloAir1Temperature].numericState) || 0) + 243.5)) * (Number(items[props.apolloAir1Humidity].numericState)
+                || 0) * 2.1674 / (273.15 + (Number(items[props.apolloAir1Temperature].numericState) || 0)))).toFixed(1) +
+                ' g/m³'
               style:
                 font-size: 12px
                 opacity: '0.6'

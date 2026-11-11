@@ -4874,15 +4874,16 @@ def soft_marks(color, ink):
                                      "padding": [5, 6, 3, 6], "borderRadius": 6},
                                "s": {"width": 64}}}}
 def temps_content():
-    """The temperatures card: indoors with the room's climate in a word (Netatmo's humidity), outdoors with whether
-    airing dries the rooms, both with their trend; the day's course below, the outdoor one with the mean the heating
-    curve works with dashed beside it, as on the heat pump page (user, 2026-10-15)."""
-    hum = "netatmo_weatherstation_atmospheric_humidity"
+    """The temperatures card: indoors with the room's climate in a word (the Apollo AIR-1's humidity; the Netatmo's
+    until 2026-11-11, user), outdoors with whether airing dries the rooms (the Netatmo's outdoor module against the
+    AIR-1), both with their trend; the day's course below, the outdoor one with the mean the heating curve works with
+    dashed beside it, as on the heat pump page (user, 2026-10-15)."""
+    hum = "apollo_air_1_humidity"
     lo, hi, segs = VT_SCALES["humidity"]
     climate, _ = rating_parts(num(hum), lo, hi, segs)
-    airing_text, airing = airing_line()["slots"]["default"]
+    airing_text, airing = airing_line(("apollo_air_1_temperature", hum))["slots"]["default"]
     small = {"font-size": "12px", "opacity": "0.6"}
-    climate_text = label(f"='Raumklima · Feuchte ' + {disp(hum)}", **small)
+    climate_text = label(f"='Raumklima · Feuchte ' + {percent(hum)}", **small)
     airing_text["config"]["style"] = small
     return [
     div([temp_stat("Indoor", INDOOR, "#fb8c00", "Heatpump sensor", [climate], climate_text),
@@ -8292,10 +8293,12 @@ def absolute_humidity(temp, rh):
             f"(273.15 + {num(temp)}))")
 
 
-def airing_line():
-    """Whether outdoor air brought in dries or dampens the rooms: its absolute humidity against the indoor air's."""
+def airing_line(inside=(W + "temperature", W + "atmospheric_humidity")):
+    """Whether outdoor air brought in dries or dampens the rooms: its absolute humidity against the indoor air's;
+    inside: the indoor temperature and humidity, a pair from one device, as a humidity is relative to its own
+    temperature (the Netatmo station's on its own page, the Apollo AIR-1's on the temperatures card)."""
     out = absolute_humidity(O + "temperature", O + "atmospheric_humidity")
-    inn = absolute_humidity(W + "temperature", W + "atmospheric_humidity")
+    inn = absolute_humidity(*inside)
     d = f"({out} - {inn})"
     cls = f"({d} < -1 ? 'good' : {d} > 1 ? 'warn' : 'neutral')"
     word = vt_chip(f"={d} < -1 ? 'Lüften trocknet' : {d} > 1 ? 'Lüften befeuchtet' : 'Lüften neutral'", cls)

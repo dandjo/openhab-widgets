@@ -310,4 +310,5 @@ EN.update({"Škoda Enyaq Ladestand": "Škoda Enyaq State of Charge", "Škoda Eny
            "Škoda Enyaq letzter Befehl": "Škoda Enyaq Last Command",
            "Škoda Enyaq Klimatisierung Ein/Aus": "Škoda Enyaq Climatisation On/Off"})
 # the Apollo AIR-1's items, created with German labels (2026-11-10), where widgets take them as props
-EN.update({"Apollo AIR-1 Luftfeuchtigkeit": "Apollo AIR-1 Humidity", "Apollo AIR-1 CO2": "Apollo AIR-1 CO2"})
+EN.update({"Apollo AIR-1 Luftfeuchtigkeit": "Apollo AIR-1 Humidity", "Apollo AIR-1 CO2": "Apollo AIR-1 CO2",
+           "Apollo AIR-1 Temperatur": "Apollo AIR-1 Temperature"})
