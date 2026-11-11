@@ -123,7 +123,7 @@ POINTS = {
                                {"unit": {"value": "ppm"}, **command("%.0f ppm", min=400, max=500, step=1)}, "number",
                                control("number", "co2_calibration_target", unit="ppm", min=400, max=500, step=1)),
     "co2_calibrate": ("String", "CO2 kalibrieren", "co2", ["Control"], [], command("%s", options="PRESS=Kalibrieren"),
-                      "string", {"commandTopic": TOPIC + "button/calibrate_scd40/command"}),
+                      "string", {"commandTopic": TOPIC + "button/calibrate_co2/command"}),
     "co2_calibration": ("String", "CO2-Kalibrierung", "co2", ["Status"], [], state("%s"), "string",
                         {"stateTopic": sensor("co2_calibration")}),
 }
