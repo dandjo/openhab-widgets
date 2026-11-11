@@ -90,6 +90,8 @@ CALIBRATION_JS_FUNCTION = r"""(function(data) {
     why = 'kein Zielwert';
   } else if (why === 'less than 3 minutes of readings') {
     why = 'noch keine 3 Minuten Messwerte';
+  } else if (why === 'the sensor refused it') {
+    why = 'der Sensor hat es abgelehnt';
   } else if ((w = why.match(/^readings not steady \((\d+)-(\d+) ppm\)$/))) {
     why = 'Werte schwanken (' + w[1] + ' bis ' + w[2] + ' ppm)';
   } else if ((w = why.match(/^(\d+) ppm is too far from (\d+) ppm$/))) {
