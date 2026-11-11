@@ -61,6 +61,46 @@ def sensor(name):
     return TOPIC + f"sensor/{name}/state"
 
 
+# the CO2 calibration's outcome, which the device names in English for its own interface (user, 2026-11-11), in German
+# for openHAB's: a managed JS transformation as the item's display pattern; the item's state stays the device's text
+CALIBRATION_JS = "config:js:apollo_air_1_co2_calibration"
+CALIBRATION_JS_FUNCTION = r"""(function(data) {
+  // the AIR-1's calibration outcome, which the device names in English, in German for the UI
+  if (data === null || data === undefined || data === 'NULL' || data === 'UNDEF' || data === '') {
+    return data;
+  }
+  var text = String(data);
+  var when = '';
+  var t = text.match(/ on (\d{4})-(\d\d)-(\d\d) at (\d\d:\d\d)/);
+  if (t) {
+    when = ' am ' + t[3] + '.' + t[2] + '.' + t[1] + ' ' + t[4];
+    text = text.replace(t[0], '');
+  }
+  var m = text.match(/^Calibrated to (\d+) ppm \(was (\d+) ppm\)$/);
+  if (m) {
+    return 'Kalibriert auf ' + m[1] + ' ppm' + when + ' (vorher ' + m[2] + ' ppm)';
+  }
+  m = text.match(/^Not calibrated: (.*)$/);
+  if (!m) {
+    return String(data);
+  }
+  var why = m[1];
+  var w;
+  if (why === 'no target') {
+    why = 'kein Zielwert';
+  } else if (why === 'less than 3 minutes of readings') {
+    why = 'noch keine 3 Minuten Messwerte';
+  } else if ((w = why.match(/^readings not steady \((\d+)-(\d+) ppm\)$/))) {
+    why = 'Werte schwanken (' + w[1] + ' bis ' + w[2] + ' ppm)';
+  } else if ((w = why.match(/^(\d+) ppm is too far from (\d+) ppm$/))) {
+    why = w[1] + ' ppm sind keine Außenluft nahe ' + w[2] + ' ppm';
+  }
+  return 'Nicht kalibriert' + when + ': ' + why;
+})(input)
+"""
+TRANSFORMATION = {"uid": CALIBRATION_JS, "label": "Apollo AIR-1 CO2-Kalibrierung auf Deutsch", "type": "js",
+                  "configuration": {"function": CALIBRATION_JS_FUNCTION}}
+
 # suffix: (item type, label after "Apollo AIR-1 ", icon, tags, persistence groups, metadata, channel type, channel
 # configuration); the channel's id is the item's name, as on the other MQTT things
 POINTS = {
@@ -124,8 +164,8 @@ POINTS = {
                                control("number", "co2_calibration_target", unit="ppm", min=400, max=500, step=1)),
     "co2_calibrate": ("String", "CO2 kalibrieren", "co2", ["Control"], [], command("%s", options="PRESS=Kalibrieren"),
                       "string", {"commandTopic": TOPIC + "button/calibrate_co2/command"}),
-    "co2_calibration": ("String", "CO2-Kalibrierung", "co2", ["Status"], [], state("%s"), "string",
-                        {"stateTopic": sensor("co2_calibration")}),
+    "co2_calibration": ("String", "CO2-Kalibrierung", "co2", ["Status"], [], state(f"JS({CALIBRATION_JS}):%s"),
+                        "string", {"stateTopic": sensor("co2_calibration")}),
 }
 # items linked to another item's channel with a profile: item suffix -> (channel suffix, profile)
 PROFILE_LINKS = {"last_seen": ("uptime", "system:timestamp-update")}
@@ -178,7 +218,10 @@ print(f"thing {THING}:", "exists" if call("GET", f"/things/{q(THING)}")[0] == 20
 for name in ITEMS:
     status, item = call("GET", f"/items/{name}")
     print(f"item {name}:", f"exists, state {item['state']}" if status == 200 else "missing")
+print(f"transformation {CALIBRATION_JS}:",
+      "exists" if call("GET", f"/transformations/{CALIBRATION_JS}")[0] == 200 else "missing")
 if apply:
+    print("transformation PUT", call("PUT", f"/transformations/{CALIBRATION_JS}", TRANSFORMATION)[0])
     if call("GET", f"/things/{q(THING)}")[0] == 200:
         print("thing PUT", call("PUT", f"/things/{q(THING)}", THING_BODY)[0])
     else:

@@ -10134,7 +10134,7 @@ def air1_blocks():
              div([label("CO₂ kalibrieren", **{"font-size": "13px", "line-height": "16px"}),
                   label(f"=['NULL', 'UNDEF'].includes(items.{a}co2_calibration.state) ? "
                         f"'Am offenen Fenster, nach 3 Minuten stabiler Werte' : "
-                        f"'Zuletzt: ' + items.{a}co2_calibration.state",
+                        f"'Zuletzt: ' + (items.{a}co2_calibration.displayState || items.{a}co2_calibration.state)",
                         **{"font-size": "11px", "opacity": "0.7", "line-height": "14px", "white-space": "normal"})],
                  **{"flex": "1", "min-width": "0", "display": "flex", "flex-direction": "column"}),
              comp("oh-button", {"text": "Kalibrieren", "action": "command", "actionItem": a + "co2_calibrate",
