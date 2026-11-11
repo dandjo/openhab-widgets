@@ -6924,7 +6924,7 @@ def trend_chip(item, digits, unit, hours=1, factor=1, small=None):
     d = f"({num(item)} * {factor} - {then})"
     small = small if small is not None else 0.5 * 10 ** -digits
     icon = f"='material:' + (Math.abs({d}) < {small} ? 'trending_flat' : {d} > 0 ? 'trending_up' : 'trending_down')"
-    text = f"={fixed(f'Math.abs({d})', digits)} + ' {unit} / {hours} h'"
+    text = f"={fixed(f'Math.abs({d})', digits)} + '{' ' + unit if unit else ''} / {hours} h'"
     return vt_icon_chip(icon, text, "'neutral'", visible=f"={vt_has(vt_hv(item, 'h'))}")
 
 
@@ -8612,12 +8612,16 @@ VALUE_RENDER = {
     A1 + "co2": vt_r(lambda t, i: rating_tile(t, i, "co2", spark_of=("#90a4ae", 200, "ppm", 0, 1000))),
     A1 + "humidity": vt_r(lambda t, i: rating_tile(t, i, "humidity", spark_of=("#29b6f6", 10, "%", 0, None))),
     A1 + "pressure": vt_r(lambda t, i: spark_tile(t, i, "#7986cb", "hPa", 1, span=6, trend_h=3, wide=True)),
-    A1 + "pm2_5": vt_r(lambda t, i: rating_tile(t, i, "pm2_5", expr=f"({num(i)} - 0.5)")),
-    A1 + "pm10": vt_r(lambda t, i: rating_tile(t, i, "pm10", expr=f"({num(i)} - 0.5)")),
+    # the pollutants with trend and course as CO₂ (user, 2026-11-11), the dashed line where "good" ends
+    A1 + "pm2_5": vt_r(lambda t, i: rating_tile(t, i, "pm2_5", expr=f"({num(i)} - 0.5)",
+                                                spark_of=("#8d6e63", 10, UG_M3, 1, 15))),
+    A1 + "pm10": vt_r(lambda t, i: rating_tile(t, i, "pm10", expr=f"({num(i)} - 0.5)",
+                                               spark_of=("#bcaaa4", 10, UG_M3, 1, 27))),
     A1 + "pm1": vt_r(particle_sizes_tile),
-    A1 + "aqi": vt_r(lambda t, i: rating_tile(t, i, "aqi_us", expr=f"({num(i)} - 0.5)")),
-    A1 + "voc_index": vt_r(lambda t, i: rating_tile(t, i, "voc")),
-    A1 + "nox_index": vt_r(lambda t, i: rating_tile(t, i, "nox")),
+    A1 + "aqi": vt_r(lambda t, i: rating_tile(t, i, "aqi_us", expr=f"({num(i)} - 0.5)",
+                                              spark_of=("#a1887f", 20, "", 0, 50))),
+    A1 + "voc_index": vt_r(lambda t, i: rating_tile(t, i, "voc", spark_of=("#9575cd", 50, "", 0, 150))),
+    A1 + "nox_index": vt_r(lambda t, i: rating_tile(t, i, "nox", spark_of=("#ba68c8", 5, "", 0, 20))),
     A1 + "last_seen": vt_r(lambda t, i: age_tile(t, i, 1)),
     A1 + "rssi": vt_r(lambda t, i: levels_tile(t, i, [("1", "schwach"), ("2", "mittel"), ("3", "gut"),
                                                       ("4", "sehr gut")],
