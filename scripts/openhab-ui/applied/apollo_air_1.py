@@ -87,6 +87,10 @@ CALIBRATION_JS_FUNCTION = r"""(function(data) {
   if (m) {
     return 'Kalibriert auf ' + m[1] + ' ppm' + when + ' (vorher ' + m[2] + ' ppm)' + restart;
   }
+  // the target reached the sensor, but its answer could not be read: it may have taken it
+  if (text === "Calibration outcome unknown: the sensor's answer could not be read") {
+    return 'Kalibrierung ungewiss' + when + ': die Antwort des Sensors war nicht lesbar' + restart;
+  }
   m = text.match(/^Not calibrated: (.*)$/);
   if (!m) {
     return String(data);
@@ -105,8 +109,6 @@ CALIBRATION_JS_FUNCTION = r"""(function(data) {
     why = 'der Sensor hat die Messung nicht angehalten';
   } else if (why === 'the target did not reach the sensor') {
     why = 'der Zielwert kam beim Sensor nicht an';
-  } else if (why === 'the sensor did not answer') {
-    why = 'der Sensor hat nicht geantwortet';
   } else if ((w = why.match(/^readings not steady \((\d+)-(\d+) ppm\)$/))) {
     why = 'Werte schwanken (' + w[1] + ' bis ' + w[2] + ' ppm)';
   } else if ((w = why.match(/^(\d+) ppm is too far from (\d+) ppm$/))) {
