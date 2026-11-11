@@ -7174,22 +7174,25 @@ def donut_svg(parts, total_expr, size, center_expr=None, unit=""):
                viewBox="0 0 100 100", style={"width": f"{size}px", "height": f"{size}px", "flex": "0 0 auto"})
 
 
-def donut_split(parts, total_expr, digits=2, size=76):
+def donut_split(parts, total_expr, digits=2, size=92):
     """Parts of a whole inside a tile, under its value: the donut, its middle empty as the tile names the whole, and
     beside it each part on two lines, its name, then its value and share, so that it fits a tile half a card wide
-    (user, 2026-11-11: the heat pump's Heute as pies, as the AIR-1's particle sizes)."""
+    (user, 2026-11-11: the heat pump's Heute as pies, as the AIR-1's particle sizes). The donut as high as three
+    parts' lines, which stood taller than it at 76 px (user, same evening)."""
     total = f"(Math.max({total_expr}, 0.0001))"
     rows = []
     for name, expr, colour in parts:
         share = vt_clamp(f"({expr}) / {total} * 100")
         rows.append(div([vt_dot(colour),
-                         div([label(name, **{"font-size": "12px", "line-height": "15px"}),
-                              label(f"={fixed(expr, digits)} + ' · ' + Math.round({share}) + ' %'",
-                                    **{"font-size": "11px", "line-height": "14px", "opacity": "0.7",
-                                       "white-space": "nowrap"})], **{"min-width": "0"})],
+                         div([label(name, **{"font-size": "12px", "line-height": "14px"}),
+                              div([label(f"={fixed(expr, digits)}", **{"font-weight": "600"}),
+                                   label(f"='· ' + Math.round({share}) + ' %'",
+                                         **{"opacity": "0.6", "margin-left": "4px"})],
+                                  **{"display": "flex", "font-size": "11px", "line-height": "14px",
+                                     "white-space": "nowrap"})], **{"min-width": "0"})],
                         **{"display": "flex", "align-items": "flex-start", "gap": "7px"}))
     return div([donut_svg(parts, total_expr, size),
-                div(rows, **{"display": "flex", "flex-direction": "column", "gap": "6px", "min-width": "0"})],
+                div(rows, **{"display": "flex", "flex-direction": "column", "gap": "4px", "min-width": "0"})],
                **{"display": "flex", "align-items": "center", "gap": "12px", "margin-top": "10px"})
 
 
