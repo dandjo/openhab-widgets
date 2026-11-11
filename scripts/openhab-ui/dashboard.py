@@ -7042,19 +7042,20 @@ VT_SCALES = {
 }
 
 
-def rating_tile(title, item, scale, expr=None, value_expr=None, color=None, spark_of=None, extra=()):
+def rating_tile(title, item, scale, expr=None, value_expr=None, color=None, spark_of=None, extra=(), wide=False):
     """The value with its word and a segment band; with spark_of=(colour, span, unit, digits, threshold) its day's
     course below as well (12 + 03), the change of the last hour beside the value."""
     lo, hi, segs = VT_SCALES[scale]
     word, band = rating_parts(expr or num(item), lo, hi, segs)
     shown = value_expr or f"={dash(disp(item))}"
     if not spark_of:
-        return vt_tile([vt_head(title, word), vt_value(shown, color), band, *extra], item, title, color)
+        return vt_tile([vt_head(title, word), vt_value(shown, color), band, *extra], item, title, color, wide)
     colour, span, unit, digits, threshold, *rest = spark_of
     hours = rest[0] if rest else 1
     track_history(item, s=True, t=hours)
     return vt_tile([vt_head(title, word), vt_value(shown, color, trend_chip(item, digits, unit, hours)), band, *extra,
-                 sparkline(item, colour, span, threshold=threshold), minmax_line(item, digits)], item, title, color)
+                 sparkline(item, colour, span, threshold=threshold), minmax_line(item, digits)], item, title, color,
+                   wide)
 
 
 # ---------------------------------------------------------------- 02 · setpoint bar and normal band
@@ -8632,7 +8633,9 @@ VALUE_RENDER = {
                                                               f".split(' ')[0]", **VT_SUB)], i, t)),
     # Tado: the course in the page's chart, so its humidity rates without a sparkline, in whole per cent (the zone
     # reports two decimals)
-    "tado_humidity": vt_r(lambda t, i: rating_tile(t, i, "humidity", value_expr=f"={percent(i)}")),
+    # with trend and course as the AIR-1's (user, 2026-11-11), across the card as the page's only tile
+    "tado_humidity": vt_r(lambda t, i: rating_tile(t, i, "humidity", value_expr=f"={percent(i)}",
+                                                  spark_of=("#29b6f6", 10, "%", 0, None), wide=True)),
     # SmartPi and the Huawei power meter
     "smartpi_ecday": grid_day("smartpi_ecday", "smartpi_epday"),
     "smartpi_i4": VT_DROP,  # in the current triangle
@@ -10158,7 +10161,10 @@ def tado_blocks():
     floor, the temperature at the head with the device drawn, its LED matrix showing it, the humidity beside; their
     course today beside it, temperature over humidity."""
     t, h = "tado_temperature", "tado_humidity"
-    now = [hero("material:thermostat", "#fb8c00", "Temperatur", f"={disp(t)}",
+    # the temperature's change of the last hour under it (user, 2026-11-11: trend and course as the AIR-1's tiles;
+    # its course is the chart's beside)
+    track_history(t, t=1)
+    now = [hero("material:thermostat", "#fb8c00", "Temperatur", f"={disp(t)}", [trend_chip(t, 1, "K", 1)],
                 picture=device_icon(tado_parts("#fb8c00", num(t)), "#fb8c00")),
            value_grid([vtile("Luftfeuchtigkeit", h)])]
     room = stacked_chart([("Temperatur", [line("Temperatur", t, "#fb8c00")], span_axis("°C")),
