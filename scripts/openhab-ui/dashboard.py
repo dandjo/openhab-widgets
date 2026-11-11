@@ -6409,6 +6409,13 @@ def hero(icon, color, caption, value, extra=(), value_color=None, picture=None):
                **{"display": "flex", "align-items": "center", "gap": "18px", "padding": "12px 16px 8px"})
 
 
+def hero_trend(item):
+    """A device page's main temperature's change of the last hour, under it (user, 2026-11-11: Tado, Netatmo inside
+    and outside, Apollo AIR-1); its course is the page's chart. The history rule keeps one trend span per item."""
+    track_history(item, t=1)
+    return trend_chip(item, 1, "K", 1)
+
+
 def plug_chart(item, color, floor=100, height="260px"):
     series = [area("Leistung", item, color)]
     if floor:  # keeps standby noise of a few tenths of a watt from filling the axis
@@ -10061,11 +10068,11 @@ def netatmo_blocks():
     # the station's two modules side by side, as they stand, each card's own drawn fully (user, 2026-10-05: icons after
     # the real devices); the indoor module's top in the CO₂'s colour
     inside = [hero("material:thermostat", "#fb8c00", "Innen", f"={disp(w + 'temperature')}",
-                   picture=device_icon(netatmo_parts("#fb8c00", "indoor", num(w + "co2")), "#fb8c00")),
+                   [hero_trend(w + "temperature")], picture=device_icon(netatmo_parts("#fb8c00", "indoor", num(w + "co2")), "#fb8c00")),
               value_grid([vtile("Luftfeuchtigkeit", w + "atmospheric_humidity"), vtile("CO2", w + "co2"),
                          vtile("Lärm", w + "noise"), vtile("Luftdruck", w + "barometric_pressure")])]
     outside = [hero("material:wb_sunny", "#29b6f6", "Außen", f"={disp(o + 'temperature')}",
-                    picture=device_icon(netatmo_parts("#29b6f6", "outdoor", num(w + "co2")), "#29b6f6")),
+                    [hero_trend(o + "temperature")], picture=device_icon(netatmo_parts("#29b6f6", "outdoor", num(w + "co2")), "#29b6f6")),
                value_grid([vtile("Luftfeuchtigkeit", o + "atmospheric_humidity"), vtile("Batteriestand", o + "battery_level")])]
     panel = lambda name, item, color, unit: (name, [line(name, item, color)],
                                              span_axis(unit) if unit in LEAST_SPAN else value_axis(unit, scale=True))
@@ -10095,7 +10102,8 @@ def air1_blocks():
     below; the device's state at the foot."""
     a = A1
     offline = div([chip("offline", "#9e9e9e")], f"=items.{a}online.state === 'OFF'")
-    air = [hero("material:thermostat", "#fb8c00", "Temperatur", f"={disp(a + 'temperature')}", [offline],
+    air = [hero("material:thermostat", "#fb8c00", "Temperatur", f"={disp(a + 'temperature')}",
+                [hero_trend(a + "temperature"), offline],
                 picture=device_icon(air1_parts("#fb8c00", num(a + "co2")), "#fb8c00")),
            value_grid([vtile("CO₂", a + "co2"), vtile("Luftfeuchtigkeit", a + "humidity"),
                        vtile("Luftdruck (absolut)", a + "pressure")])]
@@ -10161,10 +10169,7 @@ def tado_blocks():
     floor, the temperature at the head with the device drawn, its LED matrix showing it, the humidity beside; their
     course today beside it, temperature over humidity."""
     t, h = "tado_temperature", "tado_humidity"
-    # the temperature's change of the last hour under it (user, 2026-11-11: trend and course as the AIR-1's tiles;
-    # its course is the chart's beside)
-    track_history(t, t=1)
-    now = [hero("material:thermostat", "#fb8c00", "Temperatur", f"={disp(t)}", [trend_chip(t, 1, "K", 1)],
+    now = [hero("material:thermostat", "#fb8c00", "Temperatur", f"={disp(t)}", [hero_trend(t)],
                 picture=device_icon(tado_parts("#fb8c00", num(t)), "#fb8c00")),
            value_grid([vtile("Luftfeuchtigkeit", h)])]
     room = stacked_chart([("Temperatur", [line("Temperatur", t, "#fb8c00")], span_axis("°C")),
