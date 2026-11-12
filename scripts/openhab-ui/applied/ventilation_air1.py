@@ -28,7 +28,9 @@ chosen by hand loses against the boost; the way out is the switch VOC-Automatik)
 and took what was left of its hour, which on its first real morning cost 12 minutes. The rule keeps no clock of its
 own any more. On its first day the boost came six times for about five hours of level 3 (user, the same evening): a
 rise now counts only from a conspicuous level on (the index at 150 or more), and the boost also ends once the index
-is below 150 again; crossing 250 starts one as before.
+is below 150 again; crossing 250 starts one as before. As that changed little (replayed on the day, one boost of
+seven fewer), the user had the boost shortened to 30 minutes and its rise judged by its share, the index half as
+high again within 5 minutes, instead of by 50 points (2026-11-13): a rise from 355 to 448 no longer counts.
 apply creates the new item with the old one's state, PUTs the rule and the sitemap, then removes the old item; its
 history stays in InfluxDB.
 Usage: ventilation_air1.py check|apply   (on homepi, as pi; the API token from ~/.openhab_token)"""
@@ -591,6 +593,26 @@ VOC_LEVEL = [
 VOC_LEVEL_DESCRIPTION = [("in 5 Minuten um 50 oder über 250,", "in 5 Minuten um 50 auf mindestens 150 oder über 250,"),
                          ("sobald der Index wieder beim Ausgangswert ist",
                           "sobald der Index wieder unter 150 oder beim Ausgangswert ist")]
+# the boost half as long and its rise by its share (user, 2026-11-13), on top of VOC_LEVEL
+VOC_PERCENT = [
+    ("""A rise of 50 within 5 minutes, or the index crossing 250,""",
+     """A rise by half within 5 minutes, or the index crossing 250,"""),
+    ("""the ventilation's timer to 60 minutes and level 3,""",
+     """the ventilation's timer to 30 minutes and level 3,"""),
+    ("""  if ((voc - low >= 50 && voc >= 150) || (last < 250 && voc >= 250)) {""",
+     """  // by its share, not by points (user, 2026-11-13): half as high again as the lowest of the last 5 minutes; a
+  // rise from 355 to 448 is none
+  if ((voc >= 1.5 * low && voc >= 150) || (last < 250 && voc >= 250)) {"""),
+    ("""    voc_boost = { base: Math.min(low, voc - 50), timer_from: Date.now(), minutes: 60 };""",
+     """    voc_boost = { base: Math.min(low, voc - 50), timer_from: Date.now(), minutes: 30 };"""),
+    ("""  // the timer first, so that its own rule, which runs on the level's change, finds it set and leaves it
+  timer_item.postUpdate(Quantity('60 min'));""",
+     """  // 30 minutes (user, 2026-11-13; 60 before), as long as the timer's own rule holds any level change
+  timer_item.postUpdate(Quantity('30 min'));"""),
+]
+VOC_PERCENT_DESCRIPTION = [("in 5 Minuten um 50 auf mindestens 150 oder über 250,",
+                            "in 5 Minuten um die Hälfte auf mindestens 150 oder über 250,"),
+                           ("Stufe 3 und den Timer auf 60 Minuten", "Stufe 3 und den Timer auf 30 Minuten")]
 VOC_SWITCH_DESCRIPTION = [("oder über 250, gilt bis zu 60 Minuten Stufe 3,",
                            "oder über 250, gilt mit eingeschalteter VOC-Automatik bis zu 60 Minuten Stufe 3,")]
 VOC_HEAT_DESCRIPTION = [("auch bei trockener Luft, nicht ab 30 °C außen und nicht in der ersten Stunde",
@@ -723,8 +745,14 @@ if not voc_override:
 voc_level = "voc >= 150" in script
 print(f"rule {RULE}:", "VOC boost from 150 on" if voc_level else f"{len(VOC_LEVEL)} replacements for the boost's level")
 if not voc_level:
-    action["configuration"]["script"] = replaced(script, VOC_LEVEL, "script")
+    script = action["configuration"]["script"] = replaced(script, VOC_LEVEL, "script")
     rule["description"] = replaced(rule["description"], VOC_LEVEL_DESCRIPTION, "description")
+voc_percent = "1.5 * low" in script
+print(f"rule {RULE}:", "VOC rise by its share, 30 min" if voc_percent
+      else f"{len(VOC_PERCENT)} replacements for share and length")
+if not voc_percent:
+    action["configuration"]["script"] = replaced(script, VOC_PERCENT, "script")
+    rule["description"] = replaced(rule["description"], VOC_PERCENT_DESCRIPTION, "description")
 voc_trigger = any(t["configuration"].get("itemName") == VOC_ITEM for t in rule["triggers"])
 if not voc_trigger:
     rule["triggers"].append({"id": str(max(int(t["id"]) for t in rule["triggers"]) + 1),
@@ -766,7 +794,7 @@ if not voc_item:
                                        {"value": " ", "config": {"pattern": "%s"}})[0])
     print("state ON", put_text(f"/items/{VOC_ITEM}/state", "ON"))
 if not (done and fresh and fallback and voc and voc_heat and voc_switch and voc_trigger and voc_timer and voc_override
-        and voc_level):
+        and voc_level and voc_percent):
     body = {k: v for k, v in rule.items() if k not in ("status", "editable", "templateState")}
     print("PUT rule", call("PUT", f"/rules/{RULE}", body)[0])
 if not moved or not voc_in_sitemap:
