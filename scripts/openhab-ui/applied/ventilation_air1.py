@@ -26,7 +26,9 @@ changed stands. Before, the hour lived in cache.private, the timer showed its us
 came only after them. A boost starts at once over any running timer, whoever set it (user, the same day: a level
 chosen by hand loses against the boost; the way out is the switch VOC-Automatik); before, it waited for the timer
 and took what was left of its hour, which on its first real morning cost 12 minutes. The rule keeps no clock of its
-own any more.
+own any more. On its first day the boost came six times for about five hours of level 3 (user, the same evening): a
+rise now counts only from a conspicuous level on (the index at 150 or more), and the boost also ends once the index
+is below 150 again; crossing 250 starts one as before.
 apply creates the new item with the old one's state, PUTs the rule and the sitemap, then removes the old item; its
 history stays in InfluxDB.
 Usage: ventilation_air1.py check|apply   (on homepi, as pi; the API token from ~/.openhab_token)"""
@@ -576,6 +578,19 @@ VOC_OVERRIDE_DESCRIPTION = [("auch bei trockener Luft und ab 30 °C außen, nich
                              "auch bei trockener Luft, ab 30 °C außen und über jeden laufenden Timer hinweg, also "
                              "auch über eine von Hand gewählte Stufe (Ausweg: VOC-Automatik aus), nicht in der "
                              "ersten Stunde")]
+# a rise only from a conspicuous level on, and over below it (user, 2026-11-12), on top of VOC_OVERRIDE
+VOC_LEVEL = [
+    ("""  if (voc - low >= 50 || (last < 250 && voc >= 250)) {""",
+     """  // a rise counts only from a conspicuous level on, 150, where the page calls the index auffällig: on its first
+  // day the boost came six times for five hours, also on rises that ended at 90 or 110 (user, 2026-11-12)
+  if ((voc - low >= 50 && voc >= 150) || (last < 250 && voc >= 250)) {"""),
+    ("""  } else if (!voc_on || (voc_ok && voc <= voc_boost.base + 20)) {""",
+     """  } else if (!voc_on || (voc_ok && (voc <= voc_boost.base + 20 || voc < 150))) {
+    // back where it rose from, or below the conspicuous level again (with a base of 2 or 22 the first never came)"""),
+]
+VOC_LEVEL_DESCRIPTION = [("in 5 Minuten um 50 oder über 250,", "in 5 Minuten um 50 auf mindestens 150 oder über 250,"),
+                         ("sobald der Index wieder beim Ausgangswert ist",
+                          "sobald der Index wieder unter 150 oder beim Ausgangswert ist")]
 VOC_SWITCH_DESCRIPTION = [("oder über 250, gilt bis zu 60 Minuten Stufe 3,",
                            "oder über 250, gilt mit eingeschalteter VOC-Automatik bis zu 60 Minuten Stufe 3,")]
 VOC_HEAT_DESCRIPTION = [("auch bei trockener Luft, nicht ab 30 °C außen und nicht in der ersten Stunde",
@@ -682,7 +697,8 @@ print(f"rule {RULE}:", "has the VOC boost" if voc else f"{len(VOC)} replacements
 if not voc:
     script = action["configuration"]["script"] = replaced(script, VOC, "script")
     rule["description"] = replaced(rule["description"], VOC_DESCRIPTION, "description")
-voc_heat = "outranks them all" in script
+# the override's rewrite dropped the comment this step is known by
+voc_heat = "outranks them all" in script or "whoever set" in script
 print(f"rule {RULE}:", "VOC boost over the heat too" if voc_heat
       else f"{len(VOC_HEAT)} replacement for the boost over the heat")
 if not voc_heat:
@@ -702,8 +718,13 @@ voc_override = "whoever set" in script
 print(f"rule {RULE}:", "the VOC boost overrides a running timer" if voc_override
       else "1 replacement for the boost over a timer")
 if not voc_override:
-    action["configuration"]["script"] = replaced(script, VOC_OVERRIDE, "script")
+    script = action["configuration"]["script"] = replaced(script, VOC_OVERRIDE, "script")
     rule["description"] = replaced(rule["description"], VOC_OVERRIDE_DESCRIPTION, "description")
+voc_level = "voc >= 150" in script
+print(f"rule {RULE}:", "VOC boost from 150 on" if voc_level else f"{len(VOC_LEVEL)} replacements for the boost's level")
+if not voc_level:
+    action["configuration"]["script"] = replaced(script, VOC_LEVEL, "script")
+    rule["description"] = replaced(rule["description"], VOC_LEVEL_DESCRIPTION, "description")
 voc_trigger = any(t["configuration"].get("itemName") == VOC_ITEM for t in rule["triggers"])
 if not voc_trigger:
     rule["triggers"].append({"id": str(max(int(t["id"]) for t in rule["triggers"]) + 1),
@@ -744,7 +765,8 @@ if not voc_item:
     print("PUT stateDescription", call("PUT", f"/items/{VOC_ITEM}/metadata/stateDescription",
                                        {"value": " ", "config": {"pattern": "%s"}})[0])
     print("state ON", put_text(f"/items/{VOC_ITEM}/state", "ON"))
-if not (done and fresh and fallback and voc and voc_heat and voc_switch and voc_trigger and voc_timer and voc_override):
+if not (done and fresh and fallback and voc and voc_heat and voc_switch and voc_trigger and voc_timer and voc_override
+        and voc_level):
     body = {k: v for k, v in rule.items() if k not in ("status", "editable", "templateState")}
     print("PUT rule", call("PUT", f"/rules/{RULE}", body)[0])
 if not moved or not voc_in_sitemap:
