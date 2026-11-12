@@ -11,26 +11,10 @@ with the device online, as a sensor that stopped measuring, would otherwise stee
 Instead of holding the level for as long as readings lack, the rule sets level 2 (Mittel) once they have lacked for
 30 minutes and no timer holds a level, with a push naming them, and pushes again once they are back (user, same
 evening); it keeps the episode in its cache.private, which a PUT of the rule empties.
-Since 2026-11-12 (user) the AIR-1's VOC index boosts the ventilation: a rise of 50 within 5 minutes or the index
-crossing 250 means level 3 for up to 60 minutes (cooking, toasting; the index is relative to its last day, so its rise
-says more than its level), sooner over once it is back within 20 of where it rose from. The boost outranks the CO2,
-the dry air's level 1 and, since the user asked for it the same night, the hot outdoor air's; it waits for a running
-timer as every automatic level does and does not start in the AIR-1's first hour after a restart, while the index
-learns anew. It has a switch of its own, ventilation_voc_management (VOC-Automatik, user, the same night), a member of
-the automatic's group as the CO2's, on when it is created; while it is off no boost starts and a running one ends. It
-stands under the CO2's in the sitemap; the page's row is the generator's (dashboard.py).
-The boost's clock is the ventilation's timer (user, the same night): at its start the rule sets the timer to 60
-minutes, so the page shows how long level 3 holds, and its early end puts the timer back to 0, as long as the timer
-is still the boost's own (it shows about what the boost has left and the level is 3); a timer or level the user
-changed stands. Before, the hour lived in cache.private, the timer showed its usual 30 minutes and the early end
-came only after them. A boost starts at once over any running timer, whoever set it (user, the same day: a level
-chosen by hand loses against the boost; the way out is the switch VOC-Automatik); before, it waited for the timer
-and took what was left of its hour, which on its first real morning cost 12 minutes. The rule keeps no clock of its
-own any more. On its first day the boost came six times for about five hours of level 3 (user, the same evening): a
-rise now counts only from a conspicuous level on (the index at 150 or more), and the boost also ends once the index
-is below 150 again; crossing 250 starts one as before. As that changed little (replayed on the day, one boost of
-seven fewer), the user had the boost shortened to 30 minutes and its rise judged by its share, the index half as
-high again within 5 minutes, instead of by 50 points (2026-11-13): a rise from 355 to 448 no longer counts.
+The VOC index does not steer the ventilation. From 12 to 13 November 2026 a boost on its rise did (level 3 for 60,
+then 30 minutes, with a switch ventilation_voc_management); the user had it removed again: it came six times on its
+first day, and level 3 hardly lowered the index, which stayed at 360 to 445 from 20:00 to 22:30 with level 3 running
+almost throughout. apply takes what is left of it out of the rule, its trigger, the sitemap and the items.
 apply creates the new item with the old one's state, PUTs the rule and the sitemap, then removes the old item; its
 history stays in InfluxDB.
 Usage: ventilation_air1.py check|apply   (on homepi, as pi; the API token from ~/.openhab_token)"""
@@ -141,486 +125,6 @@ if (!auto_on || !missing) {
     + lacking.join(', ') + '), Stufe Mittel');
 }"""),
 ]
-# the VOC boost, on top of FALLBACK
-VOC = [
-    ("""}
-
-if (items.getItem('ventilation_management').state === 'ON' && items.getItem('ventilation_timer').numericState <= 0
-  && !missing) {
-  let level_to_set = 2;""",
-     """}
-
-// VOC boost (user, 2026-11-12): cooking and the like show as a fast rise of the AIR-1's VOC index, which is relative
-// to its last day, so its rise says more than its level. A rise of 50 within 5 minutes, or the index crossing 250,
-// starts a boost: level 3 for up to 60 minutes, sooner over once the index is back within 20 of where it rose from.
-// Not in the AIR-1's first hour after a restart, while its index learns anew, nor on a reading older than 3 minutes.
-const voc = items.getItem('apollo_air_1_voc_index').numericState;
-const voc_ok = voc !== null && air1_fresh('apollo_air_1_voc_index')
-  && items.getItem('apollo_air_1_uptime').numericState >= 3600;
-let voc_hist = JSON.parse(cache.private.get('voc_hist') || '[]').filter((h) => Date.now() - h[0] <= 5.5 * 60000);
-let voc_boost = JSON.parse(cache.private.get('voc_boost') || 'null');
-if (voc_ok) {
-  const low = voc_hist.reduce((a, h) => Math.min(a, h[1]), voc);
-  const last = voc_hist.length ? voc_hist[voc_hist.length - 1][1] : voc;
-  if (!voc_boost && (voc - low >= 50 || (last < 250 && voc >= 250))) {
-    // where it rose from; for an index that crept over 250, at least 50 below it, or the boost would end at once
-    voc_boost = { since: Date.now(), base: Math.min(low, voc - 50) };
-  }
-  voc_hist.push([Date.now(), voc]);
-} else {
-  voc_hist = [];
-}
-if (voc_boost && (Date.now() - voc_boost.since >= 60 * 60000 || (voc_ok && voc <= voc_boost.base + 20))) {
-  voc_boost = null;
-}
-cache.private.put('voc_hist', JSON.stringify(voc_hist));
-if (voc_boost) {
-  cache.private.put('voc_boost', JSON.stringify(voc_boost));
-} else {
-  cache.private.remove('voc_boost');
-}
-
-if (items.getItem('ventilation_management').state === 'ON' && items.getItem('ventilation_timer').numericState <= 0
-  && !missing) {
-  let level_to_set = 2;"""),
-    ("""    level_to_set = 1;
-  }
-  if (
-    items.getItem('ventilation_temperature_management').state === 'ON'""",
-     """    level_to_set = 1;
-  }
-  // the VOC boost outranks the CO2 and the dry air, not the hot outdoor air below
-  if (voc_boost) {
-    level_to_set = 3;
-  }
-  if (
-    items.getItem('ventilation_temperature_management').state === 'ON'"""),
-]
-# the VOC boost over the hot outdoor air's level 1 as well (user, 2026-11-12), on top of VOC
-VOC_HEAT = [
-    ("""  // the VOC boost outranks the CO2 and the dry air, not the hot outdoor air below
-  if (voc_boost) {
-    level_to_set = 3;
-  }
-  if (
-    items.getItem('ventilation_temperature_management').state === 'ON'
-    && items.getItem('espaltherma_ext_ambient_temp').numericState >= 30
-    && items.getItem('faikout_perfera_switch').state === 'OFF'
-  ) {
-    level_to_set = 1;
-  }""",
-     """  if (
-    items.getItem('ventilation_temperature_management').state === 'ON'
-    && items.getItem('espaltherma_ext_ambient_temp').numericState >= 30
-    && items.getItem('faikout_perfera_switch').state === 'OFF'
-  ) {
-    level_to_set = 1;
-  }
-  // the VOC boost outranks them all: the CO2, the dry air and the hot outdoor air (user, 2026-11-12)
-  if (voc_boost) {
-    level_to_set = 3;
-  }"""),
-]
-# the VOC boost's own switch (user, 2026-11-12), on top of VOC_HEAT
-VOC_ITEM = "ventilation_voc_management"
-VOC_NEW_ITEM = {"type": "Switch", "name": VOC_ITEM, "label": "Lüftung VOC-Automatik", "category": "material:tune",
-                "groupNames": ["mapdb_change_restore", "influxdb_change", "ventilation", "ventilation_management"],
-                "tags": ["Switch"]}
-VOC_SITEMAP = {"component": "Switch", "config": {"icon": "material:bubble_chart", "item": VOC_ITEM,
-                                                 "label": "VOC-Automatik"}}
-VOC_SWITCH = [
-    ("""const voc = items.getItem('apollo_air_1_voc_index').numericState;""",
-     """// Only while the VOC automatic is switched on: off, no boost starts and a running one ends.
-const voc_on = items.getItem('ventilation_voc_management').state === 'ON';
-const voc = items.getItem('apollo_air_1_voc_index').numericState;"""),
-    ("""  if (!voc_boost && (voc - low >= 50 || (last < 250 && voc >= 250))) {""",
-     """  if (voc_on && !voc_boost && (voc - low >= 50 || (last < 250 && voc >= 250))) {"""),
-    ("""if (voc_boost && (Date.now() - voc_boost.since >= 60 * 60000 || (voc_ok && voc <= voc_boost.base + 20))) {""",
-     """if (voc_boost && (!voc_on || Date.now() - voc_boost.since >= 60 * 60000
-  || (voc_ok && voc <= voc_boost.base + 20))) {"""),
-]
-# the ventilation's timer as the VOC boost's clock (user, 2026-11-12), on top of VOC_SWITCH: the whole part from the
-# boost to the level is replaced
-VOC_TIMER = [
-    ("""}
-
-// VOC boost (user, 2026-11-12): cooking and the like show as a fast rise of the AIR-1's VOC index, which is relative
-// to its last day, so its rise says more than its level. A rise of 50 within 5 minutes, or the index crossing 250,
-// starts a boost: level 3 for up to 60 minutes, sooner over once the index is back within 20 of where it rose from.
-// Not in the AIR-1's first hour after a restart, while its index learns anew, nor on a reading older than 3 minutes.
-// Only while the VOC automatic is switched on: off, no boost starts and a running one ends.
-const voc_on = items.getItem('ventilation_voc_management').state === 'ON';
-const voc = items.getItem('apollo_air_1_voc_index').numericState;
-const voc_ok = voc !== null && air1_fresh('apollo_air_1_voc_index')
-  && items.getItem('apollo_air_1_uptime').numericState >= 3600;
-let voc_hist = JSON.parse(cache.private.get('voc_hist') || '[]').filter((h) => Date.now() - h[0] <= 5.5 * 60000);
-let voc_boost = JSON.parse(cache.private.get('voc_boost') || 'null');
-if (voc_ok) {
-  const low = voc_hist.reduce((a, h) => Math.min(a, h[1]), voc);
-  const last = voc_hist.length ? voc_hist[voc_hist.length - 1][1] : voc;
-  if (voc_on && !voc_boost && (voc - low >= 50 || (last < 250 && voc >= 250))) {
-    // where it rose from; for an index that crept over 250, at least 50 below it, or the boost would end at once
-    voc_boost = { since: Date.now(), base: Math.min(low, voc - 50) };
-  }
-  voc_hist.push([Date.now(), voc]);
-} else {
-  voc_hist = [];
-}
-if (voc_boost && (!voc_on || Date.now() - voc_boost.since >= 60 * 60000
-  || (voc_ok && voc <= voc_boost.base + 20))) {
-  voc_boost = null;
-}
-cache.private.put('voc_hist', JSON.stringify(voc_hist));
-if (voc_boost) {
-  cache.private.put('voc_boost', JSON.stringify(voc_boost));
-} else {
-  cache.private.remove('voc_boost');
-}
-
-if (items.getItem('ventilation_management').state === 'ON' && items.getItem('ventilation_timer').numericState <= 0
-  && !missing) {
-  let level_to_set = 2;
-  if (items.getItem('ventilation_co2_management').state === 'ON') {
-    if (co2_item.numericState >= 1000) {
-      level_to_set = 3;
-    }
-    if (co2_item.numericState < 500) {
-      level_to_set = 1;
-    }
-  }
-  if (
-    items.getItem('ventilation_humidity_management').state === 'ON'
-    && items.getItem('apollo_air_1_humidity').numericState <= 35
-  ) {
-    level_to_set = 1;
-  }
-  if (
-    items.getItem('ventilation_temperature_management').state === 'ON'
-    && items.getItem('espaltherma_ext_ambient_temp').numericState >= 30
-    && items.getItem('faikout_perfera_switch').state === 'OFF'
-  ) {
-    level_to_set = 1;
-  }
-  // the VOC boost outranks them all: the CO2, the dry air and the hot outdoor air (user, 2026-11-12)
-  if (voc_boost) {
-    level_to_set = 3;
-  }
-  items.getItem('esplyfterl_level').sendCommandIfDifferent(String(level_to_set));
-}""",
-     """}
-
-// VOC boost (user, 2026-11-12): cooking and the like show as a fast rise of the AIR-1's VOC index, which is relative
-// to its last day, so its rise says more than its level. A rise of 50 within 5 minutes, or the index crossing 250,
-// starts a boost: level 3 with the ventilation's timer set to 60 minutes, so the page shows how long it holds (the
-// timer's own rule lifts a timer only up to 30 minutes and leaves a longer one). It is over sooner, the timer back
-// at 0, once the index is back within 20 of where it rose from or the VOC automatic is switched off, but only while
-// the timer is still the boost's own: it shows about what the boost has left and the level is still 3. A timer or
-// a level the user changed stands. A rise during a running timer waits for it and takes what is left of its hour,
-// at least the 30 minutes every level change holds.
-// Not in the AIR-1's first hour after a restart, while its index learns anew, nor on a reading older than 3 minutes.
-const voc_on = items.getItem('ventilation_voc_management').state === 'ON';
-const voc = items.getItem('apollo_air_1_voc_index').numericState;
-const voc_ok = voc !== null && air1_fresh('apollo_air_1_voc_index')
-  && items.getItem('apollo_air_1_uptime').numericState >= 3600;
-const timer_item = items.getItem('ventilation_timer');
-const timer_min = timer_item.numericState;
-let voc_hist = JSON.parse(cache.private.get('voc_hist') || '[]').filter((h) => Date.now() - h[0] <= 5.5 * 60000);
-let voc_boost = JSON.parse(cache.private.get('voc_boost') || 'null');
-if (voc_ok) {
-  const low = voc_hist.reduce((a, h) => Math.min(a, h[1]), voc);
-  const last = voc_hist.length ? voc_hist[voc_hist.length - 1][1] : voc;
-  if (voc_on && !voc_boost && (voc - low >= 50 || (last < 250 && voc >= 250))) {
-    // where it rose from; for an index that crept over 250, at least 50 below it, or the boost would end at once
-    voc_boost = { since: Date.now(), base: Math.min(low, voc - 50) };
-  }
-  voc_hist.push([Date.now(), voc]);
-} else {
-  voc_hist = [];
-}
-let voc_start = false;
-if (voc_boost) {
-  const back = !voc_on || (voc_ok && voc <= voc_boost.base + 20);
-  if (voc_boost.timer_from) {
-    // started: the timer is its clock
-    const left = voc_boost.minutes - Math.floor((Date.now() - voc_boost.timer_from) / 60000);
-    const own = timer_min > 0 && Math.abs(timer_min - left) <= 2 && items.getItem('esplyfterl_level').state === '3';
-    if (!own) {
-      voc_boost = null;  // run out, or the user took the timer or the level over
-    } else if (back) {
-      // again every minute until the timer shows 0: its countdown, which runs at the same second, may overwrite this
-      timer_item.postUpdate(Quantity('0 min'));
-    }
-  } else if (back || Date.now() - voc_boost.since >= 60 * 60000) {
-    voc_boost = null;  // waited for a timer until it was no longer needed
-  } else if (auto_on && timer_min <= 0 && !missing) {
-    voc_start = true;
-  }
-}
-
-if (auto_on && timer_min <= 0 && !missing) {
-  let level_to_set = 2;
-  if (items.getItem('ventilation_co2_management').state === 'ON') {
-    if (co2_item.numericState >= 1000) {
-      level_to_set = 3;
-    }
-    if (co2_item.numericState < 500) {
-      level_to_set = 1;
-    }
-  }
-  if (
-    items.getItem('ventilation_humidity_management').state === 'ON'
-    && items.getItem('apollo_air_1_humidity').numericState <= 35
-  ) {
-    level_to_set = 1;
-  }
-  if (
-    items.getItem('ventilation_temperature_management').state === 'ON'
-    && items.getItem('espaltherma_ext_ambient_temp').numericState >= 30
-    && items.getItem('faikout_perfera_switch').state === 'OFF'
-  ) {
-    level_to_set = 1;
-  }
-  // the VOC boost outranks them all: the CO2, the dry air and the hot outdoor air (user, 2026-11-12)
-  if (voc_start) {
-    level_to_set = 3;
-    // what is left of the boost's hour, at least the 30 minutes every level change holds; the timer first, so that
-    // its own rule, which runs on the level's change, finds it set and leaves it
-    voc_boost.minutes = Math.max(30, 60 - Math.floor((Date.now() - voc_boost.since) / 60000));
-    voc_boost.timer_from = Date.now();
-    timer_item.postUpdate(Quantity(voc_boost.minutes + ' min'));
-  }
-  items.getItem('esplyfterl_level').sendCommandIfDifferent(String(level_to_set));
-}
-cache.private.put('voc_hist', JSON.stringify(voc_hist));
-if (voc_boost) {
-  cache.private.put('voc_boost', JSON.stringify(voc_boost));
-} else {
-  cache.private.remove('voc_boost');
-}"""),
-]
-VOC_TIMER_DESCRIPTION = [("gilt mit eingeschalteter VOC-Automatik bis zu 60 Minuten Stufe 3,",
-                          "setzt die Regel mit eingeschalteter VOC-Automatik Stufe 3 und den Timer auf 60 Minuten "
-                          "(früher zurück auf 0, sobald der Index wieder beim Ausgangswert ist und Timer und Stufe "
-                          "noch die des Schubs sind),")]
-# the VOC boost over any running timer, without waiting (user, 2026-11-12), on top of VOC_TIMER: the same part again
-VOC_OVERRIDE = [
-    ("""}
-
-// VOC boost (user, 2026-11-12): cooking and the like show as a fast rise of the AIR-1's VOC index, which is relative
-// to its last day, so its rise says more than its level. A rise of 50 within 5 minutes, or the index crossing 250,
-// starts a boost: level 3 with the ventilation's timer set to 60 minutes, so the page shows how long it holds (the
-// timer's own rule lifts a timer only up to 30 minutes and leaves a longer one). It is over sooner, the timer back
-// at 0, once the index is back within 20 of where it rose from or the VOC automatic is switched off, but only while
-// the timer is still the boost's own: it shows about what the boost has left and the level is still 3. A timer or
-// a level the user changed stands. A rise during a running timer waits for it and takes what is left of its hour,
-// at least the 30 minutes every level change holds.
-// Not in the AIR-1's first hour after a restart, while its index learns anew, nor on a reading older than 3 minutes.
-const voc_on = items.getItem('ventilation_voc_management').state === 'ON';
-const voc = items.getItem('apollo_air_1_voc_index').numericState;
-const voc_ok = voc !== null && air1_fresh('apollo_air_1_voc_index')
-  && items.getItem('apollo_air_1_uptime').numericState >= 3600;
-const timer_item = items.getItem('ventilation_timer');
-const timer_min = timer_item.numericState;
-let voc_hist = JSON.parse(cache.private.get('voc_hist') || '[]').filter((h) => Date.now() - h[0] <= 5.5 * 60000);
-let voc_boost = JSON.parse(cache.private.get('voc_boost') || 'null');
-if (voc_ok) {
-  const low = voc_hist.reduce((a, h) => Math.min(a, h[1]), voc);
-  const last = voc_hist.length ? voc_hist[voc_hist.length - 1][1] : voc;
-  if (voc_on && !voc_boost && (voc - low >= 50 || (last < 250 && voc >= 250))) {
-    // where it rose from; for an index that crept over 250, at least 50 below it, or the boost would end at once
-    voc_boost = { since: Date.now(), base: Math.min(low, voc - 50) };
-  }
-  voc_hist.push([Date.now(), voc]);
-} else {
-  voc_hist = [];
-}
-let voc_start = false;
-if (voc_boost) {
-  const back = !voc_on || (voc_ok && voc <= voc_boost.base + 20);
-  if (voc_boost.timer_from) {
-    // started: the timer is its clock
-    const left = voc_boost.minutes - Math.floor((Date.now() - voc_boost.timer_from) / 60000);
-    const own = timer_min > 0 && Math.abs(timer_min - left) <= 2 && items.getItem('esplyfterl_level').state === '3';
-    if (!own) {
-      voc_boost = null;  // run out, or the user took the timer or the level over
-    } else if (back) {
-      // again every minute until the timer shows 0: its countdown, which runs at the same second, may overwrite this
-      timer_item.postUpdate(Quantity('0 min'));
-    }
-  } else if (back || Date.now() - voc_boost.since >= 60 * 60000) {
-    voc_boost = null;  // waited for a timer until it was no longer needed
-  } else if (auto_on && timer_min <= 0 && !missing) {
-    voc_start = true;
-  }
-}
-
-if (auto_on && timer_min <= 0 && !missing) {
-  let level_to_set = 2;
-  if (items.getItem('ventilation_co2_management').state === 'ON') {
-    if (co2_item.numericState >= 1000) {
-      level_to_set = 3;
-    }
-    if (co2_item.numericState < 500) {
-      level_to_set = 1;
-    }
-  }
-  if (
-    items.getItem('ventilation_humidity_management').state === 'ON'
-    && items.getItem('apollo_air_1_humidity').numericState <= 35
-  ) {
-    level_to_set = 1;
-  }
-  if (
-    items.getItem('ventilation_temperature_management').state === 'ON'
-    && items.getItem('espaltherma_ext_ambient_temp').numericState >= 30
-    && items.getItem('faikout_perfera_switch').state === 'OFF'
-  ) {
-    level_to_set = 1;
-  }
-  // the VOC boost outranks them all: the CO2, the dry air and the hot outdoor air (user, 2026-11-12)
-  if (voc_start) {
-    level_to_set = 3;
-    // what is left of the boost's hour, at least the 30 minutes every level change holds; the timer first, so that
-    // its own rule, which runs on the level's change, finds it set and leaves it
-    voc_boost.minutes = Math.max(30, 60 - Math.floor((Date.now() - voc_boost.since) / 60000));
-    voc_boost.timer_from = Date.now();
-    timer_item.postUpdate(Quantity(voc_boost.minutes + ' min'));
-  }
-  items.getItem('esplyfterl_level').sendCommandIfDifferent(String(level_to_set));
-}
-cache.private.put('voc_hist', JSON.stringify(voc_hist));
-if (voc_boost) {
-  cache.private.put('voc_boost', JSON.stringify(voc_boost));
-} else {
-  cache.private.remove('voc_boost');
-}""",
-     """}
-
-// VOC boost (user, 2026-11-12): cooking and the like show as a fast rise of the AIR-1's VOC index, which is relative
-// to its last day, so its rise says more than its level. A rise of 50 within 5 minutes, or the index crossing 250,
-// starts a boost at once: the ventilation's timer to 60 minutes and level 3, over any running timer, whoever set
-// it, by hand or the automatic with its 30 minutes (user, the same day: a level chosen by hand loses against the
-// boost; the way out is the switch VOC-Automatik). The timer is the boost's only clock, and the page shows how long
-// it holds (the timer's own rule lifts a timer only up to 30 minutes and leaves a longer one). It is over sooner,
-// the timer back at 0, once the index is back within 20 of where it rose from or the VOC automatic is switched
-// off, but only while the timer is still the boost's own: it shows about what the boost has left and the level is
-// still 3. A timer or a level the user changed during the boost stands. No second boost during one.
-// Only with the automatic on and no enabled automatic lacking its reading, not in the AIR-1's first hour after a
-// restart, while its index learns anew, nor on a reading older than 3 minutes.
-const voc_on = items.getItem('ventilation_voc_management').state === 'ON';
-const voc = items.getItem('apollo_air_1_voc_index').numericState;
-const voc_ok = voc !== null && air1_fresh('apollo_air_1_voc_index')
-  && items.getItem('apollo_air_1_uptime').numericState >= 3600;
-const timer_item = items.getItem('ventilation_timer');
-const timer_min = timer_item.numericState;
-let voc_hist = JSON.parse(cache.private.get('voc_hist') || '[]').filter((h) => Date.now() - h[0] <= 5.5 * 60000);
-let voc_boost = JSON.parse(cache.private.get('voc_boost') || 'null');
-let voc_start = false;
-if (voc_boost) {
-  const left = voc_boost.minutes - Math.floor((Date.now() - voc_boost.timer_from) / 60000);
-  const own = timer_min > 0 && Math.abs(timer_min - left) <= 2 && items.getItem('esplyfterl_level').state === '3';
-  if (!own) {
-    voc_boost = null;  // run out, or the user took the timer or the level over
-  } else if (!voc_on || (voc_ok && voc <= voc_boost.base + 20)) {
-    // again every minute until the timer shows 0: its countdown, which runs at the same second, may overwrite this
-    timer_item.postUpdate(Quantity('0 min'));
-  }
-} else if (voc_ok && voc_on && auto_on && !missing) {
-  const low = voc_hist.reduce((a, h) => Math.min(a, h[1]), voc);
-  const last = voc_hist.length ? voc_hist[voc_hist.length - 1][1] : voc;
-  if (voc - low >= 50 || (last < 250 && voc >= 250)) {
-    // where it rose from; for an index that crept over 250, at least 50 below it, or the boost would end at once
-    voc_boost = { base: Math.min(low, voc - 50), timer_from: Date.now(), minutes: 60 };
-    voc_start = true;
-  }
-}
-if (voc_ok) {
-  voc_hist.push([Date.now(), voc]);
-} else {
-  voc_hist = [];
-}
-cache.private.put('voc_hist', JSON.stringify(voc_hist));
-if (voc_boost) {
-  cache.private.put('voc_boost', JSON.stringify(voc_boost));
-} else {
-  cache.private.remove('voc_boost');
-}
-
-if (voc_start) {
-  // the timer first, so that its own rule, which runs on the level's change, finds it set and leaves it
-  timer_item.postUpdate(Quantity('60 min'));
-  items.getItem('esplyfterl_level').sendCommandIfDifferent('3');
-} else if (auto_on && timer_min <= 0 && !missing) {
-  let level_to_set = 2;
-  if (items.getItem('ventilation_co2_management').state === 'ON') {
-    if (co2_item.numericState >= 1000) {
-      level_to_set = 3;
-    }
-    if (co2_item.numericState < 500) {
-      level_to_set = 1;
-    }
-  }
-  if (
-    items.getItem('ventilation_humidity_management').state === 'ON'
-    && items.getItem('apollo_air_1_humidity').numericState <= 35
-  ) {
-    level_to_set = 1;
-  }
-  if (
-    items.getItem('ventilation_temperature_management').state === 'ON'
-    && items.getItem('espaltherma_ext_ambient_temp').numericState >= 30
-    && items.getItem('faikout_perfera_switch').state === 'OFF'
-  ) {
-    level_to_set = 1;
-  }
-  items.getItem('esplyfterl_level').sendCommandIfDifferent(String(level_to_set));
-}"""),
-]
-VOC_OVERRIDE_DESCRIPTION = [("auch bei trockener Luft und ab 30 °C außen, nicht in der ersten Stunde",
-                             "auch bei trockener Luft, ab 30 °C außen und über jeden laufenden Timer hinweg, also "
-                             "auch über eine von Hand gewählte Stufe (Ausweg: VOC-Automatik aus), nicht in der "
-                             "ersten Stunde")]
-# a rise only from a conspicuous level on, and over below it (user, 2026-11-12), on top of VOC_OVERRIDE
-VOC_LEVEL = [
-    ("""  if (voc - low >= 50 || (last < 250 && voc >= 250)) {""",
-     """  // a rise counts only from a conspicuous level on, 150, where the page calls the index auffällig: on its first
-  // day the boost came six times for five hours, also on rises that ended at 90 or 110 (user, 2026-11-12)
-  if ((voc - low >= 50 && voc >= 150) || (last < 250 && voc >= 250)) {"""),
-    ("""  } else if (!voc_on || (voc_ok && voc <= voc_boost.base + 20)) {""",
-     """  } else if (!voc_on || (voc_ok && (voc <= voc_boost.base + 20 || voc < 150))) {
-    // back where it rose from, or below the conspicuous level again (with a base of 2 or 22 the first never came)"""),
-]
-VOC_LEVEL_DESCRIPTION = [("in 5 Minuten um 50 oder über 250,", "in 5 Minuten um 50 auf mindestens 150 oder über 250,"),
-                         ("sobald der Index wieder beim Ausgangswert ist",
-                          "sobald der Index wieder unter 150 oder beim Ausgangswert ist")]
-# the boost half as long and its rise by its share (user, 2026-11-13), on top of VOC_LEVEL
-VOC_PERCENT = [
-    ("""A rise of 50 within 5 minutes, or the index crossing 250,""",
-     """A rise by half within 5 minutes, or the index crossing 250,"""),
-    ("""the ventilation's timer to 60 minutes and level 3,""",
-     """the ventilation's timer to 30 minutes and level 3,"""),
-    ("""  if ((voc - low >= 50 && voc >= 150) || (last < 250 && voc >= 250)) {""",
-     """  // by its share, not by points (user, 2026-11-13): half as high again as the lowest of the last 5 minutes; a
-  // rise from 355 to 448 is none
-  if ((voc >= 1.5 * low && voc >= 150) || (last < 250 && voc >= 250)) {"""),
-    ("""    voc_boost = { base: Math.min(low, voc - 50), timer_from: Date.now(), minutes: 60 };""",
-     """    voc_boost = { base: Math.min(low, voc - 50), timer_from: Date.now(), minutes: 30 };"""),
-    ("""  // the timer first, so that its own rule, which runs on the level's change, finds it set and leaves it
-  timer_item.postUpdate(Quantity('60 min'));""",
-     """  // 30 minutes (user, 2026-11-13; 60 before), as long as the timer's own rule holds any level change
-  timer_item.postUpdate(Quantity('30 min'));"""),
-]
-VOC_PERCENT_DESCRIPTION = [("in 5 Minuten um 50 auf mindestens 150 oder über 250,",
-                            "in 5 Minuten um die Hälfte auf mindestens 150 oder über 250,"),
-                           ("Stufe 3 und den Timer auf 60 Minuten", "Stufe 3 und den Timer auf 30 Minuten")]
-VOC_SWITCH_DESCRIPTION = [("oder über 250, gilt bis zu 60 Minuten Stufe 3,",
-                           "oder über 250, gilt mit eingeschalteter VOC-Automatik bis zu 60 Minuten Stufe 3,")]
-VOC_HEAT_DESCRIPTION = [("auch bei trockener Luft, nicht ab 30 °C außen und nicht in der ersten Stunde",
-                         "auch bei trockener Luft und ab 30 °C außen, nicht in der ersten Stunde")]
-VOC_DESCRIPTION = [("ebenso wenn die Werte wieder da sind.",
-                    "ebenso wenn die Werte wieder da sind. Steigt der VOC-Index des AIR-1 in 5 Minuten um 50 oder über "
-                    "250, gilt bis zu 60 Minuten Stufe 3, auch bei trockener Luft, nicht ab 30 °C außen und nicht in "
-                    "der ersten Stunde nach einem Neustart des AIR-1.")]
 FALLBACK_DESCRIPTION = [("seit über 3 Minuten nicht aktualisiert, bleibt die Stufe.",
                          "seit über 3 Minuten nicht aktualisiert, bleibt die Stufe; fehlen Werte 30 Minuten lang, "
                          "setzt die Regel Stufe 2, sobald kein Timer läuft, und meldet das per Push, ebenso wenn die "
@@ -628,6 +132,53 @@ FALLBACK_DESCRIPTION = [("seit über 3 Minuten nicht aktualisiert, bleibt die St
 FRESH_DESCRIPTION = [("Fehlt eine Messung oder ist der AIR-1 offline, bleibt die Stufe.",
                       "Fehlt eine Messung, ist der AIR-1 offline oder ein Wert von ihm seit über 3 Minuten nicht "
                       "aktualisiert, bleibt die Stufe.")]
+# the VOC boost of 12 and 13 November 2026, removed again: what apply takes out wherever it still finds it
+VOC_ITEM = "ventilation_voc_management"
+# the level's part of the rule as it stood before the boost and stands again
+LEVEL = """\
+if (items.getItem('ventilation_management').state === 'ON' && items.getItem('ventilation_timer').numericState <= 0
+  && !missing) {
+  let level_to_set = 2;
+  if (items.getItem('ventilation_co2_management').state === 'ON') {
+    if (co2_item.numericState >= 1000) {
+      level_to_set = 3;
+    }
+    if (co2_item.numericState < 500) {
+      level_to_set = 1;
+    }
+  }
+  if (
+    items.getItem('ventilation_humidity_management').state === 'ON'
+    && items.getItem('apollo_air_1_humidity').numericState <= 35
+  ) {
+    level_to_set = 1;
+  }
+  if (
+    items.getItem('ventilation_temperature_management').state === 'ON'
+    && items.getItem('espaltherma_ext_ambient_temp').numericState >= 30
+    && items.getItem('faikout_perfera_switch').state === 'OFF'
+  ) {
+    level_to_set = 1;
+  }
+  items.getItem('esplyfterl_level').sendCommandIfDifferent(String(level_to_set));
+}
+
+"""
+
+
+def without_voc(script):
+    """The rule's script without the VOC boost: everything from its comment to the CO2 alert's is the level's part
+    again."""
+    a, b = script.index("// VOC boost"), script.index("// alert CO2 level")
+    return script[:a] + LEVEL + script[b:]
+
+
+def without_voc_sentence(text):
+    """A rule description without the boost's sentence, which stood before the CO2 alert's."""
+    a = text.find(" Steigt der VOC-Index")
+    return text if a < 0 else text[:a] + text[text.index(" Meldet CO2 ab", a):]
+
+
 DESCRIPTION = [("nach CO2, Feuchte und Außentemperatur",
                 "nach CO2 und Feuchte des Apollo AIR-1 und der Außentemperatur"),
                ("Fehlt eine Messung, bleibt die Stufe.",
@@ -691,8 +242,7 @@ def move_alert(sitemap):
 
 
 apply = sys.argv[1] == "apply"
-for n in ("apollo_air_1", "apollo_air_1_co2", "apollo_air_1_humidity", "apollo_air_1_online", "apollo_air_1_voc_index",
-          "apollo_air_1_uptime", "influxdb_change",
+for n in ("apollo_air_1", "apollo_air_1_co2", "apollo_air_1_humidity", "apollo_air_1_online", "influxdb_change",
           "mapdb_change_restore"):
     assert call("GET", f"/items/{n}")[0] == 200, f"item {n} missing"
 status, rule = call("GET", f"/rules/{RULE}")
@@ -714,51 +264,17 @@ print(f"rule {RULE}:", "falls back after 30 minutes" if fallback else f"{len(FAL
 if not fallback:
     script = action["configuration"]["script"] = replaced(script, FALLBACK, "script")
     rule["description"] = replaced(rule["description"], FALLBACK_DESCRIPTION, "description")
-voc = "voc_boost" in script
-print(f"rule {RULE}:", "has the VOC boost" if voc else f"{len(VOC)} replacements for the VOC boost")
-if not voc:
-    script = action["configuration"]["script"] = replaced(script, VOC, "script")
-    rule["description"] = replaced(rule["description"], VOC_DESCRIPTION, "description")
-# the override's rewrite dropped the comment this step is known by
-voc_heat = "outranks them all" in script or "whoever set" in script
-print(f"rule {RULE}:", "VOC boost over the heat too" if voc_heat
-      else f"{len(VOC_HEAT)} replacement for the boost over the heat")
-if not voc_heat:
-    script = action["configuration"]["script"] = replaced(script, VOC_HEAT, "script")
-    rule["description"] = replaced(rule["description"], VOC_HEAT_DESCRIPTION, "description")
-voc_switch = VOC_ITEM in script
-print(f"rule {RULE}:", "asks the VOC switch" if voc_switch else f"{len(VOC_SWITCH)} replacements for the VOC switch")
-if not voc_switch:
-    script = action["configuration"]["script"] = replaced(script, VOC_SWITCH, "script")
-    rule["description"] = replaced(rule["description"], VOC_SWITCH_DESCRIPTION, "description")
-voc_timer = "voc_start" in script
-print(f"rule {RULE}:", "the timer is the VOC boost's clock" if voc_timer else "1 replacement for the boost's timer")
-if not voc_timer:
-    script = action["configuration"]["script"] = replaced(script, VOC_TIMER, "script")
-    rule["description"] = replaced(rule["description"], VOC_TIMER_DESCRIPTION, "description")
-voc_override = "whoever set" in script
-print(f"rule {RULE}:", "the VOC boost overrides a running timer" if voc_override
-      else "1 replacement for the boost over a timer")
-if not voc_override:
-    script = action["configuration"]["script"] = replaced(script, VOC_OVERRIDE, "script")
-    rule["description"] = replaced(rule["description"], VOC_OVERRIDE_DESCRIPTION, "description")
-voc_level = "voc >= 150" in script
-print(f"rule {RULE}:", "VOC boost from 150 on" if voc_level else f"{len(VOC_LEVEL)} replacements for the boost's level")
-if not voc_level:
-    script = action["configuration"]["script"] = replaced(script, VOC_LEVEL, "script")
-    rule["description"] = replaced(rule["description"], VOC_LEVEL_DESCRIPTION, "description")
-voc_percent = "1.5 * low" in script
-print(f"rule {RULE}:", "VOC rise by its share, 30 min" if voc_percent
-      else f"{len(VOC_PERCENT)} replacements for share and length")
-if not voc_percent:
-    action["configuration"]["script"] = replaced(script, VOC_PERCENT, "script")
-    rule["description"] = replaced(rule["description"], VOC_PERCENT_DESCRIPTION, "description")
-voc_trigger = any(t["configuration"].get("itemName") == VOC_ITEM for t in rule["triggers"])
-if not voc_trigger:
-    rule["triggers"].append({"id": str(max(int(t["id"]) for t in rule["triggers"]) + 1),
-                             "type": "core.ItemStateChangeTrigger", "configuration": {"itemName": VOC_ITEM}})
+voc_trigger = [t for t in rule["triggers"] if t["configuration"].get("itemName") == VOC_ITEM]
+voc_free = "voc" not in script.lower() and "VOC" not in rule["description"] and not voc_trigger
+print(f"rule {RULE}:", "without the VOC boost" if voc_free else "the VOC boost to take out")
+if not voc_free:
+    if "// VOC boost" in script:
+        script = action["configuration"]["script"] = without_voc(script)
+    rule["description"] = without_voc_sentence(rule["description"])
+    rule["triggers"] = [t for t in rule["triggers"] if t not in voc_trigger]
+    assert "voc" not in script.lower() and "VOC" not in rule["description"], "VOC left in the rule"
 voc_item = call("GET", f"/items/{VOC_ITEM}")[0] == 200
-print(f"item {VOC_ITEM}:", "exists" if voc_item else "missing", "| trigger:", "there" if voc_trigger else "to add")
+print(f"item {VOC_ITEM}:", "to delete" if voc_item else "gone")
 old_status, old_item = call("GET", f"/items/{OLD}")
 new_exists = call("GET", f"/items/{NEW}")[0] == 200
 print(f"item {NEW}:", "exists" if new_exists else "missing", f"| item {OLD}:",
@@ -770,16 +286,12 @@ print("sitemap:", "alert in the ventilation's frame" if moved else "alert to mov
 if not moved:
     sitemap = move_alert(sitemap)
 voc_in_sitemap = VOC_ITEM in json.dumps(sitemap)
-print("sitemap:", "VOC switch there" if voc_in_sitemap else "VOC switch to add under the CO2's")
-if not voc_in_sitemap:
+print("sitemap:", "VOC switch to take out" if voc_in_sitemap else "no VOC switch")
+if voc_in_sitemap:
     for _, frame in frames(sitemap, []):
-        ws = frame["slots"]["widgets"]
-        at = [i for i, w in enumerate(ws) if w.get("config", {}).get("item") == "ventilation_co2_management"]
-        if at:
-            ws.insert(at[0] + 1, copy.deepcopy(VOC_SITEMAP))
-            break
-    else:
-        raise SystemExit("CO2-Automatik not in the sitemap")
+        frame["slots"]["widgets"] = [w for w in frame["slots"]["widgets"]
+                                     if w.get("config", {}).get("item") != VOC_ITEM]
+    assert VOC_ITEM not in json.dumps(sitemap), "VOC switch left in the sitemap"
 if not apply:
     sys.exit(0)
 
@@ -788,16 +300,13 @@ if not new_exists:
     print("PUT stateDescription", call("PUT", f"/items/{NEW}/metadata/stateDescription", STATE_DESCRIPTION)[0])
     state = old_item["state"] if old_status == 200 and old_item["state"] in ("ON", "OFF") else "OFF"
     print("state", state, put_text(f"/items/{NEW}/state", state))
-if not voc_item:
-    print("PUT item", VOC_ITEM, call("PUT", f"/items/{VOC_ITEM}", VOC_NEW_ITEM)[0])
-    print("PUT stateDescription", call("PUT", f"/items/{VOC_ITEM}/metadata/stateDescription",
-                                       {"value": " ", "config": {"pattern": "%s"}})[0])
-    print("state ON", put_text(f"/items/{VOC_ITEM}/state", "ON"))
-if not (done and fresh and fallback and voc and voc_heat and voc_switch and voc_trigger and voc_timer and voc_override
-        and voc_level and voc_percent):
+if not done or not fresh or not fallback or not voc_free:
     body = {k: v for k, v in rule.items() if k not in ("status", "editable", "templateState")}
     print("PUT rule", call("PUT", f"/rules/{RULE}", body)[0])
-if not moved or not voc_in_sitemap:
+if not moved or voc_in_sitemap:
     print("PUT sitemap", call("PUT", SITEMAP, sitemap)[0])
+# last, when neither the rule nor the sitemap names it any more; the page's row is the generator's (dashboard.py)
+if voc_item:
+    print("DELETE item", VOC_ITEM, call("DELETE", f"/items/{VOC_ITEM}")[0])
 if old_status == 200:
     print("DELETE item", OLD, call("DELETE", f"/items/{OLD}")[0])
