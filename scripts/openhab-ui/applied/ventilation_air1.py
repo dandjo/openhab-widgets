@@ -11,6 +11,11 @@ with the device online, as a sensor that stopped measuring, would otherwise stee
 Instead of holding the level for as long as readings lack, the rule sets level 2 (Mittel) once they have lacked for
 30 minutes and no timer holds a level, with a push naming them, and pushes again once they are back (user, same
 evening); it keeps the episode in its cache.private, which a PUT of the rule empties.
+Since 2026-11-12 (user) the AIR-1's VOC index boosts the ventilation: a rise of 50 within 5 minutes or the index
+crossing 250 means level 3 for up to 60 minutes (cooking, toasting; the index is relative to its last day, so its rise
+says more than its level), sooner over once it is back within 20 of where it rose from. The boost outranks the CO2 and
+the dry air's level 1, not the hot outdoor air's, and waits for a running timer as every automatic level does; it does
+not start in the AIR-1's first hour after a restart, while the index learns anew.
 apply creates the new item with the old one's state, PUTs the rule and the sitemap, then removes the old item; its
 history stays in InfluxDB.
 Usage: ventilation_air1.py check|apply   (on homepi, as pi; the API token from ~/.openhab_token)"""
@@ -121,6 +126,65 @@ if (!auto_on || !missing) {
     + lacking.join(', ') + '), Stufe Mittel');
 }"""),
 ]
+# the VOC boost, on top of FALLBACK
+VOC = [
+    ("""}
+
+if (items.getItem('ventilation_management').state === 'ON' && items.getItem('ventilation_timer').numericState <= 0
+  && !missing) {
+  let level_to_set = 2;""",
+     """}
+
+// VOC boost (user, 2026-11-12): cooking and the like show as a fast rise of the AIR-1's VOC index, which is relative
+// to its last day, so its rise says more than its level. A rise of 50 within 5 minutes, or the index crossing 250,
+// starts a boost: level 3 for up to 60 minutes, sooner over once the index is back within 20 of where it rose from.
+// Not in the AIR-1's first hour after a restart, while its index learns anew, nor on a reading older than 3 minutes.
+const voc = items.getItem('apollo_air_1_voc_index').numericState;
+const voc_ok = voc !== null && air1_fresh('apollo_air_1_voc_index')
+  && items.getItem('apollo_air_1_uptime').numericState >= 3600;
+let voc_hist = JSON.parse(cache.private.get('voc_hist') || '[]').filter((h) => Date.now() - h[0] <= 5.5 * 60000);
+let voc_boost = JSON.parse(cache.private.get('voc_boost') || 'null');
+if (voc_ok) {
+  const low = voc_hist.reduce((a, h) => Math.min(a, h[1]), voc);
+  const last = voc_hist.length ? voc_hist[voc_hist.length - 1][1] : voc;
+  if (!voc_boost && (voc - low >= 50 || (last < 250 && voc >= 250))) {
+    // where it rose from; for an index that crept over 250, at least 50 below it, or the boost would end at once
+    voc_boost = { since: Date.now(), base: Math.min(low, voc - 50) };
+  }
+  voc_hist.push([Date.now(), voc]);
+} else {
+  voc_hist = [];
+}
+if (voc_boost && (Date.now() - voc_boost.since >= 60 * 60000 || (voc_ok && voc <= voc_boost.base + 20))) {
+  voc_boost = null;
+}
+cache.private.put('voc_hist', JSON.stringify(voc_hist));
+if (voc_boost) {
+  cache.private.put('voc_boost', JSON.stringify(voc_boost));
+} else {
+  cache.private.remove('voc_boost');
+}
+
+if (items.getItem('ventilation_management').state === 'ON' && items.getItem('ventilation_timer').numericState <= 0
+  && !missing) {
+  let level_to_set = 2;"""),
+    ("""    level_to_set = 1;
+  }
+  if (
+    items.getItem('ventilation_temperature_management').state === 'ON'""",
+     """    level_to_set = 1;
+  }
+  // the VOC boost outranks the CO2 and the dry air, not the hot outdoor air below
+  if (voc_boost) {
+    level_to_set = 3;
+  }
+  if (
+    items.getItem('ventilation_temperature_management').state === 'ON'"""),
+]
+VOC_DESCRIPTION = [("ebenso wenn die Werte wieder da sind.",
+                    "ebenso wenn die Werte wieder da sind. Steigt der VOC-Index des AIR-1 in 5 Minuten um 50 oder über "
+                    "250, gilt bis zu 60 Minuten Stufe 3, auch bei trockener Luft, nicht ab 30 °C außen und nicht in "
+                    "der ersten Stunde nach einem Neustart des AIR-1.")]
 FALLBACK_DESCRIPTION = [("seit über 3 Minuten nicht aktualisiert, bleibt die Stufe.",
                          "seit über 3 Minuten nicht aktualisiert, bleibt die Stufe; fehlen Werte 30 Minuten lang, "
                          "setzt die Regel Stufe 2, sobald kein Timer läuft, und meldet das per Push, ebenso wenn die "
@@ -191,7 +255,8 @@ def move_alert(sitemap):
 
 
 apply = sys.argv[1] == "apply"
-for n in ("apollo_air_1", "apollo_air_1_co2", "apollo_air_1_humidity", "apollo_air_1_online", "influxdb_change",
+for n in ("apollo_air_1", "apollo_air_1_co2", "apollo_air_1_humidity", "apollo_air_1_online", "apollo_air_1_voc_index",
+          "apollo_air_1_uptime", "influxdb_change",
           "mapdb_change_restore"):
     assert call("GET", f"/items/{n}")[0] == 200, f"item {n} missing"
 status, rule = call("GET", f"/rules/{RULE}")
@@ -211,8 +276,13 @@ if not fresh:
 fallback = "lacking_since" in script
 print(f"rule {RULE}:", "falls back after 30 minutes" if fallback else f"{len(FALLBACK)} replacement for the fallback")
 if not fallback:
-    action["configuration"]["script"] = replaced(script, FALLBACK, "script")
+    script = action["configuration"]["script"] = replaced(script, FALLBACK, "script")
     rule["description"] = replaced(rule["description"], FALLBACK_DESCRIPTION, "description")
+voc = "voc_boost" in script
+print(f"rule {RULE}:", "has the VOC boost" if voc else f"{len(VOC)} replacements for the VOC boost")
+if not voc:
+    action["configuration"]["script"] = replaced(script, VOC, "script")
+    rule["description"] = replaced(rule["description"], VOC_DESCRIPTION, "description")
 old_status, old_item = call("GET", f"/items/{OLD}")
 new_exists = call("GET", f"/items/{NEW}")[0] == 200
 print(f"item {NEW}:", "exists" if new_exists else "missing", f"| item {OLD}:",
@@ -231,7 +301,7 @@ if not new_exists:
     print("PUT stateDescription", call("PUT", f"/items/{NEW}/metadata/stateDescription", STATE_DESCRIPTION)[0])
     state = old_item["state"] if old_status == 200 and old_item["state"] in ("ON", "OFF") else "OFF"
     print("state", state, put_text(f"/items/{NEW}/state", state))
-if not done or not fresh or not fallback:
+if not done or not fresh or not fallback or not voc:
     body = {k: v for k, v in rule.items() if k not in ("status", "editable", "templateState")}
     print("PUT rule", call("PUT", f"/rules/{RULE}", body)[0])
 if not moved:
