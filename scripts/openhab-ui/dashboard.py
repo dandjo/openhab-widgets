@@ -9237,6 +9237,8 @@ def ventilation_blocks():
         vent_timer(row=True),
         switch_row("Automatik", "material:tune", "ventilation_management", VENT_TEAL),
         switch_row("CO2-Automatik", "material:co2", "ventilation_co2_management", VENT_TEAL),
+        # the VOC boost's switch under the CO2's (user, 2026-11-12)
+        switch_row("VOC-Automatik", "material:bubble_chart", "ventilation_voc_management", VENT_TEAL),
         switch_row("Feuchte-Automatik", "material:water_drop", "ventilation_humidity_management", VENT_TEAL),
         switch_row("Temperatur-Automatik", "material:thermostat", "ventilation_temperature_management", VENT_TEAL))
     # the level (a text item of 1 to 3, which MainUI's series reads as numbers) over the air the automations act on,

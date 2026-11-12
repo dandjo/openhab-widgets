@@ -16,7 +16,9 @@ crossing 250 means level 3 for up to 60 minutes (cooking, toasting; the index is
 says more than its level), sooner over once it is back within 20 of where it rose from. The boost outranks the CO2,
 the dry air's level 1 and, since the user asked for it the same night, the hot outdoor air's; it waits for a running
 timer as every automatic level does and does not start in the AIR-1's first hour after a restart, while the index
-learns anew.
+learns anew. It has a switch of its own, ventilation_voc_management (VOC-Automatik, user, the same night), a member of
+the automatic's group as the CO2's, on when it is created; while it is off no boost starts and a running one ends. It
+stands under the CO2's in the sitemap; the page's row is the generator's (dashboard.py).
 apply creates the new item with the old one's state, PUTs the rule and the sitemap, then removes the old item; its
 history stays in InfluxDB.
 Usage: ventilation_air1.py check|apply   (on homepi, as pi; the API token from ~/.openhab_token)"""
@@ -207,6 +209,26 @@ VOC_HEAT = [
     level_to_set = 3;
   }"""),
 ]
+# the VOC boost's own switch (user, 2026-11-12), on top of VOC_HEAT
+VOC_ITEM = "ventilation_voc_management"
+VOC_NEW_ITEM = {"type": "Switch", "name": VOC_ITEM, "label": "Lüftung VOC-Automatik", "category": "material:tune",
+                "groupNames": ["mapdb_change_restore", "influxdb_change", "ventilation", "ventilation_management"],
+                "tags": ["Switch"]}
+VOC_SITEMAP = {"component": "Switch", "config": {"icon": "material:bubble_chart", "item": VOC_ITEM,
+                                                 "label": "VOC-Automatik"}}
+VOC_SWITCH = [
+    ("""const voc = items.getItem('apollo_air_1_voc_index').numericState;""",
+     """// Only while the VOC automatic is switched on: off, no boost starts and a running one ends.
+const voc_on = items.getItem('ventilation_voc_management').state === 'ON';
+const voc = items.getItem('apollo_air_1_voc_index').numericState;"""),
+    ("""  if (!voc_boost && (voc - low >= 50 || (last < 250 && voc >= 250))) {""",
+     """  if (voc_on && !voc_boost && (voc - low >= 50 || (last < 250 && voc >= 250))) {"""),
+    ("""if (voc_boost && (Date.now() - voc_boost.since >= 60 * 60000 || (voc_ok && voc <= voc_boost.base + 20))) {""",
+     """if (voc_boost && (!voc_on || Date.now() - voc_boost.since >= 60 * 60000
+  || (voc_ok && voc <= voc_boost.base + 20))) {"""),
+]
+VOC_SWITCH_DESCRIPTION = [("oder über 250, gilt bis zu 60 Minuten Stufe 3,",
+                           "oder über 250, gilt mit eingeschalteter VOC-Automatik bis zu 60 Minuten Stufe 3,")]
 VOC_HEAT_DESCRIPTION = [("auch bei trockener Luft, nicht ab 30 °C außen und nicht in der ersten Stunde",
                          "auch bei trockener Luft und ab 30 °C außen, nicht in der ersten Stunde")]
 VOC_DESCRIPTION = [("ebenso wenn die Werte wieder da sind.",
@@ -315,8 +337,19 @@ voc_heat = "outranks them all" in script
 print(f"rule {RULE}:", "VOC boost over the heat too" if voc_heat
       else f"{len(VOC_HEAT)} replacement for the boost over the heat")
 if not voc_heat:
-    action["configuration"]["script"] = replaced(script, VOC_HEAT, "script")
+    script = action["configuration"]["script"] = replaced(script, VOC_HEAT, "script")
     rule["description"] = replaced(rule["description"], VOC_HEAT_DESCRIPTION, "description")
+voc_switch = VOC_ITEM in script
+print(f"rule {RULE}:", "asks the VOC switch" if voc_switch else f"{len(VOC_SWITCH)} replacements for the VOC switch")
+if not voc_switch:
+    action["configuration"]["script"] = replaced(script, VOC_SWITCH, "script")
+    rule["description"] = replaced(rule["description"], VOC_SWITCH_DESCRIPTION, "description")
+voc_trigger = any(t["configuration"].get("itemName") == VOC_ITEM for t in rule["triggers"])
+if not voc_trigger:
+    rule["triggers"].append({"id": str(max(int(t["id"]) for t in rule["triggers"]) + 1),
+                             "type": "core.ItemStateChangeTrigger", "configuration": {"itemName": VOC_ITEM}})
+voc_item = call("GET", f"/items/{VOC_ITEM}")[0] == 200
+print(f"item {VOC_ITEM}:", "exists" if voc_item else "missing", "| trigger:", "there" if voc_trigger else "to add")
 old_status, old_item = call("GET", f"/items/{OLD}")
 new_exists = call("GET", f"/items/{NEW}")[0] == 200
 print(f"item {NEW}:", "exists" if new_exists else "missing", f"| item {OLD}:",
@@ -327,6 +360,17 @@ moved = NEW in json.dumps(sitemap)
 print("sitemap:", "alert in the ventilation's frame" if moved else "alert to move")
 if not moved:
     sitemap = move_alert(sitemap)
+voc_in_sitemap = VOC_ITEM in json.dumps(sitemap)
+print("sitemap:", "VOC switch there" if voc_in_sitemap else "VOC switch to add under the CO2's")
+if not voc_in_sitemap:
+    for _, frame in frames(sitemap, []):
+        ws = frame["slots"]["widgets"]
+        at = [i for i, w in enumerate(ws) if w.get("config", {}).get("item") == "ventilation_co2_management"]
+        if at:
+            ws.insert(at[0] + 1, copy.deepcopy(VOC_SITEMAP))
+            break
+    else:
+        raise SystemExit("CO2-Automatik not in the sitemap")
 if not apply:
     sys.exit(0)
 
@@ -335,10 +379,15 @@ if not new_exists:
     print("PUT stateDescription", call("PUT", f"/items/{NEW}/metadata/stateDescription", STATE_DESCRIPTION)[0])
     state = old_item["state"] if old_status == 200 and old_item["state"] in ("ON", "OFF") else "OFF"
     print("state", state, put_text(f"/items/{NEW}/state", state))
-if not done or not fresh or not fallback or not voc or not voc_heat:
+if not voc_item:
+    print("PUT item", VOC_ITEM, call("PUT", f"/items/{VOC_ITEM}", VOC_NEW_ITEM)[0])
+    print("PUT stateDescription", call("PUT", f"/items/{VOC_ITEM}/metadata/stateDescription",
+                                       {"value": " ", "config": {"pattern": "%s"}})[0])
+    print("state ON", put_text(f"/items/{VOC_ITEM}/state", "ON"))
+if not done or not fresh or not fallback or not voc or not voc_heat or not voc_switch or not voc_trigger:
     body = {k: v for k, v in rule.items() if k not in ("status", "editable", "templateState")}
     print("PUT rule", call("PUT", f"/rules/{RULE}", body)[0])
-if not moved:
+if not moved or not voc_in_sitemap:
     print("PUT sitemap", call("PUT", SITEMAP, sitemap)[0])
 if old_status == 200:
     print("DELETE item", OLD, call("DELETE", f"/items/{OLD}")[0])
