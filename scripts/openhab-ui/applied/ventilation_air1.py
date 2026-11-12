@@ -13,9 +13,10 @@ Instead of holding the level for as long as readings lack, the rule sets level 2
 evening); it keeps the episode in its cache.private, which a PUT of the rule empties.
 Since 2026-11-12 (user) the AIR-1's VOC index boosts the ventilation: a rise of 50 within 5 minutes or the index
 crossing 250 means level 3 for up to 60 minutes (cooking, toasting; the index is relative to its last day, so its rise
-says more than its level), sooner over once it is back within 20 of where it rose from. The boost outranks the CO2 and
-the dry air's level 1, not the hot outdoor air's, and waits for a running timer as every automatic level does; it does
-not start in the AIR-1's first hour after a restart, while the index learns anew.
+says more than its level), sooner over once it is back within 20 of where it rose from. The boost outranks the CO2,
+the dry air's level 1 and, since the user asked for it the same night, the hot outdoor air's; it waits for a running
+timer as every automatic level does and does not start in the AIR-1's first hour after a restart, while the index
+learns anew.
 apply creates the new item with the old one's state, PUTs the rule and the sitemap, then removes the old item; its
 history stays in InfluxDB.
 Usage: ventilation_air1.py check|apply   (on homepi, as pi; the API token from ~/.openhab_token)"""
@@ -181,6 +182,33 @@ if (items.getItem('ventilation_management').state === 'ON' && items.getItem('ven
   if (
     items.getItem('ventilation_temperature_management').state === 'ON'"""),
 ]
+# the VOC boost over the hot outdoor air's level 1 as well (user, 2026-11-12), on top of VOC
+VOC_HEAT = [
+    ("""  // the VOC boost outranks the CO2 and the dry air, not the hot outdoor air below
+  if (voc_boost) {
+    level_to_set = 3;
+  }
+  if (
+    items.getItem('ventilation_temperature_management').state === 'ON'
+    && items.getItem('espaltherma_ext_ambient_temp').numericState >= 30
+    && items.getItem('faikout_perfera_switch').state === 'OFF'
+  ) {
+    level_to_set = 1;
+  }""",
+     """  if (
+    items.getItem('ventilation_temperature_management').state === 'ON'
+    && items.getItem('espaltherma_ext_ambient_temp').numericState >= 30
+    && items.getItem('faikout_perfera_switch').state === 'OFF'
+  ) {
+    level_to_set = 1;
+  }
+  // the VOC boost outranks them all: the CO2, the dry air and the hot outdoor air (user, 2026-11-12)
+  if (voc_boost) {
+    level_to_set = 3;
+  }"""),
+]
+VOC_HEAT_DESCRIPTION = [("auch bei trockener Luft, nicht ab 30 °C außen und nicht in der ersten Stunde",
+                         "auch bei trockener Luft und ab 30 °C außen, nicht in der ersten Stunde")]
 VOC_DESCRIPTION = [("ebenso wenn die Werte wieder da sind.",
                     "ebenso wenn die Werte wieder da sind. Steigt der VOC-Index des AIR-1 in 5 Minuten um 50 oder über "
                     "250, gilt bis zu 60 Minuten Stufe 3, auch bei trockener Luft, nicht ab 30 °C außen und nicht in "
@@ -281,8 +309,14 @@ if not fallback:
 voc = "voc_boost" in script
 print(f"rule {RULE}:", "has the VOC boost" if voc else f"{len(VOC)} replacements for the VOC boost")
 if not voc:
-    action["configuration"]["script"] = replaced(script, VOC, "script")
+    script = action["configuration"]["script"] = replaced(script, VOC, "script")
     rule["description"] = replaced(rule["description"], VOC_DESCRIPTION, "description")
+voc_heat = "outranks them all" in script
+print(f"rule {RULE}:", "VOC boost over the heat too" if voc_heat
+      else f"{len(VOC_HEAT)} replacement for the boost over the heat")
+if not voc_heat:
+    action["configuration"]["script"] = replaced(script, VOC_HEAT, "script")
+    rule["description"] = replaced(rule["description"], VOC_HEAT_DESCRIPTION, "description")
 old_status, old_item = call("GET", f"/items/{OLD}")
 new_exists = call("GET", f"/items/{NEW}")[0] == 200
 print(f"item {NEW}:", "exists" if new_exists else "missing", f"| item {OLD}:",
@@ -301,7 +335,7 @@ if not new_exists:
     print("PUT stateDescription", call("PUT", f"/items/{NEW}/metadata/stateDescription", STATE_DESCRIPTION)[0])
     state = old_item["state"] if old_status == 200 and old_item["state"] in ("ON", "OFF") else "OFF"
     print("state", state, put_text(f"/items/{NEW}/state", state))
-if not done or not fresh or not fallback or not voc:
+if not done or not fresh or not fallback or not voc or not voc_heat:
     body = {k: v for k, v in rule.items() if k not in ("status", "editable", "templateState")}
     print("PUT rule", call("PUT", f"/rules/{RULE}", body)[0])
 if not moved:
