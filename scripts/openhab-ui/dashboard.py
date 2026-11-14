@@ -6399,14 +6399,18 @@ def glyph_icon(icon, color, active="false"):
 def hero(icon, color, caption, value, extra=(), value_color=None, picture=None):
     """Head of a device card: its icon large in a ring (picture, by default the Material icon at rest), the main value
     large beside it, chips below."""
+    return div([picture or glyph_icon(icon, color), hero_texts(caption, value, extra, value_color)],
+               **{"display": "flex", "align-items": "center", "gap": "18px", "padding": "12px 16px 8px"})
+
+
+def hero_texts(caption, value, extra=(), value_color=None):
+    """A device head's texts: the caption small, the main value large, chips and lines below."""
     big = {**HERO, "white-space": "nowrap"}
     if value_color:
         big["color"] = value_color
-    return div([picture or glyph_icon(icon, color),
-                div([label(caption, **{"font-size": "12px", "opacity": "0.7"}), label(value, **big), *extra],
-                    **{"display": "flex", "flex-direction": "column", "align-items": "flex-start", "gap": "3px",
-                       "min-width": "0"})],
-               **{"display": "flex", "align-items": "center", "gap": "18px", "padding": "12px 16px 8px"})
+    return div([label(caption, **{"font-size": "12px", "opacity": "0.7"}), label(value, **big), *extra],
+               **{"display": "flex", "flex-direction": "column", "align-items": "flex-start", "gap": "3px",
+                  "min-width": "0"})
 
 
 def hero_trend(item):
@@ -9405,10 +9409,220 @@ def target_bar(pct, target, color, left, right):
                      **{"height": "100%", "border-radius": "4px", "overflow": "hidden"}), mark],
                 **{"position": "relative", "height": "8px", "border-radius": "4px",
                    "background": "rgba(127, 127, 127, 0.18)"})
-    return div([track, div([label(left), label(right)],
-                           **{"display": "flex", "justify-content": "space-between", "font-size": "12px",
-                              "opacity": "0.7", "margin-top": "4px"})],
-               **{"padding": "0 16px 16px"})
+    return div([track, bar_ends(left, right)], **{"padding": "0 16px 16px"})
+
+
+def bar_ends(left, right):
+    """The small texts under a bar's two ends."""
+    return div([label(left), label(right)],
+               **{"display": "flex", "justify-content": "space-between", "font-size": "12px", "opacity": "0.7",
+                  "margin-top": "4px"})
+
+
+# The car in Škoda's own renders of it (user, 2026-11-13/14, variant A of three previews): its side with what it
+# reports drawn on it, and the cockpit over the climate's controls. The pictures are the user's and not the
+# repository's: applied by hand to openHAB's html folder (/static/enyaq/), three WebP files, side.webp (the right
+# side, where the charge port is, 1680 x 700 px of the render with 120 px of room above the roof), trunk.webp (the
+# open boot) and dash.webp (the cockpit, the whole 1920 x 1080 render). Without them the page draws the car as the
+# energy flow does. openHAB serves /static/ with a year's cache, so each address carries its file's checksum.
+ENYAQ_PHOTO_DIR = os.environ.get("ENYAQ_PHOTOS", "/etc/openhab/html/enyaq")
+ENYAQ_SIZE = {"side": (1680, 700), "trunk": (1653, 1080), "dash": (1920, 1080)}  # the renders' pixels, as drawn on
+
+
+def enyaq_photos():
+    """name: address of each of the car's pictures, or nothing while one is missing."""
+    found = {}
+    for name in ENYAQ_SIZE:
+        try:
+            with open(os.path.join(ENYAQ_PHOTO_DIR, name + ".webp"), "rb") as f:
+                found[name] = f"/static/enyaq/{name}.webp?v=" + hashlib.sha256(f.read()).hexdigest()[:8]
+        except OSError:
+            return {}
+    return found
+
+
+ENYAQ_PHOTO = enyaq_photos()
+ENYAQ_OPEN = "#fb8c00"  # what stands open or unlocked
+ENYAQ_BRIGHT = "#2fd6c3"  # the car's colour, lighter: on the dark sill the charge has to stand out
+ENYAQ_DY = 120  # the side view's room above the car, for the climate's badge and the boot's picture
+# the charge's bar at the sill's lower edge, clear of the doors, in the side view's pixels
+ENYAQ_BAR = (552, 572, 580, 34)
+# The body parts as the side view shows them, in its pixels without the room above. The doors with their window
+# frames: seams and the paint's lower edge, which falls towards the front, snapped to the photo (the darkest pixel
+# across a seam, the strongest step at the paint's edge), the tops along the chrome traced at 4x; the small fixed
+# pane before the mirror is the body's. The dark cladding under the paint belongs to the doors too, but is left to
+# the charge's bar.
+ENYAQ_REAR_DOOR = [
+    (472, 54), (550, 48), (625, 44), (675, 43), (731, 43), (750, 172), (760, 200), (762, 211), (763, 229), (768, 268),
+    (769, 285), (770, 314), (769, 338), (769, 355), (775, 384), (776, 401), (547, 391), (542, 372), (538, 360),
+    (528, 338), (522, 328), (508, 311), (492, 295), (469, 279), (464, 276), (451, 263), (443, 247), (427, 199),
+    (420, 177), (416, 155), (420, 149), (421, 143), (424, 131), (427, 126), (455, 73), (462, 63), (467, 59)]
+ENYAQ_FRONT_DOOR = [
+    (732, 44), (795, 45), (850, 51), (900, 61), (945, 72), (995, 90), (1045, 112), (1090, 136), (1103, 144),
+    (1120, 184), (1120, 187), (1136, 214), (1140, 227), (1139, 239), (1142, 273), (1142, 310), (1139, 357),
+    (1135, 419), (776, 401), (775, 384), (769, 355), (769, 338), (770, 314), (769, 285), (768, 268), (763, 229),
+    (762, 211), (760, 200), (750, 172)]
+ENYAQ_REAR_GLASS = [(474, 60), (525, 57), (600, 51), (675, 49), (710, 50), (718, 170), (625, 166), (525, 161),
+                    (429, 154)]
+ENYAQ_FRONT_GLASS = [(755, 51), (800, 51), (850, 55), (900, 66), (950, 81), (1000, 101), (1037, 119), (1042, 137),
+                     (1022, 146), (1014, 160), (1015, 186), (900, 180), (784, 173), (776, 137)]
+# The tailgate, from the side its spoiler and fin with the car's rear edge below, and the bonnet between its upper
+# outline and its shut line to the wing: the outlines against the background from the photo's alpha, the fin's seam
+# and the headlight's upper edge from its brightness, the shut line by hand at 4x.
+ENYAQ_TAILGATE = [(303, 51), (231, 62), (180, 71), (180, 77), (193, 91), (198, 100), (192, 101), (189, 104),
+                  (157, 141), (147, 148), (143, 155), (141, 162), (149, 163), (205, 123), (253, 89), (268, 78),
+                  (284, 68), (304, 53)]
+ENYAQ_TAIL_EDGE = [(141, 159), (120, 173), (123, 187), (123, 200), (114, 250), (114, 257), (124, 300)]
+ENYAQ_BONNET = [(1178, 182), (1212, 180), (1253, 179), (1330, 188), (1377, 196), (1400, 201), (1453, 218),
+                (1500, 237), (1524, 250), (1524, 258), (1501, 252), (1473, 245), (1432, 238), (1383, 234),
+                (1360, 233), (1275, 227), (1260, 221), (1217, 217), (1210, 211), (1200, 203)]
+# The cockpit: the part of the render to show, the windscreen and the dashboard without the doors, and what the
+# climate tints: the windscreen from its lower rim, read from the render's transparent glass between the A-pillars,
+# level from the pillars' feet to the picture's sides, up to the picture's top.
+ENYAQ_DASH_VIEW = (250, 30, 1420, 560)
+ENYAQ_WINDSCREEN = [
+    (250, 30), (1670, 30), (1670, 333), (1470, 333), (1430, 330), (1390, 328), (1350, 325), (1310, 323), (1270, 322),
+    (1230, 320), (1190, 319), (1150, 318), (1110, 317), (1070, 316), (1030, 315), (990, 315), (950, 315), (910, 315),
+    (870, 316), (830, 316), (790, 317), (750, 318), (710, 319), (670, 321), (630, 322), (590, 324), (550, 326),
+    (510, 329), (470, 331), (440, 332), (250, 332)]
+
+
+def photo_stage(name, overlays=(), extra=(), visible=None, view=None, **style):
+    """One of the car's pictures as wide as its place, an svg in the picture's own pixels over it, and further boxes
+    (extra) over both; view: the part of the picture to show (x, y, width, height), else all of it."""
+    pw, ph = ENYAQ_SIZE[name]
+    x, y, w, h = view or (0, 0, pw, ph)
+    kids = [svg("svg", list(overlays) or [svg("g")], viewBox=f"{x} {y} {w} {h}",
+                style={"position": "absolute", "inset": "0", "width": "100%", "height": "100%", "overflow": "hidden"}),
+            *extra]
+    place = f"{100 * x / (pw - w) if pw > w else 0:.2f}% {100 * y / (ph - h) if ph > h else 0:.2f}%"
+    return div(kids, visible, **{"position": "relative", "width": "100%", "aspect-ratio": f"{w} / {h}",
+                                 "background-image": f"url({ENYAQ_PHOTO[name]})",
+                                 "background-size": f"{100 * pw / w:.2f}% {100 * ph / h:.2f}%",
+                                 "background-position": place, "background-repeat": "no-repeat", **style})
+
+
+def photo_poly(points, visible, **attrs):
+    return svg("polygon", points=" ".join(f"{x},{y}" for x, y in points), visible=f"={visible}", **attrs)
+
+
+def photo_pin(x, y, icon, color, visible, r=38):
+    """A round badge with a Material icon; icon and color may be expressions."""
+    return svg("g", [svg("circle", cx=x, cy=y, r=r, fill=color, stroke="#ffffff", **{"stroke-width": 5}),
+                     glyph(x, y, icon, round(r * 1.25), "#ffffff")], visible=f"={visible}")
+
+
+def enyaq_climate_color(state):
+    """Red while the climate heats, blue while it cools, else the car's colour; state: an expression."""
+    return (f"({state} === 'COOLING' ? '#1e88e5' : ['HEATING', 'HEATING_AUXILIARY'].includes({state}) ? '#e53935' : "
+            f"'{ECAR_COLOR}')")
+
+
+def enyaq_side():
+    """The car's right side with what it reports drawn on it: the charge as a bar at the sill, where the battery
+    lies, paler up to the charge target, which is a white mark with its value on a flag under the car, the mark
+    always over the flag's middle; the lights' glow; a lock at the doors; doors, windows, tailgate and bonnet
+    coloured along their shut lines while open, the open boot also as its own picture in the corner; the cable and,
+    while it charges, a bolt at the charge port; the climate with its target over the roof."""
+    def is_(suffix, state):
+        return f"items.{skoda(suffix)}.state === '{state}'"
+
+    def down(points):
+        return [(x, y + ENYAQ_DY) for x, y in points]
+    bx, by, bw, bh = ENYAQ_BAR
+    dy = ENYAQ_DY
+    locked, unlocked = is_("locked", "ON"), is_("locked", "OFF")
+    plugged = f"({is_('plug', 'ON')} || {SKODA_CHARGING})"
+    cable = f"({SKODA_CHARGING} ? '{ECAR_COLOR}' : '#9e9e9e')"
+    climate, state = is_("climate", "ON"), f"items.{skoda('climate_state')}.state"
+    soc, goal = vt_clamp(SOC_NOW), vt_clamp(num(skoda("charge_target")))
+    goal_x = f"({bx} + {bw} * {goal} / 100)"
+    flag = f"('Ziel ' + Math.round({goal}) + ' %')"
+    flag_w = f"(({flag}).length * 23 + 38)"
+    target = climate_degrees(skoda("climate_target"))
+    pill_w = f"(({target}).length * 22.4 + 40)"
+    opened = {"fill": ENYAQ_OPEN, "stroke": ENYAQ_OPEN, "stroke-linejoin": "round"}
+    over = [
+        # the charge: a dark body with a light edge, the charge in it, paler what is still to be charged
+        svg("rect", x=bx - 8, y=by - 6, width=bw + 16, height=bh + 12, rx=12, fill="#101214", stroke="#ffffff",
+            **{"stroke-width": 5}),
+        svg("rect", x=bx, y=by, width=f"=({bw} * {soc} / 100).toFixed(0)", height=bh, rx=7, fill=ENYAQ_BRIGHT),
+        svg("rect", x=f"=({bx} + {bw} * {soc} / 100).toFixed(0)", y=by,
+            width=f"=({bw} * Math.max(0, {goal} - {soc}) / 100).toFixed(0)", height=bh, fill=ENYAQ_BRIGHT,
+            **{"fill-opacity": "0.3"}),
+        svg("g", [
+            svg("rect", x=f"=({goal_x} - 6).toFixed(0)", y=by - 14, width=12, height=bh + 30, rx=6, fill="#ffffff",
+                stroke="#101214", **{"stroke-width": 3}),
+            svg("rect", x=f"=({goal_x} - {flag_w} / 2).toFixed(0)", y=by + bh + 12, width=f"=({flag_w}).toFixed(0)",
+                height=56, rx=28, fill="#ffffff", stroke="#101214", **{"stroke-width": 3}),
+            svg("text", x=f"=({goal_x}).toFixed(0)", y=by + bh + 54, fill="#101214", content=f"={flag}",
+                **{"font-size": 40, "font-weight": "700", "text-anchor": "middle"}),
+        ], visible=f"={num(skoda('charge_target'))} > 0"),
+        # the lights
+        svg("ellipse", cx=1500, cy=268 + dy, rx=120, ry=48, fill="#fff3b0", visible=f"={is_('lights', 'ON')}",
+            style={"filter": "blur(24px)"}),
+        photo_poly([(1530, 248 + dy), (1680, 205 + dy), (1680, 345 + dy), (1530, 292 + dy)], is_("lights", "ON"),
+                   fill="#fff3b0", style={"filter": "blur(14px)"}, **{"fill-opacity": "0.55"}),
+        svg("ellipse", cx=170, cy=216 + dy, rx=80, ry=36, fill="#ff3b30", visible=f"={is_('lights', 'ON')}",
+            style={"filter": "blur(20px)"}),
+        # what stands open; the API tells doors and windows only all together
+        *[photo_poly(down(p), is_("doors", "OPEN"), **opened, **{"fill-opacity": "0.22", "stroke-width": 6})
+          for p in (ENYAQ_REAR_DOOR, ENYAQ_FRONT_DOOR)],
+        *[photo_poly(down(p), is_("windows", "OPEN"), fill=ENYAQ_OPEN, **{"fill-opacity": "0.6"})
+          for p in (ENYAQ_REAR_GLASS, ENYAQ_FRONT_GLASS)],
+        *[photo_poly(down(p), is_(part, "OPEN"), **opened, **{"fill-opacity": "0.55", "stroke-width": 5})
+          for p, part in ((ENYAQ_TAILGATE, "trunk"), (ENYAQ_BONNET, "bonnet"))],
+        svg("polyline", points=" ".join(f"{x},{y}" for x, y in down(ENYAQ_TAIL_EDGE)),
+            visible=f"={is_('trunk', 'OPEN')}", fill="none", stroke=ENYAQ_OPEN,
+            **{"stroke-width": 9, "stroke-linecap": "round", "stroke-linejoin": "round"}),
+        # the cable at the charge port, behind the rear wheel on this side
+        svg("path", d=f"M 330 {240 + dy} C 326 {360 + dy}, 250 {470 + dy}, 120 {530 + dy} L 0 {548 + dy}",
+            visible=f"={plugged}", fill="none", stroke=f"={cable}", **{"stroke-width": 10, "stroke-linecap": "round"}),
+        svg("rect", x=313, y=218 + dy, width=34, height=38, rx=9, fill=f"={cable}", visible=f"={plugged}"),
+        photo_pin(330, 150 + dy, "bolt", ECAR_COLOR, SKODA_CHARGING),
+        # locked or not, at the doors
+        photo_pin(790, 300 + dy, f"={locked} ? 'lock' : 'lock_open'", f"={locked} ? '{ECAR_COLOR}' : '{ENYAQ_OPEN}'",
+                  f"({locked} || {unlocked})"),
+        # the climate over the roof: a snowflake while it cools, else a thermometer, and its target
+        svg("g", [
+            photo_pin(780, 60, f"=({state} === 'COOLING' ? 'ac_unit' : 'thermostat')",
+                      f"={enyaq_climate_color(state)}", "true"),
+            svg("rect", x=f"=(920 - {pill_w} / 2).toFixed(0)", y=22, width=f"=({pill_w}).toFixed(0)", height=60, rx=30,
+                fill=f"={enyaq_climate_color(state)}"),
+            svg("text", x=920, y=66, fill="#ffffff", content=f"={target}",
+                **{"font-size": 40, "font-weight": "700", "text-anchor": "middle"}),
+        ], visible=f"={climate}"),
+    ]
+    # the open boot's picture where the photo is empty, above the bonnet
+    boot = photo_stage("trunk", visible=f"={is_('trunk', 'OPEN')}", **{
+        "position": "absolute", "right": "0", "top": "0", "width": "25%", "border-radius": "10px",
+        "border": f"2px solid {ENYAQ_OPEN}", "background-color": TILE_BG, "box-sizing": "border-box"})
+    return photo_stage("side", over, [boot])
+
+
+def enyaq_dash():
+    """The cockpit over the climate's controls: the display black with the target temperature, Aus while the climate
+    is off; while it runs the windscreen tinted up to the picture's top and sides, red with three waves while it
+    heats, blue with three snowflakes while it cools, else in the car's colour."""
+    climate, state = f"items.{skoda('climate')}.state === 'ON'", f"items.{skoda('climate_state')}.state"
+
+    def wave(x, bottom=300, step=62):
+        return svg("path", d=f"M {x} {bottom} c {-step * 0.36:.0f} {-step * 0.34:.0f}, {step * 0.36:.0f} "
+                             f"{-step * 0.66:.0f}, 0 {-step} c {-step * 0.36:.0f} {-step * 0.34:.0f}, "
+                             f"{step * 0.36:.0f} {-step * 0.66:.0f}, 0 {-step}",
+                   fill="none", stroke=ENYAQ_OPEN, **{"stroke-width": 13, "stroke-linecap": "round"})
+    over = [
+        photo_poly(ENYAQ_WINDSCREEN, climate, fill=f"={enyaq_climate_color(state)}", **{"fill-opacity": "0.28"}),
+        svg("g", [wave(x) for x in (860, 960, 1060)],
+            visible=f"=({climate} && ['HEATING', 'HEATING_AUXILIARY'].includes({state}))"),
+        svg("g", [glyph(x, 238, "ac_unit", 96, "#e3f2fd") for x in (850, 960, 1070)],
+            visible=f"=({climate} && {state} === 'COOLING')"),
+        svg("rect", x=824, y=336, width=312, height=158, rx=10, fill="#000000"),
+        svg("text", x=980, y=436, fill="#ffffff",
+            content=f"=({climate} ? {climate_degrees(skoda('climate_target'))} : 'Aus')",
+            **{"font-size": 70, "font-weight": "700", "text-anchor": "middle"}),
+    ]
+    return photo_stage("dash", over, view=ENYAQ_DASH_VIEW, **{"border-radius": "12px", "overflow": "hidden"})
 
 
 def e_car_now():
@@ -9418,7 +9632,10 @@ def e_car_now():
     the charge target (Ladeziel), while it charges when it will be done and always the target at its ends; then the
     locks with what stands
     open, the place, the odometer, the climate, the charging cable and the plug's lock (user, 2026-10-25: cable and
-    plug up here, under odometer and climate)."""
+    plug up here, under odometer and climate).
+    With the car's pictures (ENYAQ_PHOTO; user, 2026-11-14) the head is its side view, enyaq_side(), which draws the
+    charge with its target, the lock, what stands open, the lights, the cable and the climate: the texts stand
+    under it, the charge's bar and the cable's and the plug's tiles are left out."""
     soc, state, plug = skoda("soc"), skoda("charging_state"), skoda("plug")
     # charging at home shows on the circuit at once, elsewhere only in what the car reports
     power = f"Math.max({num(ECAR)}, {SKODA_CHARGING} ? {num(skoda('charge_power'))} * 1000 : 0)"
@@ -9444,16 +9661,15 @@ def e_car_now():
     # under it says hochgerechnet)
     rng = skoda("range")
     est_range = f"Math.round({num(rng)} / {num(soc)} * {num(SOC_EST)} / 5) * 5"
-    head = hero("material:electric_car", ECAR_COLOR, "Ladestand",
-                f"=({SOC_ESTIMATED} ? Math.round({num(SOC_EST)}) + ' %' + ({ok(rng)} && {num(soc)} > 0 ? "
-                f"' / ' + {est_range} + ' km' : '') : {disp(soc)} + ' / ' + {disp(rng)})",
-                [chips(chip(f"={state_text}", f"={plugged} ? '{ECAR_COLOR}' : '#9e9e9e'"),
-                       chip(f"={where}", "#78909c")),
-                 # where it wraps (a phone), after the report's time: the rest holds non-breaking spaces
-                 label(f"='Stand ' + {when_short(skoda('updated'))} + ({SOC_ESTIMATED} ? ' · ' + ('vor ' + "
-                       f"{hm(SINCE_REPORT)} + ' · hochgerechnet').split(' ').join('\u00a0') : '')",
-                       **{"font-size": "14px"})],
-                picture=icon)
+    head = ("Ladestand",
+            f"=({SOC_ESTIMATED} ? Math.round({num(SOC_EST)}) + ' %' + ({ok(rng)} && {num(soc)} > 0 ? "
+            f"' / ' + {est_range} + ' km' : '') : {disp(soc)} + ' / ' + {disp(rng)})",
+            [chips(chip(f"={state_text}", f"={plugged} ? '{ECAR_COLOR}' : '#9e9e9e'"),
+                   chip(f"={where}", "#78909c")),
+             # where it wraps (a phone), after the report's time: the rest holds non-breaking spaces
+             label(f"='Stand ' + {when_short(skoda('updated'))} + ({SOC_ESTIMATED} ? ' · ' + ('vor ' + "
+                   f"{hm(SINCE_REPORT)} + ' · hochgerechnet').split(' ').join('\u00a0') : '')",
+                   **{"font-size": "14px"})])
     # the mark at the charge target, the value set in the car that it charges to (user, 2026-10-25); under the bar on
     # the left, while it charges, the time left and when it reaches the target as in the Steuerung card ("noch 1:35 h ·
     # fertig 21:59", user, 2026-11-04; it said "fertig ca." before), each part breaking only after its "·", on
@@ -9461,11 +9677,10 @@ def e_car_now():
     # with battery care on, a 50 % target stayed 50 %; without "aktiv" since 2026-11-04, user)
     target, reached_at = skoda("charge_target"), skoda("target_reached_at")
     left = f"Math.max(0, Math.round(dayjs(items.{reached_at}.state).diff(dayjs(), 'minute', true)))"
-    charge = target_bar(vt_clamp(SOC_NOW), target, ECAR_COLOR,
-                        f"={SKODA_CHARGING} && {ok(reached_at)} ? ['noch ' + {hm(left)}, 'fertig ' + "
-                        f"{clock_of(reached_at)}].map((s) => s.split(' ').join('\u00a0')).join('\u00a0· ') : ''",
-                        f"='Ladeziel ' + {disp(target)} + (items.{skoda('battery_care')}.state === 'ON' ? "
-                        f"' · Akkuschonung' : '')")
+    ends = (f"={SKODA_CHARGING} && {ok(reached_at)} ? ['noch ' + {hm(left)}, 'fertig ' + "
+            f"{clock_of(reached_at)}].map((s) => s.split(' ').join('\u00a0')).join('\u00a0· ') : ''",
+            f"='Ladeziel ' + {disp(target)} + (items.{skoda('battery_care')}.state === 'ON' ? "
+            f"' · Akkuschonung' : '')")
     # the locks, and below them what stands open; the lights only while on
     locked = skoda("locked")
     lock_text = (f"(items.{locked}.state === 'ON' ? 'Verriegelt' : items.{locked}.state === 'OFF' ? 'Entriegelt' : "
@@ -9492,12 +9707,18 @@ def e_car_now():
     climate_tile = vt_tile([vt_head("Klimatisierung"), vt_value(f"={disp(climate)}"),
                             label(f"='Ziel ' + {climate_degrees(target)}", **VT_SUB)], climate, "Klimatisierung",
                            ECAR_COLOR)
+    if ENYAQ_PHOTO:
+        return [div([enyaq_side()], **{"padding": "8px 12px 0"}),
+                div([hero_texts(*head)], **{"padding": "4px 16px 8px"}),
+                div([bar_ends(*ends)], **{"padding": "0 16px 12px"}),
+                two_on_phone(value_grid([lock_tile, place_tile, km_tile(), climate_tile]), 200)]
     tiles = two_on_phone(value_grid([lock_tile, place_tile,
                         km_tile(),
                         climate_tile,
                         vtile("Ladekabel", skoda("plug"), color=ECAR_COLOR),
                         vtile("Ladestecker", skoda("plug_locked"), color=ECAR_COLOR)]), 200)
-    return [head, charge, tiles]
+    return [hero("material:electric_car", ECAR_COLOR, *head, picture=icon),
+            target_bar(vt_clamp(SOC_NOW), skoda("charge_target"), ECAR_COLOR, *ends), tiles]
 
 
 KM_POPUP = "e_car_km"
@@ -9547,7 +9768,8 @@ def e_car_controls():
     estimated range at the target, and the target
     temperature, LO, 16 to 29.5 °C in steps of 0.5 and HI, sent with the start
     or, while the air conditioning runs, at once. Last how the last command went. The rule skoda_enyaq_status sends
-    the commands; their items change once Škoda accepted them."""
+    the commands; their items change once Škoda accepted them. With the car's pictures (ENYAQ_PHOTO) the cockpit,
+    enyaq_dash(), stands over the climate's pill."""
     plug, charging, target = skoda("plug"), skoda("charging"), skoda("charge_target")
     plugged = f"(items.{plug}.state === 'ON' || items.{charging}.state === 'ON' || {SKODA_CHARGING})"
     # while it charges the time left until the charge target and the clock it will be reached at (user, 2026-10-25); the
@@ -9590,7 +9812,9 @@ def e_car_controls():
     # each action directly over its setting (user, 2026-10-25: Laden over Ladeziel, Klima over Zieltemperatur), the
     # two groups one under the other on a desktop as on a phone (user, 2026-11-01)
     group = {"display": "flex", "flex-direction": "column", "gap": "6px", "min-width": "0"}
-    groups = div([div([pill, hint, slider], **group), div([climate_pill, climate_slider], **group)],
+    # with the car's pictures the cockpit over the climate's controls (user, 2026-11-14)
+    cockpit = [div([enyaq_dash()], **{"margin": "10px 0 4px"})] if ENYAQ_PHOTO else []
+    groups = div([div([pill, hint, slider], **group), div([*cockpit, climate_pill, climate_slider], **group)],
                  **{"display": "grid", "gap": "6px", "grid-template-columns": "minmax(0, 1fr)"})
     return controls_box(groups, outcome)
 
@@ -11516,6 +11740,8 @@ OBSOLETE_PAGES = ["dashboard",  # became the overview page
                   # overview design proposals, B2 adopted on every page (2026-10-08)
                   "harmony_a", "harmony_b", "harmony_b2", "harmony_c", "harmony_d", "harmony_e",
                   "widget_gallery",  # the widget repository's screenshots, put up by widget_gallery.py while they are taken
+                  # the car's pictures in three variants, A built on the E-Auto's page (2026-11-14)
+                  "preview_enyaq_a", "preview_enyaq_b", "preview_enyaq_c",
                   "dashboard_smart_meter", "dashboard_battery", "dashboard_hot_water", "dashboard_pv", "dashboard_home",
                   "dashboard_power_meter", "dashboard_energy_storage", "dashboard_pv_days", "dashboard_energy_days",
                   "dashboard_outdoor", "dashboard_indoor", "dashboard_heatpump_dhw",
