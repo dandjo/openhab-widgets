@@ -9576,7 +9576,9 @@ def enyaq_side():
             visible=f"={is_('trunk', 'OPEN')}", fill="none", stroke=ENYAQ_OPEN,
             **{"stroke-width": 9, "stroke-linecap": "round", "stroke-linejoin": "round"}),
         # the cable at the charge port, behind the rear wheel on this side
-        svg("path", d=f"M 330 {240 + dy} C 326 {360 + dy}, 250 {470 + dy}, 120 {530 + dy} L 0 {548 + dy}",
+        # one curve, down from the port and out level along the ground (user, 2026-11-14: a curve and a straight
+        # piece met in a corner)
+        svg("path", d=f"M 330 {240 + dy} C 326 {400 + dy}, 230 {548 + dy}, 0 {548 + dy}",
             visible=f"={plugged}", fill="none", stroke=f"={cable}", **{"stroke-width": 10, "stroke-linecap": "round"}),
         svg("rect", x=313, y=218 + dy, width=34, height=38, rx=9, fill=f"={cable}", visible=f"={plugged}"),
         photo_pin(330, 150 + dy, "bolt", ECAR_COLOR, SKODA_CHARGING),
