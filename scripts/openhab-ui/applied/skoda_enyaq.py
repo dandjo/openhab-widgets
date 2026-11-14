@@ -139,6 +139,8 @@ POINTS = {
                 state("%1$td.%1$tm. %1$tR")),
     "api_status": ("String", "API-Status", "cloud", ["Status"], RESTORE, state("%s", options=API_STATES)),
     "api_requests_left": ("Number", "API-Anfragen übrig", "data_usage", ["Point"], RESTORE, state("%.0f")),
+    # when the rule's next regular read goes out, for the page (user, 2026-11-14)
+    "next_read": ("DateTime", "nächster Abruf", "schedule", ["Timestamp", "Point"], RESTORE, state("%1$tR")),
     "api_quota_reset_at": ("DateTime", "API-Kontingent wieder voll um", "update", ["Timestamp", "Point"], RESTORE,
                            state("%1$tR")),
     "api_key_expiry": ("DateTime", "API-Schlüssel gültig bis", "key", ["Timestamp", "Point"], RESTORE,

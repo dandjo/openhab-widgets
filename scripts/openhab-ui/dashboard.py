@@ -9836,7 +9836,10 @@ def e_car_controls():
     # rule reads the API on the command and reports below like the other commands
     refresh = div([comp("oh-icon", {"icon": "material:refresh", "width": 22, "height": 22}),
                    div([label("Fahrzeugdaten", **{"font-size": "13px", "line-height": "16px"}),
-                        label("holt den letzten Stand von Škoda, weckt das Auto nicht",
+                        # when the rule reads next by itself (user, 2026-11-14): its clock, with the weekday
+                        # beyond today
+                        label(f"=({ok(skoda('next_read'))} ? 'nächster Abruf ' + {clock_of(skoda('next_read'))} + "
+                              f"' · ' : '') + 'weckt das Auto nicht'",
                               **{"font-size": "11px", "opacity": "0.7", "line-height": "14px",
                                  "white-space": "normal"})],
                        **{"flex": "1", "min-width": "0", "display": "flex", "flex-direction": "column"}),

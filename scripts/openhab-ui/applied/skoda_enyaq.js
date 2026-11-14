@@ -14,6 +14,8 @@ const VEHICLE_URL = 'https://public.api.connect.skoda-auto.cz/api/v1/vehicles/';
 const P = 'skoda_enyaq_';
 const ACTIVE_MINUTES = 5;
 const IDLE_MINUTES = 15;
+const TURN_MS = 5 * 60000; // the rule's turns, as its cron trigger has them: every 5 minutes,
+const TURN_SECOND = 20;    // 20 s past
 const QUOTA_RESERVE = 4;
 // watts on the car's circuit (rule air_conditioning_circuit_power) from which it counts as charging at home
 const HOME_CHARGING_WATTS = 100;
@@ -333,12 +335,32 @@ function blocked(reserve) {
   return null;
 }
 
-function due() {
+// from when on a read is due: the interval after the last request, less a minute's slack, so the cron's own jitter
+// does not skip a turn
+function dueAt() {
   const active = state('charging_state') === 'CHARGING' || state('parking_state') === 'IN_MOTION' ||
     (items.getItem('e_car_power').numericState || 0) > HOME_CHARGING_WATTS;
   const minutes = active ? ACTIVE_MINUTES : IDLE_MINUTES;
-  // a minute's slack, so the cron's own jitter does not skip a turn
-  return Date.now() - (store.get('lastRequest') || 0) >= (minutes - 1) * 60000;
+  return (store.get('lastRequest') || 0) + (minutes - 1) * 60000;
+}
+
+function due() {
+  return Date.now() >= dueAt();
+}
+
+// when the next regular read goes out, for the page (user, 2026-11-14): the rule's first turn (every 5 minutes, 20 s
+// past) from when a read is due, not before a 429's wait or, with only the reserve left, the quota's reset has
+// passed. As things stand now: a charge or a drive that starts shortens it at the next turn
+function nextRead() {
+  const now = Date.now();
+  let from = Math.max(now, dueAt(), store.get('retryAt') || 0);
+  const remaining = store.get('remaining');
+  const resetAt = store.get('resetAt') || 0;
+  if (remaining !== null && remaining !== undefined && remaining <= QUOTA_RESERVE && now < resetAt) {
+    from = Math.max(from, resetAt);
+  }
+  const turn = Math.ceil((from - TURN_SECOND * 1000) / TURN_MS) * TURN_MS + TURN_SECOND * 1000;
+  postTime('next_read', new Date(turn).toISOString());
 }
 
 // reads the vehicle: when due, or forced after a command (then the reserve may be used, not the last request).
@@ -1026,6 +1048,11 @@ function run() {
     setClimate(received.command);
   } else {
     setClimateTarget(received.command);
+  }
+  try {
+    nextRead();
+  } catch (e) {
+    console.warn(`Škoda: nächster Abruf: ${e}`);
   }
   try {
     estimateSoc();
