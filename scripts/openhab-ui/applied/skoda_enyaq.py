@@ -126,10 +126,12 @@ POINTS = {
     "climate_target": ("Number:Temperature", "Klimatisierung Zieltemperatur", "device_thermostat",
                        ["Setpoint", "Temperature"], CHANGE,
                        {"unit": {"value": "°C"}, **command("%.1f %unit%", min=15.5, max=30, step=0.5)}),
-    # the windscreen's heating as the API reports it with the climate (user, 2026-11-14: the front one only; the
-    # API has the rear window's too); read-only, the API has no command for it
+    # the windscreen's and the rear window's heating as the API reports them with the climate (user, 2026-11-14);
+    # read-only, the API has no command for them
     "window_heating_front": ("Switch", "Frontscheibenheizung", "waves", ["Status"], CHANGE,
                              state("%s", options="ON=An,OFF=Aus")),
+    "window_heating_rear": ("Switch", "Heckscheibenheizung", "waves", ["Status"], CHANGE,
+                            state("%s", options="ON=An,OFF=Aus")),
     "updated": ("DateTime", "zuletzt gemeldet", "update", ["Timestamp", "Point"], RESTORE,
                 state("%1$td.%1$tm. %1$tR")),
     "api_status": ("String", "API-Status", "cloud", ["Status"], RESTORE, state("%s", options=API_STATES)),

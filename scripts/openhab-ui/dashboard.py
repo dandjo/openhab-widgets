@@ -9603,17 +9603,21 @@ def enyaq_side():
 def enyaq_dash():
     """The cockpit over the climate's controls: the display black with the target temperature, Aus while the climate
     is off; while it runs the windscreen tinted up to the picture's top and sides, red with three waves while it
-    heats, blue with three snowflakes while it cools, else in the car's colour. While the windscreen's heating is on
-    (user, 2026-11-14), its sign as on the car's own button stands in the windscreen's right half: the pane with
-    three arrows rising through it."""
+    heats, blue with three snowflakes while it cools, else in the car's colour. While a window's heating is on
+    (user, 2026-11-14), its sign as on the car's own button stands in the windscreen, three arrows rising through a
+    pane: the windscreen's, a pane wider below, in the right half, the rear window's, a rectangle, in the left."""
     climate, state = f"items.{skoda('climate')}.state === 'ON'", f"items.{skoda('climate_state')}.state"
 
-    def defrost(cx, cy, k=1.4):
-        """The windscreen's heating sign around (cx, cy): a pane, wider below, and three wavy arrows through it."""
+    def defrost(cx, cy, rear=False, k=1.4):
+        """A window's heating sign around (cx, cy): three wavy arrows through a pane, the windscreen's wider below,
+        the rear window's a rectangle."""
         def at(x, y):
             return f"{cx + k * x:.0f} {cy + k * y:.0f}"
-        pane = svg("path", d=f"M {at(-70, 34)} Q {at(0, 58)} {at(70, 34)} L {at(50, -46)} Q {at(0, -62)} "
-                             f"{at(-50, -46)} Z",
+        outline = (f"M {at(-58, -48)} L {at(58, -48)} Q {at(68, -48)} {at(68, -38)} L {at(68, 28)} Q {at(68, 38)} "
+                   f"{at(58, 38)} L {at(-58, 38)} Q {at(-68, 38)} {at(-68, 28)} L {at(-68, -38)} Q {at(-68, -48)} "
+                   f"{at(-58, -48)} Z" if rear else
+                   f"M {at(-70, 34)} Q {at(0, 58)} {at(70, 34)} L {at(50, -46)} Q {at(0, -62)} {at(-50, -46)} Z")
+        pane = svg("path", d=outline,
                    fill=ENYAQ_OPEN, stroke=ENYAQ_OPEN, **{"fill-opacity": "0.18", "stroke-width": round(7 * k),
                                                          "stroke-linejoin": "round"})
         arrows = [svg("path", d=f"M {at(x, 72)} Q {at(x - 13, 58)} {at(x, 44)} T {at(x, 16)} T {at(x, -12)} "
@@ -9634,6 +9638,7 @@ def enyaq_dash():
         svg("g", [glyph(x, 238, "ac_unit", 96, "#e3f2fd") for x in (850, 960, 1070)],
             visible=f"=({climate} && {state} === 'COOLING')"),
         svg("g", defrost(1340, 196), visible=f"=items.{skoda('window_heating_front')}.state === 'ON'"),
+        svg("g", defrost(620, 196, rear=True), visible=f"=items.{skoda('window_heating_rear')}.state === 'ON'"),
         svg("rect", x=824, y=336, width=312, height=158, rx=10, fill="#000000"),
         svg("text", x=980, y=436, fill="#ffffff",
             content=f"=({climate} ? {climate_degrees(skoda('climate_target'))} : 'Aus')",
