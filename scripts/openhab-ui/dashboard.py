@@ -9844,8 +9844,8 @@ def e_car_controls():
     or, while the air conditioning runs, at once. Last how the last command went. The rule skoda_enyaq_status sends
     the commands; their items change once Škoda accepted them. With the car's pictures (ENYAQ_PHOTO) the cockpit,
     enyaq_dash(), stands over the climate's pill. Under the groups a button reads the API at once
-    (skoda_enyaq_refresh), beside it when the API was last read and when the rule reads next; the last line holds
-    the last command's result and the hour's quota."""
+    (skoda_enyaq_refresh), beside it when the API was last read and when the rule reads next, and under them the
+    requests used of the hour's quota; the last line holds the last command's result."""
     plug, charging, target = skoda("plug"), skoda("charging"), skoda("charge_target")
     plugged = f"(items.{plug}.state === 'ON' || items.{charging}.state === 'ON' || {SKODA_CHARGING})"
     # while it charges the time left until the charge target and the clock it will be reached at (user, 2026-10-25); the
@@ -9884,6 +9884,10 @@ def e_car_controls():
                                  icon="material:device_thermostat", row=True)
     # a read at once (user, 2026-11-14: a button "jetzt aktualisieren"), a row as the air conditioner's restart: the
     # rule reads the API on the command and reports below like the other commands
+    left, reset = skoda("api_requests_left"), skoda("api_quota_reset_at")
+    quota = (f"=((over) => {ok(left)} ? 'API-Kontingent ' + (over ? 0 : Math.max(0, {SKODA_REQUESTS_PER_HOUR} - "
+             f"Math.round({num(left)}))) + ' von {SKODA_REQUESTS_PER_HOUR}' : '')"
+             f"({ok(reset)} && !dayjs(items.{reset}.state).isAfter(dayjs()))")
     refresh = div([comp("oh-icon", {"icon": "material:refresh", "width": 22, "height": 22}),
                    div([label("Fahrzeugdaten", **{"font-size": "13px", "line-height": "16px"}),
                         # when the API was last read, by the rule or at once, and when the rule reads next by
@@ -9893,7 +9897,9 @@ def e_car_controls():
                               f"{ok(skoda('next_read'))} ? 'nächster Abruf ' + {clock_of(skoda('next_read'))} : '']"
                               f".filter((s) => s !== '').map((s) => s.split(' ').join('\u00a0')).join('\u00a0· ')",
                               **{"font-size": "11px", "opacity": "0.7", "line-height": "14px",
-                                 "white-space": "normal"})],
+                                 "white-space": "normal"}),
+                        # under it the requests used of the hour's quota (user, 2026-11-14)
+                        label(quota, **{"font-size": "11px", "opacity": "0.7", "line-height": "14px"})],
                        **{"flex": "1", "min-width": "0", "display": "flex", "flex-direction": "column"}),
                    comp("oh-button", {"text": "Jetzt aktualisieren", "action": "command",
                                       "actionItem": skoda("refresh"), "actionCommand": "ON",
@@ -9901,17 +9907,9 @@ def e_car_controls():
                                       "style": {"flex": "0 0 auto", "width": "auto", "padding": "0 10px",
                                                 "color": ECAR_COLOR, "border-color": ECAR_COLOR}})],
                   **{"display": "flex", "align-items": "center", "gap": "8px", "padding": "8px 2px 0"})
-    # the card's last line: how the last command went, and at its right end the requests used of the hour's quota
-    # (user, 2026-11-14), under the result where the two do not fit beside each other
     last = skoda("command_result")
-    left, reset = skoda("api_requests_left"), skoda("api_quota_reset_at")
-    quota = label(f"=((over) => {ok(left)} ? 'API-Kontingent ' + (over ? 0 : Math.max(0, {SKODA_REQUESTS_PER_HOUR} - "
-                  f"Math.round({num(left)}))) + ' von {SKODA_REQUESTS_PER_HOUR}' : '')"
-                  f"({ok(reset)} && !dayjs(items.{reset}.state).isAfter(dayjs()))",
-                  **{"margin-left": "auto", "white-space": "nowrap"})
-    outcome = div([label(f"=items.{last}.state", f"={ok(last)}"), quota],
-                  **{"display": "flex", "flex-wrap": "wrap", "align-items": "baseline", "gap": "2px 12px",
-                     "font-size": "12px", "opacity": "0.65", "padding": "6px 2px 0"})
+    outcome = label(f"=items.{last}.state", f"={ok(last)}",
+                    **{"font-size": "12px", "opacity": "0.65", "padding": "6px 2px 0"})
     # each action directly over its setting (user, 2026-10-25: Laden over Ladeziel, Klima over Zieltemperatur), the
     # two groups one under the other on a desktop as on a phone (user, 2026-11-01)
     group = {"display": "flex", "flex-direction": "column", "gap": "6px", "min-width": "0"}
