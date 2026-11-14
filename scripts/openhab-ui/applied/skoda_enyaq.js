@@ -240,6 +240,8 @@ function applyParking(parking) {
 function applyAirConditioning(air) {
   post('climate_state', air.state);
   post('climate', CLIMATE_RUNNING.includes(air.state) ? 'ON' : 'OFF');
+  // the windscreen's heating, which the API reports with the climate (user, 2026-11-14: the front one only)
+  post('window_heating_front', onOff((air.windowHeating || {}).front, 'ON', 'OFF'));
   const target = air.targetTemperature || {};
   const chosen = store.get('climateChosen');
   if (chosen !== null && chosen !== undefined && target.value !== chosen) {

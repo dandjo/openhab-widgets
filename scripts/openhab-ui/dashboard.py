@@ -9603,8 +9603,24 @@ def enyaq_side():
 def enyaq_dash():
     """The cockpit over the climate's controls: the display black with the target temperature, Aus while the climate
     is off; while it runs the windscreen tinted up to the picture's top and sides, red with three waves while it
-    heats, blue with three snowflakes while it cools, else in the car's colour."""
+    heats, blue with three snowflakes while it cools, else in the car's colour. While the windscreen's heating is on
+    (user, 2026-11-14), its sign as on the car's own button stands in the windscreen's right half: the pane with
+    three arrows rising through it."""
     climate, state = f"items.{skoda('climate')}.state === 'ON'", f"items.{skoda('climate_state')}.state"
+
+    def defrost(cx, cy, k=1.4):
+        """The windscreen's heating sign around (cx, cy): a pane, wider below, and three wavy arrows through it."""
+        def at(x, y):
+            return f"{cx + k * x:.0f} {cy + k * y:.0f}"
+        pane = svg("path", d=f"M {at(-70, 34)} Q {at(0, 58)} {at(70, 34)} L {at(50, -46)} Q {at(0, -62)} "
+                             f"{at(-50, -46)} Z",
+                   fill=ENYAQ_OPEN, stroke=ENYAQ_OPEN, **{"fill-opacity": "0.18", "stroke-width": round(7 * k),
+                                                         "stroke-linejoin": "round"})
+        arrows = [svg("path", d=f"M {at(x, 72)} Q {at(x - 13, 58)} {at(x, 44)} T {at(x, 16)} T {at(x, -12)} "
+                                f"M {at(x - 11, 0)} L {at(x, -16)} L {at(x + 11, 0)}",
+                      fill="none", stroke=ENYAQ_OPEN, **{"stroke-width": round(6 * k), "stroke-linecap": "round",
+                                                         "stroke-linejoin": "round"}) for x in (-30, 0, 30)]
+        return [pane, *arrows]
 
     def wave(x, bottom=300, step=62):
         return svg("path", d=f"M {x} {bottom} c {-step * 0.36:.0f} {-step * 0.34:.0f}, {step * 0.36:.0f} "
@@ -9617,6 +9633,7 @@ def enyaq_dash():
             visible=f"=({climate} && ['HEATING', 'HEATING_AUXILIARY'].includes({state}))"),
         svg("g", [glyph(x, 238, "ac_unit", 96, "#e3f2fd") for x in (850, 960, 1070)],
             visible=f"=({climate} && {state} === 'COOLING')"),
+        svg("g", defrost(1340, 196), visible=f"=items.{skoda('window_heating_front')}.state === 'ON'"),
         svg("rect", x=824, y=336, width=312, height=158, rx=10, fill="#000000"),
         svg("text", x=980, y=436, fill="#ffffff",
             content=f"=({climate} ? {climate_degrees(skoda('climate_target'))} : 'Aus')",
