@@ -9794,7 +9794,8 @@ def e_car_controls():
     temperature, LO, 16 to 29.5 °C in steps of 0.5 and HI, sent with the start
     or, while the air conditioning runs, at once. Last how the last command went. The rule skoda_enyaq_status sends
     the commands; their items change once Škoda accepted them. With the car's pictures (ENYAQ_PHOTO) the cockpit,
-    enyaq_dash(), stands over the climate's pill."""
+    enyaq_dash(), stands over the climate's pill. Under the groups a button reads the API at once
+    (skoda_enyaq_refresh)."""
     plug, charging, target = skoda("plug"), skoda("charging"), skoda("charge_target")
     plugged = f"(items.{plug}.state === 'ON' || items.{charging}.state === 'ON' || {SKODA_CHARGING})"
     # while it charges the time left until the charge target and the clock it will be reached at (user, 2026-10-25); the
@@ -9831,6 +9832,20 @@ def e_car_controls():
                                  climate_degrees(climate_target), climate_context,
                                  [(15.5, "LO"), (20, "20 °C"), (25, "25 °C"), (30, "HI")], "°C",
                                  icon="material:device_thermostat", row=True)
+    # a read at once (user, 2026-11-14: a button "jetzt aktualisieren"), a row as the air conditioner's restart: the
+    # rule reads the API on the command and reports below like the other commands
+    refresh = div([comp("oh-icon", {"icon": "material:refresh", "width": 22, "height": 22}),
+                   div([label("Fahrzeugdaten", **{"font-size": "13px", "line-height": "16px"}),
+                        label("holt den letzten Stand von Škoda, weckt das Auto nicht",
+                              **{"font-size": "11px", "opacity": "0.7", "line-height": "14px",
+                                 "white-space": "normal"})],
+                       **{"flex": "1", "min-width": "0", "display": "flex", "flex-direction": "column"}),
+                   comp("oh-button", {"text": "Jetzt aktualisieren", "action": "command",
+                                      "actionItem": skoda("refresh"), "actionCommand": "ON",
+                                      "actionFeedback": "Abfrage gesendet", "outline": True, "small": True,
+                                      "style": {"flex": "0 0 auto", "width": "auto", "padding": "0 10px",
+                                                "color": ECAR_COLOR, "border-color": ECAR_COLOR}})],
+                  **{"display": "flex", "align-items": "center", "gap": "8px", "padding": "8px 2px 0"})
     last = skoda("command_result")
     outcome = label(f"=items.{last}.state", f"={ok(last)}",
                     **{"font-size": "12px", "opacity": "0.65", "padding": "6px 2px 0"})
@@ -9841,7 +9856,7 @@ def e_car_controls():
     cockpit = [div([enyaq_dash()], **{"margin": "10px 0 4px"})] if ENYAQ_PHOTO else []
     groups = div([div([pill, hint, slider], **group), div([*cockpit, climate_pill, climate_slider], **group)],
                  **{"display": "grid", "gap": "6px", "grid-template-columns": "minmax(0, 1fr)"})
-    return controls_box(groups, outcome)
+    return controls_box(groups, refresh, outcome)
 
 
 E_CAR_CHART_H = 300

@@ -132,6 +132,9 @@ POINTS = {
                              state("%s", options="ON=An,OFF=Aus")),
     "window_heating_rear": ("Switch", "Heckscheibenheizung", "waves", ["Status"], CHANGE,
                             state("%s", options="ON=An,OFF=Aus")),
+    # a command to it makes the rule read the API at once (user, 2026-11-14: a button on the E-Auto's page); it keeps
+    # no state and no history
+    "refresh": ("Switch", "Jetzt abfragen", "refresh", ["Switch"], [], command("%s", options="ON=Abfragen")),
     "updated": ("DateTime", "zuletzt gemeldet", "update", ["Timestamp", "Point"], RESTORE,
                 state("%1$td.%1$tm. %1$tR")),
     "api_status": ("String", "API-Status", "cloud", ["Status"], RESTORE, state("%s", options=API_STATES)),
@@ -156,13 +159,15 @@ RULE = {
     "description": RULE_DESCRIPTIONS[UID],
     "tags": [],
     # every 5 minutes, 20 s past, the script itself decides whether a read is due; once at startup; and on a command
-    # to the charge limit, the charging switch, the air conditioning's switch or its target temperature
+    # to the charge limit, the charging switch, the air conditioning's switch or its target temperature, or to
+    # skoda_enyaq_refresh, which asks for a read at once
     "triggers": [{"id": "1", "type": "timer.GenericCronTrigger", "configuration": {"cronExpression": "20 0/5 * * * ? *"}},
                  {"id": "2", "type": "core.SystemStartlevelTrigger", "configuration": {"startlevel": 100}},
                  {"id": "4", "type": "core.ItemCommandTrigger", "configuration": {"itemName": P + "charge_target"}},
                  {"id": "5", "type": "core.ItemCommandTrigger", "configuration": {"itemName": P + "charging"}},
                  {"id": "6", "type": "core.ItemCommandTrigger", "configuration": {"itemName": P + "climate"}},
-                 {"id": "7", "type": "core.ItemCommandTrigger", "configuration": {"itemName": P + "climate_target"}}],
+                 {"id": "7", "type": "core.ItemCommandTrigger", "configuration": {"itemName": P + "climate_target"}},
+                 {"id": "8", "type": "core.ItemCommandTrigger", "configuration": {"itemName": P + "refresh"}}],
     "conditions": [],
     "actions": [{"id": "3", "type": "script.ScriptAction",
                  "configuration": {"type": "application/javascript", "script": SCRIPT}}],

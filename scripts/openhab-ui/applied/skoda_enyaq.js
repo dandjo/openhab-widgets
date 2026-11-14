@@ -23,6 +23,7 @@ const KWH_PER_PERCENT = 0.85;
 const HOME_RADIUS_METERS = 200;
 const KEY_WARNING_DAYS = 7;
 const REFRESH_AFTER_COMMAND_MS = 90000;
+const REFRESH_MIN_MS = 20000; // a read asked for from the page, not sooner after the last request
 // the charge limits the car takes: 50 to 100 % in steps of 10
 const LIMIT_MIN = 50;
 const LIMIT_MAX = 100;
@@ -275,7 +276,9 @@ function apply(vehicle) {
     .filter((ms) => !Number.isNaN(ms));
   if (captured.length > 0) {
     postTime('updated', new Date(Math.max(...captured)).toISOString());
+    return Math.max(...captured);
   }
+  return null;
 }
 
 function notify(message) {
@@ -338,31 +341,40 @@ function due() {
   return Date.now() - (store.get('lastRequest') || 0) >= (minutes - 1) * 60000;
 }
 
-// reads the vehicle: when due, or forced after a command (then the reserve may be used, not the last request)
+// reads the vehicle: when due, or forced after a command (then the reserve may be used, not the last request).
+// Returns null when nothing was asked, else the answer's status and, of a good answer, when the car last reported
+// (captured, ms) and whether that is newer than at the read before (newer; null when no read before is known)
 function poll(force) {
   if ((!force && !due()) || blocked(force ? 0 : QUOTA_RESERVE) !== null) {
-    return;
+    return null;
   }
   const credentials = readCredentials();
   if (credentials === null) {
     setApiStatus('NO_CREDENTIALS', `keine Zugangsdaten in ${CREDENTIALS}`);
-    return;
+    return null;
   }
   store.put('lastRequest', Date.now());
   const response = request(credentials, 'GET', '', null, 30);
   noteHeaders(response);
+  const outcome = { status: response.status, captured: null, newer: null };
   if (response.status === 200) {
     let body = null;
     try {
       body = JSON.parse(response.body);
     } catch (e) {
       setApiStatus('ERROR', 'Antwort ist kein JSON');
-      return;
+      outcome.status = -1;
+      return outcome;
     }
     store.remove('keyAlarm');
     setApiStatus('OK');
     const previous = tripPrevious();
-    apply(body.vehicle || {});
+    outcome.captured = apply(body.vehicle || {});
+    const capturedBefore = store.get('captured');
+    if (outcome.captured !== null) {
+      outcome.newer = typeof capturedBefore === 'number' ? outcome.captured > capturedBefore : null;
+      store.put('captured', outcome.captured);
+    }
     try {
       trackTrips(body.vehicle || {}, previous, Date.now());
     } catch (e) {
@@ -387,6 +399,7 @@ function poll(force) {
   } else {
     setApiStatus('ERROR', response.status === 0 ? `nicht erreichbar: ${response.error}` : `HTTP ${response.status}`);
   }
+  return outcome;
 }
 
 // ---- trips (user, 2026-10-26): the API keeps no trips, so the rule finds them in what it reads, as the MyŠkoda app's
@@ -724,7 +737,8 @@ function receivedCommand() {
   };
   const item = read('itemName', 'getItemName');
   const command = read('receivedCommand', 'itemCommand', 'getItemCommand');
-  return item && command && [P + 'charge_target', P + 'charging', P + 'climate', P + 'climate_target'].includes(item)
+  return item && command &&
+    [P + 'charge_target', P + 'charging', P + 'climate', P + 'climate_target', P + 'refresh'].includes(item)
     ? { item, command } : null;
 }
 
@@ -969,10 +983,41 @@ function kmPerDay() {
   }
 }
 
+// a read at once on the user's word (user, 2026-11-14: a button "jetzt aktualisieren" on the E-Auto's page). It does
+// not wake the car: it fetches what the car last reported to Škoda, and says whether that is newer than before. Not
+// within REFRESH_MIN_MS of the last request, and the quota's reserve stays for commands to the car
+function refreshNow() {
+  const now = Date.now();
+  if (now - (store.get('lastRequest') || 0) < REFRESH_MIN_MS) {
+    result(`Gerade erst abgefragt · ${clock(now)}`);
+    return;
+  }
+  const wait = blocked(QUOTA_RESERVE);
+  if (wait !== null) {
+    result(`Abfrage: ${wait}`);
+    return;
+  }
+  const outcome = poll(true);
+  if (outcome === null) {
+    result('Abfrage nicht möglich');
+  } else if (outcome.status === 200 && outcome.captured !== null) {
+    result(outcome.newer === false ? `Abgefragt · ${clock(now)} · nichts Neues vom Auto`
+      : `Aktualisiert · ${clock(now)} · Stand vom Auto ${clock(outcome.captured)}`);
+  } else if (outcome.status === 200) {
+    result(`Abgefragt · ${clock(now)}`);
+  } else {
+    const why = { 401: 'API-Schlüssel abgelaufen oder ungültig', 403: 'Schlüssel gilt nicht für dieses Fahrzeug',
+      429: 'Anfragelimit erreicht', 0: 'Škoda nicht erreichbar' }[outcome.status] || `Fehler ${outcome.status}`;
+    result(`Abfrage fehlgeschlagen: ${why}`);
+  }
+}
+
 function run() {
   const received = receivedCommand();
   if (received === null) {
     poll(typeof refresh !== 'undefined');
+  } else if (received.item === P + 'refresh') {
+    refreshNow();
   } else if (received.item === P + 'charge_target') {
     setLimit(received.command);
   } else if (received.item === P + 'charging') {
