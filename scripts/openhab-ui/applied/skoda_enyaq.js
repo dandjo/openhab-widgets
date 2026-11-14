@@ -278,9 +278,7 @@ function apply(vehicle) {
     .filter((ms) => !Number.isNaN(ms));
   if (captured.length > 0) {
     postTime('updated', new Date(Math.max(...captured)).toISOString());
-    return Math.max(...captured);
   }
-  return null;
 }
 
 function notify(message) {
@@ -364,8 +362,7 @@ function nextRead() {
 }
 
 // reads the vehicle: when due, or forced after a command (then the reserve may be used, not the last request).
-// Returns null when nothing was asked, else the answer's status and, of a good answer, when the car last reported
-// (captured, ms) and whether that is newer than at the read before (newer; null when no read before is known)
+// Returns null when nothing was asked, else the answer's status (-1 for an answer that could not be read)
 function poll(force) {
   if ((!force && !due()) || blocked(force ? 0 : QUOTA_RESERVE) !== null) {
     return null;
@@ -378,7 +375,7 @@ function poll(force) {
   store.put('lastRequest', Date.now());
   const response = request(credentials, 'GET', '', null, 30);
   noteHeaders(response);
-  const outcome = { status: response.status, captured: null, newer: null };
+  const outcome = { status: response.status };
   if (response.status === 200) {
     let body = null;
     try {
@@ -391,12 +388,9 @@ function poll(force) {
     store.remove('keyAlarm');
     setApiStatus('OK');
     const previous = tripPrevious();
-    outcome.captured = apply(body.vehicle || {});
-    const capturedBefore = store.get('captured');
-    if (outcome.captured !== null) {
-      outcome.newer = typeof capturedBefore === 'number' ? outcome.captured > capturedBefore : null;
-      store.put('captured', outcome.captured);
-    }
+    apply(body.vehicle || {});
+    // when the API was last read with success, by the rule's turn or at once, for the page (user, 2026-11-14)
+    postTime('last_read', new Date(Math.round(Date.now() / 1000) * 1000).toISOString());
     try {
       trackTrips(body.vehicle || {}, previous, Date.now());
     } catch (e) {
@@ -1006,31 +1000,30 @@ function kmPerDay() {
 }
 
 // a read at once on the user's word (user, 2026-11-14: a button "jetzt aktualisieren" on the E-Auto's page). It does
-// not wake the car: it fetches what the car last reported to Škoda, and says whether that is newer than before. Not
-// within REFRESH_MIN_MS of the last request, and the quota's reserve stays for commands to the car
+// not wake the car: it fetches what the car last reported to Škoda. Not within REFRESH_MIN_MS of the last request, and
+// the quota's reserve stays for commands to the car. A read that went through says so by skoda_enyaq_last_read
+// alone, which the page shows (user, same day: "Gerade erst abgefragt · 19:21" still stood there hours later); only
+// a read that could not go out or failed leaves a result, with its time
 function refreshNow() {
   const now = Date.now();
   if (now - (store.get('lastRequest') || 0) < REFRESH_MIN_MS) {
-    result(`Gerade erst abgefragt · ${clock(now)}`);
+    console.info('Škoda: Abfrage: gerade erst abgefragt');
     return;
   }
   const wait = blocked(QUOTA_RESERVE);
   if (wait !== null) {
-    result(`Abfrage: ${wait}`);
+    result(`Abfrage ${clock(now)}: ${wait}`);
     return;
   }
   const outcome = poll(true);
   if (outcome === null) {
-    result('Abfrage nicht möglich');
-  } else if (outcome.status === 200 && outcome.captured !== null) {
-    result(outcome.newer === false ? `Abgefragt · ${clock(now)} · nichts Neues vom Auto`
-      : `Aktualisiert · ${clock(now)} · Stand vom Auto ${clock(outcome.captured)}`);
+    result(`Abfrage ${clock(now)}: nicht möglich`);
   } else if (outcome.status === 200) {
-    result(`Abgefragt · ${clock(now)}`);
+    console.info('Škoda: abgefragt');
   } else {
     const why = { 401: 'API-Schlüssel abgelaufen oder ungültig', 403: 'Schlüssel gilt nicht für dieses Fahrzeug',
       429: 'Anfragelimit erreicht', 0: 'Škoda nicht erreichbar' }[outcome.status] || `Fehler ${outcome.status}`;
-    result(`Abfrage fehlgeschlagen: ${why}`);
+    result(`Abfrage ${clock(now)} fehlgeschlagen: ${why}`);
   }
 }
 
