@@ -9600,9 +9600,10 @@ def enyaq_side():
                 **{"font-size": 40, "font-weight": "700", "text-anchor": "middle"}),
         ], visible=f"={climate}"),
     ]
-    # the open boot's picture where the photo is empty, above the bonnet
+    # the open boot's picture where the photo is empty, over the windscreen's foot and the bonnet, reaching above
+    # the picture into the card's room (user, 2026-11-14: further up and further left)
     boot = photo_stage("trunk", visible=f"={is_('trunk', 'OPEN')}", **{
-        "position": "absolute", "right": "0", "top": "0", "width": "20%", "border-radius": "10px",
+        "position": "absolute", "right": "10%", "top": "-11%", "width": "20%", "border-radius": "10px",
         "border": f"2px solid {ENYAQ_OPEN}", "background-color": TILE_BG, "box-sizing": "border-box"})
     return photo_stage("side", over, [boot], view=ENYAQ_SIDE_VIEW)
 
