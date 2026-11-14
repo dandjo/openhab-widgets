@@ -9551,11 +9551,11 @@ def enyaq_side():
             width=f"=({bw} * Math.max(0, {goal} - {soc}) / 100).toFixed(0)", height=bh, fill=ENYAQ_BRIGHT,
             **{"fill-opacity": "0.3"}),
         svg("g", [
-            svg("rect", x=f"=({goal_x} - 6).toFixed(0)", y=by - 14, width=12, height=bh + 30, rx=6, fill="#ffffff",
+            svg("rect", x=f"=({goal_x} - 6).toFixed(0)", y=by - 14, width=12, height=bh + 42, rx=6, fill="#ffffff",
                 stroke="#101214", **{"stroke-width": 3}),
-            svg("rect", x=f"=({goal_x} - {flag_w} / 2).toFixed(0)", y=by + bh + 12, width=f"=({flag_w}).toFixed(0)",
+            svg("rect", x=f"=({goal_x} - {flag_w} / 2).toFixed(0)", y=by + bh + 24, width=f"=({flag_w}).toFixed(0)",
                 height=56, rx=28, fill="#ffffff", stroke="#101214", **{"stroke-width": 3}),
-            svg("text", x=f"=({goal_x}).toFixed(0)", y=by + bh + 54, fill="#101214", content=f"={flag}",
+            svg("text", x=f"=({goal_x}).toFixed(0)", y=by + bh + 66, fill="#101214", content=f"={flag}",
                 **{"font-size": 40, "font-weight": "700", "text-anchor": "middle"}),
         ], visible=f"={num(skoda('charge_target'))} > 0"),
         # the lights
