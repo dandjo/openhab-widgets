@@ -9734,7 +9734,8 @@ def e_car_now():
                            ECAR_COLOR)
     if ENYAQ_PHOTO:
         return [div([enyaq_side()], **{"padding": "8px 12px 0"}),
-                div([hero_texts(*head)], **{"padding": "4px 16px 8px"}),
+                # a little room between the picture and the charge (user, 2026-11-14)
+                div([hero_texts(*head)], **{"padding": "14px 16px 8px"}),
                 div([bar_ends(*ends)], **{"padding": "0 16px 12px"}),
                 two_on_phone(value_grid([lock_tile, place_tile, km_tile(), climate_tile]), 200)]
     tiles = two_on_phone(value_grid([lock_tile, place_tile,
