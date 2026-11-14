@@ -9444,7 +9444,10 @@ def enyaq_photos():
 ENYAQ_PHOTO = enyaq_photos()
 ENYAQ_OPEN = "#fb8c00"  # what stands open or unlocked
 ENYAQ_BRIGHT = "#2fd6c3"  # the car's colour, lighter: on the dark sill the charge has to stand out
-ENYAQ_DY = 120  # the side view's room above the car, for the climate's badge and the boot's picture
+ENYAQ_DY = 120  # the side view's room above the car in the file; the outlines below count from under it
+# the part of the side view the page shows: 40 px of that room, for the boot's picture (user, 2026-11-14: less room
+# above the car)
+ENYAQ_SIDE_VIEW = (0, 80, 1680, 620)
 # the charge's bar at the sill's lower edge, clear of the doors, in the side view's pixels
 ENYAQ_BAR = (552, 572, 580, 34)
 # The body parts as the side view shows them, in its pixels without the room above. The doors with their window
@@ -9523,7 +9526,7 @@ def enyaq_side():
     lies, paler up to the charge target, which is a white mark with its value on a flag under the car, the mark
     always over the flag's middle; the lights' glow; a lock at the doors; doors, windows, tailgate and bonnet
     coloured along their shut lines while open, the open boot also as its own picture in the corner; the cable and,
-    while it charges, a bolt at the charge port; the climate with its target over the roof."""
+    while it charges, a bolt at the charge port; the climate with its target on the front door's pane."""
     def is_(suffix, state):
         return f"items.{skoda(suffix)}.state === '{state}'"
 
@@ -9540,7 +9543,7 @@ def enyaq_side():
     flag = f"('Ziel ' + Math.round({goal}) + ' %')"
     flag_w = f"(({flag}).length * 23 + 38)"
     target = climate_degrees(skoda("climate_target"))
-    pill_w = f"(({target}).length * 22.4 + 40)"
+    pill_w = f"(({target}).length * 22.4 + 92)"
     opened = {"fill": ENYAQ_OPEN, "stroke": ENYAQ_OPEN, "stroke-linejoin": "round"}
     over = [
         # the charge: a dark body with a light edge, the charge in it, paler what is still to be charged
@@ -9586,21 +9589,22 @@ def enyaq_side():
         # locked or not, at the doors
         photo_pin(790, 300 + dy, f"={locked} ? 'lock' : 'lock_open'", f"={locked} ? '{ECAR_COLOR}' : '{ENYAQ_OPEN}'",
                   f"({locked} || {unlocked})"),
-        # the climate over the roof: a snowflake while it cools, else a thermometer, and its target
+        # the climate on the front door's pane (over the roof until the room above the car went; user, 2026-11-14):
+        # one pill, a snowflake while it cools, else a thermometer, and its target
         svg("g", [
-            photo_pin(780, 60, f"=({state} === 'COOLING' ? 'ac_unit' : 'thermostat')",
-                      f"={enyaq_climate_color(state)}", "true"),
-            svg("rect", x=f"=(920 - {pill_w} / 2).toFixed(0)", y=22, width=f"=({pill_w}).toFixed(0)", height=60, rx=30,
-                fill=f"={enyaq_climate_color(state)}"),
-            svg("text", x=920, y=66, fill="#ffffff", content=f"={target}",
+            svg("rect", x=f"=(885 - {pill_w} / 2).toFixed(0)", y=220, width=f"=({pill_w}).toFixed(0)", height=64,
+                rx=32, fill=f"={enyaq_climate_color(state)}", stroke="#ffffff", **{"stroke-width": 4}),
+            glyph(f"=(885 - {pill_w} / 2 + 40).toFixed(0)", 252,
+                  f"=({state} === 'COOLING' ? 'ac_unit' : 'thermostat')", 44, "#ffffff"),
+            svg("text", x=f"=(885 + 24).toFixed(0)", y=266, fill="#ffffff", content=f"={target}",
                 **{"font-size": 40, "font-weight": "700", "text-anchor": "middle"}),
         ], visible=f"={climate}"),
     ]
     # the open boot's picture where the photo is empty, above the bonnet
     boot = photo_stage("trunk", visible=f"={is_('trunk', 'OPEN')}", **{
-        "position": "absolute", "right": "0", "top": "0", "width": "25%", "border-radius": "10px",
+        "position": "absolute", "right": "0", "top": "0", "width": "20%", "border-radius": "10px",
         "border": f"2px solid {ENYAQ_OPEN}", "background-color": TILE_BG, "box-sizing": "border-box"})
-    return photo_stage("side", over, [boot])
+    return photo_stage("side", over, [boot], view=ENYAQ_SIDE_VIEW)
 
 
 def enyaq_dash():
@@ -9650,6 +9654,36 @@ def enyaq_dash():
     return photo_stage("dash", over, view=ENYAQ_DASH_VIEW, **{"border-radius": "12px", "overflow": "hidden"})
 
 
+def trip_tiles(place_popup):
+    """Two tiles from the trips the rule keeps for the last 30 days (skoda_enyaq_trips, days and their trips newest
+    first): the last trip with its km, its day and its times, a tap opening that trip; and the 30 days' km with the
+    number of trips and what they took per 100 km, "~" as the trips' energy is estimated from the charge, a tap
+    opening the place's popup with all trips. No address stands on the tiles."""
+    trips = skoda("trips")
+    days = f"(((s) => (s || '').charAt(0) === '[' ? JSON.parse(s) : [])(items.{trips}.state))"
+    newest = f"(({days}[0] || {{}}).t || [])[0]"
+    last = vt_tile([
+        vt_head("Letzte Fahrt"),
+        vt_value(f"=((t) => !t ? '–' : t.km === null || t.km === undefined || !t.e ? 'unterwegs' : t.km + ' km')"
+                 f"({newest})"),
+        label(f"=((d, t) => !t ? '' : dayjs(d.d).format('dd DD.MM.') + ' · ' + (t.x ? '~ ' : '') + t.s + "
+              f"(t.e ? '–' + t.e : ''))({days}[0], {newest})", **{**VT_SUB, "white-space": "normal"}),
+        comp("oh-link", {"action": "popup", "actionModal": "widget:trip-popup", "visible": f"=!!{newest}",
+                         "actionModalConfig": {"trips": trips, "id": f"=({newest} || {{}}).id"},
+                         "style": TILE_LINK})])
+    all_ = f"{days}.flatMap((d) => d.t)"
+    measured = f"{all_}.filter((t) => t.kwh !== null && t.kwh !== undefined && t.km > 0)"
+    per_100 = (f"((m) => ((km) => km > 0 ? ' · ~ ' + (100 * m.reduce((a, t) => a + t.kwh, 0) / km).toFixed(1)"
+               f".replace('.', ',') + ' kWh/100 km' : '')(m.reduce((a, t) => a + t.km, 0)))({measured})")
+    month = vt_tile([
+        vt_head("30 Tage"),
+        vt_value(f"={days}.reduce((a, d) => a + (d.km || 0), 0).toLocaleString('de-DE') + ' km'"),
+        label(f"=((n) => n + (n === 1 ? ' Fahrt' : ' Fahrten'))({all_}.length) + {per_100}",
+              **{**VT_SUB, "white-space": "normal"})],
+        skoda("at_home"), "Standort", ECAR_COLOR, popup=place_popup)
+    return [last, month]
+
+
 def e_car_now():
     """The car as it last reported itself (user, 2026-10-25): its drawing from the energy flow with the charge on its
     ring, the charge and the range large, beside it its charging state and where it stands as chips and when it
@@ -9660,7 +9694,9 @@ def e_car_now():
     plug up here, under odometer and climate).
     With the car's pictures (ENYAQ_PHOTO; user, 2026-11-14) the head is its side view, enyaq_side(), which draws the
     charge with its target, the lock, what stands open, the lights, the cable and the climate: the texts stand
-    under it, the charge's bar and the cable's and the plug's tiles are left out."""
+    under it, the charge target at the right end of the report's line; the charge's bar and the cable's and the
+    plug's tiles are left out, two tiles from the trips (trip_tiles()) follow the other four, and the tiles reach
+    down to the card's end, which is the end of the controls' card beside it on a desktop."""
     soc, state, plug = skoda("soc"), skoda("charging_state"), skoda("plug")
     # charging at home shows on the circuit at once, elsewhere only in what the car reports
     power = f"Math.max({num(ECAR)}, {SKODA_CHARGING} ? {num(skoda('charge_power'))} * 1000 : 0)"
@@ -9723,21 +9759,32 @@ def e_car_now():
     away = (f"items.{skoda('at_home')}.state === 'OFF' && items.{skoda('parking_state')}.state === 'PARKED' && "
             f"{ok(address)}")
     # "Standort und Fahrten", as its popup holds the trips too (user, 2026-10-26)
+    # its popup with a map of where the car stands and its trips (user, 2026-10-26)
+    place_popup = {"map": skoda("parking_position"), "trips": skoda("trips")}
     place_tile = vt_tile([vt_head("Standort und Fahrten"), vt_value(f"={where}"),
                           label(f"=items.{address}.state", f"={away}", **{**VT_SUB, "white-space": "normal"})],
-                         skoda("at_home"), "Standort", ECAR_COLOR,
-                         # its popup with a map of where the car stands and its trips (user, 2026-10-26)
-                         popup={"map": skoda("parking_position"), "trips": skoda("trips")})
+                         skoda("at_home"), "Standort", ECAR_COLOR, popup=place_popup)
     climate, target = skoda("climate_state"), skoda("climate_target")
     climate_tile = vt_tile([vt_head("Klimatisierung"), vt_value(f"={disp(climate)}"),
                             label(f"='Ziel ' + {climate_degrees(target)}", **VT_SUB)], climate, "Klimatisierung",
                            ECAR_COLOR)
     if ENYAQ_PHOTO:
+        # the charge target at the right end of the report's line (user, 2026-11-14), under it where the two do not
+        # fit beside each other; the time a charge still takes stands in the Laden pill of the card beside
+        caption, value, (state_chips, stand) = head
+        stand_row = div([stand, label(ends[1], **{"font-size": "12px", "opacity": "0.7", "margin-left": "auto",
+                                                   "white-space": "nowrap"})],
+                        **{"display": "flex", "flex-wrap": "wrap", "align-items": "baseline", "gap": "2px 12px",
+                           "align-self": "stretch"})
+        # with two tiles from the trips, two abreast at every width, the card is about as high as the controls
+        # beside it, whose picture grows with the card as this one's does; the tiles take what is left, so both
+        # cards end level on a desktop
+        tiles = value_grid([lock_tile, place_tile, km_tile(), climate_tile, *trip_tiles(place_popup)])
+        tiles["config"]["style"].update({"flex": "1 1 auto", "grid-template-columns": "repeat(2, minmax(0, 1fr))"})
         return [div([enyaq_side()], **{"padding": "8px 12px 0"}),
                 # a little room between the picture and the charge (user, 2026-11-14)
-                div([hero_texts(*head)], **{"padding": "14px 16px 8px"}),
-                div([bar_ends(*ends)], **{"padding": "0 16px 12px"}),
-                two_on_phone(value_grid([lock_tile, place_tile, km_tile(), climate_tile]), 200)]
+                div([hero_texts(caption, value, [state_chips, stand_row])], **{"padding": "14px 16px 10px"}),
+                tiles]
     tiles = two_on_phone(value_grid([lock_tile, place_tile,
                         km_tile(),
                         climate_tile,
@@ -9906,7 +9953,7 @@ def e_car_blocks():
                            vtile("Akkuschonung", skoda("battery_care"))]), 200)
     # the controls beside the car's report, about as high as each other, the week's charge across the page under them;
     # on a phone the controls, the car's report and the chart in this order (user, 2026-10-25)
-    top = [two(card("Steuerung", [e_car_controls()]), card("Škoda Enyaq", e_car_now())),
+    top = [two(card("Steuerung", [e_car_controls()]), card("Škoda Enyaq", e_car_now(), fill=bool(ENYAQ_PHOTO))),
            one(card("Ladestand", [e_car_charge_chart()]))]
     now, power, days, electric = plug_refs(
         "e_car", "material:electric_car", ECAR_COLOR, title="E-Auto", meter="Shelly EM", controllable=False, range_=20,
