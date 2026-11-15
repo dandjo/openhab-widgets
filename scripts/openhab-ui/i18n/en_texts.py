@@ -19,7 +19,7 @@ EN = {
     "Heute und Technik": "Today and technical", "Heute und Verlauf": "Today and history",
     "Strom heute": "Electricity today", "Strom heute und pro Tag": "Electricity today and per day",
     "Laden zu Hause": "Charging at home", "Anteil am Hausverbrauch": "Share of the house's consumption",
-    "Zähler": "Counters", "Gerät · Wetterstation": "Device · Weather station",
+    "Zähler": "Counters", "Gerät · Wetterstation": "Device · Weather station", "von": "of",
     "Gerät · Außenmodul": "Device · Outdoor module",
     # the weather page's day popup
     "Stunden": "Hours", "Verlauf in Viertelstunden": "Quarter hours",

@@ -1347,10 +1347,10 @@ Needs `weather-icon`.
 
 Four cards for a metered plug, built from one item prefix: `<prefix>_power`, `_switch`, `_energy_today`,
 `_energy_total`, `_voltage`, `_current`, `_power_factor`, `_apparent_power` and `_reactive_power`, as a Tasmota plug
-provides them. On a device page they stand two by two: the plug card beside the electrical card, titled after the
-meter (`Electrical · Nous Plug`, `Electrical · Shelly EM`), and the power over the day beside the energy per day; where
-the plug card is far taller (a car with `range` and a note), the two stand one above the other, and the power over the
-day takes the height beside them. `plug-card` also covers devices that are not plugs: give it
+provides them. On a device page they stand in the order of every page: the plug card beside the power over the day, below
+them the energy per day beside the electrical card, titled after the meter (`Electrical · Nous Plug`,
+`Electrical · Shelly EM`); the card between them, the device's share of the house's consumption, is the page's
+own and no widget. `plug-card` also covers devices that are not plugs: give it
 the device's `title`, hide the switch with `controllable: false`, or take the switch from another item with `switch`.
 
 The comparisons with yesterday and the last 7 days come from one String item, `history`, which the rule in
