@@ -64,7 +64,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Nov 11, 2026, 11:43:29 AM
+timestamp: Nov 15, 2026, 9:47:20 AM
 component: oh-card
 config:
   title: Temperatures
@@ -182,7 +182,7 @@ slots:
         display: grid
         grid-template-columns: '=screen.width < 600 ? ''1fr'' : ''1fr 1fr'''
         gap: 12px
-        padding: 4px 16px 0
+        padding: 16px 16px 0
     slots:
       default:
       - component: div

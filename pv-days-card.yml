@@ -10,7 +10,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Nov 2, 2026, 3:41:47 PM
+timestamp: Nov 15, 2026, 9:47:20 AM
 component: oh-card
 config:
   title: PV Yield per Day
@@ -131,7 +131,7 @@ slots:
       - component: div
         config:
           style:
-            padding: 4px 12px 0
+            padding: 10px 12px 0
         slots:
           default:
           - component: f7-segmented

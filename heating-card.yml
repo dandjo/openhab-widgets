@@ -202,7 +202,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Nov 11, 2026, 12:36:14 AM
+timestamp: Nov 15, 2026, 9:47:20 AM
 component: oh-card
 config:
   title: Heating & Hot Water
@@ -387,7 +387,7 @@ slots:
   - component: div
     config:
       style:
-        padding: 12px 16px 16px
+        padding: 16px 16px 16px
         font-size: 14px
     slots:
       default:

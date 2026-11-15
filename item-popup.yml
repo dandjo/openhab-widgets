@@ -193,7 +193,7 @@ props:
     required: false
     context: item
   parameterGroups: []
-timestamp: Nov 8, 2026, 3:32:55 AM
+timestamp: Nov 15, 2026, 9:47:20 AM
 component: div
 config:
   style:
@@ -233,14 +233,21 @@ config:
     \ center; animation: a-ripple 1.6s linear infinite; }\n.a-run { animation: a-run 2.5s linear infinite; }\n.a-drop { animation:\
     \ a-drop 0.9s linear infinite; }\n.a-bubble-l { transform-box: fill-box; transform-origin: center; animation: a-bubble-l\
     \ 2.6s linear infinite; }\n.a-bubble-r { transform-box: fill-box; transform-origin: center; animation: a-bubble-r 2.6s\
-    \ linear infinite; }\n\n.card { border-radius: 14px; box-shadow: 0 0 0 1px color-mix(in srgb, var(--f7-text-color) 8%,\
-    \ transparent); }\n.card-header { justify-content: flex-start; min-height: 0; font-size: 13px; font-weight: 600;\n  padding:\
-    \ 16px 16px 4px; opacity: 0.6; letter-spacing: 0.02em; }\n.card-header::after { display: none !important; }\n.oh-chart-container\
+    \ linear infinite; }\n\n.card { border-radius: 14px; box-shadow: 0 0 0 1px color-mix(in srgb, var(--f7-text-color) 16%,\
+    \ transparent); }\n.card .card { box-shadow: none; }\n.card-header { justify-content: flex-start; min-height: 0; font-size:\
+    \ 13px; font-weight: 700; line-height: 18px;\n  padding: 8px 16px; opacity: 1; letter-spacing: 0.01em; border-radius:\
+    \ 14px 14px 0 0; background: color-mix(in srgb, var(--f7-text-color) 8%, transparent);\n  border-bottom: 1px solid color-mix(in\
+    \ srgb, var(--f7-text-color) 16%, transparent); }\n.card-header::after { display: none !important; }\n.oh-chart-container\
     \ > .menu .menu-item { background: color-mix(in srgb, var(--f7-text-color) 8%, transparent);\n  color: inherit; border-radius:\
-    \ 6px; min-width: 32px; }\n.oh-chart-container > .menu .menu-item + .menu-item { margin-left: 6px; }\n.segmented-strong\
-    \ { border-radius: 10px; background: color-mix(in srgb, var(--f7-text-color) 8%, transparent); }\n.segmented-strong .button,\
-    \ .segmented-strong .segmented-highlight { border-radius: 8px !important; }\n.menu-item-dropdown:not(.menu-item-dropdown-opened)\
-    \ .menu-dropdown { display: none; }\n.oh-chart-container > .menu.padding { padding-top: 6px !important; }"
+    \ 6px; min-width: 32px; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--f7-text-color) 13%, transparent); }\n.oh-chart-container\
+    \ > .menu .menu-item + .menu-item { margin-left: 6px; }\n.segmented-strong { border-radius: 10px; background: color-mix(in\
+    \ srgb, var(--f7-text-color) 8%, transparent);\n  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--f7-text-color)\
+    \ 13%, transparent); }\n.segmented-strong .button, .segmented-strong .segmented-highlight { border-radius: 8px !important;\
+    \ }\n[style*=\"var(--f7-text-color) 6%\"] { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--f7-text-color) 11%, transparent);\
+    \ }\n.card .range-bar { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--f7-text-color) 11%, transparent); }\n.card\
+    \ [style*=\"align-items: center\"][style*=\"background: rgba(127, 127, 127, 0.1\"] { box-shadow: inset 0 0 0 1px color-mix(in\
+    \ srgb, var(--f7-text-color) 11%, transparent); }\n.menu-item-dropdown:not(.menu-item-dropdown-opened) .menu-dropdown\
+    \ { display: none; }\n.oh-chart-container > .menu.padding { padding-top: 6px !important; }"
 slots:
   default:
   - component: oh-card
@@ -464,7 +471,7 @@ slots:
       style:
         height: calc(100% - 2 * var(--f7-card-margin-vertical))
         clip-path: inset(0 round 14px)
-        box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--f7-text-color) 8%, transparent)
+        box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--f7-text-color) 16%, transparent)
       stylesheet: '.card-content { padding: 0 !important; }'
       visible: '=!!props.map && ((p) => p.length === 2 && p.every(Number.isFinite))(((items[props.map] ? items[props.map].state
         : '''') || '''').split('','').slice(0, 2).map(Number))'
@@ -477,7 +484,9 @@ slots:
             justify-content: space-between
             align-items: baseline
             gap: 12px
-            padding: 16px 16px 10px
+            padding: 8px 16px
+            background: color-mix(in srgb, var(--f7-text-color) 8%, transparent)
+            border-bottom: 1px solid color-mix(in srgb, var(--f7-text-color) 16%, transparent)
         slots:
           default:
           - component: Label
@@ -485,9 +494,9 @@ slots:
               text: Parking position
               style:
                 font-size: 13px
-                font-weight: '600'
-                opacity: '0.6'
-                letter-spacing: 0.02em
+                font-weight: '700'
+                line-height: 18px
+                letter-spacing: 0.01em
           - component: oh-link
             config:
               text: Map data © OpenStreetMap
@@ -525,7 +534,7 @@ slots:
       - component: div
         config:
           style:
-            padding: 0 8px 10px
+            padding: 8px 8px 10px
         slots:
           default:
           - component: Label
@@ -724,7 +733,7 @@ slots:
             line-height: '=screen.width < 600 ? ''32px'' : ''34px'''
             letter-spacing: -0.01em
             overflow-wrap: anywhere
-            padding: 4px 16px 18px
+            padding: 16px 16px 18px
           visible: =!props.item2 && !props.ring
       - component: div
         config:

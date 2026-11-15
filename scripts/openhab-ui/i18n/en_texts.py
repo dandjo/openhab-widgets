@@ -14,6 +14,13 @@ EN = {
     "Fahrräder": "Bicycles", "Medien": "Media", "Weitere Verbraucher": "Other consumers",
     "Büros": "Offices", "Kaffee": "Coffee", "Verbraucher": "Consumers", "Sollwerte": "Setpoints", "Modi": "Modes",
     "Verlauf": "History", "Vorhersage": "Forecast", "Warnungen": "Warnings", "Weitere Quellen": "More sources",
+    # the device pages' headings and what their order added (2026-11-15)
+    "Technik": "Technical", "Jetzt und heute": "Now and today", "Verlauf und Technik": "History and technical",
+    "Heute und Technik": "Today and technical", "Heute und Verlauf": "Today and history",
+    "Strom heute": "Electricity today", "Strom heute und pro Tag": "Electricity today and per day",
+    "Laden zu Hause": "Charging at home", "Anteil am Hausverbrauch": "Share of the house's consumption",
+    "Zähler": "Counters", "Gerät · Wetterstation": "Device · Weather station",
+    "Gerät · Außenmodul": "Device · Outdoor module",
     # the weather page's day popup
     "Stunden": "Hours", "Verlauf in Viertelstunden": "Quarter hours",
     "Für diesen Tag liegen noch keine Stunden vor.": "No hours for this day yet.",

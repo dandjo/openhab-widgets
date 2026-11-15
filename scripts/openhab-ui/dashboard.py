@@ -140,7 +140,30 @@ def stack(*cards):
     return div(cards, **{"display": "flex", "flex-direction": "column", "height": "100%"})
 
 
+CONTROLS_PAD = " 16px 12px"  # a box of controls, after its padding above: its rows bring their own room there
+
+
+def level_top(content):
+    """As much room above a card's content as at its sides (user, 2026-11-15). Framework7 pads a card's content by
+    16 px all round and what stands in it brings a padding of its own: 16 or 12 px at the sides, but 0 to 12 px above,
+    from when the title followed without a line. Under the title's band the first part's padding above becomes that
+    of its sides, so a tile is as far from the band's line as from the card's edges. A box of controls keeps its
+    few px: its rows have room of their own above, and the box says how much is missing (controls_box)."""
+    first = content[0] if isinstance(content, list) and content and isinstance(content[0], dict) else {}
+    style = first.get("config", {}).get("style")
+    padding = style.get("padding") if isinstance(style, dict) else None
+    if not isinstance(padding, str) or padding.endswith(CONTROLS_PAD):
+        return
+    sides = padding.split()
+    if 2 <= len(sides) <= 4 and all(re.fullmatch(r"0|\d+px", x) for x in sides):
+        if int(sides[0].rstrip("px")) < int(sides[1].rstrip("px")):
+            # above as at the sides; below as it was, which two values give as the first
+            style["padding"] = " ".join([sides[1], sides[1], *(sides[2:] or sides[:1])])
+
+
 def card(title, content, fill=False):
+    if title:
+        level_top(content)
     cfg = {"title": title, "style": {"height": "calc(100% - 2 * var(--f7-card-margin-vertical))"}}
     if fill:
         # the content grows into the height the row gives the card
@@ -1305,18 +1328,39 @@ TOGGLE_R = "8px"  # the small toggle of a switch row, 24 px high; its knob KNOB_
 SVG_PILL_RX = {18: 6, 14: 4, 13: 4}  # the same corners for pills drawn in SVG, by their height
 HERO = {"font-size": f"={NARROW} ? '26px' : '28px'", "font-weight": "700",
         "line-height": f"={NARROW} ? '32px' : '34px'", "letter-spacing": "-0.01em"}
-CARD_RING = "0 0 0 1px color-mix(in srgb, var(--f7-text-color) 8%, transparent)"  # a card's edge, a faint line around it
+def tone(percent):
+    """The text's colour thinned: a grey that stands out on a light ground and on a dark one."""
+    return f"color-mix(in srgb, var(--f7-text-color) {percent}%, transparent)"
+
+
+# A quiet frame of one line around the cards and around what is a ground of its own within them (user, 2026-11-15,
+# after six looks: the look as it was, "mit dezentem Rahmen für Karten, Widgets usw."): the tiles, the segmented bars,
+# the charts' period buttons, the sliders' tracks and the grey blocks that hold a row (the off half of a switch
+# pill, the boost's row; not the thin tracks of the same grey).
+CARD_RING = f"0 0 0 1px {tone(16)}"  # a card's edge
+FRAME = f"inset 0 0 0 1px {tone(11)}"  # a tile's and a track's
+CONTROL_FRAME = f"inset 0 0 0 1px {tone(13)}"  # a segmented bar's, a period button's
 # the cards' shell, every page's and popup's stylesheet; before PHONE_EDGES, whose title padding wins on a phone
 CARD_STYLE = "\n".join([
     f".card {{ border-radius: 14px; box-shadow: {CARD_RING}; }}",
-    ".card-header { justify-content: flex-start; min-height: 0; font-size: 13px; font-weight: 600;",
-    "  padding: 16px 16px 4px; opacity: 0.6; letter-spacing: 0.02em; }",
+    # a card within a card (the water meter's picture) has no frame of its own (user, 2026-11-15)
+    ".card .card { box-shadow: none; }",
+    # the title in a band across the card's top, on a ground of its own over a line (user, 2026-11-15): 35 px high
+    # where the title's line took 40
+    ".card-header { justify-content: flex-start; min-height: 0; font-size: 13px; font-weight: 700; line-height: 18px;",
+    f"  padding: 8px 16px; opacity: 1; letter-spacing: 0.01em; border-radius: 14px 14px 0 0; background: {tone(8)};",
+    f"  border-bottom: 1px solid {tone(16)}; }}",
     ".card-header::after { display: none !important; }",
     ".oh-chart-container > .menu .menu-item { background: color-mix(in srgb, var(--f7-text-color) 8%, transparent);",
-    f"  color: inherit; border-radius: {PILL_R}; min-width: 32px; }}",
+    f"  color: inherit; border-radius: {PILL_R}; min-width: 32px; box-shadow: {CONTROL_FRAME}; }}",
     ".oh-chart-container > .menu .menu-item + .menu-item { margin-left: 6px; }",
-    f".segmented-strong {{ border-radius: {SWITCH_R}; background: color-mix(in srgb, var(--f7-text-color) 8%, transparent); }}",
-    ".segmented-strong .button, .segmented-strong .segmented-highlight { border-radius: 8px !important; }"])
+    f".segmented-strong {{ border-radius: {SWITCH_R}; background: color-mix(in srgb, var(--f7-text-color) 8%, transparent);",
+    f"  box-shadow: {CONTROL_FRAME}; }}",
+    ".segmented-strong .button, .segmented-strong .segmented-highlight { border-radius: 8px !important; }",
+    # the tiles carry no class: found by their ground (TILE_BG), as the browser writes an inline style back
+    f'[style*="var(--f7-text-color) 6%"] {{ box-shadow: {FRAME}; }}',
+    f".card .range-bar {{ box-shadow: {FRAME}; }}",
+    f'.card [style*="align-items: center"][style*="background: rgba(127, 127, 127, 0.1"] {{ box-shadow: {FRAME}; }}'])
 
 
 def share_ring(cx, cy, title, part, whole, r=22, visible=None, lift=0):
@@ -2433,7 +2477,7 @@ def weather_forecast_card():
                 f".slice(0, {WX_FORECAST_DAYS})")
     days = div([comp("oh-repeater", {"for": "day", "sourceType": "array", "in": f"={upcoming}",
                                      "fragment": True}, default=[wx_day_row()])],
-               **{"padding-top": "2px", "margin-bottom": "12px"})
+               **{"padding-top": "7px", "margin-bottom": "12px"})  # the first day's row 32 px under the title's line
     return card("Vorhersage", [days, div([weather_forecast_chart()], **{"padding": "0 4px 6px"})])
 
 
@@ -3321,7 +3365,7 @@ def heatpump_content():
                for (cx, cy), uid in HP_NODE_POPUPS]]
     drawing = div([hp_svg, *links], **{"position": "relative"})
     # its tiles as far in from the card's edge as the other cards' tiles, on a phone too (user, 2026-10-05)
-    return [div([hp_stats()], **{"padding": f"={NARROW} ? '8px 16px 0' : '12px 16px 0'"}),
+    return [div([hp_stats()], **{"padding": "16px 16px 0"}),
             div([drawing],
                 # at its own size outside a phone, so its circles never shrink there (user, 2026-10-05: below 1500 px
                 # the card was narrower than the drawing, which since 2026-10-08 fits even the narrowest card, 522 px);
@@ -4798,7 +4842,7 @@ def day_view_bar(cfg):
     bar = comp("f7-segmented", {"strong": True, "stylesheet": BY_TEXT_BAR,
                                 "style": {"width": "100%", "max-width": f"={NARROW} ? 'none' : '440px'"}},
                default=buttons)
-    return div([bar], **{"padding": "4px 12px 0"})
+    return div([bar], **{"padding": "10px 12px 0"})  # 28 px under the title's line, as from the card's edges
 
 
 def day_calendar(cfg):
@@ -5962,8 +6006,10 @@ def sign_colors(series_index=0):
                                                    {"min": 0, "max": 100000, "color": "#e53935"}]})]
 
 
-def controls_box(*rows):
-    return div(list(rows), **{"padding": "4px 16px 12px"})
+def controls_box(*rows, top=4):
+    """Rows of controls in a card. top: with the room the first row has of its own above, what its content stands
+    below the title's line is the 32 px it has at its sides (a switch row brings less than a section's head)."""
+    return div(list(rows), **{"padding": f"{top}px{CONTROLS_PAD}"})
 
 
 HOME_BLUE = "#1e88e5"
@@ -9185,7 +9231,7 @@ def air_conditioning_blocks():
              comp("oh-button", {"text": "Neu starten", "action": "command", "actionItem": "faikout_perfera_restart",
                                 "actionCommand": "ON", "actionConfirmation": "Faikout Perfera neu starten?",
                                 "actionFeedback": "Neustart gesendet", "outline": True, "small": True})],
-            **{"display": "flex", "align-items": "center", "gap": "10px", "padding": "5px 2px"}))
+            **{"display": "flex", "align-items": "center", "gap": "10px", "padding": "5px 2px"}), top=6)
     on = AC_ON_STATE
     # its node from the energy flow large, its mode badge on the ring, the timer's time left as the arc; while the
     # timer runs the time left, when it switches the unit off, large, and the timer as a bar (user, 2026-10-05: as
@@ -9337,7 +9383,8 @@ def energy_storage_blocks():
                                   != "none" else {}),
                                "icon": "material:hourglass_bottom", "item": "huawei_inverter_energy_storage_remaining_charge_discharge_time",
                                "title": "Restzeit Laden/Entladen"})]
-    controls = [comp("f7-list", {"style": {"margin": "0 0 8px"}}, default=control_items),
+    # 8 px above: the first row's content 32 px under the title's line, as from the card's edges
+    controls = [comp("f7-list", {"style": {"margin": "8px 0"}}, default=control_items),
                 controls_box(battery_power_slider("huawei_inverter_energy_storage_forcible_charge_power",
                                                   "Zwangsladeleistung", "beim Zwangsladen"),
                              battery_power_slider("huawei_inverter_energy_storage_forcible_discharge_power",
@@ -9917,7 +9964,8 @@ def e_car_controls():
     cockpit = [div([enyaq_dash()], **{"margin": "10px 0 4px"})] if ENYAQ_PHOTO else []
     groups = div([div([pill, hint, slider], **group), div([*cockpit, climate_pill, climate_slider], **group)],
                  **{"display": "grid", "gap": "6px", "grid-template-columns": "minmax(0, 1fr)"})
-    return controls_box(groups, refresh, outcome)
+    # no box of controls: the groups have no room of their own above, as the other boxes' rows have
+    return div([groups, refresh, outcome], **{"padding": "16px 16px 12px"})
 
 
 E_CAR_CHART_H = 300
@@ -10168,7 +10216,7 @@ def roof_map():
     # no legend of the lines and the east modules under it (user, 2026-10-20: "den text unten lass einfach weg")
     foot = div([label(f"={dash(disp(OPT + 'status'))} + ' · max. ' + {fixed(num(OPT + 'temperature_max'), 1)} + "
                       f"' °C · ' + {dash(disp(OPT + 'updated'))}", **small)], **{"padding": "8px 16px 16px"})
-    return [comp("div", {"stylesheet": ROOF_CSS}, default=[drawing, foot])]
+    return [comp("div", {"stylesheet": ROOF_CSS, "style": {"padding-top": "12px"}}, default=[drawing, foot])]
 
 
 def shade(hex_, f):
@@ -10383,7 +10431,7 @@ def grid_peaks_card():
     note = label("Stärkste Viertelstunde je Monat (mittlerer Netzbezug), die letzten 6 Monate. Tippen zeigt die 7 "
                  "stärksten Tage des Monats.", **{**VT_SUB, "padding": "0 2px 8px"})
     content = comp("oh-context", {"variables": {"olderPeaks": ""}},
-                   default=[div([note, *rows, olders, toggle], **{"padding": "0 12px 8px"})])
+                   default=[div([note, *rows, olders, toggle], **{"padding": "12px 12px 8px"})])
     return card("Spitzen-Viertelstunden", [content])
 
 
@@ -10516,7 +10564,7 @@ def air1_blocks():
                                 "actionConfirmation": "Steht der AIR-1 seit mindestens 3 Minuten am offenen Fenster? "
                                                       "Sein CO₂-Sensor wird dann auf den Zielwert kalibriert.",
                                 "actionFeedback": "Kalibrierung gesendet", "outline": True, "small": True})],
-            **{"display": "flex", "align-items": "center", "gap": "8px", "padding": "8px 2px 4px"}))
+            **{"display": "flex", "align-items": "center", "gap": "8px", "padding": "8px 2px 4px"}), top=8)
     return [two(card("Raumluft", air), card("Schadstoffe", pollutants)),
             two(card("Raumluft heute", [room]), card("Schadstoffe heute", [dust])),
             two(card("Gerät", [device]), card("Einstellungen", [settings]))]
@@ -10678,6 +10726,259 @@ DEVICE_PAGES = {
     "epex_spot": epex_spot_blocks,
 }
 DEVICE_PAGES = {uid: below_controls(builder) for uid, builder in DEVICE_PAGES.items()}
+
+
+# ---------------------------------------------------------------- the pages' order
+
+# Every device page in one order under small headings (user, 2026-11-15, from the proposal pages of that day): what
+# is now, with the controls at the left; today; the course over days; the technical cards last. A page's builder
+# makes its cards as before and ORDER[uid] places them. Cards side by side end level: the shorter one's content
+# grows, or cards are stacked beside the one that is as high as they are together.
+
+
+class PageCards:
+    """The cards of a built page by their title, a card widget by its uid; a second of a name as (name, 1)."""
+
+    def __init__(self, blocks):
+        self.found, self.used = [], set()
+
+        def walk(node):
+            if isinstance(node, dict):
+                if self.name(node):
+                    self.found.append(node)
+                    return
+                for v in node.get("slots", {}).values():
+                    walk(v)
+            elif isinstance(node, list):
+                for v in node:
+                    walk(v)
+        walk(blocks)
+
+    @staticmethod
+    def name(node):
+        kind = node.get("component", "")
+        if kind == "oh-card":
+            return node["config"].get("title", "?")
+        return kind[len("widget:"):] if kind.startswith("widget:") and kind.endswith("-card") else None
+
+    def __getitem__(self, key):
+        name, nth = key if isinstance(key, tuple) else (key, 0)
+        hits = [i for i, c in enumerate(self.found) if self.name(c) == name]
+        assert len(hits) > nth, (name, nth, [self.name(c) for c in self.found])
+        self.used.add(hits[nth])
+        node = copy.deepcopy(self.found[hits[nth]])
+        if node["component"] == "oh-card":  # as a card of its own, not as it stood in a stack
+            node["config"].setdefault("style", {})["height"] = "calc(100% - 2 * var(--f7-card-margin-vertical))"
+            node["config"]["style"].pop("flex", None)
+        return node
+
+    def unused(self):
+        return [self.name(c) for i, c in enumerate(self.found) if i not in self.used]
+
+
+def renamed(node, title):
+    node["config"]["title"] = title
+    return node
+
+
+def filled(node, part=-1):
+    """A card whose content takes the height its row gives it: its part (the last by default) grows."""
+    if node["component"] != "oh-card":
+        return node
+    node["config"]["style"].update({"display": "flex", "flex-direction": "column"})
+    node["config"]["contentStyle"] = {"flex": "1 1 auto", "display": "flex", "flex-direction": "column",
+                                      **node["config"].get("contentStyle", {})}
+    node["slots"]["content"][part].setdefault("config", {}).setdefault("style", {})["flex"] = "1 1 auto"
+    return node
+
+
+def split_card(node, titled):
+    """A card's content as cards of their own: titled = (title, index of the part) each."""
+    return [card(title, [copy.deepcopy(node["slots"]["content"][i])]) for title, i in titled]
+
+
+def heading(title):
+    """A small heading over a group of rows."""
+    return row(full(label(title, **{"display": "block", "font-size": "12px", "font-weight": "700",
+                                    "letter-spacing": "0.09em", "text-transform": "uppercase", "opacity": "0.55",
+                                    "margin": "14px calc(var(--f7-card-margin-horizontal) + 6px) -4px"})))
+
+
+def abreast(a, b):
+    return row(col([a]), col([b]))
+
+
+def across(a):
+    return row(full(a))
+
+
+def share_card(prefix, color):
+    """What a metered device takes of the house, now (power) and today (energy), each as a ring with its values;
+    from the items the pages show already."""
+    home_w, home_kwh = num(HOME), num("home_ec_day")
+    w, kwh = num(f"{prefix}_power"), num(f"{prefix}_energy_today")
+
+    def tile(name, part, whole, text):
+        pct = f"({whole} > 0 ? 100 * {part} / {whole} : 0)"
+        return div([ring_svg(pct, color),
+                    div([label(name, **VT_TITLE),
+                         label(f"=Math.round({vt_clamp(pct)}) + ' %'", **{"font-size": "20px", "font-weight": "700",
+                                                                        "line-height": "1.3"}),
+                         label(f"={text}", **{**VT_SUB, "white-space": "normal"})], **{"min-width": "0"})],
+                   **{"display": "flex", "align-items": "center", "gap": "12px", "padding": "10px 12px",
+                      "border-radius": "12px", "background": TILE_BG, "min-width": "0"})
+    now = tile("jetzt", w, home_w, f"{fixed(f'{w} / 1000', 2)} + ' von ' + {fixed(f'{home_w} / 1000', 2)} + ' kW'")
+    today = tile("heute", kwh, home_kwh, f"{fixed(kwh, 2)} + ' von ' + {fixed(home_kwh, 1)} + ' kWh'")
+    grid = div([now, today], **{"display": "grid", "gap": "8px", "padding": "0 16px 16px",
+                                "grid-template-columns": "repeat(2, minmax(0, 1fr))", "flex": "1 1 auto"})
+    return filled(card("Anteil am Hausverbrauch", [grid]))
+
+
+def plug_of(cards):
+    """The prefix and the colour of the page's plug card."""
+    cfg = next(c for c in cards.found if c["component"] == "widget:plug-card")["config"]
+    return cfg["prefix"], cfg["color"]
+
+
+def plug_rows(cards):
+    """The cards every metered device has: now beside today's power, then the days over the device's share of the
+    house beside the meter's electrical values."""
+    return [abreast(cards["plug-card"], widget_stack(cards["plug-power-card"], grow=1)),
+            abreast(widget_stack(cards["plug-energy-days-card"], share_card(*plug_of(cards)), grow=2),
+                    cards["plug-electric-card"])]
+
+
+def order_plug(c):
+    now, course = plug_rows(c)
+    return [heading("Jetzt und heute"), now, heading("Verlauf und Technik"), course]
+
+
+def order_miele(c):
+    # Jetzt over the share of the house ends level with the programme; the plug last, as with the ventilation
+    return [heading("Jetzt"),
+            abreast(widget_stack(c["Jetzt"], share_card(*plug_of(c)), grow=2), filled(c["Programm"])),
+            heading("Strom heute und pro Tag"), abreast(c["plug-power-card"], c["plug-energy-days-card"]),
+            heading("Technik"), abreast(c["plug-card"], c["plug-electric-card"])]
+
+
+def order_living_room(c):
+    now, course = plug_rows(c)
+    return [heading("Jetzt"), across(c["Receiver"]), heading("Strom heute"), now,
+            heading("Verlauf und Technik"), course]
+
+
+def order_weather(c):
+    # the weather now as the overview's bar on top; the warnings only while there are any
+    return [heading("Jetzt"), across(widget_ref("weather-card", **overview_widget_props()["weather-card"])),
+            wx_warnings_row(c["Warnungen"]), heading("Vorhersage"),
+            abreast(c["Vorhersage"], widget_stack(c["Meteoblue · 5 Tage"], c["Weitere Quellen"], grow=1))]
+
+
+def order_epex_spot(c):
+    return [heading("Jetzt und heute"), abreast(c["Jetzt"], c["Preise und EEG-Bilanz, 12 h zurück, 36 h voraus"])]
+
+
+def order_netatmo(c):
+    return [heading("Jetzt"), abreast(c["Wetterstation"], filled(c["Außenmodul"])),
+            heading("Heute"), abreast(c["Temperaturen heute"], c["Raumluft heute"]),
+            heading("Technik"), abreast(renamed(c["Wetterstation Details"], "Gerät · Wetterstation"),
+                                        filled(renamed(c["Außenmodul Details"], "Gerät · Außenmodul")))]
+
+
+def order_air1(c):
+    return [heading("Jetzt"), abreast(filled(c["Raumluft"]), c["Schadstoffe"]),
+            heading("Heute"), abreast(c["Raumluft heute"], c["Schadstoffe heute"]),
+            heading("Technik"), abreast(filled(c["Gerät"]), c["Einstellungen"])]
+
+
+def order_tado(c):
+    return [heading("Jetzt und heute"), abreast(filled(renamed(c["Raumklima"], "Jetzt")), c["Raumklima heute"])]
+
+
+def order_smartpi(c):
+    return [heading("Jetzt und heute"), abreast(c["Jetzt"], c["Leistung heute"]),
+            heading("Technik"), across(c["Phasen"])]
+
+
+def order_power_meter(c):
+    return [heading("Jetzt und heute"), abreast(c["Jetzt"], c["Leistung heute"]),
+            heading("Verlauf"), across(c["Spitzen-Viertelstunden"]), heading("Technik"), across(c["Phasen"])]
+
+
+def order_photovoltaics(c):
+    return [heading("Jetzt"),
+            abreast(c["Jetzt"], widget_stack(c["Strings (DC)"], c["Netz (AC)"], c["Ertrag pro Tag"], grow=3)),
+            heading("Heute"), abreast(c["Leistung heute"], filled(c["Module heute"])),
+            across(c["Himmelsrichtungen heute"]),
+            heading("Verlauf"), across(c["PV-Eigenverbrauch pro Tag"]),
+            heading("Technik"), abreast(filled(c["Wechselrichter"]), c["Module"])]
+
+
+def order_energy_storage(c):
+    return [heading("Jetzt"), abreast(c["Steuerung"], filled(c["Jetzt"])),
+            heading("Heute und Technik"),
+            abreast(widget_stack(c["Leistung heute"], renamed(c["Speicher"], "Zähler"), grow=1), c["Einheit 1"])]
+
+
+def order_e_car(c):
+    return [heading("Jetzt"), abreast(c["Steuerung"], c["Škoda Enyaq"]),
+            heading("Verlauf"), across(c["Ladestand"]),
+            heading("Laden zu Hause"),
+            abreast(widget_stack(c["plug-card"], share_card(*plug_of(c)), grow=2),
+                    widget_stack(c["plug-power-card"], c["plug-energy-days-card"], grow=1)),
+            heading("Technik"), abreast(c["plug-electric-card"], filled(c["Diagnose"]))]
+
+
+def order_air_conditioning(c):
+    return [heading("Jetzt"), abreast(c["Steuerung"], filled(c["Jetzt"])),
+            heading("Heute"),
+            abreast(c["Betrieb heute"], widget_stack(c["plug-power-card"], c["plug-energy-days-card"], grow=1)),
+            heading("Technik"),
+            abreast(widget_stack(c["plug-card"], share_card(*plug_of(c)), grow=2), c["plug-electric-card"])]
+
+
+def order_heatpump(c):
+    # the diagnosis as three cards: its values beside the modes, the refrigerant's day across
+    diagnosis, modes, refrigerant = split_card(c["Diagnose"], [("Diagnose", 0), ("Modi", 2),
+                                                               ("Kältemittel heute", 4)])
+    return [heading("Jetzt"), abreast(widget_stack(c["Steuerung"], c["Heute"], grow=2), filled(c["Jetzt"])),
+            heading("Heute"), abreast(c["Heizbetrieb heute"], c["Temperaturen heute"]),
+            heading("Verlauf"), abreast(c["Wärmepumpe pro Tag"], c["COP nach Zweck pro Tag"]),
+            heading("Technik"), abreast(filled(diagnosis), filled(modes)), across(refrigerant),
+            abreast(widget_stack(c["plug-card"], share_card(*plug_of(c)), grow=2), c["plug-electric-card"])]
+
+
+def order_ventilation(c):
+    return [heading("Jetzt"),
+            abreast(widget_stack(c["Steuerung"], share_card(*plug_of(c)), grow=2), c["Jetzt"]),
+            heading("Heute"), across(c["Lüftung heute"]),
+            abreast(c["plug-power-card"], c["plug-energy-days-card"]),
+            heading("Technik"), abreast(c["plug-card"], c["plug-electric-card"])]
+
+
+def order_water_meter(c):
+    return [heading("Jetzt"), abreast(c["Jetzt"], c["Zählerbild"]),
+            heading("Heute und Verlauf"), abreast(c["Durchfluss heute"], c["Verbrauch pro Tag"])]
+
+
+ORDER = {"weather": order_weather, "epex_spot": order_epex_spot, "netatmo": order_netatmo,
+         "apollo_air_1": order_air1, "tado": order_tado, "smartpi": order_smartpi, "power_meter": order_power_meter,
+         "photovoltaics": order_photovoltaics, "energy_storage": order_energy_storage, "e_car": order_e_car,
+         "air_conditioning": order_air_conditioning, "heatpump": order_heatpump, "ventilation": order_ventilation,
+         "water_meter": order_water_meter, "washing_machine_1": order_miele, "tumble_dryer": order_miele,
+         "dishwasher": order_miele, "living_room_entertainment": order_living_room}
+
+
+def in_order(uid, build):
+    def rows():
+        cards = PageCards(build())
+        placed = ORDER.get(uid, order_plug)(cards)
+        assert not cards.unused(), (uid, cards.unused())  # a card nobody placed
+        return [block(*placed)]
+    return rows
+
+
+DEVICE_PAGES = {uid: in_order(uid, build) for uid, build in DEVICE_PAGES.items()}
 
 
 
@@ -11082,11 +11383,11 @@ def location_map_card():
            f"(themeOptions.dark === 'dark' ? 1 : 0) : 'about:blank')({pos})")
     # the card's title drawn as CARD_STYLE draws a card header, with the credit at its right: below the map, which
     # now reaches the card's bottom edge, there is no room for it
-    head = div([label("Parkposition", **{"font-size": "13px", "font-weight": "600", "opacity": "0.6",
-                                         "letter-spacing": "0.02em"}),
+    head = div([label("Parkposition", **{"font-size": "13px", "font-weight": "700", "line-height": "18px",
+                                         "letter-spacing": "0.01em"}),
                 osm_credit(**{"padding-top": "0", "display": "inline"})],
                **{"display": "flex", "justify-content": "space-between", "align-items": "baseline", "gap": "12px",
-                  "padding": "16px 16px 10px"})
+                  "padding": "8px 16px", "background": tone(8), "border-bottom": f"1px solid {tone(16)}"})
     out = map_card([head, map_frame(url, "300px")])
     out["config"]["visible"] = f"=!!props.map && {valid}({pos})"
     return out
@@ -11843,6 +12144,8 @@ OBSOLETE_PAGES = ["dashboard",  # became the overview page
                   "widget_gallery",  # the widget repository's screenshots, put up by widget_gallery.py while they are taken
                   # the car's pictures in three variants, A built on the E-Auto's page (2026-11-14)
                   "preview_enyaq_a", "preview_enyaq_b", "preview_enyaq_c",
+                  # the proposals of 2026-11-15 (order, frames, the title's band), adopted on every page
+                  "vorschlag_overview", *(f"vorschlag_{uid}" for uid in DEVICE_PAGES),
                   "dashboard_smart_meter", "dashboard_battery", "dashboard_hot_water", "dashboard_pv", "dashboard_home",
                   "dashboard_power_meter", "dashboard_energy_storage", "dashboard_pv_days", "dashboard_energy_days",
                   "dashboard_outdoor", "dashboard_indoor", "dashboard_heatpump_dhw",

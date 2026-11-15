@@ -94,7 +94,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Oct 25, 2026, 2:07:58 PM
+timestamp: Nov 15, 2026, 9:47:20 AM
 component: oh-card
 config:
   title: Switches
@@ -206,7 +206,7 @@ slots:
   - component: div
     config:
       style:
-        padding: 12px 16px 16px
+        padding: 16px 16px 16px
     slots:
       default:
       - component: div

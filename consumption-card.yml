@@ -160,7 +160,7 @@ props:
     required: false
     default: 'true'
   parameterGroups: []
-timestamp: Nov 9, 2026, 10:48:10 PM
+timestamp: Nov 15, 2026, 9:47:20 AM
 component: oh-card
 config:
   title: '=''Consumption Today · '' + ([''NULL'', ''UNDEF''].includes(items[props.homeEnergyToday].state) ? ''–'' : (items[props.homeEnergyToday].displayState
@@ -273,7 +273,7 @@ slots:
   - component: div
     config:
       style:
-        padding: 4px 16px 16px
+        padding: 16px 16px 16px
     slots:
       default:
       - component: div

@@ -400,7 +400,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Nov 11, 2026, 11:34:07 AM
+timestamp: Nov 15, 2026, 9:47:20 AM
 component: oh-card
 config:
   title: Heat Pump
@@ -621,7 +621,7 @@ slots:
   - component: div
     config:
       style:
-        padding: '=screen.width < 600 ? ''8px 16px 0'' : ''12px 16px 0'''
+        padding: 16px 16px 0
     slots:
       default:
       - component: div
