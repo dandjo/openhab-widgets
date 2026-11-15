@@ -9325,23 +9325,62 @@ def ventilation_blocks():
             *plug_cards("ventilation", "material:air", VENT_TEAL, kind="ventilation", threshold=5)]
 
 
-# the time until the battery is full or empty at the power of the last 5 minutes (rule battery_power_5min, negative
-# while charging), on its page under Jetzt: it holds about 7 kWh (charged from 3 to 100 % with 6.98 kWh net on
-# 2026-10-03) and discharges down to 3 %; below 50 W it rests
+# When the battery will be full or empty next, on its page under Jetzt (user, 2026-11-15: with the PV forecast instead
+# of the present power alone, which said nothing while the battery rested and "empty" at night when the sun came
+# first). Hour by hour through the forecast: the hour that runs at the power of the last 5 minutes (rule
+# battery_power_5min, negative while charging), every later hour at the PV's forecast (pv_forecast_hourly, 48 hours)
+# less what the house took in the same hour of the last 24 (the tiles' history, 24 hourly means), within what the
+# battery can take or give. It holds about 7 kWh (charged from 3 to 100 % with 6.98 kWh net on 2026-10-03) and
+# discharges down to 3 %; 5 % are lost each way. Replayed over 35 days at 299 moments before the battery became full
+# or empty: the right event in 225 (the present power alone: 79, none in 157), wrong in 39 (63); the time off by
+# 1.6 h in the median, as the house's consumption ahead is the weak part (with the true consumption 0.4 h).
 BATT_5MIN = num("huawei_inverter_energy_storage_power_5min")
-BATT_KWH_PER_PERCENT, BATT_FLOOR, BATT_IDLE = 0.07, 3, 50
+BATT_KWH_PER_PERCENT, BATT_FLOOR, BATT_IDLE, BATT_MAX_W, BATT_EFFICIENCY = 0.07, 3, 50, 3500, 0.95
+PV_FORECAST_HOURLY = "pv_forecast_hourly"
 
 
-def battery_eta_parts():
-    """The battery's time until full or empty as expressions: (charging, at work, duration, clock time with the weekday
-    beyond today)."""
-    soc, p = num(SOC), BATT_5MIN
-    charging, discharging = f"({p} < -{BATT_IDLE})", f"({p} > {BATT_IDLE})"
-    minutes = (f"Math.round(({charging} ? Math.max(0, 100 - {soc}) * {BATT_KWH_PER_PERCENT} / (-{p} / 1000) : "
-               f"Math.max(0, {soc} - {BATT_FLOOR}) * {BATT_KWH_PER_PERCENT} / ({p} / 1000)) * 60)")
-    dur = ("((m) => m >= 2880 ? 'über 2 Tage' : m < 60 ? Math.max(1, m) + ' min' : "
-           "Math.floor(m / 60) + ':' + ('0' + m % 60).slice(-2) + ' h')")
-    return charging, f"({charging} || {discharging})", f"{dur}({minutes})", clock_in(minutes)
+def battery_eta_core():
+    """The walk through the hours as a JavaScript function of the forecast's hours [[unix, W]], the house's 24 hourly
+    means up to now, the charge in %, the battery's power in W (negative while charging), the house's power now (for
+    an hour without a mean) and the time: [charge, event (1 full, 2 empty, 0 none), its time or the forecast's end,
+    two flags, the highest charge on the way and when, the lowest and when]. An end counts only when the battery was
+    away from it: below 97 % at the start or below 95 % since for full,
+    3 points above the floor at the start or 5 since for empty. Without a forecast the present power alone."""
+    kwh, floor, top, loss = BATT_KWH_PER_PERCENT, BATT_FLOOR, BATT_MAX_W, BATT_EFFICIENCY
+    rest = "0, 0, soc, now, soc, now]"
+    present = (f"(p < -{BATT_IDLE} ? [soc, 1, now + Math.max(0, 100 - soc) * {kwh} / (-p / 1000) * 3600, {rest} : "
+               f"p > {BATT_IDLE} ? [soc, 2, now + Math.max(0, soc - {floor}) * {kwh} / (p / 1000) * 3600, {rest} : "
+               f"[soc, 0, now, {rest})")
+    # the hour's net power into the battery: the running hour as measured, a later one from forecast and habit
+    net = (f"(k === 0 ? -p : Math.max(-{top}, Math.min({top}, h[1] - "
+           "((v) => Number.isFinite(v) ? v : load)(S[(k + 23) % 24]))))")
+    turns = "st[5], st[6], st[7], st[8]]"
+    step = (f"((d) => (st[3] && d > 0 && st[0] + d >= 100) ? [st[0], 1, a + (100 - st[0]) / d * (h[0] + 3600 - a), "
+            f"0, 0, {turns} : "
+            f"(st[4] && d < 0 && st[0] + d <= {floor}) ? [st[0], 2, a + (st[0] - {floor}) / -d * (h[0] + 3600 - a), "
+            f"0, 0, {turns} : "
+            f"((c) => [c, 0, h[0] + 3600, st[3] || c < 95, st[4] || c > {floor + 5}, c > st[5] ? c : st[5], "
+            "c > st[5] ? h[0] + 3600 : st[6], c < st[7] ? c : st[7], c < st[7] ? h[0] + 3600 : st[8]])"
+            f"(Math.max({floor}, Math.min(100, st[0] + d))))"
+            f"(((n) => n / 1000 * (h[0] + 3600 - a) / 3600 / {kwh} * (n > 0 ? {loss} : 1 / {loss}))({net}))")
+    walk = ("F.filter((h) => h[0] + 3600 > now).reduce((st, h) => st[1] ? st : "
+            f"((k, a) => ({step}))(Math.round((h[0] - Math.floor(now / 3600) * 3600) / 3600), Math.max(h[0], now)), "
+            f"[soc, 0, now, soc < 97, soc > {floor + 3}, soc, now, soc, now])")
+    return f"((F, S, soc, p, load, now) => F.some((h) => h[0] + 3600 > now) ? {walk} : {present})"
+
+
+def battery_eta():
+    """The battery's next end as an expression, [charge, event, time, ...] of battery_eta_core()."""
+    track_history(HOME, s=True)
+    state = f"items.{PV_FORECAST_HOURLY}.state"
+    forecast = f"((x) => x.charAt(0) === '{{' ? (JSON.parse(x).h || []) : [])('' + {state})"
+    means = f"(({vt_hv(HOME, 's')}) || [])"
+    return f"({battery_eta_core()})({forecast}, {means}, {num(SOC)}, {BATT_5MIN}, {num(HOME)}, dayjs().unix())"
+
+
+def clock_at(unix):
+    """The clock time of a moment (an expression, unix seconds), with the weekday before it beyond today."""
+    return f"((d) => d.isSame(dayjs(), 'day') ? d.format('HH:mm') : d.format('dd HH:mm'))(dayjs.unix({unix}))"
 
 
 def clock_in(minutes):
@@ -9352,20 +9391,35 @@ def clock_in(minutes):
 
 def energy_storage_blocks():
     batt_state = f"{num(BATT)} < -10 ? 'lädt' : {num(BATT)} > 10 ? 'entlädt' : 'ruht'"
-    charging, at_work, dur, clock = battery_eta_parts()
+    eta = battery_eta()
+    event, until = f"({eta})[1]", f"({eta})[2]"
+    # before an end the other way: how far the charge goes first and when it turns (charging now and empty tonight
+    # reads wrong without it), from 5 points on
+    turn = f"((e) => e[1] === 2 ? [e[5], e[6]] : [e[7], e[8]])({eta})"
+    turns = f"((e) => (e[1] === 2 && e[5] > e[0] + 5) || (e[1] === 1 && e[7] < e[0] - 5))({eta})"
+    left = ("((m) => m >= 2880 ? 'über 2 Tage' : m < 60 ? Math.max(1, m) + ' min' : "
+            f"Math.floor(m / 60) + ':' + ('0' + m % 60).slice(-2) + ' h')(Math.round(({until} - dayjs().unix()) / 60))")
+    forecast = f"('' + items.{PV_FORECAST_HOURLY}.state).charAt(0) === '{{'"
     soc = f"Math.max(0, Math.min(100, {num(SOC)}))"
     # as Waschmaschine 1 in the battery's green (user, 2026-10-05): its node from the energy flow large, the charge
     # on its ring, pulsing while power flows; while it charges or discharges the time left as a timer chip beside its
-    # state and when it will be full or empty large below ("voll ca. Do 01:17", an estimate, without "um", which
-    # reads wrong before a weekday; user 2026-10-05), under the power of the last 5 minutes they come from; the
-    # charge as a bar under it, the energy above the floor and the room left at its ends
+    # state and when it will be full or empty next large below ("voll ca. Do 01:17", an estimate, without "um", which
+    # reads wrong before a weekday; user 2026-10-05), under the power of the last 5 minutes, over what the estimate
+    # rests on; where the forecast's hours end with neither, that instead; the charge as a bar under it, the energy
+    # above the floor and the room left at its ends
     icon = node_icon("battery", BATTERY_GREEN, flowing(num(BATT), 10), share=f"{num(SOC)} / 100", soc=num(SOC))
     now = [hero("material:battery_charging_full", BATTERY_GREEN, "Ladestand", f"={disp(SOC)}",
                 [chips(chip(f"={fixed(f'{num(BATT)} / 1000', 3)} + ' kW · ' + ({batt_state})", BATTERY_GREEN),
-                       timer_chip(f"={dur}", f"={at_work}", tint=BATTERY_GREEN)),
+                       timer_chip(f"={left}", f"={event} > 0", tint=BATTERY_GREEN)),
                  label(f"='Ø 5 min · ' + {fixed(f'{BATT_5MIN} / 1000', 2)} + ' kW'", **{"font-size": "14px"}),
-                 label(f"=({charging} ? 'voll ca. ' : 'leer ca. ') + {clock}", f"={at_work}",
-                       **{"font-size": "22px", "font-weight": "700"})], picture=icon),
+                 label(f"=({event} === 1 ? 'voll ca. ' : 'leer ca. ') + {clock_at(until)}", f"={event} > 0",
+                       **{"font-size": "22px", "font-weight": "700"}),
+                 label(f"='vorher bis ca. ' + {clock_at(f'{turn}[1]')} + ' auf ' + Math.round({turn}[0]) + ' %'",
+                       f"={turns}", **{"font-size": "14px", "font-weight": "600"}),
+                 label(f"='bis ' + {clock_at(until)} + ' weder voll noch leer'", f"={event} === 0 && {forecast}",
+                       **{"font-size": "14px", "font-weight": "600"}),
+                 label("aus PV-Prognose und dem Verbrauch der letzten 24 h", f"={forecast}",
+                       **{**VT_SUB, "white-space": "normal"})], picture=icon),
            bar(soc, BATTERY_GREEN,
                f"={fixed(f'Math.max(0, {soc} - {BATT_FLOOR}) * {BATT_KWH_PER_PERCENT}', 2)} + ' kWh nutzbar'",
                f"={fixed(f'(100 - {soc}) * {BATT_KWH_PER_PERCENT}', 2)} + ' kWh frei'"),
