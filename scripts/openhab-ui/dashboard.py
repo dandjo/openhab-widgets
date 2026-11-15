@@ -9522,12 +9522,15 @@ def bar_ends(left, right):
 
 # The car in Škoda's own renders of it (user, 2026-11-13/14, variant A of three previews): its side with what it
 # reports drawn on it, and the cockpit over the climate's controls. The pictures are the user's and not the
-# repository's: applied by hand to openHAB's html folder (/static/enyaq/), three WebP files, side.webp (the right
+# repository's: applied by hand to openHAB's html folder (/static/enyaq/), four WebP files, side.webp (the right
 # side, where the charge port is, 1680 x 700 px of the render with 120 px of room above the roof), trunk.webp (the
-# open boot) and dash.webp (the cockpit, the whole 1920 x 1080 render). Without them the page draws the car as the
-# energy flow does. openHAB serves /static/ with a year's cache, so each address carries its file's checksum.
+# open boot), dash.webp (the cockpit, the whole 1920 x 1080 render) and port.webp (the charge port open with the plug
+# in it, cut from the MyŠkoda app's picture of the car charging; user, 2026-11-15). Without them the page draws the
+# car as the energy flow does. openHAB serves /static/ with a year's cache, so each address carries its file's
+# checksum.
 ENYAQ_PHOTO_DIR = os.environ.get("ENYAQ_PHOTOS", "/etc/openhab/html/enyaq")
-ENYAQ_SIZE = {"side": (1680, 700), "trunk": (1653, 1080), "dash": (1920, 1080)}  # the renders' pixels, as drawn on
+# the pictures' pixels, the renders' as drawn on
+ENYAQ_SIZE = {"side": (1680, 700), "trunk": (1653, 1080), "dash": (1920, 1080), "port": (98, 56)}
 
 
 def enyaq_photos():
@@ -9551,6 +9554,12 @@ ENYAQ_DY = 120  # the side view's room above the car in the file; the outlines b
 ENYAQ_SIDE_VIEW = (0, 80, 1680, 620)
 # the charge's bar at the sill's lower edge, clear of the doors, in the side view's pixels
 ENYAQ_BAR = (552, 572, 580, 34)
+# The charge port's picture where it lies on the side view (x, y, width, height), in the side view's pixels without
+# the room above: the recess's middle above the rear wheel at the tail light's height, the line from the tail light
+# through its upper third as on the car, scaled 1.3 by the rear wheel's size in the app's picture; the cable leaves
+# the plug at ENYAQ_PLUG.
+ENYAQ_PORT = (281, 175, 127, 73)
+ENYAQ_PLUG = (338, 220)
 # The body parts as the side view shows them, in its pixels without the room above. The doors with their window
 # frames: seams and the paint's lower edge, which falls towards the front, snapped to the photo (the darkest pixel
 # across a seam, the strongest step at the paint's edge), the tops along the chrome traced at 4x; the small fixed
@@ -9626,14 +9635,17 @@ def enyaq_side():
     """The car's right side with what it reports drawn on it: the charge as a bar at the sill, where the battery
     lies, paler up to the charge target, which is a white mark with its value on a flag under the car, the mark
     always over the flag's middle; the lights' glow; a lock at the doors; doors, windows, tailgate and bonnet
-    coloured along their shut lines while open, the open boot also as its own picture in the corner; the cable and,
-    while it charges, a bolt at the charge port; the climate with its target on the front door's pane."""
+    coloured along their shut lines while open, the open boot also as its own picture in the corner; while the
+    cable is plugged in the charge port open with the plug in it and the cable, and while it charges a bolt above
+    the port; the climate with its target on the front door's pane."""
     def is_(suffix, state):
         return f"items.{skoda(suffix)}.state === '{state}'"
 
     def down(points):
         return [(x, y + ENYAQ_DY) for x, y in points]
     bx, by, bw, bh = ENYAQ_BAR
+    port_x, port_y, port_w, port_h = ENYAQ_PORT
+    plug_x, plug_y = ENYAQ_PLUG
     dy = ENYAQ_DY
     locked, unlocked = is_("locked", "ON"), is_("locked", "OFF")
     plugged = f"({is_('plug', 'ON')} || {SKODA_CHARGING})"
@@ -9680,13 +9692,15 @@ def enyaq_side():
         svg("polyline", points=" ".join(f"{x},{y}" for x, y in down(ENYAQ_TAIL_EDGE)),
             visible=f"={is_('trunk', 'OPEN')}", fill="none", stroke=ENYAQ_OPEN,
             **{"stroke-width": 9, "stroke-linecap": "round", "stroke-linejoin": "round"}),
-        # the cable at the charge port, behind the rear wheel on this side
-        # one curve, down from the port and out level along the ground (user, 2026-11-14: a curve and a straight
-        # piece met in a corner)
-        svg("path", d=f"M 330 {240 + dy} C 326 {400 + dy}, 230 {548 + dy}, 0 {548 + dy}",
+        # the charge port open with the plug in it, from the app's picture of the car (user, 2026-11-15), and the
+        # cable out of the plug, behind the rear wheel on this side: one curve, down and out level along the ground
+        # (user, 2026-11-14: a curve and a straight piece met in a corner)
+        svg("image", href=ENYAQ_PHOTO["port"], x=port_x, y=port_y + dy, width=port_w, height=port_h,
+            preserveAspectRatio="none", visible=f"={plugged}"),
+        svg("path", d=f"M {plug_x} {plug_y + dy} C {plug_x - 4} {400 + dy}, 230 {548 + dy}, 0 {548 + dy}",
             visible=f"={plugged}", fill="none", stroke=f"={cable}", **{"stroke-width": 10, "stroke-linecap": "round"}),
-        svg("rect", x=313, y=218 + dy, width=34, height=38, rx=9, fill=f"={cable}", visible=f"={plugged}"),
-        photo_pin(330, 150 + dy, "bolt", ECAR_COLOR, SKODA_CHARGING),
+        # the bolt over the recess, clear of the open flap
+        photo_pin(port_x + 43, 125 + dy, "bolt", ECAR_COLOR, SKODA_CHARGING),
         # locked or not, at the doors
         photo_pin(790, 300 + dy, f"={locked} ? 'lock' : 'lock_open'", f"={locked} ? '{ECAR_COLOR}' : '{ENYAQ_OPEN}'",
                   f"({locked} || {unlocked})"),
