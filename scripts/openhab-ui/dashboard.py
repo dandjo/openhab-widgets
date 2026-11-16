@@ -9565,11 +9565,12 @@ ENYAQ_BAR = (552, 572, 580, 34)
 # the plug at ENYAQ_PLUG.
 ENYAQ_PORT = (281, 175, 127, 73)
 ENYAQ_PLUG = (338, 220)
-# The flap closed: its shut line along the open port's recess, which is a little of a trapezium, higher at its
-# rear edge than at the hinge (user, 2026-11-16; the corners from lines fitted to the picture's four edges), with
-# rounded corners, drawn as the render's own seams are, black and about 1.6 px wide.
-ENYAQ_FLAP = [(289, 188), (358, 192), (358, 238), (289, 243)]
-ENYAQ_FLAP_RADIUS = 8
+# The flap closed: its shut line where the open port's recess lies, drawn as the render's own seams are, black and
+# about 1.6 px wide. Seen from the side it is a rectangle (user, 2026-11-16, from a photo of the port: the trapezium
+# of the app's picture is that picture's perspective), its corners rounded unequally, clockwise from the upper rear
+# one: the lower rear corner widest, the upper one at the hinge nearly square.
+ENYAQ_FLAP = [(289, 189), (358, 189), (358, 241), (289, 241)]
+ENYAQ_FLAP_RADIUS = (7, 5, 9, 14)
 # The body parts as the side view shows them, in its pixels without the room above. The doors with their window
 # frames: seams and the paint's lower edge, which falls towards the front, snapped to the photo (the darkest pixel
 # across a seam, the strongest step at the paint's edge), the tops along the chrome traced at 4x; the small fixed
@@ -9625,15 +9626,16 @@ def photo_stage(name, overlays=(), extra=(), visible=None, view=None, **style):
                                  "background-position": place, "background-repeat": "no-repeat", **style})
 
 
-def rounded_path(points, radius, dy=0):
-    """A closed svg path through the points with its corners rounded (a quadratic curve from radius before a corner
-    to radius after it), dy added to every y."""
-    def towards(a, b):
+def rounded_path(points, radii, dy=0):
+    """A closed svg path through the points with its corners rounded (a quadratic curve from the corner's radius
+    before it to the radius after it; radii: one per point), dy added to every y."""
+    def towards(a, b, radius):
         length = math.hypot(b[0] - a[0], b[1] - a[1])
         return (a[0] + (b[0] - a[0]) * radius / length, a[1] + (b[1] - a[1]) * radius / length)
     parts = []
     for i, corner in enumerate(points):
-        before, after = towards(corner, points[i - 1]), towards(corner, points[(i + 1) % len(points)])
+        before = towards(corner, points[i - 1], radii[i])
+        after = towards(corner, points[(i + 1) % len(points)], radii[i])
         parts.append(f"{'L' if parts else 'M'} {before[0]:.1f} {before[1] + dy:.1f} "
                      f"Q {corner[0]} {corner[1] + dy} {after[0]:.1f} {after[1] + dy:.1f}")
     return " ".join(parts) + " Z"
