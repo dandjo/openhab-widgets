@@ -75,6 +75,19 @@ python3 cdp_elems.py $B/weather 1400 $O/wxday "$(cat screenshot-js/quick_rect.js
 python3 cdp_elems.py $B/weather 1400 $O/wxday-dark "$(cat screenshot-js/quick_rect.js)('weather-day')" \
   "$(cat screenshot-js/day_popup.js)(1)" dark >/dev/null
 cp $O/wxday/weather-day.png $R/; cp $O/wxday-dark/weather-day.png $R/weather-day-dark.png
+# the e-car page's Škoda Enyaq card with its controls, charging and with the cable out, on demo values (demo_ecar.js,
+# made-up trips; user, 2026-11-16), with the car's pictures where the installation has them (not in the repository)
+step e-car
+for scene in charging unplugged; do
+  out=$([ $scene = unplugged ] && echo true || echo false)
+  python3 cdp_elems.py $B/e_car 1400 $O/ecar-$scene "$(cat screenshot-js/ecar_cards.js)" "$(cat demo_ecar.js)($out)" \
+    >/dev/null
+  python3 cdp_elems.py $B/e_car 1400 $O/ecar-$scene-dark "$(cat screenshot-js/ecar_cards.js)" \
+    "$(cat demo_ecar.js)($out)" dark >/dev/null
+  python3 cdp_elems.py $B/e_car 390 $O/ecar-$scene-phone "$(cat screenshot-js/ecar_cards.js)" \
+    "$(cat demo_ecar.js)($out)" >/dev/null
+  for v in "" -dark -phone; do cp $O/ecar-$scene$v/e-car.png $R/e-car-$scene$v.png; done
+done
 if [ "${GALLERY:-1}" = 1 ]; then  # GALLERY=0 leaves the gallery's shots as they are
 step gallery; python3 cdp_cards.py $B/widget_gallery $O/g900 900 >/dev/null
 cp $O/g900-3-state-bar.png $R/state-bars.png; cp $O/g900-5-switch-tile.png $R/switch-tiles.png

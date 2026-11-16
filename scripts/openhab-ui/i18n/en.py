@@ -13,7 +13,7 @@ import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
-from en_texts import DAY_LETTERS, EN, LISTS  # noqa: E402
+from en_texts import DAY_LETTERS, EN, LISTS, SUFFIXED  # noqa: E402
 
 # what a text may carry around its core, kept as it is
 EDGE = " ·:,;()/+–-|%•"
@@ -71,10 +71,42 @@ def tr_plain(text):
     return lead + tr_core(core) + trail if core else text
 
 
+def suffixed(expr):
+    """A German word before a duration in parentheses where English puts it, after: 'vor ' + (…) as (…) + ' ago'."""
+    for de, word in SUFFIXED.items():
+        head = f"'{de} ' + ("
+        i = expr.find(head)
+        while i >= 0:
+            start = i + len(head) - 1  # the opening parenthesis
+            depth, k, quoted = 0, start, False
+            while k < len(expr):
+                c = expr[k]
+                if quoted:
+                    if c == "\\":
+                        k += 1
+                    elif c == "'":
+                        quoted = False
+                elif c == "'":
+                    quoted = True
+                elif c == "(":
+                    depth += 1
+                elif c == ")":
+                    depth -= 1
+                    if depth == 0:
+                        break
+                k += 1
+            if depth:  # unbalanced: left as it is
+                break
+            expr = expr[:i] + expr[start:k + 1] + f" + ' {word}'" + expr[k + 1:]
+            i = expr.find(head, i)
+    return expr
+
+
 def tr_expr(expr):
     """An expression: whole lists, then its quoted texts by their cores; German number and time formats English."""
     for de, en in LISTS.items():
         expr = expr.replace(de, en)
+    expr = suffixed(expr)
     expr = expr.replace(".replace('.', ',')", "").replace("toLocaleString('de-AT'", "toLocaleString('en-GB'")
     expr = expr.replace("toLocaleString('de-DE'", "toLocaleString('en-GB'").replace("'DD.MM.YY'", "'DD/MM/YY'")
     expr = expr.replace(" + ' Uhr'", "").replace("' Uhr'", "''")

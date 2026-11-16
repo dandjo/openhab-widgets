@@ -15,7 +15,7 @@ props:
     type: TEXT
     required: true
   parameterGroups: []
-timestamp: Nov 8, 2026, 11:26:49 AM
+timestamp: Nov 16, 2026, 10:12:42 PM
 component: div
 config:
   style:
@@ -184,7 +184,7 @@ slots:
                       default:
                       - component: Label
                         config:
-                          text: =((d) => d.format('dd DD.MM.') + ' · ' + d.format('HH:mm') + '–' + d.add(15, 'minute').format('HH:mm'))(dayjs(loop.day.t))
+                          text: =((d) => d.format('ddd D MMM') + ' · ' + d.format('HH:mm') + '–' + d.add(15, 'minute').format('HH:mm'))(dayjs(loop.day.t))
                           style:
                             font-weight: '700'
                   - component: Label

@@ -1513,6 +1513,31 @@ config:
 | `wrap` | A long text wraps across the whole row of the grid instead of being cut | BOOLEAN |  |
 | `fontSize` | The tile's base size, e.g. 1.1em to grow with its card; default 14px | TEXT |  |
 
+## E-car page
+
+The page of my Škoda Enyaq iV, two cards side by side: the controls, and the car as it last reported itself. Its data
+come from the official MyŠkoda Public API through the rule in
+[`scripts/openhab-ui/applied/skoda_enyaq.py`](scripts/openhab-ui/applied/skoda_enyaq.py) (with `skoda_enyaq.js`),
+which reads it every 5 minutes while the car charges or drives and every 15 otherwise, and sends the charge target,
+the start and stop of a charge and the climate with its target temperature as commands. The car's side view carries
+what it reports: the charge as a bar along the sill, marked at its target; the lock; open doors, boot and bonnet
+coloured along their shut lines; the charge port open with the plug while the cable is in, the cable teal while it
+charges, and the closed flap's shut line without it. While it charges, the time left and when it will be done stand
+at the end of the charge's line. The cockpit over the climate's controls shows the target temperature, waves while
+the climate heats and snowflakes while it cools, and the window heating. Below the car, the locks, where it stands,
+the odometer, the climate and two tiles from the trips the rule finds in the reports, the last one and the last 30
+days.
+
+The pictures of the car are Škoda's renders of mine and not part of this repository: `dashboard.py` takes them from
+`/etc/openhab/html/enyaq/` (or the directory in `ENYAQ_PHOTOS`) and without them draws the car as the energy flow
+does. The screenshots show demo values.
+
+| | Charging | Cable out |
+|---|---|---|
+| Light | ![The e-car page while charging](screenshots/e-car-charging.png) | ![The e-car page with the cable out](screenshots/e-car-unplugged.png) |
+| Dark | ![The e-car page while charging in dark mode](screenshots/e-car-charging-dark.png) | ![The e-car page with the cable out in dark mode](screenshots/e-car-unplugged-dark.png) |
+| Phone | ![The e-car page while charging on a phone](screenshots/e-car-charging-phone.png) | ![The e-car page with the cable out on a phone](screenshots/e-car-unplugged-phone.png) |
+
 ## About these widgets
 
 The widgets are generated from Python by the script that builds my whole MainUI, which keeps the cards of the

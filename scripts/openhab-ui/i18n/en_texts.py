@@ -319,3 +319,44 @@ EN.update({"Škoda Enyaq Ladestand": "Škoda Enyaq State of Charge", "Škoda Eny
 # the Apollo AIR-1's items, created with German labels (2026-11-10), where widgets take them as props
 EN.update({"Apollo AIR-1 Luftfeuchtigkeit": "Apollo AIR-1 Humidity", "Apollo AIR-1 CO2": "Apollo AIR-1 CO2",
            "Apollo AIR-1 Temperatur": "Apollo AIR-1 Temperature"})
+# the e-car page (e_car) as the repository's screenshots of the Škoda Enyaq show it (2026-11-16)
+EN.update({"Ladestand": "Charge", "Ladeziel": "Charge target", "Akkuschonung": "Battery care", "Ziel": "Target",
+           "km Reichweite": "km range", "Lädt": "Charging", "Klima": "Climate", "Klimatisierung": "Climatisation",
+           "Zieltemperatur": "Target temperature", "gilt beim nächsten Start": "applies at the next start",
+           "das Auto klimatisiert auf diesen Wert": "the car climatises to this value",
+           "Zum Laden das Ladekabel einstecken": "Plug in the cable to charge", "Fahrzeugdaten": "Vehicle data",
+           "abgefragt": "read", "nächster Abruf": "next read", "API-Kontingent": "API quota", "von 20": "of 20",
+           "von 20 belegt": "of 20 used", "pro Stunde": "per hour", "Abfrage gesendet": "Request sent",
+           "Jetzt aktualisieren": "Refresh now", "Stand": "As of", "hochgerechnet": "extrapolated",
+           "Verriegelung": "Locks", "Verriegelt": "Locked", "Entriegelt": "Unlocked", "alles zu": "all closed",
+           "offen": "open", "Tür": "door", "Fenster": "windows", "Kofferraum": "boot", "Motorhaube": "bonnet",
+           "Licht an": "lights on", "Standort": "Location", "Standort und Fahrten": "Location and trips",
+           "Zu Hause": "At home", "Unterwegs": "Away", "Fährt": "Driving", "Kilometerstand": "Odometer",
+           "Letzte Fahrt": "Last trip", "30 Tage": "30 days", "Ladeleistung": "Charging power",
+           "Eingesteckt": "Plugged in", "Ausgesteckt": "Unplugged", "Nicht eingesteckt": "Not plugged in",
+           "Ladebereit": "Ready to charge", "Ladeerhaltung": "Maintaining charge", "Unterbrochen": "Interrupted",
+           "Entlädt": "Discharging", "Geparkt": "Parked", "Kühlt": "Cooling", "Heizt": "Heating",
+           "Heizt mit Zusatzheizung": "Heating with the auxiliary heater", "Lüftet": "Ventilating",
+           "Nicht unterstützt": "Not supported", "Schlüssel abgelaufen": "Key expired",
+           "Nicht berechtigt": "Not authorised", "Limit erreicht": "Limit reached",
+           "Keine Zugangsdaten": "No credentials",
+           "Diagnose": "Diagnostics", "Schlüssel gültig bis": "Key valid until",
+           "ON=Verriegelt,OFF=Entriegelt": "ON=Locked,OFF=Unlocked", "ON=Zu Hause,OFF=Unterwegs": "ON=At home,OFF=Away",
+           "OFF=Aus,COOLING=Kühlt,HEATING=Heizt,HEATING_AUXILIARY=Heizt mit Zusatzheizung,VENTILATION=Lüftet,"
+           "COMPLETED=Fertig,UNKNOWN=Unbekannt,UNSUPPORTED=Nicht unterstützt":
+               "OFF=Off,COOLING=Cooling,HEATING=Heating,HEATING_AUXILIARY=Heating with the auxiliary heater,"
+               "VENTILATION=Ventilating,COMPLETED=Done,UNKNOWN=Unknown,UNSUPPORTED=Not supported",
+           "OK=OK,KEY_EXPIRED=Schlüssel abgelaufen,NOT_AUTHORIZED=Nicht berechtigt,RATE_LIMITED=Limit erreicht,"
+           "ERROR=Fehler,NO_CREDENTIALS=Keine Zugangsdaten":
+               "OK=OK,KEY_EXPIRED=Key expired,NOT_AUTHORIZED=Not authorised,RATE_LIMITED=Limit reached,"
+               "ERROR=Error,NO_CREDENTIALS=No credentials",
+           "Berechnet aus der Messung der Klimaanlage (Shelly EM) abzüglich der Leistung laut Faikin und der "
+           "Grundlast der Klimaanlage (Standby, Innengerät); unter 300 W lädt das Auto nicht. Der Schalter spiegelt "
+           "nur das Relais des Shelly EM, das mit nichts verbunden ist.":
+               "Calculated from the air conditioner's meter (Shelly EM) less the power Faikin reports and the air "
+               "conditioner's base load (standby, indoor unit); below 300 W the car is not charging. The switch only "
+               "mirrors the Shelly EM's relay, which is connected to nothing."})
+LISTS.update({"(n === 1 ? ' Fahrt' : ' Fahrten')": "(n === 1 ? ' trip' : ' trips')", "'dd HH:mm'": "'ddd HH:mm'",
+              "'DD.MM. HH:mm'": "'D MMM HH:mm'", "'dd DD.MM.'": "'ddd D MMM'"})
+# a German word before a duration in parentheses, the English word after it: 'vor ' + (…) as (…) + ' ago' (en.py)
+SUFFIXED = {"vor": "ago", "noch": "left"}
