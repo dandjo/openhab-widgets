@@ -9565,6 +9565,9 @@ ENYAQ_BAR = (552, 572, 580, 34)
 # the plug at ENYAQ_PLUG.
 ENYAQ_PORT = (281, 175, 127, 73)
 ENYAQ_PLUG = (338, 220)
+# The flap closed, a rounded rectangle around the open port's recess (x, y, width, height, corner radius): its shut
+# line drawn as the render's own seams are, black and about 1.6 px wide.
+ENYAQ_FLAP = (289, 189, 69, 52, 8)
 # The body parts as the side view shows them, in its pixels without the room above. The doors with their window
 # frames: seams and the paint's lower edge, which falls towards the front, snapped to the photo (the darkest pixel
 # across a seam, the strongest step at the paint's edge), the tops along the chrome traced at 4x; the small fixed
@@ -9642,7 +9645,7 @@ def enyaq_side():
     always over the flag's middle; the lights' glow; a lock at the doors; doors, windows, tailgate and bonnet
     coloured along their shut lines while open, the open boot also as its own picture in the corner; while the
     cable is plugged in the charge port open with the plug in it and the cable, and while it charges a bolt above
-    the port; the climate with its target on the front door's pane."""
+    the port, else the port's flap closed as its shut line; the climate with its target on the front door's pane."""
     def is_(suffix, state):
         return f"items.{skoda(suffix)}.state === '{state}'"
 
@@ -9651,6 +9654,7 @@ def enyaq_side():
     bx, by, bw, bh = ENYAQ_BAR
     port_x, port_y, port_w, port_h = ENYAQ_PORT
     plug_x, plug_y = ENYAQ_PLUG
+    flap_x, flap_y, flap_w, flap_h, flap_r = ENYAQ_FLAP
     dy = ENYAQ_DY
     locked, unlocked = is_("locked", "ON"), is_("locked", "OFF")
     plugged = f"({is_('plug', 'ON')} || {SKODA_CHARGING})"
@@ -9702,6 +9706,9 @@ def enyaq_side():
         # (user, 2026-11-14: a curve and a straight piece met in a corner)
         svg("image", href=ENYAQ_PHOTO["port"], x=port_x, y=port_y + dy, width=port_w, height=port_h,
             preserveAspectRatio="none", visible=f"={plugged}"),
+        # without the cable the flap is closed: its shut line (user, 2026-11-16: the closed flap should show)
+        svg("rect", x=flap_x, y=flap_y + dy, width=flap_w, height=flap_h, rx=flap_r, fill="none", stroke="#000000",
+            visible=f"=!{plugged}", **{"stroke-width": 1.6}),
         svg("path", d=f"M {plug_x} {plug_y + dy} C {plug_x - 4} {400 + dy}, 230 {548 + dy}, 0 {548 + dy}",
             visible=f"={plugged}", fill="none", stroke=f"={cable}", **{"stroke-width": 10, "stroke-linecap": "round"}),
         # the bolt over the recess, clear of the open flap
