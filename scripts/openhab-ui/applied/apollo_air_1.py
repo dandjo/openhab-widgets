@@ -184,7 +184,7 @@ POINTS = {
     "co2_calibrate": ("String", "CO2 kalibrieren", "co2", ["Control"], [], command("%s", options="PRESS=Kalibrieren"),
                       "string", {"commandTopic": TOPIC + "button/calibrate_co2/command"}),
     "co2_calibration": ("String", "CO2-Kalibrierung", "co2", ["Status"], [], state(f"JS({CALIBRATION_JS}):%s"),
-                        "string", {"stateTopic": sensor("co2_calibration")}),
+                        "string", {"stateTopic": sensor("co2_calibration_result")}),
 }
 # items linked to another item's channel with a profile: item suffix -> (channel suffix, profile)
 PROFILE_LINKS = {"last_seen": ("uptime", "system:timestamp-update")}
