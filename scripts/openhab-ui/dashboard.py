@@ -9565,9 +9565,11 @@ ENYAQ_BAR = (552, 572, 580, 34)
 # the plug at ENYAQ_PLUG.
 ENYAQ_PORT = (281, 175, 127, 73)
 ENYAQ_PLUG = (338, 220)
-# The flap closed, a rounded rectangle around the open port's recess (x, y, width, height, corner radius): its shut
-# line drawn as the render's own seams are, black and about 1.6 px wide.
-ENYAQ_FLAP = (289, 189, 69, 52, 8)
+# The flap closed: its shut line along the open port's recess, which is a little of a trapezium, higher at its
+# rear edge than at the hinge (user, 2026-11-16; the corners from lines fitted to the picture's four edges), with
+# rounded corners, drawn as the render's own seams are, black and about 1.6 px wide.
+ENYAQ_FLAP = [(289, 188), (358, 192), (358, 238), (289, 243)]
+ENYAQ_FLAP_RADIUS = 8
 # The body parts as the side view shows them, in its pixels without the room above. The doors with their window
 # frames: seams and the paint's lower edge, which falls towards the front, snapped to the photo (the darkest pixel
 # across a seam, the strongest step at the paint's edge), the tops along the chrome traced at 4x; the small fixed
@@ -9623,6 +9625,20 @@ def photo_stage(name, overlays=(), extra=(), visible=None, view=None, **style):
                                  "background-position": place, "background-repeat": "no-repeat", **style})
 
 
+def rounded_path(points, radius, dy=0):
+    """A closed svg path through the points with its corners rounded (a quadratic curve from radius before a corner
+    to radius after it), dy added to every y."""
+    def towards(a, b):
+        length = math.hypot(b[0] - a[0], b[1] - a[1])
+        return (a[0] + (b[0] - a[0]) * radius / length, a[1] + (b[1] - a[1]) * radius / length)
+    parts = []
+    for i, corner in enumerate(points):
+        before, after = towards(corner, points[i - 1]), towards(corner, points[(i + 1) % len(points)])
+        parts.append(f"{'L' if parts else 'M'} {before[0]:.1f} {before[1] + dy:.1f} "
+                     f"Q {corner[0]} {corner[1] + dy} {after[0]:.1f} {after[1] + dy:.1f}")
+    return " ".join(parts) + " Z"
+
+
 def photo_poly(points, visible, **attrs):
     return svg("polygon", points=" ".join(f"{x},{y}" for x, y in points), visible=f"={visible}", **attrs)
 
@@ -9654,7 +9670,6 @@ def enyaq_side():
     bx, by, bw, bh = ENYAQ_BAR
     port_x, port_y, port_w, port_h = ENYAQ_PORT
     plug_x, plug_y = ENYAQ_PLUG
-    flap_x, flap_y, flap_w, flap_h, flap_r = ENYAQ_FLAP
     dy = ENYAQ_DY
     locked, unlocked = is_("locked", "ON"), is_("locked", "OFF")
     plugged = f"({is_('plug', 'ON')} || {SKODA_CHARGING})"
@@ -9707,7 +9722,7 @@ def enyaq_side():
         svg("image", href=ENYAQ_PHOTO["port"], x=port_x, y=port_y + dy, width=port_w, height=port_h,
             preserveAspectRatio="none", visible=f"={plugged}"),
         # without the cable the flap is closed: its shut line (user, 2026-11-16: the closed flap should show)
-        svg("rect", x=flap_x, y=flap_y + dy, width=flap_w, height=flap_h, rx=flap_r, fill="none", stroke="#000000",
+        svg("path", d=rounded_path(ENYAQ_FLAP, ENYAQ_FLAP_RADIUS, dy), fill="none", stroke="#000000",
             visible=f"=!{plugged}", **{"stroke-width": 1.6}),
         svg("path", d=f"M {plug_x} {plug_y + dy} C {plug_x - 4} {400 + dy}, 230 {548 + dy}, 0 {548 + dy}",
             visible=f"={plugged}", fill="none", stroke=f"={cable}", **{"stroke-width": 10, "stroke-linecap": "round"}),
