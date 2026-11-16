@@ -6449,12 +6449,17 @@ def hero(icon, color, caption, value, extra=(), value_color=None, picture=None):
                **{"display": "flex", "align-items": "center", "gap": "18px", "padding": "12px 16px 8px"})
 
 
-def hero_texts(caption, value, extra=(), value_color=None):
-    """A device head's texts: the caption small, the main value large, chips and lines below."""
+def hero_texts(caption, value, extra=(), value_color=None, aside=None):
+    """A device head's texts: the caption small, the main value large, chips and lines below; aside: a component at
+    the right end of the main value's line, under it where the two do not fit beside each other."""
     big = {**HERO, "white-space": "nowrap"}
     if value_color:
         big["color"] = value_color
-    return div([label(caption, **{"font-size": "12px", "opacity": "0.7"}), label(value, **big), *extra],
+    main = label(value, **big)
+    if aside is not None:
+        main = div([main, aside], **{"display": "flex", "flex-wrap": "wrap", "align-items": "baseline",
+                                     "gap": "2px 12px", "align-self": "stretch"})
+    return div([label(caption, **{"font-size": "12px", "opacity": "0.7"}), main, *extra],
                **{"display": "flex", "flex-direction": "column", "align-items": "flex-start", "gap": "3px",
                   "min-width": "0"})
 
@@ -9810,7 +9815,8 @@ def e_car_now():
     plug up here, under odometer and climate).
     With the car's pictures (ENYAQ_PHOTO; user, 2026-11-14) the head is its side view, enyaq_side(), which draws the
     charge with its target, the lock, what stands open, the lights, the cable and the climate: the texts stand
-    under it, the charge target at the right end of the report's line; the charge's bar and the cable's and the
+    under it, while it charges the time left and when it is done at the right end of the charge's line, the charge
+    target at the right end of the report's line; the charge's bar and the cable's and the
     plug's tiles are left out, two tiles from the trips (trip_tiles()) follow the other four, and the tiles reach
     down to the card's end, which is the end of the controls' card beside it on a desktop."""
     soc, state, plug = skoda("soc"), skoda("charging_state"), skoda("plug")
@@ -9886,8 +9892,11 @@ def e_car_now():
                            ECAR_COLOR)
     if ENYAQ_PHOTO:
         # the charge target at the right end of the report's line (user, 2026-11-14), under it where the two do not
-        # fit beside each other; the time a charge still takes stands in the Laden pill of the card beside
+        # fit beside each other; while it charges the time left and when it is done at the right end of the charge's
+        # line, as the MyŠkoda app has it (user, 2026-11-16: back in this card, as in the Laden pill beside)
         caption, value, (state_chips, stand) = head
+        time_left = label(ends[0], f"={SKODA_CHARGING} && {ok(reached_at)}",
+                          **{"font-size": "14px", "margin-left": "auto"})
         stand_row = div([stand, label(ends[1], **{"font-size": "12px", "opacity": "0.7", "margin-left": "auto",
                                                    "white-space": "nowrap"})],
                         **{"display": "flex", "flex-wrap": "wrap", "align-items": "baseline", "gap": "2px 12px",
@@ -9899,7 +9908,8 @@ def e_car_now():
         tiles["config"]["style"].update({"flex": "1 1 auto", "grid-template-columns": "repeat(2, minmax(0, 1fr))"})
         return [div([enyaq_side()], **{"padding": "8px 12px 0"}),
                 # a little room between the picture and the charge (user, 2026-11-14)
-                div([hero_texts(caption, value, [state_chips, stand_row])], **{"padding": "14px 16px 10px"}),
+                div([hero_texts(caption, value, [state_chips, stand_row], aside=time_left)],
+                    **{"padding": "14px 16px 10px"}),
                 tiles]
     tiles = two_on_phone(value_grid([lock_tile, place_tile,
                         km_tile(),
