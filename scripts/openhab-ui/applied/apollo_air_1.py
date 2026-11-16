@@ -27,7 +27,7 @@ THING = "mqtt:topic:mosquitto:apollo_air_1"
 GROUP = "apollo_air_1"
 P = GROUP + "_"
 TOPIC = os.environ["AIR1_TOPIC"].rstrip("/") + "/"  # the device's topic prefix, its name with the MAC suffix
-STATUS_TOPIC = "apollo-air-1/status"  # its birth and last will, without the suffix (ESPHome adds it to the rest only)
+STATUS_TOPIC = TOPIC + "status"  # its birth and last will, under the same prefix since ESPHome 2026.11 (esphome#9315)
 UG = "\u00b5g/m\u00b3"  # µg/m³ with the micro sign, as openHAB knows the unit
 # what the LED can show (the device's select), with its German labels
 LED_SOURCES = {"Off": "Aus", "CO2": "CO₂", "NowCast AQI": "US-AQI", "VOC Index": "VOC-Index"}
