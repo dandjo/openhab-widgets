@@ -5,10 +5,12 @@ same heat given in a day window with the leaving water offset a little higher (+
 long runs, the house's mass carries it through the night, and more of it comes from the PV. The rule
 heatpump_day_heating (hp_day_heating.js next to this file) sets the offset to the day offset in the window (default
 9–19 h) and to −10 K outside it, where the setpoint stays at the controller's minimum of 20 °C and it never calls for
-heat. The season is decided once a day at the window's start: a 24-hour mean outdoor temperature
-(espaltherma_ext_ambient_temp_avg, the heating curve's basis, read from InfluxDB at that moment) of 8 °C or more makes
-the day and the night after it day mode, a lower one normal operation until the next window's start, so a mean
-swinging around 8 °C within a day never switches back and forth. In normal operation the offset goes back to 0 once and
+heat. The season is decided at the window's start for the window and at its end for the night after it (the second
+point since 2026-11-19), by the weather forecast's mean of the 24 hours from the point (weather_hourly, since
+2026-11-19) plus 0.8 K, which the heat pump's outdoor sensor reads above it over a day; without a fresh forecast the
+24-hour mean behind the point (espaltherma_ext_ambient_temp_avg, the heating curve's basis, from InfluxDB) decides.
+8 °C or more makes the window or the night day mode, less normal operation until the next point, so a value around
+8 °C never switches back and forth within a window or a night. In normal operation the offset goes back to 0 once and
 the cycle guard
 (hp_cycle_guard.js) works as before; in day mode it locks starts in the window only after a charge or a short run (the
 rule waits for its lock to go) and keeps out at night, as it reads heatpump_day_heating_state. The switch off alone,
@@ -17,7 +19,8 @@ next window start, when the rule switches it on again; with all of them off (Aut
 Items: the switch heatpump_day_heating (a member of heatpump_management, like the two other heat pump automations, so
 the Automatik switch switches it too; its own switch row is the pause), heatpump_day_heating_state (day, night, normal, off), the settings
 heatpump_day_heating_offset (K, whole kelvins: the controller takes no others), heatpump_day_heating_start and _end
-(hours, decimals for minutes); all restored by MapDB after a restart, state and offset in InfluxDB on change.
+(hours, decimals for minutes), heatpump_day_heating_decision (the last decision as JSON: at, source forecast or mean,
+forecast, mean); all restored by MapDB after a restart, state, offset and decision in InfluxDB on change.
 apply creates or updates items, metadata and the rule, sets the settings to their defaults where they have no state yet
 and the switch to the group's state. Apply before the cycle guard's update, which reads the state item.
 Usage: hp_day_heating.py check|apply   (on homepi, as pi; the API token from ~/.openhab_token)"""
@@ -36,7 +39,7 @@ TOKEN = open(os.path.expanduser("~/.openhab_token")).read().strip()
 SCRIPT = open(os.path.join(HERE, "hp_day_heating.js"), encoding="utf-8").read()
 UID = SWITCH = "heatpump_day_heating"
 GROUP = "heatpump_management"
-STATE, OFFSET, START, END = (f"{UID}_{s}" for s in ("state", "offset", "start", "end"))
+STATE, OFFSET, START, END, DECISION = (f"{UID}_{s}" for s in ("state", "offset", "start", "end", "decision"))
 KEEP = ["influxdb_change", "mapdb_change_restore"]
 ITEMS = {
     SWITCH: {"type": "Switch", "label": "Wärmepumpe Tagheizung-Automatik", "tags": ["Switch"],
@@ -45,6 +48,7 @@ ITEMS = {
     OFFSET: {"type": "Number", "label": "Wärmepumpe Tagheizung Offset", "tags": [], "groupNames": KEEP},
     START: {"type": "Number", "label": "Wärmepumpe Tagheizung Beginn", "tags": [], "groupNames": ["mapdb_change_restore"]},
     END: {"type": "Number", "label": "Wärmepumpe Tagheizung Ende", "tags": [], "groupNames": ["mapdb_change_restore"]},
+    DECISION: {"type": "String", "label": "Wärmepumpe Tagheizung Entscheidung", "tags": [], "groupNames": KEEP},
 }
 for name, item in ITEMS.items():
     item.update(name=name, category="material:wb_sunny")
@@ -55,10 +59,11 @@ METADATA = {
     OFFSET: {"stateDescription": {"value": " ", "config": {"pattern": "%+.0f K", "min": -10, "max": 10, "step": 1}}},
     START: {"stateDescription": {"value": " ", "config": {"pattern": "%s Uhr", "min": 0, "max": 24, "step": 0.5}}},
     END: {"stateDescription": {"value": " ", "config": {"pattern": "%s Uhr", "min": 0, "max": 24, "step": 0.5}}},
+    DECISION: {"stateDescription": {"value": " ", "config": {"pattern": "%s", "readOnly": True}}},
 }
 DEFAULTS = {OFFSET: "2", START: "9", END: "19"}
-# the offset, the switches, the settings and the guard's lock at once; the window's start and end (and with the start
-# the season's decision) every 20 seconds, between the guard's runs
+# the offset, the switches, the settings and the guard's lock at once; the window's start and end (and with them the
+# season's two decisions) every 20 seconds, between the guard's runs
 WATCHED = ("pyaltherma_leaving_water_temp_offset_heating", SWITCH, "pyaltherma_climate_control_power", OFFSET, START,
            END, "heatpump_cycle_lock")
 RULE = {
