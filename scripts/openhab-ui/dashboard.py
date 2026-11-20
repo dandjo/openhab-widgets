@@ -10446,36 +10446,66 @@ def peak_quarter(t):
             f"(dayjs({t}))")
 
 
+def peak_key(role):
+    """The class of a group's segment or chip (loop.part[0]) in a peak box's hover highlight: its index in
+    PEAK_COLORS, -1 for a group the generator does not know."""
+    names = "[" + ", ".join(js_str(n) for n in PEAK_COLORS) + "]"
+    return f"='{role} k k-' + {names}.indexOf(loop.part[0])"
+
+
+def peak_hover_css():
+    """Hovering a group's segment or chip lifts both and fades the rest of the box, as the consumption card's bar and
+    list (hover_group()); where a pointer hovers, bar and chips lie above the box's tap link (F7 gives it z-index 1),
+    which opens the month from the rest of the box (a phone taps the whole box as before)."""
+    css = [".k { transition: opacity 0.15s, transform 0.15s, background-color 0.15s; }",
+           ".pchip { border-radius: 6px; padding: 1px 5px; margin: -1px -5px; }",
+           ":host:has(.k:hover) .k { opacity: 0.3; }",
+           "@media (hover: hover) and (pointer: fine) { .lift { position: relative; z-index: 2; } }"]
+    for i, (name, color) in enumerate(PEAK_COLORS.items()):
+        tint = rgba("#9e9e9e" if name == "Nicht gemessen" else color, 0.4)
+        css += [f":host:has(.k-{i}:hover) .k-{i} {{ opacity: 1; }}",
+                f":host:has(.k-{i}:hover) .pchip.k-{i} {{ background-color: {tint}; font-weight: 700; }}",
+                f":host:has(.k-{i}:hover) .seg.k-{i} {{ transform: scaleY(1.5); }}"]
+    return "\n".join(css)
+
+
 def peak_box(title, sub, q, scale, tap=None):
     """A strong quarter-hour (q: its JSON object, {t, kw, pv, p: [[group, kW], ...]}) as a box: a title and a line
     under it, its mean import on the right, a bar of what the house drew then by consumer group (its length against
     scale, the strongest draw of the list) and the main groups with their kW and what PV covered; tap: a link over
-    it."""
+    it. A segment's or a chip's tooltip names the group with its kW and its share of the draw, hovering lifts the
+    pair (user, 2026-11-20: as Verbrauch heute)."""
     total = f"{q}.p.reduce((a, x) => a + x[1], 0)"
+    tip = (f"=loop.part[0] + ' · ' + loop.part[1].toFixed(2).replace('.', ',') + ' kW · ' + "
+           f"Math.round(100 * loop.part[1] / Math.max(0.001, {total})) + ' %'")
     head = div([div([label(f"={title}", **{"font-weight": "700"}),
                      *([label(f"={sub}", **{**VT_SUB, "font-size": "12px"})] if sub else [])],
                     **{"min-width": "0"}),
                 label(f"={q}.kw.toFixed(2).replace('.', ',') + ' kW'",
                       **{"font-weight": "700", "font-size": "17px", "color": "#e53935", "white-space": "nowrap"})],
                **{"display": "flex", "justify-content": "space-between", "align-items": "baseline", "gap": "8px"})
-    segment_ = div([], **{"width": f"=(100 * loop.part[1] / Math.max(0.001, {total})).toFixed(2) + '%'",
-                          "height": "100%", "background": f"={peak_color()}", "border-radius": "3px"})
-    bar = div([comp("oh-repeater", {"for": "part", "sourceType": "array", "in": f"={q}.p", "fragment": True},
-                    default=[segment_])],
-              **{"display": "flex", "gap": "2px", "height": "12px", "margin": "8px 0 6px",
-                 "width": f"=(100 * {total} / Math.max(0.001, {scale} || 0)).toFixed(1) + '%'"})
+    segment_ = keyed(peak_key("seg"), [], title=tip, style={
+        "width": f"=(100 * loop.part[1] / Math.max(0.001, {total})).toFixed(2) + '%'",
+        "height": "100%", "background": f"={peak_color()}", "border-radius": "3px"})
+    bar = keyed("lift", [comp("oh-repeater", {"for": "part", "sourceType": "array", "in": f"={q}.p",
+                                              "fragment": True}, default=[segment_])],
+                style={"display": "flex", "gap": "2px", "height": "12px", "margin": "8px 0 6px",
+                       "width": f"=(100 * {total} / Math.max(0.001, {scale} || 0)).toFixed(1) + '%'"})
     dot = div([], **{"width": "8px", "height": "8px", "border-radius": "50%", "flex": "0 0 auto",
                      "background": f"={peak_color()}"})
-    chip_ = div([dot, label("=loop.part[0] + ' ' + loop.part[1].toFixed(1).replace('.', ',') + ' kW'")],
-                **{"display": "flex", "align-items": "center", "gap": "5px", "white-space": "nowrap"})
-    legend = div([comp("oh-repeater", {"for": "part", "sourceType": "array", "fragment": True,
-                                       "in": f"={q}.p.filter((x) => x[1] >= 0.1).slice(0, 4)"}, default=[chip_]),
-                  label(f"='PV deckte ' + {q}.pv.toFixed(1).replace('.', ',') + ' kW'", f"={q}.pv >= 0.1",
-                        **{"white-space": "nowrap"})],
-                 **{**VT_SUB, "display": "flex", "flex-wrap": "wrap", "align-items": "center", "gap": "4px 12px"})
-    return div([head, bar, legend, *([tap] if tap else [])],
-               **{"background": "rgba(127, 127, 127, 0.12)", "border-radius": "12px", "padding": "10px 12px",
-                  "margin-bottom": "8px", "position": "relative"})
+    chip_ = keyed(peak_key("pchip"), [dot, label("=loop.part[0] + ' ' + loop.part[1].toFixed(1).replace('.', ',') "
+                                                 "+ ' kW'")], title=tip,
+                  style={"display": "flex", "align-items": "center", "gap": "5px", "white-space": "nowrap"})
+    legend = keyed("lift", [comp("oh-repeater", {"for": "part", "sourceType": "array", "fragment": True,
+                                                 "in": f"={q}.p.filter((x) => x[1] >= 0.1).slice(0, 4)"},
+                                 default=[chip_]),
+                            label(f"='PV deckte ' + {q}.pv.toFixed(1).replace('.', ',') + ' kW'", f"={q}.pv >= 0.1",
+                                  **{"white-space": "nowrap"})],
+                   style={**VT_SUB, "display": "flex", "flex-wrap": "wrap", "align-items": "center",
+                          "gap": "4px 12px"})
+    return comp("div", {"stylesheet": peak_hover_css(), "style": {
+        "background": "rgba(127, 127, 127, 0.12)", "border-radius": "12px", "padding": "10px 12px",
+        "margin-bottom": "8px", "position": "relative"}}, default=[head, bar, legend, *([tap] if tap else [])])
 
 
 def peak_month_name(m):

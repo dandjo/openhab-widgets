@@ -15,7 +15,7 @@ props:
     type: TEXT
     required: true
   parameterGroups: []
-timestamp: Nov 16, 2026, 10:12:42 PM
+timestamp: Nov 20, 2026, 5:19:41 PM
 component: div
 config:
   style:
@@ -159,6 +159,103 @@ slots:
           default:
           - component: div
             config:
+              stylesheet: '.k { transition: opacity 0.15s, transform 0.15s, background-color 0.15s; }
+
+                .pchip { border-radius: 6px; padding: 1px 5px; margin: -1px -5px; }
+
+                :host:has(.k:hover) .k { opacity: 0.3; }
+
+                @media (hover: hover) and (pointer: fine) { .lift { position: relative; z-index: 2; } }
+
+                :host:has(.k-0:hover) .k-0 { opacity: 1; }
+
+                :host:has(.k-0:hover) .pchip.k-0 { background-color: rgba(255, 183, 77, 0.4); font-weight: 700; }
+
+                :host:has(.k-0:hover) .seg.k-0 { transform: scaleY(1.5); }
+
+                :host:has(.k-1:hover) .k-1 { opacity: 1; }
+
+                :host:has(.k-1:hover) .pchip.k-1 { background-color: rgba(38, 166, 154, 0.4); font-weight: 700; }
+
+                :host:has(.k-1:hover) .seg.k-1 { transform: scaleY(1.5); }
+
+                :host:has(.k-2:hover) .k-2 { opacity: 1; }
+
+                :host:has(.k-2:hover) .pchip.k-2 { background-color: rgba(79, 195, 247, 0.4); font-weight: 700; }
+
+                :host:has(.k-2:hover) .seg.k-2 { transform: scaleY(1.5); }
+
+                :host:has(.k-3:hover) .k-3 { opacity: 1; }
+
+                :host:has(.k-3:hover) .pchip.k-3 { background-color: rgba(206, 147, 216, 0.4); font-weight: 700; }
+
+                :host:has(.k-3:hover) .seg.k-3 { transform: scaleY(1.5); }
+
+                :host:has(.k-4:hover) .k-4 { opacity: 1; }
+
+                :host:has(.k-4:hover) .pchip.k-4 { background-color: rgba(159, 168, 218, 0.4); font-weight: 700; }
+
+                :host:has(.k-4:hover) .seg.k-4 { transform: scaleY(1.5); }
+
+                :host:has(.k-5:hover) .k-5 { opacity: 1; }
+
+                :host:has(.k-5:hover) .pchip.k-5 { background-color: rgba(128, 203, 196, 0.4); font-weight: 700; }
+
+                :host:has(.k-5:hover) .seg.k-5 { transform: scaleY(1.5); }
+
+                :host:has(.k-6:hover) .k-6 { opacity: 1; }
+
+                :host:has(.k-6:hover) .pchip.k-6 { background-color: rgba(176, 190, 197, 0.4); font-weight: 700; }
+
+                :host:has(.k-6:hover) .seg.k-6 { transform: scaleY(1.5); }
+
+                :host:has(.k-7:hover) .k-7 { opacity: 1; }
+
+                :host:has(.k-7:hover) .pchip.k-7 { background-color: rgba(188, 170, 164, 0.4); font-weight: 700; }
+
+                :host:has(.k-7:hover) .seg.k-7 { transform: scaleY(1.5); }
+
+                :host:has(.k-8:hover) .k-8 { opacity: 1; }
+
+                :host:has(.k-8:hover) .pchip.k-8 { background-color: rgba(244, 143, 177, 0.4); font-weight: 700; }
+
+                :host:has(.k-8:hover) .seg.k-8 { transform: scaleY(1.5); }
+
+                :host:has(.k-9:hover) .k-9 { opacity: 1; }
+
+                :host:has(.k-9:hover) .pchip.k-9 { background-color: rgba(174, 213, 129, 0.4); font-weight: 700; }
+
+                :host:has(.k-9:hover) .seg.k-9 { transform: scaleY(1.5); }
+
+                :host:has(.k-10:hover) .k-10 { opacity: 1; }
+
+                :host:has(.k-10:hover) .pchip.k-10 { background-color: rgba(255, 241, 118, 0.4); font-weight: 700; }
+
+                :host:has(.k-10:hover) .seg.k-10 { transform: scaleY(1.5); }
+
+                :host:has(.k-11:hover) .k-11 { opacity: 1; }
+
+                :host:has(.k-11:hover) .pchip.k-11 { background-color: rgba(255, 138, 101, 0.4); font-weight: 700; }
+
+                :host:has(.k-11:hover) .seg.k-11 { transform: scaleY(1.5); }
+
+                :host:has(.k-12:hover) .k-12 { opacity: 1; }
+
+                :host:has(.k-12:hover) .pchip.k-12 { background-color: rgba(158, 158, 158, 0.4); font-weight: 700; }
+
+                :host:has(.k-12:hover) .seg.k-12 { transform: scaleY(1.5); }
+
+                :host:has(.k-13:hover) .k-13 { opacity: 1; }
+
+                :host:has(.k-13:hover) .pchip.k-13 { background-color: rgba(77, 182, 172, 0.4); font-weight: 700; }
+
+                :host:has(.k-13:hover) .seg.k-13 { transform: scaleY(1.5); }
+
+                :host:has(.k-14:hover) .k-14 { opacity: 1; }
+
+                :host:has(.k-14:hover) .pchip.k-14 { background-color: rgba(255, 241, 118, 0.4); font-weight: 700; }
+
+                :host:has(.k-14:hover) .seg.k-14 { transform: scaleY(1.5); }'
               style:
                 background: rgba(127, 127, 127, 0.12)
                 border-radius: 12px
@@ -197,6 +294,7 @@ slots:
                         white-space: nowrap
               - component: div
                 config:
+                  class: lift
                   style:
                     display: flex
                     gap: 2px
@@ -217,6 +315,11 @@ slots:
                       default:
                       - component: div
                         config:
+                          class: ='seg k k-' + ['Heat Pump', 'E-Car', 'Air Conditioner', 'Offices', 'Network', 'Ventilation',
+                            'Refrigerator', 'Coffee Machine', 'Living Room Media', 'Laundry & Dishes', 'Terrace', 'Bicycles',
+                            'Not measured', 'Akku laden', 'Terrace & Bicycles'].indexOf(loop.part[0])
+                          title: =loop.part[0] + ' · ' + loop.part[1].toFixed(2) + ' kW · ' + Math.round(100 * loop.part[1]
+                            / Math.max(0.001, loop.day.p.reduce((a, x) => a + x[1], 0))) + ' %'
                           style:
                             width: =(100 * loop.part[1] / Math.max(0.001, loop.day.p.reduce((a, x) => a + x[1], 0))).toFixed(2)
                               + '%'
@@ -233,6 +336,7 @@ slots:
                           default: []
               - component: div
                 config:
+                  class: lift
                   style:
                     font-size: 11px
                     opacity: '0.65'
@@ -252,6 +356,11 @@ slots:
                       default:
                       - component: div
                         config:
+                          class: ='pchip k k-' + ['Heat Pump', 'E-Car', 'Air Conditioner', 'Offices', 'Network', 'Ventilation',
+                            'Refrigerator', 'Coffee Machine', 'Living Room Media', 'Laundry & Dishes', 'Terrace', 'Bicycles',
+                            'Not measured', 'Akku laden', 'Terrace & Bicycles'].indexOf(loop.part[0])
+                          title: =loop.part[0] + ' · ' + loop.part[1].toFixed(2) + ' kW · ' + Math.round(100 * loop.part[1]
+                            / Math.max(0.001, loop.day.p.reduce((a, x) => a + x[1], 0))) + ' %'
                           style:
                             display: flex
                             align-items: center
