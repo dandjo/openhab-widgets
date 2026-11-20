@@ -22,11 +22,10 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Nov 15, 2026, 9:47:20 AM
+timestamp: Nov 20, 2026, 7:56:01 PM
 component: div
 config:
-  style:
-    --quick-popup: panel
+  style: {}
   label: 3-Way Valve
   stylesheet: "@keyframes a-soft { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.06; } }\n@keyframes a-full { 0%, 100% { opacity:\
     \ 0.3; } 50% { opacity: 1; } }\n@keyframes a-arc { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }\n@keyframes a-halo\
@@ -63,10 +62,9 @@ config:
     \ center; animation: a-ripple 1.6s linear infinite; }\n.a-run { animation: a-run 2.5s linear infinite; }\n.a-drop { animation:\
     \ a-drop 0.9s linear infinite; }\n.a-bubble-l { transform-box: fill-box; transform-origin: center; animation: a-bubble-l\
     \ 2.6s linear infinite; }\n.a-bubble-r { transform-box: fill-box; transform-origin: center; animation: a-bubble-r 2.6s\
-    \ linear infinite; }\n\n:root .popup:has(> .oh-popup[style*=\"--quick-popup\"]) { --f7-popup-tablet-width: 420px; --f7-popup-tablet-height:\
-    \ min(660px, calc(100vh - 64px)); }\n.card { border-radius: 14px; box-shadow: 0 0 0 1px color-mix(in srgb, var(--f7-text-color)\
-    \ 16%, transparent); }\n.card .card { box-shadow: none; }\n.card-header { justify-content: flex-start; min-height: 0;\
-    \ font-size: 13px; font-weight: 700; line-height: 18px;\n  padding: 8px 16px; opacity: 1; letter-spacing: 0.01em; border-radius:\
+    \ linear infinite; }\n\n.card { border-radius: 14px; box-shadow: 0 0 0 1px color-mix(in srgb, var(--f7-text-color) 16%,\
+    \ transparent); }\n.card .card { box-shadow: none; }\n.card-header { justify-content: flex-start; min-height: 0; font-size:\
+    \ 13px; font-weight: 700; line-height: 18px;\n  padding: 8px 16px; opacity: 1; letter-spacing: 0.01em; border-radius:\
     \ 14px 14px 0 0; background: color-mix(in srgb, var(--f7-text-color) 8%, transparent);\n  border-bottom: 1px solid color-mix(in\
     \ srgb, var(--f7-text-color) 16%, transparent); }\n.card-header::after { display: none !important; }\n.oh-chart-container\
     \ > .menu .menu-item { background: color-mix(in srgb, var(--f7-text-color) 8%, transparent);\n  color: inherit; border-radius:\

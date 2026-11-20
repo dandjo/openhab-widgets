@@ -670,7 +670,8 @@ actionModalConfig:
   heatpumpDefrostOperaton: espaltherma_defrost_operaton
 ```
 
-It opens 420 px wide, on a phone full screen; its values stand two abreast on top, its charts start below their period
+It opens at 630 × 630 px like an item popup, on a phone full screen; its values stand at most two abreast on top, its
+charts start below their period
 buttons, and a closed period menu takes no room. The card's tiles, wall unit, outdoor unit, tank, valve and floor
 loops and the three figures at its top open them:
 

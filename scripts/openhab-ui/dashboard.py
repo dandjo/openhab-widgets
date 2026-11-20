@@ -4003,10 +4003,7 @@ def operation_section(*titles, row=False):
 # water, the outdoor air and the heat exchanger that draws heat from it; the parts of the heat pump's power and energy
 # stay together, as energy balances do
 
-# a quick panel opens as a compact popup instead of Framework7's 630 × 630 px: MainUI puts a popup widget's style on
-# the popup's page, where the mark tells it from other popups; ":root" keeps the rule unscoped while it is shown
-QUICK_POPUP = (':root .popup:has(> .oh-popup[style*="--quick-popup"]) { --f7-popup-tablet-width: 420px; '
-               '--f7-popup-tablet-height: min(660px, calc(100vh - 64px)); }')
+# a quick panel opens at Framework7's 630 × 630 px, as every item popup (user, 2026-11-20: as large as all the others)
 
 
 def details_button(page, color):
@@ -4018,10 +4015,10 @@ def details_button(page, color):
 
 
 def quick(icon, title, color, state, children, page):
-    """A part's values or controls under a head with its state, and the way to its page; opened as a compact
-    popup, the bar names the part (config.label). icon: a glyph, or a device's drawing as the heat pump card shows it
-    (hp_device_icon()); either large in its ring as a device page's head (user, 2026-10-17: as the household
-    appliances' popups), the drawing's units scaled from the card's pixels to ICON_SIZE."""
+    """A part's values or controls under a head with its state, and the way to its page; opened as a popup of
+    the item popups' size, the bar names the part (config.label). icon: a glyph, or a device's drawing as the heat
+    pump card shows it (hp_device_icon()); either large in its ring as a device page's head (user, 2026-10-17: as the
+    household appliances' popups), the drawing's units scaled from the card's pixels to ICON_SIZE."""
     if isinstance(icon, dict):
         icon["config"].update({"width": ICON_SIZE, "height": ICON_SIZE})
     else:
@@ -4035,8 +4032,7 @@ def quick(icon, title, color, state, children, page):
     root = div([div([head, *children, details_button(page, color)],
                     **{"display": "flex", "flex-direction": "column", "gap": "6px", "padding": "12px 14px"})])
     # a chart's closed period menu would stretch the popup by its full length, as on the pages (PERIOD_MENU)
-    root["config"].update({"label": title, "style": {"--quick-popup": "panel"},
-                           "stylesheet": "\n".join([QUICK_POPUP, CARD_STYLE, PERIOD_MENU])})
+    root["config"].update({"label": title, "stylesheet": "\n".join([CARD_STYLE, PERIOD_MENU])})
     return root
 
 
@@ -4232,8 +4228,8 @@ def hp_split_charts(part_power, part_energy, parts):
 
 
 def quick_values(*tiles):
-    """Values of a compact popup in the device pages' forms, two abreast in its 420 px, over its charts. The tiles
-    open no item popup here: a popup over this compact one would hide it, and its charts show the course."""
+    """Values of a quick popup in the device pages' forms, at most two abreast, over its charts. The tiles
+    open no item popup here: an item popup over this one would cover it, and its charts show the course."""
     def unlinked(v):
         if isinstance(v, dict):
             if v.get("component") == "oh-link" and v.get("config", {}).get("actionModal") == "widget:item-popup":
@@ -4245,7 +4241,9 @@ def quick_values(*tiles):
     tiles = [unlinked(t) for t in tiles]
     if len(tiles) == 1:  # alone it takes the whole row, no empty half beside it
         tiles[0]["config"]["style"]["grid-column"] = "1 / -1"
-    return div(tiles, **{"display": "grid", "grid-template-columns": "repeat(auto-fill, minmax(170px, 1fr))",
+    # a track at least half the row (less the gap and a pixel's slack): no third column with an empty track in 630 px
+    return div(tiles, **{"display": "grid",
+                         "grid-template-columns": "repeat(auto-fill, minmax(max(170px, calc(50% - 5px)), 1fr))",
                          "gap": "8px"})
 
 
