@@ -5125,7 +5125,8 @@ APPLIANCES = [
 
 
 def miele_state(p):
-    """Running flag, chip colour, chip text and the program · phase · ready line of a Miele machine."""
+    """Running flag, chip colour, chip text and the program · phase line of a Miele machine (its ready time stands
+    large under it, user 2026-11-20: not twice)."""
     running = ok(f"{p}_program_progress")
     state = f"items.{p}_operation_state.state"
     finished = f"(['beendet', 'finish', 'end'].some((w) => ('' + {state}).toLowerCase().indexOf(w) >= 0))"
@@ -5134,8 +5135,7 @@ def miele_state(p):
     prog, phase = f"items.{p}_active_program.state", f"items.{p}_program_phase.state"
     details = (f"=({ok(p + '_active_program')} ? {prog} : '') + "
                f"({ok(p + '_active_program')} && {ok(p + '_program_phase')} ? ' · ' : '') + "
-               f"({ok(p + '_program_phase')} ? {phase} : '') + "
-               f"({ok(p + '_program_finished_time')} ? ' · fertig ' + dayjs(items.{p}_program_finished_time.state).format('HH:mm') : '')")
+               f"({ok(p + '_program_phase')} ? {phase} : '')")
     return running, color, status, details
 
 
@@ -8060,8 +8060,8 @@ def price_strip(title, price, cheap_hour, dear_hour):
 
 
 def program_tile(title, p):
-    """A Miele programme from its start to its end as a bar, the present as a dot, elapsed and remaining time below,
-    its end large."""
+    """A Miele programme from its start to its end as a bar, the present as a dot, its start and the elapsed and
+    remaining time below, its end large (only there, user 2026-11-20)."""
     running = f"(['NULL', 'UNDEF'].includes(items.{p}_program_finished_time.state) === false && {num(p + '_program_remaining_time')} > 0)"
     el, rest = num(p + "_program_elapsed_time"), num(p + "_program_remaining_time")
     share = f"({vt_clamp(f'{el} / Math.max(1, {el} + {rest}) * 100')})"
@@ -8075,8 +8075,7 @@ def program_tile(title, p):
                **{"position": "relative", "height": "10px", "margin": "12px 4px 6px",
                   "background": "rgba(127, 127, 127, 0.18)", "border-radius": "5px"})
     ends = div([label(f"='Start ' + dayjs().subtract({el}, 'second').format('HH:mm')"),
-                label(f"='seit ' + {d(el)} + ' · noch ' + {d(rest)}"),
-                label(f"='Ende ' + dayjs(items.{p}_program_finished_time.state).format('HH:mm')")],
+                label(f"='seit ' + {d(el)} + ' · noch ' + {d(rest)}")],
                **{"display": "flex", "justify-content": "space-between", "gap": "8px", **VT_SUB})
     kids = [vt_head(title, vt_chip(f"=Math.round({share}) + ' %'", "'info'")),
             vt_value(f"='fertig um ' + dayjs(items.{p}_program_finished_time.state).format('HH:mm')"), bar_, ends]
