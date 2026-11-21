@@ -11028,7 +11028,7 @@ def order_photovoltaics(c):
 
 
 def order_energy_storage(c):
-    return [heading("Jetzt"), abreast(c["Steuerung"], filled(c["Jetzt"])),
+    return [heading("Jetzt"), abreast(filled(c["Jetzt"]), c["Steuerung"]),
             heading("Heute und Technik"),
             abreast(widget_stack(c["Leistung heute"], renamed(c["Speicher"], "Zähler"), grow=1), c["Einheit 1"])]
 
