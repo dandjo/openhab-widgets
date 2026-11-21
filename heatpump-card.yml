@@ -231,9 +231,21 @@ props:
     type: TEXT
     required: true
     context: item
+  - name: heatpumpDayHeatingOffset
+    label: Wärmepumpe Tagheizung Offset
+    description: Number item
+    type: TEXT
+    required: true
+    context: item
   - name: heatpumpManagement
     label: Heatpump Management
     description: Group item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpDayHeatingState
+    label: Wärmepumpe Tagheizung Zustand
+    description: String item
     type: TEXT
     required: true
     context: item
@@ -363,21 +375,15 @@ props:
     type: TEXT
     required: true
     context: item
-  - name: heatpumpDayHeatingState
-    label: Wärmepumpe Tagheizung Zustand
-    description: String item
-    type: TEXT
-    required: true
-    context: item
-  - name: heatpumpDayHeatingOffset
-    label: Wärmepumpe Tagheizung Offset
-    description: Number item
-    type: TEXT
-    required: true
-    context: item
   - name: heatpumpDayHeatingEnd
     label: Wärmepumpe Tagheizung Ende
     description: Number item
+    type: TEXT
+    required: true
+    context: item
+  - name: heatpumpDayHeatingDecision
+    label: Wärmepumpe Tagheizung Entscheidung
+    description: String item
     type: TEXT
     required: true
     context: item
@@ -400,7 +406,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Nov 15, 2026, 9:47:20 AM
+timestamp: Nov 21, 2026, 9:17:16 PM
 component: oh-card
 config:
   title: Heat Pump
@@ -2924,7 +2930,7 @@ slots:
                 config:
                   x: 109.0
                   y: 99.15
-                  content: Automatic
+                  content: Day heating
                   fill: currentColor
                   font-size: 11
                   font-weight: normal
@@ -2934,7 +2940,9 @@ slots:
                 config:
                   x: 265.0
                   y: 101
-                  content: '=items[props.heatpumpManagement].state === ''ON'' ? ''On'' : ''Off'''
+                  content: '=((s) => s === ''day'' ? ''Day '' + ((n) => (n > 0 ? ''+'' : '''') + n)(Math.round(Number(items[props.heatpumpDayHeatingOffset].state)))
+                    + '' K'' : s === ''night'' ? ''Night '' + ''−10 K'' : s === ''normal'' ? ''Normal'' : s === ''off'' ?
+                    (items[props.heatpumpManagement].state === ''ON'' ? ''Pause'' : ''Off'') : ''–'')(items[props.heatpumpDayHeatingState].state)'
                   fill: currentColor
                   font-size: 15
                   font-weight: '700'
@@ -3564,6 +3572,7 @@ slots:
                 heatpumpDayHeatingState: =props.heatpumpDayHeatingState
                 heatpumpDayHeatingOffset: =props.heatpumpDayHeatingOffset
                 heatpumpDayHeatingEnd: =props.heatpumpDayHeatingEnd
+                heatpumpDayHeatingDecision: =props.heatpumpDayHeatingDecision
               style:
                 position: absolute
                 display: block

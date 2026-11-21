@@ -99,8 +99,14 @@ props:
     type: TEXT
     required: true
     context: item
+  - name: heatpumpDayHeatingDecision
+    label: Wärmepumpe Tagheizung Entscheidung
+    description: String item
+    type: TEXT
+    required: true
+    context: item
   parameterGroups: []
-timestamp: Nov 20, 2026, 7:56:01 PM
+timestamp: Nov 21, 2026, 9:17:16 PM
 component: div
 config:
   style: {}
@@ -491,6 +497,22 @@ slots:
           marks: 0=0;1=+1;2=+2;3=+3;4=+4;5=+5 K
           icon: material:wb_sunny
           row: true
+      - component: Label
+        config:
+          text: '=((d, a, b) => ''Decision '' + (d.at.slice(0, 10) === dayjs().format(''YYYY-MM-DD'') ? '''' : d.at.slice(8,
+            10) + ''.'' + d.at.slice(5, 7) + ''. '') + Number(d.at.slice(11, 13)) + d.at.slice(13, 16) + '': '' + (d.mean
+            >= 8 ? (Number(d.at.slice(11, 13)) < b ? ''Day heating'' : ''Night setback'') : ''Normal operation'') + '' · ''
+            + (d.source === ''forecast'' ? ''Forecast'' : ''measured'') + '' Ø 24 h '' + (Number(d.mean)).toFixed(1) + ''
+            °C, '' + ''threshold'' + '' 8 °C · '' + ''next'' + '' '' + ((h) => h >= a && h < b ? b : a)(dayjs().hour()) +
+            '':00'')(((x) => x.charAt(0) === ''{'' ? JSON.parse(x) : null)('''' + items[props.heatpumpDayHeatingDecision].state),
+            Math.round(Number(items[props.heatpumpDayHeatingStart].state)), Math.round(Number(items[props.heatpumpDayHeatingEnd].state)))'
+          style:
+            font-size: 11px
+            opacity: '0.7'
+            line-height: 15px
+            padding: 0 2px
+          visible: '=((x) => x.charAt(0) === ''{'' ? JSON.parse(x) : null)('''' + items[props.heatpumpDayHeatingDecision].state)
+            !== null'
       - component: div
         config:
           style:

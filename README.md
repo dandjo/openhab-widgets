@@ -424,17 +424,17 @@ a defrost. The valve shows its position in its icon. Badges just outside three r
 shows (*Hz*) and the wall unit's (water while it flows, a red bolt while the backup heater runs) and where the tank's
 heat comes from; grey while their device rests. Tiles in the style of the switch tiles hold the figures: the outdoor
 unit (its power, the compressor, both outdoor sensors and its heat exchanger), the control (heating, hot water, Smart
-Grid, automation and the outdoor mean its heating curve works with), the refrigerant, the heating circuit (the leaving
-water setpoint over leaving and inlet water), the climate of the two floors, the tank with its booster heater and the
-indoor unit (flow, water pressure, backup heater), each tinted in its colour while what it shows is at work. A tap on a
-tile, the wall unit, the outdoor unit, the tank, the valve or a floor's loops opens its quick popup (see [Quick
-popups](#quick-popups)). At the card's top, across its whole width as the energy flow's tiles, the electrical power, the
-heat and the COP as a row of value tiles that open their quick popups too (today's split and COPs are in the heating
-card). The drawing ends at the house's walls, and the tiles beside them end flush with the walls; on a phone it takes
-the card's width inside the same padding as the value tiles above it, so the house and its outer tiles line up with
-them. Everywhere else it stands at its own size, as the energy flow does, so their texts keep the UI's sizes and their
-rings come out the same and never shrink, centred and in the middle of the height the card is given. The recordings show
-it with demo values (a space heating run).
+Grid, the day heating's phase and the outdoor mean its heating curve works with), the refrigerant, the heating circuit
+(the leaving water setpoint over leaving and inlet water), the climate of the two floors, the tank with its booster
+heater and the indoor unit (flow, water pressure, backup heater), each tinted in its colour while what it shows is at
+work. A tap on a tile, the wall unit, the outdoor unit, the tank, the valve or a floor's loops opens its quick popup
+(see [Quick popups](#quick-popups)). At the card's top, across its whole width as the energy flow's tiles, the
+electrical power, the heat and the COP as a row of value tiles that open their quick popups too (today's split and COPs
+are in the heating card). The drawing ends at the house's walls, and the tiles beside them end flush with the walls; on
+a phone it takes the card's width inside the same padding as the value tiles above it, so the house and its outer tiles
+line up with them. Everywhere else it stands at its own size, as the energy flow does, so their texts keep the UI's
+sizes and their rings come out the same and never shrink, centred and in the middle of the height the card is given. The
+recordings show it with demo values (a space heating run).
 
 Needs `boost-pill`, `flow-node`, `ground-floor-quick`, `heatpump-circuit-quick`, `heatpump-control-quick`,
 `heatpump-cop-quick`, `heatpump-electric-quick`, `heatpump-heat-quick`, `heatpump-indoor-quick`,
@@ -446,7 +446,7 @@ Needs `boost-pill`, `flow-node`, `ground-floor-quick`, `heatpump-circuit-quick`,
 ![Heat pump in dark mode](screenshots/heatpump-card-dark.gif)
 
 <details>
-<summary>66 props</summary>
+<summary>67 props</summary>
 
 | Prop | Item | Item type |
 |---|---|---|
@@ -488,7 +488,9 @@ Needs `boost-pill`, `flow-node`, `ground-floor-quick`, `heatpump-circuit-quick`,
 | `heatpumpClimateControlPower` | Pyaltherma Climate Control Power | Switch |
 | `heatpumpDhwBoost` | Pyaltherma DHW Powerful | Switch |
 | `heatpumpDhwPower` | Pyaltherma DHW Power | Switch |
+| `heatpumpDayHeatingOffset` | Wärmepumpe Tagheizung Offset | Number |
 | `heatpumpManagement` | Heatpump Management | Group |
+| `heatpumpDayHeatingState` | Wärmepumpe Tagheizung Zustand | String |
 | `heatpumpExtAmbientTempAvg` | ESPAltherma External Ambient Temperature Average | Number:Temperature |
 | `heatpumpDischargePipeTemp` | ESPAltherma Discharge Pipe Temperature | Number:Temperature |
 | `heatpumpRefrigerantTemp` | ESPAltherma Refrigerant Temperature Liquid Side | Number:Temperature |
@@ -510,9 +512,8 @@ Needs `boost-pill`, `flow-node`, `ground-floor-quick`, `heatpump-circuit-quick`,
 | `heatpumpDayHeatingStart` | Wärmepumpe Tagheizung Beginn | Number |
 | `heatpumpDhwTempHeating` | Pyaltherma DHW Temp Heating | Number:Temperature |
 | `heatpumpLeavingWaterTempOffsetHeating` | Pyaltherma Leaving Water Temp Offset Heating | Number |
-| `heatpumpDayHeatingState` | Wärmepumpe Tagheizung Zustand | String |
-| `heatpumpDayHeatingOffset` | Wärmepumpe Tagheizung Offset | Number |
 | `heatpumpDayHeatingEnd` | Wärmepumpe Tagheizung Ende | Number |
+| `heatpumpDayHeatingDecision` | Wärmepumpe Tagheizung Entscheidung | String |
 | `heatpumpTargetDischargeTemp` | ESPAltherma Target Discharge Temperature | Number:Temperature |
 | `heatpumpHeatingPowerAfterBuh` | ESPAltherma Heating Power After BUH | Number:Power |
 | `heatpumpWaterPumpSignal` | ESPAltherma Water Pump Signal | Number:Dimensionless |
@@ -676,7 +677,8 @@ buttons, and a closed period menu takes no room. The card's tiles, wall unit, ou
 loops and the three figures at its top open them:
 
 - `heatpump-control-quick`, control: all the heat pump's controls: the Smart Grid, heating, hot water and automation,
-  the DHW setpoint, the hot-water boost and the leaving water offset.
+  the DHW setpoint, the hot-water boost, the leaving water offset and the day heating's, with its last decision (when,
+  what came of it, the forecast 24-hour mean against the threshold, when the next falls).
 - `heatpump-indoor-quick`, indoor unit: the circulation pump as a ring with the water's flow and the water pressure
   rated in words on top; its power without the backup heater, the flow, the pressure and the backup heater over the day.
 - `heatpump-outdoor-quick`, outdoor unit: the compressor's frequency as a ring and the outdoor air beside the heat
@@ -711,7 +713,7 @@ loops and the three figures at its top open them:
 `heatpump-control-quick` needs `boost-pill`, `pill-slider`, `pill-switch`, `state-bar`, `switch-row`.
 
 <details>
-<summary><code>heatpump-control-quick</code>: 16 props</summary>
+<summary><code>heatpump-control-quick</code>: 17 props</summary>
 
 | Prop | Item | Item type |
 |---|---|---|
@@ -731,6 +733,7 @@ loops and the three figures at its top open them:
 | `heatpumpDayHeatingState` | Wärmepumpe Tagheizung Zustand | String |
 | `heatpumpDayHeatingOffset` | Wärmepumpe Tagheizung Offset | Number |
 | `heatpumpDayHeatingEnd` | Wärmepumpe Tagheizung Ende | Number |
+| `heatpumpDayHeatingDecision` | Wärmepumpe Tagheizung Entscheidung | String |
 
 </details>
 

@@ -99,8 +99,8 @@ OVERVIEW = [
      "outside three rings say what the outdoor unit's ring shows (*Hz*) and the wall unit's (water while it flows, a red "
      "bolt while the backup heater runs) and where the tank's heat comes from; grey while their device rests. Tiles in the "
      "style of the switch tiles hold the figures: the outdoor unit (its power, the compressor, both outdoor sensors "
-     "and its heat exchanger), the control (heating, hot water, Smart Grid, automation and the outdoor mean its "
-     "heating curve works with), the refrigerant, the heating circuit (the leaving water setpoint over leaving and "
+     "and its heat exchanger), the control (heating, hot water, Smart Grid, the day heating's phase and the outdoor "
+     "mean its heating curve works with), the refrigerant, the heating circuit (the leaving water setpoint over leaving and "
      "inlet water), the climate of the two floors, the tank with its booster heater and the indoor unit (flow, water "
      "pressure, backup heater), each tinted in its "
      "colour while what it shows is at work. A tap on a tile, the wall unit, the outdoor unit, "
@@ -158,7 +158,8 @@ PLUG = [("plug-card", "Now: the device's icon large in a ring, pulsing while it 
 # where they belong together
 QUICK = [
     ("heatpump-control-quick", "Control", "all the heat pump's controls: the Smart Grid, heating, hot water and "
-     "automation, the DHW setpoint, the hot-water boost and the leaving water offset"),
+     "automation, the DHW setpoint, the hot-water boost, the leaving water offset and the day heating's, with its "
+     "last decision (when, what came of it, the forecast 24-hour mean against the threshold, when the next falls)"),
     ("heatpump-indoor-quick", "Indoor unit", "the circulation pump as a ring with the water's flow and the water "
      "pressure rated in words on top; its power without the backup heater, the flow, the pressure and the backup heater "
      "over the day"),

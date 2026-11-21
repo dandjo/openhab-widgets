@@ -224,7 +224,9 @@ EN.update({"Kartendaten © OpenStreetMap": "Map data © OpenStreetMap", "Zwische
            "Fahrten": "Trips", "unterwegs": "on the way", "Ladestopp": "charging stop", "Ladestopps": "charging stops", "Tagheizung": "Day heating", "Aus bis": "Off until", "Warmwasser-Automatik": "Hot water automation", "Taktschutz": "Cycle guard",
            "Taktschutz-Automatik": "Cycle guard automation", "Tagheizung-Automatik": "Day heating automation",
            "Tagheizung regelt": "Day heating controls", "Tagheizung-Offset": "Day heating offset",
-           "Tagfenster": "Day window",
+           "Tagfenster": "Day window", "Nacht": "Night", "Entscheidung": "Decision",
+           "Nachtabsenkung": "Night setback", "Normalbetrieb": "Normal operation", "Prognose": "Forecast",
+           "gemessen": "measured", "Schwelle": "threshold", "nächste": "next",
            "Die 7 stärksten Tage, je mit ihrer stärksten Viertelstunde":
                "The 7 strongest days, each with its strongest quarter-hour", "PV deckte": "PV covered",
            "Fahrten mit weniger als 2 Stunden Abstand sind eine Sitzung, „~“: aus den Abfragen geschätzt":

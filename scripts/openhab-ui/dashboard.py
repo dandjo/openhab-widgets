@@ -3027,6 +3027,20 @@ HP_VB = (OUTER_LEFT, OUTDOOR_TILE[1] - 7, OUTER_RIGHT - OUTER_LEFT,
          BOTTOM + 12 + 35 + 3 * TILE_ROW + 6 - (OUTDOOR_TILE[1] - 7))
 
 
+DAY_HEATING_NIGHT = -10  # K outside the window in day mode, NIGHT in applied/hp_day_heating.js
+DAY_HEATING_SEASON = 8  # °C 24-hour mean from which a decision gives day mode, SEASON_AVG there
+# the day heating's phase as its rule sets it (heatpump_day_heating_state: day, night, normal, off): in day mode the
+# offset it holds, Pause while its switch alone is off (until the next window start), Aus with the whole automation,
+# a dash while the state is not known yet (NULL after a restart)
+DAY_HEATING_PHASE = (
+    "((s) => s === 'day' ? 'Tag ' + ((n) => (n > 0 ? '+' : '') + n)"
+    "(Math.round(Number(items.heatpump_day_heating_offset.state))) + ' K' : "
+    f"s === 'night' ? 'Nacht ' + '{str(DAY_HEATING_NIGHT).replace('-', '−')} K' : s === 'normal' ? 'Normal' : "
+    "s === 'off' ? (items.heatpump_management.state === 'ON' ? 'Pause' : 'Aus') : '–')"
+    "(items.heatpump_day_heating_state.state)")
+
+
+
 def hp_tile(cx, y, w, title, icon, color, on, rows, state=None):
     """A tile of the drawing, built like the switch tiles under the energy flow: a rounded card, faintly grey, tinted
     and outlined in its colour while `on`; its icon and title at the top left, then a row
@@ -3133,8 +3147,8 @@ hp_svg = svg("svg", [
         ("Wärmetauscher", f"={disp(HPX['exchanger'])}", "currentColor")],
              state=f"=items.{HPX['defrost']}.state === 'ON' ? 'Abtauen' : ''"),
     # the control's tile flush with the left wall: whether heating and hot water are on (Boost while the powerful
-    # mode runs), the Smart Grid state, the automation and the outdoor mean its heating curve works with (user,
-    # 2026-10-09); tinted while the grid asks for something
+    # mode runs), the Smart Grid state, the day heating's phase (user, 2026-11-21: instead of the automation's switch)
+    # and the outdoor mean its heating curve works with (user, 2026-10-09); tinted while the grid asks for something
     *hp_tile(*CONTROL_TILE, "Regelung", "tune", "#fb8c00", "items.espaltherma_smart_grid.state !== '0'", [
         ("Heizung", "=items.pyaltherma_climate_control_power.state === 'ON' ? 'An' : 'Aus'", "currentColor"),
         ("Warmwasser", "=items.pyaltherma_dhw_powerful.state === 'ON' ? 'Boost' : "
@@ -3142,7 +3156,7 @@ hp_svg = svg("svg", [
         ("Smart Grid", "=(" + " : ".join(f"items.espaltherma_smart_grid.state === '{v}' ? '{t}'" for v, t in
                                           [("1", "Sperre"), ("2", "Empfehlung"), ("3", "Befehl")]) + " : 'Normal')",
          "currentColor"),
-        ("Automatik", "=items.heatpump_management.state === 'ON' ? 'An' : 'Aus'", "currentColor"),
+        ("Tagheizung", f"={DAY_HEATING_PHASE}", "currentColor"),
         (f"Außen {HP_AVG_NAME}", f"={disp(HPX['outdoor_avg'])}", "currentColor")]),
     # right of the riser, centred between it and the refrigerant line: the refrigerant in the upper floor, between
     # its sloping ceiling and its floor, the heating circuit in the ground floor
@@ -3972,6 +3986,27 @@ def battery_period_slider():
 # when its rule switches it on again (with all automations off it stays off)
 HP_SWITCH_BAR = [("Heizung", "pyaltherma_climate_control_power", "material:local_fire_department"),
                  ("Warmwasser", "pyaltherma_dhw_power", "material:shower")]
+def day_heating_decision():
+    """The day heating's last decision as a line (user, 2026-11-21, in the Regelung popup), from its JSON item
+    {at, source: forecast or mean, forecast, mean}: when, what came of it, the 24-hour mean it took (the forecast with
+    its offset, or the measured mean without a fresh forecast) against the threshold, and when the next one falls (the
+    window's start or end). Hidden while the item holds no decision."""
+    dec = "((x) => x.charAt(0) === '{' ? JSON.parse(x) : null)('' + items.heatpump_day_heating_decision.state)"
+    start, end = (f"Math.round(Number(items.heatpump_day_heating_{k}.state))" for k in ("start", "end"))
+    text = (f"((d, a, b) => 'Entscheidung ' + "
+            # the day only when it is not today (openHAB down at a decision point)
+            "(d.at.slice(0, 10) === dayjs().format('YYYY-MM-DD') ? '' : d.at.slice(8, 10) + '.' + d.at.slice(5, 7) + "
+            "'. ') + Number(d.at.slice(11, 13)) + d.at.slice(13, 16) + ': ' + "
+            f"(d.mean >= {DAY_HEATING_SEASON} ? (Number(d.at.slice(11, 13)) < b ? 'Tagheizung' : 'Nachtabsenkung') : "
+            "'Normalbetrieb') + ' · ' + "
+            f"(d.source === 'forecast' ? 'Prognose' : 'gemessen') + ' {HP_AVG_NAME} ' + {fixed('Number(d.mean)', 1)} + "
+            f"' °C, ' + 'Schwelle' + ' {DAY_HEATING_SEASON} °C · ' + 'nächste' + ' ' + "
+            "((h) => h >= a && h < b ? b : a)(dayjs().hour()) + ':00')"
+            f"({dec}, {start}, {end})")
+    return label(f"={text}", visible=f"={dec} !== null",
+                 **{"font-size": "11px", "opacity": "0.7", "line-height": "15px", "padding": "0 2px"})
+
+
 DAY_HEATING_PAUSE_END = ("=items.heatpump_management.state === 'ON' ? ((s) => Number.isFinite(s) ? 'Aus bis ' + "
                          "Math.floor(s) + ':' + ('0' + Math.round(s % 1 * 60)).slice(-2) : 'Aus')"
                          "(Number(items.heatpump_day_heating_start.state)) : 'Aus'")
@@ -4050,12 +4085,13 @@ def quick_stack(*panels, weights=None):
 
 def hp_control_quick():
     """The heat pump's control: all its controls, as on its page: Smart Grid, heating, hot water and the automation,
-    the DHW setpoint, the hot-water boost, the leaving water offset and under it the day heating's."""
+    the DHW setpoint, the hot-water boost, the leaving water offset and under it the day heating's, with its last
+    decision."""
     on = lambda item: f"(items.{item}.state === 'ON' ? 'an' : 'aus')"
     state = f"'Heizung ' + {on('pyaltherma_climate_control_power')} + ' · Warmwasser ' + {on('pyaltherma_dhw_power')}"
     return quick("material:tune", "Regelung", HP_ORANGE, state,
                  [smart_grid_section(row=True), operation_section(row=True), dhw_setpoint(row=True), dhw_boost(),
-                  lw_offset(row=True), day_heating_offset(row=True)], "heatpump")
+                  lw_offset(row=True), day_heating_offset(row=True), day_heating_decision()], "heatpump")
 
 
 # the heat pump's charts over the day, as panels of stacked_chart(), shared by the card's popups and its page
