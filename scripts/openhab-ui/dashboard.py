@@ -85,10 +85,11 @@ def kw(item):
     return f"{fixed(f'Math.abs({num(item)}) / 1000', 3)} + ' kW'"
 
 
-def kw2(item, *plus):
-    """A power item's state in kW to two decimals, a dash while it has none; plus: further power items added to it."""
+def kw2(item, *plus, digits=2):
+    """A power item's state in kW to two decimals (digits), a dash while it has none; plus: further power items added
+    to it."""
     watts = num(item) if not plus else "(" + " + ".join(num(i) for i in (item, *plus)) + ")"
-    return f"(['NULL', 'UNDEF'].includes(items.{item}.state) ? '–' : {fixed(f'{watts} / 1000', 2)} + ' kW')"
+    return f"(['NULL', 'UNDEF'].includes(items.{item}.state) ? '–' : {fixed(f'{watts} / 1000', digits)} + ' kW')"
 
 
 def comp(component, config=None, **slots):
@@ -3199,7 +3200,7 @@ hp_svg = svg("svg", [
 def stat_tile(title, value, color, icon, popup):
     """A figure of the heat pump card: a value tile sized by the width of its row (a container): a tenth larger than
     elsewhere where the row is as wide as the drawing, smaller down to 11.9 px in a narrow card or on a phone, where a
-    power in kW to two decimals still fits. A tap opens its quick popup."""
+    power in kW to three decimals still fits. A tap opens its quick popup."""
     tile = comp("widget:value-tile", {"title": title, "value": value, "icon": f"material:{icon}", "color": color,
                                       "fontSize": "clamp(11.9px, 2.93cqw, 15.4px)"})
     link = hp_popup_link({"position": "absolute", "inset": "0", "display": "block", "border-radius": "12px"}, popup)
@@ -3308,9 +3309,12 @@ legend_dot = lambda name, c: keyed(f"item k k-{name.lower()}", [
     label(name, **{"font-size": "12px", "opacity": "0.75"})], style={"display": "flex", "align-items": "center", "gap": "5px"})
 def hp_stats():
     """The figures above the drawing, built with it, as their tiles link to quick popups; a row across the card's
-    whole width, as the energy flow's tiles under its star (user, 2026-10-05)."""
-    return div([stat_tile("Electrical", f"={kw2(HPX['power'])}", ELECTRIC_C, "bolt", "heatpump-electric-quick"),
-                stat_tile("Heat", f"={kw2(HPX['heat'])}", SUPPLY, "local_fire_department", "heatpump-heat-quick"),
+    whole width, as the energy flow's tiles under its star (user, 2026-10-05); the powers to three decimals
+    (user, 2026-11-24)."""
+    return div([stat_tile("Electrical", f"={kw2(HPX['power'], digits=3)}", ELECTRIC_C, "bolt",
+                          "heatpump-electric-quick"),
+                stat_tile("Heat", f"={kw2(HPX['heat'], digits=3)}", SUPPLY, "local_fire_department",
+                          "heatpump-heat-quick"),
                 stat_tile("COP", f"={num(HPX['cop'])} > 0 ? {fixed(num(HPX['cop']), 2)} : '–'", COP_C, "eco",
                           "heatpump-cop-quick")],
                **{"display": "grid", "grid-template-columns": "repeat(3, minmax(0, 1fr))", "gap": "8px",
@@ -4365,7 +4369,8 @@ HP_HEAT = ("espaltherma_heating_power_{}", "espaltherma_heating_energy_{}_today"
 
 def hp_split_quick(title, icon, color, power, today, split):
     """Electricity or heat by part (hp_split_charts(), split: HP_ELECTRIC or HP_HEAT)."""
-    state = f"{kw2(power)} + ' · heute ' + {fixed(num(today), 1)} + ' kWh'"
+    # the power to three decimals, as the card's tile that opens it (user, 2026-11-24)
+    state = f"{kw2(power, digits=3)} + ' · heute ' + {fixed(num(today), 1)} + ' kWh'"
     day, month = hp_split_charts(*split)
     # by purpose now and today, as bars of the parts, over the charts (user, 2026-10-06)
     part_power, part_energy, parts = split
@@ -4374,8 +4379,8 @@ def hp_split_quick(title, icon, color, power, today, split):
     now_total = " + ".join(e for _, e, _ in now_parts)
     day_total = " + ".join(e for _, e, _ in day_parts)
     values = quick_values(
-        vt_tile([vt_head("Jetzt nach Zweck"), vt_value(f"={fixed(f'{now_total}', 2)} + ' kW'"),
-                 split_bar(now_parts, now_total), split_legend(now_parts)], wide=True),
+        vt_tile([vt_head("Jetzt nach Zweck"), vt_value(f"={fixed(f'{now_total}', 3)} + ' kW'"),
+                 split_bar(now_parts, now_total), split_legend(now_parts, 3)], wide=True),
         vt_tile([vt_head("Heute nach Zweck"), vt_value(f"={fixed(f'{day_total}', 2)} + ' kWh'"),
                  split_bar(day_parts, day_total), split_legend(day_parts)], wide=True))
     return quick(f"material:{icon}", title, color, state,

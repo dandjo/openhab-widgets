@@ -406,7 +406,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Nov 21, 2026, 9:17:16 PM
+timestamp: Nov 24, 2026, 10:09:18 PM
 component: oh-card
 config:
   title: Heat Pump
@@ -651,7 +651,7 @@ slots:
                 config:
                   title: Electrical
                   value: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpPower].state) ? ''–'' : ((Number(items[props.heatpumpPower].numericState)
-                    || 0) / 1000).toFixed(2) + '' kW'')'
+                    || 0) / 1000).toFixed(3) + '' kW'')'
                   icon: material:bolt
                   color: '#ffa726'
                   fontSize: clamp(11.9px, 2.93cqw, 15.4px)
@@ -684,7 +684,7 @@ slots:
                 config:
                   title: Heat
                   value: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpHeatPower].state) ? ''–'' : ((Number(items[props.heatpumpHeatPower].numericState)
-                    || 0) / 1000).toFixed(2) + '' kW'')'
+                    || 0) / 1000).toFixed(3) + '' kW'')'
                   icon: material:local_fire_department
                   color: '#e57373'
                   fontSize: clamp(11.9px, 2.93cqw, 15.4px)

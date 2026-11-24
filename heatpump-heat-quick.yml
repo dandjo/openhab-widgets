@@ -40,7 +40,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Nov 20, 2026, 7:56:01 PM
+timestamp: Nov 24, 2026, 10:09:18 PM
 component: div
 config:
   style: {}
@@ -227,7 +227,7 @@ slots:
               - component: Label
                 config:
                   text: '=([''NULL'', ''UNDEF''].includes(items[props.heatpumpHeatPower].state) ? ''–'' : ((Number(items[props.heatpumpHeatPower].numericState)
-                    || 0) / 1000).toFixed(2) + '' kW'') + '' · today '' + ((Number(items[props.heatpumpHeatingEnergyToday].numericState)
+                    || 0) / 1000).toFixed(3) + '' kW'') + '' · today '' + ((Number(items[props.heatpumpHeatingEnergyToday].numericState)
                     || 0)).toFixed(1) + '' kWh'''
                   style:
                     font-size: 12px
@@ -274,7 +274,7 @@ slots:
               - component: Label
                 config:
                   text: =((Number(items[props.heatpumpHeatingPowerSpace].numericState) || 0) / 1000 + (Number(items[props.heatpumpHeatingPowerDhw].numericState)
-                    || 0) / 1000).toFixed(2) + ' kW'
+                    || 0) / 1000).toFixed(3) + ' kW'
                   style:
                     font-size: 20px
                     font-weight: '700'
@@ -379,7 +379,7 @@ slots:
                           default: []
                       - component: Label
                         config:
-                          text: ='Heating ' + ((Number(items[props.heatpumpHeatingPowerSpace].numericState) || 0) / 1000).toFixed(2)
+                          text: ='Heating ' + ((Number(items[props.heatpumpHeatingPowerSpace].numericState) || 0) / 1000).toFixed(3)
                   - component: div
                     config:
                       style:
@@ -400,7 +400,7 @@ slots:
                           default: []
                       - component: Label
                         config:
-                          text: ='Hot water ' + ((Number(items[props.heatpumpHeatingPowerDhw].numericState) || 0) / 1000).toFixed(2)
+                          text: ='Hot water ' + ((Number(items[props.heatpumpHeatingPowerDhw].numericState) || 0) / 1000).toFixed(3)
           - component: div
             config:
               style:
