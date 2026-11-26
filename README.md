@@ -497,7 +497,7 @@ Needs `boost-pill`, `flow-node`, `ground-floor-quick`, `heatpump-circuit-quick`,
 | `heatpumpRefrigerantPressure` | ESPAltherma Refrigerant Pressure Sensor | Number:Pressure |
 | `heatpumpLeavingWaterSetpoint` | ESPAltherma Leaving Water Setpoint | Number:Temperature |
 | `heatpumpInletWaterTemp` | ESPAltherma Inlet Water Temperature | Number:Temperature |
-| `acTemperature` | Faikout Perfera Temperature | Number:Temperature |
+| `tadoTemperature` | Tado Temperature | Number:Temperature |
 | `tadoHumidity` | Tado Humidity | Number:Dimensionless |
 | `heatpumpIndoorAmbientTemp` | ESPAltherma Indoor Ambient Temperature | Number:Temperature |
 | `apolloAir1Humidity` | Apollo AIR-1 Humidity | Number:Dimensionless |
@@ -835,7 +835,7 @@ loops and the three figures at its top open them:
 | `heatpumpFlowSensor` | ESPAltherma Flow Sensor (l/min) | Number:VolumetricFlowRate |
 | `heatpumpValve` | ESPAltherma 3-Way Valve Mode | String |
 | `heatpumpLeavingWaterTempAfterBuh` | ESPAltherma Leaving Water Temperature After BUH | Number:Temperature |
-| `acTemperature` | Faikout Perfera Temperature | Number:Temperature |
+| `tadoTemperature` | Tado Temperature | Number:Temperature |
 | `tadoHumidity` | Tado Humidity | Number:Dimensionless |
 
 </details>

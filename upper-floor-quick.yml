@@ -27,8 +27,8 @@ props:
     type: TEXT
     required: true
     context: item
-  - name: acTemperature
-    label: Faikout Perfera Temperature
+  - name: tadoTemperature
+    label: Tado Temperature
     description: Number:Temperature item
     type: TEXT
     required: true
@@ -40,7 +40,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Nov 20, 2026, 7:56:01 PM
+timestamp: Nov 26, 2026, 8:31:59 AM
 component: div
 config:
   style: {}
@@ -312,8 +312,8 @@ slots:
                     font-weight: '600'
               - component: Label
                 config:
-                  text: '=([''NULL'', ''UNDEF''].includes(items[props.acTemperature].state) ? ''–'' : (items[props.acTemperature].displayState
-                    || items[props.acTemperature].state)) + '' · '' + ([''NULL'', ''UNDEF''].includes(items[props.tadoHumidity].state)
+                  text: '=([''NULL'', ''UNDEF''].includes(items[props.tadoTemperature].state) ? ''–'' : (items[props.tadoTemperature].displayState
+                    || items[props.tadoTemperature].state)) + '' · '' + ([''NULL'', ''UNDEF''].includes(items[props.tadoHumidity].state)
                     ? ''–'' : ((Number(items[props.tadoHumidity].numericState) || 0)).toFixed(0) + '' %'')'
                   style:
                     font-size: 12px
@@ -628,7 +628,7 @@ slots:
               xAxisIndex: 0
               yAxisIndex: 0
               type: line
-              item: =props.acTemperature
+              item: =props.tadoTemperature
               symbol: none
               lineStyle:
                 width: 2
@@ -716,7 +716,7 @@ slots:
             config:
               text: All details
               action: popup
-              actionModal: page:air_conditioning
+              actionModal: page:tado
               outline: true
               small: true
               style:

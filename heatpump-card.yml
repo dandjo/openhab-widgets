@@ -285,8 +285,8 @@ props:
     type: TEXT
     required: true
     context: item
-  - name: acTemperature
-    label: Faikout Perfera Temperature
+  - name: tadoTemperature
+    label: Tado Temperature
     description: Number:Temperature item
     type: TEXT
     required: true
@@ -406,7 +406,7 @@ props:
     required: true
     context: item
   parameterGroups: []
-timestamp: Nov 24, 2026, 10:09:18 PM
+timestamp: Nov 26, 2026, 8:31:59 AM
 component: oh-card
 config:
   title: Heat Pump
@@ -3218,8 +3218,8 @@ slots:
                 config:
                   x: 258.0
                   y: 224
-                  content: '=([''NULL'', ''UNDEF''].includes(items[props.acTemperature].state) ? ''–'' : (items[props.acTemperature].displayState
-                    || items[props.acTemperature].state))'
+                  content: '=([''NULL'', ''UNDEF''].includes(items[props.tadoTemperature].state) ? ''–'' : (items[props.tadoTemperature].displayState
+                    || items[props.tadoTemperature].state))'
                   fill: currentColor
                   font-size: 15
                   font-weight: '700'
@@ -3646,7 +3646,7 @@ slots:
                 heatpumpFlowSensor: =props.heatpumpFlowSensor
                 heatpumpValve: =props.heatpumpValve
                 heatpumpLeavingWaterTempAfterBuh: =props.heatpumpLeavingWaterTempAfterBuh
-                acTemperature: =props.acTemperature
+                tadoTemperature: =props.tadoTemperature
                 tadoHumidity: =props.tadoHumidity
               style:
                 position: absolute
@@ -3805,7 +3805,7 @@ slots:
                 heatpumpFlowSensor: =props.heatpumpFlowSensor
                 heatpumpValve: =props.heatpumpValve
                 heatpumpLeavingWaterTempAfterBuh: =props.heatpumpLeavingWaterTempAfterBuh
-                acTemperature: =props.acTemperature
+                tadoTemperature: =props.tadoTemperature
                 tadoHumidity: =props.tadoHumidity
               style:
                 position: absolute

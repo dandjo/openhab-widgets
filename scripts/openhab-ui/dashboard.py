@@ -3171,12 +3171,12 @@ hp_svg = svg("svg", [
         ("VL-Soll", f"={disp('espaltherma_leaving_water_setpoint')}", "currentColor"),
         ("Vorlauf", f"={disp(HPX['supply'])}", SUPPLY), ("Rücklauf", f"={disp(HPX['return'])}", RETURN)]),
     # the floors' climate left of their floor loops, tinted while those carry water:
-    # the upper floor's from the air conditioner (temperature) and its Tado zone (humidity), the ground floor's from
-    # the heat pump's room sensor (temperature) and the Apollo AIR-1 beside it (humidity, CO₂; user, 2026-11-11:
-    # instead of the Netatmo station)
+    # the upper floor's from its Tado zone (temperature and humidity; user, 2026-11-26: instead of the air
+    # conditioner's temperature in 0.5 K steps), the ground floor's from the heat pump's room sensor (temperature)
+    # and the Apollo AIR-1 beside it (humidity, CO₂; user, 2026-11-11: instead of the Netatmo station)
     *hp_tile(*UPPER_TILE, "Obergeschoss", "bed",
              "#f48fb1", HEATING_FLOW, [
-        ("Temperatur", f"={disp('faikout_perfera_temperature')}", "currentColor"),
+        ("Temperatur", f"={disp('tado_temperature')}", "currentColor"),
         ("Luftfeuchtigkeit", f"={percent('tado_humidity')}", "currentColor")]),
     *hp_tile(*GROUND_TILE, "Erdgeschoss", "weekend",
              "#f48fb1", HEATING_FLOW, [
@@ -4407,8 +4407,8 @@ QUICK_PANELS = {"heatpump-control-quick": hp_control_quick, "heatpump-indoor-qui
                 "heatpump-heat-quick": lambda: hp_split_quick(
                     "Wärme", "local_fire_department", SUPPLY, HPX["heat"], "espaltherma_heating_energy_today", HP_HEAT),
                 "heatpump-cop-quick": hp_cop_quick,
-                "upper-floor-quick": lambda: floor_quick("Obergeschoss", "faikout_perfera_temperature",
-                                                         "tado_humidity", None, "air_conditioning"),
+                "upper-floor-quick": lambda: floor_quick("Obergeschoss", "tado_temperature", "tado_humidity",
+                                                         None, "tado"),
                 "ground-floor-quick": lambda: floor_quick("Erdgeschoss", HPX["indoor"], "apollo_air_1_humidity",
                                                           "apollo_air_1_co2", "apollo_air_1")}
 _QUICK = {}
