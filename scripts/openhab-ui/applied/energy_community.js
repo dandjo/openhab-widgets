@@ -1,8 +1,10 @@
-// The house's energy community (WiEnergy): the public forecast and signal, static files the operator regenerates
-// every hour (API stage 1). Balance, production and consumption go into InfluxDB as a forecast series per quarter hour;
+// The house's energy community (WiEnergy): the public forecast and signal from WiEnergy's API server, regenerated
+// every hour. Balance, production and consumption go into InfluxDB as a forecast series per quarter hour;
 // the running quarter hour's level and certainty and the next surplus window go into plain items. No control here.
-// the community's id is set by the applier (energy_community.py) from ~/.config/energy-community.json
-const BASE = 'https://eeg-wienergy.at/make/api/v1/public/communities/__COMMUNITY__';
+// the community's id is set by the applier (energy_community.py) from ~/.config/energy-community.json; until
+// 2026-11 the static files at https://eeg-wienergy.at/make/api/v1/... (each path with .json), which WiEnergy has
+// not regenerated since 2026-11-10
+const BASE = 'https://api.eeg-wienergy.at/api/v1/public/communities/__COMMUNITY__';
 const P = 'energy_community_';
 const SERIES = { balance: 'balanceW', production: 'productionW', consumption: 'consumptionW' };
 const JTimeSeries = Java.type('org.openhab.core.types.TimeSeries');
@@ -13,7 +15,7 @@ const store = cache.private;
 const now = Date.now();
 
 function fetchJson(name) {
-  const body = actions.HTTP.sendHttpGetRequest(`${BASE}/${name}.json`, 15000);
+  const body = actions.HTTP.sendHttpGetRequest(`${BASE}/${name}`, 15000);
   if (body === null || body === undefined || body === '') {
     return null;
   }
@@ -97,6 +99,15 @@ if (forecast !== null && Array.isArray(forecast.values)) {
 //    after the file's expiry, and the next surplus window that has not ended yet.
 const signal = load('signal');
 const valid = signal !== null && now < Date.parse(signal.expiresAt);
+// an answer with an expired signal means WiEnergy no longer regenerates it: say so once, as when it does not
+// answer, since the items only turn UNDEF
+if (signal !== null && !valid && !store.get('expired')) {
+  console.warn(`EEG: Signal von WiEnergy abgelaufen (erzeugt ${signal.generatedAt}), Werte UNDEF`);
+  store.put('expired', true);
+} else if (valid && store.get('expired')) {
+  console.info('EEG: Signal von WiEnergy wieder aktuell');
+  store.remove('expired');
+}
 const interval = valid && Array.isArray(signal.intervals) ? signal.intervals.find(covers) : undefined;
 if (interval && interval.confidence !== 'unavailable') {
   post('level', interval.level);

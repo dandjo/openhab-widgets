@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """The renewable energy community the house belongs to (WiEnergy), as items (user,
-2026-10-16): WiEnergy publishes a forecast per quarter hour for each of its communities as static JSON files it
-regenerates every hour (API stage 1, no key); the rule energy_community_forecast (energy_community.js next to this file)
-reads them every 15 minutes. Balance, production and consumption (W, positive balance = surplus) go into InfluxDB as a
+2026-10-16): WiEnergy publishes a forecast per quarter hour for each of its communities on its API server
+(api.eeg-wienergy.at, public endpoints, no key; until 2026-11 static files), regenerated every hour; the rule
+energy_community_forecast (energy_community.js next to this file) reads them every 15 minutes. Balance,
+production and consumption (W, positive balance = surplus) go into InfluxDB as a
 forecast series through the group influxdb_forecast, so openHAB sets their state per quarter hour as it does the
 aWATTar prices'; the level and certainty of the running quarter hour and the next surplus window (start, end, energy,
 certainty) are plain items the rule sets, not persisted (it runs at startup). Nothing is controlled from them yet.
