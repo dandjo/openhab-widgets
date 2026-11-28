@@ -4252,6 +4252,19 @@ def hp_cop_month(total=True, height="270px"):
     return chart_
 
 
+# the space heating's mean powers per day, without the hot water (rule energy_daily_totals, applied/hp_space_means.py):
+# the day's energy over its hours, today's over the hours since midnight (user, 2026-11-28)
+HP_SPACE_MEANS = [("Strom", "energy_daily_heatpump_space_electric_mean", ELECTRIC_C),
+                  ("Wärme", "energy_daily_heatpump_space_heat_mean", "#e53935")]
+
+
+def hp_space_means(height="300px"):
+    """The space heating's mean electric and heat power per day of the month as bars beside each other, in the heat
+    pump card's colours; the heat's is the house's mean heating load that day."""
+    return month_chart([daily(name, item, c, itemStyle={"color": c, "borderRadius": [4, 4, 0, 0]})
+                        for name, item, c in HP_SPACE_MEANS], "kW", height=height)
+
+
 def hp_split_charts(part_power, part_energy, parts):
     """Electricity or heat by part: the parts' power over the day, their energy per day of the month stacked;
     part_power and part_energy name a part's items by its key. A balance of one quantity, so the parts share a chart
@@ -9260,6 +9273,8 @@ def heatpump_blocks():
     return [two(stack(card("Steuerung", [controls]), card("Heute", [today])), card("Jetzt", now)),
             two(card("Wärmepumpe pro Tag", [hp_days()]),
                 card("COP nach Zweck pro Tag", [hp_cop_month(total=False, height="300px")])),
+            # the space heating's mean powers per day across under them (user, 2026-11-28)
+            one(card("Ø Leistung Heizung pro Tag", [hp_space_means()])),
             two(card("Heizbetrieb heute", [stacked_chart(hp_run_panels(), HP_DAY_H)]),
                 card("Temperaturen heute", [stacked_chart(hp_temp_panels(), HP_DAY_H)])),
             one(card("Diagnose", diagnose)),
@@ -11098,6 +11113,7 @@ def order_heatpump(c):
     return [heading("Jetzt"), abreast(widget_stack(c["Steuerung"], c["Heute"], grow=2), filled(c["Jetzt"])),
             heading("Heute"), abreast(c["Heizbetrieb heute"], c["Temperaturen heute"]),
             heading("Verlauf"), abreast(c["Wärmepumpe pro Tag"], c["COP nach Zweck pro Tag"]),
+            across(c["Ø Leistung Heizung pro Tag"]),
             heading("Technik"), abreast(filled(diagnosis), filled(modes)), across(refrigerant),
             abreast(widget_stack(c["plug-card"], share_card(*plug_of(c)), grow=2), c["plug-electric-card"])]
 

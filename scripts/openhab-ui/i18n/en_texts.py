@@ -7,7 +7,8 @@ EN = {
     # cards, pages, sections
     "Übersicht": "Overview", "Steuerung": "Controls", "Energiefluss": "Energy Flow", "Haushaltsgeräte": "Appliances",
     "Schalter": "Switches", "Heizung & Warmwasser": "Heating & Hot Water", "Strompreis": "Electricity Price",
-    "Wärmepumpe": "Heat Pump", "Energie pro Tag": "Energy per Day", "PV-Ertrag pro Tag": "PV Yield per Day",
+    "Wärmepumpe": "Heat Pump", "Energie pro Tag": "Energy per Day",
+    "Ø Leistung Heizung pro Tag": "Ø Heating Power per Day", "PV-Ertrag pro Tag": "PV Yield per Day",
     "PV-Ertrag": "PV yield", "Temperaturen": "Temperatures", "Temperaturen heute": "Temperatures today",
     "Verbrauch heute": "Consumption Today", "Widget-Galerie": "Widget Gallery", "Regelung": "Control",
     "Wäsche & Geschirr": "Laundry & Dishes", "Terrasse & Fahrräder": "Terrace & Bicycles", "Terrasse": "Terrace",
@@ -253,6 +254,8 @@ EN.update({"Aus dem Akku": "From Battery", "aus dem Akku": "from the battery", "
            "Energie täglich Haus aus Akku": "Energy Daily Home from Battery",
            "Energie täglich Haus aus Netz": "Energy Daily Home from Grid",
            "Energie täglich Akku-Netzladung": "Energy Daily Battery Grid Charge",
+           "Wärmepumpe Heizung Ø Stromleistung täglich": "Heat Pump Heating Mean Electrical Power Daily",
+           "Wärmepumpe Heizung Ø Heizleistung täglich": "Heat Pump Heating Mean Heat Power Daily",
            "PV Prognose": "PV Forecast", "PV Prognose Tagesenergie": "PV Forecast Daily Energy",
            "PV Prognose Tagesenergie morgen": "PV Forecast Daily Energy Tomorrow"})
 
