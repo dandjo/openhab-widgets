@@ -3304,37 +3304,55 @@ def cop_tile(title, item, color, width="100%", name=None):
                   "background": TILE_BG, "min-width": "0", "display": "flex", "align-items": "center"})
 
 
-def mean_tile(title, item, hours, color, width="100%"):
-    """A mean power of the day under the heating card's COPs, as a COP's tile stands (cop_tile(); user, 2026-11-28:
-    "auf der Übersicht in der Karte", a row of tiles): the mean over the hours of its purpose (HP_DAY_MEANS) inside a
-    ring filled by the share of the day so far its purpose took (hours), a dash below 6 minutes of them; beside it the
-    title, heute with the hours, and yesterday's whole day's mean in a neutral pill, as a higher mean is neither better
-    nor worse. A tap opens the quick popup with the means and hours per day of the month."""
-    value, h = num(item), num(hours)
-    elapsed = "Math.max(0.01, dayjs().diff(dayjs().startOf('day'), 'minute') / 60)"
-    share = f"(Math.min(1, Math.max(0, {h} / {elapsed})) || 0)"
-    length = round(2 * math.pi * 22, 2)
-    text, _, known = day_value_change(item, 2)
-    unit = svg_text(24, 36, "kW", 7, opacity="0.6")
-    unit["config"]["visible"] = f"={value} > 0"
-    ring = svg("svg", [svg("circle", cx=24, cy=25, r=22, **stroke(5, "#9e9e9e", **{"stroke-opacity": "0.25"})),
-                       # without a share no arc: a round cap would draw a dot at the top
-                       svg("circle", visible=f"={share} > 0", cx=24, cy=25, r=22, transform="rotate(-90 24 25)",
-                           **stroke(5, color,
-                                    **{"stroke-dasharray": f"=({length} * {share}).toFixed(1) + ' {length}'"})),
-                       svg_text(24, f"={value} > 0 ? 27.5 : 30", f"={value} > 0 ? {fixed(value, 2)} : '–'", 12, "700"),
-                       unit,
-                       svg_text(56, 13, title, 12, anchor="start", opacity="0.7"),
-                       svg_text(56, 29, f"={h} >= 0 ? 'heute · ' + {fixed(h, 1)} + ' h' : 'heute'", 11,
-                                anchor="start", opacity="0.5"),
-                       svg_pill(56, 34, text, "'neutral'", known)],
-               viewBox="0 0 150 50", width="100%",
-               style={"display": "block", "overflow": "visible", "max-width": "170px", "width": width})
+MEAN_MIN_HOURS = 0.1  # below, a day's mean says nothing (applied/hp_day_means.py writes 0)
+
+
+def mean_tile(title, hours, parts):
+    """The day's mean powers of a purpose under the heating card's COPs (user, 2026-11-28: "auf der Übersicht in der
+    Karte", one tile for each purpose, the rings by the values on a fixed scale), as the rings of today's electricity
+    and heat stand above them (split_ring()): the means over the hours of the purpose as rings one inside the other,
+    the first part's outside, each filled up to its value / full (parts: (name, item, colour, full kW)), the hours
+    inside; beside them the title, each value behind a dot in its ring's colour, and yesterday's whole day's values in a
+    neutral pill, as a higher mean is neither better nor worse; dashes below 6 minutes of the purpose. A tap opens the
+    quick popup with the means and hours per day of the month."""
+    h = num(hours)
+    known = f"{h} >= {MEAN_MIN_HOURS}"
+    rings, shares, before = [], [], []
+    for i, (name, item, color, full) in enumerate(parts):
+        # the inner ring thin enough that 12,5 h stands clear of it inside (user's phone, 2026-11-28)
+        r, width = (21, 4.5) if i == 0 else (15, 3.5)
+        length = round(2 * math.pi * r, 2)
+        value = num(item)
+        share = f"(Math.min(1, Math.max(0, {value} / {full})) || 0)"
+        tip = f"='{name}' + ' · ' + {fixed(value, 2)} + ' kW · ' + 'Ring voll bei' + ' {full} kW'"
+        rings += [svg("circle", cx=25, cy=25, r=r, fill="none", stroke="rgba(127, 127, 127, 0.25)",
+                      **{"stroke-width": width}),
+                  # without a value no arc: a round cap would draw a dot at the top
+                  svg("circle", [svg("title", content=tip)], visible=f"={known} && {share} > 0", cx=25, cy=25, r=r,
+                      transform="rotate(-90 25 25)",
+                      **stroke(width, color,
+                               **{"stroke-dasharray": f"=({length} * {share}).toFixed(1) + ' {length}'"}))]
+        shares.append(div([div([], **{"width": "8px", "height": "8px", "border-radius": "50%", "background": color}),
+                           label(f"='{name}' + ' ' + ({known} ? {fixed(value, 2)} + ' kW' : '–')",
+                                 **{"font-size": "12px", "opacity": "0.85", "white-space": "nowrap"})],
+                          **{"display": "flex", "align-items": "center", "gap": "4px"}))
+        track_history(item, c=True)
+        d = f"Number({vt_hv(item, 'd')})"
+        before.append((f"({d} > 0 ? {fixed(d, 2)} : '–')", vt_has(vt_hv(item, "d"))))
+    ring_ = svg("svg", rings + [svg_text(25, 26.8, f"={h} >= 0 ? {fixed(h, 1)} : '–'", 9.5, "700"),
+                                svg_text(25, 33, "h", 5.5, opacity="0.6")],
+                viewBox="0 0 50 50", width=66, height=66,
+                style={"display": "block", "flex": "0 0 auto", "overflow": "visible"})
+    chip = vt_chip("='gestern ' + " + " + ' · ' + ".join(t for t, _ in before), "'neutral'",
+                   "=" + " && ".join(k for _, k in before))
+    chip["config"]["style"].update({"max-width": "100%", "overflow": "hidden", "text-overflow": "ellipsis"})
+    texts = div([label(title, **VT_TITLE), div(shares, **{"display": "flex", "flex-wrap": "wrap", "gap": "2px 10px"}),
+                 chip], **{"display": "flex", "flex-direction": "column", "gap": "4px", "min-width": "0"})
     link = hp_popup_link({"position": "absolute", "inset": "0", "display": "block", "border-radius": "12px"},
                          "heatpump-means-quick")
-    return div([div([ring], **{"position": "relative", "min-width": "0", "flex": "1 1 auto"}), link],
-               **{"position": "relative", "overflow": "hidden", "padding": "8px 10px", "border-radius": "12px",
-                  "background": TILE_BG, "min-width": "0", "display": "flex", "align-items": "center"})
+    return div([ring_, texts, link], **{"position": "relative", "overflow": "hidden", "display": "flex",
+                                         "align-items": "center", "gap": "14px", "padding": "10px 12px",
+                                         "border-radius": "12px", "background": TILE_BG, "min-width": "0"})
 
 
 legend_dot = lambda name, c: keyed(f"item k k-{name.lower()}", [
@@ -4290,21 +4308,31 @@ def hp_cop_month(total=True, height="270px"):
 # Rest fällt nur im Heizbetrieb auf die Heizung"; "Rest des Tages"): the hot water's over the hours the heat pump made
 # hot water (the valve on DHW, or the booster heater on), the space heating's electricity and heat (user, the same day:
 # "nur Heizung, ohne Warmwasser") over the rest of the hours with the heating switched on; today's those so far, 0
-# below 6 minutes. The hot water's in its lighter red as the split charts. Short names: with "Wärme Heizung" and
-# "Wärme Warmwasser" the legend overflowed into a second page at 412 px
+# below 6 minutes. The hot water's electricity too (user, the same day: "Für das Warmwasser braucht es doch auch eine
+# durchschnittliche Stromleistung"); the hot water's pair in lighter shades of the heating's, its heat in the split
+# charts' lighter red. Four names do not fit one line of the legend at 412 px: the heating's pair over the hot water's
 HP_DAY_MEANS = [("Strom Heizung", "energy_daily_heatpump_space_electric_mean", ELECTRIC_C),
-                ("Heizwärme", "energy_daily_heatpump_space_heat_mean", "#e53935"),
-                ("Warmwasser", "energy_daily_heatpump_dhw_heat_mean", DHW_C)]
+                ("Wärme Heizung", "energy_daily_heatpump_space_heat_mean", "#e53935"),
+                ("Strom Warmwasser", "energy_daily_heatpump_dhw_electric_mean", "#ffcc80"),
+                ("Wärme Warmwasser", "energy_daily_heatpump_dhw_heat_mean", DHW_C)]
+# the rings of the heating card's tiles are full at these (kW), each above nearly all days since October 2024
+MEAN_FULL = {"energy_daily_heatpump_space_electric_mean": 1, "energy_daily_heatpump_space_heat_mean": 3,
+             "energy_daily_heatpump_dhw_electric_mean": 4, "energy_daily_heatpump_dhw_heat_mean": 8}
 # the hours the means divide by, the day's or today's so far
 SPACE_HOURS, DHW_HOURS = "energy_daily_heatpump_space_hours", "energy_daily_heatpump_dhw_hours"
 HP_DAY_HOURS = [("Heizung", SPACE_HOURS, SPACE_C), ("Warmwasser", DHW_HOURS, DHW_C)]
 
 
-def hp_day_means(height="300px"):
+def hp_day_means(height="320px"):
     """The heat pump's mean powers per day of the month as bars beside each other: the space heating's electricity
-    and heat and the hot water's heat, each over the hours of its purpose."""
-    return month_chart([daily(name, item, c, itemStyle={"color": c, "borderRadius": [4, 4, 0, 0]})
-                        for name, item, c in HP_DAY_MEANS], "kW", height=height)
+    and heat and the hot water's, each over the hours of its purpose; the legend in two lines, the heating's pair
+    over the hot water's (an empty name breaks a plain legend's line), the plot 22 px higher above it."""
+    chart_ = month_chart([daily(name, item, c, itemStyle={"color": c, "borderRadius": [4, 4, 0, 0]})
+                          for name, item, c in HP_DAY_MEANS], "kW", height=height)
+    names = [name for name, _, _ in HP_DAY_MEANS]
+    chart_["slots"]["legend"][0]["config"].update({"type": "plain", "data": names[:2] + [""] + names[2:]})
+    chart_["slots"]["grid"][0]["config"]["bottom"] = "82"
+    return chart_
 
 
 def hp_day_hours(height="270px"):
@@ -4455,7 +4483,7 @@ def hp_means_quick():
     """The heat pump's mean powers of the day, each over the hours of its purpose (applied/hp_day_means.py), as the
     heating card's tiles of the means open it (user, 2026-11-28): today's with their hours, over the means per day of
     the month and the hours per day."""
-    (_, electric, _), (_, heat, _), (_, dhw, _) = HP_DAY_MEANS
+    (_, electric, _), (_, heat, _), (_, dhw_electric, _), (_, dhw, _) = HP_DAY_MEANS
     space_h, dhw_h = num(SPACE_HOURS), num(DHW_HOURS)
     kw = lambda item: f"({num(item)} > 0 ? {fixed(num(item), 3)} + ' kW' : '–')"
     hours = lambda h: f"({h} >= 0 ? {fixed(h, 1)} : '–') + ' h'"
@@ -4464,7 +4492,7 @@ def hp_means_quick():
         vt_tile([vt_head("Heizwärme heute"), vt_value(f"={kw(heat)}"),
                  label(f"='Strom ' + {kw(electric)} + ' · ' + {hours(space_h)}", **VT_SUB)]),
         vt_tile([vt_head("Warmwasser heute"), vt_value(f"={kw(dhw)}"),
-                 label(f"='Ladezeit ' + {hours(dhw_h)}", **VT_SUB)]))
+                 label(f"='Strom ' + {kw(dhw_electric)} + ' · Ladezeit ' + {hours(dhw_h)}", **VT_SUB)]))
     return quick("material:speed", "Ø Leistung", HP_ORANGE, state,
                  [values, titled(hp_day_means(), "Ø Leistung pro Tag"), titled(hp_day_hours(), "Stunden pro Tag")],
                  "heatpump")
@@ -5467,8 +5495,8 @@ def heat_specs():
 
 def heating(tile=heat_tile):
     """The heating card's content: the tank and the heat pump as tiles (built by tile), today's split of electricity
-    and heat, the day's three COPs in one row (on a phone two abreast over the total) and under them the day's three
-    mean powers in the same way (mean_tile())."""
+    and heat, the day's three COPs in one row (on a phone two abreast over the total) and under them the day's mean
+    powers of space heating and hot water (mean_tile())."""
     tiles = div([tile(**spec) for spec in heat_specs()],
                 **{"display": "grid", "grid-template-columns": "1fr 1fr", "gap": "10px", "margin-bottom": "16px"})
     # one row of three (user, 2026-10-04: back to one row, "COP WW" so the title fits), every ring as large as
@@ -5482,14 +5510,17 @@ def heating(tile=heat_tile):
                 cop_tile("COP WW", "espaltherma_dcop_dhw", DHW_C, "100%", "Tages-COP Warmwasser"), total],
                **{"display": "grid", "gap": "8px",
                   "grid-template-columns": f"={NARROW} ? 'repeat(2, minmax(0, 1fr))' : 'repeat(3, minmax(0, 1fr))'"})
-    # the day's mean powers, each over the hours of its purpose, in a row of their own under the COPs (user,
-    # 2026-11-28: "auf der Übersicht in der Karte"), on a phone as the COPs: two abreast over the hot water's
-    (_, electric, c_electric), (_, heat, c_heat), (_, dhw, c_dhw) = HP_DAY_MEANS
-    dhw_tile = mean_tile("Ø Warmwasser", dhw, DHW_HOURS, c_dhw, f"={NARROW} ? 'calc(50% - 14px)' : '100%'")
-    dhw_tile["config"]["style"]["grid-column"] = f"={NARROW} ? '1 / -1' : 'auto'"
-    means = div([mean_tile("Ø Strom Heizung", electric, SPACE_HOURS, c_electric),
-                 mean_tile("Ø Heizwärme", heat, SPACE_HOURS, c_heat), dhw_tile],
-                **{**cops["config"]["style"], "margin-top": "8px"})
+    # the day's mean powers, each over the hours of its purpose, under the COPs (user, 2026-11-28: "auf der Übersicht
+    # in der Karte"), a tile for each purpose with its heat and electricity, two abreast as the rings of today's
+    # electricity and heat, one over the other on a phone
+    part = lambda name, item, color: (name, item, color, MEAN_FULL[item])
+    (_, s_el, c_s_el), (_, s_heat, c_s_heat), (_, d_el, c_d_el), (_, d_heat, c_d_heat) = HP_DAY_MEANS
+    means = div([mean_tile("Ø Heizung heute", SPACE_HOURS,
+                           [part("Wärme", s_heat, c_s_heat), part("Strom", s_el, c_s_el)]),
+                 mean_tile("Ø Warmwasser heute", DHW_HOURS,
+                           [part("Wärme", d_heat, c_d_heat), part("Strom", d_el, c_d_el)])],
+                **{"display": "grid", "gap": "8px", "margin-top": "8px",
+                   "grid-template-columns": "repeat(auto-fit, minmax(225px, 1fr))"})
     content = div([tiles, *hp_day_split(), cops, means], **{"padding": "12px 16px 16px", "font-size": "14px"})
     return [content]
 

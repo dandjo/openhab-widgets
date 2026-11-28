@@ -33,8 +33,14 @@ props:
     type: TEXT
     required: true
     context: item
+  - name: dailyHeatpumpDhwElectricMean
+    label: Heat Pump Hot Water Mean Electrical Power Daily
+    description: Number:Power item
+    type: TEXT
+    required: true
+    context: item
   parameterGroups: []
-timestamp: Nov 28, 2026, 12:48:22 PM
+timestamp: Nov 28, 2026, 1:21:07 PM
 component: div
 config:
   style: {}
@@ -324,7 +330,9 @@ slots:
                     white-space: nowrap
               - component: Label
                 config:
-                  text: '=''Charging time '' + ((Number(items[props.dailyHeatpumpDhwHours].numericState) || 0) >= 0 ? ((Number(items[props.dailyHeatpumpDhwHours].numericState)
+                  text: '=''Electricity '' + ((Number(items[props.dailyHeatpumpDhwElectricMean].numericState) || 0) > 0 ?
+                    ((Number(items[props.dailyHeatpumpDhwElectricMean].numericState) || 0)).toFixed(3) + '' kW'' : ''–'')
+                    + '' · Charging time '' + ((Number(items[props.dailyHeatpumpDhwHours].numericState) || 0) >= 0 ? ((Number(items[props.dailyHeatpumpDhwHours].numericState)
                     || 0)).toFixed(1) : ''–'') + '' h'''
                   style:
                     font-size: 11px
@@ -333,7 +341,7 @@ slots:
         config:
           chartType: month
           periodVisible: true
-          height: 300px
+          height: 320px
           options:
             backgroundColor: transparent
         slots:
@@ -341,7 +349,7 @@ slots:
           - component: oh-chart-grid
             config:
               top: '62'
-              bottom: '60'
+              bottom: '82'
               left: '45'
               right: '20'
           xAxis:
@@ -390,7 +398,7 @@ slots:
                 - 0
           - component: oh-aggregate-series
             config:
-              name: Space heat
+              name: Heat heating
               gridIndex: 0
               xAxisIndex: 0
               yAxisIndex: 0
@@ -407,7 +415,24 @@ slots:
                 - 0
           - component: oh-aggregate-series
             config:
-              name: Hot water
+              name: Electricity hot water
+              gridIndex: 0
+              xAxisIndex: 0
+              yAxisIndex: 0
+              type: bar
+              item: =props.dailyHeatpumpDhwElectricMean
+              aggregationFunction: last
+              dimension1: date
+              itemStyle:
+                color: '#ffcc80'
+                borderRadius:
+                - 4
+                - 4
+                - 0
+                - 0
+          - component: oh-aggregate-series
+            config:
+              name: Heat hot water
               gridIndex: 0
               xAxisIndex: 0
               yAxisIndex: 0
@@ -427,7 +452,13 @@ slots:
             config:
               show: true
               bottom: '0'
-              type: scroll
+              type: plain
+              data:
+              - Electricity heating
+              - Heat heating
+              - ''
+              - Electricity hot water
+              - Heat hot water
           tooltip:
           - component: oh-chart-tooltip
             config:
@@ -461,7 +492,7 @@ slots:
                 (top - y) + ''px''), f(f, i + 1, top + b.offsetHeight)][1])(Math.max(y ? y + 4 : 0, i === h ? Math.max(T[i],
                 Math.min(pt[1] + 20, B[i] - b.offsetHeight)) : T[i])))(c.children[i]) : 0), [left ? pt[0] - 20 - c.offsetWidth
                 : pt[0] + 20, 0]][5])(dom.firstChild, pt[0] > size.viewSize[0] / 2, T.filter((t) => t <= pt[1]).length - 1))([62],
-                [size.viewSize[1] - 60])'
+                [size.viewSize[1] - 82])'
               backgroundColor: transparent
               borderWidth: 0
               padding: 0

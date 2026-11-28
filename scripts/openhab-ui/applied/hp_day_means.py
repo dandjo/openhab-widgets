@@ -1,20 +1,21 @@
 #!/usr/bin/env python3
 """The heat pump's mean powers per day, each over the hours of its purpose (user, 2026-11-28: "Die Warmwasserleistung
 nur für den Betrieb im Warmwasser rechnen, der Rest fällt nur im Heizbetrieb auf die Heizung"; of three ways to count
-the heating's hours, "Rest des Tages"): the hot water's heat power over the hours the heat pump made hot water (the
-three-way valve on DHW, or the tank's booster heater on), the space heating's electric and heat power over the rest
-of the hours with the heating switched on (pyaltherma_climate_control_power; a summer day has none); 0 where a day
-has less than 6 minutes of them (a valve's blip of 36 s once made 34 kW). Items
-energy_daily_heatpump_space_electric_mean, energy_daily_heatpump_space_heat_mean and
+the heating's hours, "Rest des Tages"): the hot water's heat and electric power (the latter added the same day) over
+the hours the heat pump made hot water (the three-way valve on DHW, or the tank's booster heater on), the space
+heating's electric and heat power over the rest of the hours with the heating switched on
+(pyaltherma_climate_control_power; a summer day has none); 0 where a day has less than 6 minutes of them (a valve's
+blip of 36 s once made 34 kW). Items energy_daily_heatpump_space_electric_mean,
+energy_daily_heatpump_space_heat_mean, energy_daily_heatpump_dhw_electric_mean and
 energy_daily_heatpump_dhw_heat_mean in kW, and the two counts of hours, energy_daily_heatpump_space_hours and
 energy_daily_heatpump_dhw_hours, one point per day at 23:59:59 as the other daily totals. Rule energy_daily_totals
-writes them from espaltherma_energy_space_today, espaltherma_heating_energy_space_today and
-espaltherma_heating_energy_dhw_today and the hours from the states' changes since midnight in InfluxDB, so today's
-point is the mean so far; the block is appended to its script here, or replaces the one an earlier run appended (also
-the first version's, which divided by the day's 24 hours). apply also writes the days from 19 October 2024 (the
-counters' first whole day) to yesterday, from each day's last counter reading and the states in InfluxDB, through
-openHAB's persistence REST API, only the days whose stored point differs (equal timestamps overwrite); check prints
-what it would write.
+writes them from espaltherma_energy_space_today, espaltherma_heating_energy_space_today, espaltherma_energy_dhw_today
+and espaltherma_heating_energy_dhw_today and the hours from the states' changes since midnight in InfluxDB, so
+today's point is the mean so far; the block is appended to its script here, or replaces the one an earlier run
+appended (also the first version's, which divided by the day's 24 hours). apply also writes the days from 19 October
+2024 (the counters' first whole day) to yesterday, from each day's last counter reading and the states in InfluxDB,
+through openHAB's persistence REST API, only the days whose stored point differs (equal timestamps overwrite); check
+prints what it would write.
 Usage: hp_day_means.py check|apply   (on homepi, as pi; the API token from ~/.openhab_token)"""
 import datetime
 import json
@@ -42,6 +43,10 @@ MEANS = [("energy_daily_heatpump_space_electric_mean", "Wärmepumpe Heizung Ø S
           "espaltherma_energy_space_today", "space"),
          ("energy_daily_heatpump_space_heat_mean", "Wärmepumpe Heizung Ø Heizleistung täglich",
           "espaltherma_heating_energy_space_today", "space"),
+         # the hot water's electricity too (user, 2026-11-28: "Für das Warmwasser braucht es doch auch eine
+         # durchschnittliche Stromleistung")
+         ("energy_daily_heatpump_dhw_electric_mean", "Wärmepumpe Warmwasser Ø Stromleistung täglich",
+          "espaltherma_energy_dhw_today", "dhw"),
          ("energy_daily_heatpump_dhw_heat_mean", "Wärmepumpe Warmwasser Ø Heizleistung täglich",
           "espaltherma_heating_energy_dhw_today", "dhw")]
 HOURS = [("energy_daily_heatpump_space_hours", "Wärmepumpe Heizung Stunden täglich", "space"),
@@ -55,9 +60,9 @@ MARKERS = ("\n  // the heat pump's mean powers of the day, each over", "\n  // t
            "\n  // the space heating's mean electric and heat power")
 BLOCK = """
   // the heat pump's mean powers of the day, each over the hours of its purpose (user, 2026-11-28): the hot water's
-  // heat over the hours the heat pump made hot water (the three-way valve on DHW, or the tank's booster heater on), the
-  // space heating's electricity and heat over the rest of the hours with the heating switched on (none on a summer
-  // day); the hours from the states' changes since midnight, so today's means are those so far; 0 below 6 minutes of
+  // heat and electricity over the hours the heat pump made hot water (the three-way valve on DHW, or the tank's
+  // booster heater on), the space heating's electricity and heat over the rest of the hours with the heating switched
+  // on (none on a summer day); the hours from the states' changes since midnight, so today's means are those so far; 0 below 6 minutes of
   // such hours (a valve's blip of 36 s once made 34 kW)
   const from = time.toZDT('00:00');
   const fromMs = from.toInstant().toEpochMilli();
