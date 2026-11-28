@@ -3304,6 +3304,39 @@ def cop_tile(title, item, color, width="100%", name=None):
                   "background": TILE_BG, "min-width": "0", "display": "flex", "align-items": "center"})
 
 
+def mean_tile(title, item, hours, color, width="100%"):
+    """A mean power of the day under the heating card's COPs, as a COP's tile stands (cop_tile(); user, 2026-11-28:
+    "auf der Übersicht in der Karte", a row of tiles): the mean over the hours of its purpose (HP_DAY_MEANS) inside a
+    ring filled by the share of the day so far its purpose took (hours), a dash below 6 minutes of them; beside it the
+    title, heute with the hours, and yesterday's whole day's mean in a neutral pill, as a higher mean is neither better
+    nor worse. A tap opens the quick popup with the means and hours per day of the month."""
+    value, h = num(item), num(hours)
+    elapsed = "Math.max(0.01, dayjs().diff(dayjs().startOf('day'), 'minute') / 60)"
+    share = f"(Math.min(1, Math.max(0, {h} / {elapsed})) || 0)"
+    length = round(2 * math.pi * 22, 2)
+    text, _, known = day_value_change(item, 2)
+    unit = svg_text(24, 36, "kW", 7, opacity="0.6")
+    unit["config"]["visible"] = f"={value} > 0"
+    ring = svg("svg", [svg("circle", cx=24, cy=25, r=22, **stroke(5, "#9e9e9e", **{"stroke-opacity": "0.25"})),
+                       # without a share no arc: a round cap would draw a dot at the top
+                       svg("circle", visible=f"={share} > 0", cx=24, cy=25, r=22, transform="rotate(-90 24 25)",
+                           **stroke(5, color,
+                                    **{"stroke-dasharray": f"=({length} * {share}).toFixed(1) + ' {length}'"})),
+                       svg_text(24, f"={value} > 0 ? 27.5 : 30", f"={value} > 0 ? {fixed(value, 2)} : '–'", 12, "700"),
+                       unit,
+                       svg_text(56, 13, title, 12, anchor="start", opacity="0.7"),
+                       svg_text(56, 29, f"={h} >= 0 ? 'heute · ' + {fixed(h, 1)} + ' h' : 'heute'", 11,
+                                anchor="start", opacity="0.5"),
+                       svg_pill(56, 34, text, "'neutral'", known)],
+               viewBox="0 0 150 50", width="100%",
+               style={"display": "block", "overflow": "visible", "max-width": "170px", "width": width})
+    link = hp_popup_link({"position": "absolute", "inset": "0", "display": "block", "border-radius": "12px"},
+                         "heatpump-means-quick")
+    return div([div([ring], **{"position": "relative", "min-width": "0", "flex": "1 1 auto"}), link],
+               **{"position": "relative", "overflow": "hidden", "padding": "8px 10px", "border-radius": "12px",
+                  "background": TILE_BG, "min-width": "0", "display": "flex", "align-items": "center"})
+
+
 legend_dot = lambda name, c: keyed(f"item k k-{name.lower()}", [
     div([], **{"width": "10px", "height": "10px", "border-radius": "3px", "background": c}),
     label(name, **{"font-size": "12px", "opacity": "0.75"})], style={"display": "flex", "align-items": "center", "gap": "5px"})
@@ -4252,20 +4285,35 @@ def hp_cop_month(total=True, height="270px"):
     return chart_
 
 
-# the heat pump's mean powers per day (rule energy_daily_totals, applied/hp_space_means.py): the day's energy over its
-# hours, today's over the hours since midnight; the space heating's electricity and heat (user, 2026-11-28: "nur
-# Heizung, ohne Warmwasser"), the hot water's heat beside them (the same day), in its lighter red as the split charts.
-# Short names: with "Wärme Heizung" and "Wärme Warmwasser" the legend overflowed into a second page at 412 px
+# the heat pump's mean powers per day (rule energy_daily_totals, applied/hp_day_means.py), each the day's energy over
+# the hours of its purpose (user, 2026-11-28: "Die Warmwasserleistung nur für den Betrieb im Warmwasser rechnen, der
+# Rest fällt nur im Heizbetrieb auf die Heizung"; "Rest des Tages"): the hot water's over the hours the heat pump made
+# hot water (the valve on DHW, or the booster heater on), the space heating's electricity and heat (user, the same day:
+# "nur Heizung, ohne Warmwasser") over the rest of the hours with the heating switched on; today's those so far, 0
+# below 6 minutes. The hot water's in its lighter red as the split charts. Short names: with "Wärme Heizung" and
+# "Wärme Warmwasser" the legend overflowed into a second page at 412 px
 HP_DAY_MEANS = [("Strom Heizung", "energy_daily_heatpump_space_electric_mean", ELECTRIC_C),
                 ("Heizwärme", "energy_daily_heatpump_space_heat_mean", "#e53935"),
                 ("Warmwasser", "energy_daily_heatpump_dhw_heat_mean", DHW_C)]
+# the hours the means divide by, the day's or today's so far
+SPACE_HOURS, DHW_HOURS = "energy_daily_heatpump_space_hours", "energy_daily_heatpump_dhw_hours"
+HP_DAY_HOURS = [("Heizung", SPACE_HOURS, SPACE_C), ("Warmwasser", DHW_HOURS, DHW_C)]
 
 
 def hp_day_means(height="300px"):
     """The heat pump's mean powers per day of the month as bars beside each other: the space heating's electricity
-    and heat, the heat's being the house's mean heating load that day, and the hot water's heat."""
+    and heat and the hot water's heat, each over the hours of its purpose."""
     return month_chart([daily(name, item, c, itemStyle={"color": c, "borderRadius": [4, 4, 0, 0]})
                         for name, item, c in HP_DAY_MEANS], "kW", height=height)
+
+
+def hp_day_hours(height="270px"):
+    """The hours of each purpose per day of the month, stacked, which the day's means divide by: the heating's (with
+    the heating switched on, without the hot water's) and the hot water's."""
+    last = len(HP_DAY_HOURS) - 1
+    return month_chart([daily(name, item, c, stack="day",
+                              **({"itemStyle": {"color": c, "borderRadius": [4, 4, 0, 0]}} if i == last else {}))
+                        for i, (name, item, c) in enumerate(HP_DAY_HOURS)], "h", height=height)
 
 
 def hp_split_charts(part_power, part_energy, parts):
@@ -4403,6 +4451,25 @@ def hp_split_quick(title, icon, color, power, today, split):
                  [values, titled(day, "Leistung"), titled(month, "Energie pro Tag")], "heatpump")
 
 
+def hp_means_quick():
+    """The heat pump's mean powers of the day, each over the hours of its purpose (applied/hp_day_means.py), as the
+    heating card's tiles of the means open it (user, 2026-11-28): today's with their hours, over the means per day of
+    the month and the hours per day."""
+    (_, electric, _), (_, heat, _), (_, dhw, _) = HP_DAY_MEANS
+    space_h, dhw_h = num(SPACE_HOURS), num(DHW_HOURS)
+    kw = lambda item: f"({num(item)} > 0 ? {fixed(num(item), 3)} + ' kW' : '–')"
+    hours = lambda h: f"({h} >= 0 ? {fixed(h, 1)} : '–') + ' h'"
+    state = f"'heute Heizung ' + {hours(space_h)} + ' · Warmwasser ' + {hours(dhw_h)}"
+    values = quick_values(
+        vt_tile([vt_head("Heizwärme heute"), vt_value(f"={kw(heat)}"),
+                 label(f"='Strom ' + {kw(electric)} + ' · ' + {hours(space_h)}", **VT_SUB)]),
+        vt_tile([vt_head("Warmwasser heute"), vt_value(f"={kw(dhw)}"),
+                 label(f"='Ladezeit ' + {hours(dhw_h)}", **VT_SUB)]))
+    return quick("material:speed", "Ø Leistung", HP_ORANGE, state,
+                 [values, titled(hp_day_means(), "Ø Leistung pro Tag"), titled(hp_day_hours(), "Stunden pro Tag")],
+                 "heatpump")
+
+
 def hp_cop_quick():
     """The COP over the day with the outdoor temperature, and the day's COPs per day of the month."""
     cop = num(HPX["cop"])
@@ -4422,7 +4489,7 @@ QUICK_PANELS = {"heatpump-control-quick": hp_control_quick, "heatpump-indoor-qui
                     "Elektrisch", "bolt", ELECTRIC_C, HPX["power"], "espaltherma_energy_today", HP_ELECTRIC),
                 "heatpump-heat-quick": lambda: hp_split_quick(
                     "Wärme", "local_fire_department", SUPPLY, HPX["heat"], "espaltherma_heating_energy_today", HP_HEAT),
-                "heatpump-cop-quick": hp_cop_quick,
+                "heatpump-cop-quick": hp_cop_quick, "heatpump-means-quick": hp_means_quick,
                 "upper-floor-quick": lambda: floor_quick("Obergeschoss", "tado_temperature", "tado_humidity",
                                                          None, "tado"),
                 "ground-floor-quick": lambda: floor_quick("Erdgeschoss", HPX["indoor"], "apollo_air_1_humidity",
@@ -5400,7 +5467,8 @@ def heat_specs():
 
 def heating(tile=heat_tile):
     """The heating card's content: the tank and the heat pump as tiles (built by tile), today's split of electricity
-    and heat, and the day's three COPs in one row (on a phone two abreast over the total)."""
+    and heat, the day's three COPs in one row (on a phone two abreast over the total) and under them the day's three
+    mean powers in the same way (mean_tile())."""
     tiles = div([tile(**spec) for spec in heat_specs()],
                 **{"display": "grid", "grid-template-columns": "1fr 1fr", "gap": "10px", "margin-bottom": "16px"})
     # one row of three (user, 2026-10-04: back to one row, "COP WW" so the title fits), every ring as large as
@@ -5414,7 +5482,15 @@ def heating(tile=heat_tile):
                 cop_tile("COP WW", "espaltherma_dcop_dhw", DHW_C, "100%", "Tages-COP Warmwasser"), total],
                **{"display": "grid", "gap": "8px",
                   "grid-template-columns": f"={NARROW} ? 'repeat(2, minmax(0, 1fr))' : 'repeat(3, minmax(0, 1fr))'"})
-    content = div([tiles, *hp_day_split(), cops], **{"padding": "12px 16px 16px", "font-size": "14px"})
+    # the day's mean powers, each over the hours of its purpose, in a row of their own under the COPs (user,
+    # 2026-11-28: "auf der Übersicht in der Karte"), on a phone as the COPs: two abreast over the hot water's
+    (_, electric, c_electric), (_, heat, c_heat), (_, dhw, c_dhw) = HP_DAY_MEANS
+    dhw_tile = mean_tile("Ø Warmwasser", dhw, DHW_HOURS, c_dhw, f"={NARROW} ? 'calc(50% - 14px)' : '100%'")
+    dhw_tile["config"]["style"]["grid-column"] = f"={NARROW} ? '1 / -1' : 'auto'"
+    means = div([mean_tile("Ø Strom Heizung", electric, SPACE_HOURS, c_electric),
+                 mean_tile("Ø Heizwärme", heat, SPACE_HOURS, c_heat), dhw_tile],
+                **{**cops["config"]["style"], "margin-top": "8px"})
+    content = div([tiles, *hp_day_split(), cops, means], **{"padding": "12px 16px 16px", "font-size": "14px"})
     return [content]
 
 # ---------------------------------------------------------------- 8b. appliance pages

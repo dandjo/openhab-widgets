@@ -257,6 +257,12 @@ EN.update({"Aus dem Akku": "From Battery", "aus dem Akku": "from the battery", "
            "Wärmepumpe Heizung Ø Stromleistung täglich": "Heat Pump Heating Mean Electrical Power Daily",
            "Wärmepumpe Heizung Ø Heizleistung täglich": "Heat Pump Heating Mean Heat Power Daily",
            "Wärmepumpe Warmwasser Ø Heizleistung täglich": "Heat Pump Hot Water Mean Heat Power Daily",
+           "Wärmepumpe Heizung Stunden täglich": "Heat Pump Heating Hours Daily",
+           "Wärmepumpe Warmwasser Stunden täglich": "Heat Pump Hot Water Hours Daily",
+           # the heating card's tiles of the mean powers and their popup (2026-11-28)
+           "Ø Strom Heizung": "Ø Electricity heating", "Ø Heizwärme": "Ø Space heat", "Ø Warmwasser": "Ø Hot water",
+           "Ø Leistung": "Ø Power", "Heizwärme heute": "Space heat today", "Warmwasser heute": "Hot water today",
+           "heute Heizung": "today heating", "Ladezeit": "Charging time", "Stunden pro Tag": "Hours per Day",
            "PV Prognose": "PV Forecast", "PV Prognose Tagesenergie": "PV Forecast Daily Energy",
            "PV Prognose Tagesenergie morgen": "PV Forecast Daily Energy Tomorrow"})
 

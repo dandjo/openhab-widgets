@@ -49,7 +49,7 @@ number formats come from the items.
 | `flow-node` | – |
 | `grid-peaks-month` | – |
 | `ground-floor-quick` | – |
-| `heating-card` | `flow-node`, `item-popup`, `trip-popup` |
+| `heating-card` | `flow-node`, `heatpump-means-quick`, `item-popup`, `trip-popup` |
 | `heatpump-card` | `boost-pill`, `flow-node`, `ground-floor-quick`, `heatpump-circuit-quick`, `heatpump-control-quick`, `heatpump-cop-quick`, `heatpump-electric-quick`, `heatpump-heat-quick`, `heatpump-indoor-quick`, `heatpump-outdoor-quick`, `heatpump-refrigerant-quick`, `heatpump-tank-quick`, `heatpump-valve-quick`, `item-popup`, `pill-slider`, `pill-switch`, `state-bar`, `switch-row`, `trip-popup`, `upper-floor-quick`, `value-tile` |
 | `heatpump-circuit-quick` | `pill-slider` |
 | `heatpump-control-quick` | `boost-pill`, `pill-slider`, `pill-switch`, `state-bar`, `switch-row` |
@@ -57,6 +57,7 @@ number formats come from the items.
 | `heatpump-electric-quick` | – |
 | `heatpump-heat-quick` | – |
 | `heatpump-indoor-quick` | – |
+| `heatpump-means-quick` | – |
 | `heatpump-outdoor-quick` | `flow-node` |
 | `heatpump-refrigerant-quick` | – |
 | `heatpump-tank-quick` | – |
@@ -327,22 +328,26 @@ part lifts it everywhere) and today against yesterday at this time in a pill (th
 of space heating, DHW and in total in one row as rings like the energy flow's self-consumption, each with yesterday's
 whole day's COP in a pill under its title, green or orange once today has a base; a tap on one opens the item popup with
 that COP large inside its ring, beside it today's heat and electricity it is the ratio of and yesterday's whole day, and
-its course over the day. While the tank charges or the heating runs, a line under its tile says since when. A round
-badge right of each tile's pills counts today's compressor runs in the tile's mode: every stretch of 2 minutes or more
-in which the compressor runs with the three-way valve on that side, so a charge that takes over a running heating run
+its course over the day. Under them, in the same way, the day's mean powers of space heating (electricity and heat) and
+of DHW, each over the hours of its purpose (the hot water's while the heat pump made hot water, the space heating's over
+the rest of the hours with the heating switched on), the ring filled by the share of the day so far its purpose took,
+yesterday's whole day in a neutral pill; a tap opens a popup with today's means and hours over the means and the hours
+per day of the month. While the tank charges or the heating runs, a line under its tile says since when. A round badge
+right of each tile's pills counts today's compressor runs in the tile's mode: every stretch of 2 minutes or more in
+which the compressor runs with the three-way valve on that side, so a charge that takes over a running heating run
 counts for hot water (the restarts of a defrost do not count), outlined in the tile's colour, grey at none; while the
 cycle guard of my installation holds back the next start after a stop (it lowers the leaving water setpoint until the
 return water has cooled well below the heating curve, so that the run after it lasts), a line under the heating tile
 says so. The screenshots show it with the heat pump card's demo values.
 
-Needs `flow-node`, `item-popup`, `trip-popup`.
+Needs `flow-node`, `heatpump-means-quick`, `item-popup`, `trip-popup`.
 
 ![Heating and hot water](screenshots/heating-card.png)
 
 ![Heating and hot water in dark mode](screenshots/heating-card-dark.png)
 
 <details>
-<summary>33 props</summary>
+<summary>38 props</summary>
 
 | Prop | Item | Item type |
 |---|---|---|
@@ -379,6 +384,11 @@ Needs `flow-node`, `item-popup`, `trip-popup`.
 | `heatpumpDcopSpace` | ESPAltherma DCOP Space | Number |
 | `heatpumpDcopDhw` | ESPAltherma DCOP DHW | Number |
 | `heatpumpDcop` | ESPAltherma DCOP | Number |
+| `dailyHeatpumpSpaceHours` | Heat Pump Heating Hours Daily | Number:Time |
+| `dailyHeatpumpSpaceElectricMean` | Heat Pump Heating Mean Electrical Power Daily | Number:Power |
+| `dailyHeatpumpDhwHours` | Heat Pump Hot Water Hours Daily | Number:Time |
+| `dailyHeatpumpSpaceHeatMean` | Heat Pump Heating Mean Heat Power Daily | Number:Power |
+| `dailyHeatpumpDhwHeatMean` | Heat Pump Hot Water Mean Heat Power Daily | Number:Power |
 
 </details>
 

@@ -1,0 +1,627 @@
+uid: heatpump-means-quick
+tags:
+- controls
+props:
+  parameters:
+  - name: dailyHeatpumpSpaceHours
+    label: Heat Pump Heating Hours Daily
+    description: Number:Time item
+    type: TEXT
+    required: true
+    context: item
+  - name: dailyHeatpumpDhwHours
+    label: Heat Pump Hot Water Hours Daily
+    description: Number:Time item
+    type: TEXT
+    required: true
+    context: item
+  - name: dailyHeatpumpSpaceHeatMean
+    label: Heat Pump Heating Mean Heat Power Daily
+    description: Number:Power item
+    type: TEXT
+    required: true
+    context: item
+  - name: dailyHeatpumpSpaceElectricMean
+    label: Heat Pump Heating Mean Electrical Power Daily
+    description: Number:Power item
+    type: TEXT
+    required: true
+    context: item
+  - name: dailyHeatpumpDhwHeatMean
+    label: Heat Pump Hot Water Mean Heat Power Daily
+    description: Number:Power item
+    type: TEXT
+    required: true
+    context: item
+  parameterGroups: []
+timestamp: Nov 28, 2026, 12:48:22 PM
+component: div
+config:
+  style: {}
+  label: Ø Power
+  stylesheet: "@keyframes a-soft { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.06; } }\n@keyframes a-full { 0%, 100% { opacity:\
+    \ 0.3; } 50% { opacity: 1; } }\n@keyframes a-arc { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }\n@keyframes a-halo\
+    \ { 0%, 100% { opacity: 0; } 50% { opacity: 1; } }\n@keyframes a-halo-arc { 0%, 100% { opacity: 1; } 50% { opacity: 0;\
+    \ } }\n@keyframes a-fade { 0%, 100% { opacity: 0; } 50% { opacity: 1; } }\n@keyframes a-glow { 0%, 100% { opacity: 0.35;\
+    \ } 50% { opacity: 1; } }\n@keyframes a-blink-up { 0%, 100% { opacity: 0.2; } 50% { opacity: 1; } }\n@keyframes a-blink-down\
+    \ { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }\n@keyframes a-flicker-a { 0%, 100% { opacity: 1; } 50% { opacity:\
+    \ 0.25; } }\n@keyframes a-flicker-b { 0%, 100% { opacity: 0.25; } 50% { opacity: 1; } }\n@keyframes a-flicker-c { 0%,\
+    \ 100% { opacity: 1; } 50% { opacity: 0.4; } }\n@keyframes a-bolt { 0%, 66.7%, 100% { opacity: 1; } 33.3% { opacity: 0.35;\
+    \ } }\n@keyframes a-breathe { 0%, 100% { transform: scale(0.82); } 50% { transform: scale(1.05); } }\n@keyframes a-spin\
+    \ { to { transform: rotate(360deg); } }\n@keyframes a-wobble { 0%, 100% { transform: translateY(0); } 50% { transform:\
+    \ translateY(3px); } }\n@keyframes a-rise { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px);\
+    \ } }\n@keyframes a-fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }\n@keyframes a-ripple { from {\
+    \ transform: scale(1); opacity: 0.7; } to { transform: scale(var(--grow)); opacity: 0; } }\n@keyframes a-run { from {\
+    \ transform: translate(var(--ax), var(--ay)); } to { transform: translate(var(--bx), var(--by)); } }\n@keyframes a-drop\
+    \ { 0% { transform: translate(0, 0); opacity: 0; } 25% { opacity: 1; } 75% { opacity: 1; } 100% { transform: translate(-2px,\
+    \ 6px); opacity: 0; } }\n@keyframes a-bubble-l { 0% { transform: translate(0.00px, 0.00px) scale(1.00); opacity: 0; }\
+    \ 15% { opacity: 0.9; } 25% { transform: translate(0.42px, -5.84px) scale(1.33); } 50% { transform: translate(0.00px,\
+    \ -11.50px) scale(1.67); } 70% { opacity: 0.9; } 75% { transform: translate(-0.42px, -17.16px) scale(2.00); } 100% { transform:\
+    \ translate(0.00px, -23.00px) scale(2.33); opacity: 0; } }\n@keyframes a-bubble-r { 0% { transform: translate(0.00px,\
+    \ 0.00px) scale(1.00); opacity: 0; } 15% { opacity: 0.9; } 25% { transform: translate(-0.42px, -5.84px) scale(1.33); }\
+    \ 50% { transform: translate(0.00px, -11.50px) scale(1.67); } 70% { opacity: 0.9; } 75% { transform: translate(0.42px,\
+    \ -17.16px) scale(2.00); } 100% { transform: translate(0.00px, -23.00px) scale(2.33); opacity: 0; } }\n.a-soft { animation:\
+    \ a-soft 2s linear infinite; }\n.a-full { animation: a-full 2s linear infinite; }\n.a-arc { animation: a-arc 2s linear\
+    \ infinite; }\n.a-halo { animation: a-halo 2s linear infinite; }\n.a-halo-arc { animation: a-halo-arc 2s linear infinite;\
+    \ }\n.a-fade { animation: a-fade 2.4s linear infinite; }\n.a-glow { animation: a-glow 2.4s linear infinite; }\n.a-blink-up\
+    \ { animation: a-blink-up 1.8s ease-in-out infinite; }\n.a-blink-down { animation: a-blink-down 1.8s ease-in-out infinite;\
+    \ }\n.a-flicker-a { animation: a-flicker-a 0.9s linear infinite; }\n.a-flicker-b { animation: a-flicker-b 1.3s linear\
+    \ infinite; }\n.a-flicker-c { animation: a-flicker-c 2s linear infinite; }\n.a-bolt { animation: a-bolt 1.8s linear infinite;\
+    \ }\n.a-breathe { transform-box: fill-box; transform-origin: center; animation: a-breathe 2.4s ease-in-out infinite; }\n\
+    .a-spin { transform-box: fill-box; transform-origin: center; animation: a-spin 1s linear infinite; }\n.a-wobble { animation:\
+    \ a-wobble 2s linear infinite; }\n.a-rise { animation: a-rise 1s linear infinite; }\n.a-fill { transform-box: fill-box;\
+    \ transform-origin: left center; animation: a-fill 2.4s linear infinite; }\n.a-ripple { transform-box: fill-box; transform-origin:\
+    \ center; animation: a-ripple 1.6s linear infinite; }\n.a-run { animation: a-run 2.5s linear infinite; }\n.a-drop { animation:\
+    \ a-drop 0.9s linear infinite; }\n.a-bubble-l { transform-box: fill-box; transform-origin: center; animation: a-bubble-l\
+    \ 2.6s linear infinite; }\n.a-bubble-r { transform-box: fill-box; transform-origin: center; animation: a-bubble-r 2.6s\
+    \ linear infinite; }\n\n.card { border-radius: 14px; box-shadow: 0 0 0 1px color-mix(in srgb, var(--f7-text-color) 16%,\
+    \ transparent); }\n.card .card { box-shadow: none; }\n.card-header { justify-content: flex-start; min-height: 0; font-size:\
+    \ 13px; font-weight: 700; line-height: 18px;\n  padding: 8px 16px; opacity: 1; letter-spacing: 0.01em; border-radius:\
+    \ 14px 14px 0 0; background: color-mix(in srgb, var(--f7-text-color) 8%, transparent);\n  border-bottom: 1px solid color-mix(in\
+    \ srgb, var(--f7-text-color) 16%, transparent); }\n.card-header::after { display: none !important; }\n.oh-chart-container\
+    \ > .menu .menu-item { background: color-mix(in srgb, var(--f7-text-color) 8%, transparent);\n  color: inherit; border-radius:\
+    \ 6px; min-width: 32px; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--f7-text-color) 13%, transparent); }\n.oh-chart-container\
+    \ > .menu .menu-item + .menu-item { margin-left: 6px; }\n.segmented-strong { border-radius: 10px; background: color-mix(in\
+    \ srgb, var(--f7-text-color) 8%, transparent);\n  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--f7-text-color)\
+    \ 13%, transparent); }\n.segmented-strong .button, .segmented-strong .segmented-highlight { border-radius: 8px !important;\
+    \ }\n[style*=\"var(--f7-text-color) 6%\"] { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--f7-text-color) 11%, transparent);\
+    \ }\n.card .range-bar { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--f7-text-color) 11%, transparent); }\n.card\
+    \ [style*=\"align-items: center\"][style*=\"background: rgba(127, 127, 127, 0.1\"] { box-shadow: inset 0 0 0 1px color-mix(in\
+    \ srgb, var(--f7-text-color) 11%, transparent); }\n.menu-item-dropdown:not(.menu-item-dropdown-opened) .menu-dropdown\
+    \ { display: none; }\n.oh-chart-container > .menu.padding { padding-top: 6px !important; }"
+slots:
+  default:
+  - component: div
+    config:
+      style:
+        display: flex
+        flex-direction: column
+        gap: 6px
+        padding: 12px 14px
+    slots:
+      default:
+      - component: div
+        config:
+          style:
+            display: flex
+            align-items: center
+            gap: 18px
+            padding-bottom: 4px
+        slots:
+          default:
+          - component: svg
+            config:
+              viewBox: -34 -34 68 68
+              width: 104
+              height: 104
+              style:
+                display: block
+                flex: 0 0 auto
+                overflow: visible
+            slots:
+              default:
+              - component: g
+                config: {}
+                slots:
+                  default:
+                  - component: circle
+                    config:
+                      cx: 0
+                      cy: 0
+                      r: 32.25
+                      style:
+                        fill: 'var(--f7-card-bg-color, #fff)'
+                  - component: circle
+                    config:
+                      cx: 0
+                      cy: 0
+                      r: 29.2
+                      fill: none
+                      stroke: rgba(127, 127, 127, 0.28)
+                      stroke-width: 2.9
+              - component: g
+                config: {}
+                slots:
+                  default:
+                  - component: circle
+                    config:
+                      cx: 0
+                      cy: 0
+                      r: 29.2
+                      fill: none
+                      stroke: '#fb8c00'
+                      stroke-width: 2.9
+                      visible: =(false) && !(false)
+                      class: a-full
+                  - component: circle
+                    config:
+                      cx: 0
+                      cy: 0
+                      r: 29.2
+                      stroke: '#fb8c00'
+                      fill: none
+                      stroke-width: 4.5
+                      visible: =(false) && !(false)
+                      class: a-halo
+                  - component: circle
+                    config:
+                      cx: 0
+                      cy: 0
+                      r: 29.2
+                      fill: none
+                      stroke: '#fb8c00'
+                      stroke-width: 2.9
+                      visible: =(false) && (false)
+                      class: a-soft
+              - component: g
+                config: {}
+                slots:
+                  default:
+                  - component: circle
+                    config:
+                      cx: 0
+                      cy: 0
+                      r: 27.75
+                      style:
+                        fill: 'var(--f7-card-bg-color, #fff)'
+                  - component: circle
+                    config:
+                      cx: 0
+                      cy: 0
+                      r: 27.75
+                      fill: '#fb8c00'
+                      fill-opacity: '0.12'
+              - component: text
+                config:
+                  x: 0
+                  y: 0
+                  content: speed
+                  fill: '#fb8c00'
+                  font-size: 30
+                  text-anchor: middle
+                  dominant-baseline: central
+                  style:
+                    font-family: '''Material Icons'''
+                    font-feature-settings: '''liga'''
+          - component: div
+            config:
+              style:
+                display: flex
+                flex-direction: column
+                gap: 2px
+                min-width: '0'
+            slots:
+              default:
+              - component: Label
+                config:
+                  text: Ø Power
+                  style:
+                    font-size: 15px
+                    font-weight: '600'
+              - component: Label
+                config:
+                  text: '=''today heating '' + ((Number(items[props.dailyHeatpumpSpaceHours].numericState) || 0) >= 0 ? ((Number(items[props.dailyHeatpumpSpaceHours].numericState)
+                    || 0)).toFixed(1) : ''–'') + '' h'' + '' · Hot water '' + ((Number(items[props.dailyHeatpumpDhwHours].numericState)
+                    || 0) >= 0 ? ((Number(items[props.dailyHeatpumpDhwHours].numericState) || 0)).toFixed(1) : ''–'') + ''
+                    h'''
+                  style:
+                    font-size: 12px
+                    opacity: '0.7'
+      - component: div
+        config:
+          style:
+            display: grid
+            grid-template-columns: repeat(auto-fill, minmax(max(170px, calc(50% - 5px)), 1fr))
+            gap: 8px
+        slots:
+          default:
+          - component: div
+            config:
+              style:
+                position: relative
+                box-sizing: border-box
+                min-width: '0'
+                border-radius: 12px
+                padding: 10px 12px
+                background: color-mix(in srgb, var(--f7-text-color) 6%, transparent)
+                overflow: hidden
+            slots:
+              default:
+              - component: div
+                config:
+                  style:
+                    display: flex
+                    align-items: center
+                    gap: 8px
+                slots:
+                  default:
+                  - component: Label
+                    config:
+                      text: Space heat today
+                      style:
+                        font-size: 12px
+                        opacity: '0.65'
+                        white-space: nowrap
+                        overflow: hidden
+                        text-overflow: ellipsis
+                        flex: 1 1 auto
+              - component: Label
+                config:
+                  text: '=((Number(items[props.dailyHeatpumpSpaceHeatMean].numericState) || 0) > 0 ? ((Number(items[props.dailyHeatpumpSpaceHeatMean].numericState)
+                    || 0)).toFixed(3) + '' kW'' : ''–'')'
+                  style:
+                    font-size: 20px
+                    font-weight: '700'
+                    line-height: '1.3'
+                    white-space: nowrap
+              - component: Label
+                config:
+                  text: '=''Electricity '' + ((Number(items[props.dailyHeatpumpSpaceElectricMean].numericState) || 0) > 0
+                    ? ((Number(items[props.dailyHeatpumpSpaceElectricMean].numericState) || 0)).toFixed(3) + '' kW'' : ''–'')
+                    + '' · '' + ((Number(items[props.dailyHeatpumpSpaceHours].numericState) || 0) >= 0 ? ((Number(items[props.dailyHeatpumpSpaceHours].numericState)
+                    || 0)).toFixed(1) : ''–'') + '' h'''
+                  style:
+                    font-size: 11px
+                    opacity: '0.65'
+          - component: div
+            config:
+              style:
+                position: relative
+                box-sizing: border-box
+                min-width: '0'
+                border-radius: 12px
+                padding: 10px 12px
+                background: color-mix(in srgb, var(--f7-text-color) 6%, transparent)
+                overflow: hidden
+            slots:
+              default:
+              - component: div
+                config:
+                  style:
+                    display: flex
+                    align-items: center
+                    gap: 8px
+                slots:
+                  default:
+                  - component: Label
+                    config:
+                      text: Hot water today
+                      style:
+                        font-size: 12px
+                        opacity: '0.65'
+                        white-space: nowrap
+                        overflow: hidden
+                        text-overflow: ellipsis
+                        flex: 1 1 auto
+              - component: Label
+                config:
+                  text: '=((Number(items[props.dailyHeatpumpDhwHeatMean].numericState) || 0) > 0 ? ((Number(items[props.dailyHeatpumpDhwHeatMean].numericState)
+                    || 0)).toFixed(3) + '' kW'' : ''–'')'
+                  style:
+                    font-size: 20px
+                    font-weight: '700'
+                    line-height: '1.3'
+                    white-space: nowrap
+              - component: Label
+                config:
+                  text: '=''Charging time '' + ((Number(items[props.dailyHeatpumpDhwHours].numericState) || 0) >= 0 ? ((Number(items[props.dailyHeatpumpDhwHours].numericState)
+                    || 0)).toFixed(1) : ''–'') + '' h'''
+                  style:
+                    font-size: 11px
+                    opacity: '0.65'
+      - component: oh-chart
+        config:
+          chartType: month
+          periodVisible: true
+          height: 300px
+          options:
+            backgroundColor: transparent
+        slots:
+          grid:
+          - component: oh-chart-grid
+            config:
+              top: '62'
+              bottom: '60'
+              left: '45'
+              right: '20'
+          xAxis:
+          - component: oh-category-axis
+            config:
+              gridIndex: 0
+              categoryType: month
+              name: Day
+              nameGap: 12
+              axisTick:
+                show: false
+          yAxis:
+          - component: oh-value-axis
+            config:
+              gridIndex: 0
+              name: kW
+              nameGap: 14
+              nameTextStyle:
+                align: right
+                padding:
+                - 0
+                - 8
+                - 0
+                - 0
+              splitLine:
+                lineStyle:
+                  type: dashed
+                  opacity: 0.4
+          series:
+          - component: oh-aggregate-series
+            config:
+              name: Electricity heating
+              gridIndex: 0
+              xAxisIndex: 0
+              yAxisIndex: 0
+              type: bar
+              item: =props.dailyHeatpumpSpaceElectricMean
+              aggregationFunction: last
+              dimension1: date
+              itemStyle:
+                color: '#ffa726'
+                borderRadius:
+                - 4
+                - 4
+                - 0
+                - 0
+          - component: oh-aggregate-series
+            config:
+              name: Space heat
+              gridIndex: 0
+              xAxisIndex: 0
+              yAxisIndex: 0
+              type: bar
+              item: =props.dailyHeatpumpSpaceHeatMean
+              aggregationFunction: last
+              dimension1: date
+              itemStyle:
+                color: '#e53935'
+                borderRadius:
+                - 4
+                - 4
+                - 0
+                - 0
+          - component: oh-aggregate-series
+            config:
+              name: Hot water
+              gridIndex: 0
+              xAxisIndex: 0
+              yAxisIndex: 0
+              type: bar
+              item: =props.dailyHeatpumpDhwHeatMean
+              aggregationFunction: last
+              dimension1: date
+              itemStyle:
+                color: '#e57373'
+                borderRadius:
+                - 4
+                - 4
+                - 0
+                - 0
+          legend:
+          - component: oh-chart-legend
+            config:
+              show: true
+              bottom: '0'
+              type: scroll
+          tooltip:
+          - component: oh-chart-tooltip
+            config:
+              show: true
+              confine: true
+              trigger: axis
+              smartFormatter: false
+              formatter: '=(ps) => ((H) => ''<div style="display: flex; flex-direction: column; align-items: flex-start; height:
+                0">'' + [0].map((g) => ((r) => ''<div style="'' + (r ? ''border: 1px solid; border-radius: 4px; padding: 10px;
+                box-shadow: rgba(0, 0, 0, 0.2) 1px 2px 10px; '' + (themeOptions.dark === ''dark'' ? ''background-color: rgb(58,
+                62, 68); border-color: rgb(91, 94, 100)'' : ''background-color: rgb(255, 255, 255); border-color: rgb(183,
+                185, 190)'') : ''display: none'') + ''">'' + (r ? ''<div'' + '' data-head="'' + (ps[0].axisType === ''xAxis.time''
+                ? dayjs(H).format(''llll'') : ps[0].axisValueLabel) + ''"'' + '' style="font-size: 12px; line-height: 18px;
+                margin: 0 -10px 6px; padding: 0 10px 6px; border-bottom: 1px solid; border-bottom-color: inherit">'' + (ps[0].axisType
+                === ''xAxis.time'' ? dayjs(H).format(''llll'') : ps[0].axisValueLabel) + ''</div>'' + r : '''') + ''</div>'')(ps.filter((p)
+                => [0][p.axisIndex] === g && p.seriesId && p.seriesId !== ''oh-data-series#clock'' && (p.seriesId.indexOf(''oh-time-series'')
+                === 0 ? !p.seriesId.split(''#'')[4] : p.seriesId.indexOf(''oh-state-series'') !== 0)).map((p) => p.marker
+                + '' '' + p.seriesName + ''<span style="float: right; margin-left: 20px"><b style="text-align: right;">''
+                + ((v) => v.toLocaleString(''en-GB'') + '' '' + p.seriesId.split(''#'')[2])(Number(p.value[1])) + ''</b></span><br/>'').join(''''))).join('''')
+                + ''</div>'')(ps[0].axisValue)'
+              position: '=(pt, ps, dom, rect, size) => ((T, B) => ((c, left, h) => [((hd, per) => hd && per ? ((w) => ((k)
+                => k === undefined ? 0 : hd.replaceChildren(dayjs().date(1).year(Number(w[1])).month(k).date(Number(hd.getAttribute(''data-head''))).format(''ddd,
+                ll'')))([0,1,2,3,4,5,6,7,8,9,10,11].filter((k) => dayjs().date(1).month(k).format(''MMM'') === w[0])[0]))(per.textContent.trim().split(''
+                '')) : 0)(c.querySelector(''[data-head]''), (dom.closest(''.oh-chart-container'') || dom).querySelector(''.menu-item-content:not(:has(i))'')),
+                c.style.setProperty(''align-items'', left ? ''flex-end'' : ''flex-start''), dom.hasAttribute(''data-wb'')
+                || [dom.parentNode.addEventListener(''mouseleave'', () => [0].map((i) => dom.removeAttribute(''data-wb'' +
+                i))), dom.setAttribute(''data-wb'', '''')], [0].map((i) => ((b) => b.style.display === ''none'' ? 0 : ((w)
+                => [b.style.setProperty(''box-sizing'', ''border-box''), b.style.setProperty(''min-width'', w + ''px''), dom.setAttribute(''data-wb''
+                + i, w)])(Math.max(b.offsetWidth, Number(dom.getAttribute(''data-wb'' + i)))))(c.children[i])), ((f) => f(f,
+                0, 0))((f, i, y) => i < 1 ? ((b) => b.style.display === ''none'' ? f(f, i + 1, y) : ((top) => [b.style.setProperty(''margin-top'',
+                (top - y) + ''px''), f(f, i + 1, top + b.offsetHeight)][1])(Math.max(y ? y + 4 : 0, i === h ? Math.max(T[i],
+                Math.min(pt[1] + 20, B[i] - b.offsetHeight)) : T[i])))(c.children[i]) : 0), [left ? pt[0] - 20 - c.offsetWidth
+                : pt[0] + 20, 0]][5])(dom.firstChild, pt[0] > size.viewSize[0] / 2, T.filter((t) => t <= pt[1]).length - 1))([62],
+                [size.viewSize[1] - 60])'
+              backgroundColor: transparent
+              borderWidth: 0
+              padding: 0
+              transitionDuration: 0
+              extraCssText: 'box-shadow: none;'
+          title:
+          - component: oh-chart-title
+            config:
+              show: true
+              text: Ø Power per Day
+              left: 10
+              top: 15
+              textStyle:
+                fontSize: 13
+                fontWeight: 600
+      - component: oh-chart
+        config:
+          chartType: month
+          periodVisible: true
+          height: 270px
+          options:
+            backgroundColor: transparent
+        slots:
+          grid:
+          - component: oh-chart-grid
+            config:
+              top: '62'
+              bottom: '60'
+              left: '45'
+              right: '20'
+          xAxis:
+          - component: oh-category-axis
+            config:
+              gridIndex: 0
+              categoryType: month
+              name: Day
+              nameGap: 12
+              axisTick:
+                show: false
+          yAxis:
+          - component: oh-value-axis
+            config:
+              gridIndex: 0
+              name: h
+              nameGap: 14
+              nameTextStyle:
+                align: right
+                padding:
+                - 0
+                - 8
+                - 0
+                - 0
+              splitLine:
+                lineStyle:
+                  type: dashed
+                  opacity: 0.4
+          series:
+          - component: oh-aggregate-series
+            config:
+              name: Heating
+              gridIndex: 0
+              xAxisIndex: 0
+              yAxisIndex: 0
+              type: bar
+              item: =props.dailyHeatpumpSpaceHours
+              aggregationFunction: last
+              dimension1: date
+              itemStyle:
+                color: '#ffb74d'
+              stack: day
+          - component: oh-aggregate-series
+            config:
+              name: Hot water
+              gridIndex: 0
+              xAxisIndex: 0
+              yAxisIndex: 0
+              type: bar
+              item: =props.dailyHeatpumpDhwHours
+              aggregationFunction: last
+              dimension1: date
+              itemStyle:
+                color: '#e57373'
+                borderRadius:
+                - 4
+                - 4
+                - 0
+                - 0
+              stack: day
+          legend:
+          - component: oh-chart-legend
+            config:
+              show: true
+              bottom: '0'
+              type: scroll
+          tooltip:
+          - component: oh-chart-tooltip
+            config:
+              show: true
+              confine: true
+              trigger: axis
+              smartFormatter: false
+              formatter: '=(ps) => ((H) => ''<div style="display: flex; flex-direction: column; align-items: flex-start; height:
+                0">'' + [0].map((g) => ((r) => ''<div style="'' + (r ? ''border: 1px solid; border-radius: 4px; padding: 10px;
+                box-shadow: rgba(0, 0, 0, 0.2) 1px 2px 10px; '' + (themeOptions.dark === ''dark'' ? ''background-color: rgb(58,
+                62, 68); border-color: rgb(91, 94, 100)'' : ''background-color: rgb(255, 255, 255); border-color: rgb(183,
+                185, 190)'') : ''display: none'') + ''">'' + (r ? ''<div'' + '' data-head="'' + (ps[0].axisType === ''xAxis.time''
+                ? dayjs(H).format(''llll'') : ps[0].axisValueLabel) + ''"'' + '' style="font-size: 12px; line-height: 18px;
+                margin: 0 -10px 6px; padding: 0 10px 6px; border-bottom: 1px solid; border-bottom-color: inherit">'' + (ps[0].axisType
+                === ''xAxis.time'' ? dayjs(H).format(''llll'') : ps[0].axisValueLabel) + ''</div>'' + r : '''') + ''</div>'')(ps.filter((p)
+                => [0][p.axisIndex] === g && p.seriesId && p.seriesId !== ''oh-data-series#clock'' && (p.seriesId.indexOf(''oh-time-series'')
+                === 0 ? !p.seriesId.split(''#'')[4] : p.seriesId.indexOf(''oh-state-series'') !== 0)).map((p) => p.marker
+                + '' '' + p.seriesName + ''<span style="float: right; margin-left: 20px"><b style="text-align: right;">''
+                + ((v) => v.toLocaleString(''en-GB'') + '' '' + p.seriesId.split(''#'')[2])(Number(p.value[1])) + ''</b></span><br/>'').join(''''))).join('''')
+                + ''</div>'')(ps[0].axisValue)'
+              position: '=(pt, ps, dom, rect, size) => ((T, B) => ((c, left, h) => [((hd, per) => hd && per ? ((w) => ((k)
+                => k === undefined ? 0 : hd.replaceChildren(dayjs().date(1).year(Number(w[1])).month(k).date(Number(hd.getAttribute(''data-head''))).format(''ddd,
+                ll'')))([0,1,2,3,4,5,6,7,8,9,10,11].filter((k) => dayjs().date(1).month(k).format(''MMM'') === w[0])[0]))(per.textContent.trim().split(''
+                '')) : 0)(c.querySelector(''[data-head]''), (dom.closest(''.oh-chart-container'') || dom).querySelector(''.menu-item-content:not(:has(i))'')),
+                c.style.setProperty(''align-items'', left ? ''flex-end'' : ''flex-start''), dom.hasAttribute(''data-wb'')
+                || [dom.parentNode.addEventListener(''mouseleave'', () => [0].map((i) => dom.removeAttribute(''data-wb'' +
+                i))), dom.setAttribute(''data-wb'', '''')], [0].map((i) => ((b) => b.style.display === ''none'' ? 0 : ((w)
+                => [b.style.setProperty(''box-sizing'', ''border-box''), b.style.setProperty(''min-width'', w + ''px''), dom.setAttribute(''data-wb''
+                + i, w)])(Math.max(b.offsetWidth, Number(dom.getAttribute(''data-wb'' + i)))))(c.children[i])), ((f) => f(f,
+                0, 0))((f, i, y) => i < 1 ? ((b) => b.style.display === ''none'' ? f(f, i + 1, y) : ((top) => [b.style.setProperty(''margin-top'',
+                (top - y) + ''px''), f(f, i + 1, top + b.offsetHeight)][1])(Math.max(y ? y + 4 : 0, i === h ? Math.max(T[i],
+                Math.min(pt[1] + 20, B[i] - b.offsetHeight)) : T[i])))(c.children[i]) : 0), [left ? pt[0] - 20 - c.offsetWidth
+                : pt[0] + 20, 0]][5])(dom.firstChild, pt[0] > size.viewSize[0] / 2, T.filter((t) => t <= pt[1]).length - 1))([62],
+                [size.viewSize[1] - 60])'
+              backgroundColor: transparent
+              borderWidth: 0
+              padding: 0
+              transitionDuration: 0
+              extraCssText: 'box-shadow: none;'
+          title:
+          - component: oh-chart-title
+            config:
+              show: true
+              text: Hours per Day
+              left: 10
+              top: 15
+              textStyle:
+                fontSize: 13
+                fontWeight: 600
+      - component: div
+        config:
+          style:
+            display: flex
+            justify-content: flex-end
+            padding-top: 4px
+        slots:
+          default:
+          - component: oh-button
+            config:
+              text: All details
+              action: popup
+              actionModal: page:heatpump
+              outline: true
+              small: true
+              style:
+                color: '#fb8c00'
+                border-color: '#fb8c00'
+                width: auto
+                padding: 0 12px
